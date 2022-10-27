@@ -1,19 +1,18 @@
 import 'package:flutter/material.dart';
-import 'package:easy_localization/easy_localization.dart';
 
-class ChatPage extends StatefulWidget {
-  const ChatPage({Key? key}) : super(key: key);
+class BulletinPage extends StatefulWidget {
+  const BulletinPage({Key? key}) : super(key: key);
   @override
-  State<StatefulWidget> createState() => _ChatPageState();
+  State<StatefulWidget> createState() => _BulletinPageState();
 }
 
-class _ChatPageState extends State<ChatPage> {
+class _BulletinPageState extends State<BulletinPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          "appBar.chatting".tr(),
+          '게시판',
           style: Theme.of(context).textTheme.headline1,
         ),
       ),

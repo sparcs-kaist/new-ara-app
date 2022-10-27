@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:new_ara_app/pages/main_page.dart';
+import 'package:new_ara_app/pages/bulletin_page.dart';
 import 'package:new_ara_app/pages/chat_page.dart';
 import 'package:new_ara_app/pages/notification_page.dart';
 import 'package:new_ara_app/pages/user_page.dart';
@@ -15,7 +16,7 @@ class _NewAraHomeState extends State<NewAraHome> {
   int _selectedIndex = 0;
   final List<Widget> _widgetOptions = <Widget>[
     MainPage(),
-    Scaffold(), // 아직 기능을 몰라서 디자이너분께 물어보고 바꾸기
+    BulletinPage(),
     ChatPage(),
     NotificationPage(),
     UserPage(),
@@ -46,7 +47,7 @@ class _NewAraHomeState extends State<NewAraHome> {
       showUnselectedLabels: false,
       type: BottomNavigationBarType.fixed,
       onTap: _onItemTapped,
-      elevation: 0,
+      elevation: 10,
       items: const [
         BottomNavigationBarItem(
           icon: ImageIcon(
@@ -56,9 +57,9 @@ class _NewAraHomeState extends State<NewAraHome> {
         ),
         BottomNavigationBarItem(
           icon: ImageIcon(
-            AssetImage('assets/icons/icon_2ndPage.png'),
+            AssetImage('assets/icons/icon_bulletinPage.png'),
           ),
-          label: 'Unknown', // 디자이너분께 물어봐서 고치기
+          label: 'Bulletin',
         ),
         BottomNavigationBarItem(
           icon: ImageIcon(
@@ -76,7 +77,7 @@ class _NewAraHomeState extends State<NewAraHome> {
           icon: ImageIcon(
             AssetImage('assets/icons/icon_UserPage.png'),
           ),
-          label: 'User page',
+          label: 'MyPage',
         ),
       ],
     );

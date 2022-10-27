@@ -8,8 +8,8 @@ import 'package:new_ara_app/home.dart';
 import 'package:new_ara_app/constants/colors.dart';
 
 final supportedLocales = [
-  Locale('en', 'US'),
-  Locale('ko', 'KR'),
+  const Locale('en', 'US'),
+  const Locale('ko', 'KR'),
 ];
 
 void main() async {
@@ -20,8 +20,8 @@ void main() async {
     EasyLocalization(
       supportedLocales: supportedLocales,
       path: 'assets/translations',
-      fallbackLocale: Locale('ko', 'KR'),
-      startLocale: Locale('ko', 'KR'),
+      fallbackLocale: const Locale('ko', 'KR'),
+      startLocale: const Locale('ko', 'KR'),
       child: MyApp(),
     ),
   );
@@ -34,18 +34,22 @@ class MyApp extends StatelessWidget {
       localizationsDelegates: context.localizationDelegates,
       supportedLocales: context.supportedLocales,
       locale: context.locale,
-      theme: ThemeData(
-        textTheme: const TextTheme(
-          headline1: TextStyle(
-              color: TEXT_COLOR, fontSize: 23, fontWeight: FontWeight.bold),
-        ),
-        appBarTheme: AppBarTheme(
-          elevation: 0,
-          backgroundColor: Colors.white,
-        ),
-        scaffoldBackgroundColor: Colors.white,
-      ),
+      theme: _setThemeData(),
       home: NewAraHome(), // 나중에 로그인 관련 처리를 해야함(일단 로그인 되었다고 가정)
+    );
+  }
+
+  ThemeData _setThemeData() {
+    return ThemeData(
+      textTheme: const TextTheme(
+        headline1: TextStyle(
+            color: NEWARA_COLOR, fontSize: 23, fontWeight: FontWeight.bold),
+      ),
+      appBarTheme: const AppBarTheme(
+        elevation: 0,
+        backgroundColor: Colors.white,
+      ),
+      scaffoldBackgroundColor: Colors.white,
     );
   }
 }
