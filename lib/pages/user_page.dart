@@ -70,20 +70,6 @@ class _UserPageState extends State<UserPage> {
                           ],
                         ),
                       ),
-                      // 수정 버튼
-                      Container(
-                        width: 50,
-                        height: 50,
-                        child: TextButton(
-                          onPressed: () {}, // 수정 기능 개발되면 사용하기
-                          child: const Text('myPage.change',
-                                  style: TextStyle(
-                                      fontWeight: FontWeight.w600,
-                                      fontSize: 14,
-                                      color: NEWARA_COLOR))
-                              .tr(),
-                        ),
-                      ),
                     ],
                   ),
                 ),

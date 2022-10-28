@@ -61,7 +61,7 @@ class _MainPageState extends State<MainPage> {
                   width: MediaQuery.of(context).size.width - 40,
                   height: 200,
                   decoration: BoxDecoration(
-                    border: Border.all(color: Colors.grey),
+                    color: Color.fromRGBO(250, 250, 250, 1),
                     borderRadius: const BorderRadius.all(Radius.circular(20)),
                   ),
                 ),
@@ -69,9 +69,9 @@ class _MainPageState extends State<MainPage> {
                 _buildTextButton("main_page.notice", false),
                 Container(
                   width: MediaQuery.of(context).size.width - 40,
-                  height: 120,
+                  height: 223,
                   decoration: BoxDecoration(
-                    border: Border.all(color: Colors.grey),
+                    color: Color.fromRGBO(250, 250, 250, 1),
                     borderRadius: const BorderRadius.all(Radius.circular(20)),
                   ),
                 ),
