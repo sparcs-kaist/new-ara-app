@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:easy_localization/easy_localization.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:new_ara_app/constants/colors.dart';
 
 class MainPage extends StatefulWidget {
@@ -13,7 +14,10 @@ class _MainPageState extends State<MainPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Image.asset('assets/images/logo.png', fit: BoxFit.cover),
+        title: SvgPicture.asset(
+          'assets/images/logo.svg',
+          fit: BoxFit.cover,
+        ),
         actions: [
           IconButton(
             icon: const Icon(Icons.search_outlined,

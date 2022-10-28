@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 import 'package:new_ara_app/pages/main_page.dart';
 import 'package:new_ara_app/pages/bulletin_page.dart';
@@ -41,41 +42,46 @@ class _NewAraHomeState extends State<NewAraHome> {
   BottomNavigationBar _buildBottomNavigationBar() {
     return BottomNavigationBar(
       currentIndex: _selectedIndex,
-      selectedItemColor: Colors.black,
-      unselectedItemColor: Colors.grey,
+      //selectedItemColor: Colors.black,
+      //unselectedItemColor: Colors.grey,
       showSelectedLabels: false,
       showUnselectedLabels: false,
       type: BottomNavigationBarType.fixed,
       onTap: _onItemTapped,
       elevation: 10,
-      items: const [
+      items: [
         BottomNavigationBarItem(
-          icon: ImageIcon(
-            AssetImage('assets/icons/icon_MainPage.png'),
+          icon: SvgPicture.asset(
+            'assets/icons/icon_MainPage.svg',
+            color: _selectedIndex == 0 ? Colors.black : Colors.grey,
           ),
           label: 'Home',
         ),
         BottomNavigationBarItem(
-          icon: ImageIcon(
-            AssetImage('assets/icons/icon_bulletinPage.png'),
+          icon: SvgPicture.asset(
+            'assets/icons/icon_bulletinPage.svg',
+            color: _selectedIndex == 1 ? Colors.black : Colors.grey,
           ),
           label: 'Bulletin',
         ),
         BottomNavigationBarItem(
-          icon: ImageIcon(
-            AssetImage('assets/icons/icon_ChatPage.png'),
+          icon: SvgPicture.asset(
+            'assets/icons/icon_ChatPage.svg',
+            color: _selectedIndex == 2 ? Colors.black : Colors.grey,
           ),
           label: 'Chatting',
         ),
         BottomNavigationBarItem(
-          icon: ImageIcon(
-            AssetImage('assets/icons/icon_NotiPage.png'),
+          icon: SvgPicture.asset(
+            'assets/icons/icon_NotiPage.svg',
+            color: _selectedIndex == 3 ? Colors.black : Colors.grey,
           ),
           label: 'Notification',
         ),
         BottomNavigationBarItem(
-          icon: ImageIcon(
-            AssetImage('assets/icons/icon_UserPage.png'),
+          icon: SvgPicture.asset(
+            'assets/icons/icon_UserPage.svg',
+            color: _selectedIndex == 4 ? Colors.black : Colors.grey,
           ),
           label: 'MyPage',
         ),

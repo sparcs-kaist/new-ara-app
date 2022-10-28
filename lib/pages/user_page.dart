@@ -40,9 +40,7 @@ class _UserPageState extends State<UserPage> {
                         ),
                       ),
                       // 컨테이너간 여백은 Sizedbox 이용하기
-                      const SizedBox(
-                        width: 10,
-                      ),
+                      _buildSizedBox(10),
                       // 이름 및 이메일
                       Container(
                         width: 250,
@@ -94,6 +92,12 @@ class _UserPageState extends State<UserPage> {
           ),
         ),
       ),
+    );
+  }
+
+  SizedBox _buildSizedBox(double width) {
+    return SizedBox(
+      width: width,
     );
   }
 }
