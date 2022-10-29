@@ -1,8 +1,5 @@
-import 'dart:io'; // 사용자 OS가 ios, android인지 확인가능(추후에 사용)
-
 import 'package:flutter/material.dart';
-import 'package:easy_localization/easy_localization.dart'; // easy_localization이 안되면 flutter run 다시 시작하기
-//import 'package:flutter/cupertino.dart';
+import 'package:easy_localization/easy_localization.dart';
 
 import 'package:new_ara_app/home.dart';
 import 'package:new_ara_app/constants/colors.dart';
@@ -27,6 +24,14 @@ void main() async {
   );
 }
 
+class CustomScrollBehavior extends ScrollBehavior {
+  @override
+  Widget buildOverscrollIndicator(
+      BuildContext context, Widget child, ScrollableDetails details) {
+    return child;
+  }
+}
+
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -35,7 +40,13 @@ class MyApp extends StatelessWidget {
       supportedLocales: context.supportedLocales,
       locale: context.locale,
       theme: _setThemeData(),
-      home: NewAraHome(), // 나중에 로그인 관련 처리를 해야함(일단 로그인 되었다고 가정)
+      builder: (context, child) {
+        return ScrollConfiguration(
+          behavior: CustomScrollBehavior(),
+          child: child!,
+        );
+      },
+      home: NewAraHome(), // 추후에 로그인 여부 관련 처리 필요
     );
   }
 

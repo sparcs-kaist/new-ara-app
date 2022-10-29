@@ -42,8 +42,6 @@ class _NewAraHomeState extends State<NewAraHome> {
   BottomNavigationBar _buildBottomNavigationBar() {
     return BottomNavigationBar(
       currentIndex: _selectedIndex,
-      //selectedItemColor: Colors.black,
-      //unselectedItemColor: Colors.grey,
       showSelectedLabels: false,
       showUnselectedLabels: false,
       type: BottomNavigationBarType.fixed,

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:easy_localization/easy_localization.dart';
 
 class BulletinPage extends StatefulWidget {
   const BulletinPage({Key? key}) : super(key: key);
@@ -12,7 +13,7 @@ class _BulletinPageState extends State<BulletinPage> {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          '게시판',
+          'appBar.bulletin'.tr(),
           style: Theme.of(context).textTheme.headline1,
         ),
       ),

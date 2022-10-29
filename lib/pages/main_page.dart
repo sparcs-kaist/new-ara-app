@@ -22,7 +22,7 @@ class _MainPageState extends State<MainPage> {
           IconButton(
             icon: const Icon(Icons.search_outlined,
                 color: NEWARA_COLOR, size: 28),
-            onPressed: () {}, // 추후에 검색 기능 구현하면 추가하기
+            onPressed: () {}, // 추후에 검색 기능 추가 필요
           ),
         ],
       ),
@@ -75,6 +75,7 @@ class _MainPageState extends State<MainPage> {
                     borderRadius: const BorderRadius.all(Radius.circular(20)),
                   ),
                 ),
+                _buildSizedBox(5),
               ],
             ),
           ),

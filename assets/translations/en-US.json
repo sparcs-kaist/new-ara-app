@@ -2,7 +2,8 @@
     "appBar": {
         "chatting": "Chatting",
         "notification": "Notifications",
-        "mypage": "My Info"
+        "mypage": "My Info",
+        "bulletin": "Bulletins"
     },
     "main_page": {
         "realtime": "Hot posts",
