@@ -7,7 +7,8 @@
     },
     "main_page": {
         "realtime": "Hot posts",
-        "notice": "Notices"
+        "notice": "Notices",
+        "stu_community": "Student Community"
     },
     "myPage": {
         "change": "change"

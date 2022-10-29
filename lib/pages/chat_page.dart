@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:easy_localization/easy_localization.dart';
 
+import 'package:new_ara_app/constants/colors.dart';
+
 class ChatPage extends StatefulWidget {
   const ChatPage({Key? key}) : super(key: key);
   @override
@@ -16,6 +18,13 @@ class _ChatPageState extends State<ChatPage> {
           "appBar.chatting".tr(),
           style: Theme.of(context).textTheme.headline1,
         ),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.search_outlined,
+                color: NEWARA_COLOR, size: 28),
+            onPressed: () {}, // 추후에 검색 기능 추가 필요
+          ),
+        ],
       ),
       body: SafeArea(
         child: SingleChildScrollView(

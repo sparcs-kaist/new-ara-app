@@ -75,7 +75,17 @@ class _MainPageState extends State<MainPage> {
                     borderRadius: const BorderRadius.all(Radius.circular(20)),
                   ),
                 ),
-                _buildSizedBox(5),
+                _buildSizedBox(3),
+                _buildTextButton('main_page.stu_community', true),
+                Container(
+                  width: MediaQuery.of(context).size.width - 40,
+                  height: 111,
+                  decoration: BoxDecoration(
+                    color: Color.fromRGBO(250, 250, 250, 1),
+                    borderRadius: BorderRadius.all(Radius.circular(20)),
+                  ),
+                ),
+                _buildSizedBox(3),
               ],
             ),
           ),

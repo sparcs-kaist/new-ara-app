@@ -7,7 +7,8 @@
     },
     "main_page": {
         "realtime": "실시간 인기글",
-        "notice": "공지"
+        "notice": "공지",
+        "stu_community": "학생 단체"
     },
     "myPage": {
         "change": "수정"
