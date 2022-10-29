@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:easy_localization/easy_localization.dart';
 
 import 'package:new_ara_app/home.dart';
-import 'package:new_ara_app/constants/colors.dart';
+import 'package:new_ara_app/constants/constants.dart';
 
 final supportedLocales = [
   const Locale('en'),
@@ -54,7 +54,9 @@ class MyApp extends StatelessWidget {
     return ThemeData(
       textTheme: const TextTheme(
         headline1: TextStyle(
-            color: NEWARA_COLOR, fontSize: 23, fontWeight: FontWeight.bold),
+            color: ColorsInfo.newara,
+            fontSize: 23,
+            fontWeight: FontWeight.bold),
       ),
       appBarTheme: const AppBarTheme(
         elevation: 0,

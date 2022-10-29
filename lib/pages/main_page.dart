@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:new_ara_app/constants/colors.dart';
+import 'package:new_ara_app/constants/constants.dart';
 
 class MainPage extends StatefulWidget {
   const MainPage({Key? key}) : super(key: key);
@@ -21,7 +21,7 @@ class _MainPageState extends State<MainPage> {
         actions: [
           IconButton(
             icon: const Icon(Icons.search_outlined,
-                color: NEWARA_COLOR, size: 28),
+                color: ColorsInfo.newara, size: 28),
             onPressed: () {}, // 추후에 검색 기능 추가 필요
           ),
         ],
@@ -40,7 +40,7 @@ class _MainPageState extends State<MainPage> {
                   height: 204,
                   decoration: const BoxDecoration(
                     borderRadius: BorderRadius.all(Radius.circular(20)),
-                    color: NEWARA_COLOR_SOFT,
+                    color: ColorsInfo.newaraSoft,
                   ),
                   child: const Center(
                     child: Text(
