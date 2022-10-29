@@ -5,8 +5,8 @@ import 'package:new_ara_app/home.dart';
 import 'package:new_ara_app/constants/colors.dart';
 
 final supportedLocales = [
-  const Locale('en', 'US'),
-  const Locale('ko', 'KR'),
+  const Locale('en'),
+  const Locale('ko'),
 ];
 
 void main() async {
@@ -17,8 +17,8 @@ void main() async {
     EasyLocalization(
       supportedLocales: supportedLocales,
       path: 'assets/translations',
-      fallbackLocale: const Locale('ko', 'KR'),
-      startLocale: const Locale('ko', 'KR'),
+      fallbackLocale: const Locale('ko'),
+      startLocale: const Locale('ko'),
       child: MyApp(),
     ),
   );
