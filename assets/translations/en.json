@@ -1,0 +1,16 @@
+{
+    "appBar": {
+        "chatting": "Chatting",
+        "notification": "Notifications",
+        "mypage": "My Info",
+        "bulletin": "Bulletins"
+    },
+    "main_page": {
+        "realtime": "Hot posts",
+        "notice": "Notices",
+        "stu_community": "Student Community"
+    },
+    "myPage": {
+        "change": "change"
+    }
+}

@@ -1,0 +1,16 @@
+{
+    "appBar": {
+        "chatting": "채팅",
+        "notification": "알림",
+        "mypage": "나의 정보",
+        "bulletin": "게시판"
+    },
+    "main_page": {
+        "realtime": "실시간 인기글",
+        "notice": "공지",
+        "stu_community": "학생 단체"
+    },
+    "myPage": {
+        "change": "수정"
+    }
+}
