@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:easy_localization/easy_localization.dart';
+import 'package:provider/provider.dart';
+
+import 'package:new_ara_app/models/auth_model.dart';
+import 'package:new_ara_app/constants/constants.dart';
 
 class UserPage extends StatefulWidget {
   const UserPage({Key? key}) : super(key: key);
@@ -14,6 +18,15 @@ class _UserPageState extends State<UserPage> {
       appBar: AppBar(
         title: Text('appBar.mypage'.tr(),
             style: Theme.of(context).textTheme.headline1),
+        actions: [
+          IconButton(
+            icon: Icon(Icons.logout_outlined),
+            color: ColorsInfo.newara,
+            onPressed: () {
+              context.read<AuthModel>().logout();
+            },
+          ),
+        ],
       ),
       body: SafeArea(
         child: SingleChildScrollView(

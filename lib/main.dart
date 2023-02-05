@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:easy_localization/easy_localization.dart';
+import 'package:provider/provider.dart';
 
 import 'package:new_ara_app/home.dart';
+import 'package:new_ara_app/pages/login_page.dart';
 import 'package:new_ara_app/constants/constants.dart';
+import 'package:new_ara_app/models/auth_model.dart';
 
 final supportedLocales = [
   const Locale('en'),
@@ -12,14 +15,18 @@ final supportedLocales = [
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await EasyLocalization.ensureInitialized();
-
   runApp(
     EasyLocalization(
       supportedLocales: supportedLocales,
       path: 'assets/translations',
       fallbackLocale: const Locale('ko'),
       startLocale: const Locale('ko'),
-      child: MyApp(),
+      child: MultiProvider(
+        providers: [
+          ChangeNotifierProvider(create: (_) => AuthModel()),
+        ],
+        child: MyApp(),
+      ),
     ),
   );
 }
@@ -46,7 +53,7 @@ class MyApp extends StatelessWidget {
           child: child!,
         );
       },
-      home: NewAraHome(), // 추후에 로그인 여부 관련 처리 필요
+      home: context.watch<AuthModel>().isLogined ? NewAraHome() : LoginPage(),
     );
   }
 

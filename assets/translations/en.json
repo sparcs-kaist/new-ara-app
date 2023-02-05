@@ -12,5 +12,8 @@
     },
     "myPage": {
         "change": "change"
+    },
+    "login_page": {
+        "login": "Sign in with SPARCS SSO"
     }
 }

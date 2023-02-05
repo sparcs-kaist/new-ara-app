@@ -12,5 +12,8 @@
     },
     "myPage": {
         "change": "수정"
+    },
+    "login_page" : {
+        "login": "SPARCS SSO로 로그인"
     }
 }

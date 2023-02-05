@@ -50,8 +50,8 @@ class _NewAraHomeState extends State<NewAraHome> {
       items: [
         BottomNavigationBarItem(
           icon: SvgPicture.asset(
-            'assets/icons/icon_MainPage.svg',
-            color: _selectedIndex == 0 ? Colors.black : Colors.grey,
+            'assets/icons/house-door-fill.svg',
+            color: _selectedIndex == 0 ? Colors.red : Colors.grey,
           ),
           label: 'Home',
         ),
