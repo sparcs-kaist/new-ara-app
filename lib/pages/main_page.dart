@@ -19,11 +19,26 @@ class _MainPageState extends State<MainPage> {
           fit: BoxFit.cover,
         ),
         actions: [
-          IconButton(
-            icon: const Icon(Icons.search_outlined,
-                color: ColorsInfo.newara, size: 28),
-            onPressed: () {}, // 추후에 검색 기능 추가 필요
+          Container(
+            width: 40,
+            height: 40,
+            decoration: BoxDecoration(
+              color: const Color.fromRGBO(240, 240, 240, 1),
+              shape: BoxShape.circle,
+            ),
+            child: IconButton(
+              highlightColor: Colors.white,
+              splashColor: Colors.white,
+              icon: SvgPicture.asset(
+                'assets/icons/search.svg',
+                color: ColorsInfo.newara,
+                width: 20,
+                height: 20,
+              ),
+              onPressed: () {},
+            ),
           ),
+          SizedBox(width: 20),
         ],
       ),
       body: SafeArea(

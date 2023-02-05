@@ -2,7 +2,6 @@
     "appBar": {
         "chatting": "Chatting",
         "notification": "Notifications",
-        "mypage": "My Info",
         "bulletin": "Bulletins"
     },
     "main_page": {
@@ -15,5 +14,8 @@
     },
     "login_page": {
         "login": "Sign in with SPARCS SSO"
+    },
+    "setting_page": {
+        "title": "setting"
     }
 }

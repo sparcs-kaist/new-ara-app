@@ -51,35 +51,45 @@ class _NewAraHomeState extends State<NewAraHome> {
         BottomNavigationBarItem(
           icon: SvgPicture.asset(
             'assets/icons/house-door-fill.svg',
-            color: _selectedIndex == 0 ? Colors.red : Colors.grey,
+            color: _selectedIndex == 0 ? Colors.black : Colors.grey,
+            width: 20.31,
+            height: 21.88,
           ),
           label: 'Home',
         ),
         BottomNavigationBarItem(
           icon: SvgPicture.asset(
-            'assets/icons/icon_bulletinPage.svg',
+            'assets/icons/list-ul.svg',
             color: _selectedIndex == 1 ? Colors.black : Colors.grey,
+            width: 25,
+            height: 17.86,
           ),
           label: 'Bulletin',
         ),
         BottomNavigationBarItem(
           icon: SvgPicture.asset(
-            'assets/icons/icon_ChatPage.svg',
+            'assets/icons/chat.svg',
             color: _selectedIndex == 2 ? Colors.black : Colors.grey,
+            width: 25,
+            height: 23.33,
           ),
           label: 'Chatting',
         ),
         BottomNavigationBarItem(
           icon: SvgPicture.asset(
-            'assets/icons/icon_NotiPage.svg',
+            'assets/icons/bell.svg',
             color: _selectedIndex == 3 ? Colors.black : Colors.grey,
+            width: 21.88,
+            height: 25,
           ),
           label: 'Notification',
         ),
         BottomNavigationBarItem(
           icon: SvgPicture.asset(
-            'assets/icons/icon_UserPage.svg',
+            'assets/icons/person-circle.svg',
             color: _selectedIndex == 4 ? Colors.black : Colors.grey,
+            width: 25,
+            height: 25,
           ),
           label: 'MyPage',
         ),

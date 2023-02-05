@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:easy_localization/easy_localization.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 import 'package:new_ara_app/constants/constants.dart';
 
@@ -19,11 +20,26 @@ class _ChatPageState extends State<ChatPage> {
           style: Theme.of(context).textTheme.headline1,
         ),
         actions: [
-          IconButton(
-            icon: const Icon(Icons.search_outlined,
-                color: ColorsInfo.newara, size: 28),
-            onPressed: () {}, // 추후에 검색 기능 추가 필요
+          Container(
+            width: 40,
+            height: 40,
+            decoration: BoxDecoration(
+              color: const Color.fromRGBO(240, 240, 240, 1),
+              shape: BoxShape.circle,
+            ),
+            child: IconButton(
+              highlightColor: Colors.white,
+              splashColor: Colors.white,
+              icon: SvgPicture.asset(
+                'assets/icons/search.svg',
+                color: ColorsInfo.newara,
+                width: 20,
+                height: 20,
+              ),
+              onPressed: () {},
+            ),
           ),
+          SizedBox(width: 20),
         ],
       ),
       body: SafeArea(

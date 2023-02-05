@@ -2,7 +2,6 @@
     "appBar": {
         "chatting": "채팅",
         "notification": "알림",
-        "mypage": "나의 정보",
         "bulletin": "게시판"
     },
     "main_page": {
@@ -15,5 +14,8 @@
     },
     "login_page" : {
         "login": "SPARCS SSO로 로그인"
+    },
+    "setting_page": {
+        "title": "설정"
     }
 }
