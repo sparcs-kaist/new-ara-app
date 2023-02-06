@@ -45,8 +45,8 @@ class _UserPageState extends State<UserPage>
           Container(
             width: 40,
             height: 40,
-            decoration: BoxDecoration(
-              color: const Color.fromRGBO(240, 240, 240, 1),
+            decoration: const BoxDecoration(
+              color: Color.fromRGBO(240, 240, 240, 1),
               shape: BoxShape.circle,
             ),
             child: IconButton(
@@ -64,7 +64,7 @@ class _UserPageState extends State<UserPage>
               },
             ),
           ),
-          _buildSizedBox(20),
+          _buildSizedBox(20, 0),
         ],
       ),
       body: SafeArea(
@@ -90,7 +90,7 @@ class _UserPageState extends State<UserPage>
                         ),
                       ),
                       // 컨테이너간 여백은 Sizedbox 이용하기
-                      _buildSizedBox(10),
+                      _buildSizedBox(10, 0),
                       // 이름 및 이메일
                       Container(
                         width: 250,
@@ -120,7 +120,7 @@ class _UserPageState extends State<UserPage>
                           ],
                         ),
                       ),
-                      _buildSizedBox(30),
+                      _buildSizedBox(30, 0),
                       Container(
                         width: 26,
                         height: 21,
@@ -139,12 +139,12 @@ class _UserPageState extends State<UserPage>
                     ],
                   ),
                 ),
-                SizedBox(height: 10),
+                _buildSizedBox(0, 10),
                 TabBar(
                   unselectedLabelColor: Colors.grey,
                   labelColor: ColorsInfo.newara,
                   indicatorColor: ColorsInfo.newara,
-                  tabs: [
+                  tabs: const [
                     Tab(
                       child: Text(
                         '작성한 글',
@@ -209,9 +209,10 @@ class _UserPageState extends State<UserPage>
     );
   }
 
-  SizedBox _buildSizedBox(double width) {
+  SizedBox _buildSizedBox(double width, double height) {
     return SizedBox(
       width: width,
+      height: height,
     );
   }
 }

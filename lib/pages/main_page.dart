@@ -22,8 +22,8 @@ class _MainPageState extends State<MainPage> {
           Container(
             width: 40,
             height: 40,
-            decoration: BoxDecoration(
-              color: const Color.fromRGBO(240, 240, 240, 1),
+            decoration: const BoxDecoration(
+              color: Color.fromRGBO(240, 240, 240, 1),
               shape: BoxShape.circle,
             ),
             child: IconButton(
