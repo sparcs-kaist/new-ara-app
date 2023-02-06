@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
@@ -13,6 +14,15 @@ class SettingPage extends StatefulWidget {
 }
 
 class SettingPageState extends State<SettingPage> {
+  List<bool> switch_lights = [
+    true,
+    true,
+    true,
+    true,
+    true,
+    true
+  ]; // 나중에 이 정보도 provider로 공유해야 할 수도 있음
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -67,8 +77,63 @@ class SettingPageState extends State<SettingPage> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
-                      Row(),
-                      Row(),
+                      const SizedBox(height: 10),
+                      Row(
+                        children: [
+                          const SizedBox(width: 15),
+                          Container(
+                              child: const Text(
+                            '성인글 보기',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          )),
+                          const SizedBox(width: 199),
+                          Container(
+                            width: 43,
+                            height: 27,
+                            child: FittedBox(
+                              fit: BoxFit.fill,
+                              child: CupertinoSwitch(
+                                  activeColor: ColorsInfo.newara,
+                                  value: switch_lights[0],
+                                  onChanged: (value) {
+                                    setState(() => switch_lights[0] = value);
+                                  }),
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 16),
+                      Row(
+                        children: [
+                          const SizedBox(width: 15),
+                          Container(
+                              child: const Text(
+                            '정치글 보기',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          )),
+                          const SizedBox(width: 199),
+                          Container(
+                            width: 43,
+                            height: 27,
+                            child: FittedBox(
+                              fit: BoxFit.fill,
+                              child: CupertinoSwitch(
+                                  activeColor: ColorsInfo.newara,
+                                  value: switch_lights[1],
+                                  onChanged: (value) {
+                                    setState(() => switch_lights[1] = value);
+                                  }),
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 10),
                     ],
                   ),
                 ),
@@ -91,6 +156,21 @@ class SettingPageState extends State<SettingPage> {
                     borderRadius: const BorderRadius.all(Radius.circular(10)),
                     border: Border.all(
                       color: const Color.fromRGBO(240, 240, 240, 1),
+                    ),
+                  ),
+                  child: Container(
+                    margin: EdgeInsets.only(
+                        top: 14, bottom: 12, left: 15, right: 219),
+                    child: GestureDetector(
+                      onTap: () {}, // 추후에 기능 구현 예정
+                      child: const Text(
+                        '차단한 유저 목록',
+                        style: TextStyle(
+                          color: ColorsInfo.newara,
+                          fontSize: 16,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
                     ),
                   ),
                 ),
@@ -126,6 +206,68 @@ class SettingPageState extends State<SettingPage> {
                       color: const Color.fromRGBO(240, 240, 240, 1),
                     ),
                   ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      const SizedBox(height: 10),
+                      Row(
+                        children: [
+                          const SizedBox(width: 15),
+                          Container(
+                              child: const Text(
+                            '내 글에 달린 댓글 및 대댓글',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          )),
+                          const SizedBox(width: 97),
+                          Container(
+                            width: 43,
+                            height: 27,
+                            child: FittedBox(
+                              fit: BoxFit.fill,
+                              child: CupertinoSwitch(
+                                  activeColor: ColorsInfo.newara,
+                                  value: switch_lights[2],
+                                  onChanged: (value) {
+                                    setState(() => switch_lights[2] = value);
+                                  }),
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 16),
+                      Row(
+                        children: [
+                          const SizedBox(width: 15),
+                          Container(
+                              child: const Text(
+                            '댓글에 달린 대댓글',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          )),
+                          const SizedBox(width: 152),
+                          Container(
+                            width: 43,
+                            height: 27,
+                            child: FittedBox(
+                              fit: BoxFit.fill,
+                              child: CupertinoSwitch(
+                                  activeColor: ColorsInfo.newara,
+                                  value: switch_lights[3],
+                                  onChanged: (value) {
+                                    setState(() => switch_lights[3] = value);
+                                  }),
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 10),
+                    ],
+                  ),
                 ),
                 const SizedBox(height: 10),
                 Container(
@@ -136,6 +278,68 @@ class SettingPageState extends State<SettingPage> {
                     border: Border.all(
                       color: const Color.fromRGBO(240, 240, 240, 1),
                     ),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      const SizedBox(height: 10),
+                      Row(
+                        children: [
+                          const SizedBox(width: 15),
+                          Container(
+                              child: const Text(
+                            '인기 공지글',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          )),
+                          const SizedBox(width: 199),
+                          Container(
+                            width: 43,
+                            height: 27,
+                            child: FittedBox(
+                              fit: BoxFit.fill,
+                              child: CupertinoSwitch(
+                                  activeColor: ColorsInfo.newara,
+                                  value: switch_lights[4],
+                                  onChanged: (value) {
+                                    setState(() => switch_lights[4] = value);
+                                  }),
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 16),
+                      Row(
+                        children: [
+                          const SizedBox(width: 15),
+                          Container(
+                              child: const Text(
+                            '인기글',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          )),
+                          const SizedBox(width: 232),
+                          Container(
+                            width: 43,
+                            height: 27,
+                            child: FittedBox(
+                              fit: BoxFit.fill,
+                              child: CupertinoSwitch(
+                                  activeColor: ColorsInfo.newara,
+                                  value: switch_lights[5],
+                                  onChanged: (value) {
+                                    setState(() => switch_lights[5] = value);
+                                  }),
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 10),
+                    ],
                   ),
                 ),
                 const SizedBox(height: 5),
