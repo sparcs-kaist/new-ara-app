@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:provider/provider.dart';
 
 import 'package:new_ara_app/constants/constants.dart';
 import 'package:new_ara_app/pages/setting_page.dart';
+import 'package:new_ara_app/providers/user_model.dart';
 
 class UserPage extends StatefulWidget {
   const UserPage({Key? key}) : super(key: key);
@@ -34,8 +36,8 @@ class _UserPageState extends State<UserPage>
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          'ninesens',
-          style: TextStyle(
+          context.watch<UserModel>().naUser!.nickname,
+          style: const TextStyle(
             fontSize: 28,
             fontWeight: FontWeight.w700,
             color: ColorsInfo.newara,
@@ -81,13 +83,15 @@ class _UserPageState extends State<UserPage>
                     children: [
                       // 프로필 이미지
                       Container(
-                        width: 50,
-                        height: 50,
+                        width: 55,
+                        height: 55,
                         decoration: BoxDecoration(
                           border: Border.all(color: Colors.grey),
                           borderRadius:
                               const BorderRadius.all(Radius.circular(50)),
                         ),
+                        child: Image.network(
+                            context.watch<UserModel>().naUser!.picture),
                       ),
                       // 컨테이너간 여백은 Sizedbox 이용하기
                       _buildSizedBox(10, 0),
@@ -100,7 +104,7 @@ class _UserPageState extends State<UserPage>
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             Text(
-                              '즐거운 넙죽이 123abc', // Sample text
+                              "${context.watch<UserModel>().naUser!.sso_user_info['first_name']} ${context.watch<UserModel>().naUser!.sso_user_info['last_name']}",
                               style: const TextStyle(
                                 fontSize: 18,
                                 fontWeight: FontWeight.w700,
@@ -110,7 +114,7 @@ class _UserPageState extends State<UserPage>
                               height: 3,
                             ),
                             Text(
-                              'ninesens@kaist.ac.kr', // Sample text
+                              context.watch<UserModel>().naUser!.email,
                               style: const TextStyle(
                                 fontSize: 14,
                                 fontWeight: FontWeight.w500,
@@ -181,7 +185,7 @@ class _UserPageState extends State<UserPage>
                   width: MediaQuery.of(context).size.width - 40,
                   height: 24,
                   child: Text(
-                    '총 N개의 글',
+                    '총 ${context.watch<UserModel>().naUser!.num_articles}개의 글',
                     style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w700,

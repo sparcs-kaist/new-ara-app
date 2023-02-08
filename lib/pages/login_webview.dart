@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 
 import 'package:new_ara_app/constants/constants.dart';
-import 'package:new_ara_app/models/auth_model.dart';
+import 'package:new_ara_app/providers/auth_model.dart';
 
 import 'package:provider/provider.dart';
 

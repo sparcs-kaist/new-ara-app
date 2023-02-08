@@ -5,7 +5,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
 
 import 'package:new_ara_app/constants/constants.dart';
-import 'package:new_ara_app/models/auth_model.dart';
+import 'package:new_ara_app/providers/auth_model.dart';
 
 List<bool> switchLights = [
   true,

@@ -5,7 +5,8 @@ import 'package:provider/provider.dart';
 import 'package:new_ara_app/home.dart';
 import 'package:new_ara_app/pages/login_page.dart';
 import 'package:new_ara_app/constants/constants.dart';
-import 'package:new_ara_app/models/auth_model.dart';
+import 'package:new_ara_app/providers/auth_model.dart';
+import 'package:new_ara_app/providers/user_model.dart';
 
 final supportedLocales = [
   const Locale('en'),
@@ -23,7 +24,18 @@ void main() async {
       startLocale: const Locale('ko'),
       child: MultiProvider(
         providers: [
-          ChangeNotifierProvider(create: (_) => AuthModel()),
+          ChangeNotifierProvider(create: (context) => AuthModel()),
+          ChangeNotifierProxyProvider<AuthModel, UserModel>(
+            create: (context) => UserModel(),
+            update: (context, authModel, userModel) {
+              if (authModel.isLogined) {
+                print(
+                    '-----------------------------------------------login complete');
+                userModel?.getUser();
+              }
+              return (userModel is UserModel) ? userModel : UserModel();
+            },
+          ),
         ],
         child: MyApp(),
       ),
