@@ -85,16 +85,16 @@ class _UserPageState extends State<UserPage>
                         width: 50,
                         height: 50,
                         decoration: BoxDecoration(
+                          shape: BoxShape.circle,
                           border: Border.all(color: Colors.grey),
-                          borderRadius:
-                              const BorderRadius.all(Radius.circular(100)),
                         ),
                         child: ClipRRect(
                           borderRadius:
                               const BorderRadius.all(Radius.circular(100)),
                           child: SizedBox.fromSize(
-                            size: const Size.fromRadius(100),
+                            size: const Size.fromRadius(48),
                             child: Image.network(
+                                fit: BoxFit.cover,
                                 context.watch<UserModel>().naUser!.picture),
                           ),
                         ),
