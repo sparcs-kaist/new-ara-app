@@ -28,11 +28,7 @@ void main() async {
           ChangeNotifierProxyProvider<AuthModel, UserModel>(
             create: (context) => UserModel(),
             update: (context, authModel, userModel) {
-              if (authModel.isLogined) {
-                print(
-                    '-----------------------------------------------login complete');
-                userModel?.getUser();
-              }
+              if (authModel.isLogined) userModel?.getUser();
               return (userModel is UserModel) ? userModel : UserModel();
             },
           ),

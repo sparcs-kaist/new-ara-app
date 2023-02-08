@@ -81,17 +81,23 @@ class _UserPageState extends State<UserPage>
                   height: 60,
                   child: Row(
                     children: [
-                      // 프로필 이미지
                       Container(
-                        width: 55,
-                        height: 55,
+                        width: 50,
+                        height: 50,
                         decoration: BoxDecoration(
                           border: Border.all(color: Colors.grey),
                           borderRadius:
-                              const BorderRadius.all(Radius.circular(50)),
+                              const BorderRadius.all(Radius.circular(100)),
                         ),
-                        child: Image.network(
-                            context.watch<UserModel>().naUser!.picture),
+                        child: ClipRRect(
+                          borderRadius:
+                              const BorderRadius.all(Radius.circular(100)),
+                          child: SizedBox.fromSize(
+                            size: const Size.fromRadius(100),
+                            child: Image.network(
+                                context.watch<UserModel>().naUser!.picture),
+                          ),
+                        ),
                       ),
                       // 컨테이너간 여백은 Sizedbox 이용하기
                       _buildSizedBox(10, 0),

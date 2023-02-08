@@ -15,6 +15,12 @@ class NAUser {
   final String nickname_updated_at;
   final bool see_sexual;
   final bool see_social;
+  final Map<String, dynamic> extra_preferences;
+  final int group;
+  final bool is_newara;
+  final String ara_id;
+  final String agree_terms_of_service_at;
+  final inactive_due_at = null;
 
   NAUser({
     required this.user,
@@ -33,6 +39,11 @@ class NAUser {
     required this.nickname_updated_at,
     required this.see_sexual,
     required this.see_social,
+    required this.extra_preferences,
+    required this.group,
+    required this.is_newara,
+    required this.ara_id,
+    required this.agree_terms_of_service_at,
   });
 
   NAUser.fromJson(Map<String, dynamic> json)
@@ -51,7 +62,12 @@ class NAUser {
         picture = json['picture'],
         nickname_updated_at = json['nickname_updated_at'],
         see_sexual = json['see_sexual'],
-        see_social = json['see_social'];
+        see_social = json['see_social'],
+        extra_preferences = json['extra_preferences'],
+        group = json['group'],
+        is_newara = json['is_newara'],
+        ara_id = json['ara_id'],
+        agree_terms_of_service_at = json['agree_terms_of_service_at'];
 
   Map<String, dynamic> toJson() => {
         'user': user,
@@ -70,5 +86,11 @@ class NAUser {
         'nickname_updated_at': nickname_updated_at,
         'see_sexual': see_sexual,
         'see_social': see_social,
+        'extra_preferences': extra_preferences,
+        'group': group,
+        'is_newara': is_newara,
+        'ara_id': ara_id,
+        'agree_terms_of_service_at': agree_terms_of_service_at,
+        'inactive_due_at': inactive_due_at,
       };
 }
