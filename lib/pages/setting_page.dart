@@ -132,7 +132,7 @@ class SettingPageState extends State<SettingPage> {
                 ]),
                 const SizedBox(height: 5),
                 TextInfo('setting_page.hot_info'.tr()),
-                const SizedBox(height: 5),
+                const SizedBox(height: 10),
                 Container(
                   width: MediaQuery.of(context).size.width - 40,
                   height: 50,
@@ -144,7 +144,7 @@ class SettingPageState extends State<SettingPage> {
                   ),
                   child: Container(
                     margin: const EdgeInsets.only(
-                        top: 14, bottom: 12, left: 15, right: 219),
+                        top: 12, bottom: 12, left: 15, right: 219),
                     child: GestureDetector(
                       onTap: () {
                         context.read<AuthModel>().logout();
@@ -239,7 +239,6 @@ class _TextAndSwitchState extends State<TextAndSwitch> {
                 fontWeight: FontWeight.w500,
               ),
             )),
-        //const SizedBox(width: 199),
         Container(
           margin: const EdgeInsets.only(right: 10),
           width: 43,

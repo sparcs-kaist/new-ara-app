@@ -10,7 +10,10 @@
         "stu_community": "Student Community"
     },
     "myPage": {
-        "change": "change"
+        "change": "change",
+        "mypost": "My Posts",
+        "scrap": "Scrapped",
+        "recent": "Recent"
     },
     "login_page": {
         "login": "Sign in with SPARCS SSO"

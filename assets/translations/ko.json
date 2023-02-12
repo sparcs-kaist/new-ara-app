@@ -10,7 +10,10 @@
         "stu_community": "학생 단체"
     },
     "myPage": {
-        "change": "수정"
+        "change": "수정",
+        "mypost": "작성한 글",
+        "scrap": "담아둔 글",
+        "recent": "최근 본 글"
     },
     "login_page" : {
         "login": "SPARCS SSO로 로그인"

@@ -19,15 +19,15 @@ class _LoginPageState extends State<LoginPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            _buildSizedBox(324),
-            Container(
-              height: 109,
+            const SizedBox(height: 324),
+            SizedBox(
+              height: 108.54,
               width: MediaQuery.of(context).size.width,
               child: SvgPicture.asset(
                 'assets/images/logo.svg',
               ),
             ),
-            _buildSizedBox(297),
+            const SizedBox(height: 297.46),
             Container(
               width: 350,
               height: 60,
@@ -54,9 +54,5 @@ class _LoginPageState extends State<LoginPage> {
         ),
       ),
     );
-  }
-
-  SizedBox _buildSizedBox(double height) {
-    return SizedBox(height: height);
   }
 }

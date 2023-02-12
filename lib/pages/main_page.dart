@@ -57,16 +57,26 @@ class _MainPageState extends State<MainPage> {
                     borderRadius: BorderRadius.all(Radius.circular(20)),
                     color: ColorsInfo.newaraSoft,
                   ),
-                  child: const Center(
-                    child: Text(
-                      '뉴아라 앱이 출시되었습니다 :)',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.w600,
-                        fontSize: 25,
-                      ),
-                    ), // Sample text
-                  ),
+                  child: Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: const [
+                        Text('뉴아라 앱이 출시됐습니다!',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.w600,
+                              fontSize: 25,
+                            )),
+                        SizedBox(height: 15),
+                        Text('이제 댓글 알림을 받아볼 수 있어요',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.w600,
+                              fontSize: 15,
+                            ))
+                      ],
+                    ),
+                  ), // Sample text
                 ),
                 _buildSizedBox(3),
                 // 실시간 인기글 TextButton

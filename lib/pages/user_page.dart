@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
+import 'package:easy_localization/easy_localization.dart';
 
 import 'package:new_ara_app/constants/constants.dart';
 import 'package:new_ara_app/pages/setting_page.dart';
@@ -48,9 +49,8 @@ class _UserPageState extends State<UserPage>
             width: 40,
             height: 40,
             decoration: const BoxDecoration(
-              color: Color.fromRGBO(240, 240, 240, 1),
-              shape: BoxShape.circle,
-            ),
+                color: Color.fromRGBO(240, 240, 240, 1),
+                shape: BoxShape.circle),
             child: IconButton(
               highlightColor: Colors.white,
               splashColor: Colors.white,
@@ -66,17 +66,17 @@ class _UserPageState extends State<UserPage>
               },
             ),
           ),
-          _buildSizedBox(20, 0),
+          const SizedBox(width: 11),
         ],
       ),
       body: SafeArea(
         child: SingleChildScrollView(
-          child: Container(
+          child: SizedBox(
             width: MediaQuery.of(context).size.width,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                Container(
+                SizedBox(
                   width: MediaQuery.of(context).size.width - 40,
                   height: 60,
                   child: Row(
@@ -84,9 +84,8 @@ class _UserPageState extends State<UserPage>
                       Container(
                         width: 50,
                         height: 50,
-                        decoration: BoxDecoration(
+                        decoration: const BoxDecoration(
                           shape: BoxShape.circle,
-                          border: Border.all(color: Colors.grey),
                         ),
                         child: ClipRRect(
                           borderRadius:
@@ -99,10 +98,8 @@ class _UserPageState extends State<UserPage>
                           ),
                         ),
                       ),
-                      // 컨테이너간 여백은 Sizedbox 이용하기
-                      _buildSizedBox(10, 0),
-                      // 이름 및 이메일
-                      Container(
+                      const SizedBox(width: 10),
+                      SizedBox(
                         width: 250,
                         height: 50,
                         child: Column(
@@ -116,9 +113,6 @@ class _UserPageState extends State<UserPage>
                                 fontWeight: FontWeight.w700,
                               ),
                             ),
-                            const SizedBox(
-                              height: 3,
-                            ),
                             Text(
                               context.watch<UserModel>().naUser!.email,
                               style: const TextStyle(
@@ -130,15 +124,15 @@ class _UserPageState extends State<UserPage>
                           ],
                         ),
                       ),
-                      _buildSizedBox(30, 0),
-                      Container(
+                      const SizedBox(width: 30),
+                      SizedBox(
                         width: 26,
                         height: 21,
                         child: GestureDetector(
                           onTap: () {}, // 추후에 프로필 수정 기능 구현 예정
-                          child: const Text(
-                            '수정',
-                            style: TextStyle(
+                          child: Text(
+                            'myPage.change'.tr(),
+                            style: const TextStyle(
                               color: Color.fromRGBO(100, 100, 100, 1),
                               fontSize: 14,
                               fontWeight: FontWeight.w500,
@@ -149,66 +143,42 @@ class _UserPageState extends State<UserPage>
                     ],
                   ),
                 ),
-                _buildSizedBox(0, 10),
+                const SizedBox(height: 10),
                 TabBar(
-                  unselectedLabelColor: Colors.grey,
+                  unselectedLabelColor: Color.fromRGBO(177, 177, 177, 1),
                   labelColor: ColorsInfo.newara,
                   indicatorColor: ColorsInfo.newara,
                   tabs: const [
-                    Tab(
-                      child: Text(
-                        '작성한 글',
-                        style: TextStyle(
-                          fontSize: 15,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                    ),
-                    Tab(
-                      child: Text(
-                        '담아둔 글',
-                        style: TextStyle(
-                          fontSize: 15,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                    ),
-                    Tab(
-                      child: Text(
-                        '최근 본 글',
-                        style: TextStyle(
-                          fontSize: 15,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                    ),
+                    UserTab('myPage.mypost'),
+                    UserTab('myPage.scrap'),
+                    UserTab('myPage.recent'),
                   ],
                   controller: _tabController,
                   indicatorSize: TabBarIndicatorSize.tab,
                 ),
                 Container(
-                  margin: EdgeInsets.only(top: 14),
+                  margin: const EdgeInsets.only(top: 14),
                   width: MediaQuery.of(context).size.width - 40,
                   height: 24,
                   child: Text(
                     '총 ${context.watch<UserModel>().naUser!.num_articles}개의 글',
-                    style: TextStyle(
+                    style: const TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w700,
-                      color: Colors.grey,
+                      color: Color.fromRGBO(177, 177, 177, 1),
                     ),
                   ),
                 ),
-                Container(
+                SizedBox(
                   width: MediaQuery.of(context).size.width - 10,
                   height: 500,
                   child: TabBarView(
+                    controller: _tabController,
                     children: [
                       Container(child: Center(child: Text('없음'))),
                       Container(child: Center(child: Text('없음'))),
                       Container(child: Center(child: Text('없음'))),
                     ],
-                    controller: _tabController,
                   ),
                 ),
               ],
@@ -218,11 +188,26 @@ class _UserPageState extends State<UserPage>
       ),
     );
   }
+}
 
-  SizedBox _buildSizedBox(double width, double height) {
-    return SizedBox(
-      width: width,
-      height: height,
+class UserTab extends StatefulWidget {
+  final String tabText;
+  const UserTab(this.tabText);
+  @override
+  State<UserTab> createState() => _UserTabState();
+}
+
+class _UserTabState extends State<UserTab> {
+  @override
+  Widget build(BuildContext context) {
+    return Tab(
+      child: Text(
+        widget.tabText.tr(),
+        style: const TextStyle(
+          fontSize: 15,
+          fontWeight: FontWeight.w500,
+        ),
+      ),
     );
   }
 }

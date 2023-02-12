@@ -67,17 +67,12 @@ class MyApp extends StatelessWidget {
 
   ThemeData _setThemeData() {
     return ThemeData(
-      textTheme: const TextTheme(
-        headline1: TextStyle(
-            color: ColorsInfo.newara,
-            fontSize: 23,
-            fontWeight: FontWeight.bold),
-      ),
       appBarTheme: const AppBarTheme(
         elevation: 0,
         backgroundColor: Colors.white,
       ),
       scaffoldBackgroundColor: Colors.white,
+      fontFamily: 'NotoSansKR',
     );
   }
 }
