@@ -15,7 +15,7 @@ class DioInfo {
         ..headers['Cookie'] = cookieStr
         ..headers['X-CSRFToken'] = csrftokenStr;
     } catch (exception) {
-      print('------------------------------------------$exception');
+      print('$exception');
     }
   }
 }

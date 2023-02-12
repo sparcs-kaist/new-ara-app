@@ -4,7 +4,6 @@ import 'package:provider/provider.dart';
 
 import 'package:new_ara_app/home.dart';
 import 'package:new_ara_app/pages/login_page.dart';
-import 'package:new_ara_app/constants/constants.dart';
 import 'package:new_ara_app/providers/auth_model.dart';
 import 'package:new_ara_app/providers/user_model.dart';
 
@@ -28,7 +27,9 @@ void main() async {
           ChangeNotifierProxyProvider<AuthModel, UserModel>(
             create: (context) => UserModel(),
             update: (context, authModel, userModel) {
-              if (authModel.isLogined) userModel?.getUser();
+              authModel.isLogined
+                  ? userModel?.getUserInfo()
+                  : userModel?.delUserInfo();
               return (userModel is UserModel) ? userModel : UserModel();
             },
           ),
@@ -61,7 +62,7 @@ class MyApp extends StatelessWidget {
           child: child!,
         );
       },
-      home: context.watch<AuthModel>().isLogined ? NewAraHome() : LoginPage(),
+      home: context.watch<UserModel>().hasData ? NewAraHome() : LoginPage(),
     );
   }
 

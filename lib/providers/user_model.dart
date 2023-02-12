@@ -10,15 +10,20 @@ class UserModel with ChangeNotifier {
   bool _hasData = false;
   bool get hasData => _hasData;
 
-  Future<void> getUser() async {
+  Future<void> getUserInfo() async {
     try {
       final response = await DioInfo().dio.get("${UrlInfo.BASE_URL}/me");
       _naUser = NAUser.fromJson(response.data);
       _hasData = true;
       notifyListeners();
     } catch (exception) {
-      print(
-          '-------------------------------------------------------------------$exception');
+      print('$exception');
     }
+  }
+
+  void delUserInfo() {
+    _naUser = null;
+    _hasData = false;
+    notifyListeners();
   }
 }
