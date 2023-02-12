@@ -6,6 +6,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:new_ara_app/constants/constants.dart';
 import 'package:new_ara_app/pages/setting_page.dart';
 import 'package:new_ara_app/providers/user_model.dart';
+import 'package:new_ara_app/widgetclasses/user_tab.dart';
 
 class UserPage extends StatefulWidget {
   const UserPage({Key? key}) : super(key: key);
@@ -184,28 +185,6 @@ class _UserPageState extends State<UserPage>
               ],
             ),
           ),
-        ),
-      ),
-    );
-  }
-}
-
-class UserTab extends StatefulWidget {
-  final String tabText;
-  const UserTab(this.tabText);
-  @override
-  State<UserTab> createState() => _UserTabState();
-}
-
-class _UserTabState extends State<UserTab> {
-  @override
-  Widget build(BuildContext context) {
-    return Tab(
-      child: Text(
-        widget.tabText.tr(),
-        style: const TextStyle(
-          fontSize: 15,
-          fontWeight: FontWeight.w500,
         ),
       ),
     );

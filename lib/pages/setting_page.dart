@@ -1,20 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
 
 import 'package:new_ara_app/constants/constants.dart';
 import 'package:new_ara_app/providers/auth_model.dart';
-
-List<bool> switchLights = [
-  true,
-  true,
-  true,
-  true,
-  true,
-  true
-]; // 나중에 provider 등으로 상태 공유할 수 있게 하기
+import 'package:new_ara_app/widgetclasses/text_info.dart';
+import 'package:new_ara_app/widgetclasses/border_boxes.dart';
+import 'package:new_ara_app/widgetclasses/text_and_switch.dart';
 
 class SettingPage extends StatefulWidget {
   const SettingPage({Key? key}) : super(key: key);
@@ -35,7 +28,7 @@ class SettingPageState extends State<SettingPage> {
             Navigator.pop(context);
           },
         ),
-        title: Container(
+        title: SizedBox(
           child: Text(
             'setting_page.title'.tr(),
             style: const TextStyle(
@@ -48,13 +41,13 @@ class SettingPageState extends State<SettingPage> {
       ),
       body: SafeArea(
         child: SingleChildScrollView(
-          child: Container(
+          child: SizedBox(
             width: MediaQuery.of(context).size.width,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 const SizedBox(height: 23),
-                Container(
+                SizedBox(
                   width: MediaQuery.of(context).size.width - 50,
                   child: Text(
                     'setting_page.bulletin'.tr(),
@@ -65,15 +58,9 @@ class SettingPageState extends State<SettingPage> {
                   ),
                 ),
                 const SizedBox(height: 7),
-                BorderBoxes(94, [
-                  const SizedBox(height: 10),
-                  TextAndSwitch('setting_page.adult'.tr(), 0),
-                  const SizedBox(height: 16),
-                  TextAndSwitch('setting_page.politics'.tr(), 1),
-                  const SizedBox(height: 10),
-                ]),
+                BorderBoxes(94, switchItems[0]),
                 const SizedBox(height: 24),
-                Container(
+                SizedBox(
                   width: MediaQuery.of(context).size.width - 50,
                   child: Text(
                     'setting_page.block'.tr(),
@@ -104,7 +91,7 @@ class SettingPageState extends State<SettingPage> {
                 const SizedBox(height: 5),
                 TextInfo('setting_page.block_howto'.tr()),
                 const SizedBox(height: 20),
-                Container(
+                SizedBox(
                   width: MediaQuery.of(context).size.width - 50,
                   child: Text(
                     'setting_page.noti'.tr(),
@@ -115,21 +102,9 @@ class SettingPageState extends State<SettingPage> {
                   ),
                 ),
                 const SizedBox(height: 7),
-                BorderBoxes(94, [
-                  const SizedBox(height: 10),
-                  TextAndSwitch('setting_page.myreply'.tr(), 2),
-                  const SizedBox(height: 16),
-                  TextAndSwitch('setting_page.reply'.tr(), 3),
-                  const SizedBox(height: 10),
-                ]),
+                BorderBoxes(94, switchItems[1]),
                 const SizedBox(height: 10),
-                BorderBoxes(94, [
-                  const SizedBox(height: 10),
-                  TextAndSwitch('setting_page.hot_noti'.tr(), 4),
-                  const SizedBox(height: 16),
-                  TextAndSwitch('setting_page.hot_posts'.tr(), 5),
-                  const SizedBox(height: 10),
-                ]),
+                BorderBoxes(94, switchItems[2]),
                 const SizedBox(height: 5),
                 TextInfo('setting_page.hot_info'.tr()),
                 const SizedBox(height: 10),
@@ -166,95 +141,6 @@ class SettingPageState extends State<SettingPage> {
           ),
         ),
       ),
-    );
-  }
-}
-
-class TextInfo extends StatelessWidget {
-  final String info_str;
-  const TextInfo(this.info_str);
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: MediaQuery.of(context).size.width - 60,
-      child: Text(
-        info_str,
-        style: const TextStyle(
-            fontSize: 12,
-            fontWeight: FontWeight.w500,
-            color: Color.fromRGBO(191, 191, 191, 1)),
-      ),
-    );
-  }
-}
-
-class BorderBoxes extends StatefulWidget {
-  final double height;
-  final List<Widget> widgetsList;
-  const BorderBoxes(this.height, this.widgetsList);
-  @override
-  State<BorderBoxes> createState() => _BorderBoxesState();
-}
-
-class _BorderBoxesState extends State<BorderBoxes> {
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: MediaQuery.of(context).size.width - 40,
-      height: widget.height,
-      decoration: BoxDecoration(
-        borderRadius: const BorderRadius.all(Radius.circular(10)),
-        border: Border.all(
-          color: const Color.fromRGBO(240, 240, 240, 1),
-        ),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: widget.widgetsList,
-      ),
-    );
-  }
-}
-
-class TextAndSwitch extends StatefulWidget {
-  final String title;
-  final int num;
-  const TextAndSwitch(this.title, this.num);
-  @override
-  State<TextAndSwitch> createState() => _TextAndSwitchState();
-}
-
-class _TextAndSwitchState extends State<TextAndSwitch> {
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Container(
-            margin: const EdgeInsets.only(left: 10),
-            child: Text(
-              widget.title,
-              style: const TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w500,
-              ),
-            )),
-        Container(
-          margin: const EdgeInsets.only(right: 10),
-          width: 43,
-          height: 27,
-          child: FittedBox(
-            fit: BoxFit.fill,
-            child: CupertinoSwitch(
-                activeColor: ColorsInfo.newara,
-                value: switchLights[widget.num],
-                onChanged: (value) {
-                  // 현재 이 메서드는 추후 필터링 관련 개발이 시작될 때 완성될 예정임
-                  setState(() => switchLights[widget.num] = value);
-                }),
-          ),
-        ),
-      ],
     );
   }
 }
