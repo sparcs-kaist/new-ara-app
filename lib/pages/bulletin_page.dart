@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:easy_localization/easy_localization.dart';
 
+import 'package:new_ara_app/constants/constants.dart';
+
 class BulletinPage extends StatefulWidget {
   const BulletinPage({Key? key}) : super(key: key);
   @override
@@ -14,7 +16,11 @@ class _BulletinPageState extends State<BulletinPage> {
       appBar: AppBar(
         title: Text(
           'appBar.bulletin'.tr(),
-          style: Theme.of(context).textTheme.headline1,
+          style: const TextStyle(
+            fontSize: 28,
+            fontWeight: FontWeight.w700,
+            color: ColorsInfo.newara,
+          ),
         ),
       ),
       body: SafeArea(

@@ -17,7 +17,11 @@ class _ChatPageState extends State<ChatPage> {
       appBar: AppBar(
         title: Text(
           "appBar.chatting".tr(),
-          style: Theme.of(context).textTheme.headline1,
+          style: const TextStyle(
+            fontSize: 28,
+            fontWeight: FontWeight.w700,
+            color: ColorsInfo.newara,
+          ),
         ),
         actions: [
           Container(

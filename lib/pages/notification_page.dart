@@ -17,7 +17,11 @@ class _NotificationPageState extends State<NotificationPage> {
       appBar: AppBar(
         title: Text(
           'appBar.notification'.tr(),
-          style: Theme.of(context).textTheme.headline1,
+          style: const TextStyle(
+            fontSize: 28,
+            fontWeight: FontWeight.w700,
+            color: ColorsInfo.newara,
+          ),
         ),
         actions: [
           Container(
