@@ -9,4 +9,6 @@ class ColorsInfo {
 class UrlInfo {
   static const BASE_URL = 'https://newara.dev.sparcs.org/api';
   static const MAIN_URL = 'https://newara.dev.sparcs.org';
+  static const MAIN_AUTHORITY = 'newara.dev.sparcs.org';
+  static const AUTH_AUTHORITY = 'sparcssso.kaist.ac.kr';
 }
