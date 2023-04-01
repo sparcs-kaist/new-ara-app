@@ -17,7 +17,8 @@ class UserModel with ChangeNotifier {
       _hasData = true;
       notifyListeners();
     } catch (exception) {
-      debugPrint('$exception');
+      debugPrint(
+          '*******************************************\n getUserInfo Exception: $exception *******************************************\n');
     }
   }
 
