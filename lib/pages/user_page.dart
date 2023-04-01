@@ -62,8 +62,7 @@ class _UserPageState extends State<UserPage>
                 height: 20,
               ),
               onPressed: () {
-                Navigator.push(context,
-                    MaterialPageRoute(builder: (context) => SettingPage()));
+                Navigator.of(context).push(_createRoute());
               },
             ),
           ),
@@ -189,4 +188,22 @@ class _UserPageState extends State<UserPage>
       ),
     );
   }
+}
+
+Route _createRoute() {
+  return PageRouteBuilder(
+    pageBuilder: (context, animation, secondaryAnimation) => SettingPage(),
+    transitionsBuilder: ((context, animation, secondaryAnimation, child) {
+      var begin = const Offset(1, 0);
+      var end = const Offset(0, 0);
+      var curve = Curves.ease;
+
+      var tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+      var offsetAnimation = animation.drive(tween);
+      return SlideTransition(
+        position: offsetAnimation,
+        child: child,
+      );
+    }),
+  );
 }
