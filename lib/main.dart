@@ -6,6 +6,7 @@ import 'package:new_ara_app/home.dart';
 import 'package:new_ara_app/pages/login_page.dart';
 import 'package:new_ara_app/providers/auth_model.dart';
 import 'package:new_ara_app/providers/user_model.dart';
+import 'package:new_ara_app/constants/constants.dart';
 
 final supportedLocales = [
   const Locale('en'),
@@ -52,20 +53,17 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      localizationsDelegates: context.localizationDelegates,
-      supportedLocales: context.supportedLocales,
-      locale: context.locale,
-      theme: _setThemeData(),
-      builder: (context, child) {
-        return ScrollConfiguration(
-          behavior: CustomScrollBehavior(),
-          child: child!,
-        );
-      },
-      home: context.watch<UserModel>().hasData
-          ? const NewAraHome()
-          : const LoginPage(),
-    );
+        localizationsDelegates: context.localizationDelegates,
+        supportedLocales: context.supportedLocales,
+        locale: context.locale,
+        theme: _setThemeData(),
+        builder: (context, child) {
+          return ScrollConfiguration(
+            behavior: CustomScrollBehavior(),
+            child: child!,
+          );
+        },
+        home: context.watch<UserModel>().hasData ? NewAraHome() : LoginPage());
   }
 
   ThemeData _setThemeData() {

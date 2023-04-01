@@ -16,6 +16,7 @@ class LoginWebView extends StatefulWidget {
 class _LoginWebViewState extends State<LoginWebView> {
   late final WebViewController _controller;
   final webViewKey = GlobalKey();
+  bool isVisible = false;
 
   @override
   void initState() {
@@ -32,6 +33,7 @@ class _LoginWebViewState extends State<LoginWebView> {
           debugPrint('WebView is loading (progress: $progress)');
         },
         onPageStarted: (String url) {
+          setState(() => isVisible = false);
           if (Uri.parse(url).authority == UrlInfo.MAIN_AUTHORITY) {
             context
                 .read<AuthModel>()
@@ -40,6 +42,9 @@ class _LoginWebViewState extends State<LoginWebView> {
           }
         },
         onPageFinished: (String url) {
+          if (Uri.parse(url).authority != UrlInfo.MAIN_AUTHORITY) {
+            setState(() => isVisible = true);
+          }
           debugPrint('TBD');
         },
         onWebResourceError: (WebResourceError error) {
@@ -66,9 +71,20 @@ class _LoginWebViewState extends State<LoginWebView> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: SafeArea(
-        child: WebViewWidget(
-          key: webViewKey,
-          controller: _controller,
+        child: Stack(
+          children: [
+            const Center(
+              child: CircularProgressIndicator(
+                  backgroundColor: Colors.white, color: ColorsInfo.newara),
+            ),
+            Visibility(
+              visible: isVisible,
+              child: WebViewWidget(
+                key: webViewKey,
+                controller: _controller,
+              ),
+            ),
+          ],
         ),
       ),
     );
