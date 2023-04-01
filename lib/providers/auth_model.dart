@@ -1,25 +1,26 @@
-import 'package:flutter/material.dart';
-import 'package:flutter_inappwebview/flutter_inappwebview.dart';
+import 'dart:io';
 
-import 'package:new_ara_app/constants/constants.dart';
+import 'package:flutter/material.dart';
+import 'package:webview_cookie_manager/webview_cookie_manager.dart';
+
 import 'package:new_ara_app/dio_info.dart';
 
 class AuthModel with ChangeNotifier {
   bool _isLogined = false;
   bool get isLogined => _isLogined;
-  final CookieManager _cookieManager = CookieManager.instance();
 
   Future<void> login(String url) async {
     try {
-      List<Cookie> cookies =
-          await _cookieManager.getCookies(url: Uri.parse(UrlInfo.MAIN_URL));
-      await _cookieManager.deleteAllCookies();
-      String cookieStr =
-          cookies.map((cookie) => "${cookie.name}=${cookie.value}").join(';');
-      String csrftokenStr =
-          cookies.firstWhere((cookie) => cookie.name == 'csrftoken').value;
+      final cookieManager = WebviewCookieManager();
+      List<Cookie> cookies = await cookieManager.getCookies(url);
+      cookieManager.clearCookies();
 
-      DioInfo().updateOptions(cookieStr, csrftokenStr);
+      String sessionid =
+          cookies.firstWhere((cookie) => cookie.name == 'sessionid').toString();
+      String csrftoken =
+          cookies.firstWhere((cookie) => cookie.name == 'csrftoken').toString();
+
+      DioInfo().updateOptions(sessionid, csrftoken);
 
       _isLogined = true;
       notifyListeners();

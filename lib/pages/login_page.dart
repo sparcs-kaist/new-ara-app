@@ -19,51 +19,49 @@ class _LoginPageState extends State<LoginPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: SafeArea(
-        child: context.watch<AuthModel>().isLogined
-            ? const LoadingIndicator()
-            : SizedBox(
-                width: MediaQuery.of(context).size.width,
-                height: MediaQuery.of(context).size.height,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    SizedBox(
-                      height: MediaQuery.of(context).size.height - 150,
-                      width: 200,
-                      child: SizedBox(
-                        child: SvgPicture.asset(
-                          'assets/images/logo.svg',
-                        ),
-                      ),
-                    ),
-                    Container(
-                      width: 350,
-                      height: 60,
-                      decoration: BoxDecoration(
-                        color: ColorsInfo.newara,
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                      child: TextButton(
-                        child: Text(
-                          'login_page.login'.tr(),
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 18,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                        onPressed: () {
-                          Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => LoginWebView()));
-                        },
-                      ),
-                    ),
-                  ],
+        child: SizedBox(
+          width: MediaQuery.of(context).size.width,
+          height: MediaQuery.of(context).size.height,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              SizedBox(
+                height: MediaQuery.of(context).size.height - 150,
+                width: 200,
+                child: SizedBox(
+                  child: SvgPicture.asset(
+                    'assets/images/logo.svg',
+                  ),
                 ),
               ),
+              Container(
+                width: 350,
+                height: 60,
+                decoration: BoxDecoration(
+                  color: ColorsInfo.newara,
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: TextButton(
+                  child: Text(
+                    'login_page.login'.tr(),
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 18,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                  onPressed: () {
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => LoginWebView()));
+                  },
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }

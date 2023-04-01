@@ -13,104 +13,49 @@ class _MainPageState extends State<MainPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.transparent,
+      extendBodyBehindAppBar: true,
       appBar: AppBar(
+        elevation: 0,
+        backgroundColor: Colors.transparent,
         title: SvgPicture.asset(
           'assets/images/logo.svg',
           fit: BoxFit.cover,
         ),
         actions: [
-          Container(
-            width: 40,
-            height: 40,
-            decoration: const BoxDecoration(
-              color: Color.fromRGBO(240, 240, 240, 1),
-              shape: BoxShape.circle,
+          IconButton(
+            icon: SvgPicture.asset(
+              'assets/icons/search.svg',
+              color: ColorsInfo.newara,
+              width: 20,
+              height: 20,
             ),
-            child: IconButton(
-              highlightColor: Colors.white,
-              splashColor: Colors.white,
-              icon: SvgPicture.asset(
-                'assets/icons/search.svg',
-                color: ColorsInfo.newara,
-                width: 20,
-                height: 20,
-              ),
-              onPressed: () {},
-            ),
+            onPressed: () {},
           ),
-          SizedBox(width: 20),
+          const SizedBox(width: 20),
         ],
       ),
       body: SafeArea(
         child: SingleChildScrollView(
           child: Container(
+            decoration: BoxDecoration(color: Colors.transparent),
             width: MediaQuery.of(context).size.width,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                _buildSizedBox(1.9),
-                // 광고
                 Container(
-                  width: MediaQuery.of(context).size.width - 40,
-                  height: 204,
+                  height: 305,
                   decoration: const BoxDecoration(
-                    borderRadius: BorderRadius.all(Radius.circular(20)),
-                    color: ColorsInfo.newaraSoft,
-                  ),
-                  child: Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: const [
-                        Text('뉴아라 앱이 출시됐습니다!',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontWeight: FontWeight.w600,
-                              fontSize: 25,
-                            )),
-                        SizedBox(height: 15),
-                        Text('이제 댓글 알림을 받아볼 수 있어요',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontWeight: FontWeight.w600,
-                              fontSize: 15,
-                            ))
-                      ],
+                    gradient: LinearGradient(
+                      colors: [ColorsInfo.gradBegin, ColorsInfo.gradEnd],
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
                     ),
-                  ), // Sample text
-                ),
-                _buildSizedBox(3),
-                // 실시간 인기글 TextButton
-                _buildTextButton("main_page.realtime", true),
-                // 실시간 인기글 ListView
-                Container(
-                  width: MediaQuery.of(context).size.width - 40,
-                  height: 200,
-                  decoration: BoxDecoration(
-                    color: Color.fromRGBO(250, 250, 250, 1),
-                    borderRadius: const BorderRadius.all(Radius.circular(20)),
                   ),
                 ),
-                // 공지 TextButton
-                _buildTextButton("main_page.notice", false),
                 Container(
-                  width: MediaQuery.of(context).size.width - 40,
-                  height: 223,
-                  decoration: BoxDecoration(
-                    color: Color.fromRGBO(250, 250, 250, 1),
-                    borderRadius: const BorderRadius.all(Radius.circular(20)),
-                  ),
+                  height: 800,
                 ),
-                _buildSizedBox(3),
-                _buildTextButton('main_page.stu_community', true),
-                Container(
-                  width: MediaQuery.of(context).size.width - 40,
-                  height: 111,
-                  decoration: BoxDecoration(
-                    color: Color.fromRGBO(250, 250, 250, 1),
-                    borderRadius: BorderRadius.all(Radius.circular(20)),
-                  ),
-                ),
-                _buildSizedBox(3),
               ],
             ),
           ),

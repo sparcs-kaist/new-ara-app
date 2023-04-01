@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_inappwebview/flutter_inappwebview.dart';
+import 'package:webview_flutter/webview_flutter.dart';
 
 import 'package:new_ara_app/constants/constants.dart';
 import 'package:new_ara_app/providers/auth_model.dart';
@@ -14,15 +14,47 @@ class LoginWebView extends StatefulWidget {
 }
 
 class _LoginWebViewState extends State<LoginWebView> {
-  final GlobalKey webViewKey = GlobalKey();
-  InAppWebViewController? webViewController;
-  String targetUrl =
-      "https://newara.dev.sparcs.org/api/users/sso_login/?next=https://newara.dev.sparcs.org/login-handler";
-  bool _isVisible = true;
+  late final WebViewController _controller;
+  final webViewKey = GlobalKey();
 
   @override
   void initState() {
     super.initState();
+    late final PlatformWebViewControllerCreationParams params;
+    params = const PlatformWebViewControllerCreationParams();
+    final WebViewController controller =
+        WebViewController.fromPlatformCreationParams(params);
+    controller
+      ..setJavaScriptMode(JavaScriptMode.unrestricted)
+      ..setBackgroundColor(const Color(0x00000000))
+      ..setNavigationDelegate(NavigationDelegate(
+        onProgress: (int progress) {
+          debugPrint('WebView is loading (progress: $progress)');
+        },
+        onPageStarted: (String url) {
+          if (Uri.parse(url).authority == UrlInfo.MAIN_AUTHORITY) {
+            context
+                .read<AuthModel>()
+                .login(UrlInfo.MAIN_URL)
+                .then((_) => Navigator.pop(context));
+          }
+        },
+        onPageFinished: (String url) {
+          debugPrint('TBD');
+        },
+        onWebResourceError: (WebResourceError error) {
+          debugPrint(
+              'code: ${error.errorCode}\ndescription: ${error.description}\nerrorType: ${error.errorType}\nisForMainFrame: ${error.isForMainFrame}');
+        },
+      ))
+      ..addJavaScriptChannel('Toaster',
+          onMessageReceived: (JavaScriptMessage message) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(message.message)),
+        );
+      })
+      ..loadRequest(Uri.parse(UrlInfo.WEBVIEW_INIT));
+    _controller = controller;
   }
 
   @override
@@ -34,39 +66,9 @@ class _LoginWebViewState extends State<LoginWebView> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: SafeArea(
-        child: Stack(
-          children: [
-            const LoadingIndicator(),
-            Visibility(
-              maintainSize: true,
-              maintainState: true,
-              maintainAnimation: true,
-              visible: _isVisible,
-              child: InAppWebView(
-                key: webViewKey,
-                initialUrlRequest: URLRequest(url: Uri.parse(targetUrl)),
-                onWebViewCreated: (controller) {
-                  webViewController = controller;
-                },
-                onLoadStart: ((controller, url) async {
-                  Uri _curUri = Uri.parse(url.toString());
-                  setState(() => _isVisible = false);
-                  if (_curUri.authority == UrlInfo.MAIN_AUTHORITY) {
-                    context
-                        .read<AuthModel>()
-                        .login(UrlInfo.MAIN_URL)
-                        .then((_) => Navigator.pop(context));
-                  }
-                }),
-                onLoadStop: (((controller, url) {
-                  Uri _curUri = Uri.parse(url.toString());
-                  if (_curUri.authority == UrlInfo.AUTH_AUTHORITY) {
-                    setState(() => _isVisible = true);
-                  }
-                })),
-              ),
-            ),
-          ],
+        child: WebViewWidget(
+          key: webViewKey,
+          controller: _controller,
         ),
       ),
     );

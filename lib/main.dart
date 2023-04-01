@@ -62,17 +62,17 @@ class MyApp extends StatelessWidget {
           child: child!,
         );
       },
-      home: context.watch<UserModel>().hasData ? NewAraHome() : LoginPage(),
+      home: context.watch<UserModel>().hasData
+          ? const NewAraHome()
+          : const LoginPage(),
     );
   }
 
   ThemeData _setThemeData() {
     return ThemeData(
-      appBarTheme: const AppBarTheme(
-        elevation: 0,
-        backgroundColor: Colors.white,
-      ),
-      scaffoldBackgroundColor: Colors.white,
+      appBarTheme:
+          const AppBarTheme(elevation: 0, backgroundColor: Colors.transparent),
+      //scaffoldBackgroundColor: Colors.white,
       fontFamily: 'NotoSansKR',
     );
   }
