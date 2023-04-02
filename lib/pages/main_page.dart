@@ -13,11 +13,8 @@ class _MainPageState extends State<MainPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.transparent,
-      extendBodyBehindAppBar: true,
       appBar: AppBar(
         elevation: 0,
-        backgroundColor: Colors.transparent,
         title: SvgPicture.asset(
           'assets/images/logo.svg',
           fit: BoxFit.cover,
@@ -37,25 +34,102 @@ class _MainPageState extends State<MainPage> {
       ),
       body: SafeArea(
         child: SingleChildScrollView(
-          child: Container(
-            decoration: BoxDecoration(color: Colors.transparent),
+          child: SizedBox(
             width: MediaQuery.of(context).size.width,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
+                const MainPageTextButton('main_page.realtime'),
+                // 실시간 인기글을 ListView로 도입 예정
                 Container(
-                  height: 305,
-                  decoration: const BoxDecoration(
-                    gradient: LinearGradient(
-                      colors: [ColorsInfo.gradBegin, ColorsInfo.gradEnd],
-                      begin: Alignment.topCenter,
-                      end: Alignment.bottomCenter,
+                  width: MediaQuery.of(context).size.width - 40,
+                  height: 200,
+                  decoration: BoxDecoration(
+                    border: Border.all(
+                      width: 1,
+                      color: const Color.fromRGBO(240, 240, 240, 1),
                     ),
+                    borderRadius: const BorderRadius.all(Radius.circular(20)),
                   ),
                 ),
+                const SizedBox(height: 10),
+                const MainPageTextButton('main_page.notice'),
                 Container(
-                  height: 800,
+                  width: MediaQuery.of(context).size.width - 40,
+                  height: 200,
+                  decoration: BoxDecoration(
+                    border: Border.all(
+                      width: 1,
+                      color: const Color.fromRGBO(240, 240, 240, 1),
+                    ),
+                    borderRadius: const BorderRadius.all(Radius.circular(20)),
+                  ),
                 ),
+                const SizedBox(height: 10),
+                const MainPageTextButton('main_page.stu_community'),
+                Container(
+                  width: MediaQuery.of(context).size.width - 40,
+                  height: 110,
+                  decoration: BoxDecoration(
+                    border: Border.all(
+                      width: 1,
+                      color: const Color.fromRGBO(240, 240, 240, 1),
+                    ),
+                    borderRadius: const BorderRadius.all(Radius.circular(20)),
+                  ),
+                  child: ListView(
+                    padding: const EdgeInsets.only(
+                        top: 10, bottom: 10, left: 15, right: 15),
+                    children: [
+                      Container(
+                        height: 28,
+                        child: Row(
+                          children: [
+                            Text(
+                              '원총',
+                              style: TextStyle(
+                                fontWeight: FontWeight.w700,
+                                fontSize: 14,
+                                color: Color.fromRGBO(177, 177, 177, 1),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      Container(
+                        height: 28,
+                        child: Row(
+                          children: [
+                            Text(
+                              '총학',
+                              style: TextStyle(
+                                fontWeight: FontWeight.w700,
+                                fontSize: 14,
+                                color: Color.fromRGBO(177, 177, 177, 1),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      Container(
+                        height: 28,
+                        child: Row(
+                          children: [
+                            Text(
+                              '새학',
+                              style: TextStyle(
+                                fontWeight: FontWeight.w700,
+                                fontSize: 14,
+                                color: Color.fromRGBO(177, 177, 177, 1),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 20),
               ],
             ),
           ),
@@ -63,30 +137,34 @@ class _MainPageState extends State<MainPage> {
       ),
     );
   }
+}
 
-  Container _buildTextButton(String name, bool isArrow) {
-    return Container(
+class MainPageTextButton extends StatelessWidget {
+  final String buttonTitle;
+  const MainPageTextButton(this.buttonTitle);
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
       width: MediaQuery.of(context).size.width - 40,
-      height: 50,
       child: Row(
         children: [
           TextButton(
             onPressed: () {},
-            child: Text(isArrow ? ('$name'.tr() + ' >') : ('$name'.tr()),
-                style: const TextStyle(
-                  fontWeight: FontWeight.w600,
-                  fontSize: 16,
-                  color: Colors.black,
-                )),
+            child: Text(
+              '${this.buttonTitle}'.tr() + ' >',
+              style: const TextStyle(
+                fontWeight: FontWeight.w600,
+                fontSize: 17,
+                color: Colors.black,
+              ),
+            ),
+          ),
+          const Expanded(
+            child: SizedBox(),
           ),
         ],
       ),
-    );
-  }
-
-  SizedBox _buildSizedBox(double height) {
-    return SizedBox(
-      height: height,
     );
   }
 }

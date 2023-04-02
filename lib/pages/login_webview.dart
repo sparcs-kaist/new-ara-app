@@ -73,10 +73,7 @@ class _LoginWebViewState extends State<LoginWebView> {
       body: SafeArea(
         child: Stack(
           children: [
-            const Center(
-              child: CircularProgressIndicator(
-                  backgroundColor: Colors.white, color: ColorsInfo.newara),
-            ),
+            LoadingIndicator(),
             Visibility(
               visible: isVisible,
               child: WebViewWidget(

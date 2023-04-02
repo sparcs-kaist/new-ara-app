@@ -69,9 +69,10 @@ class MyApp extends StatelessWidget {
   ThemeData _setThemeData() {
     return ThemeData(
       appBarTheme:
-          const AppBarTheme(elevation: 0, backgroundColor: Colors.transparent),
+          const AppBarTheme(elevation: 0, backgroundColor: Colors.white),
       //scaffoldBackgroundColor: Colors.white,
       fontFamily: 'NotoSansKR',
+      scaffoldBackgroundColor: Colors.white,
     );
   }
 }
