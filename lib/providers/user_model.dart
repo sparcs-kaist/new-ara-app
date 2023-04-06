@@ -1,3 +1,4 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 
 import 'package:new_ara_app/dio_info.dart';
@@ -10,9 +11,9 @@ class UserModel with ChangeNotifier {
   bool _hasData = false;
   bool get hasData => _hasData;
 
-  Future<void> getUserInfo() async {
+  void getUserInfo() async {
     try {
-      final response = await DioInfo().dio.get("${UrlInfo.BASE_URL}/me");
+      final response = await DioInfo().dio.get("${UrlInfo.BASE_URL}/me",);
       _naUser = NAUser.fromJson(response.data);
       _hasData = true;
       notifyListeners();

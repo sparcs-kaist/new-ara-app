@@ -34,7 +34,7 @@ class _LoginWebViewState extends State<LoginWebView> {
         },
         onPageStarted: (String url) {
           setState(() => isVisible = false);
-          if (Uri.parse(url).authority == UrlInfo.MAIN_AUTHORITY) {
+          if (Uri.parse(url).authority == UrlInfo.MAIN_AUTHORITY && url!=UrlInfo.WEBVIEW_INIT) {
             context
                 .read<AuthModel>()
                 .login(UrlInfo.MAIN_URL)

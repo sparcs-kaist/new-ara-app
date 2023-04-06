@@ -26,9 +26,10 @@ void main() async {
         providers: [
           ChangeNotifierProvider(create: (context) => AuthModel()),
           ChangeNotifierProxyProvider<AuthModel, UserModel>(
+            //AuthModel 변화시, UserModel을 변경시킨다.
             create: (context) => UserModel(),
             update: (context, authModel, userModel) {
-              authModel.isLogined
+               authModel.isLogined
                   ? userModel?.getUserInfo()
                   : userModel?.delUserInfo();
               return (userModel is UserModel) ? userModel : UserModel();
