@@ -23,17 +23,6 @@ class UserProvider with ChangeNotifier {
     _hasData=tf;
     notifyListeners();
   }
-  void getUserInfo() async {
-    try {
-      final response = await DioInfo().dio.get("${UrlInfo.BASE_URL}/me",);
-      _naUser = NAUser.fromJson(response.data);
-      _hasData = true;
-      notifyListeners();
-    } catch (exception) {
-      debugPrint(
-          '*******************************************\n getUserInfo Exception: $exception *******************************************\n');
-    }
-  }
   Future<void> getCookies(url) async{
     cookies = await WebviewCookieManager().getCookies(url);
   }
