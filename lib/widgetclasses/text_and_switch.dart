@@ -1,7 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:easy_localization/easy_localization.dart';
 
-import 'package:new_ara_app/constants/constants.dart';
+import 'package:new_ara_app/constants/colors_info.dart';
 
 List<bool> switchLights = [
   true,

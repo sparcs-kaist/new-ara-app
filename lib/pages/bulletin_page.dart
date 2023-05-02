@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:easy_localization/easy_localization.dart';
 
-import 'package:new_ara_app/constants/constants.dart';
+import 'package:new_ara_app/constants/colors_info.dart';
 
 class BulletinPage extends StatefulWidget {
   const BulletinPage({Key? key}) : super(key: key);

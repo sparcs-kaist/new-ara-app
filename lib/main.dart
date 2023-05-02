@@ -2,11 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:provider/provider.dart';
 
-import 'package:new_ara_app/home.dart';
+import 'package:new_ara_app/pages/newAra_home_page.dart';
 import 'package:new_ara_app/pages/login_page.dart';
-import 'package:new_ara_app/providers/auth_model.dart';
-import 'package:new_ara_app/providers/user_model.dart';
-import 'package:new_ara_app/constants/constants.dart';
+import 'package:new_ara_app/providers/user_provider.dart';
+import 'package:new_ara_app/constants/colors_info.dart';
 
 final supportedLocales = [
   const Locale('en'),
@@ -24,17 +23,7 @@ void main() async {
       startLocale: const Locale('ko'),
       child: MultiProvider(
         providers: [
-          ChangeNotifierProvider(create: (context) => AuthModel()),
-          ChangeNotifierProxyProvider<AuthModel, UserModel>(
-            //AuthModel 변화시, UserModel을 변경시킨다.
-            create: (context) => UserModel(),
-            update: (context, authModel, userModel) {
-               authModel.isLogined
-                  ? userModel?.getUserInfo()
-                  : userModel?.delUserInfo();
-              return (userModel is UserModel) ? userModel : UserModel();
-            },
-          ),
+          ChangeNotifierProvider(create: (_) => UserProvider()),
         ],
         child: MyApp(),
       ),
@@ -64,7 +53,9 @@ class MyApp extends StatelessWidget {
             child: child!,
           );
         },
-        home: context.watch<UserModel>().hasData ? NewAraHome() : LoginPage());
+
+        /// hasData true -> newarahomepage, false -> loginpage.
+        home: context.watch<UserProvider>().hasData ? NewAraHomePage() : LoginPage());
   }
 
   ThemeData _setThemeData() {

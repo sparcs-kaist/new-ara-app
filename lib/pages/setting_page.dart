@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:new_ara_app/providers/user_provider.dart';
 import 'package:provider/provider.dart';
 
-import 'package:new_ara_app/constants/constants.dart';
-import 'package:new_ara_app/providers/auth_model.dart';
+import 'package:new_ara_app/constants/colors_info.dart';
 import 'package:new_ara_app/widgetclasses/text_info.dart';
 import 'package:new_ara_app/widgetclasses/border_boxes.dart';
 import 'package:new_ara_app/widgetclasses/text_and_switch.dart';
+import 'package:webview_cookie_manager/webview_cookie_manager.dart';
 
 class SettingPage extends StatefulWidget {
   const SettingPage({Key? key}) : super(key: key);
@@ -121,9 +122,12 @@ class SettingPageState extends State<SettingPage> {
                     margin: const EdgeInsets.only(
                         top: 12, bottom: 12, left: 15, right: 219),
                     child: GestureDetector(
-                      onTap: () {
-                        context.read<AuthModel>().logout();
-                        Navigator.pop(context);
+                      onTap: () async{
+                        Provider.of<UserProvider>(context, listen: false).setHasData(false);
+                        Navigator.of(context).popUntil((route) => route.isFirst);
+                        await WebviewCookieManager().clearCookies();
+
+                        debugPrint("log out");
                       }, // 임시 로그아웃 기능으로 디자인 변경에 따라 수정될 예정
                       child: const Text(
                         '로그아웃',

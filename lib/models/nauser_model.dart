@@ -46,6 +46,7 @@ class NAUser {
     required this.agree_terms_of_service_at,
   });
 
+  //아래 코드는 NAUser 클래스에 대한 fromJson 팩토리 메소드를 정의한 것입니다. 이 메소드는 JSON 데이터를 파라미터로 받아서 NAUser 객체를 생성하고 반환합니다.
   NAUser.fromJson(Map<String, dynamic> json)
       : user = json['user'],
         email = json['email'],
@@ -68,6 +69,7 @@ class NAUser {
         is_newara = json['is_newara'],
         ara_id = json['ara_id'],
         agree_terms_of_service_at = json['agree_terms_of_service_at'];
+
 
   Map<String, dynamic> toJson() => {
         'user': user,

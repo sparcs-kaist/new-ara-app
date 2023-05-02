@@ -1,31 +1,33 @@
+import 'dart:convert';
+import 'dart:io';
+import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
+import 'package:new_ara_app/providers/user_provider.dart';
+import 'package:webview_cookie_manager/webview_cookie_manager.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
-import 'package:new_ara_app/constants/constants.dart';
-import 'package:new_ara_app/providers/auth_model.dart';
+import 'package:new_ara_app/constants/colors_info.dart';
 import 'package:new_ara_app/widgetclasses/loading_indicator.dart';
 
 import 'package:provider/provider.dart';
 
-class LoginWebView extends StatefulWidget {
-  const LoginWebView({Key? key}) : super(key: key);
+class SparcsSSOPage extends StatefulWidget {
+  const SparcsSSOPage({Key? key}) : super(key: key);
   @override
-  State<LoginWebView> createState() => _LoginWebViewState();
+  State<SparcsSSOPage> createState() => _SparcsSSOPageState();
 }
 
-class _LoginWebViewState extends State<LoginWebView> {
+class _SparcsSSOPageState extends State<SparcsSSOPage> {
   late final WebViewController _controller;
   final webViewKey = GlobalKey();
   bool isVisible = false;
+  List<Cookie> cookies=[];
+  int userID=0;
 
   @override
   void initState() {
     super.initState();
-    late final PlatformWebViewControllerCreationParams params;
-    params = const PlatformWebViewControllerCreationParams();
-    final WebViewController controller =
-        WebViewController.fromPlatformCreationParams(params);
-    controller
+    _controller = WebViewController()
       ..setJavaScriptMode(JavaScriptMode.unrestricted)
       ..setBackgroundColor(const Color(0x00000000))
       ..setNavigationDelegate(NavigationDelegate(
@@ -34,32 +36,35 @@ class _LoginWebViewState extends State<LoginWebView> {
         },
         onPageStarted: (String url) {
           setState(() => isVisible = false);
-          if (Uri.parse(url).authority == UrlInfo.MAIN_AUTHORITY && url!=UrlInfo.WEBVIEW_INIT) {
-            context
-                .read<AuthModel>()
-                .login(UrlInfo.MAIN_URL)
-                .then((_) => Navigator.pop(context));
-          }
         },
-        onPageFinished: (String url) {
-          if (Uri.parse(url).authority != UrlInfo.MAIN_AUTHORITY) {
-            setState(() => isVisible = true);
+        onPageFinished: (String url) async{
+          setState(() {
+            isVisible = true;
+          });
+          debugPrint("current url is $url");
+
+          //(수정 요망)현재는 야매로 하는 방법
+          if (url.endsWith('https://newara.dev.sparcs.org/')) {
+            debugPrint("main.dart:login success");
+
+            //현재 정상적으로 로그인 된 상태이므로 newAraHomePage 띄우기
+            Provider.of<UserProvider>(context, listen: false).setHasData(true);
           }
-          debugPrint('TBD');
         },
         onWebResourceError: (WebResourceError error) {
           debugPrint(
               'code: ${error.errorCode}\ndescription: ${error.description}\nerrorType: ${error.errorType}\nisForMainFrame: ${error.isForMainFrame}');
         },
       ))
-      ..addJavaScriptChannel('Toaster',
-          onMessageReceived: (JavaScriptMessage message) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(message.message)),
-        );
-      })
-      ..loadRequest(Uri.parse(UrlInfo.WEBVIEW_INIT));
-    _controller = controller;
+      // ..addJavaScriptChannel('Toaster',
+      //     onMessageReceived: (JavaScriptMessage message) {
+      //   ScaffoldMessenger.of(context).showSnackBar(
+      //     SnackBar(content: Text(message.message)),
+      //   );
+      // })
+      ..loadRequest(Uri.parse(
+          'https://newara.dev.sparcs.org/api/users/sso_login/'));
+
   }
 
   @override

@@ -6,14 +6,17 @@ import 'package:new_ara_app/pages/bulletin_page.dart';
 import 'package:new_ara_app/pages/chat_page.dart';
 import 'package:new_ara_app/pages/notification_page.dart';
 import 'package:new_ara_app/pages/user_page.dart';
+import 'package:new_ara_app/providers/user_provider.dart';
+import 'package:provider/provider.dart';
+import 'package:webview_cookie_manager/webview_cookie_manager.dart';
 
-class NewAraHome extends StatefulWidget {
-  const NewAraHome({Key? key}) : super(key: key);
+class NewAraHomePage extends StatefulWidget {
+  const NewAraHomePage({Key? key}) : super(key: key);
   @override
-  State<StatefulWidget> createState() => _NewAraHomeState();
+  State<StatefulWidget> createState() => _NewAraHomePageState();
 }
 
-class _NewAraHomeState extends State<NewAraHome> {
+class _NewAraHomePageState extends State<NewAraHomePage> {
   int _selectedIndex = 0;
   final List<Widget> _widgetOptions = <Widget>[
     MainPage(),
@@ -27,6 +30,18 @@ class _NewAraHomeState extends State<NewAraHome> {
     setState(() {
       _selectedIndex = index;
     });
+  }
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+
+    //api/me 해서 유저 정보를 모델에 저장하기.
+    downloadUserInfo();
+  }
+  void downloadUserInfo() async{
+    await Provider.of<UserProvider>(context, listen: false).getCookies("https://newara.dev.sparcs.org/");
+    await Provider.of<UserProvider>(context, listen: false).apiMeUserInfo();
   }
 
   @override

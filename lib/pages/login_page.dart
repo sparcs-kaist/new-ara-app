@@ -3,9 +3,8 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:provider/provider.dart';
 
-import 'package:new_ara_app/constants/constants.dart';
-import 'package:new_ara_app/pages/login_webview.dart';
-import 'package:new_ara_app/providers/auth_model.dart';
+import 'package:new_ara_app/constants/colors_info.dart';
+import 'package:new_ara_app/pages/sparcs_sso_page.dart';
 import 'package:new_ara_app/widgetclasses/loading_indicator.dart';
 
 class LoginPage extends StatefulWidget {
@@ -15,13 +14,16 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
+
+
+  bool showSSOPage =false;
   @override
   Widget build(BuildContext context) {
+
     return Scaffold(
       body: SafeArea(
-        child: context.watch<AuthModel>().isLogined
-            ? LoadingIndicator()
-            : SizedBox(
+        child: showSSOPage == false ?
+              SizedBox(
                 width: MediaQuery.of(context).size.width,
                 height: MediaQuery.of(context).size.height,
                 child: Column(
@@ -54,16 +56,17 @@ class _LoginPageState extends State<LoginPage> {
                           ),
                         ),
                         onPressed: () {
-                          Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => LoginWebView()));
+                          setState(() {
+                            showSSOPage = true;
+                          });
                         },
                       ),
                     ),
                   ],
                 ),
-              ),
+              )
+            :
+            SparcsSSOPage(),
       ),
     );
   }
