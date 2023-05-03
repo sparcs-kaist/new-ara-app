@@ -23,24 +23,20 @@ class _LoginPageState extends State<LoginPage> {
     return Scaffold(
       body: SafeArea(
         child: showSSOPage == false ?
-              SizedBox(
-                width: MediaQuery.of(context).size.width,
-                height: MediaQuery.of(context).size.height,
+              Center(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    SizedBox(
-                      height: MediaQuery.of(context).size.height - 150,
-                      width: 200,
-                      child: SizedBox(
-                        child: SvgPicture.asset(
-                          'assets/images/logo.svg',
-                        ),
+                    Expanded(
+                      child: SvgPicture.asset(
+                        fit: BoxFit.contain, // 이미지 비율 유지
+                        width: 200, // 원하는 너비 지정
+                        'assets/images/logo.svg',
                       ),
                     ),
                     Container(
-                      width: 350,
+                      width: 300,
                       height: 60,
                       decoration: BoxDecoration(
                         color: ColorsInfo.newara,
@@ -61,6 +57,10 @@ class _LoginPageState extends State<LoginPage> {
                           });
                         },
                       ),
+                    ),
+                    SizedBox(
+                      //로그인 버튼과 화면 하단과의 공백 공간
+                      height: 50,
                     ),
                   ],
                 ),
