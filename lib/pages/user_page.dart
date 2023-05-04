@@ -46,25 +46,18 @@ class _UserPageState extends State<UserPage>
           ),
         ),
         actions: [
-          Container(
-            width: 40,
-            height: 40,
-            decoration: const BoxDecoration(
-                color: Color.fromRGBO(240, 240, 240, 1),
-                shape: BoxShape.circle),
-            child: IconButton(
-              highlightColor: Colors.white,
-              splashColor: Colors.white,
-              icon: SvgPicture.asset(
-                'assets/icons/gear.svg',
-                color: ColorsInfo.newara,
-                width: 20,
-                height: 20,
-              ),
-              onPressed: () {
-                Navigator.of(context).push(_createRoute());
-              },
+          IconButton(
+            highlightColor: Colors.white,
+            splashColor: Colors.white,
+            icon: SvgPicture.asset(
+              'assets/icons/icon-setting.svg',
+              color: ColorsInfo.newara,
+              width: 25,
+              height: 25,
             ),
+            onPressed: () {
+              Navigator.of(context).push(_createRoute());
+            },
           ),
           const SizedBox(width: 11),
         ],

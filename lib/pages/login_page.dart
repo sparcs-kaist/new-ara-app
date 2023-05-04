@@ -15,7 +15,6 @@ class LoginPage extends StatefulWidget {
 
 class _LoginPageState extends State<LoginPage> {
 
-
   bool showSSOPage =false;
   @override
   Widget build(BuildContext context) {
