@@ -2,7 +2,6 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:easy_localization/easy_localization.dart';
-import 'package:flutter_driver/driver_extension.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:new_ara_app/widgetclasses/loading_indicator.dart';
 import 'package:provider/provider.dart';
