@@ -22,14 +22,22 @@ class _MainPageState extends State<MainPage> {
         actions: [
           IconButton(
             icon: SvgPicture.asset(
-              'assets/icons/search.svg',
+              'assets/icons/post.svg',
               color: ColorsInfo.newara,
-              width: 20,
-              height: 20,
+              width: 35,
+              height: 35,
             ),
             onPressed: () {},
           ),
-          const SizedBox(width: 20),
+          IconButton(
+            icon: SvgPicture.asset(
+              'assets/icons/search.svg',
+              color: ColorsInfo.newara,
+              width: 35,
+              height: 35,
+            ),
+            onPressed: () {},
+          ),
         ],
       ),
       body: SafeArea(
