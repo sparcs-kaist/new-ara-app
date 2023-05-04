@@ -24,26 +24,18 @@ class _NotificationPageState extends State<NotificationPage> {
           ),
         ),
         actions: [
-          Container(
-            width: 40,
-            height: 40,
-            decoration: const BoxDecoration(
-              color: Color.fromRGBO(240, 240, 240, 1),
-              shape: BoxShape.circle,
+          IconButton(
+            highlightColor: Colors.white,
+            splashColor: Colors.white,
+            icon: SvgPicture.asset(
+              'assets/icons/search.svg',
+              color: ColorsInfo.newara,
+              width: 45,
+              height: 45,
             ),
-            child: IconButton(
-              highlightColor: Colors.white,
-              splashColor: Colors.white,
-              icon: SvgPicture.asset(
-                'assets/icons/search.svg',
-                color: ColorsInfo.newara,
-                width: 20,
-                height: 20,
-              ),
-              onPressed: () {},
-            ),
+            onPressed: () {},
           ),
-          SizedBox(width: 20),
+          const SizedBox(width: 20),
         ],
       ),
       body: SafeArea(
