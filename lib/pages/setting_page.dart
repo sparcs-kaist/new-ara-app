@@ -24,6 +24,7 @@ class SettingPageState extends State<SettingPage> {
       appBar: AppBar(
         centerTitle: true,
         leading: IconButton(
+          color: ColorsInfo.newara,
           icon: SvgPicture.asset('assets/icons/chevron-left.svg',
               color: ColorsInfo.newara, width: 10.7, height: 18.99),
           onPressed: () {
@@ -51,12 +52,21 @@ class SettingPageState extends State<SettingPage> {
                 const SizedBox(height: 23),
                 SizedBox(
                   width: MediaQuery.of(context).size.width - 50,
-                  child: Text(
-                    'setting_page.bulletin'.tr(),
-                    style: const TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.w700,
-                    ),
+                  child: Row(
+                    children: [
+                      SvgPicture.asset(
+                        'assets/icons/post-1.svg',
+                        width: 34,
+                        height: 34,
+                      ),
+                      Text(
+                        'setting_page.bulletin'.tr(),
+                        style: const TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
                 const SizedBox(height: 7),
@@ -64,12 +74,47 @@ class SettingPageState extends State<SettingPage> {
                 const SizedBox(height: 24),
                 SizedBox(
                   width: MediaQuery.of(context).size.width - 50,
-                  child: Text(
-                    'setting_page.block'.tr(),
-                    style: const TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.w700,
-                    ),
+                  child: Row(
+                    children: [
+                      SvgPicture.asset(
+                        'assets/icons/notification-1.svg',
+                        width: 34,
+                        height: 34,
+                      ),
+                      Text(
+                        'setting_page.noti'.tr(),
+                        style: const TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 7),
+                BorderBoxes(94, switchItems[1]),
+                const SizedBox(height: 10),
+                BorderBoxes(94, switchItems[2]),
+                const SizedBox(height: 5),
+                TextInfo('setting_page.hot_info'.tr()),
+                const SizedBox(height: 10),
+                SizedBox(
+                  width: MediaQuery.of(context).size.width - 50,
+                  child: Row(
+                    children: [
+                      SvgPicture.asset(
+                        'assets/icons/barrior-1.svg',
+                        width: 34,
+                        height: 34,
+                      ),
+                      Text(
+                        'setting_page.block'.tr(),
+                        style: const TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
                 const SizedBox(height: 7),
@@ -93,23 +138,6 @@ class SettingPageState extends State<SettingPage> {
                 const SizedBox(height: 5),
                 TextInfo('setting_page.block_howto'.tr()),
                 const SizedBox(height: 20),
-                SizedBox(
-                  width: MediaQuery.of(context).size.width - 50,
-                  child: Text(
-                    'setting_page.noti'.tr(),
-                    style: const TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.w700,
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 7),
-                BorderBoxes(94, switchItems[1]),
-                const SizedBox(height: 10),
-                BorderBoxes(94, switchItems[2]),
-                const SizedBox(height: 5),
-                TextInfo('setting_page.hot_info'.tr()),
-                const SizedBox(height: 10),
                 Container(
                   width: MediaQuery.of(context).size.width - 40,
                   height: 50,

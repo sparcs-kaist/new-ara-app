@@ -71,10 +71,10 @@ class _NewAraHomePageState extends State<NewAraHomePage> {
       items: [
         BottomNavigationBarItem(
           icon: SvgPicture.asset(
-            'assets/icons/house-door-fill.svg',
+            'assets/icons/home-1.svg',
             color: _selectedIndex == 0 ? Colors.black : Colors.grey,
-            width: 20.31,
-            height: 21.88,
+            width: 36,
+            height: 36,
           ),
           label: 'Home',
         ),
@@ -82,8 +82,8 @@ class _NewAraHomePageState extends State<NewAraHomePage> {
           icon: SvgPicture.asset(
             'assets/icons/list-ul.svg',
             color: _selectedIndex == 1 ? Colors.black : Colors.grey,
-            width: 25,
-            height: 17.86,
+            width: 23,
+            height: 20,
           ),
           label: 'Bulletin',
         ),
@@ -107,10 +107,10 @@ class _NewAraHomePageState extends State<NewAraHomePage> {
         ),
         BottomNavigationBarItem(
           icon: SvgPicture.asset(
-            'assets/icons/person-circle.svg',
+            'assets/icons/member-1.svg',
             color: _selectedIndex == 4 ? Colors.black : Colors.grey,
-            width: 25,
-            height: 25,
+            width: 36,
+            height: 36,
           ),
           label: 'MyPage',
         ),
