@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:easy_localization/easy_localization.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:new_ara_app/providers/user_provider.dart';
 import 'package:provider/provider.dart';
@@ -123,8 +124,13 @@ class SettingPageState extends State<SettingPage> {
                         top: 12, bottom: 12, left: 15, right: 219),
                     child: GestureDetector(
                       onTap: () async{
+
                         Provider.of<UserProvider>(context, listen: false).setHasData(false);
                         Navigator.of(context).popUntil((route) => route.isFirst);
+                        // 이 뒤에 코드는 작동 해요~
+
+                        FlutterSecureStorage secureStorage = FlutterSecureStorage();
+                        await secureStorage.delete(key: 'cookie');
                         await WebviewCookieManager().clearCookies();
 
                         debugPrint("log out");

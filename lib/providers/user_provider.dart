@@ -9,35 +9,53 @@ import 'package:new_ara_app/models/nauser_model.dart';
 import 'package:new_ara_app/constants/colors_info.dart';
 import 'package:webview_cookie_manager/webview_cookie_manager.dart';
 
-
 //Provider.of<UserProvider>(context, listen: false).increment()
 class UserProvider with ChangeNotifier {
-  NAUser? _naUser;  // api/me 했을 때 받는 유저의 정보
+  NAUser? _naUser; // api/me 했을 때 받는 유저의 정보
   bool _hasData = false; // api/me 했을 때 유저의 정보가 있는가?
-  List<Cookie> cookies=[];
+  List<Cookie> cookies = [];
 
   NAUser? get naUser => _naUser;
   bool get hasData => _hasData;
 
   void setHasData(bool tf) {
-    _hasData=tf;
+    _hasData = tf;
     notifyListeners();
   }
-  Future<void> getCookies(url) async{
-    cookies = await WebviewCookieManager().getCookies(url);
-  }
-  Future<void> apiMeUserInfo() async{
-    //쿠키를 기반으로 api/me 해서 namodel 갱신하는 메소드
 
-    // 쿠키를 문자열로 변환하여 HTTP 요청의 헤더에 추가
-    String cookieString = cookies.map((cookie) => '${cookie.name}=${cookie.value}').join('; ');
-    debugPrint("cookieString $cookieString");
-    // API 요청을 보낼 URL
+  String getCookiesToString(){
+    String cookieString =
+    cookies.map((cookie) => '${cookie.name}=${cookie.value}').join('; ');
+    return cookieString;
+  }
+  Future<List<Cookie>> getCookies(url) async {
+    debugPrint("getCookies Method");
+    cookies = await WebviewCookieManager().getCookies(url);
+
+    //외부에서 바꿀 수 없도록 복사해서 반환.
+    return cookies.toList();
+  }
+
+  Future<bool> apiMeUserInfo({String initCookieString : ""}) async {
+    //쿠키를 기반으로 api/me 해서 namodel 갱신하는 메소드
+    //initCookieString 이 없으면 현재 프로바이더의 쿠키로 한다.
+
+    String cookieString="";
     String apiUrl = 'https://newara.dev.sparcs.org/api/me';
 
+    if(initCookieString == "") {
+      // 쿠키를 문자열로 변환하여 HTTP 요청의 헤더에 추가
+      cookieString =
+      cookies.map((cookie) => '${cookie.name}=${cookie.value}').join('; ');
+      debugPrint("cookieString $cookieString");
+      // API 요청을 보낼 URL
+
+    }
+    else{
+      cookieString=initCookieString;
+    }
     // HTTP 요청을 위한 헤더 및 쿠키 추가
     Map<String, String> headers = {
-
       'Cookie': cookieString, // 쿠키 추가
     };
 
@@ -49,17 +67,22 @@ class UserProvider with ChangeNotifier {
     if (response.statusCode == 200) {
       // 요청이 성공적으로 처리됨
       //_naUser 모델에 요청값 입력.
-      Map<String, dynamic> responseData =  jsonDecode(utf8.decode(response.bodyBytes));;
-      _naUser=NAUser.fromJson(responseData);
+      Map<String, dynamic> responseData =
+          jsonDecode(utf8.decode(response.bodyBytes));
+      ;
+      _naUser = NAUser.fromJson(responseData);
       // 유저 정보 출력
-      print(responseData);
+      debugPrint("user_provider.dart : $responseData");
 
       //유저 정보를 사용하는 곳에서 재 실행!
       notifyListeners();
+      return true;
     } else {
       // 요청이 실패함 -> 유저가 로그아웃 된 상태 또는 인터넷 오류.
       print('api/me request failed with status code: ${response.statusCode}');
+      return false;
     }
+    return false;
   }
 
   void delUserInfo() {

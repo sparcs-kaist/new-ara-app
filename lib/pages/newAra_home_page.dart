@@ -31,6 +31,7 @@ class _NewAraHomePageState extends State<NewAraHomePage> {
       _selectedIndex = index;
     });
   }
+
   @override
   void initState() {
     // TODO: implement initState
@@ -40,10 +41,15 @@ class _NewAraHomePageState extends State<NewAraHomePage> {
     //use_build_context_synchronously 도 고려해야함.
     downloadUserInfo(context);
   }
-  void downloadUserInfo(initStateContext) async{
-    await Provider.of<UserProvider>(initStateContext, listen: false).getCookies("https://newara.dev.sparcs.org/");
-    await Provider.of<UserProvider>(initStateContext, listen: false).apiMeUserInfo();
+
+  void downloadUserInfo(initStateContext) async {
+    debugPrint("downloadUserInfo");
+    await Provider.of<UserProvider>(initStateContext, listen: false)
+        .getCookies("https://newara.dev.sparcs.org/");
+    await Provider.of<UserProvider>(initStateContext, listen: false)
+        .apiMeUserInfo();
   }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(

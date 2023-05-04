@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:new_ara_app/providers/user_provider.dart';
@@ -26,6 +27,7 @@ class _SparcsSSOPageState extends State<SparcsSSOPage> {
 
   @override
   void initState() {
+
     super.initState();
     _controller = WebViewController()
       ..setJavaScriptMode(JavaScriptMode.unrestricted)
@@ -38,6 +40,9 @@ class _SparcsSSOPageState extends State<SparcsSSOPage> {
           setState(() => isVisible = false);
         },
         onPageFinished: (String url) async{
+
+          var userProvider = Provider.of<UserProvider>(context,listen: false);
+
           setState(() {
             isVisible = true;
           });
@@ -45,10 +50,27 @@ class _SparcsSSOPageState extends State<SparcsSSOPage> {
 
           //(수정 요망)현재는 야매로 하는 방법
           if (url.endsWith('https://newara.dev.sparcs.org/')) {
+
+            final tempContext=context;
+            //웹뷰에서 로그인 성공
             debugPrint("main.dart:login success");
 
+            FlutterSecureStorage secureStorage = FlutterSecureStorage();
+
+
+            userProvider.setHasData(true);
+            await userProvider.getCookies("https://newara.dev.sparcs.org/");
+            await userProvider.apiMeUserInfo();
+
+
+            String cookieString = userProvider.getCookiesToString();
+            await secureStorage.write(key: 'cookie', value: cookieString);
+
+
+
+
             //현재 정상적으로 로그인 된 상태이므로 newAraHomePage 띄우기
-            Provider.of<UserProvider>(context, listen: false).setHasData(true);
+
           }
         },
         onWebResourceError: (WebResourceError error) {
