@@ -23,6 +23,7 @@ class SettingPageState extends State<SettingPage> {
       appBar: AppBar(
         centerTitle: true,
         leading: IconButton(
+          color: ColorsInfo.newara,
           icon: SvgPicture.asset('assets/icons/chevron-left.svg',
               color: ColorsInfo.newara, width: 10.7, height: 18.99),
           onPressed: () {
