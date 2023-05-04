@@ -19,7 +19,7 @@ class SparcsSSOPage extends StatefulWidget {
 }
 
 class _SparcsSSOPageState extends State<SparcsSSOPage> {
-  late final WebViewController _controller;
+  WebViewController _controller = WebViewController();
   final webViewKey = GlobalKey();
   bool isVisible = false;
   List<Cookie> cookies=[];
@@ -29,6 +29,7 @@ class _SparcsSSOPageState extends State<SparcsSSOPage> {
   void initState() {
 
     super.initState();
+    WebViewCookieManager().clearCookies();
     _controller = WebViewController()
       ..setJavaScriptMode(JavaScriptMode.unrestricted)
       ..setBackgroundColor(const Color(0x00000000))
