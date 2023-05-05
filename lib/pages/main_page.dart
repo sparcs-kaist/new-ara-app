@@ -27,15 +27,17 @@ class _MainPageState extends State<MainPage> {
     //프로바이더에 있는 정보 사용.
     var myMap = userProvider.getApiRes("home");
     setState(() {
-
+      textContent = myMap?["daily_bests"][0]["title"] ?? "loading";
     });
 
     // api 호출과 프로바이더 정보 동기화.
     await userProvider.synApiRes("home", "home");
     myMap = userProvider.getApiRes("home");
-    setState(() {
-
-    });
+    if(mounted) {
+      setState(() {
+        textContent = myMap?["daily_bests"][0]["title"] ?? "loading";
+      });
+    }
   }
   @override
   Widget build(BuildContext context) {
@@ -76,7 +78,7 @@ class _MainPageState extends State<MainPage> {
               children: [
                 const MainPageTextButton('main_page.realtime'),
                 // 실시간 인기글을 ListView로 도입 예정
-                Text("---- $textContent"),
+                Text("$textContent"),
                 Container(
                   width: MediaQuery.of(context).size.width - 40,
                   height: 200,
