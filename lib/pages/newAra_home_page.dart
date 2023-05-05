@@ -37,15 +37,12 @@ class _NewAraHomePageState extends State<NewAraHomePage> {
     // TODO: implement initState
     super.initState();
 
-    //api/me 해서 유저 정보를 모델에 저장하기.
-    //use_build_context_synchronously 도 고려해야함.
-    downloadUserInfo(context);
   }
 
   void downloadUserInfo(initStateContext) async {
-    debugPrint("downloadUserInfo");
+
     await Provider.of<UserProvider>(initStateContext, listen: false)
-        .getCookies("https://newara.dev.sparcs.org/");
+         .setCookiesFromUrl("https://newara.dev.sparcs.org/");
     await Provider.of<UserProvider>(initStateContext, listen: false)
         .apiMeUserInfo();
   }

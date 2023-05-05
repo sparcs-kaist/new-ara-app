@@ -42,7 +42,6 @@ void main() async {
   //   }
   //   return '';
   // });
-
 }
 
 class CustomScrollBehavior extends ScrollBehavior {
@@ -65,7 +64,7 @@ class _MyAppState extends State<MyApp> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    autoLoginByGetCookie(Provider.of<UserProvider>(context,listen: false));
+    autoLoginByGetCookie(Provider.of<UserProvider>(context, listen: false));
   }
 
   void autoLoginByGetCookie(UserProvider userProvider) async {
@@ -82,23 +81,21 @@ class _MyAppState extends State<MyApp> {
 
     debugPrint("main.dart : ${cookiesBySecureStorage}");
     if (cookiesBySecureStorage != null) {
-
       String apiUrl = 'https://newara.dev.sparcs.org/api/me';
 
       setState(() {
         is_loading = true;
       });
-      bool tf=await userProvider.apiMeUserInfo(initCookieString: cookiesBySecureStorage);
-      if(tf){
+      bool tf = await userProvider.apiMeUserInfo(
+          initCookieString: cookiesBySecureStorage);
+      if (tf) {
         userProvider.setHasData(true);
+        userProvider.setCookieToList(cookiesBySecureStorage);
       }
       setState(() {
         is_loading = false;
       });
-    }
-    else{
-
-    }
+    } else {}
   }
 
   @override
@@ -117,12 +114,11 @@ class _MyAppState extends State<MyApp> {
 
         /// hasData true -> newarahomepage, false -> loginpage.
         /// webview에서 /ara.org 로 이동 가능하면 true로 바꿀 수 있음.
-        home:
-        is_loading == true ?
-        LoadingIndicator() // 자동 로그인 시 로컬 쿠키에서 가져오는 동안 공백이 생긴다. 그 동안 띄어주는 indicator
-        :context.watch<UserProvider>().hasData
-            ? NewAraHomePage()
-            : LoginPage());
+        home: is_loading == true
+            ? LoadingIndicator() // 자동 로그인 시 로컬 쿠키에서 가져오는 동안 공백이 생긴다. 그 동안 띄어주는 indicator
+            : context.watch<UserProvider>().hasData
+                ? NewAraHomePage()
+                : LoginPage());
   }
 
   ThemeData _setThemeData() {

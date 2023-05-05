@@ -60,12 +60,13 @@ class _SparcsSSOPageState extends State<SparcsSSOPage> {
 
 
             userProvider.setHasData(true);
-            await userProvider.getCookies("https://newara.dev.sparcs.org/");
+            await userProvider.setCookiesFromUrl("https://newara.dev.sparcs.org/");
             await userProvider.apiMeUserInfo();
 
 
             String cookieString = userProvider.getCookiesToString();
             await secureStorage.write(key: 'cookie', value: cookieString);
+
 
 
 
