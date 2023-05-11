@@ -3,7 +3,7 @@ import 'package:easy_localization/easy_localization.dart';
 
 class UserTab extends StatefulWidget {
   final String tabText;
-  const UserTab(this.tabText);
+  const UserTab(this.tabText, {super.key});
   @override
   State<UserTab> createState() => _UserTabState();
 }

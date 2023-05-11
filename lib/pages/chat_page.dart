@@ -43,10 +43,10 @@ class _ChatPageState extends State<ChatPage> {
               onPressed: () {},
             ),
           ),
-          SizedBox(width: 20),
+          const SizedBox(width: 20),
         ],
       ),
-      body: SafeArea(
+      body: const SafeArea(
         child: SingleChildScrollView(
           child: Center(
             child: Text('TBD'),

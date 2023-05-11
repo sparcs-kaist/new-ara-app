@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 
 class TextInfo extends StatelessWidget {
-  final String info_str;
-  const TextInfo(this.info_str);
+  final String infoStr;
+  const TextInfo(this.infoStr, {super.key});
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return SizedBox(
       width: MediaQuery.of(context).size.width - 60,
       child: Text(
-        info_str,
+        infoStr,
         style: const TextStyle(
             fontSize: 12,
             fontWeight: FontWeight.w500,

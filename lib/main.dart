@@ -19,7 +19,7 @@ void main() async {
     EasyLocalization(
       supportedLocales: supportedLocales,
       path: 'assets/translations',
-      fallbackLocale: const Locale('ko'),
+      fallbackLocale: const Locale('en'),
       startLocale: const Locale('ko'),
       child: MultiProvider(
         providers: [

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-
 import 'package:new_ara_app/pages/main_page.dart';
 import 'package:new_ara_app/pages/bulletin_page.dart';
 import 'package:new_ara_app/pages/chat_page.dart';
@@ -8,7 +7,6 @@ import 'package:new_ara_app/pages/notification_page.dart';
 import 'package:new_ara_app/pages/user_page.dart';
 import 'package:new_ara_app/providers/user_provider.dart';
 import 'package:provider/provider.dart';
-import 'package:webview_cookie_manager/webview_cookie_manager.dart';
 
 class NewAraHomePage extends StatefulWidget {
   const NewAraHomePage({Key? key}) : super(key: key);
@@ -19,11 +17,11 @@ class NewAraHomePage extends StatefulWidget {
 class _NewAraHomePageState extends State<NewAraHomePage> {
   int _selectedIndex = 0;
   final List<Widget> _widgetOptions = <Widget>[
-    MainPage(),
-    BulletinPage(),
-    ChatPage(),
-    NotificationPage(),
-    UserPage(),
+    const MainPage(),
+    const BulletinPage(),
+    const ChatPage(),
+    const NotificationPage(),
+    const UserPage(),
   ];
 
   void _onItemTapped(int index) {
@@ -40,8 +38,9 @@ class _NewAraHomePageState extends State<NewAraHomePage> {
     downloadUserInfo();
   }
   void downloadUserInfo() async{
-    await Provider.of<UserProvider>(context, listen: false).getCookies("https://newara.dev.sparcs.org/");
-    await Provider.of<UserProvider>(context, listen: false).apiMeUserInfo();
+    var userProvider=Provider.of<UserProvider>(context, listen: false);
+    await userProvider.getCookies("https://newara.dev.sparcs.org/");
+    await userProvider.apiMeUserInfo();
   }
 
   @override

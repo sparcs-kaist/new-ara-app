@@ -39,7 +39,7 @@ List<List<Widget>> switchItems = [
 class TextAndSwitch extends StatefulWidget {
   final String title;
   final int num;
-  const TextAndSwitch(this.title, this.num);
+  const TextAndSwitch(this.title, this.num, {super.key});
   @override
   State<TextAndSwitch> createState() => _TextAndSwitchState();
 }

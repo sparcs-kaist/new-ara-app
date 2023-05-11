@@ -1,12 +1,8 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:http/http.dart' as http;
-import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
-
-import 'package:new_ara_app/dio_info.dart';
 import 'package:new_ara_app/models/nauser_model.dart';
-import 'package:new_ara_app/constants/colors_info.dart';
 import 'package:webview_cookie_manager/webview_cookie_manager.dart';
 
 
@@ -49,11 +45,9 @@ class UserProvider with ChangeNotifier {
     if (response.statusCode == 200) {
       // 요청이 성공적으로 처리됨
       //_naUser 모델에 요청값 입력.
-      Map<String, dynamic> responseData =  jsonDecode(utf8.decode(response.bodyBytes));;
+      Map<String, dynamic> responseData =  jsonDecode(utf8.decode(response.bodyBytes));
       _naUser=NAUser.fromJson(responseData);
       // 유저 정보 출력
-      print(responseData);
-
       //유저 정보를 사용하는 곳에서 재 실행!
       notifyListeners();
     } else {

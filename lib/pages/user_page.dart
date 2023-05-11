@@ -145,7 +145,7 @@ class _UserPageState extends State<UserPage>
                 ),
                 const SizedBox(height: 10),
                 TabBar(
-                  unselectedLabelColor: Color.fromRGBO(177, 177, 177, 1),
+                  unselectedLabelColor: const Color.fromRGBO(177, 177, 177, 1),
                   labelColor: ColorsInfo.newara,
                   indicatorColor: ColorsInfo.newara,
                   tabs: const [
@@ -174,10 +174,10 @@ class _UserPageState extends State<UserPage>
                   height: 500,
                   child: TabBarView(
                     controller: _tabController,
-                    children: [
-                      Container(child: Center(child: Text('없음'))),
-                      Container(child: Center(child: Text('없음'))),
-                      Container(child: Center(child: Text('없음'))),
+                    children: const [
+                      Center(child: Text('없음')),
+                      Center(child: Text('없음')),
+                      Center(child: Text('없음')),
                     ],
                   ),
                 ),
@@ -192,7 +192,7 @@ class _UserPageState extends State<UserPage>
 
 Route _createRoute() {
   return PageRouteBuilder(
-    pageBuilder: (context, animation, secondaryAnimation) => SettingPage(),
+    pageBuilder: (context, animation, secondaryAnimation) => const SettingPage(),
     transitionsBuilder: ((context, animation, secondaryAnimation, child) {
       var begin = const Offset(1, 0);
       var end = const Offset(0, 0);

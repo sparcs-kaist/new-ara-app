@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 class BorderBoxes extends StatefulWidget {
   final double height;
   final List<Widget> widgetsList;
-  const BorderBoxes(this.height, this.widgetsList);
+  const BorderBoxes(this.height, this.widgetsList, {super.key});
   @override
   State<BorderBoxes> createState() => _BorderBoxesState();
 }
