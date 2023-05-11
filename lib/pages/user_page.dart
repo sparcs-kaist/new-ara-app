@@ -35,10 +35,12 @@ class _UserPageState extends State<UserPage>
 
   @override
   Widget build(BuildContext context) {
+    var userProvider = context.watch<UserProvider>();
+
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          context.watch<UserProvider>().naUser!.nickname,
+          userProvider.naUser!.nickname,
           style: const TextStyle(
             fontSize: 28,
             fontWeight: FontWeight.w700,
@@ -94,7 +96,7 @@ class _UserPageState extends State<UserPage>
                             size: const Size.fromRadius(48),
                             child: Image.network(
                                 fit: BoxFit.cover,
-                                context.watch<UserProvider>().naUser!.picture),
+                                userProvider.naUser!.picture),
                           ),
                         ),
                       ),
@@ -107,14 +109,14 @@ class _UserPageState extends State<UserPage>
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             Text(
-                              "${context.watch<UserProvider>().naUser!.sso_user_info['first_name']} ${context.watch<UserProvider>().naUser!.sso_user_info['last_name']}",
+                              "${userProvider.naUser!.sso_user_info['first_name']} ${userProvider.naUser!.sso_user_info['last_name']}",
                               style: const TextStyle(
                                 fontSize: 18,
                                 fontWeight: FontWeight.w700,
                               ),
                             ),
                             Text(
-                              context.watch<UserProvider>().naUser!.email,
+                              userProvider.naUser!.email,
                               style: const TextStyle(
                                 fontSize: 14,
                                 fontWeight: FontWeight.w500,
@@ -161,7 +163,7 @@ class _UserPageState extends State<UserPage>
                   width: MediaQuery.of(context).size.width - 40,
                   height: 24,
                   child: Text(
-                    '총 ${context.watch<UserProvider>().naUser!.num_articles}개의 글',
+                    '총 ${userProvider.naUser!.num_articles}개의 글',
                     style: const TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w700,

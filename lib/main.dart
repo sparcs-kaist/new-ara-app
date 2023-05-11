@@ -55,7 +55,7 @@ class MyApp extends StatelessWidget {
         },
 
         /// hasData true -> newarahomepage, false -> loginpage.
-        home: context.watch<UserProvider>().hasData ? NewAraHomePage() : LoginPage());
+        home: context.watch<UserProvider>().hasData ? const NewAraHomePage() : const LoginPage());
   }
 
   ThemeData _setThemeData() {

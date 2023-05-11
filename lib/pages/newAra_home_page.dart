@@ -38,7 +38,7 @@ class _NewAraHomePageState extends State<NewAraHomePage> {
     downloadUserInfo();
   }
   void downloadUserInfo() async{
-    var userProvider=Provider.of<UserProvider>(context, listen: false);
+    var userProvider = context.watch<UserProvider>();
     await userProvider.getCookies("https://newara.dev.sparcs.org/");
     await userProvider.apiMeUserInfo();
   }
