@@ -40,7 +40,7 @@ class _UserPageState extends State<UserPage>
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          userProvider.naUser!.nickname,
+          userProvider.hasData==true?userProvider.naUser!.nickname:"",
           style: const TextStyle(
             fontSize: 28,
             fontWeight: FontWeight.w700,

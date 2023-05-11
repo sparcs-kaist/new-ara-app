@@ -4,13 +4,13 @@ import 'package:flutter_svg/flutter_svg.dart';
 
 import 'package:new_ara_app/constants/colors_info.dart';
 
-class ChatPage extends StatefulWidget {
-  const ChatPage({Key? key}) : super(key: key);
+class ChatListPage extends StatefulWidget {
+  const ChatListPage({Key? key}) : super(key: key);
   @override
-  State<StatefulWidget> createState() => _ChatPageState();
+  State<StatefulWidget> createState() => _ChatListPageState();
 }
 
-class _ChatPageState extends State<ChatPage> {
+class _ChatListPageState extends State<ChatListPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
