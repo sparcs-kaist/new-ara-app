@@ -126,10 +126,10 @@ class _MainPageState extends State<MainPage> {
                     padding: const EdgeInsets.only(
                         top: 10, bottom: 10, left: 15, right: 15),
                     children: [
-                      Container(
+                      SizedBox(
                         height: 28,
                         child: Row(
-                          children: [
+                          children: const [
                             Text(
                               '원총',
                               style: TextStyle(
@@ -141,11 +141,11 @@ class _MainPageState extends State<MainPage> {
                           ],
                         ),
                       ),
-                      Container(
+                      SizedBox(
                         height: 28,
                         child: Row(
-                          children: [
-                            Text(
+                          children: const [
+                             Text(
                               '총학',
                               style: TextStyle(
                                 fontWeight: FontWeight.w700,
@@ -156,10 +156,10 @@ class _MainPageState extends State<MainPage> {
                           ],
                         ),
                       ),
-                      Container(
+                      SizedBox(
                         height: 28,
                         child: Row(
-                          children: [
+                          children: const [
                             Text(
                               '새학',
                               style: TextStyle(
@@ -287,7 +287,7 @@ class ingiBoard extends StatelessWidget {
 
 class MainPageTextButton extends StatelessWidget {
   final String buttonTitle;
-  const MainPageTextButton(this.buttonTitle);
+  const MainPageTextButton(this.buttonTitle, {super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -298,7 +298,7 @@ class MainPageTextButton extends StatelessWidget {
           TextButton(
             onPressed: () {},
             child: Text(
-              '${this.buttonTitle}'.tr() + ' >',
+              '${buttonTitle.tr()} >',
               style: const TextStyle(
                 fontWeight: FontWeight.w600,
                 fontSize: 17,

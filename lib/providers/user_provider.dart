@@ -1,12 +1,8 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:http/http.dart' as http;
-import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
-
-import 'package:new_ara_app/dio_info.dart';
 import 'package:new_ara_app/models/nauser_model.dart';
-import 'package:new_ara_app/constants/colors_info.dart';
 import 'package:webview_cookie_manager/webview_cookie_manager.dart';
 
 //Provider.of<UserProvider>(context, listen: false).increment()
@@ -18,15 +14,14 @@ class UserProvider with ChangeNotifier {
   NAUser? get naUser => _naUser;
   bool get hasData => _hasData;
 
-  Map<String,dynamic> apiRes={};
+  Map<String, dynamic> apiRes = {};
 
   void setHasData(bool tf) {
     _hasData = tf;
     notifyListeners();
   }
-  void setCookieToList(String cookieString){
 
-
+  void setCookieToList(String cookieString) {
     _loginCookie.clear();
     List<String> tempCookieList = cookieString.split('; ');
     for (String cookie in tempCookieList) {
@@ -36,15 +31,18 @@ class UserProvider with ChangeNotifier {
       _loginCookie.add(Cookie(name, value));
     }
   }
-  String getCookiesToString(){
-    String cookieString =
-    _loginCookie.map((cookie) => '${cookie.name}=${cookie.value}').join('; ');
+
+  String getCookiesToString() {
+    String cookieString = _loginCookie
+        .map((cookie) => '${cookie.name}=${cookie.value}')
+        .join('; ');
     return cookieString;
   }
+
   Future<void> setCookiesFromUrl(url) async {
     //웹뷰에서 쿠키 가져와서 프로바이더에 저장하는 메소드.
 
-    if(_loginCookie.isEmpty) {
+    if (_loginCookie.isEmpty) {
       _loginCookie = await WebviewCookieManager().getCookies(url);
     }
 
@@ -52,21 +50,21 @@ class UserProvider with ChangeNotifier {
     return;
   }
 
-  Future<bool> apiMeUserInfo({String initCookieString : ""}) async {
+  Future<bool> apiMeUserInfo({String initCookieString: ""}) async {
     //쿠키를 기반으로 api/me 해서 namodel 갱신하는 메소드
     //initCookieString 이 없으면 현재 프로바이더의 쿠키로 한다.
 
-    dynamic cookieString="ㅁ";
+    dynamic cookieString = "ㅁ";
     String apiUrl = 'https://newara.dev.sparcs.org/api/me';
 
-    if(initCookieString == "") {
+    if (initCookieString == "") {
       // 쿠키를 문자열로 변환하여 HTTP 요청의 헤더에 추가
-      cookieString = _loginCookie.map((cookie) => '${cookie.name}=${cookie.value}').join('; ');
+      cookieString = _loginCookie
+          .map((cookie) => '${cookie.name}=${cookie.value}')
+          .join('; ');
       // API 요청을 보낼 URL
-
-    }
-    else{
-      cookieString=initCookieString;
+    } else {
+      cookieString = initCookieString;
     }
     // HTTP 요청을 위한 헤더 및 쿠키 추가
     Map<String, String> headers = {
@@ -87,11 +85,11 @@ class UserProvider with ChangeNotifier {
       _naUser = NAUser.fromJson(responseData);
       // 유저 정보 출력
       debugPrint("user_provider.dart : $responseData");
-
       //유저 정보를 사용하는 곳에서 재 실행!
       notifyListeners();
       return true;
-    } else {//401 Unauthorized
+    } else {
+      //401 Unauthorized
       // 요청이 실패함 -> 유저가 로그아웃 된 상태 또는 인터넷 오류.
       print('api/me request failed with status code: ${response.statusCode}');
       return false;
@@ -99,21 +97,21 @@ class UserProvider with ChangeNotifier {
     return false;
   }
 
-
-
-  Future<bool> synApiRes(String apiUrl,String mapKey,{String initCookieString : ""}) async {
+  Future<bool> synApiRes(String apiUrl, String mapKey,
+      {String initCookieString: ""}) async {
     //initCookieString 이 없으면 현재 프로바이더의 쿠키로 한다.
 
-    String cookieString="";
-  //  String apiUrl = 'https://newara.dev.sparcs.org/api/me';
-    apiUrl="https://newara.dev.sparcs.org/api/$apiUrl";
-    if(initCookieString == "") {
+    String cookieString = "";
+    //  String apiUrl = 'https://newara.dev.sparcs.org/api/me';
+    apiUrl = "https://newara.dev.sparcs.org/api/$apiUrl";
+    if (initCookieString == "") {
       // 쿠키를 문자열로 변환하여 HTTP 요청의 헤더에 추가
 
-      cookieString = _loginCookie.map((cookie) => '${cookie.name}=${cookie.value}').join('; ');
-    }
-    else{
-      cookieString=initCookieString;
+      cookieString = _loginCookie
+          .map((cookie) => '${cookie.name}=${cookie.value}')
+          .join('; ');
+    } else {
+      cookieString = initCookieString;
     }
     // HTTP 요청을 위한 헤더 및 쿠키 추가
     Map<String, String> headers = {
@@ -128,9 +126,9 @@ class UserProvider with ChangeNotifier {
     if (response.statusCode == 200) {
       // 요청이 성공적으로 처리됨
       Map<String, dynamic> responseData =
-      jsonDecode(utf8.decode(response.bodyBytes));
+          jsonDecode(utf8.decode(response.bodyBytes));
 
-      apiRes[mapKey]=responseData;
+      apiRes[mapKey] = responseData;
       print("user_provider.dart responseData: $responseData");
 
       //유저 프로바이더를 사용하는 곳에서 재 실행!
@@ -144,11 +142,10 @@ class UserProvider with ChangeNotifier {
     return false;
   }
 
-  dynamic getApiRes(String mapKey){
-    if(apiRes.containsKey(mapKey)) {
+  dynamic getApiRes(String mapKey) {
+    if (apiRes.containsKey(mapKey)) {
       return Map.from(apiRes[mapKey]);
-    }
-    else
+    } else
       return null;
   }
 }

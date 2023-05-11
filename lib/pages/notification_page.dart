@@ -38,7 +38,7 @@ class _NotificationPageState extends State<NotificationPage> {
           const SizedBox(width: 20),
         ],
       ),
-      body: SafeArea(
+      body: const SafeArea(
         child: SingleChildScrollView(
           child: Center(
             child: Text('TBD'),

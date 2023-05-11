@@ -1,15 +1,9 @@
-import 'dart:convert';
 import 'dart:io';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:new_ara_app/providers/user_provider.dart';
-import 'package:webview_cookie_manager/webview_cookie_manager.dart';
 import 'package:webview_flutter/webview_flutter.dart';
-
-import 'package:new_ara_app/constants/colors_info.dart';
 import 'package:new_ara_app/widgetclasses/loading_indicator.dart';
-
 import 'package:provider/provider.dart';
 
 class SparcsSSOPage extends StatefulWidget {
@@ -88,21 +82,14 @@ class _SparcsSSOPageState extends State<SparcsSSOPage> {
       // })
       ..loadRequest(Uri.parse(
           'https://newara.dev.sparcs.org/api/users/sso_login/'));
-
   }
-
-  @override
-  void dispose() {
-    super.dispose();
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: SafeArea(
         child: Stack(
           children: [
-            LoadingIndicator(),
+            const LoadingIndicator(),
             Visibility(
               visible: isVisible,
               child: WebViewWidget(

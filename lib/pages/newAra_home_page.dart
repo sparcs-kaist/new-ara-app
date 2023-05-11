@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-
 import 'package:new_ara_app/pages/main_page.dart';
 import 'package:new_ara_app/pages/bulletin_page.dart';
 import 'package:new_ara_app/pages/chat_page.dart';
@@ -19,11 +18,11 @@ class _NewAraHomePageState extends State<NewAraHomePage> {
   int _selectedIndex = 0;
 
   final List<Widget> _widgetOptions = <Widget>[
-    MainPage(),
-    BulletinPage(),
-    ChatPage(),
-    NotificationPage(),
-    UserPage(),
+    const MainPage(),
+    const BulletinPage(),
+    const ChatPage(),
+    const NotificationPage(),
+    const UserPage(),
   ];
 
   void _onItemTapped(int index) {
@@ -38,7 +37,6 @@ class _NewAraHomePageState extends State<NewAraHomePage> {
     super.initState();
 
   }
-
   void downloadUserInfo(initStateContext) async {
 
     await Provider.of<UserProvider>(initStateContext, listen: false)

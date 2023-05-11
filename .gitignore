@@ -32,8 +32,6 @@ migrate_working_dir/
 .pub-cache/
 .pub/
 /build/
-/linux/
-/macos/
 
 # Symbolication related
 app.*.symbols
@@ -46,7 +44,3 @@ app.*.map.json
 /android/app/profile
 /android/app/release
 
-#Flutter SDK의 flutter_linux 및 flutter_macos 폴더는 Flutter 앱을 빌드하는 데 필요한 도구 및 환경 설정을 제공합니다. 이 폴더들은 Flutter SDK에 포함되어 있으며, 개발자가 직접 수정하거나 삭제하지 않아야 합니다.
-/linux
-/macos
-/windows

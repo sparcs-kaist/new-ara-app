@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:easy_localization/easy_localization.dart';
-import 'package:provider/provider.dart';
 
 import 'package:new_ara_app/constants/colors_info.dart';
 import 'package:new_ara_app/pages/sparcs_sso_page.dart';
-import 'package:new_ara_app/widgetclasses/loading_indicator.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({Key? key}) : super(key: key);
@@ -65,7 +63,7 @@ class _LoginPageState extends State<LoginPage> {
                 ),
               )
             :
-            SparcsSSOPage(),
+            const SparcsSSOPage(),
       ),
     );
   }

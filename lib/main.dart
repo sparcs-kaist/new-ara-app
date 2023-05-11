@@ -24,7 +24,7 @@ void main() async {
     EasyLocalization(
       supportedLocales: supportedLocales,
       path: 'assets/translations',
-      fallbackLocale: const Locale('ko'),
+      fallbackLocale: const Locale('en'),
       startLocale: const Locale('ko'),
       child: MultiProvider(
         providers: [
@@ -113,7 +113,6 @@ class _MyAppState extends State<MyApp> {
         },
 
         /// hasData true -> newarahomepage, false -> loginpage.
-        /// webview에서 /ara.org 로 이동 가능하면 true로 바꿀 수 있음.
         home: is_loading == true
             ? LoadingIndicator() // 자동 로그인 시 로컬 쿠키에서 가져오는 동안 공백이 생긴다. 그 동안 띄어주는 indicator
             : context.watch<UserProvider>().hasData

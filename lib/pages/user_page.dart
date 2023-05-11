@@ -35,10 +35,12 @@ class _UserPageState extends State<UserPage>
 
   @override
   Widget build(BuildContext context) {
+    var userProvider = context.watch<UserProvider>();
+
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          context.watch<UserProvider>().naUser!.nickname,
+          userProvider.naUser!.nickname,
           style: const TextStyle(
             fontSize: 28,
             fontWeight: FontWeight.w700,
@@ -87,7 +89,7 @@ class _UserPageState extends State<UserPage>
                             size: const Size.fromRadius(48),
                             child: Image.network(
                                 fit: BoxFit.cover,
-                                context.watch<UserProvider>().naUser!.picture),
+                                userProvider.naUser!.picture),
                           ),
                         ),
                       ),
@@ -114,6 +116,7 @@ class _UserPageState extends State<UserPage>
                                   fontWeight: FontWeight.w500,
                                   color: Color.fromRGBO(177, 177, 177, 1),
                                 ),
+
                               ),
                             ],
                           ),
@@ -140,7 +143,7 @@ class _UserPageState extends State<UserPage>
                 ),
                 const SizedBox(height: 10),
                 TabBar(
-                  unselectedLabelColor: Color.fromRGBO(177, 177, 177, 1),
+                  unselectedLabelColor: const Color.fromRGBO(177, 177, 177, 1),
                   labelColor: ColorsInfo.newara,
                   indicatorColor: ColorsInfo.newara,
                   tabs: const [
@@ -156,7 +159,7 @@ class _UserPageState extends State<UserPage>
                   width: MediaQuery.of(context).size.width - 40,
                   height: 24,
                   child: Text(
-                    '총 ${context.watch<UserProvider>().naUser!.num_articles}개의 글',
+                    '총 ${userProvider.naUser!.num_articles}개의 글',
                     style: const TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w700,
@@ -189,7 +192,7 @@ class _UserPageState extends State<UserPage>
 
 Route _createRoute() {
   return PageRouteBuilder(
-    pageBuilder: (context, animation, secondaryAnimation) => SettingPage(),
+    pageBuilder: (context, animation, secondaryAnimation) => const SettingPage(),
     transitionsBuilder: ((context, animation, secondaryAnimation, child) {
       var begin = const Offset(1, 0);
       var end = const Offset(0, 0);
