@@ -36,26 +36,23 @@ class _SparcsSSOPageState extends State<SparcsSSOPage> {
         },
         onPageFinished: (String url) async{
 
-          var userProvider = Provider.of<UserProvider>(context,listen: false);
-
-          setState(() {
-            isVisible = true;
-          });
-          debugPrint("current url is $url");
-
+          if(mounted){ // 위에 onPageStarted 에는 왜 mounted 조건문을 안해도 되는지 모르겠음
+            setState(() {
+              isVisible = true;
+            });
+          }
           //(수정 요망)현재는 야매로 하는 방법
-          if (url.endsWith('https://newara.dev.sparcs.org/')) {
-
-            final tempContext=context;
-            //웹뷰에서 로그인 성공
+          if (url.endsWith('https://newara.dev.sparcs.org/') && mounted) {
+            var userProvider = context.read<UserProvider>();
             debugPrint("main.dart:login success");
 
             FlutterSecureStorage secureStorage = FlutterSecureStorage();
 
+            debugPrint("current url is $url");
 
             userProvider.setHasData(true);
-            await userProvider.setCookiesFromUrl("https://newara.dev.sparcs.org/");
-            await userProvider.apiMeUserInfo();
+            await userProvider.setCookiesFromUrl(url);
+            await userProvider.apiMeUserInfo(message : "sparscssso");
 
 
             String cookieString = userProvider.getCookiesToString();

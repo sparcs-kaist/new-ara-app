@@ -37,13 +37,13 @@ class _NewAraHomePageState extends State<NewAraHomePage> {
     super.initState();
 
   }
-  void downloadUserInfo(initStateContext) async {
-
-    await Provider.of<UserProvider>(initStateContext, listen: false)
-         .setCookiesFromUrl("https://newara.dev.sparcs.org/");
-    await Provider.of<UserProvider>(initStateContext, listen: false)
-        .apiMeUserInfo();
-  }
+  // void downloadUserInfo(initStateContext) async {
+  //
+  //   await Provider.of<UserProvider>(initStateContext, listen: false)
+  //        .setCookiesFromUrl("https://newara.dev.sparcs.org/");
+  //   await Provider.of<UserProvider>(initStateContext, listen: false)
+  //       .apiMeUserInfo(message: "new-ara-home-page");
+  // }
 
   @override
   Widget build(BuildContext context) {

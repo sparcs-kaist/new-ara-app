@@ -41,16 +41,11 @@ class UserProvider with ChangeNotifier {
 
   Future<void> setCookiesFromUrl(url) async {
     //웹뷰에서 쿠키 가져와서 프로바이더에 저장하는 메소드.
-
-    if (_loginCookie.isEmpty) {
-      _loginCookie = await WebviewCookieManager().getCookies(url);
-    }
-
-    //외부에서 바꿀 수 없도록 복사해서 반환.
+    _loginCookie = await WebviewCookieManager().getCookies(url);
     return;
   }
 
-  Future<bool> apiMeUserInfo({String initCookieString: ""}) async {
+  Future<bool> apiMeUserInfo({String initCookieString: "",String message:""}) async {
     //쿠키를 기반으로 api/me 해서 namodel 갱신하는 메소드
     //initCookieString 이 없으면 현재 프로바이더의 쿠키로 한다.
 
@@ -84,14 +79,14 @@ class UserProvider with ChangeNotifier {
       ;
       _naUser = NAUser.fromJson(responseData);
       // 유저 정보 출력
-      debugPrint("user_provider.dart : $responseData");
+      debugPrint("user_provider.dart($message) : $responseData");
       //유저 정보를 사용하는 곳에서 재 실행!
       notifyListeners();
       return true;
     } else {
       //401 Unauthorized
       // 요청이 실패함 -> 유저가 로그아웃 된 상태 또는 인터넷 오류.
-      print('api/me request failed with status code: ${response.statusCode}');
+      debugPrint('api/me request failed with status code: ${response.statusCode}');
       return false;
     }
     return false;
@@ -129,14 +124,14 @@ class UserProvider with ChangeNotifier {
           jsonDecode(utf8.decode(response.bodyBytes));
 
       apiRes[mapKey] = responseData;
-      print("user_provider.dart responseData: $responseData");
+      debugPrint("user_provider.dart responseData: $responseData");
 
       //유저 프로바이더를 사용하는 곳에서 재 실행!
       notifyListeners();
       return true;
     } else {
       // 요청이 실패함
-      print('$apiUrl request failed with status code: ${response.statusCode}');
+      debugPrint('$apiUrl request failed with status code: ${response.statusCode}');
       return false;
     }
     return false;
