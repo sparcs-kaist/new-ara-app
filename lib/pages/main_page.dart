@@ -19,28 +19,33 @@ class _MainPageState extends State<MainPage> {
     // TODO: implement initState
     super.initState();
     var userProvider=Provider.of<UserProvider>(context,listen:false);
-    initDailyBest(userProvider);
+    refreshDailyBest(userProvider);
   }
-  void initDailyBest(UserProvider userProvider) async{
+  void refreshDailyBest(UserProvider userProvider) async{
 
     //example
     //프로바이더에 있는 정보 사용.
     var myMap = userProvider.getApiRes("home");
+
     setState(() {
       textContent = myMap?["daily_bests"][0]["title"] ?? "loading";
     });
 
+
     // api 호출과 프로바이더 정보 동기화.
     await userProvider.synApiRes("home", "home");
-    myMap = userProvider.getApiRes("home");
+   // await Future.delayed(Duration(seconds: 1));
+     myMap = userProvider.getApiRes("home");
     if(mounted) {
       setState(() {
         textContent = myMap?["daily_bests"][0]["title"] ?? "loading";
       });
     }
   }
+
   @override
   Widget build(BuildContext context) {
+    var userProvider = context.watch<UserProvider>();
     return Scaffold(
       appBar: AppBar(
         elevation: 0,

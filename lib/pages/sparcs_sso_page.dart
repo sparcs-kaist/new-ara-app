@@ -16,12 +16,11 @@ class _SparcsSSOPageState extends State<SparcsSSOPage> {
   WebViewController _controller = WebViewController();
   final webViewKey = GlobalKey();
   bool isVisible = false;
-  List<Cookie> cookies=[];
-  int userID=0;
+  List<Cookie> cookies = [];
+  int userID = 0;
 
   @override
   void initState() {
-
     super.initState();
     WebViewCookieManager().clearCookies();
     _controller = WebViewController()
@@ -34,13 +33,7 @@ class _SparcsSSOPageState extends State<SparcsSSOPage> {
         onPageStarted: (String url) {
           setState(() => isVisible = false);
         },
-        onPageFinished: (String url) async{
-
-          if(mounted){ // 위에 onPageStarted 에는 왜 mounted 조건문을 안해도 되는지 모르겠음
-            setState(() {
-              isVisible = true;
-            });
-          }
+        onPageFinished: (String url) async {
           //(수정 요망)현재는 야매로 하는 방법
           if (url.endsWith('https://newara.dev.sparcs.org/') && mounted) {
             var userProvider = context.read<UserProvider>();
@@ -50,20 +43,18 @@ class _SparcsSSOPageState extends State<SparcsSSOPage> {
 
             debugPrint("current url is $url");
 
-            userProvider.setHasData(true);
             await userProvider.setCookiesFromUrl(url);
-            await userProvider.apiMeUserInfo(message : "sparscssso");
-
+            await userProvider.apiMeUserInfo(message: "sparscssso");
+            userProvider.setHasData(true);
+            //현재 정상적으로 로그인 된 상태이므로 newAraHomePage 띄우기
 
             String cookieString = userProvider.getCookiesToString();
             await secureStorage.write(key: 'cookie', value: cookieString);
-
-
-
-
-
-            //현재 정상적으로 로그인 된 상태이므로 newAraHomePage 띄우기
-
+          } else if (mounted) {
+            // 위에 onPageStarted 에는 왜 mounted 조건문을 안해도 되는지 모르겠음
+            setState(() {
+              isVisible = true;
+            });
           }
         },
         onWebResourceError: (WebResourceError error) {
@@ -77,9 +68,10 @@ class _SparcsSSOPageState extends State<SparcsSSOPage> {
       //     SnackBar(content: Text(message.message)),
       //   );
       // })
-      ..loadRequest(Uri.parse(
-          'https://newara.dev.sparcs.org/api/users/sso_login/'));
+      ..loadRequest(
+          Uri.parse('https://newara.dev.sparcs.org/api/users/sso_login/'));
   }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(

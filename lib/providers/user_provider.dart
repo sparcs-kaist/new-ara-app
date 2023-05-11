@@ -127,7 +127,7 @@ class UserProvider with ChangeNotifier {
       debugPrint("user_provider.dart responseData: $responseData");
 
       //유저 프로바이더를 사용하는 곳에서 재 실행!
-      notifyListeners();
+    //  notifyListeners();
       return true;
     } else {
       // 요청이 실패함
