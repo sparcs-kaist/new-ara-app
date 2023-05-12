@@ -339,7 +339,8 @@ class _MainPageState extends State<MainPage> {
                                     child: Text(
                                       "2023년 의생명과학분야 대학원 장학생 선발 안내",
                                       style: TextStyle(
-                                          fontSize: 14, fontWeight: FontWeight.w400),
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.w400),
                                       maxLines: 1,
                                       overflow: TextOverflow.ellipsis,
                                     ),
@@ -366,7 +367,8 @@ class _MainPageState extends State<MainPage> {
                                     child: Text(
                                       "2022년도 제14차 중앙운영위원회 (9월 정기회)ㄴㅇㄹㄴㅇㄹㄴㄹ",
                                       style: TextStyle(
-                                          fontSize: 14, fontWeight: FontWeight.w400),
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.w400),
                                       maxLines: 1,
                                       overflow: TextOverflow.ellipsis,
                                     ),
@@ -393,7 +395,8 @@ class _MainPageState extends State<MainPage> {
                                     child: Text(
                                       "2022년도 제14차 중앙운영위원회 (9월 정기회)ㄴㅇㄹㄴㅇㄹㄴㄹ",
                                       style: TextStyle(
-                                          fontSize: 14, fontWeight: FontWeight.w400),
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.w400),
                                       maxLines: 1,
                                       overflow: TextOverflow.ellipsis,
                                     ),
@@ -471,14 +474,35 @@ class PopularBoard extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  json["title"],
-                  style: const TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 16,
-                  ),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
+                Row(
+                  children: [
+                    Expanded(
+                      child: Text(
+                        json["title"],
+                        style: const TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                    SizedBox(
+                      height: 14.22,
+                      child: json["attachment_type"] == "IMAGE"
+                          ? SvgPicture.asset(
+                              'assets/icons/has-picture.svg',
+                              fit: BoxFit.fitHeight,
+                            )
+                          : json["attachment_type"] == "NON_IMAGE"
+                              ? SvgPicture.asset(
+                                  'assets/icons/has-picture.svg',
+                                  fit: BoxFit.fitHeight,
+                                )
+                              : Container(),
+                    )
+                  ],
+                  //attachment_type
                 ),
                 SizedBox(
                   height: 17.7,
