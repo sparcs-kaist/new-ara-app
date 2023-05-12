@@ -484,7 +484,7 @@ class MainPageTextButton extends StatelessWidget {
               //잠시 free_bullentin_board들 테스트 하기 위한
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => FreeBullentinBoardPage()),
+                MaterialPageRoute(builder: (context) => FreeBulletinBoardPage()),
               );
             },
             child: Row(

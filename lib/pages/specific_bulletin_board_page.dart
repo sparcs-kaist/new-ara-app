@@ -6,14 +6,14 @@ import 'package:new_ara_app/widgetclasses/loading_indicator.dart';
 import 'package:new_ara_app/widgetclasses/post_preview.dart';
 import 'package:provider/provider.dart';
 
-class FreeBulletinBoardPage extends StatefulWidget {
-  const FreeBulletinBoardPage({Key? key}) : super(key: key);
+class SpecificBulletinBoardPage extends StatefulWidget {
+  const SpecificBulletinBoardPage({Key? key}) : super(key: key);
 
   @override
-  State<FreeBulletinBoardPage> createState() => _FreeBulletinBoardPageState();
+  State<SpecificBulletinBoardPage> createState() => _SpecificBulletinBoardPageState();
 }
 
-class _FreeBulletinBoardPageState extends State<FreeBulletinBoardPage> {
+class _SpecificBulletinBoardPageState extends State<SpecificBulletinBoardPage> {
   List<Map<String, dynamic>> postPreviewList = [];
   int currentPage=1;
 
@@ -42,7 +42,7 @@ class _FreeBulletinBoardPageState extends State<FreeBulletinBoardPage> {
       "is_school_communication": false,
       "group_id": 2,
       "banner_image":
-          "https://sparcs-newara-dev.s3.amazonaws.com/board_banner_images/smalltalk-board-banner.jpg",
+      "https://sparcs-newara-dev.s3.amazonaws.com/board_banner_images/smalltalk-board-banner.jpg",
       "ko_banner_description": "",
       "en_banner_description": "",
       "banner_url": ""
@@ -53,7 +53,7 @@ class _FreeBulletinBoardPageState extends State<FreeBulletinBoardPage> {
       "username": "abcbaa3c-d929-4092-af43-cdb9fabfca0d",
       "profile": {
         "picture":
-            "https://sparcs-newara-dev.s3.amazonaws.com/user_profiles/pictures/AF9AA945-6AC2-4C53-9D27-F1B1A3EF707B.jpeg",
+        "https://sparcs-newara-dev.s3.amazonaws.com/user_profiles/pictures/AF9AA945-6AC2-4C53-9D27-F1B1A3EF707B.jpeg",
         "nickname": "열렬한 알파카",
         "user": 857,
         "is_official": false,
@@ -123,7 +123,7 @@ class _FreeBulletinBoardPageState extends State<FreeBulletinBoardPage> {
   }
   void _scrollListener() async{
     var userProvider = context.read<UserProvider>();
-   if (_scrollController.position.pixels  == _scrollController.position.maxScrollExtent ) {
+    if (_scrollController.position.pixels  == _scrollController.position.maxScrollExtent ) {
       currentPage=currentPage+1;
       var myMap = userProvider.getApiRes("articles/?parent_board=7&page=$currentPage");
 
@@ -186,31 +186,31 @@ class _FreeBulletinBoardPageState extends State<FreeBulletinBoardPage> {
       body: isLoading
           ? LoadingIndicator()
           : SafeArea(
-              child: Center(
-                child: SizedBox(
-                  width: MediaQuery.of(context).size.width - 40,
-                  child: ListView.builder(
-                    controller: _scrollController,
-                    itemCount: postPreviewList.length, // 아이템 개수
-                    itemBuilder: (BuildContext context, int index) {
-                      // 각 아이템을 위한 위젯 생성
-                      return Column(
-                        children: [
-                          Padding(
-                            padding: const EdgeInsets.all(10.0),
-                            child: PostPreview(json: postPreviewList[index]),
-                          ),
-                          Container(
-                            height: 1,
-                            color: const Color(0xFFF0F0F0),
-                          ),
-                        ],
-                      );
-                    },
-                  ),
-                ),
-              ),
+        child: Center(
+          child: SizedBox(
+            width: MediaQuery.of(context).size.width - 40,
+            child: ListView.builder(
+              controller: _scrollController,
+              itemCount: postPreviewList.length, // 아이템 개수
+              itemBuilder: (BuildContext context, int index) {
+                // 각 아이템을 위한 위젯 생성
+                return Column(
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.all(10.0),
+                      child: PostPreview(json: postPreviewList[index]),
+                    ),
+                    Container(
+                      height: 1,
+                      color: const Color(0xFFF0F0F0),
+                    ),
+                  ],
+                );
+              },
             ),
+          ),
+        ),
+      ),
     );
   }
 }
