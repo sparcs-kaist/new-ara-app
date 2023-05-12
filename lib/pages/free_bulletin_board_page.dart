@@ -153,13 +153,34 @@ class _FreeBulletinBoardPageState extends State<FreeBulletinBoardPage> {
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
-        leading: IconButton(
-          color: ColorsInfo.newara,
-          icon: SvgPicture.asset('assets/icons/chevron-left.svg',
-              color: ColorsInfo.newara, width: 10.7, height: 18.99),
-          onPressed: () {
-            Navigator.pop(context);
-          },
+        leadingWidth: 100,
+        leading: Row(
+          children: [
+            SizedBox(
+              width: 35,
+              child: IconButton(
+
+                color: ColorsInfo.newara,
+
+                icon: SizedBox(
+                  width: 11.58,
+                  height: 21.87,
+                  child: SvgPicture.asset('assets/icons/chevron-left.svg',
+                    color: ColorsInfo.newara,
+                    fit: BoxFit.fill,
+                  ),
+                ),
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+              ),
+            ),
+            const Text("게시판",style: TextStyle(
+              color: Color(0xFFED3A3A),
+              fontSize: 17,
+              fontWeight: FontWeight.w500,
+            ),),
+          ],
         ),
         title: const SizedBox(
           child: Text(
@@ -183,12 +204,35 @@ class _FreeBulletinBoardPageState extends State<FreeBulletinBoardPage> {
           ),
         ],
       ),
+      floatingActionButton: Column(
+        mainAxisAlignment: MainAxisAlignment.end,
+        children: [
+          FloatingActionButton(
+            onPressed: () {
+              // FloatingActionButton을 누를 때 실행될 동작을 정의합니다.
+              print('FloatingActionButton pressed');
+            },
+            child: SizedBox(
+              width: 42,
+              height: 42,
+              child: SvgPicture.asset(
+                'assets/icons/modify.svg',
+                fit: BoxFit.fill,
+              ),
+            ),
+            backgroundColor: Colors.white,
+          ),
+          SizedBox(
+            height: 20,
+          )
+        ],
+      ),
       body: isLoading
           ? const LoadingIndicator()
           : SafeArea(
               child: Center(
                 child: SizedBox(
-                  width: MediaQuery.of(context).size.width - 40,
+                  width: MediaQuery.of(context).size.width - 18,
                   child: ListView.builder(
                     controller: _scrollController,
                     itemCount: postPreviewList.length, // 아이템 개수
@@ -197,7 +241,7 @@ class _FreeBulletinBoardPageState extends State<FreeBulletinBoardPage> {
                       return Column(
                         children: [
                           Padding(
-                            padding: const EdgeInsets.all(10.0),
+                            padding: const EdgeInsets.all(11.0),
                             child: PostPreview(json: postPreviewList[index]),
                           ),
                           Container(
