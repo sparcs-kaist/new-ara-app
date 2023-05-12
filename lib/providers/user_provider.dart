@@ -126,8 +126,8 @@ class UserProvider with ChangeNotifier {
       apiRes[mapKey] = responseData;
       debugPrint("user_provider.dart responseData: $responseData");
 
-      //유저 프로바이더를 사용하는 곳에서 재 실행!
-    //  notifyListeners();
+      //getApiRes 하는 곳에서 재 실행!
+      notifyListeners();
       return true;
     } else {
       // 요청이 실패함
