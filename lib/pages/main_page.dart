@@ -5,6 +5,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:new_ara_app/constants/colors_info.dart';
 import 'package:new_ara_app/pages/free_bulletin_board_page.dart';
+import 'package:new_ara_app/pages/specific_bulletin_board_page.dart';
 import 'package:new_ara_app/providers/user_provider.dart';
 import 'package:new_ara_app/widgetclasses/loading_indicator.dart';
 import 'package:new_ara_app/widgetclasses/post_preview.dart';
@@ -30,7 +31,7 @@ class _MainPageState extends State<MainPage> {
 
   void refreshDailyBest(UserProvider userProvider) async {
     //example
-    //프로바이더에 있는 정보 사용.
+    //Provider 에 있는 정보 사용.
     var myMap = userProvider.getApiRes("home");
 
     setState(() {
@@ -95,8 +96,18 @@ class _MainPageState extends State<MainPage> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
-                      const MainPageTextButton('main_page.realtime'),
-                      // 실시간 인기글을 ListView로 도입 예정
+                      MainPageTextButton(
+                        'main_page.realtime',
+                        () {
+                          //잠시 free_bulletin_board 들 테스트 하기 위한
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => const FreeBulletinBoardPage()),
+                          );
+                        },
+                      ),
+                      // 실시간 인기 글을 ListView 로 도입 예정
                       Container(
                         width: MediaQuery.of(context).size.width - 40,
                         child: Column(
@@ -143,7 +154,14 @@ class _MainPageState extends State<MainPage> {
                         ),
                       ),
                       const SizedBox(height: 10),
-                      const MainPageTextButton('main_page.notice'),
+                      MainPageTextButton('main_page.notice', () {
+                        //잠시 free_bulletin_board들 테스트 하기 위한
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => const SpecificBulletinBoardPage()),
+                        );
+                      }),
                       Container(
                         padding: const EdgeInsets.all(12),
                         width: MediaQuery.of(context).size.width - 40,
@@ -165,7 +183,7 @@ class _MainPageState extends State<MainPage> {
                                   'assets/icons/kaist.svg',
                                   fit: BoxFit.cover,
                                 ),
-                                Text(
+                                const Text(
                                   "포탈 공지",
                                   style: TextStyle(
                                     fontSize: 14,
@@ -173,7 +191,7 @@ class _MainPageState extends State<MainPage> {
                                     color: Color(0xFF1F4899),
                                   ),
                                 ),
-                                SizedBox(
+                                const SizedBox(
                                   width: 5,
                                 ),
                                 SizedBox(
@@ -181,7 +199,7 @@ class _MainPageState extends State<MainPage> {
                                   width: 6,
                                   child: SvgPicture.asset(
                                     'assets/icons/chevron-right.svg',
-                                    color: Color(0xFF1F4899),
+                                    color: const Color(0xFF1F4899),
                                     fit: BoxFit.fill,
                                   ),
                                 ),
@@ -229,7 +247,7 @@ class _MainPageState extends State<MainPage> {
                             ),
                             Row(
                               children: [
-                                Text(
+                                const Text(
                                   "입주 업체",
                                   style: TextStyle(
                                     fontSize: 14,
@@ -237,7 +255,7 @@ class _MainPageState extends State<MainPage> {
                                     color: Color(0xFF646464),
                                   ),
                                 ),
-                                SizedBox(
+                                const SizedBox(
                                   width: 5,
                                 ),
                                 SizedBox(
@@ -245,14 +263,14 @@ class _MainPageState extends State<MainPage> {
                                   width: 6,
                                   child: SvgPicture.asset(
                                     'assets/icons/chevron-right.svg',
-                                    color: Color(0xFF646464),
+                                    color: const Color(0xFF646464),
                                     fit: BoxFit.fill,
                                   ),
                                 ),
-                                SizedBox(
+                                const SizedBox(
                                   width: 10,
                                 ),
-                                Expanded(
+                                const Expanded(
                                   child: Text(
                                     "북측식당 웰차이 운영안내dsfsfdsdfsdsdfsdf",
                                     style: TextStyle(
@@ -269,7 +287,7 @@ class _MainPageState extends State<MainPage> {
                             ),
                             Row(
                               children: [
-                                Text(
+                                const Text(
                                   "뉴아라",
                                   style: TextStyle(
                                     fontSize: 14,
@@ -277,7 +295,7 @@ class _MainPageState extends State<MainPage> {
                                     color: Color(0xFFED3A3A),
                                   ),
                                 ),
-                                SizedBox(
+                                const SizedBox(
                                   width: 5,
                                 ),
                                 SizedBox(
@@ -285,14 +303,14 @@ class _MainPageState extends State<MainPage> {
                                   width: 6,
                                   child: SvgPicture.asset(
                                     'assets/icons/chevron-right.svg',
-                                    color: Color(0xFFED3A3A),
+                                    color: const Color(0xFFED3A3A),
                                     fit: BoxFit.fill,
                                   ),
                                 ),
-                                SizedBox(
+                                const SizedBox(
                                   width: 10,
                                 ),
-                                Expanded(
+                                const Expanded(
                                   child: Text(
                                     "🎉 뉴아라 v2.0.0 Amethyst 배포 완료dddddd",
                                     style: TextStyle(
@@ -308,7 +326,7 @@ class _MainPageState extends State<MainPage> {
                         ),
                       ),
                       const SizedBox(height: 10),
-                      const MainPageTextButton('main_page.stu_community'),
+                      MainPageTextButton('main_page.stu_community', () {}),
                       Container(
                         width: MediaQuery.of(context).size.width - 40,
                         height: 110,
@@ -431,7 +449,6 @@ class PopularBoard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-
     return Container(
       // height: 100,
       padding: const EdgeInsets.all(10),
@@ -457,21 +474,17 @@ class PopularBoard extends StatelessWidget {
           const SizedBox(
             width: 15,
           ),
-          Expanded(
-            child: PostPreview(json:json)
-          ),
+          Expanded(child: PostPreview(json: json)),
         ],
       ),
     );
   }
 }
 
-
-
-
 class MainPageTextButton extends StatelessWidget {
   final String buttonTitle;
-  const MainPageTextButton(this.buttonTitle, {super.key});
+  var onPressed = () {};
+  MainPageTextButton(this.buttonTitle, this.onPressed, {super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -480,24 +493,18 @@ class MainPageTextButton extends StatelessWidget {
       child: Row(
         children: [
           TextButton(
-            onPressed: () {
-              //잠시 free_bullentin_board들 테스트 하기 위한
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => FreeBulletinBoardPage()),
-              );
-            },
+            onPressed: onPressed,
             child: Row(
               children: [
                 Text(
-                  '${buttonTitle.tr()}',
+                  buttonTitle.tr(),
                   style: const TextStyle(
                     fontWeight: FontWeight.w600,
                     fontSize: 20,
                     color: Colors.black,
                   ),
                 ),
-                SizedBox(
+                const SizedBox(
                   width: 6.56,
                 ),
                 SizedBox(

@@ -46,8 +46,6 @@ dependencies:
   webview_cookie_manager: ^2.0.6
   intl: ^0.17.0
   collection: ^1.16.0
-  flutter_driver:
-    sdk: flutter
 
 dev_dependencies:
   flutter_test:

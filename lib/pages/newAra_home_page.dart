@@ -5,8 +5,6 @@ import 'package:new_ara_app/pages/bulletin_page.dart';
 import 'package:new_ara_app/pages/chat_list_page.dart';
 import 'package:new_ara_app/pages/notification_page.dart';
 import 'package:new_ara_app/pages/user_page.dart';
-import 'package:new_ara_app/providers/user_provider.dart';
-import 'package:provider/provider.dart';
 
 class NewAraHomePage extends StatefulWidget {
   const NewAraHomePage({Key? key}) : super(key: key);

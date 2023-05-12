@@ -1,5 +1,3 @@
-import 'dart:convert';
-import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
@@ -9,9 +7,6 @@ import 'package:provider/provider.dart';
 import 'package:new_ara_app/pages/newAra_home_page.dart';
 import 'package:new_ara_app/pages/login_page.dart';
 import 'package:new_ara_app/providers/user_provider.dart';
-import 'package:new_ara_app/constants/colors_info.dart';
-import 'package:http/http.dart' as http;
-
 final supportedLocales = [
   const Locale('en'),
   const Locale('ko'),
@@ -53,12 +48,14 @@ class CustomScrollBehavior extends ScrollBehavior {
 }
 
 class MyApp extends StatefulWidget {
+  const MyApp({super.key});
+
   @override
   State<MyApp> createState() => _MyAppState();
 }
 
 class _MyAppState extends State<MyApp> {
-  bool is_loading = false;
+  bool isLoading = false;
 
   @override
   void initState() {
@@ -76,7 +73,7 @@ class _MyAppState extends State<MyApp> {
 // # 로그인 할 때 로컬 스토리지에서 쿠키 갱신, 로그아웃 할 때 로컬 스토리지에서 쿠키 삭제.
 
     // Provider.of<UserProvider>(initStateContext, listen: false).setHasData(true);
-    FlutterSecureStorage secureStorage = FlutterSecureStorage();
+    FlutterSecureStorage secureStorage = const FlutterSecureStorage();
     var cookiesBySecureStorage = await secureStorage.read(key: 'cookie');
 
     debugPrint("main.dart : ${cookiesBySecureStorage}");
@@ -84,7 +81,7 @@ class _MyAppState extends State<MyApp> {
       String apiUrl = 'https://newara.dev.sparcs.org/api/me';
 
       setState(() {
-        is_loading = true;
+        isLoading = true;
       });
       bool tf = await userProvider.apiMeUserInfo(
           initCookieString: cookiesBySecureStorage);
@@ -93,7 +90,7 @@ class _MyAppState extends State<MyApp> {
         userProvider.setCookieToList(cookiesBySecureStorage);
       }
       setState(() {
-        is_loading = false;
+        isLoading = false;
       });
     } else {}
   }
@@ -113,11 +110,11 @@ class _MyAppState extends State<MyApp> {
         },
 
         /// hasData true -> newarahomepage, false -> loginpage.
-        home: is_loading == true
-            ? LoadingIndicator() // 자동 로그인 시 로컬 쿠키에서 가져오는 동안 공백이 생긴다. 그 동안 띄어주는 indicator
+        home: isLoading == true
+            ? const LoadingIndicator() // 자동 로그인 시 로컬 쿠키에서 가져오는 동안 공백이 생긴다. 그 동안 띄어주는 indicator
             : context.watch<UserProvider>().hasData
-                ? NewAraHomePage()
-                : LoginPage());
+                ? const NewAraHomePage()
+                : const LoginPage());
   }
 
   ThemeData _setThemeData() {

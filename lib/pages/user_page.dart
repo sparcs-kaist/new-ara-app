@@ -172,12 +172,12 @@ class _UserPageState extends State<UserPage>
                   height: 500,
                   child: TabBarView(
                     controller: _tabController,
-                    children: [
+                    children: const [
                       // 이 부분은 추후에 각각의 컨테이너에 ListView를 추가하여 구현할 예정
                       // 현 시점(2023.05.04)에는 게시물을 요청받았을 때 요청 형식을 알 수 없으므로 보류함
-                      Container(child: Center(child: Text('없음'))),
-                      Container(child: Center(child: Text('없음'))),
-                      Container(child: Center(child: Text('없음'))),
+                      Center(child: Text('없음')),
+                      Center(child: Text('없음')),
+                      Center(child: Text('없음')),
                     ],
                   ),
                 ),

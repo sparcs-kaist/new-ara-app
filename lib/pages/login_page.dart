@@ -55,7 +55,7 @@ class _LoginPageState extends State<LoginPage> {
                         },
                       ),
                     ),
-                    SizedBox(
+                    const SizedBox(
                       //로그인 버튼과 화면 하단과의 공백 공간
                       height: 50,
                     ),

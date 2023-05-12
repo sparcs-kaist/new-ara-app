@@ -161,10 +161,10 @@ class _SpecificBulletinBoardPageState extends State<SpecificBulletinBoardPage> {
             Navigator.pop(context);
           },
         ),
-        title: SizedBox(
+        title: const SizedBox(
           child: Text(
-            '자유 게시판',
-            style: const TextStyle(
+            '',
+            style: TextStyle(
               color: ColorsInfo.newara,
               fontSize: 18,
               fontWeight: FontWeight.w700,
@@ -184,7 +184,7 @@ class _SpecificBulletinBoardPageState extends State<SpecificBulletinBoardPage> {
         ],
       ),
       body: isLoading
-          ? LoadingIndicator()
+          ? const LoadingIndicator()
           : SafeArea(
         child: Center(
           child: SizedBox(
