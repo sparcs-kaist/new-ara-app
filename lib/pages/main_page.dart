@@ -4,9 +4,10 @@ import 'package:flutter/material.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:new_ara_app/constants/colors_info.dart';
+import 'package:new_ara_app/pages/free_bulletin_board_page.dart';
 import 'package:new_ara_app/providers/user_provider.dart';
 import 'package:new_ara_app/widgetclasses/loading_indicator.dart';
-import 'package:new_ara_app/widgetclasses/preview_post.dart';
+import 'package:new_ara_app/widgetclasses/post_preview.dart';
 import 'package:provider/provider.dart';
 
 class MainPage extends StatefulWidget {
@@ -457,7 +458,7 @@ class PopularBoard extends StatelessWidget {
             width: 15,
           ),
           Expanded(
-            child: PreviewPost(json:json)
+            child: PostPreview(json:json)
           ),
         ],
       ),
@@ -479,7 +480,13 @@ class MainPageTextButton extends StatelessWidget {
       child: Row(
         children: [
           TextButton(
-            onPressed: () {},
+            onPressed: () {
+              //잠시 free_bullentin_board들 테스트 하기 위한
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => FreeBullentinBoardPage()),
+              );
+            },
             child: Row(
               children: [
                 Text(

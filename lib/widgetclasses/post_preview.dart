@@ -1,14 +1,16 @@
 
+// ignore_for_file: must_be_immutable
+
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
-class PreviewPost extends StatefulWidget {
+class PostPreview extends StatefulWidget {
   Map<String, dynamic> json;
-  PreviewPost({super.key, required Map<String, dynamic> json}): json = json ?? {};
+  PostPreview({super.key, required Map<String, dynamic> json}): json = json ?? {};
 
   @override
-  State<PreviewPost> createState() => _PreviewPostState();
-}class _PreviewPostState extends State<PreviewPost> {
+  State<PostPreview> createState() => _PostPreviewState();
+}class _PostPreviewState extends State<PostPreview> {
   @override
   Widget build(BuildContext context) {
     DateTime now = DateTime.now();
@@ -19,57 +21,68 @@ class PreviewPost extends StatefulWidget {
     if (difference.inMinutes < 1) {
       time = "${difference.inSeconds}초 전";
     } else if (difference.inHours < 1) {
-      time = '${difference.inMinutes}분전';
+      time = '${difference.inMinutes}분 전';
     } else if (date.day == now.day) {
       time =
       '${DateFormat('HH').format(date)}:${DateFormat('mm').format(date)}';
-    } else {
+    }
+    else if(date.year == now.year)
+    {
       time =
       '${DateFormat('MM').format(date)}/${DateFormat('dd').format(date)}';
+    }
+    else {
+      time =
+      '${DateFormat('yyyy').format(date)}/${DateFormat('MM').format(date)}/${DateFormat('dd').format(date)}';
     }
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Row(
-          children: [
-            Expanded(
-              child: Text(
-                widget.json["title"],
-                style: const TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 16,
+        SizedBox(
+          height: 24,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              Flexible(
+                child: Text(
+                  widget.json["title"],
+                  style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16,
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                 ),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
               ),
-            ),
-            SizedBox(
-              height: 14.22,
-              child: widget.json["attachment_type"] == "IMAGE"
-                  ? SvgPicture.asset(
-                'assets/icons/has-picture.svg',
-                fit: BoxFit.fitHeight,
+              SizedBox(width: 5,),
+              SizedBox(
+                height: 14.22,
+                child: widget.json["attachment_type"] == "IMAGE"
+                    ? SvgPicture.asset(
+                  'assets/icons/has-picture.svg',
+                  fit: BoxFit.fitHeight,
+                )
+                    : widget.json["attachment_type"] == "NON_IMAGE"
+                    ? SvgPicture.asset(
+                  'assets/icons/has-picture.svg',
+                  fit: BoxFit.fitHeight,
+                )
+                    : Container(),
               )
-                  : widget.json["attachment_type"] == "NON_IMAGE"
-                  ? SvgPicture.asset(
-                'assets/icons/has-picture.svg',
-                fit: BoxFit.fitHeight,
-              )
-                  : Container(),
-            )
-          ],
-          //attachment_type
+            ],
+            //attachment_type
+          ),
         ),
         SizedBox(
-          height: 17.7,
+          height: 18,
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Row(
                 children: [
                   Text(
-                    widget.json["created_by"]["profile"]["nickname"],
+                    widget.json["created_by"]["profile"]?["nickname"] ?? "null",
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: const TextStyle(
