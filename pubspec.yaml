@@ -46,6 +46,7 @@ dependencies:
   webview_cookie_manager: ^2.0.6
   intl: ^0.17.0
   collection: ^1.16.0
+  url_launcher: ^6.1.11
 
 dev_dependencies:
   flutter_test:

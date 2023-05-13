@@ -3,6 +3,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 import 'package:new_ara_app/constants/colors_info.dart';
+import 'package:new_ara_app/pages/chat_window_page.dart';
 
 class ChatListPage extends StatefulWidget {
   const ChatListPage({Key? key}) : super(key: key);
@@ -12,7 +13,40 @@ class ChatListPage extends StatefulWidget {
 
 class _ChatListPageState extends State<ChatListPage> {
   var chatPreviewList = [];
- // int count=0;
+  // int count=0;
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+
+    //totest: 채팅창 하나는 미리 추가해놓은 로직
+    chatPreviewList.add(
+      Column(
+        children: [
+          InkWell(
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const ChatWindowPage()),
+              );
+            },
+            child: SizedBox(
+              height: 70,
+              child: Padding(
+                padding:
+                    const EdgeInsets.symmetric(vertical: 12, horizontal: 3),
+                child: ChatPreview(),
+              ),
+            ),
+          ),
+          Container(
+            height: 1,
+            color: const Color(0xFFF0F0F0),
+          ),
+        ],
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -37,32 +71,36 @@ class _ChatListPageState extends State<ChatListPage> {
               height: 45,
             ),
             onPressed: () {
-
               ///임시로 채팅 메세지 추가되는 로직을 위해 추가해둠.
               setState(() {
-
-                chatPreviewList.insert(0,Column(
-                  children: [
-
-                    InkWell(
-                      onTap:(){
-
-                      },
-                      child: SizedBox(
-                        height: 70,
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(
-                              vertical: 12, horizontal: 3),
-                          child: ChatPreview(),
+                chatPreviewList.insert(
+                  0,
+                  Column(
+                    children: [
+                      InkWell(
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => const ChatWindowPage()),
+                          );
+                        },
+                        child: SizedBox(
+                          height: 70,
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(
+                                vertical: 12, horizontal: 3),
+                            child: ChatPreview(),
+                          ),
                         ),
                       ),
-                    ),
-                    Container(
-                      height: 1,
-                      color: const Color(0xFFF0F0F0),
-                    ),
-                  ],
-                ));
+                      Container(
+                        height: 1,
+                        color: const Color(0xFFF0F0F0),
+                      ),
+                    ],
+                  ),
+                );
               });
             },
           ),
