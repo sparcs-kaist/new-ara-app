@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/svg.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:new_ara_app/constants/colors_info.dart';
 import 'package:new_ara_app/providers/user_provider.dart';
 import 'package:new_ara_app/widgetclasses/loading_indicator.dart';

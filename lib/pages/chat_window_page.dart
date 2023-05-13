@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:new_ara_app/constants/colors_info.dart';
 
-
 class ChatWindowPage extends StatefulWidget {
   const ChatWindowPage({Key? key}) : super(key: key);
 
@@ -160,43 +159,44 @@ class _DefaultInputAreaState extends State<DefaultInputArea> {
                   width: 7,
                 ),
                 Expanded(
-                    child: TextField(
-                  minLines: 1,
-                  maxLines: 5,
-                  style: const TextStyle(
-                    height: 1,
-                    fontSize: 16,
-                    fontWeight: FontWeight.w500,
-                  ),
-                  decoration: InputDecoration(
-                    filled: true,
-                    fillColor: const Color(0xFFF6F6F6),
+                  child: TextField(
+                    minLines: 1,
+                    maxLines: 5,
+                    style: const TextStyle(
+                      height: 1,
+                      fontSize: 16,
+                      fontWeight: FontWeight.w500,
+                    ),
+                    decoration: InputDecoration(
+                      filled: true,
+                      fillColor: const Color(0xFFF6F6F6),
 
-                    isDense: true,
-                    contentPadding: const EdgeInsets.fromLTRB(
-                        10.0, 10.0, 10.0, 10.0), // 모서리를 둥글게 설정
-                    enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10.0),
-                      borderSide: const BorderSide(
-                        color: Colors.transparent, // 테두리 색상 설정
-                      ), // 모서리를 둥글게 설정
+                      isDense: true,
+                      contentPadding: const EdgeInsets.fromLTRB(
+                          10.0, 10.0, 10.0, 10.0), // 모서리를 둥글게 설정
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10.0),
+                        borderSide: const BorderSide(
+                          color: Colors.transparent, // 테두리 색상 설정
+                        ), // 모서리를 둥글게 설정
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10.0),
+                        borderSide: const BorderSide(
+                          color: Colors.transparent, // 테두리 색상 설정
+                        ), // 모서리를 둥글게 설정
+                      ),
                     ),
-                    focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10.0),
-                      borderSide: const BorderSide(
-                        color: Colors.transparent, // 테두리 색상 설정
-                      ), // 모서리를 둥글게 설정
-                    ),
+                    cursorColor: Colors.transparent,
                   ),
-                  cursorColor: Colors.transparent,
-                )),
+                ),
                 const SizedBox(
                   width: 7,
                 ),
                 SvgPicture.asset('assets/icons/send.svg'),
                 const SizedBox(
                   width: 10,
-                )
+                ),
               ],
             ),
           ),
@@ -240,8 +240,7 @@ class MyChatBubble extends StatelessWidget {
                 ),
               ),
               child: const Padding(
-                padding:
-                    EdgeInsets.symmetric(vertical: 7, horizontal: 14),
+                padding: EdgeInsets.symmetric(vertical: 7, horizontal: 14),
                 child: Text(
                   "겁나긴 메세지1겁나긴 메세지1겁나긴 메세지1겁나긴 메세지1겁나긴 메세지1겁나긴 메세지1겁나긴 메세지1겁나긴 메세지1겁나긴 메세지1겁나긴 메세지1겁나긴 메세지1겁나긴 메세지1겁나긴 메세지1겁나긴 메세지1겁나긴 메세지1겁나긴 메세지끝",
                   style: TextStyle(
@@ -309,8 +308,8 @@ class _OtherChatBubbleState extends State<OtherChatBubble> {
                       ),
                     ),
                     child: const Padding(
-                      padding: EdgeInsets.symmetric(
-                          vertical: 7, horizontal: 14),
+                      padding:
+                          EdgeInsets.symmetric(vertical: 7, horizontal: 14),
                       child: Text(
                         "겁나긴 메세지1겁나긴 메세지1겁나긴 메세지1겁나긴 메세지1겁나긴 메세지1겁나긴 메세지1겁나긴 메세지1겁나긴 메세지1겁나긴 메세지1겁나긴 메세지1겁나긴 메세지1겁나긴 메세지1겁나긴 메세지1겁나긴 메세지1겁나긴 메세지1겁나긴 메세지끝",
                         style: TextStyle(
