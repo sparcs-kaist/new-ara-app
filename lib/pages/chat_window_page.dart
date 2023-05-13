@@ -1,8 +1,7 @@
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:new_ara_app/constants/colors_info.dart';
-import 'package:url_launcher/url_launcher.dart';
+
 
 class ChatWindowPage extends StatefulWidget {
   const ChatWindowPage({Key? key}) : super(key: key);
@@ -18,13 +17,21 @@ class _ChatWindowPageState extends State<ChatWindowPage> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    for (int i = 0; i <= 3; i++) chatBubbleList.add(OtherChatBubble());
-    for (int i = 0; i <= 3; i++) chatBubbleList.add(MyChatBubble());
-    chatBubbleList.add(TimeChatBubble());
-    for (int i = 0; i <= 3; i++) chatBubbleList.add(MyChatBubble());
-    chatBubbleList.add(TimeChatBubble());
-    chatBubbleList.add(TimeChatBubble());
-    for (int i = 0; i <= 3; i++) chatBubbleList.add(OtherChatBubble());
+    for (int i = 0; i <= 3; i++) {
+      chatBubbleList.add(const OtherChatBubble());
+    }
+    for (int i = 0; i <= 3; i++) {
+      chatBubbleList.add(const MyChatBubble());
+    }
+    chatBubbleList.add(const TimeChatBubble());
+    for (int i = 0; i <= 3; i++) {
+      chatBubbleList.add(const MyChatBubble());
+    }
+    chatBubbleList.add(const TimeChatBubble());
+    chatBubbleList.add(const TimeChatBubble());
+    for (int i = 0; i <= 3; i++) {
+      chatBubbleList.add(const OtherChatBubble());
+    }
   }
 
   @override
@@ -70,7 +77,7 @@ class _ChatWindowPageState extends State<ChatWindowPage> {
           children: [
             Expanded(
               child: Padding(
-                padding: EdgeInsets.fromLTRB(12, 0, 14, 0),
+                padding: const EdgeInsets.fromLTRB(12, 0, 14, 0),
                 child: ListView.builder(
                   reverse: true,
                   itemCount: chatBubbleList.length,
@@ -103,7 +110,7 @@ class _ChatWindowPageState extends State<ChatWindowPage> {
                 ),
               ),
             ),
-            DefaultInputArea(),
+            const DefaultInputArea(),
           ],
         ),
       ),
@@ -134,10 +141,10 @@ class _DefaultInputAreaState extends State<DefaultInputArea> {
       children: [
         Container(
           height: 1,
-          color: Color(0xFFF0F0F0),
+          color: const Color(0xFFF0F0F0),
         ),
         Container(
-          constraints: BoxConstraints(
+          constraints: const BoxConstraints(
             minHeight: 50.0, // 원하는 최소 높이 설정
           ),
           child: Padding(
@@ -145,49 +152,49 @@ class _DefaultInputAreaState extends State<DefaultInputArea> {
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
-                SizedBox(
+                const SizedBox(
                   width: 10,
                 ),
                 SvgPicture.asset('assets/icons/add-1.svg'),
-                SizedBox(
+                const SizedBox(
                   width: 7,
                 ),
                 Expanded(
                     child: TextField(
                   minLines: 1,
                   maxLines: 5,
-                  style: TextStyle(
+                  style: const TextStyle(
                     height: 1,
                     fontSize: 16,
                     fontWeight: FontWeight.w500,
                   ),
                   decoration: InputDecoration(
                     filled: true,
-                    fillColor: Color(0xFFF6F6F6),
+                    fillColor: const Color(0xFFF6F6F6),
 
                     isDense: true,
-                    contentPadding: EdgeInsets.fromLTRB(
+                    contentPadding: const EdgeInsets.fromLTRB(
                         10.0, 10.0, 10.0, 10.0), // 모서리를 둥글게 설정
                     enabledBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(10.0),
-                      borderSide: BorderSide(
+                      borderSide: const BorderSide(
                         color: Colors.transparent, // 테두리 색상 설정
                       ), // 모서리를 둥글게 설정
                     ),
                     focusedBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(10.0),
-                      borderSide: BorderSide(
+                      borderSide: const BorderSide(
                         color: Colors.transparent, // 테두리 색상 설정
                       ), // 모서리를 둥글게 설정
                     ),
                   ),
                   cursorColor: Colors.transparent,
                 )),
-                SizedBox(
+                const SizedBox(
                   width: 7,
                 ),
                 SvgPicture.asset('assets/icons/send.svg'),
-                SizedBox(
+                const SizedBox(
                   width: 10,
                 )
               ],
@@ -211,19 +218,19 @@ class MyChatBubble extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.end,
         crossAxisAlignment: CrossAxisAlignment.end,
         children: [
-          Text(
+          const Text(
             "10:40",
             style: TextStyle(
                 fontSize: 12,
                 fontWeight: FontWeight.w500,
                 color: Color(0xFFB1B1B1)),
           ),
-          SizedBox(
+          const SizedBox(
             width: 5,
           ),
           Flexible(
             child: Container(
-              decoration: BoxDecoration(
+              decoration: const BoxDecoration(
                 color: Color(0xFFFF7070), // 컨테이너 배경색
                 borderRadius: BorderRadius.only(
                   topLeft: Radius.circular(20.0),
@@ -232,9 +239,9 @@ class MyChatBubble extends StatelessWidget {
                   bottomRight: Radius.circular(3.0), // 좌하단 둥근 모서리 반지름
                 ),
               ),
-              child: Padding(
+              child: const Padding(
                 padding:
-                    const EdgeInsets.symmetric(vertical: 7, horizontal: 14),
+                    EdgeInsets.symmetric(vertical: 7, horizontal: 14),
                 child: Text(
                   "겁나긴 메세지1겁나긴 메세지1겁나긴 메세지1겁나긴 메세지1겁나긴 메세지1겁나긴 메세지1겁나긴 메세지1겁나긴 메세지1겁나긴 메세지1겁나긴 메세지1겁나긴 메세지1겁나긴 메세지1겁나긴 메세지1겁나긴 메세지1겁나긴 메세지1겁나긴 메세지끝",
                   style: TextStyle(
@@ -274,12 +281,12 @@ class _OtherChatBubbleState extends State<OtherChatBubble> {
               color: Colors.white,
               shape: BoxShape.circle, // 컨테이너 배경색
               border: Border.all(
-                color: Color(0xFFD9D9D9), // 테두리 색상
+                color: const Color(0xFFD9D9D9), // 테두리 색상
                 width: 1.0,
               ),
             ),
           ),
-          SizedBox(
+          const SizedBox(
             width: 10,
           ),
           Flexible(
@@ -291,18 +298,18 @@ class _OtherChatBubbleState extends State<OtherChatBubble> {
                     decoration: BoxDecoration(
                       color: Colors.white, // 컨테이너 배경색
                       border: Border.all(
-                        color: Color(0xFFD9D9D9), // 테두리 색상
+                        color: const Color(0xFFD9D9D9), // 테두리 색상
                         width: 1.0,
                       ),
-                      borderRadius: BorderRadius.only(
+                      borderRadius: const BorderRadius.only(
                         topLeft: Radius.circular(20.0),
                         topRight: Radius.circular(20.0),
                         bottomRight: Radius.circular(20.0),
                         bottomLeft: Radius.circular(3),
                       ),
                     ),
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(
+                    child: const Padding(
+                      padding: EdgeInsets.symmetric(
                           vertical: 7, horizontal: 14),
                       child: Text(
                         "겁나긴 메세지1겁나긴 메세지1겁나긴 메세지1겁나긴 메세지1겁나긴 메세지1겁나긴 메세지1겁나긴 메세지1겁나긴 메세지1겁나긴 메세지1겁나긴 메세지1겁나긴 메세지1겁나긴 메세지1겁나긴 메세지1겁나긴 메세지1겁나긴 메세지1겁나긴 메세지끝",
@@ -315,10 +322,10 @@ class _OtherChatBubbleState extends State<OtherChatBubble> {
                     ),
                   ),
                 ),
-                SizedBox(
+                const SizedBox(
                   width: 5,
                 ),
-                Text(
+                const Text(
                   "10:40",
                   style: TextStyle(
                       fontSize: 12,
@@ -331,7 +338,6 @@ class _OtherChatBubbleState extends State<OtherChatBubble> {
         ],
       ),
     );
-    ;
   }
 }
 
@@ -350,17 +356,17 @@ class _TimeChatBubbleState extends State<TimeChatBubble> {
         decoration: BoxDecoration(
           color: Colors.white, // 컨테이너 배경색
           border: Border.all(
-            color: Color(0xFFFFADAD), // 테두리 색상
+            color: const Color(0xFFFFADAD), // 테두리 색상
             width: 1.0,
           ),
-          borderRadius: BorderRadius.all(Radius.circular(12.0)),
+          borderRadius: const BorderRadius.all(Radius.circular(12.0)),
         ),
         height: 24,
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 9),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
-            children: [
+            children: const [
               Text(
                 "2022년 11월 24일",
                 style: TextStyle(

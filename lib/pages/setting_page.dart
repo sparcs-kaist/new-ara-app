@@ -151,13 +151,15 @@ class SettingPageState extends State<SettingPage> {
                     margin: const EdgeInsets.only(
                         top: 12, bottom: 12, left: 15, right: 219),
                     child: GestureDetector(
-                      onTap: () async{
-
-                        Provider.of<UserProvider>(context, listen: false).setHasData(false);
-                        Navigator.of(context).popUntil((route) => route.isFirst);
+                      onTap: () async {
+                        Provider.of<UserProvider>(context, listen: false)
+                            .setHasData(false);
+                        Navigator.of(context)
+                            .popUntil((route) => route.isFirst);
                         // 이 뒤에 코드는 작동 해요~
 
-                        FlutterSecureStorage secureStorage = FlutterSecureStorage();
+                        FlutterSecureStorage secureStorage =
+                            const FlutterSecureStorage();
                         await secureStorage.delete(key: 'cookie');
                         await WebviewCookieManager().clearCookies();
 

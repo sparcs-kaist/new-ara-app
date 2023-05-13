@@ -45,7 +45,8 @@ class UserProvider with ChangeNotifier {
     return;
   }
 
-  Future<bool> apiMeUserInfo({String initCookieString: "",String message:""}) async {
+  Future<bool> apiMeUserInfo(
+      {String initCookieString = "", String message = ""}) async {
     //쿠키를 기반으로 api/me 해서 namodel 갱신하는 메소드
     //initCookieString 이 없으면 현재 프로바이더의 쿠키로 한다.
 
@@ -76,7 +77,7 @@ class UserProvider with ChangeNotifier {
       //_naUser 모델에 요청값 입력.
       Map<String, dynamic> responseData =
           jsonDecode(utf8.decode(response.bodyBytes));
-      ;
+
       _naUser = NAUser.fromJson(responseData);
       // 유저 정보 출력
       debugPrint("user_provider.dart($message) : $responseData");
@@ -86,14 +87,14 @@ class UserProvider with ChangeNotifier {
     } else {
       //401 Unauthorized
       // 요청이 실패함 -> 유저가 로그아웃 된 상태 또는 인터넷 오류.
-      debugPrint('api/me request failed with status code: ${response.statusCode}');
+      debugPrint(
+          'api/me request failed with status code: ${response.statusCode}');
       return false;
     }
-    return false;
   }
 
   Future<bool> synApiRes(String apiUrl, String mapKey,
-      {String initCookieString: ""}) async {
+      {String initCookieString = ""}) async {
     //initCookieString 이 없으면 현재 프로바이더의 쿠키로 한다.
 
     String cookieString = "";
@@ -131,16 +132,17 @@ class UserProvider with ChangeNotifier {
       return true;
     } else {
       // 요청이 실패함
-      debugPrint('$apiUrl request failed with status code: ${response.statusCode}');
+      debugPrint(
+          '$apiUrl request failed with status code: ${response.statusCode}');
       return false;
     }
-    return false;
   }
 
   dynamic getApiRes(String mapKey) {
     if (apiRes.containsKey(mapKey)) {
       return Map.from(apiRes[mapKey]);
-    } else
+    } else {
       return null;
+    }
   }
 }

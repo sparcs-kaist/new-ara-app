@@ -82,7 +82,7 @@ class _FreeBulletinBoardPageState extends State<FreeBulletinBoardPage> {
     "hidden_at": null
   };
   bool isLoading = true;
-  ScrollController _scrollController = ScrollController();
+  final ScrollController _scrollController = ScrollController();
 
   @override
   void initState() {
@@ -210,8 +210,9 @@ class _FreeBulletinBoardPageState extends State<FreeBulletinBoardPage> {
           FloatingActionButton(
             onPressed: () {
               // FloatingActionButton을 누를 때 실행될 동작을 정의합니다.
-              print('FloatingActionButton pressed');
+              debugPrint('FloatingActionButton pressed');
             },
+            backgroundColor: Colors.white,
             child: SizedBox(
               width: 42,
               height: 42,
@@ -220,9 +221,8 @@ class _FreeBulletinBoardPageState extends State<FreeBulletinBoardPage> {
                 fit: BoxFit.fill,
               ),
             ),
-            backgroundColor: Colors.white,
           ),
-          SizedBox(
+          const SizedBox(
             height: 20,
           )
         ],

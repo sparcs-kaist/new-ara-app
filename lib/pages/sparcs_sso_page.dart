@@ -39,7 +39,7 @@ class _SparcsSSOPageState extends State<SparcsSSOPage> {
             var userProvider = context.read<UserProvider>();
             debugPrint("main.dart:login success");
 
-            FlutterSecureStorage secureStorage = FlutterSecureStorage();
+            FlutterSecureStorage secureStorage = const FlutterSecureStorage();
 
             debugPrint("current url is $url");
 

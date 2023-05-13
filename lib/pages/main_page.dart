@@ -1,5 +1,3 @@
-// ignore_for_file: must_be_immutable
-
 import 'package:flutter/material.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -58,7 +56,6 @@ class _MainPageState extends State<MainPage> {
 
   @override
   Widget build(BuildContext context) {
-    var userProvider = context.watch<UserProvider>();
     return Scaffold(
       appBar: AppBar(
         elevation: 0,
@@ -108,7 +105,7 @@ class _MainPageState extends State<MainPage> {
                         },
                       ),
                       // 실시간 인기 글을 ListView 로 도입 예정
-                      Container(
+                      SizedBox(
                         width: MediaQuery.of(context).size.width - 40,
                         child: Column(
                           children: [
@@ -187,7 +184,7 @@ class _MainPageState extends State<MainPage> {
                                     fit: BoxFit.cover,
                                   ),
                                 ),
-                                SizedBox(
+                                const SizedBox(
                                   width: 5,
                                 ),
                                 const Text(
@@ -490,8 +487,8 @@ class PopularBoard extends StatelessWidget {
 
 class MainPageTextButton extends StatelessWidget {
   final String buttonTitle;
-  var onPressed = () {};
-  MainPageTextButton(this.buttonTitle, this.onPressed, {super.key});
+  final void Function() onPressed;
+  const MainPageTextButton(this.buttonTitle, this.onPressed, {super.key});
 
   @override
   Widget build(BuildContext context) {

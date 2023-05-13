@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:new_ara_app/pages/main_page.dart';
-import 'package:new_ara_app/pages/bulletin_page.dart';
+import 'package:new_ara_app/pages/bulletin_list_page.dart';
 import 'package:new_ara_app/pages/chat_list_page.dart';
 import 'package:new_ara_app/pages/notification_page.dart';
 import 'package:new_ara_app/pages/user_page.dart';
@@ -17,7 +17,7 @@ class _NewAraHomePageState extends State<NewAraHomePage> {
 
   final List<Widget> _widgetOptions = <Widget>[
     const MainPage(),
-    const BulletinPage(),
+    const BulletinListPage(),
     const ChatListPage(),
     const NotificationPage(),
     const UserPage(),

@@ -4,7 +4,7 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:new_ara_app/widgetclasses/loading_indicator.dart';
 import 'package:provider/provider.dart';
 
-import 'package:new_ara_app/pages/newAra_home_page.dart';
+import 'package:new_ara_app/pages/new_ara_home_page.dart';
 import 'package:new_ara_app/pages/login_page.dart';
 import 'package:new_ara_app/providers/user_provider.dart';
 final supportedLocales = [
@@ -25,7 +25,7 @@ void main() async {
         providers: [
           ChangeNotifierProvider(create: (_) => UserProvider()),
         ],
-        child: MyApp(),
+        child: const MyApp(),
       ),
     ),
   );
@@ -76,10 +76,8 @@ class _MyAppState extends State<MyApp> {
     FlutterSecureStorage secureStorage = const FlutterSecureStorage();
     var cookiesBySecureStorage = await secureStorage.read(key: 'cookie');
 
-    debugPrint("main.dart : ${cookiesBySecureStorage}");
+    debugPrint("main.dart : $cookiesBySecureStorage");
     if (cookiesBySecureStorage != null) {
-      String apiUrl = 'https://newara.dev.sparcs.org/api/me';
-
       setState(() {
         isLoading = true;
       });

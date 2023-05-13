@@ -30,11 +30,11 @@ class _ChatListPageState extends State<ChatListPage> {
                 MaterialPageRoute(builder: (context) => const ChatWindowPage()),
               );
             },
-            child: SizedBox(
+            child: const SizedBox(
               height: 70,
               child: Padding(
                 padding:
-                    const EdgeInsets.symmetric(vertical: 12, horizontal: 3),
+                    EdgeInsets.symmetric(vertical: 12, horizontal: 3),
                 child: ChatPreview(),
               ),
             ),
@@ -85,10 +85,10 @@ class _ChatListPageState extends State<ChatListPage> {
                                 builder: (context) => const ChatWindowPage()),
                           );
                         },
-                        child: SizedBox(
+                        child: const SizedBox(
                           height: 70,
                           child: Padding(
-                            padding: const EdgeInsets.symmetric(
+                            padding: EdgeInsets.symmetric(
                                 vertical: 12, horizontal: 3),
                             child: ChatPreview(),
                           ),
@@ -125,6 +125,8 @@ class _ChatListPageState extends State<ChatListPage> {
 // ignore_for_file: must_be_immutable
 
 class ChatPreview extends StatefulWidget {
+  const ChatPreview({super.key});
+
   @override
   State<ChatPreview> createState() => _ChatPreviewState();
 }
@@ -143,7 +145,7 @@ class _ChatPreviewState extends State<ChatPreview> {
             fit: BoxFit.cover,
           ),
         ),
-        SizedBox(
+        const SizedBox(
           width: 12,
         ),
         Expanded(
@@ -156,11 +158,11 @@ class _ChatPreviewState extends State<ChatPreview> {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.start,
                   crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
+                  children: const [
                     Expanded(
                       child: Text(
-                        "L카이스트 익명 밝 123 익명 123 익명 123 익명 123",
-                        style: const TextStyle(
+                        "카이스트 익명 밝 123 익명 123 익명 123 익명 123",
+                        style: TextStyle(
                           fontWeight: FontWeight.w700,
                           fontSize: 16,
                         ),
@@ -168,13 +170,13 @@ class _ChatPreviewState extends State<ChatPreview> {
                         overflow: TextOverflow.ellipsis,
                       ),
                     ),
-                    const SizedBox(
+                    SizedBox(
                       width: 8,
                     ),
                     Text(
                       "20:22",
                       maxLines: 1,
-                      style: const TextStyle(
+                      style: TextStyle(
                           fontSize: 12, color: Color(0xFFB1B1B1)),
                     ),
                   ],
@@ -185,12 +187,12 @@ class _ChatPreviewState extends State<ChatPreview> {
                 height: 21,
                 child: Row(
                   children: [
-                    Expanded(
+                    const Expanded(
                       child: Text(
                         "족보 구할 수 있을까요~ 족보 주세요 족봉!!!!!!!",
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 14,
                           color: Color(0xFFB1B1B1),
                         ),
@@ -202,11 +204,11 @@ class _ChatPreviewState extends State<ChatPreview> {
                     Container(
                       width: 21, // 원의 지름을 조절하기 위해 너비를 설정합니다.
                       height: 21, // 원의 지름을 조절하기 위해 높이를 설정합니다.
-                      decoration: BoxDecoration(
+                      decoration: const BoxDecoration(
                         shape: BoxShape.circle, // 컨테이너를 원 모양으로 만듭니다.
                         color: Color(0xFFED3A3A), // 원의 배경색을 지정합니다.
                       ),
-                      child: Center(
+                      child: const Center(
                         child: Text(
                           "3",
                           style: TextStyle(

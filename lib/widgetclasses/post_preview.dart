@@ -1,16 +1,17 @@
-
-// ignore_for_file: must_be_immutable
-
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+
 class PostPreview extends StatefulWidget {
-  Map<String, dynamic> json;
-  PostPreview({super.key, required Map<String, dynamic> json}): json = json ?? {};
+  final Map<String, dynamic> json;
+  PostPreview({super.key, Map<String, dynamic>? json})
+      : json = json ?? {};
 
   @override
   State<PostPreview> createState() => _PostPreviewState();
-}class _PostPreviewState extends State<PostPreview> {
+}
+
+class _PostPreviewState extends State<PostPreview> {
   @override
   Widget build(BuildContext context) {
     DateTime now = DateTime.now();
@@ -24,16 +25,13 @@ class PostPreview extends StatefulWidget {
       time = '${difference.inMinutes}분 전';
     } else if (date.day == now.day) {
       time =
-      '${DateFormat('HH').format(date)}:${DateFormat('mm').format(date)}';
-    }
-    else if(date.year == now.year)
-    {
+          '${DateFormat('HH').format(date)}:${DateFormat('mm').format(date)}';
+    } else if (date.year == now.year) {
       time =
-      '${DateFormat('MM').format(date)}/${DateFormat('dd').format(date)}';
-    }
-    else {
+          '${DateFormat('MM').format(date)}/${DateFormat('dd').format(date)}';
+    } else {
       time =
-      '${DateFormat('yyyy').format(date)}/${DateFormat('MM').format(date)}/${DateFormat('dd').format(date)}';
+          '${DateFormat('yyyy').format(date)}/${DateFormat('MM').format(date)}/${DateFormat('dd').format(date)}';
     }
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
@@ -55,20 +53,22 @@ class PostPreview extends StatefulWidget {
                   overflow: TextOverflow.ellipsis,
                 ),
               ),
-              SizedBox(width: 5,),
+              const SizedBox(
+                width: 5,
+              ),
               SizedBox(
                 height: 14.22,
                 child: widget.json["attachment_type"] == "IMAGE"
                     ? SvgPicture.asset(
-                  'assets/icons/has-picture.svg',
-                  fit: BoxFit.fitHeight,
-                )
+                        'assets/icons/has-picture.svg',
+                        fit: BoxFit.fitHeight,
+                      )
                     : widget.json["attachment_type"] == "NON_IMAGE"
-                    ? SvgPicture.asset(
-                  'assets/icons/has-picture.svg',
-                  fit: BoxFit.fitHeight,
-                )
-                    : Container(),
+                        ? SvgPicture.asset(
+                            'assets/icons/has-picture.svg',
+                            fit: BoxFit.fitHeight,
+                          )
+                        : Container(),
               )
             ],
             //attachment_type
@@ -96,8 +96,8 @@ class PostPreview extends StatefulWidget {
                   Text(
                     time,
                     maxLines: 1,
-                    style: const TextStyle(
-                        fontSize: 12, color: Color(0xFFB1B1B1)),
+                    style:
+                        const TextStyle(fontSize: 12, color: Color(0xFFB1B1B1)),
                   ),
                 ],
               ),
@@ -158,4 +158,3 @@ class PostPreview extends StatefulWidget {
     );
   }
 }
-

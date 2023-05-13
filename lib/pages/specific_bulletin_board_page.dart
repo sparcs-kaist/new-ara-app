@@ -83,7 +83,7 @@ class _SpecificBulletinBoardPageState extends State<SpecificBulletinBoardPage> {
     "hidden_at": null
   };
   bool isLoading = true;
-  ScrollController _scrollController = ScrollController();
+  final ScrollController _scrollController = ScrollController();
 
   @override
   void initState() {
@@ -209,8 +209,9 @@ class _SpecificBulletinBoardPageState extends State<SpecificBulletinBoardPage> {
           FloatingActionButton(
             onPressed: () {
               // FloatingActionButton을 누를 때 실행될 동작을 정의합니다.
-              print('FloatingActionButton pressed');
+              debugPrint('FloatingActionButton pressed');
             },
+            backgroundColor: Colors.white,
             child: SizedBox(
               width: 42,
               height: 42,
@@ -219,9 +220,8 @@ class _SpecificBulletinBoardPageState extends State<SpecificBulletinBoardPage> {
                 fit: BoxFit.fill,
               ),
             ),
-            backgroundColor: Colors.white,
           ),
-          SizedBox(
+          const SizedBox(
             height: 20,
           )
         ],
@@ -237,10 +237,10 @@ class _SpecificBulletinBoardPageState extends State<SpecificBulletinBoardPage> {
                     children: [
                       Row(
                         children: [
-                          SizedBox(
+                          const SizedBox(
                             width: 11,
                           ),
-                          Expanded(
+                          const Expanded(
                             child: Text(
                               "학교에게 전합니다.",
                               style: TextStyle(
@@ -253,7 +253,7 @@ class _SpecificBulletinBoardPageState extends State<SpecificBulletinBoardPage> {
                           SvgPicture.asset('assets/icons/information.svg')
                         ],
                       ),
-                      SizedBox(
+                      const SizedBox(
                         height: 106,
                       ),
                       Expanded(
