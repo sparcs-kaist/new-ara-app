@@ -179,9 +179,16 @@ class _MainPageState extends State<MainPage> {
                           children: [
                             Row(
                               children: [
-                                SvgPicture.asset(
-                                  'assets/icons/kaist.svg',
-                                  fit: BoxFit.cover,
+                                SizedBox(
+                                  width:19,
+                                  height: 19,
+                                  child: Image.asset(
+                                    'assets/icons/kaist.png',
+                                    fit: BoxFit.cover,
+                                  ),
+                                ),
+                                SizedBox(
+                                  width: 5,
                                 ),
                                 const Text(
                                   "포탈 공지",
