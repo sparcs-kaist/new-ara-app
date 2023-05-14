@@ -1,0 +1,36 @@
+{
+    "appBar": {
+        "chatting": "Chatting",
+        "notification": "Notifications",
+        "bulletin": "Bulletins"
+    },
+    "main_page": {
+        "realtime": "Hot posts",
+        "notice": "Notices",
+        "stu_community": "Student Community"
+    },
+    "myPage": {
+        "change": "change",
+        "mypost": "My Posts",
+        "scrap": "Scrapped",
+        "recent": "Recent"
+    },
+    "login_page": {
+        "login": "Sign in with SPARCS SSO"
+    },
+    "setting_page": {
+        "title": "setting",
+        "bulletin": "Bulletins",
+        "adult": "R-rated posts",
+        "politics": "Political posts",
+        "block": "Account Blocking",
+        "blocked_users": "List of Blocked Users",
+        "block_howto": "You can block accounts through the detail function in posts or comments.",
+        "noti": "Notifications",
+        "myreply": "Comments and Nested Comments of My Posts",
+        "reply": "Nested Comments",
+        "hot_noti": "Hot Notifications",
+        "hot_posts": "Hot Posts",
+        "hot_info": "We deliver hot announcements and posts every day at 8:30 a.m."
+    }
+}
