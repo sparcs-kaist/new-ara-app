@@ -48,7 +48,6 @@ class _BulletinListPageState extends State<BulletinListPage> {
     setState(() {
       isLoading=false;
     });
-
    // debugPrint(myMap.toString());
   }
 

@@ -11,7 +11,7 @@ import 'package:provider/provider.dart';
 class FreeBulletinBoardPage extends StatefulWidget {
   final Map<String,dynamic>? boardInfo;
   final BoardType boardType;
-  const FreeBulletinBoardPage({super.key,  this.boardType = BoardType.recent , this.boardInfo});
+  const FreeBulletinBoardPage({super.key, required this.boardType , required this.boardInfo});
 
   @override
   State<FreeBulletinBoardPage> createState() => _FreeBulletinBoardPageState();

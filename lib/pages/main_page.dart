@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:new_ara_app/constants/board_type.dart';
 import 'package:new_ara_app/constants/colors_info.dart';
 import 'package:new_ara_app/pages/free_bulletin_board_page.dart';
 import 'package:new_ara_app/pages/specific_bulletin_board_page.dart';
@@ -16,22 +17,22 @@ class MainPage extends StatefulWidget {
 }
 
 class _MainPageState extends State<MainPage> {
-
-  List<bool> isLoading= [true,true,true,true,true,true,true];
+  List<bool> isLoading = [true, true, true, true, true, true, true,true];
+  List<dynamic> boardList = [];
   Map<String, dynamic> dailyBestContent = {};
-  Map<String,dynamic> portalContent = {};
-  Map<String,dynamic> facilityContent = {};
-  Map<String,dynamic> newAraContent = {};
-  Map<String,dynamic> gradContent = {};
-  Map<String,dynamic> underGradContent = {};
-  Map<String,dynamic> freshmanContent = {};
-
+  Map<String, dynamic> portalContent = {};
+  Map<String, dynamic> facilityContent = {};
+  Map<String, dynamic> newAraContent = {};
+  Map<String, dynamic> gradContent = {};
+  Map<String, dynamic> underGradContent = {};
+  Map<String, dynamic> freshmanContent = {};
 
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
     var userProvider = Provider.of<UserProvider>(context, listen: false);
+    refreshBoardList(userProvider);
     refreshDailyBest(userProvider);
     refreshPortalNotice(userProvider);
     refreshFacilityNotice(userProvider);
@@ -39,94 +40,104 @@ class _MainPageState extends State<MainPage> {
     refreshGradAssocNotice(userProvider);
     refreshUndergradAssocNotice(userProvider);
     refreshFreshmanCouncil(userProvider);
+    
+  }
+  void refreshBoardList(UserProvider userProvider) async {
+    //Provider에  api res 주입
+    await userProvider.synApiRes("boards/");
+    if(mounted){
+      setState(() {
+        boardList = userProvider.getApiRes("boards/");
+        isLoading[7]=false;
+      });
+    }
+    
   }
 
   void refreshDailyBest(UserProvider userProvider) async {
-
     // api 호출과 Provider 정보 동기화.
     await userProvider.synApiRes("articles/recent/");
     if (mounted) {
       setState(() {
-        dailyBestContent=userProvider.getApiRes("articles/recent/");
+        dailyBestContent = userProvider.getApiRes("articles/recent/");
         debugPrint(" ----- ${dailyBestContent["results"][0]}");
         isLoading[0] = false;
       });
     }
   }
-  void refreshPortalNotice(UserProvider userProvider) async{
+
+  void refreshPortalNotice(UserProvider userProvider) async {
     //포탈 공지
-  //  articles/?parent_board=1
+    //  articles/?parent_board=1
     await userProvider.synApiRes("articles/?parent_board=1");
-    if(mounted) {
+    if (mounted) {
       setState(() {
         portalContent = userProvider.getApiRes("articles/?parent_board=1");
         isLoading[1] = false;
       });
     }
   }
-  void refreshFacilityNotice(UserProvider userProvider) async{
+
+  void refreshFacilityNotice(UserProvider userProvider) async {
     //articles/?parent_board=11
     //입주 업체
     await userProvider.synApiRes("articles/?parent_board=11");
-    if(mounted) {
+    if (mounted) {
       setState(() {
         facilityContent = userProvider.getApiRes("articles/?parent_board=11");
         isLoading[2] = false;
       });
     }
-
   }
-  void refreshNewAraNotice(UserProvider userProvider) async{
+
+  void refreshNewAraNotice(UserProvider userProvider) async {
     //뉴아라
     await userProvider.synApiRes("articles/?parent_board=8");
-    if(mounted) {
+    if (mounted) {
       setState(() {
         newAraContent = userProvider.getApiRes("articles/?parent_board=8");
         isLoading[3] = false;
       });
     }
-
-
   }
-  void refreshGradAssocNotice(UserProvider userProvider) async{
+
+  void refreshGradAssocNotice(UserProvider userProvider) async {
     //원총
     //dev 서버랑 실제 서버 parent_topic 이 다름을 유의하기.
     //https://newara.sparcs.org/api/articles/?parent_board=2&parent_topic=24
 
     await userProvider.synApiRes("articles/?parent_board=2&parent_topic=24");
-    if(mounted) {
+    if (mounted) {
       setState(() {
         gradContent =
             userProvider.getApiRes("articles/?parent_board=2&parent_topic=24");
         isLoading[4] = false;
       });
     }
-
   }
-  void refreshUndergradAssocNotice(UserProvider userProvider) async{
+
+  void refreshUndergradAssocNotice(UserProvider userProvider) async {
     //총학
     await userProvider.synApiRes("articles/?parent_board=2&parent_topic=1");
-    if(mounted) {
+    if (mounted) {
       setState(() {
         underGradContent =
             userProvider.getApiRes("articles/?parent_board=2&parent_topic=1");
         isLoading[5] = false;
       });
     }
-
-
   }
-  void refreshFreshmanCouncil(UserProvider userProvider) async{
+
+  void refreshFreshmanCouncil(UserProvider userProvider) async {
     //새학
     await userProvider.synApiRes("articles/?parent_board=2&parent_topic=5");
-    if(mounted) {
+    if (mounted) {
       setState(() {
         freshmanContent =
             userProvider.getApiRes("articles/?parent_board=2&parent_topic=5");
         isLoading[6] = false;
       });
     }
-
   }
 
   @override
@@ -160,7 +171,14 @@ class _MainPageState extends State<MainPage> {
         ],
       ),
       body: SafeArea(
-        child: isLoading[0] || isLoading[1] || isLoading[2] || isLoading[3] || isLoading[4] || isLoading[5] || isLoading[6]
+        child: isLoading[0] ||
+                isLoading[1] ||
+                isLoading[2] ||
+                isLoading[3] ||
+                isLoading[4] ||
+                isLoading[5] ||
+                isLoading[6] ||
+                isLoading[7] 
             ? const LoadingIndicator()
             : SingleChildScrollView(
                 child: SizedBox(
@@ -175,7 +193,8 @@ class _MainPageState extends State<MainPage> {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                                builder: (context) => const FreeBulletinBoardPage()),
+                                builder: (context) =>
+                                    const FreeBulletinBoardPage(boardType: BoardType.recent, boardInfo: {},)),
                           );
                         },
                       ),
@@ -226,14 +245,18 @@ class _MainPageState extends State<MainPage> {
                         ),
                       ),
                       const SizedBox(height: 10),
-                      MainPageTextButton('main_page.notice', () {
-                        //잠시 free_bulletin_board들 테스트 하기 위한
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => const SpecificBulletinBoardPage()),
-                        );
-                      }),
+                      MainPageTextButton(
+                        'main_page.notice',
+                        () {
+                          //잠시 free_bulletin_board들 테스트 하기 위한
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) =>
+                                    const SpecificBulletinBoardPage()),
+                          );
+                        },
+                      ),
                       Container(
                         padding: const EdgeInsets.all(12),
                         width: MediaQuery.of(context).size.width - 40,
@@ -249,40 +272,49 @@ class _MainPageState extends State<MainPage> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Row(
-                              children: [
-                                SizedBox(
-                                  width:19,
-                                  height: 19,
-                                  child: Image.asset(
-                                    'assets/icons/kaist.png',
-                                    fit: BoxFit.cover,
+                            InkWell(
+                              onTap: (){
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => FreeBulletinBoardPage(boardType: BoardType.free,boardInfo: boardList[0],)),
+                                );
+                              },
+                              child: Row(
+                                children: [
+                                  SizedBox(
+                                    width: 19,
+                                    height: 19,
+                                    child: Image.asset(
+                                      'assets/icons/kaist.png',
+                                      fit: BoxFit.cover,
+                                    ),
                                   ),
-                                ),
-                                const SizedBox(
-                                  width: 5,
-                                ),
-                                const Text(
-                                  "포탈 공지",
-                                  style: TextStyle(
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.w700,
-                                    color: Color(0xFF1F4899),
+                                  const SizedBox(
+                                    width: 5,
                                   ),
-                                ),
-                                const SizedBox(
-                                  width: 5,
-                                ),
-                                SizedBox(
-                                  height: 11,
-                                  width: 6,
-                                  child: SvgPicture.asset(
-                                    'assets/icons/chevron-right.svg',
-                                    color: const Color(0xFF1F4899),
-                                    fit: BoxFit.fill,
+                                  const Text(
+                                    "포탈 공지",
+                                    style: TextStyle(
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w700,
+                                      color: Color(0xFF1F4899),
+                                    ),
                                   ),
-                                ),
-                              ],
+                                  const SizedBox(
+                                    width: 5,
+                                  ),
+                                  SizedBox(
+                                    height: 11,
+                                    width: 6,
+                                    child: SvgPicture.asset(
+                                      'assets/icons/chevron-right.svg',
+                                      color: const Color(0xFF1F4899),
+                                      fit: BoxFit.fill,
+                                    ),
+                                  ),
+                                ],
+                              ),
                             ),
                             const SizedBox(
                               height: 10,
@@ -424,7 +456,7 @@ class _MainPageState extends State<MainPage> {
                             SizedBox(
                               height: 28,
                               child: Row(
-                                children:[
+                                children: [
                                   Text(
                                     '원총',
                                     style: TextStyle(
