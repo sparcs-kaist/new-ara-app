@@ -28,21 +28,12 @@ class _MainPageState extends State<MainPage> {
   }
 
   void refreshDailyBest(UserProvider userProvider) async {
-    //example
-    //Provider 에 있는 정보 사용.
-    var myMap = userProvider.getApiRes("home");
-
-    setState(() {
-      textContent.clear();
-      textContent.add(myMap?["daily_bests"][0] ?? {});
-      textContent.add(myMap?["daily_bests"][1] ?? {});
-      textContent.add(myMap?["daily_bests"][2] ?? {});
-    });
 
     // api 호출과 Provider 정보 동기화.
-    await userProvider.synApiRes("home", "home");
-    // await Future.delayed(Duration(seconds: 1));
-    myMap = userProvider.getApiRes("home");
+    await userProvider.synApiRes("home");
+
+
+    var myMap = userProvider.getApiRes("home");
     if (mounted) {
       setState(() {
         textContent.clear();

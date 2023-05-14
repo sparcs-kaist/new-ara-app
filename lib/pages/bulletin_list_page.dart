@@ -2,6 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:new_ara_app/constants/colors_info.dart';
+import 'package:new_ara_app/providers/user_provider.dart';
+import 'package:new_ara_app/widgetclasses/loading_indicator.dart';
+import 'package:provider/provider.dart';
+
+const boardsByGroupLength = 5;
 
 class BulletinListPage extends StatefulWidget {
   const BulletinListPage({Key? key}) : super(key: key);
@@ -10,18 +15,43 @@ class BulletinListPage extends StatefulWidget {
 }
 
 class _BulletinListPageState extends State<BulletinListPage> {
+  bool isLoading = true;
+
+  var boardsByGroup = List.generate(boardsByGroupLength+1, (row){return <dynamic>[]; });
   List<Map<String, dynamic>> textContent = [];
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
-    textContent.add(
-      {},
-    );
+    var userProvider = Provider.of<UserProvider>(context, listen: false);
+    refreshBoardList(userProvider);
   }
+
+  void refreshBoardList(UserProvider userProvider) async {
+    //Provider에  api res 주입
+    await userProvider.synApiRes("boards/");
+    //Provider에 api res 정보 사용
+    //var boardsByGroup = List<dynamic>.filled(6, List< dynamic >.filled(0, null, growable: true) , growable: true);
+
+    var apiResBoards = userProvider.getApiRes("boards/");
+    int cnt=0;
+    for (var element in apiResBoards){
+      print("${element["group_id"]} ${element["ko_name"]}");
+      boardsByGroup[element["group_id"]].add(element);
+      cnt=cnt+1;
+    }
+    setState(() {
+      isLoading=false;
+    });
+
+   // debugPrint(myMap.toString());
+  }
+
 
   @override
   Widget build(BuildContext context) {
+
+
     return Scaffold(
       appBar: AppBar(
         centerTitle: false,
@@ -34,7 +64,7 @@ class _BulletinListPageState extends State<BulletinListPage> {
           ),
         ),
       ),
-      body: SafeArea(
+      body: isLoading?const LoadingIndicator():SafeArea(
         child: SingleChildScrollView(
           child: Center(
             child: Padding(
@@ -182,193 +212,149 @@ class _BulletinListPageState extends State<BulletinListPage> {
                   const SizedBox(
                     height: 10,
                   ),
-                  Theme(
-                    data: ThemeData(
-                      dividerColor: Colors.transparent, // 액센트 색상을 투명으로 설정
-                    ),
-                    child: ListTileTheme(
-                      contentPadding: const EdgeInsets.all(0),
-                      dense: true,
-                      child: ExpansionTile(
-                        // tilePadding: EdgeInsets.zero,
-                        title: SizedBox(
-                          height: 39,
-                          child: Row(
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              const SizedBox(
-                                width: 3,
-                              ),
-                              SvgPicture.asset('assets/icons/notify.svg'),
-                              const SizedBox(
-                                width: 5,
-                              ),
-                              const Text(
-                                '공지',
-                                style: TextStyle(
-                                  color: Color(0xFF333333),
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.w700,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        children: <Widget>[
-                          SizedBox(
-                            height: 39,
-                            child: Row(
-                              children: const [
-                                SizedBox(
-                                  width: 40,
-                                ),
-                                Text(
-                                  '포털공지',
-                                  style: TextStyle(
-                                    color: Color(0xFF333333),
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.w500,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                          SizedBox(
-                            height: 39,
-                            child: Row(
-                              children: const [
-                                SizedBox(
-                                  width: 40,
-                                ),
-                                Text(
-                                  '운영진 공지',
-                                  style: TextStyle(
-                                    color: Color(0xFF333333),
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.w500,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                          SizedBox(
-                            height: 39,
-                            child: Row(
-                              children: const [
-                                SizedBox(
-                                  width: 40,
-                                ),
-                                Text(
-                                  '외주업체 공지',
-                                  style: TextStyle(
-                                    color: Color(0xFF333333),
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.w500,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
 
-                  Theme(
-                    data: ThemeData(
-                      dividerColor: Colors.transparent, // 액센트 색상을 투명으로 설정
-                    ),
-                    child: ListTileTheme(
-                      contentPadding: const EdgeInsets.all(0),
-                      dense: true,
-                      child: ExpansionTile(
-                        // tilePadding: EdgeInsets.zero,
-                        title: SizedBox(
-                          height: 39,
-                          child: Row(
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              const SizedBox(
-                                width: 3,
-                              ),
-                              SvgPicture.asset('assets/icons/notify.svg'),
-                              const SizedBox(
-                                width: 5,
-                              ),
-                              const Text(
-                                '공지',
-                                style: TextStyle(
-                                  color: Color(0xFF333333),
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.w700,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        children: <Widget>[
-                          SizedBox(
-                            height: 39,
-                            child: Row(
-                              children: const [
-                                SizedBox(
-                                  width: 40,
-                                ),
-                                Text(
-                                  '포털공지',
-                                  style: TextStyle(
-                                    color: Color(0xFF333333),
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.w500,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                          SizedBox(
-                            height: 39,
-                            child: Row(
-                              children: const [
-                                SizedBox(
-                                  width: 40,
-                                ),
-                                Text(
-                                  '운영진 공지',
-                                  style: TextStyle(
-                                    color: Color(0xFF333333),
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.w500,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                          SizedBox(
-                            height: 39,
-                            child: Row(
-                              children: const [
-                                SizedBox(
-                                  width: 40,
-                                ),
-                                Text(
-                                  '외주업체 공지',
-                                  style: TextStyle(
-                                    color: Color(0xFF333333),
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.w500,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
+                  BoardExpansionTile(1,"공지",boardsByGroup[1]),
+                  BoardExpansionTile(2,"잡담",boardsByGroup[2]),
+                  BoardExpansionTile(3,"학생 단체 및 동아리",boardsByGroup[3]),
+                  BoardExpansionTile(4,"거래",boardsByGroup[4]),
+                  BoardExpansionTile(5,"소통",boardsByGroup[5]),
+
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class BoardExpansionTile extends StatelessWidget {
+  int titleNum;
+  String title;
+  dynamic boardsByGroup;
+  BoardExpansionTile(this.titleNum, this.title, this.boardsByGroup, {super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    List<Widget> test(){
+      List<Widget> temp=[];
+      for(int i=0 ;i < boardsByGroup.length; i++) {
+        temp.add(
+            SizedBox(
+              height: 39,
+              child: Row(
+                children: [
+                  SizedBox(
+                    width: 40,
+                  ),
+                  Text(
+                    boardsByGroup[i]["ko_name"],
+                    style: TextStyle(
+                      color: Color(0xFF333333),
+                      fontSize: 16,
+                      fontWeight: FontWeight.w500,
                     ),
                   ),
                 ],
               ),
             ),
+        );
+      }
+      return temp;
+    }
+
+    return Theme(
+      data: ThemeData(
+        dividerColor: Colors.transparent, // 액센트 색상을 투명으로 설정
+      ),
+      child: ListTileTheme(
+        contentPadding: const EdgeInsets.all(0),
+        dense: true,
+        child: ExpansionTile(
+          // tilePadding: EdgeInsets.zero,
+          title: SizedBox(
+            height: 39,
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                const SizedBox(
+                  width: 3,
+                ),
+                SvgPicture.asset('assets/icons/notify.svg'),
+                const SizedBox(
+                  width: 5,
+                ),
+                Text(
+                  title,
+                  style: TextStyle(
+                    color: Color(0xFF333333),
+                    fontSize: 20,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+              ],
+            ),
           ),
+          children: test(),
+
+
+          // <Widget>[
+          //   SizedBox(
+          //     height: 39,
+          //     child: Row(
+          //       children: const [
+          //         SizedBox(
+          //           width: 40,
+          //         ),
+          //         Text(
+          //           '포털공지',
+          //           style: TextStyle(
+          //             color: Color(0xFF333333),
+          //             fontSize: 16,
+          //             fontWeight: FontWeight.w500,
+          //           ),
+          //         ),
+          //       ],
+          //     ),
+          //   ),
+          //   SizedBox(
+          //     height: 39,
+          //     child: Row(
+          //       children: const [
+          //         SizedBox(
+          //           width: 40,
+          //         ),
+          //         Text(
+          //           '운영진 공지',
+          //           style: TextStyle(
+          //             color: Color(0xFF333333),
+          //             fontSize: 16,
+          //             fontWeight: FontWeight.w500,
+          //           ),
+          //         ),
+          //       ],
+          //     ),
+          //   ),
+          //   SizedBox(
+          //     height: 39,
+          //     child: Row(
+          //       children: const [
+          //         SizedBox(
+          //           width: 40,
+          //         ),
+          //         Text(
+          //           '외주업체 공지',
+          //           style: TextStyle(
+          //             color: Color(0xFF333333),
+          //             fontSize: 16,
+          //             fontWeight: FontWeight.w500,
+          //           ),
+          //         ),
+          //       ],
+          //     ),
+          //   ),
+          // ],
         ),
       ),
     );

@@ -13,8 +13,9 @@ class UserProvider with ChangeNotifier {
 
   NAUser? get naUser => _naUser;
   bool get hasData => _hasData;
+  dynamic get apiRes => _apiRes;
 
-  Map<String, dynamic> apiRes = {};
+  Map<String, dynamic> _apiRes = {};
 
   void setHasData(bool tf) {
     _hasData = tf;
@@ -93,13 +94,12 @@ class UserProvider with ChangeNotifier {
     }
   }
 
-  Future<bool> synApiRes(String apiUrl, String mapKey,
-      {String initCookieString = ""}) async {
+  Future<bool> synApiRes(String mapKey, {String initCookieString = ""}) async {
     //initCookieString 이 없으면 현재 프로바이더의 쿠키로 한다.
 
     String cookieString = "";
     //  String apiUrl = 'https://newara.dev.sparcs.org/api/me';
-    apiUrl = "https://newara.dev.sparcs.org/api/$apiUrl";
+    var apiUrl = "https://newara.dev.sparcs.org/api/$mapKey";
     if (initCookieString == "") {
       // 쿠키를 문자열로 변환하여 HTTP 요청의 헤더에 추가
 
@@ -121,10 +121,10 @@ class UserProvider with ChangeNotifier {
     );
     if (response.statusCode == 200) {
       // 요청이 성공적으로 처리됨
-      Map<String, dynamic> responseData =
+      var responseData =
           jsonDecode(utf8.decode(response.bodyBytes));
 
-      apiRes[mapKey] = responseData;
+      _apiRes[mapKey] = responseData;
       debugPrint("user_provider.dart responseData: $responseData");
 
       //getApiRes 하는 곳에서 재 실행!
@@ -139,8 +139,8 @@ class UserProvider with ChangeNotifier {
   }
 
   dynamic getApiRes(String mapKey) {
-    if (apiRes.containsKey(mapKey)) {
-      return Map.from(apiRes[mapKey]);
+    if (_apiRes.containsKey(mapKey)) {
+      return apiRes[mapKey];
     } else {
       return null;
     }

@@ -108,7 +108,7 @@ class _FreeBulletinBoardPageState extends State<FreeBulletinBoardPage> {
 
     // api 호출과 Provider 정보 동기화.
     await userProvider.synApiRes(
-        "articles/?parent_board=7&page=1", "articles/?parent_board=7&page=1");
+        "articles/?parent_board=7&page=1");
     // await Future.delayed(Duration(seconds: 1));
     myMap = userProvider.getApiRes("articles/?parent_board=7&page=1");
     if (mounted) {
@@ -129,7 +129,7 @@ class _FreeBulletinBoardPageState extends State<FreeBulletinBoardPage> {
 
       // api 호출과 Provider 정보 동기화.
       await userProvider.synApiRes(
-          "articles/?parent_board=7&page=$currentPage", "articles/?parent_board=7&page=$currentPage");
+          "articles/?parent_board=7&page=$currentPage");
       // await Future.delayed(Duration(seconds: 1));
       myMap = userProvider.getApiRes("articles/?parent_board=7&page=$currentPage");
       if (mounted) {
