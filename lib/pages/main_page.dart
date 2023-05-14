@@ -16,8 +16,16 @@ class MainPage extends StatefulWidget {
 }
 
 class _MainPageState extends State<MainPage> {
-  List<Map<String, dynamic>> textContent = [];
-  bool isLoading = true;
+  List<Map<String, dynamic>> dailyBestContent = [];
+  List<bool> isLoading= [true,true,true,true,true,true,true];
+
+  Map<String,dynamic> portalContent = {};
+  Map<String,dynamic> facilityContent = {};
+  Map<String,dynamic> newAraContent = {};
+  Map<String,dynamic> gradContent = {};
+  Map<String,dynamic> underGradContent = {};
+  Map<String,dynamic> freshmanContent = {};
+
 
   @override
   void initState() {
@@ -25,6 +33,12 @@ class _MainPageState extends State<MainPage> {
     super.initState();
     var userProvider = Provider.of<UserProvider>(context, listen: false);
     refreshDailyBest(userProvider);
+    refreshPortalNotice(userProvider);
+    refreshFacilityNotice(userProvider);
+    refreshNewAraNotice(userProvider);
+    refreshGradAssocNotice(userProvider);
+    refreshUndergradAssocNotice(userProvider);
+    refreshFreshmanCouncil(userProvider);
   }
 
   void refreshDailyBest(UserProvider userProvider) async {
@@ -36,13 +50,72 @@ class _MainPageState extends State<MainPage> {
     var myMap = userProvider.getApiRes("home");
     if (mounted) {
       setState(() {
-        textContent.clear();
-        textContent.add(myMap?["daily_bests"][0] ?? {});
-        textContent.add(myMap?["daily_bests"][1] ?? {});
-        textContent.add(myMap?["daily_bests"][2] ?? {});
-        isLoading = false;
+        dailyBestContent.clear();
+        dailyBestContent.add(myMap?["daily_bests"][0] ?? {});
+        dailyBestContent.add(myMap?["daily_bests"][1] ?? {});
+        dailyBestContent.add(myMap?["daily_bests"][2] ?? {});
+        isLoading[0] = false;
       });
     }
+  }
+  void refreshPortalNotice(UserProvider userProvider) async{
+    //포탈 공지
+  //  articles/?parent_board=1
+    await userProvider.synApiRes("articles/?parent_board=1");
+    setState(() {
+      portalContent = userProvider.getApiRes("articles/?parent_board=1");
+      isLoading[1] = false;
+    });
+  }
+  void refreshFacilityNotice(UserProvider userProvider) async{
+    //articles/?parent_board=11
+    //입주 업체
+    await userProvider.synApiRes("articles/?parent_board=11");
+    setState(() {
+      facilityContent = userProvider.getApiRes("articles/?parent_board=11");
+      isLoading[2]=false;
+    });
+
+  }
+  void refreshNewAraNotice(UserProvider userProvider) async{
+    //뉴아라
+    await userProvider.synApiRes("articles/?parent_board=8");
+    setState(() {
+      newAraContent = userProvider.getApiRes("articles/?parent_board=8");
+      isLoading[3]=false;
+    });
+
+
+  }
+  void refreshGradAssocNotice(UserProvider userProvider) async{
+    //원총
+    //dev 서버랑 실제 서버 parent_topic 이 다름을 유의하기.
+    //https://newara.sparcs.org/api/articles/?parent_board=2&parent_topic=24
+    await userProvider.synApiRes("articles/?parent_board=2&parent_topic=24");
+    setState(() {
+      gradContent = userProvider.getApiRes("articles/?parent_board=2&parent_topic=24");
+      isLoading[4]=false;
+    });
+
+  }
+  void refreshUndergradAssocNotice(UserProvider userProvider) async{
+    //총학
+    await userProvider.synApiRes("articles/?parent_board=2&parent_topic=1");
+    setState(() {
+      underGradContent = userProvider.getApiRes("articles/?parent_board=2&parent_topic=1");
+      isLoading[5]=false;
+    });
+
+
+  }
+  void refreshFreshmanCouncil(UserProvider userProvider) async{
+    //새학
+    await userProvider.synApiRes("articles/?parent_board=2&parent_topic=5");
+    setState(() {
+      freshmanContent = userProvider.getApiRes("articles/?parent_board=2&parent_topic=5");
+      isLoading[6]=false;
+    });
+
   }
 
   @override
@@ -76,7 +149,7 @@ class _MainPageState extends State<MainPage> {
         ],
       ),
       body: SafeArea(
-        child: isLoading
+        child: isLoading[0] || isLoading[1] || isLoading[2] || isLoading[3] || isLoading[4] || isLoading[5] || isLoading[6]
             ? const LoadingIndicator()
             : SingleChildScrollView(
                 child: SizedBox(
@@ -101,7 +174,7 @@ class _MainPageState extends State<MainPage> {
                         child: Column(
                           children: [
                             PopularBoard(
-                              json: textContent[0],
+                              json: dailyBestContent[0],
                               ingiNum: 1,
                             ),
                             Row(
@@ -118,7 +191,7 @@ class _MainPageState extends State<MainPage> {
                               ],
                             ),
                             PopularBoard(
-                              json: textContent[1],
+                              json: dailyBestContent[1],
                               ingiNum: 2,
                             ),
                             Row(
@@ -135,7 +208,7 @@ class _MainPageState extends State<MainPage> {
                               ],
                             ),
                             PopularBoard(
-                              json: textContent[2],
+                              json: dailyBestContent[2],
                               ingiNum: 3,
                             ),
                           ],
@@ -203,8 +276,8 @@ class _MainPageState extends State<MainPage> {
                             const SizedBox(
                               height: 10,
                             ),
-                            const Text(
-                              "2023년 의생명과학분야 대학원 장학생 선발 안내sdffsfdssfdfsds",
+                            Text(
+                              portalContent["results"][0]["title"],
                               style: TextStyle(
                                   fontSize: 14, fontWeight: FontWeight.w400),
                               maxLines: 1,
@@ -213,8 +286,8 @@ class _MainPageState extends State<MainPage> {
                             const SizedBox(
                               height: 10,
                             ),
-                            const Text(
-                              "[국제협력팀] 워크샵 안내 (10/7, 금)",
+                            Text(
+                              portalContent["results"][1]["title"],
                               style: TextStyle(
                                   fontSize: 14, fontWeight: FontWeight.w400),
                               maxLines: 1,
@@ -223,8 +296,8 @@ class _MainPageState extends State<MainPage> {
                             const SizedBox(
                               height: 10,
                             ),
-                            const Text(
-                              "코로나19 (COVID-19) 상황일지 (2022. 10. 6. 0시 기준)afddfad",
+                            Text(
+                              portalContent["results"][2]["title"],
                               style: TextStyle(
                                   fontSize: 14, fontWeight: FontWeight.w400),
                               maxLines: 1,
@@ -265,9 +338,9 @@ class _MainPageState extends State<MainPage> {
                                 const SizedBox(
                                   width: 10,
                                 ),
-                                const Expanded(
+                                Expanded(
                                   child: Text(
-                                    "북측식당 웰차이 운영안내dsfsfdsdfsdsdfsdf",
+                                    facilityContent["results"][0]["title"],
                                     style: TextStyle(
                                         fontSize: 14,
                                         fontWeight: FontWeight.w400),
@@ -305,9 +378,9 @@ class _MainPageState extends State<MainPage> {
                                 const SizedBox(
                                   width: 10,
                                 ),
-                                const Expanded(
+                                Expanded(
                                   child: Text(
-                                    "🎉 뉴아라 v2.0.0 Amethyst 배포 완료dddddd",
+                                    newAraContent["results"][0]["title"],
                                     style: TextStyle(
                                         fontSize: 14,
                                         fontWeight: FontWeight.w400),
@@ -340,7 +413,7 @@ class _MainPageState extends State<MainPage> {
                             SizedBox(
                               height: 28,
                               child: Row(
-                                children: const [
+                                children:[
                                   Text(
                                     '원총',
                                     style: TextStyle(
@@ -354,7 +427,7 @@ class _MainPageState extends State<MainPage> {
                                   ),
                                   Expanded(
                                     child: Text(
-                                      "2023년 의생명과학분야 대학원 장학생 선발 안내",
+                                      gradContent["results"][0]["title"],
                                       style: TextStyle(
                                           fontSize: 14,
                                           fontWeight: FontWeight.w400),
@@ -368,7 +441,7 @@ class _MainPageState extends State<MainPage> {
                             SizedBox(
                               height: 28,
                               child: Row(
-                                children: const [
+                                children: [
                                   Text(
                                     '총학',
                                     style: TextStyle(
@@ -382,7 +455,7 @@ class _MainPageState extends State<MainPage> {
                                   ),
                                   Expanded(
                                     child: Text(
-                                      "2022년도 제14차 중앙운영위원회 (9월 정기회)ㄴㅇㄹㄴㅇㄹㄴㄹ",
+                                      underGradContent["results"][0]["title"],
                                       style: TextStyle(
                                           fontSize: 14,
                                           fontWeight: FontWeight.w400),
@@ -396,7 +469,7 @@ class _MainPageState extends State<MainPage> {
                             SizedBox(
                               height: 28,
                               child: Row(
-                                children: const [
+                                children: [
                                   Text(
                                     '새학',
                                     style: TextStyle(
@@ -410,7 +483,7 @@ class _MainPageState extends State<MainPage> {
                                   ),
                                   Expanded(
                                     child: Text(
-                                      "2022년도 제14차 중앙운영위원회 (9월 정기회)ㄴㅇㄹㄴㅇㄹㄴㄹ",
+                                      freshmanContent["results"][0]["title"],
                                       style: TextStyle(
                                           fontSize: 14,
                                           fontWeight: FontWeight.w400),

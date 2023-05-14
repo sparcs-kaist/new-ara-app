@@ -34,11 +34,14 @@ class _BulletinListPageState extends State<BulletinListPage> {
     //var boardsByGroup = List<dynamic>.filled(6, List< dynamic >.filled(0, null, growable: true) , growable: true);
 
     var apiResBoards = userProvider.getApiRes("boards/");
-    int cnt=0;
     for (var element in apiResBoards){
-      print("${element["group_id"]} ${element["ko_name"]}");
+      // debugPrint("${element["ko_name"]}, group_id: ${element["group_id"]}, id: ${element["id"]}, lenght: ${element["topics"]}");
+      // debugPrint("-------------------------");
       boardsByGroup[element["group_id"]].add(element);
-      cnt=cnt+1;
+      // for(var topic in element["topics"]){
+      //   debugPrint("${topic["ko_name"]} ,id: ${topic["id"]}");
+      // }
+      // debugPrint("=========================");
     }
     setState(() {
       isLoading=false;
