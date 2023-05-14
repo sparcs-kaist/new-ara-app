@@ -7,11 +7,11 @@ import 'package:webview_cookie_manager/webview_cookie_manager.dart';
 
 //Provider.of<UserProvider>(context, listen: false).increment()
 class UserProvider with ChangeNotifier {
-  NAUser? _naUser; // api/me 했을 때 받는 유저의 정보
+  NAUserModel? _naUser; // api/me 했을 때 받는 유저의 정보
   bool _hasData = false; // api/me 했을 때 유저의 정보가 있는가?
   List<Cookie> _loginCookie = [];
 
-  NAUser? get naUser => _naUser;
+  NAUserModel? get naUser => _naUser;
   bool get hasData => _hasData;
   dynamic get apiRes => _apiRes;
 
@@ -79,7 +79,7 @@ class UserProvider with ChangeNotifier {
       Map<String, dynamic> responseData =
           jsonDecode(utf8.decode(response.bodyBytes));
 
-      _naUser = NAUser.fromJson(responseData);
+      _naUser = NAUserModel.fromJson(responseData);
       // 유저 정보 출력
       debugPrint("user_provider.dart($message) : $responseData");
       //유저 정보를 사용하는 곳에서 재 실행!
