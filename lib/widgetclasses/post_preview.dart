@@ -4,7 +4,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 
 class PostPreview extends StatefulWidget {
   final Map<String, dynamic> json;
-  PostPreview({super.key, Map<String, dynamic>? json})
+  PostPreview({super.key, required Map<String, dynamic> json})
       : json = json ?? {};
 
   @override
@@ -44,7 +44,7 @@ class _PostPreviewState extends State<PostPreview> {
             children: [
               Flexible(
                 child: Text(
-                  widget.json["title"],
+                  widget.json["title"] ,
                   style: const TextStyle(
                     fontWeight: FontWeight.bold,
                     fontSize: 16,
@@ -77,29 +77,37 @@ class _PostPreviewState extends State<PostPreview> {
         SizedBox(
           height: 18,
           child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            mainAxisAlignment: MainAxisAlignment.start,
             children: [
-              Row(
-                children: [
-                  Text(
-                    widget.json["created_by"]["profile"]?["nickname"] ?? "null",
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(
-                      fontSize: 12,
-                      color: Color(0xFFB1B1B1),
+              Expanded(
+                child: Row(
+                  children: [
+                    Flexible(
+                      child: Text(
+                        widget.json["created_by"]["profile"]["nickname"],
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                          fontSize: 12,
+                          color: Color(0xFFB1B1B1),
+                        ),
+                      ),
                     ),
-                  ),
-                  const SizedBox(
-                    width: 8,
-                  ),
-                  Text(
-                    time,
-                    maxLines: 1,
-                    style:
-                        const TextStyle(fontSize: 12, color: Color(0xFFB1B1B1)),
-                  ),
-                ],
+                    const SizedBox(
+                      width: 8,
+                    ),
+                    Text(
+                      time,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style:
+                          const TextStyle(fontSize: 12, color: Color(0xFFB1B1B1)),
+                    ),
+                    const SizedBox(
+                      width: 5,
+                    ),
+                  ],
+                ),
               ),
               Row(
                 children: [

@@ -16,9 +16,9 @@ class MainPage extends StatefulWidget {
 }
 
 class _MainPageState extends State<MainPage> {
-  List<Map<String, dynamic>> dailyBestContent = [];
-  List<bool> isLoading= [true,true,true,true,true,true,true];
 
+  List<bool> isLoading= [true,true,true,true,true,true,true];
+  Map<String, dynamic> dailyBestContent = {};
   Map<String,dynamic> portalContent = {};
   Map<String,dynamic> facilityContent = {};
   Map<String,dynamic> newAraContent = {};
@@ -44,16 +44,11 @@ class _MainPageState extends State<MainPage> {
   void refreshDailyBest(UserProvider userProvider) async {
 
     // api 호출과 Provider 정보 동기화.
-    await userProvider.synApiRes("home");
-
-
-    var myMap = userProvider.getApiRes("home");
+    await userProvider.synApiRes("articles/recent/");
     if (mounted) {
       setState(() {
-        dailyBestContent.clear();
-        dailyBestContent.add(myMap?["daily_bests"][0] ?? {});
-        dailyBestContent.add(myMap?["daily_bests"][1] ?? {});
-        dailyBestContent.add(myMap?["daily_bests"][2] ?? {});
+        dailyBestContent=userProvider.getApiRes("articles/recent/");
+        debugPrint(" ----- ${dailyBestContent["results"][0]}");
         isLoading[0] = false;
       });
     }
@@ -62,28 +57,34 @@ class _MainPageState extends State<MainPage> {
     //포탈 공지
   //  articles/?parent_board=1
     await userProvider.synApiRes("articles/?parent_board=1");
-    setState(() {
-      portalContent = userProvider.getApiRes("articles/?parent_board=1");
-      isLoading[1] = false;
-    });
+    if(mounted) {
+      setState(() {
+        portalContent = userProvider.getApiRes("articles/?parent_board=1");
+        isLoading[1] = false;
+      });
+    }
   }
   void refreshFacilityNotice(UserProvider userProvider) async{
     //articles/?parent_board=11
     //입주 업체
     await userProvider.synApiRes("articles/?parent_board=11");
-    setState(() {
-      facilityContent = userProvider.getApiRes("articles/?parent_board=11");
-      isLoading[2]=false;
-    });
+    if(mounted) {
+      setState(() {
+        facilityContent = userProvider.getApiRes("articles/?parent_board=11");
+        isLoading[2] = false;
+      });
+    }
 
   }
   void refreshNewAraNotice(UserProvider userProvider) async{
     //뉴아라
     await userProvider.synApiRes("articles/?parent_board=8");
-    setState(() {
-      newAraContent = userProvider.getApiRes("articles/?parent_board=8");
-      isLoading[3]=false;
-    });
+    if(mounted) {
+      setState(() {
+        newAraContent = userProvider.getApiRes("articles/?parent_board=8");
+        isLoading[3] = false;
+      });
+    }
 
 
   }
@@ -91,30 +92,40 @@ class _MainPageState extends State<MainPage> {
     //원총
     //dev 서버랑 실제 서버 parent_topic 이 다름을 유의하기.
     //https://newara.sparcs.org/api/articles/?parent_board=2&parent_topic=24
+
     await userProvider.synApiRes("articles/?parent_board=2&parent_topic=24");
-    setState(() {
-      gradContent = userProvider.getApiRes("articles/?parent_board=2&parent_topic=24");
-      isLoading[4]=false;
-    });
+    if(mounted) {
+      setState(() {
+        gradContent =
+            userProvider.getApiRes("articles/?parent_board=2&parent_topic=24");
+        isLoading[4] = false;
+      });
+    }
 
   }
   void refreshUndergradAssocNotice(UserProvider userProvider) async{
     //총학
     await userProvider.synApiRes("articles/?parent_board=2&parent_topic=1");
-    setState(() {
-      underGradContent = userProvider.getApiRes("articles/?parent_board=2&parent_topic=1");
-      isLoading[5]=false;
-    });
+    if(mounted) {
+      setState(() {
+        underGradContent =
+            userProvider.getApiRes("articles/?parent_board=2&parent_topic=1");
+        isLoading[5] = false;
+      });
+    }
 
 
   }
   void refreshFreshmanCouncil(UserProvider userProvider) async{
     //새학
     await userProvider.synApiRes("articles/?parent_board=2&parent_topic=5");
-    setState(() {
-      freshmanContent = userProvider.getApiRes("articles/?parent_board=2&parent_topic=5");
-      isLoading[6]=false;
-    });
+    if(mounted) {
+      setState(() {
+        freshmanContent =
+            userProvider.getApiRes("articles/?parent_board=2&parent_topic=5");
+        isLoading[6] = false;
+      });
+    }
 
   }
 
@@ -174,7 +185,7 @@ class _MainPageState extends State<MainPage> {
                         child: Column(
                           children: [
                             PopularBoard(
-                              json: dailyBestContent[0],
+                              json: dailyBestContent["results"][0],
                               ingiNum: 1,
                             ),
                             Row(
@@ -191,7 +202,7 @@ class _MainPageState extends State<MainPage> {
                               ],
                             ),
                             PopularBoard(
-                              json: dailyBestContent[1],
+                              json: dailyBestContent["results"][1],
                               ingiNum: 2,
                             ),
                             Row(
@@ -208,7 +219,7 @@ class _MainPageState extends State<MainPage> {
                               ],
                             ),
                             PopularBoard(
-                              json: dailyBestContent[2],
+                              json: dailyBestContent["results"][2],
                               ingiNum: 3,
                             ),
                           ],
@@ -511,7 +522,7 @@ class PopularBoard extends StatelessWidget {
   final Map<String, dynamic> json;
   final int boardNum;
 
-  PopularBoard({super.key, Map<String, dynamic>? json, int ingiNum = 1})
+  PopularBoard({super.key, required Map<String, dynamic> json, int ingiNum = 1})
       : json = json ?? {},
         boardNum = ingiNum;
 
