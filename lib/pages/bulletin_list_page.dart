@@ -237,32 +237,6 @@ class BoardExpansionTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    List<Widget> test(){
-      List<Widget> temp=[];
-      for(int i=0 ;i < boardsByGroup.length; i++) {
-        temp.add(
-            SizedBox(
-              height: 39,
-              child: Row(
-                children: [
-                  SizedBox(
-                    width: 40,
-                  ),
-                  Text(
-                    boardsByGroup[i]["ko_name"],
-                    style: TextStyle(
-                      color: Color(0xFF333333),
-                      fontSize: 16,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-        );
-      }
-      return temp;
-    }
 
     return Theme(
       data: ThemeData(
@@ -296,65 +270,26 @@ class BoardExpansionTile extends StatelessWidget {
               ],
             ),
           ),
-          children: test(),
-
-
-          // <Widget>[
-          //   SizedBox(
-          //     height: 39,
-          //     child: Row(
-          //       children: const [
-          //         SizedBox(
-          //           width: 40,
-          //         ),
-          //         Text(
-          //           '포털공지',
-          //           style: TextStyle(
-          //             color: Color(0xFF333333),
-          //             fontSize: 16,
-          //             fontWeight: FontWeight.w500,
-          //           ),
-          //         ),
-          //       ],
-          //     ),
-          //   ),
-          //   SizedBox(
-          //     height: 39,
-          //     child: Row(
-          //       children: const [
-          //         SizedBox(
-          //           width: 40,
-          //         ),
-          //         Text(
-          //           '운영진 공지',
-          //           style: TextStyle(
-          //             color: Color(0xFF333333),
-          //             fontSize: 16,
-          //             fontWeight: FontWeight.w500,
-          //           ),
-          //         ),
-          //       ],
-          //     ),
-          //   ),
-          //   SizedBox(
-          //     height: 39,
-          //     child: Row(
-          //       children: const [
-          //         SizedBox(
-          //           width: 40,
-          //         ),
-          //         Text(
-          //           '외주업체 공지',
-          //           style: TextStyle(
-          //             color: Color(0xFF333333),
-          //             fontSize: 16,
-          //             fontWeight: FontWeight.w500,
-          //           ),
-          //         ),
-          //       ],
-          //     ),
-          //   ),
-          // ],
+          children: boardsByGroup.map<Widget>((subMenu){
+            return SizedBox(
+              height: 39,
+              child: Row(
+                children: [
+                  SizedBox(
+                    width: 40,
+                  ),
+                  Text(
+                    subMenu["ko_name"],
+                    style: TextStyle(
+                      color: Color(0xFF333333),
+                      fontSize: 16,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ],
+              ),
+            );
+          }).toList(),
         ),
       ),
     );
