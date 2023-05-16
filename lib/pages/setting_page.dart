@@ -124,12 +124,14 @@ class SettingPageState extends State<SettingPage> {
                     width: MediaQuery.of(context).size.width - 60,
                     child: GestureDetector(
                       onTap: () {}, // 추후에 기능 구현 예정
-                      child: Text(
-                        'setting_page.blocked_users'.tr(),
-                        style: const TextStyle(
-                          color: ColorsInfo.newara,
-                          fontSize: 16,
-                          fontWeight: FontWeight.w500,
+                      child: Center(
+                        child: Text(
+                          'setting_page.blocked_users'.tr(),
+                          style: const TextStyle(
+                            color: ColorsInfo.newara,
+                            fontSize: 16,
+                            fontWeight: FontWeight.w500,
+                          ),
                         ),
                       ),
                     ),
