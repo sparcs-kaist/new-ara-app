@@ -4,12 +4,16 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:new_ara_app/providers/user_provider.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:dio/dio.dart';
 
 import 'package:new_ara_app/constants/colors_info.dart';
 import 'package:new_ara_app/widgetclasses/text_info.dart';
 import 'package:new_ara_app/widgetclasses/border_boxes.dart';
 import 'package:new_ara_app/widgetclasses/text_and_switch.dart';
 import 'package:webview_cookie_manager/webview_cookie_manager.dart';
+import 'package:new_ara_app/providers/user_provider.dart';
+import 'package:new_ara_app/models/nauser_model.dart';
 
 class SettingPage extends StatefulWidget {
   const SettingPage({Key? key}) : super(key: key);
@@ -20,6 +24,12 @@ class SettingPage extends StatefulWidget {
 class SettingPageState extends State<SettingPage> {
   @override
   Widget build(BuildContext context) {
+    var userProvider = context.watch<UserProvider>();
+    bool see_sexual = userProvider.naUser!.see_sexual;  // 웹과 동일하게 하기 위해 snake_case 변수명 사용
+    bool see_social = userProvider.naUser!.see_social;  // 위와 같은 이유로 snake_case
+    var dio = Dio();
+    dio.options.headers['Cookie'] = userProvider.getCookiesToString();
+
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
@@ -50,6 +60,7 @@ class SettingPageState extends State<SettingPage> {
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 const SizedBox(height: 23),
+                // 게시글 아이콘 및 게시글
                 SizedBox(
                   width: MediaQuery.of(context).size.width - 50,
                   child: Row(
@@ -70,7 +81,109 @@ class SettingPageState extends State<SettingPage> {
                   ),
                 ),
                 const SizedBox(height: 7),
-                BorderBoxes(94, switchItems[0]),
+                // 성인글 보기 및 정치글 보기
+                Container(
+                  width: MediaQuery.of(context).size.width - 40,
+                  height: 94,
+                  decoration: BoxDecoration(
+                    borderRadius: const BorderRadius.all(Radius.circular(10)),
+                    border: Border.all(
+                      color: const Color.fromRGBO(240, 240, 240, 1),
+                    ),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      const SizedBox(height: 10),
+                      // 성인글 보기
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          // 성인글 보기 글씨
+                          Container(
+                              margin: const EdgeInsets.only(left: 10),
+                              child: Text(
+                                "setting_page.adult".tr(),
+                                style: const TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              )),
+                          // 성인글 보기 CupertinoSwitch
+                          Container(
+                            margin: const EdgeInsets.only(right: 10),
+                            width: 43,
+                            height: 27,
+                            child: FittedBox(
+                              fit: BoxFit.fill,
+                              child: CupertinoSwitch(
+                                  activeColor: ColorsInfo.newara,
+                                  value: see_sexual,
+                                  onChanged: (value) async {
+                                    setState(() => see_sexual = value);
+                                    try {
+                                      await dio.patch(
+                                          'https://newara.dev.sparcs.org/api/user_profiles/${userProvider.naUser!.user}/',
+                                          data: { 'see_sexual' : value }
+                                      );
+                                      await userProvider.apiMeUserInfo();
+                                      debugPrint("Change of 'see_sexual' succeed!");
+                                    } catch (error) {
+                                      debugPrint("Change of 'see_sexual' failed: $error");
+                                      setState(() => see_sexual = !value);
+                                    }
+                                  }),
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 16),
+                      // 정치글 보기
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          // 정치글 보기 글씨
+                          Container(
+                              margin: const EdgeInsets.only(left: 10),
+                              child: Text(
+                                "setting_page.politics".tr(),
+                                style: const TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              )),
+                          // 정치글 보기 CupertinoSwitch
+                          Container(
+                            margin: const EdgeInsets.only(right: 10),
+                            width: 43,
+                            height: 27,
+                            child: FittedBox(
+                              fit: BoxFit.fill,
+                              child: CupertinoSwitch(
+                                  activeColor: ColorsInfo.newara,
+                                  value: see_social,
+                                  onChanged: (value) async {
+                                    setState(() => see_social = value);
+                                    try {
+                                      await dio.patch(
+                                          'https://newara.dev.sparcs.org/api/user_profiles/${userProvider.naUser!.user}/',
+                                          data: { 'see_social' : value }
+                                      );
+                                      await userProvider.apiMeUserInfo();
+                                      debugPrint("Change of 'see_social' succeed!");
+                                    } catch (error) {
+                                      debugPrint("Change of 'see_social' failed: $error");
+                                      setState(() => see_social = !value);
+                                    }
+                                  }),
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 10),
+                    ],
+                  ),
+                ),
                 const SizedBox(height: 24),
                 SizedBox(
                   width: MediaQuery.of(context).size.width - 50,
