@@ -149,9 +149,8 @@ class SettingPageState extends State<SettingPage> {
                       color: const Color.fromRGBO(240, 240, 240, 1),
                     ),
                   ),
-                  child: Container(
-                    margin: const EdgeInsets.only(
-                        top: 12, bottom: 12, left: 15, right: 219),
+                  child: SizedBox(
+                    width: MediaQuery.of(context).size.width - 60,
                     child: GestureDetector(
                       onTap: () async{
 
@@ -165,12 +164,14 @@ class SettingPageState extends State<SettingPage> {
 
                         debugPrint("log out");
                       }, // 임시 로그아웃 기능으로 디자인 변경에 따라 수정될 예정
-                      child: const Text(
-                        '로그아웃',
-                        style: TextStyle(
-                          color: ColorsInfo.newara,
-                          fontSize: 16,
-                          fontWeight: FontWeight.w500,
+                      child: const Center(
+                        child: Text(
+                          '로그아웃',
+                          style: TextStyle(
+                            color: ColorsInfo.newara,
+                            fontSize: 16,
+                            fontWeight: FontWeight.w500,
+                          ),
                         ),
                       ),
                     ),
