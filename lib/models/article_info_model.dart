@@ -1,12 +1,12 @@
 class ArticleInfo {
-  final int id;
-  final bool is_hidden;
+  final int? id;
+  final bool? is_hidden;
   final dynamic why_hidden;  // 변수의 타입 및 용도 정확히 모르겠음
   final dynamic can_override_hidden; // 변수의 타입 및 용도 정확히 모르겠음
   final dynamic parent_topic;  // 변수의 타입 정확하게 모르겠음
-  final Map<String, dynamic> parent_board;
+  final Map<String, dynamic>? parent_board;
   final String? title;
-  final Map<String, dynamic> created_by;
+  final Map<String, dynamic>? created_by;
   final String? read_status;
   final String? attachment_type;
   final dynamic communication_article_status;  // 변수의 타입 및 용도 정확하게 모르겠음
@@ -14,47 +14,51 @@ class ArticleInfo {
   final String? created_at;
   final String? updated_at;
   final String? deleted_at;
-  final int name_type;
-  final bool is_content_sexual;
-  final bool is_content_social;
-  final int hit_count;
-  final int comment_count;
-  final int report_count;
-  final int positive_vote_count;
-  final int negative_vote_count;
+  final int? name_type;
+  final bool? is_content_sexual;
+  final bool? is_content_social;
+  final int? hit_count;
+  final int? comment_count;
+  final int? report_count;
+  final int? positive_vote_count;
+  final int? negative_vote_count;
   final String? commented_at;
   final dynamic url;  // 변수의 타입 정확하게 모르겠음
   final dynamic content_updated_at;  // 변수의 타입 정확하게 모르겠음
   final dynamic hidden;  // 변수의 타입 정확하게 모르겠음
+  final Map<String, dynamic>? scrapped_by;
+  final dynamic parent_article;
 
   ArticleInfo({
     required this.id,
-    required this.is_hidden,
-    required this.why_hidden,
-    required this.can_override_hidden,
-    required this.parent_topic,
-    required this.parent_board,
-    required this.title,
-    required this.created_by,
-    required this.read_status,
-    required this.attachment_type,
-    required this.communication_article_status,
-    required this.days_left,
+    this.is_hidden,
+    this.why_hidden,
+    this.can_override_hidden,
+    this.parent_topic,
+    this.parent_board,
+    this.title,
+    this.created_by,
+    this.read_status,
+    this.attachment_type,
+    this.communication_article_status,
+    this.days_left,
     required this.created_at,
     required this.updated_at,
     required this.deleted_at,
-    required this.name_type,
-    required this.is_content_sexual,
-    required this.is_content_social,
-    required this.hit_count,
-    required this.comment_count,
-    required this.report_count,
-    required this.positive_vote_count,
-    required this.negative_vote_count,
-    required this.commented_at,
-    required this.url,
-    required this.content_updated_at,
-    required this.hidden,
+    this.name_type,
+    this.is_content_sexual,
+    this.is_content_social,
+    this.hit_count,
+    this.comment_count,
+    this.report_count,
+    this.positive_vote_count,
+    this.negative_vote_count,
+    this.commented_at,
+    this.url,
+    this.content_updated_at,
+    this.hidden,
+    this.scrapped_by,
+    this.parent_article,
   });
 
   ArticleInfo.fromJson(Map<String, dynamic> json)
@@ -84,7 +88,9 @@ class ArticleInfo {
   commented_at = json['commented_at'],
   url = json['url'],
   content_updated_at = json['content_updated_at'],
-  hidden = json['hidden'];
+  hidden = json['hidden'],
+  scrapped_by = json['scrapped_by'],
+  parent_article = json['parent_article'];
 
   Map<String, dynamic> toJson() => {
     'id': id,
@@ -113,6 +119,8 @@ class ArticleInfo {
     'url': url,
     'content_updated_at': content_updated_at,
     'hidden': hidden,
+    'scrapped_by': scrapped_by,
+    'parent_article': parent_article,
   };
 
 }
