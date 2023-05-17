@@ -2,11 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
 import 'package:easy_localization/easy_localization.dart';
+import 'package:dio/dio.dart';
 
 import 'package:new_ara_app/constants/colors_info.dart';
 import 'package:new_ara_app/pages/setting_page.dart';
 import 'package:new_ara_app/providers/user_provider.dart';
-import 'package:new_ara_app/widgetclasses/user_tab.dart';
+import 'package:new_ara_app/widgetclasses/loading_indicator.dart';
+import 'package:new_ara_app/models/article_info_model.dart';
 
 class UserPage extends StatefulWidget {
   const UserPage({Key? key}) : super(key: key);
@@ -18,13 +20,23 @@ class _UserPageState extends State<UserPage>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
 
+  late List<ArticleInfo> myPostList;
+  late List<ArticleInfo> myScrapList;
+  late List<ArticleInfo> myRecentList;
+
+  int myPostCount = 0, myScrapCount = 0, myRecentCount = 0;
+
+  final List<String> _tabs = [ 'myPage.mypost'.tr(), 'myPage.scrap'.tr(), 'myPage.recent'.tr() ];
+  bool isMyPostLoaded = false;
+
   @override
   void initState() {
     super.initState();
     _tabController = TabController(
-      length: 3,
+      length: _tabs.length,
       vsync: this,
     );
+    fetchMyPostList(context);
   }
 
   @override
@@ -32,6 +44,8 @@ class _UserPageState extends State<UserPage>
     _tabController.dispose();
     super.dispose();
   }
+
+  void setIsLoaded(bool value) => setState(() => isMyPostLoaded = value);
 
   @override
   Widget build(BuildContext context) {
@@ -146,11 +160,9 @@ class _UserPageState extends State<UserPage>
                   unselectedLabelColor: const Color.fromRGBO(177, 177, 177, 1),
                   labelColor: ColorsInfo.newara,
                   indicatorColor: ColorsInfo.newara,
-                  tabs: const [
-                    UserTab('myPage.mypost'),
-                    UserTab('myPage.scrap'),
-                    UserTab('myPage.recent'),
-                  ],
+                  tabs: _tabs.map((String tab) {
+                    return Tab(text: tab);
+                  }).toList(),
                   controller: _tabController,
                   indicatorSize: TabBarIndicatorSize.tab,
                 ),
@@ -159,7 +171,7 @@ class _UserPageState extends State<UserPage>
                   width: MediaQuery.of(context).size.width - 40,
                   height: 24,
                   child: Text(
-                    '총 ${userProvider.naUser!.num_articles}개의 글',
+                    '총 ${_tabController.index == 0 ? myPostCount : (_tabController.index == 1 ? myScrapCount : myRecentCount)}개의 글',
                     style: const TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w700,
@@ -167,15 +179,78 @@ class _UserPageState extends State<UserPage>
                     ),
                   ),
                 ),
+                const SizedBox(height: 15),
                 SizedBox(
-                  width: MediaQuery.of(context).size.width - 10,
+                  width: MediaQuery.of(context).size.width - 40,
                   height: 500,
                   child: TabBarView(
                     controller: _tabController,
                     children: [
-                      // 이 부분은 추후에 각각의 컨테이너에 ListView를 추가하여 구현할 예정
-                      // 현 시점(2023.05.04)에는 게시물을 요청받았을 때 요청 형식을 알 수 없으므로 보류함
-                      Container(child: Center(child: Text('없음'))),
+                      !isMyPostLoaded ? const LoadingIndicator() : ListView.separated(
+                        itemCount: myPostList.length,
+                        itemBuilder: (context, index) {
+                          var curPost = myPostList[index];
+                          return SizedBox(
+                            height: 61,
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Text(curPost.title ?? 'null',
+                                style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w500)),
+                                const SizedBox(height: 5),
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Row(
+                                      children: [
+                                        Text(curPost.created_by['profile']['nickname'] ?? 'null',
+                                            style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500, color: Color.fromRGBO(177, 177, 177, 1))),
+                                        const SizedBox(width: 10),
+                                        Text('조회 ${curPost.hit_count}',
+                                            style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500, color: Color.fromRGBO(177, 177, 177, 1))),
+                                      ],
+                                    ),
+                                    Row(
+                                      children: [
+                                        SvgPicture.asset(
+                                          'assets/icons/thumbs-up.svg',
+                                          width: 13,
+                                          height: 15,
+                                          color: ColorsInfo.newara,
+                                        ),
+                                        const SizedBox(width: 3),
+                                        Text('${curPost.positive_vote_count}', style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500, color: ColorsInfo.newara)),
+                                        const SizedBox(width: 10),
+                                        SvgPicture.asset(
+                                          'assets/icons/thumbs-down.svg',
+                                          width: 13,
+                                          height: 15,
+                                          color: const Color.fromRGBO(83, 141, 209, 1),
+                                        ),
+                                        const SizedBox(width: 3),
+                                        Text('${curPost.negative_vote_count}', style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500, color: Color.fromRGBO(83, 141, 209, 1))),
+                                        const SizedBox(width: 10),
+                                        SvgPicture.asset(
+                                          'assets/icons/comment.svg',
+                                          width: 13,
+                                          height: 15,
+                                          color: const Color.fromRGBO(99, 99, 99, 1),
+                                        ),
+                                        const SizedBox(width: 3),
+                                        Text('${curPost.comment_count}', style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500, color: Color.fromRGBO(99, 99, 99, 1))),
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          );
+                        },
+                        separatorBuilder: (context, index) {
+                          return const Divider();
+                        },
+                      ),
                       Container(child: Center(child: Text('없음'))),
                       Container(child: Center(child: Text('없음'))),
                     ],
@@ -188,6 +263,42 @@ class _UserPageState extends State<UserPage>
       ),
     );
   }
+
+  void fetchMyPostList(BuildContext initStateContext) async {
+    myPostList = [];
+    var dio = Dio();
+    dio.options.headers['Cookie'] = initStateContext.read<UserProvider>().getCookiesToString();
+    int user = initStateContext.read<UserProvider>().naUser!.user;
+    try {
+      var response = await dio.get('https://newara.dev.sparcs.org/api/articles?pages=1&created_by=$user');
+      setMyPostCount(response.data['num_items']);
+      if (response.statusCode == 200) {
+        debugPrint("fetchMyPostList() succeed!");
+        List<dynamic> rawPostList = response.data['results'];
+        for (int i = 0; i < rawPostList.length; i++) {
+          Map<String, dynamic> rawPost = rawPostList[i];
+          myPostList.add(ArticleInfo.fromJson(rawPost));
+        }
+        setIsLoaded(true);
+      }
+    } catch(error) {
+      debugPrint("fetchMyPostList() failed with error: $error");
+    }
+  }
+
+  void setMyPostCount(int value) => setState(() => myPostCount = value);
+}
+
+ListView buildListView(List<ArticleInfo> articleList) {
+  return ListView.separated(
+    itemCount: articleList.length,
+    itemBuilder: (context, index) {
+      return Text(articleList[index].title ?? 'null');
+    },
+    separatorBuilder: (context, index) {
+      return Divider();
+    },
+  );
 }
 
 Route _createRoute() {
