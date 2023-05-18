@@ -22,9 +22,12 @@ class _UserPageState extends State<UserPage>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
 
+  // index 0: 작성된 글
+  // index 1: 담아둔 글
+  // index 2: 최근 본 글
   List<List<ArticleInfo>> tabList = [[], [], []];
   List<int> tabCount = [0, 0, 0];
-  int curCount = 0;
+  int curCount = 0; // "총 N개의 글"에 사용되는 변수
   List<bool> isLoadedList = [false, false, false];
 
   final List<String> _tabs = [
@@ -40,9 +43,9 @@ class _UserPageState extends State<UserPage>
       length: _tabs.length,
       vsync: this,
     );
-    fetchArticleList(context, 0);
-    fetchArticleList(context, 1);
-    fetchArticleList(context, 2);
+    fetchArticleList(context, 0); // 작성한 글 fetch
+    fetchArticleList(context, 1); // 담아둔 글 fetch
+    fetchArticleList(context, 2); // 최근 본 글 fetch
   }
 
   @override
@@ -54,7 +57,6 @@ class _UserPageState extends State<UserPage>
   @override
   Widget build(BuildContext context) {
     var userProvider = context.watch<UserProvider>();
-    int curIndex = 0;
 
     return Scaffold(
       appBar: AppBar(
@@ -266,7 +268,7 @@ class _UserPageState extends State<UserPage>
                                               Row(
                                                 children: [
                                                   SvgPicture.asset(
-                                                    'assets/icons/thumbs-up.svg',
+                                                    'assets/icons/like.svg',
                                                     width: 13,
                                                     height: 15,
                                                     color: ColorsInfo.newara,
@@ -282,7 +284,7 @@ class _UserPageState extends State<UserPage>
                                                               .newara)),
                                                   const SizedBox(width: 10),
                                                   SvgPicture.asset(
-                                                    'assets/icons/thumbs-down.svg',
+                                                    'assets/icons/dislike.svg',
                                                     width: 13,
                                                     height: 15,
                                                     color: const Color.fromRGBO(
@@ -387,7 +389,7 @@ class _UserPageState extends State<UserPage>
                                           Row(
                                             children: [
                                               SvgPicture.asset(
-                                                'assets/icons/thumbs-up.svg',
+                                                'assets/icons/like.svg',
                                                 width: 13,
                                                 height: 15,
                                                 color: ColorsInfo.newara,
@@ -403,7 +405,7 @@ class _UserPageState extends State<UserPage>
                                                           ColorsInfo.newara)),
                                               const SizedBox(width: 10),
                                               SvgPicture.asset(
-                                                'assets/icons/thumbs-down.svg',
+                                                'assets/icons/dislike.svg',
                                                 width: 13,
                                                 height: 15,
                                                 color: const Color.fromRGBO(
@@ -502,7 +504,7 @@ class _UserPageState extends State<UserPage>
                                           Row(
                                             children: [
                                               SvgPicture.asset(
-                                                'assets/icons/thumbs-up.svg',
+                                                'assets/icons/like.svg',
                                                 width: 13,
                                                 height: 15,
                                                 color: ColorsInfo.newara,
@@ -518,7 +520,7 @@ class _UserPageState extends State<UserPage>
                                                           ColorsInfo.newara)),
                                               const SizedBox(width: 10),
                                               SvgPicture.asset(
-                                                'assets/icons/thumbs-down.svg',
+                                                'assets/icons/dislike.svg',
                                                 width: 13,
                                                 height: 15,
                                                 color: const Color.fromRGBO(
@@ -573,6 +575,7 @@ class _UserPageState extends State<UserPage>
   }
 
   void fetchArticleList(BuildContext initStateContext, int tabIndex) async {
+    // tabIndex 0 : 작성한 글, 1 : 담아둔 글, 2 : 최근 본 글
     int user = initStateContext.read<UserProvider>().naUser!.user;
     List<String> apiUrlList = [
       '/api/articles/?page=1&created_by=$user',
@@ -580,7 +583,7 @@ class _UserPageState extends State<UserPage>
       '/api/articles/recent/?page=1'
     ];
 
-    tabList[tabIndex] = [];
+    tabList[tabIndex] = []; // 먼저 초기화하기
     var dio = Dio();
     dio.options.headers['Cookie'] =
         initStateContext.read<UserProvider>().getCookiesToString();

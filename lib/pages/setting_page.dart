@@ -25,8 +25,9 @@ class SettingPageState extends State<SettingPage> {
   @override
   Widget build(BuildContext context) {
     var userProvider = context.watch<UserProvider>();
-    bool see_sexual = userProvider.naUser!.see_sexual;  // 웹과 동일하게 하기 위해 snake_case 변수명 사용
-    bool see_social = userProvider.naUser!.see_social;  // 위와 같은 이유로 snake_case
+    bool see_sexual =
+        userProvider.naUser!.see_sexual; // 웹과 동일하게 하기 위해 snake_case 변수명 사용
+    bool see_social = userProvider.naUser!.see_social; // 위와 같은 이유로 snake_case
     var dio = Dio();
     dio.options.headers['Cookie'] = userProvider.getCookiesToString();
 
@@ -66,7 +67,7 @@ class SettingPageState extends State<SettingPage> {
                   child: Row(
                     children: [
                       SvgPicture.asset(
-                        'assets/icons/post-1.svg',
+                        'assets/icons/post_list.svg',
                         width: 34,
                         height: 34,
                       ),
@@ -124,12 +125,13 @@ class SettingPageState extends State<SettingPage> {
                                     try {
                                       await dio.patch(
                                           'https://newara.dev.sparcs.org/api/user_profiles/${userProvider.naUser!.user}/',
-                                          data: { 'see_sexual' : value }
-                                      );
+                                          data: {'see_sexual': value});
                                       await userProvider.apiMeUserInfo();
-                                      debugPrint("Change of 'see_sexual' succeed!");
+                                      debugPrint(
+                                          "Change of 'see_sexual' succeed!");
                                     } catch (error) {
-                                      debugPrint("Change of 'see_sexual' failed: $error");
+                                      debugPrint(
+                                          "Change of 'see_sexual' failed: $error");
                                       setState(() => see_sexual = !value);
                                     }
                                   }),
@@ -167,12 +169,13 @@ class SettingPageState extends State<SettingPage> {
                                     try {
                                       await dio.patch(
                                           'https://newara.dev.sparcs.org/api/user_profiles/${userProvider.naUser!.user}/',
-                                          data: { 'see_social' : value }
-                                      );
+                                          data: {'see_social': value});
                                       await userProvider.apiMeUserInfo();
-                                      debugPrint("Change of 'see_social' succeed!");
+                                      debugPrint(
+                                          "Change of 'see_social' succeed!");
                                     } catch (error) {
-                                      debugPrint("Change of 'see_social' failed: $error");
+                                      debugPrint(
+                                          "Change of 'see_social' failed: $error");
                                       setState(() => see_social = !value);
                                     }
                                   }),
@@ -190,7 +193,7 @@ class SettingPageState extends State<SettingPage> {
                   child: Row(
                     children: [
                       SvgPicture.asset(
-                        'assets/icons/notification-1.svg',
+                        'assets/icons/notification.svg',
                         width: 34,
                         height: 34,
                       ),
@@ -236,9 +239,7 @@ class SettingPageState extends State<SettingPage> {
                   SizedBox(
                     width: MediaQuery.of(context).size.width - 60,
                     child: GestureDetector(
-                      onTap: () {
-
-                      }, // 추후에 기능 구현 예정
+                      onTap: () {}, // 추후에 기능 구현 예정
                       child: Center(
                         child: Text(
                           'setting_page.blocked_users'.tr(),

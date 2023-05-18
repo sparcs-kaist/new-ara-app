@@ -33,7 +33,6 @@ class _NewAraHomePageState extends State<NewAraHomePage> {
   void initState() {
     // TODO: implement initState
     super.initState();
-
   }
   // void downloadUserInfo(initStateContext) async {
   //
@@ -100,7 +99,7 @@ class _NewAraHomePageState extends State<NewAraHomePage> {
         ),
         BottomNavigationBarItem(
           icon: SvgPicture.asset(
-            'assets/icons/member-1.svg',
+            'assets/icons/member.svg',
             color: _selectedIndex == 4 ? Colors.black : Colors.grey,
             width: 36,
             height: 36,

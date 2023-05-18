@@ -68,7 +68,7 @@ class _PostPageState extends State<PostPage> {
                     Row(
                       children: [
                         SvgPicture.asset(
-                          'assets/icons/thumbs-up.svg',
+                          'assets/icons/like.svg',
                           width: 13,
                           height: 15,
                           color: ColorsInfo.newara,
@@ -81,7 +81,7 @@ class _PostPageState extends State<PostPage> {
                                 color: ColorsInfo.newara)),
                         const SizedBox(width: 10),
                         SvgPicture.asset(
-                          'assets/icons/thumbs-down.svg',
+                          'assets/icons/dislike.svg',
                           width: 13,
                           height: 15,
                           color: const Color.fromRGBO(83, 141, 209, 1),
@@ -157,7 +157,7 @@ class _PostPageState extends State<PostPage> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     SvgPicture.asset(
-                      'assets/icons/thumbs-up.svg',
+                      'assets/icons/like.svg',
                       width: 20,
                       height: 20,
                       color: ColorsInfo.newara,
@@ -170,7 +170,7 @@ class _PostPageState extends State<PostPage> {
                             color: ColorsInfo.newara)),
                     const SizedBox(width: 20),
                     SvgPicture.asset(
-                      'assets/icons/thumbs-down.svg',
+                      'assets/icons/dislike.svg',
                       width: 20,
                       height: 20,
                       color: const Color.fromRGBO(83, 141, 209, 1),
@@ -203,6 +203,7 @@ class _PostPageState extends State<PostPage> {
                             child: Center(
                               child: Row(
                                 children: [
+                                  const SizedBox(width: 2),
                                   SvgPicture.asset(
                                     'assets/icons/bookmark-circle-fill.svg',
                                     width: 20,
@@ -210,6 +211,7 @@ class _PostPageState extends State<PostPage> {
                                     color:
                                         const Color.fromRGBO(100, 100, 100, 1),
                                   ),
+                                  const SizedBox(width: 5),
                                   Text(
                                     '담아두기',
                                     style: TextStyle(
@@ -236,13 +238,15 @@ class _PostPageState extends State<PostPage> {
                             child: Center(
                               child: Row(
                                 children: [
+                                  const SizedBox(width: 2),
                                   SvgPicture.asset(
-                                    'assets/icons/square-and-arrow-up.svg',
+                                    'assets/icons/share.svg',
                                     width: 20,
                                     height: 20,
                                     color:
                                         const Color.fromRGBO(100, 100, 100, 1),
                                   ),
+                                  const SizedBox(width: 5),
                                   Text(
                                     '공유',
                                     style: TextStyle(
@@ -273,6 +277,7 @@ class _PostPageState extends State<PostPage> {
                             child: Center(
                               child: Row(
                                 children: [
+                                  const SizedBox(width: 2),
                                   SvgPicture.asset(
                                     'assets/icons/exclamationmark-bubble-fill.svg',
                                     width: 20,
@@ -280,6 +285,7 @@ class _PostPageState extends State<PostPage> {
                                     color:
                                         const Color.fromRGBO(100, 100, 100, 1),
                                   ),
+                                  const SizedBox(width: 5),
                                   Text(
                                     '신고',
                                     style: TextStyle(
