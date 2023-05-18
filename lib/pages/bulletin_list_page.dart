@@ -233,11 +233,12 @@ class _BulletinListPageState extends State<BulletinListPage> {
   }
 }
 
+
 class BoardExpansionTile extends StatelessWidget {
-  int titleNum;
-  String title;
-  dynamic boardsByGroup;
-  BoardExpansionTile(this.titleNum, this.title, this.boardsByGroup,
+  final int titleNum;
+  final String title;
+  final dynamic boardsByGroup;
+  const BoardExpansionTile(this.titleNum, this.title, this.boardsByGroup,
       {super.key});
 
   @override
@@ -265,7 +266,7 @@ class BoardExpansionTile extends StatelessWidget {
                 ),
                 Text(
                   title,
-                  style: TextStyle(
+                  style: const TextStyle(
                     color: Color(0xFF333333),
                     fontSize: 20,
                     fontWeight: FontWeight.w700,
@@ -279,7 +280,7 @@ class BoardExpansionTile extends StatelessWidget {
               height: 39,
               child: Row(
                 children: [
-                  SizedBox(
+                  const SizedBox(
                     width: 40,
                   ),
                   InkWell(
@@ -293,7 +294,7 @@ class BoardExpansionTile extends StatelessWidget {
                     },
                     child: Text(
                       subMenu["ko_name"],
-                      style: TextStyle(
+                      style: const TextStyle(
                         color: Color(0xFF333333),
                         fontSize: 16,
                         fontWeight: FontWeight.w500,

@@ -29,7 +29,7 @@ class _FreeBulletinBoardPageState extends State<FreeBulletinBoardPage> {
     // TODO: implement initState
     super.initState();
     if(widget.boardType == BoardType.free) {
-      apiUrl = "articles/?parent_board=${this.widget.boardInfo!["id"]}&page=";
+      apiUrl = "articles/?parent_board=${widget.boardInfo!["id"]}&page=";
     }
     else if(widget.boardType == BoardType.recent){
       apiUrl = "articles/recent/?page=";
@@ -131,8 +131,8 @@ class _FreeBulletinBoardPageState extends State<FreeBulletinBoardPage> {
         ),
         title: SizedBox(
           child: Text(
-            this.widget.boardInfo?["ko_name"] ?? "실시간 인기글",
-            style: TextStyle(
+            widget.boardInfo?["ko_name"] ?? "실시간 인기글",
+            style: const TextStyle(
               color: ColorsInfo.newara,
               fontSize: 18,
               fontWeight: FontWeight.w700,

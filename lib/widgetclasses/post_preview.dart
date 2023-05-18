@@ -4,7 +4,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 
 class PostPreview extends StatefulWidget {
   final Map<String, dynamic> json;
-  PostPreview({super.key, required Map<String, dynamic> json})
+  PostPreview({super.key, required Map<String, dynamic>? json})
       : json = json ?? {};
 
   @override

@@ -321,7 +321,7 @@ class _MainPageState extends State<MainPage> {
                             ),
                             Text(
                               portalContent["results"][0]["title"],
-                              style: TextStyle(
+                              style: const TextStyle(
                                   fontSize: 14, fontWeight: FontWeight.w400),
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
@@ -331,7 +331,7 @@ class _MainPageState extends State<MainPage> {
                             ),
                             Text(
                               portalContent["results"][1]["title"],
-                              style: TextStyle(
+                              style: const TextStyle(
                                   fontSize: 14, fontWeight: FontWeight.w400),
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
@@ -341,7 +341,7 @@ class _MainPageState extends State<MainPage> {
                             ),
                             Text(
                               portalContent["results"][2]["title"],
-                              style: TextStyle(
+                              style: const TextStyle(
                                   fontSize: 14, fontWeight: FontWeight.w400),
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
@@ -384,7 +384,7 @@ class _MainPageState extends State<MainPage> {
                                 Expanded(
                                   child: Text(
                                     facilityContent["results"][0]["title"],
-                                    style: TextStyle(
+                                    style: const TextStyle(
                                         fontSize: 14,
                                         fontWeight: FontWeight.w400),
                                     maxLines: 1,
@@ -424,7 +424,7 @@ class _MainPageState extends State<MainPage> {
                                 Expanded(
                                   child: Text(
                                     newAraContent["results"][0]["title"],
-                                    style: TextStyle(
+                                    style: const TextStyle(
                                         fontSize: 14,
                                         fontWeight: FontWeight.w400),
                                     maxLines: 1,
@@ -457,7 +457,7 @@ class _MainPageState extends State<MainPage> {
                               height: 28,
                               child: Row(
                                 children: [
-                                  Text(
+                                  const Text(
                                     '원총',
                                     style: TextStyle(
                                       fontWeight: FontWeight.w700,
@@ -465,13 +465,13 @@ class _MainPageState extends State<MainPage> {
                                       color: Color.fromRGBO(177, 177, 177, 1),
                                     ),
                                   ),
-                                  SizedBox(
+                                  const SizedBox(
                                     width: 10,
                                   ),
                                   Expanded(
                                     child: Text(
                                       gradContent["results"][0]["title"],
-                                      style: TextStyle(
+                                      style: const TextStyle(
                                           fontSize: 14,
                                           fontWeight: FontWeight.w400),
                                       maxLines: 1,
@@ -485,7 +485,7 @@ class _MainPageState extends State<MainPage> {
                               height: 28,
                               child: Row(
                                 children: [
-                                  Text(
+                                  const Text(
                                     '총학',
                                     style: TextStyle(
                                       fontWeight: FontWeight.w700,
@@ -493,13 +493,13 @@ class _MainPageState extends State<MainPage> {
                                       color: Color.fromRGBO(177, 177, 177, 1),
                                     ),
                                   ),
-                                  SizedBox(
+                                  const SizedBox(
                                     width: 10,
                                   ),
                                   Expanded(
                                     child: Text(
                                       underGradContent["results"][0]["title"],
-                                      style: TextStyle(
+                                      style: const TextStyle(
                                           fontSize: 14,
                                           fontWeight: FontWeight.w400),
                                       maxLines: 1,
@@ -513,7 +513,7 @@ class _MainPageState extends State<MainPage> {
                               height: 28,
                               child: Row(
                                 children: [
-                                  Text(
+                                  const Text(
                                     '새학',
                                     style: TextStyle(
                                       fontWeight: FontWeight.w700,
@@ -521,13 +521,13 @@ class _MainPageState extends State<MainPage> {
                                       color: Color.fromRGBO(177, 177, 177, 1),
                                     ),
                                   ),
-                                  SizedBox(
+                                  const SizedBox(
                                     width: 10,
                                   ),
                                   Expanded(
                                     child: Text(
                                       freshmanContent["results"][0]["title"],
-                                      style: TextStyle(
+                                      style: const TextStyle(
                                           fontSize: 14,
                                           fontWeight: FontWeight.w400),
                                       maxLines: 1,
@@ -554,7 +554,7 @@ class PopularBoard extends StatelessWidget {
   final Map<String, dynamic> json;
   final int boardNum;
 
-  PopularBoard({super.key, required Map<String, dynamic> json, int ingiNum = 1})
+  PopularBoard({super.key, required Map<String, dynamic>? json, int ingiNum = 1})
       : json = json ?? {},
         boardNum = ingiNum;
 

@@ -10,12 +10,13 @@ class UserProvider with ChangeNotifier {
   NAUserModel? _naUser; // api/me 했을 때 받는 유저의 정보
   bool _hasData = false; // api/me 했을 때 유저의 정보가 있는가?
   List<Cookie> _loginCookie = [];
+  final Map<String, dynamic> _apiRes = {};
 
   NAUserModel? get naUser => _naUser;
   bool get hasData => _hasData;
   dynamic get apiRes => _apiRes;
 
-  Map<String, dynamic> _apiRes = {};
+
 
   void setHasData(bool tf) {
     _hasData = tf;

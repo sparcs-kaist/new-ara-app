@@ -1,12 +1,12 @@
 import 'package:new_ara_app/models/article_list_action_model.dart';
 
 class ArticlePageModel {
-  int num_pages;
-  int num_items;
-  int current;
-  String previous;
-  String next;
-  List<ArticleListActionModel> result;
+  int? num_pages;
+  int? num_items;
+  int? current;
+  String? previous;
+  String? next;
+  List<ArticleListActionModel>? result;
 
   ArticlePageModel({
     required this.num_pages,
@@ -40,7 +40,7 @@ class ArticlePageModel {
     List<Map<String, dynamic>> resultJson = [];
     if (result != null) {
       // result 리스트의 각 항목을 toJson() 메서드를 통해 Map으로 변환하여 resultJson 리스트에 추가
-      resultJson = result.map((item) => item.toJson()).toList();
+      resultJson = result!.map((item) => item.toJson()).toList();
     }
 
     return {

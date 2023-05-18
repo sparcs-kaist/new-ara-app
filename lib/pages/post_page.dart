@@ -147,7 +147,7 @@ class _PostPageState extends State<PostPage> {
                   thickness: 1,
                 ),
                 // 본문 내용이 들어가는 부분 (이미지 처리 등 어떻게 할지 논의해보기)
-                Container(
+                SizedBox(
                   height: 400,
                   child: Center(
                     child: Text('본문 내용'),
