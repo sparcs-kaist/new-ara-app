@@ -22,12 +22,24 @@ class SettingPage extends StatefulWidget {
 }
 
 class SettingPageState extends State<SettingPage> {
+
+  bool see_sexual=true;
+  bool see_social=true;
+
+  @override
+  void initState() {
+    var userProvider = context.read<UserProvider>();
+    // TODO: implement initState
+    super.initState();
+    see_sexual = userProvider.naUser!.see_sexual; // 웹과 동일하게 하기 위해 snake_case 변수명 사용
+    see_social  = userProvider.naUser!.see_social; // 위와 같은 이유로 snake_case
+
+  }
+
   @override
   Widget build(BuildContext context) {
     var userProvider = context.watch<UserProvider>();
-    bool see_sexual =
-        userProvider.naUser!.see_sexual; // 웹과 동일하게 하기 위해 snake_case 변수명 사용
-    bool see_social = userProvider.naUser!.see_social; // 위와 같은 이유로 snake_case
+
     var dio = Dio();
     dio.options.headers['Cookie'] = userProvider.getCookiesToString();
 
@@ -165,7 +177,7 @@ class SettingPageState extends State<SettingPage> {
                                   activeColor: ColorsInfo.newara,
                                   value: see_social,
                                   onChanged: (value) async {
-                                    setState(() => see_social = value);
+                                    setState((){see_social = value;});
                                     try {
                                       await dio.patch(
                                           'https://newara.dev.sparcs.org/api/user_profiles/${userProvider.naUser!.user}/',
