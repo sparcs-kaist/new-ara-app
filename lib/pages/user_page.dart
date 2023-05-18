@@ -9,7 +9,7 @@ import 'package:new_ara_app/constants/colors_info.dart';
 import 'package:new_ara_app/pages/setting_page.dart';
 import 'package:new_ara_app/providers/user_provider.dart';
 import 'package:new_ara_app/widgetclasses/loading_indicator.dart';
-import 'package:new_ara_app/models/article_info_model.dart';
+import 'package:new_ara_app/models/article_list_action_model.dart';
 import 'package:new_ara_app/pages/post_page.dart';
 
 class UserPage extends StatefulWidget {
@@ -22,10 +22,7 @@ class _UserPageState extends State<UserPage>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
 
-  // index 0: 작성된 글
-  // index 1: 담아둔 글
-  // index 2: 최근 본 글
-  List<List<ArticleInfo>> tabList = [[], [], []];
+  List<List<ArticleListActionModel>> tabList = [[], [], []];
   List<int> tabCount = [0, 0, 0];
   int curCount = 0; // "총 N개의 글"에 사용되는 변수
   List<bool> isLoadedList = [false, false, false];
@@ -596,7 +593,7 @@ class _UserPageState extends State<UserPage>
         List<dynamic> rawPostList = response.data['results'];
         for (int i = 0; i < rawPostList.length; i++) {
           Map<String, dynamic> rawPost = rawPostList[i];
-          tabList[tabIndex].add(ArticleInfo.fromJson(rawPost));
+          tabList[tabIndex].add(ArticleListActionModel.fromJson(rawPost));
         }
         setIsLoaded(true, tabIndex);
         debugPrint('$tabIndex count: ${tabCount[tabIndex]}');

@@ -36,7 +36,7 @@ class SettingPageState extends State<SettingPage> {
         centerTitle: true,
         leading: IconButton(
           color: ColorsInfo.newara,
-          icon: SvgPicture.asset('assets/icons/chevron-left.svg',
+          icon: SvgPicture.asset('assets/icons/left_chevron.svg',
               color: ColorsInfo.newara, width: 10.7, height: 18.99),
           onPressed: () {
             Navigator.pop(context);
@@ -219,7 +219,7 @@ class SettingPageState extends State<SettingPage> {
                   child: Row(
                     children: [
                       SvgPicture.asset(
-                        'assets/icons/barrior-1.svg',
+                        'assets/icons/barrior.svg',
                         width: 34,
                         height: 34,
                       ),

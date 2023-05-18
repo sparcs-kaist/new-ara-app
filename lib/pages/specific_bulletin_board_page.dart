@@ -170,7 +170,7 @@ class _SpecificBulletinBoardPageState extends State<SpecificBulletinBoardPage> {
                   width: 11.58,
                   height: 21.87,
                   child: SvgPicture.asset(
-                    'assets/icons/chevron-left.svg',
+                    'assets/icons/left_chevron.svg',
                     color: ColorsInfo.newara,
                     fit: BoxFit.fill,
                   ),

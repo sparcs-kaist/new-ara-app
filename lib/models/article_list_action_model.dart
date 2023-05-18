@@ -1,4 +1,4 @@
-class ArticleInfo {
+class ArticleListActionModel {
   final int id; // 글 마다 부여되는 id, 모든 글에 있는 듯함
   final bool? is_hidden; // 숨김처리 되었는지 여부, 담아둔 글에서는 존재하지 않는다
   final dynamic why_hidden; // 숨김처리 되었는지 여부, 담아둔 글에서는 존재하지 않는다
@@ -29,7 +29,7 @@ class ArticleInfo {
   final Map<String, dynamic>? scrapped_by;
   final dynamic parent_article;
 
-  ArticleInfo({
+  ArticleListActionModel({
     required this.id,
     this.is_hidden,
     this.why_hidden,
@@ -61,7 +61,7 @@ class ArticleInfo {
     this.parent_article,
   });
 
-  ArticleInfo.fromJson(Map<String, dynamic> json)
+  ArticleListActionModel.fromJson(Map<String, dynamic> json)
       : id = json['id'],
         is_hidden = json['is_hidden'],
         why_hidden = json['why_hidden'],
