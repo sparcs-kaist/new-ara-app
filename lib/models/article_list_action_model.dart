@@ -2,7 +2,7 @@ import 'package:new_ara_app/models/board_model.dart';
 import 'package:new_ara_app/models/public_user.dart';
 import 'package:new_ara_app/models/topic_model.dart';
 
-class ArticleListAction {
+class ArticleListActionModel {
   int? id;
   bool? is_hidden;
   String? why_hidden;
@@ -31,7 +31,7 @@ class ArticleListAction {
   String? content_updated_at;
   String? hidden_at;
 
-  ArticleListAction({
+  ArticleListActionModel({
     this.id,
     this.is_hidden,
     this.why_hidden,
@@ -61,8 +61,8 @@ class ArticleListAction {
     this.hidden_at,
   });
 
-  factory ArticleListAction.fromJson(Map<String, dynamic> json) {
-    return ArticleListAction(
+  factory ArticleListActionModel.fromJson(Map<String, dynamic> json) {
+    return ArticleListActionModel(
       id: json['id'],
       is_hidden: json['is_hidden'],
       why_hidden: json['why_hidden'],

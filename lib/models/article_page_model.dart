@@ -6,7 +6,7 @@ class ArticlePageModel {
   int current;
   String previous;
   String next;
-  List<ArticleListAction> result;
+  List<ArticleListActionModel> result;
 
   ArticlePageModel({
     required this.num_pages,
@@ -18,11 +18,11 @@ class ArticlePageModel {
   });
 
   factory ArticlePageModel.fromJson(Map<String, dynamic> json) {
-    List<ArticleListAction> result = [];
+    List<ArticleListActionModel> result = [];
     if (json['result'] != null) {
       // 'result' 필드의 값이 존재하면 파싱하여 result 리스트에 할당
       json['result'].forEach((item) {
-        result.add(ArticleListAction.fromJson(item));
+        result.add(ArticleListActionModel.fromJson(item));
       });
     }
 
