@@ -192,7 +192,7 @@ class _BulletinListPageState extends State<BulletinListPage> {
                               const SizedBox(
                                 width: 3,
                               ),
-                              SvgPicture.asset('assets/icons/download.svg'),
+                              SvgPicture.asset('assets/icons/download_2.svg'),
                               const SizedBox(
                                 width: 5,
                               ),
