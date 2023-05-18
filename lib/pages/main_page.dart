@@ -308,7 +308,7 @@ class _MainPageState extends State<MainPage> {
                                     height: 11,
                                     width: 6,
                                     child: SvgPicture.asset(
-                                      'assets/icons/chevron-right.svg',
+                                      'assets/icons/right_chevron.svg',
                                       color: const Color(0xFF1F4899),
                                       fit: BoxFit.fill,
                                     ),
@@ -373,7 +373,7 @@ class _MainPageState extends State<MainPage> {
                                   height: 11,
                                   width: 6,
                                   child: SvgPicture.asset(
-                                    'assets/icons/chevron-right.svg',
+                                    'assets/icons/right_chevron.svg',
                                     color: const Color(0xFF646464),
                                     fit: BoxFit.fill,
                                   ),
@@ -413,7 +413,7 @@ class _MainPageState extends State<MainPage> {
                                   height: 11,
                                   width: 6,
                                   child: SvgPicture.asset(
-                                    'assets/icons/chevron-right.svg',
+                                    'assets/icons/right_chevron.svg',
                                     color: const Color(0xFFED3A3A),
                                     fit: BoxFit.fill,
                                   ),
@@ -622,7 +622,7 @@ class MainPageTextButton extends StatelessWidget {
                   width: 7.28,
                   height: 13.75,
                   child: SvgPicture.asset(
-                    'assets/icons/chevron-right.svg',
+                    'assets/icons/right_chevron.svg',
                     color: Colors.black,
                     width: 35,
                     height: 35,

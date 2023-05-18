@@ -17,7 +17,7 @@ class _PostPageState extends State<PostPage> {
       appBar: AppBar(
         leading: IconButton(
           color: ColorsInfo.newara,
-          icon: SvgPicture.asset('assets/icons/chevron-left.svg',
+          icon: SvgPicture.asset('assets/icons/left_chevron.svg',
               color: ColorsInfo.newara, width: 10.7, height: 18.99),
           onPressed: () {
             Navigator.pop(context);
@@ -134,7 +134,7 @@ class _PostPageState extends State<PostPage> {
                     ),
                     IconButton(
                       icon: SvgPicture.asset(
-                        'assets/icons/chevron-right.svg',
+                        'assets/icons/right_chevron.svg',
                         color: Colors.black,
                         width: 5,
                         height: 9,

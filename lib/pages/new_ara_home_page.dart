@@ -73,7 +73,7 @@ class _NewAraHomePageState extends State<NewAraHomePage> {
         ),
         BottomNavigationBarItem(
           icon: SvgPicture.asset(
-            'assets/icons/list-ul.svg',
+            'assets/icons/post_list.svg',
             color: _selectedIndex == 1 ? Colors.black : Colors.grey,
             width: 23,
             height: 20,
@@ -91,7 +91,7 @@ class _NewAraHomePageState extends State<NewAraHomePage> {
         ),
         BottomNavigationBarItem(
           icon: SvgPicture.asset(
-            'assets/icons/bell.svg',
+            'assets/icons/notification.svg',
             color: _selectedIndex == 3 ? Colors.black : Colors.grey,
             width: 21.88,
             height: 25,

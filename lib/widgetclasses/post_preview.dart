@@ -60,12 +60,12 @@ class _PostPreviewState extends State<PostPreview> {
                 height: 14.22,
                 child: widget.json["attachment_type"] == "IMAGE"
                     ? SvgPicture.asset(
-                        'assets/icons/has-picture.svg',
+                        'assets/icons/image.svg',
                         fit: BoxFit.fitHeight,
                       )
                     : widget.json["attachment_type"] == "NON_IMAGE"
                         ? SvgPicture.asset(
-                            'assets/icons/has-picture.svg',
+                            'assets/icons/image.svg',
                             fit: BoxFit.fitHeight,
                           )
                         : Container(),

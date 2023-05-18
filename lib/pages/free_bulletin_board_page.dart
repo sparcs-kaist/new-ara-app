@@ -112,7 +112,7 @@ class _FreeBulletinBoardPageState extends State<FreeBulletinBoardPage> {
                 icon: SizedBox(
                   width: 11.58,
                   height: 21.87,
-                  child: SvgPicture.asset('assets/icons/chevron-left.svg',
+                  child: SvgPicture.asset('assets/icons/left_chevron.svg',
                     color: ColorsInfo.newara,
                     fit: BoxFit.fill,
                   ),
