@@ -46,7 +46,7 @@ class _PostPreviewState extends State<PostPreview> {
                 child: Text(
                   widget.json["title"] ,
                   style: const TextStyle(
-                    fontWeight: FontWeight.bold,
+                    fontWeight: FontWeight.w500,
                     fontSize: 16,
                   ),
                   maxLines: 1,
@@ -74,93 +74,93 @@ class _PostPreviewState extends State<PostPreview> {
             //attachment_type
           ),
         ),
-        SizedBox(
-          height: 18,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: [
-              Expanded(
-                child: Row(
-                  children: [
-                    Flexible(
-                      child: Text(
-                        widget.json["created_by"]["profile"]["nickname"],
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(
-                          fontSize: 12,
-                          color: Color(0xFFB1B1B1),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(
-                      width: 8,
-                    ),
-                    Text(
-                      time,
+        Row(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            Expanded(
+              child: Row(
+                children: [
+                  Flexible(
+                    child: Text(
+                      widget.json["created_by"]["profile"]["nickname"],
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
-                      style:
-                          const TextStyle(fontSize: 12, color: Color(0xFFB1B1B1)),
-                    ),
-                    const SizedBox(
-                      width: 5,
-                    ),
-                  ],
-                ),
-              ),
-              Row(
-                children: [
-                  SvgPicture.asset(
-                    'assets/icons/like.svg',
-                    fit: BoxFit.cover,
-                  ),
-                  Text(
-                    widget.json["positive_vote_count"].toString(),
-                    style: const TextStyle(
-                      fontWeight: FontWeight.w500,
-                      fontSize: 12,
-                      color: Color(0xFFED3A3A),
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                  const SizedBox(
-                    width: 7,
-                  ),
-                  SvgPicture.asset(
-                    'assets/icons/dislike.svg',
-                    fit: BoxFit.cover,
-                  ),
-                  Text(
-                    widget.json["negative_vote_count"].toString(),
-                    style: const TextStyle(
-                        fontWeight: FontWeight.w500,
+                      style: const TextStyle(
                         fontSize: 12,
-                        color: Color(0xFF538DD1)),
-                    textAlign: TextAlign.center,
+                        color: Color(0xFFB1B1B1),
+                      ),
+                    ),
                   ),
                   const SizedBox(
-                    width: 7,
-                  ),
-                  SvgPicture.asset(
-                    'assets/icons/comment.svg',
-                    fit: BoxFit.cover,
-                  ),
-                  const SizedBox(
-                    width: 3,
+                    width: 8,
                   ),
                   Text(
-                    widget.json["comment_count"].toString(),
-                    style: const TextStyle(
-                      fontWeight: FontWeight.w500,
-                      fontSize: 12,
-                      color: Color(0xFF636363),
-                    ),
+                    time,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style:
+                        const TextStyle(fontSize: 12, color: Color(0xFFB1B1B1)),
+                  ),
+                  const SizedBox(
+                    width: 5,
                   ),
                 ],
-              )
-            ],
-          ),
+              ),
+            ),
+            Row(
+              children: [
+                SvgPicture.asset(
+                  'assets/icons/like.svg',
+                  width: 20,
+                  height: 20,
+                  color: Color(0xFFED3A3A),
+                ),
+                Text(
+                  widget.json["positive_vote_count"].toString(),
+                  style: const TextStyle(
+                    fontWeight: FontWeight.w500,
+                    fontSize: 12,
+                    color: Color(0xFFED3A3A),
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(
+                  width: 8,
+                ),
+                SvgPicture.asset(
+                  'assets/icons/dislike.svg',
+                  width: 20,
+                  height: 20,
+                  color: Color(0xFF538DD1),
+                ),
+                Text(
+                  widget.json["negative_vote_count"].toString(),
+                  style: const TextStyle(
+                      fontWeight: FontWeight.w500,
+                      fontSize: 12,
+                      color: Color(0xFF538DD1)),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(
+                  width: 8,
+                ),
+                SvgPicture.asset(
+                  'assets/icons/comment.svg',
+                  width: 20,
+                  height: 20,
+                  color: Color(0xFF636363),
+                ),
+                Text(
+                  widget.json["comment_count"].toString(),
+                  style: const TextStyle(
+                    fontWeight: FontWeight.w500,
+                    fontSize: 12,
+                    color: Color(0xFF636363),
+                  ),
+                ),
+              ],
+            )
+          ],
         ),
       ],
     );

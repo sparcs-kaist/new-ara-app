@@ -38,18 +38,20 @@ class _BulletinListPageState extends State<BulletinListPage> {
     //var boardsByGroup = List<dynamic>.filled(6, List< dynamic >.filled(0, null, growable: true) , growable: true);
 
     var apiResBoards = userProvider.getApiRes("boards/");
-    for (var element in apiResBoards) {
-      // debugPrint("${element["ko_name"]}, group_id: ${element["group_id"]}, id: ${element["id"]}, lenght: ${element["topics"]}");
-      // debugPrint("-------------------------");
-      boardsByGroup[element["group_id"]].add(element);
-      // for(var topic in element["topics"]){
-      //   debugPrint("${topic["ko_name"]} ,id: ${topic["id"]}");
-      // }
-      // debugPrint("=========================");
+    if (mounted) {
+      setState(() {
+        for (var element in apiResBoards) {
+          // debugPrint("${element["ko_name"]}, group_id: ${element["group_id"]}, id: ${element["id"]}, lenght: ${element["topics"]}");
+          // debugPrint("-------------------------");
+          boardsByGroup[element["group_id"]].add(element);
+          // for(var topic in element["topics"]){
+          //   debugPrint("${topic["ko_name"]} ,id: ${topic["id"]}");
+          // }
+          // debugPrint("=========================");
+        }
+        isLoading = false;
+      });
     }
-    setState(() {
-      isLoading = false;
-    });
     // debugPrint(myMap.toString());
   }
 
@@ -140,7 +142,12 @@ class _BulletinListPageState extends State<BulletinListPage> {
                               const SizedBox(
                                 width: 3,
                               ),
-                              SvgPicture.asset('assets/icons/menu_1.svg'),
+                              SvgPicture.asset(
+                                'assets/icons/menu_1.svg',
+                                height: 32,
+                                width: 32,
+                                color: const Color(0xFFED3A3A),
+                              ),
                               const SizedBox(
                                 width: 5,
                               ),
@@ -166,7 +173,12 @@ class _BulletinListPageState extends State<BulletinListPage> {
                               const SizedBox(
                                 width: 3,
                               ),
-                              SvgPicture.asset('assets/icons/star.svg'),
+                              SvgPicture.asset(
+                                'assets/icons/star.svg',
+                                height: 32,
+                                width: 32,
+                                color: const Color(0xFFED3A3A),
+                              ),
                               const SizedBox(
                                 width: 5,
                               ),
@@ -192,7 +204,12 @@ class _BulletinListPageState extends State<BulletinListPage> {
                               const SizedBox(
                                 width: 3,
                               ),
-                              SvgPicture.asset('assets/icons/download_2.svg'),
+                              SvgPicture.asset(
+                                'assets/icons/download_2.svg',
+                                height: 32,
+                                width: 32,
+                                color: const Color(0xFFED3A3A),
+                              ),
                               const SizedBox(
                                 width: 5,
                               ),
@@ -233,7 +250,6 @@ class _BulletinListPageState extends State<BulletinListPage> {
   }
 }
 
-
 class BoardExpansionTile extends StatelessWidget {
   final int titleNum;
   final String title;
@@ -260,7 +276,12 @@ class BoardExpansionTile extends StatelessWidget {
                 const SizedBox(
                   width: 3,
                 ),
-                SvgPicture.asset('assets/icons/notify.svg'),
+                SvgPicture.asset(
+                  'assets/icons/notify.svg',
+                  height: 32,
+                  width: 32,
+                  color: const Color(0xFF333333),
+                ),
                 const SizedBox(
                   width: 5,
                 ),

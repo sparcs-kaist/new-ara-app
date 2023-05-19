@@ -92,8 +92,8 @@ class _NewAraHomePageState extends State<NewAraHomePage> {
           icon: SvgPicture.asset(
             'assets/icons/notification.svg',
             color: _selectedIndex == 3 ? Colors.black : Colors.grey,
-            width: 21.88,
-            height: 25,
+            width: 36,
+            height: 36,
           ),
           label: 'Notification',
         ),

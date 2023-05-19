@@ -154,7 +154,12 @@ class _DefaultInputAreaState extends State<DefaultInputArea> {
                 const SizedBox(
                   width: 10,
                 ),
-                SvgPicture.asset('assets/icons/add-1.svg'),
+                SvgPicture.asset(
+                  'assets/icons/add.svg',
+                  width: 36,
+                  height: 36,
+                  color: Color(0xFFED3A3A),
+                ),
                 const SizedBox(
                   width: 7,
                 ),
