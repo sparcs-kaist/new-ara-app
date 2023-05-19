@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:easy_localization/easy_localization.dart';
+import 'package:provider/provider.dart';
 
-import 'package:new_ara_app/home.dart';
-import 'package:new_ara_app/constants/constants.dart';
+import 'package:new_ara_app/pages/newAra_home_page.dart';
+import 'package:new_ara_app/pages/login_page.dart';
+import 'package:new_ara_app/providers/user_provider.dart';
+import 'package:new_ara_app/constants/colors_info.dart';
 
 final supportedLocales = [
   const Locale('en'),
@@ -12,14 +15,18 @@ final supportedLocales = [
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await EasyLocalization.ensureInitialized();
-
   runApp(
     EasyLocalization(
       supportedLocales: supportedLocales,
       path: 'assets/translations',
-      fallbackLocale: const Locale('ko'),
+      fallbackLocale: const Locale('en'),
       startLocale: const Locale('ko'),
-      child: MyApp(),
+      child: MultiProvider(
+        providers: [
+          ChangeNotifierProvider(create: (_) => UserProvider()),
+        ],
+        child: MyApp(),
+      ),
     ),
   );
 }
@@ -36,32 +43,27 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      localizationsDelegates: context.localizationDelegates,
-      supportedLocales: context.supportedLocales,
-      locale: context.locale,
-      theme: _setThemeData(),
-      builder: (context, child) {
-        return ScrollConfiguration(
-          behavior: CustomScrollBehavior(),
-          child: child!,
-        );
-      },
-      home: NewAraHome(), // 추후에 로그인 여부 관련 처리 필요
-    );
+        localizationsDelegates: context.localizationDelegates,
+        supportedLocales: context.supportedLocales,
+        locale: context.locale,
+        theme: _setThemeData(),
+        builder: (context, child) {
+          return ScrollConfiguration(
+            behavior: CustomScrollBehavior(),
+            child: child!,
+          );
+        },
+
+        /// hasData true -> newarahomepage, false -> loginpage.
+        home: context.watch<UserProvider>().hasData ? const NewAraHomePage() : const LoginPage());
   }
 
   ThemeData _setThemeData() {
     return ThemeData(
-      textTheme: const TextTheme(
-        headline1: TextStyle(
-            color: ColorsInfo.newara,
-            fontSize: 23,
-            fontWeight: FontWeight.bold),
-      ),
-      appBarTheme: const AppBarTheme(
-        elevation: 0,
-        backgroundColor: Colors.white,
-      ),
+      appBarTheme:
+          const AppBarTheme(elevation: 0, backgroundColor: Colors.white),
+      //scaffoldBackgroundColor: Colors.white,
+      fontFamily: 'NotoSansKR',
       scaffoldBackgroundColor: Colors.white,
     );
   }

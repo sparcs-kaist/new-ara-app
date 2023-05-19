@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:new_ara_app/constants/constants.dart';
+import 'package:new_ara_app/constants/colors_info.dart';
 
 class MainPage extends StatefulWidget {
   const MainPage({Key? key}) : super(key: key);
@@ -14,78 +14,122 @@ class _MainPageState extends State<MainPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        elevation: 0,
         title: SvgPicture.asset(
           'assets/images/logo.svg',
           fit: BoxFit.cover,
         ),
         actions: [
           IconButton(
-            icon: const Icon(Icons.search_outlined,
-                color: ColorsInfo.newara, size: 28),
-            onPressed: () {}, // 추후에 검색 기능 추가 필요
+            icon: SvgPicture.asset(
+              'assets/icons/search.svg',
+              color: ColorsInfo.newara,
+              width: 20,
+              height: 20,
+            ),
+            onPressed: () {},
           ),
+          const SizedBox(width: 20),
         ],
       ),
       body: SafeArea(
         child: SingleChildScrollView(
-          child: Container(
+          child: SizedBox(
             width: MediaQuery.of(context).size.width,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                _buildSizedBox(1.9),
-                // 광고
-                Container(
-                  width: MediaQuery.of(context).size.width - 40,
-                  height: 204,
-                  decoration: const BoxDecoration(
-                    borderRadius: BorderRadius.all(Radius.circular(20)),
-                    color: ColorsInfo.newaraSoft,
-                  ),
-                  child: const Center(
-                    child: Text(
-                      '뉴아라 앱이 출시되었습니다 :)',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.w600,
-                        fontSize: 25,
-                      ),
-                    ), // Sample text
-                  ),
-                ),
-                _buildSizedBox(3),
-                // 실시간 인기글 TextButton
-                _buildTextButton("main_page.realtime", true),
-                // 실시간 인기글 ListView
+                const MainPageTextButton('main_page.realtime'),
+                // 실시간 인기글을 ListView로 도입 예정
                 Container(
                   width: MediaQuery.of(context).size.width - 40,
                   height: 200,
                   decoration: BoxDecoration(
-                    color: Color.fromRGBO(250, 250, 250, 1),
+                    border: Border.all(
+                      width: 1,
+                      color: const Color.fromRGBO(240, 240, 240, 1),
+                    ),
                     borderRadius: const BorderRadius.all(Radius.circular(20)),
                   ),
                 ),
-                // 공지 TextButton
-                _buildTextButton("main_page.notice", false),
+                const SizedBox(height: 10),
+                const MainPageTextButton('main_page.notice'),
                 Container(
                   width: MediaQuery.of(context).size.width - 40,
-                  height: 223,
+                  height: 200,
                   decoration: BoxDecoration(
-                    color: Color.fromRGBO(250, 250, 250, 1),
+                    border: Border.all(
+                      width: 1,
+                      color: const Color.fromRGBO(240, 240, 240, 1),
+                    ),
                     borderRadius: const BorderRadius.all(Radius.circular(20)),
                   ),
                 ),
-                _buildSizedBox(3),
-                _buildTextButton('main_page.stu_community', true),
+                const SizedBox(height: 10),
+                const MainPageTextButton('main_page.stu_community'),
                 Container(
                   width: MediaQuery.of(context).size.width - 40,
-                  height: 111,
+                  height: 110,
                   decoration: BoxDecoration(
-                    color: Color.fromRGBO(250, 250, 250, 1),
-                    borderRadius: BorderRadius.all(Radius.circular(20)),
+                    border: Border.all(
+                      width: 1,
+                      color: const Color.fromRGBO(240, 240, 240, 1),
+                    ),
+                    borderRadius: const BorderRadius.all(Radius.circular(20)),
+                  ),
+                  child: ListView(
+                    padding: const EdgeInsets.only(
+                        top: 10, bottom: 10, left: 15, right: 15),
+                    children: [
+                      SizedBox(
+                        height: 28,
+                        child: Row(
+                          children: const [
+                            Text(
+                              '원총',
+                              style: TextStyle(
+                                fontWeight: FontWeight.w700,
+                                fontSize: 14,
+                                color: Color.fromRGBO(177, 177, 177, 1),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      SizedBox(
+                        height: 28,
+                        child: Row(
+                          children: const [
+                             Text(
+                              '총학',
+                              style: TextStyle(
+                                fontWeight: FontWeight.w700,
+                                fontSize: 14,
+                                color: Color.fromRGBO(177, 177, 177, 1),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      SizedBox(
+                        height: 28,
+                        child: Row(
+                          children: const [
+                            Text(
+                              '새학',
+                              style: TextStyle(
+                                fontWeight: FontWeight.w700,
+                                fontSize: 14,
+                                color: Color.fromRGBO(177, 177, 177, 1),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
                   ),
                 ),
-                _buildSizedBox(3),
+                const SizedBox(height: 20),
               ],
             ),
           ),
@@ -93,30 +137,34 @@ class _MainPageState extends State<MainPage> {
       ),
     );
   }
+}
 
-  Container _buildTextButton(String name, bool isArrow) {
-    return Container(
+class MainPageTextButton extends StatelessWidget {
+  final String buttonTitle;
+  const MainPageTextButton(this.buttonTitle, {super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
       width: MediaQuery.of(context).size.width - 40,
-      height: 50,
       child: Row(
         children: [
           TextButton(
             onPressed: () {},
-            child: Text(isArrow ? ('$name'.tr() + ' >') : ('$name'.tr()),
-                style: const TextStyle(
-                  fontWeight: FontWeight.w600,
-                  fontSize: 16,
-                  color: Colors.black,
-                )),
+            child: Text(
+              '${buttonTitle.tr()} >',
+              style: const TextStyle(
+                fontWeight: FontWeight.w600,
+                fontSize: 17,
+                color: Colors.black,
+              ),
+            ),
+          ),
+          const Expanded(
+            child: SizedBox(),
           ),
         ],
       ),
-    );
-  }
-
-  SizedBox _buildSizedBox(double height) {
-    return SizedBox(
-      height: height,
     );
   }
 }

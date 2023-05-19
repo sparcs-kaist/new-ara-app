@@ -2,7 +2,6 @@
     "appBar": {
         "chatting": "채팅",
         "notification": "알림",
-        "mypage": "나의 정보",
         "bulletin": "게시판"
     },
     "main_page": {
@@ -11,6 +10,27 @@
         "stu_community": "학생 단체"
     },
     "myPage": {
-        "change": "수정"
+        "change": "수정",
+        "mypost": "작성한 글",
+        "scrap": "담아둔 글",
+        "recent": "최근 본 글"
+    },
+    "login_page" : {
+        "login": "SPARCS SSO로 로그인"
+    },
+    "setting_page": {
+        "title": "설정",
+        "bulletin": "게시글",
+        "adult": "성인글 보기",
+        "politics": "정치글 보기",
+        "block": "차단",
+        "blocked_users": "차단한 유저 목록",
+        "block_howto": "유저 차단은 게시글이나 댓글에서 더보기 기능을 통해 가능합니다.",
+        "noti": "알림",
+        "myreply": "내 글에 달린 댓글 및 대댓글",
+        "reply": "댓글에 달린 대댓글",
+        "hot_noti": "인기 공지글",
+        "hot_posts": "인기글",
+        "hot_info": "인기 공지글 및 인기 글을 매일 오전 8시 30분에 전달해 드립니다."
     }
 }
