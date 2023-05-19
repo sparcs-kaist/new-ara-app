@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter/material.dart';
+import 'package:new_ara_app/constants/url_info.dart';
 import 'package:new_ara_app/providers/user_provider.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 import 'package:new_ara_app/widgetclasses/loading_indicator.dart';
@@ -35,7 +36,7 @@ class _SparcsSSOPageState extends State<SparcsSSOPage> {
         },
         onPageFinished: (String url) async {
           //(수정 요망)현재는 야매로 하는 방법
-          if (url.endsWith('https://newara.dev.sparcs.org/') && mounted) {
+          if (url.endsWith('$newAraDefaultUrl/') && mounted) {
             var userProvider = context.read<UserProvider>();
             debugPrint("main.dart:login success");
 
@@ -69,7 +70,7 @@ class _SparcsSSOPageState extends State<SparcsSSOPage> {
       //   );
       // })
       ..loadRequest(
-          Uri.parse('https://newara.dev.sparcs.org/api/users/sso_login/'));
+          Uri.parse('$newAraDefaultUrl/api/users/sso_login/'));
   }
 
   @override

@@ -17,7 +17,7 @@ class MainPage extends StatefulWidget {
 }
 
 class _MainPageState extends State<MainPage> {
-  List<bool> isLoading = [true, true, true, true, true, true, true,true];
+  List<bool> isLoading = [true, true, true, true, true, true, true, true];
   List<dynamic> boardList = [];
   Map<String, dynamic> dailyBestContent = {};
   Map<String, dynamic> portalContent = {};
@@ -32,26 +32,9 @@ class _MainPageState extends State<MainPage> {
     // TODO: implement initState
     super.initState();
     var userProvider = Provider.of<UserProvider>(context, listen: false);
-    refreshBoardList(userProvider);
+
     refreshDailyBest(userProvider);
-    refreshPortalNotice(userProvider);
-    refreshFacilityNotice(userProvider);
-    refreshNewAraNotice(userProvider);
-    refreshGradAssocNotice(userProvider);
-    refreshUndergradAssocNotice(userProvider);
-    refreshFreshmanCouncil(userProvider);
-    
-  }
-  void refreshBoardList(UserProvider userProvider) async {
-    //Provider에  api res 주입
-    await userProvider.synApiRes("boards/");
-    if(mounted){
-      setState(() {
-        boardList = userProvider.getApiRes("boards/");
-        isLoading[7]=false;
-      });
-    }
-    
+    refreshBoardList(userProvider);
   }
 
   void refreshDailyBest(UserProvider userProvider) async {
@@ -66,13 +49,50 @@ class _MainPageState extends State<MainPage> {
     }
   }
 
+  void refreshBoardList(UserProvider userProvider) async {
+    //Provider 에  api res 주입
+    await userProvider.synApiRes("boards/");
+    if (mounted) {
+      setState(() {
+        boardList = userProvider.getApiRes("boards/");
+        isLoading[7] = false;
+      });
+    }
+
+    refreshPortalNotice(userProvider);
+    refreshFacilityNotice(userProvider);
+    refreshNewAraNotice(userProvider);
+    refreshGradAssocNotice(userProvider);
+    refreshUndergradAssocNotice(userProvider);
+    refreshFreshmanCouncil(userProvider);
+  }
+  List<int> findBoardID(String slug1, String slug2){
+    //topic 이 없는 경우 slug2로 ""을 넘겨준다.
+
+    List<int> returnValue = [-1,-1];
+    for(int i=0; i<boardList.length ; i++){
+      if(boardList[i]["slug"]==slug1){
+        returnValue[0]=boardList[i]["id"];
+        if(slug2!=""){
+          for(int j=0; j< boardList[i]["topics"].length ; j++){
+            if(boardList[i]["topics"][j]["slug"]==slug2){
+              returnValue[1]=boardList[i]["topics"][j]["id"];
+            }
+          }
+        }
+      }
+    }
+    return returnValue;
+  }
   void refreshPortalNotice(UserProvider userProvider) async {
     //포탈 공지
     //  articles/?parent_board=1
-    await userProvider.synApiRes("articles/?parent_board=1");
+    // "slug": "portal-notice",
+    int boardID = findBoardID("portal-notice", "")[0];
+    await userProvider.synApiRes("articles/?parent_board=$boardID");
     if (mounted) {
       setState(() {
-        portalContent = userProvider.getApiRes("articles/?parent_board=1");
+        portalContent = userProvider.getApiRes("articles/?parent_board=$boardID");
         isLoading[1] = false;
       });
     }
@@ -81,10 +101,12 @@ class _MainPageState extends State<MainPage> {
   void refreshFacilityNotice(UserProvider userProvider) async {
     //articles/?parent_board=11
     //입주 업체
-    await userProvider.synApiRes("articles/?parent_board=11");
+    // "slug": "facility-feedback",
+    int boardID = findBoardID("facility-feedback", "")[0];
+    await userProvider.synApiRes("articles/?parent_board=$boardID");
     if (mounted) {
       setState(() {
-        facilityContent = userProvider.getApiRes("articles/?parent_board=11");
+        facilityContent = userProvider.getApiRes("articles/?parent_board=$boardID");
         isLoading[2] = false;
       });
     }
@@ -92,10 +114,12 @@ class _MainPageState extends State<MainPage> {
 
   void refreshNewAraNotice(UserProvider userProvider) async {
     //뉴아라
-    await userProvider.synApiRes("articles/?parent_board=8");
+    //        "slug": "newara-feedback",
+    int boardID= findBoardID("newara-feedback", "")[0];
+    await userProvider.synApiRes("articles/?parent_board=$boardID");
     if (mounted) {
       setState(() {
-        newAraContent = userProvider.getApiRes("articles/?parent_board=8");
+        newAraContent = userProvider.getApiRes("articles/?parent_board=$boardID");
         isLoading[3] = false;
       });
     }
@@ -103,14 +127,17 @@ class _MainPageState extends State<MainPage> {
 
   void refreshGradAssocNotice(UserProvider userProvider) async {
     //원총
+    // "slug": "students-group",
+    // "slug": "grad-assoc",
     //dev 서버랑 실제 서버 parent_topic 이 다름을 유의하기.
     //https://newara.sparcs.org/api/articles/?parent_board=2&parent_topic=24
-
-    await userProvider.synApiRes("articles/?parent_board=2&parent_topic=24");
+    int boardID = findBoardID("students-group", "grad-assoc")[0];
+    int topicID = findBoardID("students-group", "grad-assoc")[1];
+    await userProvider.synApiRes("articles/?parent_board=$boardID&parent_topic=$topicID");
     if (mounted) {
       setState(() {
         gradContent =
-            userProvider.getApiRes("articles/?parent_board=2&parent_topic=24");
+            userProvider.getApiRes("articles/?parent_board=$boardID&parent_topic=$topicID");
         isLoading[4] = false;
       });
     }
@@ -118,11 +145,15 @@ class _MainPageState extends State<MainPage> {
 
   void refreshUndergradAssocNotice(UserProvider userProvider) async {
     //총학
-    await userProvider.synApiRes("articles/?parent_board=2&parent_topic=1");
+    // "slug": "students-group",
+    // "slug": "undergrad-assoc",
+    int boardID = findBoardID("students-group", "undergrad-assoc")[0];
+    int topicID = findBoardID("students-group", "undergrad-assoc")[1];
+    await userProvider.synApiRes("articles/?parent_board=$boardID&parent_topic=$topicID");
     if (mounted) {
       setState(() {
         underGradContent =
-            userProvider.getApiRes("articles/?parent_board=2&parent_topic=1");
+            userProvider.getApiRes("articles/?parent_board=$boardID&parent_topic=$topicID");
         isLoading[5] = false;
       });
     }
@@ -130,11 +161,15 @@ class _MainPageState extends State<MainPage> {
 
   void refreshFreshmanCouncil(UserProvider userProvider) async {
     //새학
-    await userProvider.synApiRes("articles/?parent_board=2&parent_topic=5");
+    // "slug": "students-group",
+    // "slug": "freshman-council",
+    int boardID = findBoardID("students-group", "freshman-council")[0];
+    int topicID = findBoardID("students-group", "freshman-council")[1];
+    await userProvider.synApiRes("articles/?parent_board=$boardID&parent_topic=$topicID");
     if (mounted) {
       setState(() {
         freshmanContent =
-            userProvider.getApiRes("articles/?parent_board=2&parent_topic=5");
+            userProvider.getApiRes("articles/?parent_board=$boardID&parent_topic=$topicID");
         isLoading[6] = false;
       });
     }
@@ -178,7 +213,7 @@ class _MainPageState extends State<MainPage> {
                 isLoading[4] ||
                 isLoading[5] ||
                 isLoading[6] ||
-                isLoading[7] 
+                isLoading[7]
             ? const LoadingIndicator()
             : SingleChildScrollView(
                 child: SizedBox(
@@ -194,7 +229,10 @@ class _MainPageState extends State<MainPage> {
                             context,
                             MaterialPageRoute(
                                 builder: (context) =>
-                                    const FreeBulletinBoardPage(boardType: BoardType.recent, boardInfo: {},)),
+                                    const FreeBulletinBoardPage(
+                                      boardType: BoardType.recent,
+                                      boardInfo: {},
+                                    )),
                           );
                         },
                       ),
@@ -273,11 +311,15 @@ class _MainPageState extends State<MainPage> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             InkWell(
-                              onTap: (){
+                              onTap: () {
                                 Navigator.push(
                                   context,
                                   MaterialPageRoute(
-                                      builder: (context) => FreeBulletinBoardPage(boardType: BoardType.free,boardInfo: boardList[0],)),
+                                      builder: (context) =>
+                                          FreeBulletinBoardPage(
+                                            boardType: BoardType.free,
+                                            boardInfo: boardList[0],
+                                          )),
                                 );
                               },
                               child: Row(
@@ -440,7 +482,8 @@ class _MainPageState extends State<MainPage> {
                       MainPageTextButton('main_page.stu_community', () {}),
                       Container(
                         width: MediaQuery.of(context).size.width - 40,
-                        height: 110,
+                     //   height: 110,
+                        padding: const EdgeInsets.all(12),
                         decoration: BoxDecoration(
                           border: Border.all(
                             width: 1,
@@ -449,9 +492,9 @@ class _MainPageState extends State<MainPage> {
                           borderRadius:
                               const BorderRadius.all(Radius.circular(20)),
                         ),
-                        child: ListView(
-                          padding: const EdgeInsets.only(
-                              top: 10, bottom: 10, left: 15, right: 15),
+                        child: Column(
+                       //  padding: const EdgeInsets.only(
+                       //       top: 10, bottom: 10, left: 15, right: 15),
                           children: [
                             SizedBox(
                               height: 28,
@@ -554,7 +597,8 @@ class PopularBoard extends StatelessWidget {
   final Map<String, dynamic> json;
   final int boardNum;
 
-  PopularBoard({super.key, required Map<String, dynamic>? json, int ingiNum = 1})
+  PopularBoard(
+      {super.key, required Map<String, dynamic>? json, int ingiNum = 1})
       : json = json ?? {},
         boardNum = ingiNum;
 

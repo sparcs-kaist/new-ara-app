@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:new_ara_app/constants/url_info.dart';
 import 'package:new_ara_app/providers/user_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter/cupertino.dart';
@@ -134,7 +135,7 @@ class SettingPageState extends State<SettingPage> {
                                     setState(() => see_sexual = value);
                                     try {
                                       await dio.patch(
-                                          'https://newara.dev.sparcs.org/api/user_profiles/${userProvider.naUser!.user}/',
+                                          '$newAraDefaultUrl/api/user_profiles/${userProvider.naUser!.user}/',
                                           data: {'see_sexual': value});
                                       await userProvider.apiMeUserInfo();
                                       debugPrint(
@@ -178,7 +179,7 @@ class SettingPageState extends State<SettingPage> {
                                     setState((){see_social = value;});
                                     try {
                                       await dio.patch(
-                                          'https://newara.dev.sparcs.org/api/user_profiles/${userProvider.naUser!.user}/',
+                                          '$newAraDefaultUrl/api/user_profiles/${userProvider.naUser!.user}/',
                                           data: {'see_social': value});
                                       await userProvider.apiMeUserInfo();
                                       debugPrint(

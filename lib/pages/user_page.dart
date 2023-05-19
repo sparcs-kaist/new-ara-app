@@ -1,6 +1,7 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:new_ara_app/constants/url_info.dart';
 import 'package:provider/provider.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:dio/dio.dart';
@@ -120,14 +121,16 @@ class _UserPageState extends State<UserPage>
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               Text(
-                                "${context.watch<UserProvider>().naUser!.sso_user_info['first_name']} ${context.watch<UserProvider>().naUser!.sso_user_info['last_name']}",
+                                "${userProvider.naUser!.sso_user_info['first_name']} ${userProvider.naUser!.sso_user_info['last_name']}",
                                 style: const TextStyle(
                                   fontSize: 18,
                                   fontWeight: FontWeight.w700,
                                 ),
                               ),
                               Text(
-                                context.watch<UserProvider>().naUser!.email,
+                                userProvider.naUser!.email == null
+                                    ? "이메일에 지정된 정보가 없습니다."
+                                    : userProvider.naUser!.email!,
                                 style: const TextStyle(
                                   fontSize: 14,
                                   fontWeight: FontWeight.w500,
@@ -585,8 +588,7 @@ class _UserPageState extends State<UserPage>
     dio.options.headers['Cookie'] =
         initStateContext.read<UserProvider>().getCookiesToString();
     try {
-      var response =
-          await dio.get('https://newara.dev.sparcs.org${apiUrlList[tabIndex]}');
+      var response = await dio.get('$newAraDefaultUrl${apiUrlList[tabIndex]}');
       setMyCount(response.data['num_items'], tabIndex);
       if (response.statusCode == 200) {
         debugPrint("fetchArticleList() $tabIndex succeed!");

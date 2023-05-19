@@ -1,6 +1,6 @@
 class NAUserModel {
   final int user;
-  final String email;
+  final String? email;
   final String nickname;
   final bool is_official;
   final int num_articles;

@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
+import 'package:new_ara_app/constants/url_info.dart';
 import 'package:new_ara_app/models/nauser_model.dart';
 import 'package:webview_cookie_manager/webview_cookie_manager.dart';
 
@@ -53,7 +54,7 @@ class UserProvider with ChangeNotifier {
     //initCookieString 이 없으면 현재 프로바이더의 쿠키로 한다.
 
     dynamic cookieString = "ㅁ";
-    String apiUrl = 'https://newara.dev.sparcs.org/api/me';
+    String apiUrl = '$newAraDefaultUrl/api/me';
 
     if (initCookieString == "") {
       // 쿠키를 문자열로 변환하여 HTTP 요청의 헤더에 추가
@@ -100,7 +101,7 @@ class UserProvider with ChangeNotifier {
 
     String cookieString = "";
     //  String apiUrl = 'https://newara.dev.sparcs.org/api/me';
-    var apiUrl = "https://newara.dev.sparcs.org/api/$mapKey";
+    var apiUrl = "$newAraDefaultUrl/api/$mapKey";
     if (initCookieString == "") {
       // 쿠키를 문자열로 변환하여 HTTP 요청의 헤더에 추가
 
