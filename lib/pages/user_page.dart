@@ -22,11 +22,16 @@ class UserPage extends StatefulWidget {
 class _UserPageState extends State<UserPage>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
-
+  List<ScrollController> scntrlList = [
+    ScrollController(),
+    ScrollController(),
+    ScrollController()
+  ];
   List<List<ArticleListActionModel>> tabList = [[], [], []];
   List<int> tabCount = [0, 0, 0];
   int curCount = 0; // "총 N개의 글"에 사용되는 변수
   List<bool> isLoadedList = [false, false, false];
+  List<int> nextPage = [2, 2, 2];
 
   final List<String> _tabs = [
     'myPage.mypost'.tr(),
@@ -41,14 +46,46 @@ class _UserPageState extends State<UserPage>
       length: _tabs.length,
       vsync: this,
     );
-    fetchArticleList(context, 0); // 작성한 글 fetch
-    fetchArticleList(context, 1); // 담아둔 글 fetch
-    fetchArticleList(context, 2); // 최근 본 글 fetch
+
+    scntrlList[0].addListener(_scrollListener0);
+    scntrlList[1].addListener(_scrollListener1);
+    scntrlList[2].addListener(_scrollListener2);
+
+    fetchArticleList(context, 0, 1); // 작성한 글 fetch
+    fetchArticleList(context, 1, 1); // 담아둔 글 fetch
+    fetchArticleList(context, 2, 1); // 최근 본 글 fetch
+  }
+
+  void _scrollListener0() {
+    if (isLoadedList[0] &&
+        scntrlList[0].position.pixels ==
+            scntrlList[0].position.maxScrollExtent) {
+      fetchArticleList(context, 0, nextPage[0]);
+    }
+  }
+
+  void _scrollListener1() {
+    if (isLoadedList[1] &&
+        scntrlList[1].position.pixels ==
+            scntrlList[1].position.maxScrollExtent) {
+      fetchArticleList(context, 1, nextPage[1]);
+    }
+  }
+
+  void _scrollListener2() {
+    if (isLoadedList[2] &&
+        scntrlList[2].position.pixels ==
+            scntrlList[2].position.maxScrollExtent) {
+      fetchArticleList(context, 2, nextPage[2]);
+    }
   }
 
   @override
   void dispose() {
     _tabController.dispose();
+    for (int i = 0; i < 3; i++) {
+      scntrlList[i].dispose();
+    }
     super.dispose();
   }
 
@@ -195,9 +232,9 @@ class _UserPageState extends State<UserPage>
                   child: TabBarView(
                     controller: _tabController,
                     children: [
-                      _buildPostList(0),
-                      _buildPostList(1),
-                      _buildPostList(2),
+                      _buildPostList(0), // 작성한글(0) 리스트뷰 빌드
+                      _buildPostList(1), // 담아둔 글(1) 리스트뷰 빌드
+                      _buildPostList(2), // 최근 본 글(2) 리스트뷰 빌드
                     ],
                   ),
                 ),
@@ -209,16 +246,17 @@ class _UserPageState extends State<UserPage>
     );
   }
 
-  void fetchArticleList(BuildContext initStateContext, int tabIndex) async {
+  void fetchArticleList(
+      BuildContext initStateContext, int tabIndex, int page) async {
     // tabIndex 0 : 작성한 글, 1 : 담아둔 글, 2 : 최근 본 글
     int user = initStateContext.read<UserProvider>().naUser!.user;
     List<String> apiUrlList = [
-      '/api/articles/?page=1&created_by=$user',
-      '/api/scraps/?page=1&created_by=$user',
-      '/api/articles/recent/?page=1'
+      '/api/articles/?page=$page&created_by=$user',
+      '/api/scraps/?page=$page&created_by=$user',
+      '/api/articles/recent/?page=$page'
     ];
 
-    tabList[tabIndex] = []; // 먼저 초기화하기
+    if (page == 1) tabList[tabIndex] = []; // 먼저 초기화하기
     var dio = Dio();
     dio.options.headers['Cookie'] =
         initStateContext.read<UserProvider>().getCookiesToString();
@@ -233,6 +271,7 @@ class _UserPageState extends State<UserPage>
           tabList[tabIndex].add(ArticleListActionModel.fromJson(rawPost));
         }
         setIsLoaded(true, tabIndex);
+        nextPage[tabIndex] += 1;
         debugPrint('$tabIndex count: ${tabCount[tabIndex]}');
       }
     } catch (error) {
@@ -277,6 +316,7 @@ class _UserPageState extends State<UserPage>
         ? const LoadingIndicator()
         : ListView.separated(
             itemCount: tabList[tabIndex].length,
+            controller: scntrlList[tabIndex],
             itemBuilder: (context, index) {
               var curPost = tabIndex == 1
                   ? ArticleListActionModel.fromJson(
