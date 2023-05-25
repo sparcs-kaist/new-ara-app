@@ -21,7 +21,7 @@ class PublicUserModel {
         is_blocked: json['is_blocked']);
   }
 
-  Map<String, dynamic>? toJson() {
+  Map<String, dynamic> toJson() {
     return {
       'id': id,
       'username': username,

@@ -38,7 +38,7 @@ class TopicModel {
     );
   }
 
-  Map<String, dynamic>? toJson() {
+  Map<String, dynamic> toJson() {
     return {
       'id': id,
       'created_at': created_at,
