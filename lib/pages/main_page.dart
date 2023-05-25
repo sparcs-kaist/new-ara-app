@@ -4,6 +4,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:new_ara_app/constants/board_type.dart';
 import 'package:new_ara_app/constants/colors_info.dart';
 import 'package:new_ara_app/pages/free_bulletin_board_page.dart';
+import 'package:new_ara_app/pages/post_write_page.dart';
 import 'package:new_ara_app/pages/specific_bulletin_board_page.dart';
 import 'package:new_ara_app/providers/user_provider.dart';
 import 'package:new_ara_app/widgetclasses/loading_indicator.dart';
@@ -192,7 +193,14 @@ class _MainPageState extends State<MainPage> {
               width: 35,
               height: 35,
             ),
-            onPressed: () {},
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) =>
+                    PostWritePage(),),
+              );
+            },
           ),
           IconButton(
             icon: SvgPicture.asset(
