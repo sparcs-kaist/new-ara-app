@@ -3,7 +3,7 @@ class PublicUserProfileModel {
   String? nickname;
   int? user;
   bool? is_official;
-  String? is_school_admin;
+  bool? is_school_admin;
 
   PublicUserProfileModel({
     required this.picture,
