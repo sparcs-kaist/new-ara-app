@@ -15,19 +15,18 @@ class PublicUserModel {
 
   factory PublicUserModel.fromJson(Map<String, dynamic> json) {
     return PublicUserModel(
-      id: json['id'],
-      username: json['username'],
-      profile: PublicUserProfileModel.fromJson(json['profile']),
-      is_blocked: json['is_blocked']
-    );
+        id: json['id'],
+        username: json['username'],
+        profile: PublicUserProfileModel.fromJson(json['profile']),
+        is_blocked: json['is_blocked']);
   }
 
-  Map<String, dynamic> toJson() {
+  Map<String, dynamic>? toJson() {
     return {
       'id': id,
       'username': username,
       'profile': profile?.toJson(),
-      'is_blocked':is_blocked,
+      'is_blocked': is_blocked,
     };
   }
 }
