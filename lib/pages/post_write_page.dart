@@ -1,6 +1,14 @@
+import 'dart:convert';
+import 'package:new_ara_app/constants/url_info.dart';
+import 'dart:io';
+import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:new_ara_app/constants/colors_info.dart';
+import 'package:provider/provider.dart';
+
+import '../providers/user_provider.dart';
 
 class PostWritePage extends StatefulWidget {
   const PostWritePage({Key? key}) : super(key: key);
@@ -14,9 +22,11 @@ class _PostWritePageState extends State<PostWritePage> {
   bool? isChecked = true;
   String? _chosenBoardValue = "학생 단체";
   String? _chosenTopicValue = "학생 단체";
+  File? selectedImage;
 
   @override
   Widget build(BuildContext context) {
+    var userProvider = context.watch<UserProvider>();
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
@@ -54,8 +64,75 @@ class _PostWritePageState extends State<PostWritePage> {
           ),
         ),
         actions: [
+          ElevatedButton(
+            onPressed: () async {
+              var url = Uri.parse("$newAraDefaultUrl/api/articles/");
+              var headers = {'Content-Type': 'application/json', 'Cookie':userProvider.getCookiesToString()};
+
+              var requestBody = jsonEncode({
+                'title': 'post 테스트 11:16',
+                'content':
+                    '<p><img src="https://sparcs-newara-dev.s3.amazonaws.com/files/%E1%84%89%E1%85%B3%E1%84%8F%E1%85%B3%E1%84%85%E1%85%B5%E1%86%AB%E1%84%89%E1%85%A3%E1%86%BA_2023-05-24_%E1%84%8B%E1%85%A9%E1%84%8C%E1%85%A5%E1%86%AB_6.01.21.png" width="500" data-attachment="170"></p>',
+                'attachments': [170],
+                'parent_topic': '',
+                'is_content_sexual': false,
+                'is_content_social': false,
+                'parent_board': 2,
+              });
+
+              var response =
+                  await http.post(url, headers: headers, body: requestBody);
+
+              if (response.statusCode == 200) {
+                // Request successful
+                print('Post request successful');
+                print('Response: ${response.body}');
+              } else {
+                // Request failed
+                print(
+                    'Post request failed with status code ${response.statusCode}');
+                print('Response: ${response.body}');
+              }
+            },
+            child: Text("나야"),
+          ),
           MaterialButton(
-            onPressed: () {},
+            onPressed: () async {
+              if (selectedImage != null) {
+                var request = http.MultipartRequest(
+                    'POST', Uri.parse('$newAraDefaultUrl/attachments'));
+
+                request.files.add(await http.MultipartFile.fromPath(
+                  'image',
+                  selectedImage!.path,
+                ));
+                request.headers['Cookie'] = userProvider.getCookiesToString();
+
+                File imageFile = File(selectedImage!.path);
+                var attachment = {
+                  'size': imageFile.lengthSync(),
+                  'mimetype': 'image/jpeg',
+                };
+
+                // Convert the attachment object to JSON
+                var attachmentJson = jsonEncode(attachment);
+
+                // Add the attachment JSON to the request body
+                request.fields['data'] = attachmentJson;
+
+                var response = await request.send();
+                var responseData = await response.stream.bytesToString();
+                if (response.statusCode == 200) {
+                  // Image uploaded successfully
+                  print('Image uploaded');
+                  print('Response: $responseData');
+                } else {
+                  // Image upload failed
+                  print(
+                      'Image upload failed ${response.statusCode} ${responseData}');
+                }
+              }
+            },
             // 버튼이 클릭되었을 때 수행할 동작
             padding: EdgeInsets.zero, // 패딩 제거
             child: Ink(
@@ -251,8 +328,14 @@ class _PostWritePageState extends State<PostWritePage> {
                   Row(
                     children: [
                       InkWell(
-                        onTap: () {
-
+                        onTap: () async {
+                          final pickedFile = await ImagePicker()
+                              .pickImage(source: ImageSource.gallery);
+                          if (pickedFile != null) {
+                            setState(() {
+                              selectedImage = File(pickedFile.path);
+                            });
+                          }
                         },
                         child: Text("첨부파일 추가"),
                       ),

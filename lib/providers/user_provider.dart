@@ -96,13 +96,13 @@ class UserProvider with ChangeNotifier {
     }
   }
 
-  Future<bool> synApiRes(String mapKey, {String initCookieString = ""}) async {
+  Future<bool> synApiRes(String mapKey, {String? initCookieString,File? multipartFile}) async {
     //initCookieString 이 없으면 현재 프로바이더의 쿠키로 한다.
 
     String cookieString = "";
     //  String apiUrl = 'https://newara.dev.sparcs.org/api/me';
     var apiUrl = "$newAraDefaultUrl/api/$mapKey";
-    if (initCookieString == "") {
+    if (initCookieString == null) {
       // 쿠키를 문자열로 변환하여 HTTP 요청의 헤더에 추가
 
       cookieString = _loginCookie
