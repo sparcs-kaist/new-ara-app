@@ -1,20 +1,25 @@
+// 담아둔 글의 경우 parent_article을 fromJson
+import 'package:new_ara_app/models/topic_model.dart';
+import 'package:new_ara_app/models/board_model.dart';
+import 'package:new_ara_app/models/public_user.dart';
+
 class ArticleListActionModel {
-  final int id; // 글 마다 부여되는 id, 모든 글에 있는 듯함
-  final bool? is_hidden; // 숨김처리 되었는지 여부, 담아둔 글에서는 존재하지 않는다
-  final dynamic why_hidden; // 숨김처리 되었는지 여부, 담아둔 글에서는 존재하지 않는다
-  final dynamic can_override_hidden; // 변수의 타입 및 용도 정확히 모르겠음
-  final dynamic parent_topic; // 변수의 타입 정확하게 모르겠음
-  final Map<String, dynamic>? parent_board;
+  final int id; // ID
+  final bool? is_hidden;
+  final dynamic why_hidden;
+  final bool? can_override_hidden;
+  final TopicModel? parent_topic;
+  final BoardModel? parent_board;
   final String? title;
-  final Map<String, dynamic>? created_by;
+  final PublicUserModel? created_by;
   final String? read_status;
   final String? attachment_type;
-  final dynamic communication_article_status; // 변수의 타입 및 용도 정확하게 모르겠음
-  final dynamic days_left; // 변수의 타입 및 용도 정확하게 모르겠음
+  final String? communication_article_status;
+  final String? days_left;
   final String? created_at;
   final String? updated_at;
   final String? deleted_at;
-  final int? name_type;
+  final int? name_type; // 익명 혹은 실명 여부
   final bool? is_content_sexual;
   final bool? is_content_social;
   final int? hit_count;
@@ -22,13 +27,10 @@ class ArticleListActionModel {
   final int? report_count;
   final int? positive_vote_count;
   final int? negative_vote_count;
-  final String? commented_at;
-  final dynamic url; // 변수의 타입 정확하게 모르겠음
-  final dynamic content_updated_at; // 변수의 타입 정확하게 모르겠음
-  final dynamic hidden; // 변수의 타입 정확하게 모르겠음
-  final Map<String, dynamic>? scrapped_by;
-  final dynamic parent_article;
-  final Map<String, dynamic>? my_comment_profile;
+  final String? commented_at; // 마지막 댓글이 달린 시간
+  final String? url; // 포탈 링크
+  final String? content_updated_at; // 제목, 본문, 첨부파일 수정 시간
+  final String? hidden_at; // 숨긴 시간
 
   ArticleListActionModel({
     required this.id,
@@ -43,9 +45,9 @@ class ArticleListActionModel {
     this.attachment_type,
     this.communication_article_status,
     this.days_left,
-    required this.created_at,
-    required this.updated_at,
-    required this.deleted_at,
+    this.created_at,
+    this.updated_at,
+    this.deleted_at,
     this.name_type,
     this.is_content_sexual,
     this.is_content_social,
@@ -57,10 +59,7 @@ class ArticleListActionModel {
     this.commented_at,
     this.url,
     this.content_updated_at,
-    this.hidden,
-    this.scrapped_by,
-    this.parent_article,
-    this.my_comment_profile,
+    this.hidden_at,
   });
 
   ArticleListActionModel.fromJson(Map<String, dynamic> json)
@@ -68,10 +67,16 @@ class ArticleListActionModel {
         is_hidden = json['is_hidden'],
         why_hidden = json['why_hidden'],
         can_override_hidden = json['can_override_hidden'],
-        parent_topic = json['parent_topic'],
-        parent_board = json['parent_board'],
+        parent_topic = json['parent_topic'] == null
+            ? null
+            : TopicModel.fromJson(json['parent_topic']),
+        parent_board = json['parent_board'] == null
+            ? null
+            : BoardModel.fromJson(json['parent_board']),
         title = json['title'],
-        created_by = json['created_by'],
+        created_by = json['created_by'] == null
+            ? null
+            : PublicUserModel.fromJson(json['created_by']),
         read_status = json['read_status'],
         attachment_type = json['attachment_type'],
         communication_article_status = json['communication_article_status'],
@@ -90,19 +95,17 @@ class ArticleListActionModel {
         commented_at = json['commented_at'],
         url = json['url'],
         content_updated_at = json['content_updated_at'],
-        hidden = json['hidden'],
-        scrapped_by = json['scrapped_by'],
-        my_comment_profile = json['my_comment_profile'],
-        parent_article = json['parent_article'];
+        hidden_at = json['hidden_at'];
 
   Map<String, dynamic> toJson() => {
         'id': id,
         'is_hidden': is_hidden,
+        'why_hidden': why_hidden,
         'can_override_hidden': can_override_hidden,
-        'parent_topic': parent_topic,
-        'parent_board': parent_board,
+        'parent_topic': parent_topic!.toJson(),
+        'parent_board': parent_board!.toJson(),
         'title': title,
-        'created_by': created_by,
+        'created_by': created_by!.toJson(),
         'read_status': read_status,
         'attachment_type': attachment_type,
         'communication_article_status': communication_article_status,
@@ -121,8 +124,6 @@ class ArticleListActionModel {
         'commented_at': commented_at,
         'url': url,
         'content_updated_at': content_updated_at,
-        'hidden': hidden,
-        'scrapped_by': scrapped_by,
-        'parent_article': parent_article,
+        'hidden_at': hidden_at,
       };
 }
