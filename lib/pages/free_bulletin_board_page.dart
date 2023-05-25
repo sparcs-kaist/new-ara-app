@@ -86,7 +86,7 @@ class _FreeBulletinBoardPageState extends State<FreeBulletinBoardPage> {
           for(int i=0 ; i< (myMap?["results"].length ?? 0 ); i++) {
 
             //???/
-            if(myMap["results"][i]["created_by"]["profile"]!=null && myMap["results"][i]["is_hidden"]==false) {
+            if(myMap["results"][i]["created_by"]["profile"]!=null) {
               postPreviewList.add(myMap?["results"][i] ?? {});
             }
           }

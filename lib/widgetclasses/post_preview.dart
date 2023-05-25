@@ -44,7 +44,7 @@ class _PostPreviewState extends State<PostPreview> {
             children: [
               Flexible(
                 child: Text(
-                  widget.json["title"] ,
+                  widget.json["title"]??"why2" ,
                   style: const TextStyle(
                     fontWeight: FontWeight.w500,
                     fontSize: 16,

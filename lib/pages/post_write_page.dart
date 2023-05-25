@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:dio/dio.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:new_ara_app/constants/url_info.dart';
 import 'dart:io';
 import 'package:http/http.dart' as http;
@@ -23,8 +24,10 @@ class _PostWritePageState extends State<PostWritePage> {
   bool? isChecked = true;
   String? _chosenBoardValue = "학생 단체";
   String? _chosenTopicValue = "학생 단체";
-  File? selectedImage;
-  var pickedFile;
+  File? imagePickerFile;
+  File? filePickerFile;
+  var imagePickerResult;
+  FilePickerResult? filePickerResult;
 
   @override
   Widget build(BuildContext context) {
@@ -68,6 +71,30 @@ class _PostWritePageState extends State<PostWritePage> {
         actions: [
           ElevatedButton(
             onPressed: () async {
+/*
+              Dio dio =Dio();
+              dio.options.headers['Cookie']=userProvider.getCookiesToString();
+              try {
+                var response = await dio.post(
+                  '$newAraDefaultUrl/api/articles/',
+                  data: {
+                    'title': 'post 테스트 03:11',
+                    'content':
+                    '<p><img src="https://sparcs-newara-dev.s3.amazonaws.com/files/%E1%84%89%E1%85%B3%E1%84%8F%E1%85%B3%E1%84%85%E1%85%B5%E1%86%AB%E1%84%89%E1%85%A3%E1%86%BA_2023-05-24_%E1%84%8B%E1%85%A9%E1%84%8C%E1%85%A5%E1%86%AB_6.01.21.png" width="500" data-attachment="170"></p>',
+                    'attachments': [170],
+                    'parent_topic': '',
+                    'is_content_sexual': false,
+                    'is_content_social': false,
+                    'parent_board': 2,
+                  },
+                );
+
+                debugPrint('Response data: ${response.data}');
+              } catch (e) {
+                debugPrint('Error: $e');
+              }
+
+*/
               var url = Uri.parse("$newAraDefaultUrl/api/articles/");
               var headers = {
                 'Content-Type': 'application/json',
@@ -75,10 +102,10 @@ class _PostWritePageState extends State<PostWritePage> {
               };
 
               var requestBody = jsonEncode({
-                'title': 'post 테스트 11:18',
+                'title': 'post 테스트 03:16',
                 'content':
-                    '<p><img src="https://sparcs-newara-dev.s3.amazonaws.com/files/%E1%84%89%E1%85%B3%E1%84%8F%E1%85%B3%E1%84%85%E1%85%B5%E1%86%AB%E1%84%89%E1%85%A3%E1%86%BA_2023-05-24_%E1%84%8B%E1%85%A9%E1%84%8C%E1%85%A5%E1%86%AB_6.01.21.png" width="500" data-attachment="170"></p>',
-                'attachments': [170],
+                    '<p></p>',
+                'attachments': [187],
                 'parent_topic': '',
                 'is_content_sexual': false,
                 'is_content_social': false,
@@ -103,23 +130,20 @@ class _PostWritePageState extends State<PostWritePage> {
           ),
           MaterialButton(
             onPressed: () async {
-              if (selectedImage != null) {
-                var filePath = pickedFile.path;
+              if (imagePickerFile != null) {
+                var filePath = imagePickerResult.path;
                 var filename = filePath.split("/").last;
                 var formData = FormData.fromMap({
                   "file":
                       await MultipartFile.fromFile(filePath, filename: filename)
                 });
-                Dio dio = new Dio();
+                Dio dio = Dio();
                 dio.options.headers['Cookie'] =
                     userProvider.getCookiesToString();
                 try {
                   var response = await dio.post(
                       '$newAraDefaultUrl/api/attachments/',
                       data: formData);
-
-                  // Request successful
-
                   print('Post request successful');
                   print('Response: $response.data');
                 } catch (error) {
@@ -146,6 +170,37 @@ class _PostWritePageState extends State<PostWritePage> {
               ),
             ),
           ),
+          ElevatedButton(
+            onPressed: () async {
+              if (filePickerResult != null) {
+                filePickerFile = File(filePickerResult!.files.single.path!);
+                debugPrint("!null");
+                // Create dio
+                var dio = Dio();
+                dio.options.headers['Cookie'] =
+                    userProvider.getCookiesToString();
+
+                // Create FormData
+                var formData = FormData.fromMap({
+                  "file": await MultipartFile.fromFile(filePickerFile!.path,
+                      filename: filePickerFile!.path
+                          .split('/')
+                          .last), // You may need to replace '/' with '\\' if you're using Windows.
+                });
+
+                // Post data with dio
+                try {
+                  var response = await dio.post(
+                      "$newAraDefaultUrl/api/attachments/",
+                      data: formData);
+                  print(response.data);
+                } catch (error) {
+                  debugPrint("$error");
+                }
+              }
+            },
+            child: Text("파일 테스트"),
+          )
         ],
       ),
       body: SafeArea(
@@ -312,7 +367,7 @@ class _PostWritePageState extends State<PostWritePage> {
                       fontWeight: FontWeight.w500,
                     ),
                   ),
-                  if (selectedImage != null) Image.file(selectedImage!),
+                  if (imagePickerFile != null) Image.file(imagePickerFile!),
                 ],
               ),
             ),
@@ -325,15 +380,23 @@ class _PostWritePageState extends State<PostWritePage> {
                     children: [
                       InkWell(
                         onTap: () async {
-                          pickedFile = await ImagePicker()
+                          imagePickerResult = await ImagePicker()
                               .pickImage(source: ImageSource.gallery);
-                          if (pickedFile != null) {
+                          if (imagePickerResult != null) {
                             setState(() {
-                              selectedImage = File(pickedFile.path);
+                              imagePickerFile = File(imagePickerResult.path);
                             });
                           }
                         },
-                        child: Text("첨부파일 추가"),
+                        child: Text("사진 파일 추가"),
+                      ),
+                      InkWell(
+                        onTap: () async {
+                          filePickerResult =
+                              await FilePicker.platform.pickFiles();
+                          setState(() {});
+                        },
+                        child: Text("첨부 파일 추가"),
                       ),
                     ],
                   ),
