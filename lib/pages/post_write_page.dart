@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:dio/dio.dart';
 import 'package:new_ara_app/constants/url_info.dart';
 import 'dart:io';
 import 'package:http/http.dart' as http;
@@ -23,6 +24,7 @@ class _PostWritePageState extends State<PostWritePage> {
   String? _chosenBoardValue = "학생 단체";
   String? _chosenTopicValue = "학생 단체";
   File? selectedImage;
+  var pickedFile;
 
   @override
   Widget build(BuildContext context) {
@@ -67,10 +69,13 @@ class _PostWritePageState extends State<PostWritePage> {
           ElevatedButton(
             onPressed: () async {
               var url = Uri.parse("$newAraDefaultUrl/api/articles/");
-              var headers = {'Content-Type': 'application/json', 'Cookie':userProvider.getCookiesToString()};
+              var headers = {
+                'Content-Type': 'application/json',
+                'Cookie': userProvider.getCookiesToString()
+              };
 
               var requestBody = jsonEncode({
-                'title': 'post 테스트 11:16',
+                'title': 'post 테스트 11:18',
                 'content':
                     '<p><img src="https://sparcs-newara-dev.s3.amazonaws.com/files/%E1%84%89%E1%85%B3%E1%84%8F%E1%85%B3%E1%84%85%E1%85%B5%E1%86%AB%E1%84%89%E1%85%A3%E1%86%BA_2023-05-24_%E1%84%8B%E1%85%A9%E1%84%8C%E1%85%A5%E1%86%AB_6.01.21.png" width="500" data-attachment="170"></p>',
                 'attachments': [170],
@@ -94,42 +99,33 @@ class _PostWritePageState extends State<PostWritePage> {
                 print('Response: ${response.body}');
               }
             },
-            child: Text("나야"),
+            child: Text("게시물 등록 테스트"),
           ),
           MaterialButton(
             onPressed: () async {
               if (selectedImage != null) {
-                var request = http.MultipartRequest(
-                    'POST', Uri.parse('$newAraDefaultUrl/attachments'));
+                var filePath = pickedFile.path;
+                var filename = filePath.split("/").last;
+                var formData = FormData.fromMap({
+                  "file":
+                      await MultipartFile.fromFile(filePath, filename: filename)
+                });
+                Dio dio = new Dio();
+                dio.options.headers['Cookie'] =
+                    userProvider.getCookiesToString();
+                try {
+                  var response = await dio.post(
+                      '$newAraDefaultUrl/api/attachments/',
+                      data: formData);
 
-                request.files.add(await http.MultipartFile.fromPath(
-                  'image',
-                  selectedImage!.path,
-                ));
-                request.headers['Cookie'] = userProvider.getCookiesToString();
+                  // Request successful
 
-                File imageFile = File(selectedImage!.path);
-                var attachment = {
-                  'size': imageFile.lengthSync(),
-                  'mimetype': 'image/jpeg',
-                };
-
-                // Convert the attachment object to JSON
-                var attachmentJson = jsonEncode(attachment);
-
-                // Add the attachment JSON to the request body
-                request.fields['data'] = attachmentJson;
-
-                var response = await request.send();
-                var responseData = await response.stream.bytesToString();
-                if (response.statusCode == 200) {
-                  // Image uploaded successfully
-                  print('Image uploaded');
-                  print('Response: $responseData');
-                } else {
-                  // Image upload failed
-                  print(
-                      'Image upload failed ${response.statusCode} ${responseData}');
+                  print('Post request successful');
+                  print('Response: $response.data');
+                } catch (error) {
+                  // Request failed
+                  print('Post request failed with status code $error');
+                  //  print('Response: $responseData');
                 }
               }
             },
@@ -316,7 +312,7 @@ class _PostWritePageState extends State<PostWritePage> {
                       fontWeight: FontWeight.w500,
                     ),
                   ),
-                  Placeholder(),
+                  if (selectedImage != null) Image.file(selectedImage!),
                 ],
               ),
             ),
@@ -329,7 +325,7 @@ class _PostWritePageState extends State<PostWritePage> {
                     children: [
                       InkWell(
                         onTap: () async {
-                          final pickedFile = await ImagePicker()
+                          pickedFile = await ImagePicker()
                               .pickImage(source: ImageSource.gallery);
                           if (pickedFile != null) {
                             setState(() {
