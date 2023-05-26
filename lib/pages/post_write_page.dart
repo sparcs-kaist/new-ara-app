@@ -71,59 +71,26 @@ class _PostWritePageState extends State<PostWritePage> {
         actions: [
           ElevatedButton(
             onPressed: () async {
-/*
-              Dio dio =Dio();
-              dio.options.headers['Cookie']=userProvider.getCookiesToString();
+              Dio dio = Dio();
+              dio.options.headers['Cookie'] = userProvider.getCookiesToString();
               try {
                 var response = await dio.post(
                   '$newAraDefaultUrl/api/articles/',
                   data: {
                     'title': 'post 테스트 03:11',
                     'content':
-                    '<p><img src="https://sparcs-newara-dev.s3.amazonaws.com/files/%E1%84%89%E1%85%B3%E1%84%8F%E1%85%B3%E1%84%85%E1%85%B5%E1%86%AB%E1%84%89%E1%85%A3%E1%86%BA_2023-05-24_%E1%84%8B%E1%85%A9%E1%84%8C%E1%85%A5%E1%86%AB_6.01.21.png" width="500" data-attachment="170"></p>',
+                        '<p><img src="https://sparcs-newara-dev.s3.amazonaws.com/files/%E1%84%89%E1%85%B3%E1%84%8F%E1%85%B3%E1%84%85%E1%85%B5%E1%86%AB%E1%84%89%E1%85%A3%E1%86%BA_2023-05-24_%E1%84%8B%E1%85%A9%E1%84%8C%E1%85%A5%E1%86%AB_6.01.21.png" width="500" data-attachment="170"></p>',
                     'attachments': [170],
                     'parent_topic': '',
                     'is_content_sexual': false,
                     'is_content_social': false,
                     'parent_board': 2,
+                    'name_type': 'REGULAR'
                   },
                 );
-
                 debugPrint('Response data: ${response.data}');
               } catch (e) {
                 debugPrint('Error: $e');
-              }
-
-*/
-              var url = Uri.parse("$newAraDefaultUrl/api/articles/");
-              var headers = {
-                'Content-Type': 'application/json',
-                'Cookie': userProvider.getCookiesToString()
-              };
-
-              var requestBody = jsonEncode({
-                'title': 'post 테스트 03:16',
-                'content':
-                    '<p></p>',
-                'attachments': [187],
-                'parent_topic': '',
-                'is_content_sexual': false,
-                'is_content_social': false,
-                'parent_board': 2,
-              });
-
-              var response =
-                  await http.post(url, headers: headers, body: requestBody);
-
-              if (response.statusCode == 200) {
-                // Request successful
-                print('Post request successful');
-                print('Response: ${response.body}');
-              } else {
-                // Request failed
-                print(
-                    'Post request failed with status code ${response.statusCode}');
-                print('Response: ${response.body}');
               }
             },
             child: Text("게시물 등록 테스트"),
