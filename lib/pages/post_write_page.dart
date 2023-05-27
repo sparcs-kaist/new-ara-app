@@ -8,9 +8,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:new_ara_app/constants/colors_info.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
 
 import '../providers/user_provider.dart';
+import 'package:path/path.dart' as path;
+import 'package:path_provider/path_provider.dart';
 
 class PostWritePage extends StatefulWidget {
   const PostWritePage({Key? key}) : super(key: key);
@@ -24,12 +27,12 @@ enum FileType {
   Other,
 }
 
-class FileFormat {
+class AttachmentsFormat {
   FileType fileType;
   bool isNewFile;
   String? filePath;
   Map<String, dynamic>? json;
-  FileFormat({
+  AttachmentsFormat({
     required this.fileType,
     required this.isNewFile,
     this.filePath,
@@ -39,20 +42,107 @@ class FileFormat {
 
 class _PostWritePageState extends State<PostWritePage> {
   List<bool?> selectedCheckboxes = [true, false, false];
-  bool fileMenuBarSelected = true;
-  bool selected = true;
+  bool isFileMenuBarSelected = false;
   String? _chosenBoardValue = "학생 단체";
   String? _chosenTopicValue = "학생 단체";
   File? imagePickerFile;
   File? filePickerFile;
   var imagePickerResult;
   FilePickerResult? filePickerResult;
+  
+  List<AttachmentsFormat> attachmentsList = [];
 
-  List<FileFormat> filesInPost = [];
+  late String _localPath;
+  late bool _permissionReady;
+  late TargetPlatform? platform;  
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    if (Platform.isAndroid) {
+      platform = TargetPlatform.android;
+    } else {
+      platform = TargetPlatform.iOS;
+    }
+  }
+  Future<bool> _checkPermission() async {
+    if (platform == TargetPlatform.android) {
+      final status = await Permission.storage.status;
+      debugPrint("Android");
+      if (status != PermissionStatus.granted) {
+        debugPrint("not granted");
+        final result = await Permission.storage.request();
+        if (result == PermissionStatus.granted) {
+          return true;
+        }
+        debugPrint("not granted again");
+      } else {
+        return true;
+      }
+    } else {
+      return true;
+    }
+    return false;
+  }
+   Future<String?> _findLocalPath() async {
+    if (platform == TargetPlatform.android) {
+      return "/sdcard/download/";
+    } else {
+      var directory = await getApplicationDocumentsDirectory();
+      return directory.path + Platform.pathSeparator + 'Download';
+    }
+  }
+  
+  Future<void> _prepareSaveDir() async {
+    _localPath = (await _findLocalPath())!;
+
+    print(_localPath);
+    final savedDir = Directory(_localPath);
+    bool hasExisted = await savedDir.exists();
+    if (!hasExisted) {
+      savedDir.create();
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     var userProvider = context.watch<UserProvider>();
+
+    Future<void> _filePick() async {
+      filePickerResult = await FilePicker.platform.pickFiles();
+      if (filePickerResult != null) {
+        debugPrint(filePickerResult!.files.single.path!);
+        setState(() {
+          isFileMenuBarSelected = true;
+          attachmentsList.add(AttachmentsFormat(fileType: FileType.Other, isNewFile: true, filePath: filePickerResult!.files.single.path!));
+        });
+      }
+    }
+    Future<void> _imagePick()async{
+      imagePickerResult = await ImagePicker().pickImage(source: ImageSource.gallery);
+      if (imagePickerResult != null) {
+        debugPrint(imagePickerResult.path);
+        setState(() {
+          imagePickerFile =File(imagePickerResult.path);
+        });
+      }
+    }
+
+    String formatBytes(int bytes) {
+      if (bytes < 1024) {
+        return '$bytes B'; // 바이트 단위로 표시
+      } else if (bytes < 1024 * 1024) {
+        double kb = bytes / 1024;
+        return '${kb.toStringAsFixed(2)} KB'; // 킬로바이트(KB) 단위로 표시
+      } else if (bytes < 1024 * 1024 * 1024) {
+        double mb = bytes / (1024 * 1024);
+        return '${mb.toStringAsFixed(2)} MB'; // 메가바이트(MB) 단위로 표시
+      } else {
+        double gb = bytes / (1024 * 1024 * 1024);
+        return '${gb.toStringAsFixed(2)} GB'; // 기가바이트(GB) 단위로 표시
+      }
+    }
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
@@ -99,8 +189,7 @@ class _PostWritePageState extends State<PostWritePage> {
                   '$newAraDefaultUrl/api/articles/',
                   data: {
                     'title': 'post 테스트 03:11',
-                    'content':
-                        '<p><img src="https://sparcs-newara-dev.s3.amazonaws.com/files/%E1%84%89%E1%85%B3%E1%84%8F%E1%85%B3%E1%84%85%E1%85%B5%E1%86%AB%E1%84%89%E1%85%A3%E1%86%BA_2023-05-24_%E1%84%8B%E1%85%A9%E1%84%8C%E1%85%A5%E1%86%AB_6.01.21.png" width="500" data-attachment="170"></p>',
+                    'content': '<p><img src="https://sparcs-newara-dev.s3.amazonaws.com/files/%E1%84%89%E1%85%B3%E1%84%8F%E1%85%B3%E1%84%85%E1%85%B5%E1%86%AB%E1%84%89%E1%85%A3%E1%86%BA_2023-05-24_%E1%84%8B%E1%85%A9%E1%84%8C%E1%85%A5%E1%86%AB_6.01.21.png" width="500" data-attachment="170"></p>',
                     'attachments': [170],
                     'parent_topic': '',
                     'is_content_sexual': false,
@@ -114,24 +203,18 @@ class _PostWritePageState extends State<PostWritePage> {
                 debugPrint('Error: $e');
               }
             },
-            child: Text("게시물 등록 테스트"),
+            child: Text("게시물 내용"),
           ),
           MaterialButton(
             onPressed: () async {
               if (imagePickerFile != null) {
                 var filePath = imagePickerResult.path;
                 var filename = filePath.split("/").last;
-                var formData = FormData.fromMap({
-                  "file":
-                      await MultipartFile.fromFile(filePath, filename: filename)
-                });
+                var formData = FormData.fromMap({"file": await MultipartFile.fromFile(filePath, filename: filename)});
                 Dio dio = Dio();
-                dio.options.headers['Cookie'] =
-                    userProvider.getCookiesToString();
+                dio.options.headers['Cookie'] = userProvider.getCookiesToString();
                 try {
-                  var response = await dio.post(
-                      '$newAraDefaultUrl/api/attachments/',
-                      data: formData);
+                  var response = await dio.post('$newAraDefaultUrl/api/attachments/', data: formData);
                   print('Post request successful');
                   print('Response: $response.data');
                 } catch (error) {
@@ -165,30 +248,46 @@ class _PostWritePageState extends State<PostWritePage> {
                 debugPrint("!null");
                 // Create dio
                 var dio = Dio();
-                dio.options.headers['Cookie'] =
-                    userProvider.getCookiesToString();
+                dio.options.headers['Cookie'] = userProvider.getCookiesToString();
 
                 // Create FormData
                 var formData = FormData.fromMap({
-                  "file": await MultipartFile.fromFile(filePickerFile!.path,
-                      filename: filePickerFile!.path
-                          .split('/')
-                          .last), // You may need to replace '/' with '\\' if you're using Windows.
+                  "file": await MultipartFile.fromFile(filePickerFile!.path, filename: filePickerFile!.path.split('/').last), // You may need to replace '/' with '\\' if you're using Windows.
                 });
 
                 // Post data with dio
                 try {
-                  var response = await dio.post(
-                      "$newAraDefaultUrl/api/attachments/",
-                      data: formData);
+                  var response = await dio.post("$newAraDefaultUrl/api/attachments/", data: formData);
                   print(response.data);
                 } catch (error) {
                   debugPrint("$error");
                 }
               }
             },
-            child: Text("파일 테스트"),
-          )
+            child: Text("파일"),
+          ),
+          ElevatedButton(
+            onPressed: () async {
+                  final String fileUrl = "https://sparcs-newara-dev.s3.amazonaws.com/files/lizard-7938887_1280_eAHShfM.webp";
+
+                
+                  _permissionReady = await _checkPermission();
+                  debugPrint("Click");
+          if (_permissionReady) {
+            await _prepareSaveDir();
+            debugPrint("Downloading");
+            try {
+              await Dio().download(fileUrl,
+                  _localPath + "/" + "filename.jpg");
+              debugPrint("Download Completed.");
+            } catch (e) {
+              debugPrint("Download Failed.\n\n" + e.toString());
+            }
+          }
+            },
+            child: Text("파일 다운"),
+          ),
+          
         ],
       ),
       body: SafeArea(
@@ -216,8 +315,7 @@ class _PostWritePageState extends State<PostWritePage> {
                           //isExpanded: true,
                           value: _chosenBoardValue,
                           style: TextStyle(color: Colors.red),
-                          items: <String>['학생 단체', '구인구직', '중고거래', '교내업체피드백']
-                              .map<DropdownMenuItem<String>>((String value) {
+                          items: <String>['학생 단체', '구인구직', '중고거래', '교내업체피드백'].map<DropdownMenuItem<String>>((String value) {
                             return DropdownMenuItem<String>(
                               value: value,
                               child: Padding(
@@ -225,9 +323,7 @@ class _PostWritePageState extends State<PostWritePage> {
                                 child: Text(
                                   value,
                                   style: TextStyle(
-                                    color: value == "말머리 없음"
-                                        ? Color(0xFFBBBBBB)
-                                        : ColorsInfo.newara,
+                                    color: value == "말머리 없음" ? Color(0xFFBBBBBB) : ColorsInfo.newara,
                                     fontWeight: FontWeight.w500,
                                     fontSize: 16,
                                   ),
@@ -264,13 +360,7 @@ class _PostWritePageState extends State<PostWritePage> {
                           //isExpanded: true,
                           value: _chosenTopicValue,
                           style: TextStyle(color: Colors.red),
-                          items: <String>[
-                            '말머리 없음',
-                            '학생 단체',
-                            '구인구직',
-                            '중고거래',
-                            '교내업체피드백'
-                          ].map<DropdownMenuItem<String>>((String value) {
+                          items: <String>['말머리 없음', '학생 단체', '구인구직', '중고거래', '교내업체피드백'].map<DropdownMenuItem<String>>((String value) {
                             return DropdownMenuItem<String>(
                               value: value,
                               child: Padding(
@@ -278,9 +368,7 @@ class _PostWritePageState extends State<PostWritePage> {
                                 child: Text(
                                   value,
                                   style: TextStyle(
-                                    color: value == "말머리 없음"
-                                        ? Color(0xFFBBBBBB)
-                                        : ColorsInfo.newara,
+                                    color: value == "말머리 없음" ? Color(0xFFBBBBBB) : ColorsInfo.newara,
                                     fontWeight: FontWeight.w500,
                                     fontSize: 16,
                                   ),
@@ -318,10 +406,7 @@ class _PostWritePageState extends State<PostWritePage> {
                     ),
                     decoration: InputDecoration(
                       hintText: "제목을 입력하세요",
-                      hintStyle: TextStyle(
-                          fontSize: 22,
-                          color: Color(0xFFBBBBBB),
-                          fontWeight: FontWeight.w700),
+                      hintStyle: TextStyle(fontSize: 22, color: Color(0xFFBBBBBB), fontWeight: FontWeight.w700),
 
                       filled: true,
                       fillColor: Colors.white,
@@ -359,150 +444,202 @@ class _PostWritePageState extends State<PostWritePage> {
                 ],
               ),
             ),
-            SizedBox(
-              height: 500,
-              //하단
+            Container(
               child: Column(
                 children: [
-                  // GestureDetector(
-                  //   onTap: () {
-                  //     setState(() {
-                  //       selected = !selected;
-                  //     });
-                  //   },
-                  //   child: AnimatedSize(
-                  //  //   vsync: this,
-                  //     duration: Duration(seconds: 10),
-                  //     alignment: AlignmentDirectional.topCenter,
-                  //     child: Container(
-                  //       color: selected ? Colors.red : Colors.blue,
-                  //       child: selected
-                  //           ? Column(
-                  //               children: List.generate(
-                  //                   3, (i) => FlutterLogo(size: 75)),
-                  //             )
-                  //           : FlutterLogo(size: 75),
-                  //     ),
-                  //   ),
-                  // ),
-                  AnimatedSize(duration: Duration(milliseconds: 100),
-                  alignment: AlignmentDirectional.topCenter,
-                    child: Column(
+                  if (attachmentsList.length == 0)
+                    Row(
                       children: [
+                        // InkWell(
+                        //   onTap: () async {
+                        //     imagePickerResult = await ImagePicker()
+                        //         .pickImage(source: ImageSource.gallery);
+                        //     if (imagePickerResult != null) {
+                        //       setState(() {
+                        //         imagePickerFile =
+                        //             File(imagePickerResult.path);
+                        //       });
+                        //     }
+                        //   },
+                        //   child: Text("첨부파일 추가"),
+                        // ),
                         Row(
                           children: [
-                            Text("첨부파일 1"),
+                            SizedBox(
+                              width: 10,
+                            ),
                             InkWell(
-                              onTap: (){
-                                setState(() {
-                                  fileMenuBarSelected=!fileMenuBarSelected;
-                                });
-
-                              },
-                              child: Container(
-                                width: 10,
-                                height: 10,
-                                color: Colors.red,
+                              onTap: _filePick,
+                              child: Row(
+                                children: [
+                                  SvgPicture.asset(
+                                    'assets/icons/clip.svg',
+                                    color: Color(0xFF636363),
+                                    width: 34,
+                                    height: 34,
+                                  ),
+                                  Text(
+                                    "첨부파일 추가",
+                                    style: TextStyle(fontWeight: FontWeight.w500, fontSize: 16, color: Color(0xFF636363)),
+                                  ),
+                                ],
                               ),
-                            )
+                            ),
                           ],
                         ),
-                        if(!fileMenuBarSelected) ...[
-                          Container(
-                            height: 44,
-                            child: Row(
-                              children: [
-                                Text("2023년 회계감사.pdf"),
-                              ],
-                            ),
-                          ),
-                          Container(
-                            height: 44,
-                          ),
-                        ],
                       ],
-                    ),
-
-                  ),
-                  AnimatedContainer(
-                    width: 10000,
-                    height: fileMenuBarSelected ? 100.0 : 200.0,
-                    alignment: fileMenuBarSelected
-                        ? Alignment.center
-                        : AlignmentDirectional.topCenter,
-                    duration: const Duration(milliseconds: 1000),
-                    curve: Curves.fastOutSlowIn,
-                    child: Align(
-                      alignment: Alignment.centerLeft,
+                    )
+                  else
+                    AnimatedSize(
+                      duration: Duration(milliseconds: 100),
+                      alignment: AlignmentDirectional.topCenter,
                       child: Column(
                         children: [
-                          InkWell(
-                            onTap: () {
-                              setState(() {
-                                fileMenuBarSelected = !fileMenuBarSelected;
-                              });
-                            },
-                            child: Container(
-                              width: 20,
-                              height: 20,
-                              color: Colors.blue,
-                            ),
+                          Row(
+                            children: [
+                              SizedBox(
+                                width: 20,
+                              ),
+                              Text(
+                                "첨부파일",
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                              SizedBox(
+                                width: 8,
+                              ),
+                              Text(
+                                attachmentsList.length.toString(),
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w500,
+                                  color: ColorsInfo.newara,
+                                ),
+                              ),
+                              SizedBox(
+                                width: 5,
+                              ),
+                              InkWell(
+                                onTap: () {
+                                  setState(() {
+                                    isFileMenuBarSelected = !isFileMenuBarSelected;
+                                  });
+                                },
+                                child: SvgPicture.asset(
+                                  'assets/icons/chevron_down.svg',
+                                  width: 20,
+                                  height: 20,
+                                  color: Colors.red,
+                                ),
+                              ),
+                              Spacer(),
+                              InkWell(
+                                onTap: () => _filePick(),
+                                child: SvgPicture.asset(
+                                  'assets/icons/add.svg',
+                                  width: 34,
+                                  height: 34,
+                                  color: Color(0xFFED3A3A),
+                                ),
+                              ),
+                              SizedBox(
+                                width: 14,
+                              ),
+                            ],
                           ),
-                          const FlutterLogo(size: 75),
-                          if (fileMenuBarSelected == false)
-                            Flexible(child: FlutterLogo(size: 75))
+                          if (isFileMenuBarSelected) ...[
+                            Padding(
+                              padding: const EdgeInsets.symmetric(horizontal: 15),
+                              child: Column(
+                                children: [
+                                  SizedBox(
+                                    height: 10,
+                                  ),
+                                  ListView.builder(
+                                    shrinkWrap: true,
+                                    itemCount: attachmentsList.length,
+                                    itemBuilder: (context, index) {
+                                      return Column(
+                                        children: [
+                                          if (index != 0)
+                                            SizedBox(
+                                              height: 5,
+                                            ),
+                                          Container(
+                                            height: 44,
+                                            decoration: BoxDecoration(
+                                              border: Border.all(
+                                                color: Color(0xFFF0F0F0), // #F0F0F0 색상
+                                                width: 1, // 테두리 두께 1픽셀
+                                              ),
+                                              borderRadius: BorderRadius.circular(15), // 반지름 15
+                                            ),
+                                            child: Row(
+                                              children: [
+                                                // SvgPicture.asset(
+                                                //   'assets/icons/pdf.svg',
+                                                //   width: 16,
+                                                //   height: 16,
+                                                //   color: Colors.black,
+                                                // ),
+                                                SizedBox(
+                                                  width: 6,
+                                                ),
+                                                SvgPicture.asset(
+                                                  'assets/icons/pdf.svg',
+                                                  width: 30,
+                                                  height: 30,
+                                                  color: Colors.black,
+                                                ),
+                                                SizedBox(
+                                                  width: 3,
+                                                ),
+                                                Expanded(
+                                                  child: Text(
+                                                    path.basename(attachmentsList[index].filePath!),
+                                                  ),
+                                                ),
+                                                SizedBox(
+                                                  width: 3,
+                                                ),
+                                                Text(
+                                                  formatBytes(File(attachmentsList[index].filePath!).lengthSync()),
+                                                  style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500, color: Color(0xFFBBBBBB)),
+                                                ),
+                                                InkWell(
+                                                  onTap: (){
+                                                    setState((){
+                                                      attachmentsList.removeAt(index);
+                                                    });
+                                                  },
+                                                  child: SvgPicture.asset(
+                                                    'assets/icons/close.svg',
+                                                    width: 30,
+                                                    height: 30,
+                                                    color: Color(0xFFBBBBBB),
+                                                  ),
+                                                ),
+                                                SizedBox(
+                                                  width: 8.52,
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        ],
+                                      );
+                                    },
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
                         ],
                       ),
                     ),
-                  ),
-                  Row(
-                    children: [
-                      InkWell(
-                        onTap: () async {
-                          imagePickerResult = await ImagePicker()
-                              .pickImage(source: ImageSource.gallery);
-                          if (imagePickerResult != null) {
-                            setState(() {
-                              imagePickerFile = File(imagePickerResult.path);
-                            });
-                          }
-                        },
-                        child: Text("첨부파일 추가"),
-                      ),
-                      Row(
-                        children: [
-                          SizedBox(
-                            width: 10,
-                          ),
-                          InkWell(
-                            onTap: () async {
-                              filePickerResult =
-                                  await FilePicker.platform.pickFiles();
-                              if (filePickerResult != null) {
-                                setState(() {
-                                  filesInPost.add(FileFormat(
-                                      fileType: FileType.Other,
-                                      isNewFile: true,
-                                      filePath: filePickerResult!
-                                          .files.single.path!));
-                                });
-                              }
-                            },
-                            child: Row(
-                              children: [
-                                SvgPicture.asset(
-                                  'assets/icons/clip.svg',
-                                  color: Color(0xFF636363),
-                                  width: 34,
-                                  height: 34,
-                                ),
-                                Text("첨부 파일 추가"),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
+                  SizedBox(
+                    height: 15,
                   ),
                   Row(
                     crossAxisAlignment: CrossAxisAlignment.end,
@@ -517,13 +654,18 @@ class _PostWritePageState extends State<PostWritePage> {
                           });
                         },
                         child: Container(
-                          height: 20.0,
-                          width: 20.0,
+                          width: 20,
+                          height: 20,
                           decoration: BoxDecoration(
-                            color: selectedCheckboxes[0]!
-                                ? ColorsInfo.newara
-                                : Color(0xFFF0F0F0),
+                            color: selectedCheckboxes[0]! ? ColorsInfo.newara : Color(0xFFF0F0F0),
                             borderRadius: BorderRadius.circular(5.0),
+                          ),
+                          alignment: Alignment.center,
+                          child: SvgPicture.asset(
+                            'assets/icons/check.svg',
+                            width: 16,
+                            height: 16,
+                            color: Colors.white,
                           ),
                         ),
                       ),
@@ -535,9 +677,7 @@ class _PostWritePageState extends State<PostWritePage> {
                         style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w500,
-                          color: selectedCheckboxes[0]!
-                              ? ColorsInfo.newara
-                              : Color(0xFFF0F0F0),
+                          color: selectedCheckboxes[0]! ? ColorsInfo.newara : Color(0xFFBBBBBB),
                         ),
                       ),
                       SizedBox(
@@ -550,16 +690,17 @@ class _PostWritePageState extends State<PostWritePage> {
                           });
                         },
                         child: Container(
-                          height: 20.0,
-                          width: 20.0,
+                          width: 20,
+                          height: 20,
                           decoration: BoxDecoration(
-                            color: selectedCheckboxes[1]!
-                                ? ColorsInfo.newara
-                                : Color(0xFFF0F0F0),
+                            color: selectedCheckboxes[1]! ? ColorsInfo.newara : Color(0xFFF0F0F0),
                             borderRadius: BorderRadius.circular(5.0),
                           ),
-                          child: Icon(
-                            Icons.check,
+                          alignment: Alignment.center,
+                          child: SvgPicture.asset(
+                            'assets/icons/check.svg',
+                            width: 16,
+                            height: 16,
                             color: Colors.white,
                           ),
                         ),
@@ -572,9 +713,7 @@ class _PostWritePageState extends State<PostWritePage> {
                         style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w500,
-                          color: selectedCheckboxes[1]!
-                              ? ColorsInfo.newara
-                              : Color(0xFFF0F0F0),
+                          color: selectedCheckboxes[1]! ? ColorsInfo.newara : Color(0xFFBBBBBB),
                         ),
                       ),
                       SizedBox(
@@ -587,13 +726,18 @@ class _PostWritePageState extends State<PostWritePage> {
                           });
                         },
                         child: Container(
-                          height: 20.0,
-                          width: 20.0,
+                          width: 20,
+                          height: 20,
                           decoration: BoxDecoration(
-                            color: selectedCheckboxes[2]!
-                                ? ColorsInfo.newara
-                                : Color(0xFFF0F0F0),
+                            color: selectedCheckboxes[2]! ? ColorsInfo.newara : Color(0xFFF0F0F0),
                             borderRadius: BorderRadius.circular(5.0),
+                          ),
+                          alignment: Alignment.center,
+                          child: SvgPicture.asset(
+                            'assets/icons/check.svg',
+                            width: 16,
+                            height: 16,
+                            color: Colors.white,
                           ),
                         ),
                       ),
@@ -605,10 +749,24 @@ class _PostWritePageState extends State<PostWritePage> {
                         style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w500,
-                          color: selectedCheckboxes[2]!
-                              ? ColorsInfo.newara
-                              : Color(0xFFF0F0F0),
+                          color: selectedCheckboxes[2]! ? ColorsInfo.newara : Color(0xFFBBBBBB),
                         ),
+                      ),
+                      Spacer(),
+                      GestureDetector(
+                        onTap: _imagePick,
+                        child: Text(
+                          "이용약관",
+                          style: TextStyle(
+                            decoration: TextDecoration.underline,
+                            fontSize: 16,
+                            fontWeight: FontWeight.w500,
+                            color: Color(0xFFBBBBBB),
+                          ),
+                        ),
+                      ),
+                      SizedBox(
+                        width: 20,
                       ),
                     ],
                   ),
@@ -623,4 +781,6 @@ class _PostWritePageState extends State<PostWritePage> {
       ),
     );
   }
+
+  
 }

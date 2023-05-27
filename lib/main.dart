@@ -7,6 +7,7 @@ import 'package:provider/provider.dart';
 import 'package:new_ara_app/pages/new_ara_home_page.dart';
 import 'package:new_ara_app/pages/login_page.dart';
 import 'package:new_ara_app/providers/user_provider.dart';
+
 final supportedLocales = [
   const Locale('en'),
   const Locale('ko'),
