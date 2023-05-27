@@ -56,20 +56,29 @@ class _PostPreviewState extends State<PostPreview> {
               const SizedBox(
                 width: 5,
               ),
-              SizedBox(
-                height: 14.22,
-                child: widget.json["attachment_type"] == "IMAGE"
-                    ? SvgPicture.asset(
-                        'assets/icons/image.svg',
-                        fit: BoxFit.fitHeight,
+              widget.json["attachment_type"] == "BOTH" 
+                  ? Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      SvgPicture.asset(
+                        'assets/icons/image_post_preview.svg',
+                      ),
+                      SizedBox(
+                        width: 9,
+                      ),
+                      SvgPicture.asset(
+                        'assets/icons/clip_post_preview.svg', 
+                      ),
+                    ],
+                  ):widget.json["attachment_type"] == "IMAGE"
+                  ? SvgPicture.asset(
+                        'assets/icons/image_post_preview.svg',
                       )
-                    : widget.json["attachment_type"] == "NON_IMAGE"
-                        ? SvgPicture.asset(
-                            'assets/icons/image.svg',
-                            fit: BoxFit.fitHeight,
-                          )
-                        : Container(),
-              )
+                  : widget.json["attachment_type"] == "NON_IMAGE"
+                      ? SvgPicture.asset(
+                        'assets/icons/clip_post_preview.svg', 
+                      )
+                      : Container()
             ],
             //attachment_type
           ),
