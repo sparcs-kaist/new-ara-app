@@ -19,15 +19,36 @@ class PostWritePage extends StatefulWidget {
   State<PostWritePage> createState() => _PostWritePageState();
 }
 
+enum FileType {
+  Image,
+  Other,
+}
+
+class FileFormat {
+  FileType fileType;
+  bool isNewFile;
+  String? filePath;
+  Map<String, dynamic>? json;
+  FileFormat({
+    required this.fileType,
+    required this.isNewFile,
+    this.filePath,
+    this.json,
+  });
+}
+
 class _PostWritePageState extends State<PostWritePage> {
   List<bool?> selectedCheckboxes = [true, false, false];
-  bool? isChecked = true;
+  bool fileMenuBarSelected = true;
+  bool selected = true;
   String? _chosenBoardValue = "학생 단체";
   String? _chosenTopicValue = "학생 단체";
   File? imagePickerFile;
   File? filePickerFile;
   var imagePickerResult;
   FilePickerResult? filePickerResult;
+
+  List<FileFormat> filesInPost = [];
 
   @override
   Widget build(BuildContext context) {
@@ -287,10 +308,10 @@ class _PostWritePageState extends State<PostWritePage> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  TextField(
+                  const TextField(
                     minLines: 1,
                     maxLines: 1,
-                    style: const TextStyle(
+                    style: TextStyle(
                       height: 1,
                       fontSize: 22,
                       fontWeight: FontWeight.w700,
@@ -310,13 +331,13 @@ class _PostWritePageState extends State<PostWritePage> {
                       //     10.0, 10.0, 10.0, 10.0), // 모서리를 둥글게 설정
                       enabledBorder: OutlineInputBorder(
                         // borderRadius: BorderRadius.circular(10.0),
-                        borderSide: const BorderSide(
+                        borderSide: BorderSide(
                           color: Colors.transparent, // 테두리 색상 설정
                         ), // 모서리를 둥글게 설정
                       ),
                       focusedBorder: OutlineInputBorder(
                         //  borderRadius: BorderRadius.circular(10.0),
-                        borderSide: const BorderSide(
+                        borderSide: BorderSide(
                           color: Colors.transparent, // 테두리 색상 설정
                         ), // 모서리를 둥글게 설정
                       ),
@@ -339,10 +360,101 @@ class _PostWritePageState extends State<PostWritePage> {
               ),
             ),
             SizedBox(
-              height: 40,
+              height: 500,
               //하단
               child: Column(
                 children: [
+                  // GestureDetector(
+                  //   onTap: () {
+                  //     setState(() {
+                  //       selected = !selected;
+                  //     });
+                  //   },
+                  //   child: AnimatedSize(
+                  //  //   vsync: this,
+                  //     duration: Duration(seconds: 10),
+                  //     alignment: AlignmentDirectional.topCenter,
+                  //     child: Container(
+                  //       color: selected ? Colors.red : Colors.blue,
+                  //       child: selected
+                  //           ? Column(
+                  //               children: List.generate(
+                  //                   3, (i) => FlutterLogo(size: 75)),
+                  //             )
+                  //           : FlutterLogo(size: 75),
+                  //     ),
+                  //   ),
+                  // ),
+                  AnimatedSize(duration: Duration(milliseconds: 100),
+                  alignment: AlignmentDirectional.topCenter,
+                    child: Column(
+                      children: [
+                        Row(
+                          children: [
+                            Text("첨부파일 1"),
+                            InkWell(
+                              onTap: (){
+                                setState(() {
+                                  fileMenuBarSelected=!fileMenuBarSelected;
+                                });
+
+                              },
+                              child: Container(
+                                width: 10,
+                                height: 10,
+                                color: Colors.red,
+                              ),
+                            )
+                          ],
+                        ),
+                        if(!fileMenuBarSelected) ...[
+                          Container(
+                            height: 44,
+                            child: Row(
+                              children: [
+                                Text("2023년 회계감사.pdf"),
+                              ],
+                            ),
+                          ),
+                          Container(
+                            height: 44,
+                          ),
+                        ],
+                      ],
+                    ),
+
+                  ),
+                  AnimatedContainer(
+                    width: 10000,
+                    height: fileMenuBarSelected ? 100.0 : 200.0,
+                    alignment: fileMenuBarSelected
+                        ? Alignment.center
+                        : AlignmentDirectional.topCenter,
+                    duration: const Duration(milliseconds: 1000),
+                    curve: Curves.fastOutSlowIn,
+                    child: Align(
+                      alignment: Alignment.centerLeft,
+                      child: Column(
+                        children: [
+                          InkWell(
+                            onTap: () {
+                              setState(() {
+                                fileMenuBarSelected = !fileMenuBarSelected;
+                              });
+                            },
+                            child: Container(
+                              width: 20,
+                              height: 20,
+                              color: Colors.blue,
+                            ),
+                          ),
+                          const FlutterLogo(size: 75),
+                          if (fileMenuBarSelected == false)
+                            Flexible(child: FlutterLogo(size: 75))
+                        ],
+                      ),
+                    ),
+                  ),
                   Row(
                     children: [
                       InkWell(
@@ -355,127 +467,154 @@ class _PostWritePageState extends State<PostWritePage> {
                             });
                           }
                         },
-                        child: Text("사진 파일 추가"),
+                        child: Text("첨부파일 추가"),
                       ),
-                      InkWell(
-                        onTap: () async {
-                          filePickerResult =
-                              await FilePicker.platform.pickFiles();
-                          setState(() {});
-                        },
-                        child: Text("첨부 파일 추가"),
+                      Row(
+                        children: [
+                          SizedBox(
+                            width: 10,
+                          ),
+                          InkWell(
+                            onTap: () async {
+                              filePickerResult =
+                                  await FilePicker.platform.pickFiles();
+                              if (filePickerResult != null) {
+                                setState(() {
+                                  filesInPost.add(FileFormat(
+                                      fileType: FileType.Other,
+                                      isNewFile: true,
+                                      filePath: filePickerResult!
+                                          .files.single.path!));
+                                });
+                              }
+                            },
+                            child: Row(
+                              children: [
+                                SvgPicture.asset(
+                                  'assets/icons/clip.svg',
+                                  color: Color(0xFF636363),
+                                  width: 34,
+                                  height: 34,
+                                ),
+                                Text("첨부 파일 추가"),
+                              ],
+                            ),
+                          ),
+                        ],
                       ),
                     ],
                   ),
-                  Expanded(
-                    child: Row(
-                      children: [
-                        SizedBox(
-                          width: 20,
-                        ),
-                        GestureDetector(
-                          onTap: () {
-                            setState(() {
-                              selectedCheckboxes[0] = !selectedCheckboxes[0]!;
-                            });
-                          },
-                          child: Container(
-                            height: 20.0,
-                            width: 20.0,
-                            decoration: BoxDecoration(
-                              color: selectedCheckboxes[0]!
-                                  ? ColorsInfo.newara
-                                  : Color(0xFFF0F0F0),
-                              borderRadius: BorderRadius.circular(5.0),
-                            ),
-                          ),
-                        ),
-                        SizedBox(
-                          width: 6,
-                        ),
-                        Text(
-                          "익명",
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w500,
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: [
+                      SizedBox(
+                        width: 20,
+                      ),
+                      GestureDetector(
+                        onTap: () {
+                          setState(() {
+                            selectedCheckboxes[0] = !selectedCheckboxes[0]!;
+                          });
+                        },
+                        child: Container(
+                          height: 20.0,
+                          width: 20.0,
+                          decoration: BoxDecoration(
                             color: selectedCheckboxes[0]!
                                 ? ColorsInfo.newara
                                 : Color(0xFFF0F0F0),
+                            borderRadius: BorderRadius.circular(5.0),
                           ),
                         ),
-                        SizedBox(
-                          width: 15,
+                      ),
+                      SizedBox(
+                        width: 6,
+                      ),
+                      Text(
+                        "익명",
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w500,
+                          color: selectedCheckboxes[0]!
+                              ? ColorsInfo.newara
+                              : Color(0xFFF0F0F0),
                         ),
-                        GestureDetector(
-                          onTap: () {
-                            setState(() {
-                              selectedCheckboxes[1] = !selectedCheckboxes[1]!;
-                            });
-                          },
-                          child: Container(
-                            height: 20.0,
-                            width: 20.0,
-                            decoration: BoxDecoration(
-                              color: selectedCheckboxes[1]!
-                                  ? ColorsInfo.newara
-                                  : Color(0xFFF0F0F0),
-                              borderRadius: BorderRadius.circular(5.0),
-                            ),
-                            child: Icon(
-                              Icons.check,
-                              color: Colors.white,
-                            ),
-                          ),
-                        ),
-                        SizedBox(
-                          width: 6,
-                        ),
-                        Text(
-                          "성인",
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w500,
+                      ),
+                      SizedBox(
+                        width: 15,
+                      ),
+                      GestureDetector(
+                        onTap: () {
+                          setState(() {
+                            selectedCheckboxes[1] = !selectedCheckboxes[1]!;
+                          });
+                        },
+                        child: Container(
+                          height: 20.0,
+                          width: 20.0,
+                          decoration: BoxDecoration(
                             color: selectedCheckboxes[1]!
                                 ? ColorsInfo.newara
                                 : Color(0xFFF0F0F0),
+                            borderRadius: BorderRadius.circular(5.0),
+                          ),
+                          child: Icon(
+                            Icons.check,
+                            color: Colors.white,
                           ),
                         ),
-                        SizedBox(
-                          width: 15,
+                      ),
+                      SizedBox(
+                        width: 6,
+                      ),
+                      Text(
+                        "성인",
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w500,
+                          color: selectedCheckboxes[1]!
+                              ? ColorsInfo.newara
+                              : Color(0xFFF0F0F0),
                         ),
-                        GestureDetector(
-                          onTap: () {
-                            setState(() {
-                              selectedCheckboxes[2] = !selectedCheckboxes[2]!;
-                            });
-                          },
-                          child: Container(
-                            height: 20.0,
-                            width: 20.0,
-                            decoration: BoxDecoration(
-                              color: selectedCheckboxes[2]!
-                                  ? ColorsInfo.newara
-                                  : Color(0xFFF0F0F0),
-                              borderRadius: BorderRadius.circular(5.0),
-                            ),
-                          ),
-                        ),
-                        SizedBox(
-                          width: 6,
-                        ),
-                        Text(
-                          "정치",
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w500,
+                      ),
+                      SizedBox(
+                        width: 15,
+                      ),
+                      GestureDetector(
+                        onTap: () {
+                          setState(() {
+                            selectedCheckboxes[2] = !selectedCheckboxes[2]!;
+                          });
+                        },
+                        child: Container(
+                          height: 20.0,
+                          width: 20.0,
+                          decoration: BoxDecoration(
                             color: selectedCheckboxes[2]!
                                 ? ColorsInfo.newara
                                 : Color(0xFFF0F0F0),
+                            borderRadius: BorderRadius.circular(5.0),
                           ),
                         ),
-                      ],
-                    ),
+                      ),
+                      SizedBox(
+                        width: 6,
+                      ),
+                      Text(
+                        "정치",
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w500,
+                          color: selectedCheckboxes[2]!
+                              ? ColorsInfo.newara
+                              : Color(0xFFF0F0F0),
+                        ),
+                      ),
+                    ],
                   ),
+                  SizedBox(
+                    height: 20,
+                  )
                 ],
               ),
             ),
