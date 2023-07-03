@@ -4,18 +4,19 @@ import 'package:new_ara_app/models/board_model.dart';
 import 'package:new_ara_app/models/public_user.dart';
 
 class ArticleListActionModel {
+  final dynamic parent_article;
   final int id; // ID
   final bool? is_hidden;
   final dynamic why_hidden;
   final bool? can_override_hidden;
-  final TopicModel? parent_topic;
-  final BoardModel? parent_board;
+  final Map<String, dynamic>? parent_topic;
+  final Map<String, dynamic>? parent_board;
   final String? title;
-  final PublicUserModel? created_by;
+  final Map<String, dynamic>? created_by;
   final String? read_status;
   final String? attachment_type;
-  final String? communication_article_status;
-  final String? days_left;
+  final dynamic communication_article_status;
+  final dynamic days_left;
   final String? created_at;
   final String? updated_at;
   final String? deleted_at;
@@ -33,6 +34,7 @@ class ArticleListActionModel {
   final String? hidden_at; // 숨긴 시간
 
   ArticleListActionModel({
+    this.parent_article,
     required this.id,
     this.is_hidden,
     this.why_hidden,
@@ -63,20 +65,15 @@ class ArticleListActionModel {
   });
 
   ArticleListActionModel.fromJson(Map<String, dynamic> json)
-      : id = json['id'],
+      : parent_article = json['parent_article'],
+        id = json['id'],
         is_hidden = json['is_hidden'],
         why_hidden = json['why_hidden'],
         can_override_hidden = json['can_override_hidden'],
-        parent_topic = json['parent_topic'] == null
-            ? null
-            : TopicModel.fromJson(json['parent_topic']),
-        parent_board = json['parent_board'] == null
-            ? null
-            : BoardModel.fromJson(json['parent_board']),
+        parent_topic = json['parent_topic'],
+        parent_board = json['parent_board'],
         title = json['title'],
-        created_by = json['created_by'] == null
-            ? null
-            : PublicUserModel.fromJson(json['created_by']),
+        created_by = json['created_by'],
         read_status = json['read_status'],
         attachment_type = json['attachment_type'],
         communication_article_status = json['communication_article_status'],
@@ -102,10 +99,10 @@ class ArticleListActionModel {
         'is_hidden': is_hidden,
         'why_hidden': why_hidden,
         'can_override_hidden': can_override_hidden,
-        'parent_topic': parent_topic!.toJson(),
-        'parent_board': parent_board!.toJson(),
+        'parent_topic': parent_topic,
+        'parent_board': parent_board,
         'title': title,
-        'created_by': created_by!.toJson(),
+        'created_by': created_by,
         'read_status': read_status,
         'attachment_type': attachment_type,
         'communication_article_status': communication_article_status,
