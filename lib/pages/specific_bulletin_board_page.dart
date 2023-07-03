@@ -18,70 +18,6 @@ class _SpecificBulletinBoardPageState extends State<SpecificBulletinBoardPage> {
   List<Map<String, dynamic>> postPreviewList = [];
   int currentPage = 1;
 
-  Map<String, dynamic> testJson = {
-    "id": 5689,
-    "is_hidden": false,
-    "why_hidden": [],
-    "can_override_hidden": null,
-    "parent_topic": null,
-    "parent_board": {
-      "id": 7,
-      "created_at": "2020-09-01T16:37:47.576955+09:00",
-      "updated_at": "2022-06-03T00:46:41.140645+09:00",
-      "deleted_at": "0001-01-01T08:28:00+08:28",
-      "slug": "talk",
-      "ko_name": "자유게시판",
-      "en_name": "Talk",
-      "ko_description": "자유게시판",
-      "en_description": "Talk",
-      "read_access_mask": 222,
-      "write_access_mask": 218,
-      "comment_access_mask": 254,
-      "is_readonly": false,
-      "is_hidden": false,
-      "name_type": 0,
-      "is_school_communication": false,
-      "group_id": 2,
-      "banner_image":
-          "https://sparcs-newara-dev.s3.amazonaws.com/board_banner_images/smalltalk-board-banner.jpg",
-      "ko_banner_description": "",
-      "en_banner_description": "",
-      "banner_url": ""
-    },
-    "title": "123",
-    "created_by": {
-      "id": 857,
-      "username": "abcbaa3c-d929-4092-af43-cdb9fabfca0d",
-      "profile": {
-        "picture":
-            "https://sparcs-newara-dev.s3.amazonaws.com/user_profiles/pictures/AF9AA945-6AC2-4C53-9D27-F1B1A3EF707B.jpeg",
-        "nickname": "열렬한 알파카",
-        "user": 857,
-        "is_official": false,
-        "is_school_admin": false
-      },
-      "is_blocked": false
-    },
-    "read_status": "N",
-    "attachment_type": "NONE",
-    "communication_article_status": null,
-    "days_left": null,
-    "created_at": "2023-05-11T23:17:31.450816+09:00",
-    "updated_at": "2023-05-12T11:48:24.620083+09:00",
-    "deleted_at": "0001-01-01T08:28:00+08:28",
-    "name_type": 0,
-    "is_content_sexual": false,
-    "is_content_social": false,
-    "hit_count": 2,
-    "comment_count": 0,
-    "report_count": 0,
-    "positive_vote_count": 0,
-    "negative_vote_count": 0,
-    "commented_at": null,
-    "url": null,
-    "content_updated_at": null,
-    "hidden_at": null
-  };
   bool isLoading = true;
   final ScrollController _scrollController = ScrollController();
 
@@ -108,8 +44,7 @@ class _SpecificBulletinBoardPageState extends State<SpecificBulletinBoardPage> {
     var myMap = userProvider.getApiRes("articles/?parent_board=7&page=1");
 
     // api 호출과 Provider 정보 동기화.
-    await userProvider.synApiRes(
-        "articles/?parent_board=7&page=1");
+    await userProvider.synApiRes("articles/?parent_board=7&page=1");
     // await Future.delayed(Duration(seconds: 1));
     myMap = userProvider.getApiRes("articles/?parent_board=7&page=1");
     if (mounted) {
@@ -132,7 +67,8 @@ class _SpecificBulletinBoardPageState extends State<SpecificBulletinBoardPage> {
           userProvider.getApiRes("articles/?parent_board=7&page=$currentPage");
 
       // api 호출과 Provider 정보 동기화.
-      await userProvider.synApiRes("articles/?parent_board=7&page=$currentPage");
+      await userProvider
+          .synApiRes("articles/?parent_board=7&page=$currentPage");
       // await Future.delayed(Duration(seconds: 1));
       myMap =
           userProvider.getApiRes("articles/?parent_board=7&page=$currentPage");
