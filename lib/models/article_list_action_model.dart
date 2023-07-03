@@ -1,8 +1,4 @@
 // 담아둔 글의 경우 parent_article을 fromJson
-import 'package:new_ara_app/models/topic_model.dart';
-import 'package:new_ara_app/models/board_model.dart';
-import 'package:new_ara_app/models/public_user.dart';
-
 class ArticleListActionModel {
   final dynamic parent_article;
   final int id; // ID
