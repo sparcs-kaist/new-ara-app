@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:easy_localization/easy_localization.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:new_ara_app/widgetclasses/loading_indicator.dart';
 import 'package:provider/provider.dart';
 
-import 'package:new_ara_app/pages/newAra_home_page.dart';
+import 'package:new_ara_app/pages/new_ara_home_page.dart';
 import 'package:new_ara_app/pages/login_page.dart';
 import 'package:new_ara_app/providers/user_provider.dart';
-import 'package:new_ara_app/constants/colors_info.dart';
-
 final supportedLocales = [
   const Locale('en'),
   const Locale('ko'),
@@ -25,10 +25,18 @@ void main() async {
         providers: [
           ChangeNotifierProvider(create: (_) => UserProvider()),
         ],
-        child: MyApp(),
+        child: const MyApp(),
       ),
     ),
   );
+
+  // This line is for testing purposes only
+  // enableFlutterDriverExtension(handler: (payload) async {
+  //   if (payload == 'restart') {
+  //     exit(0);
+  //   }
+  //   return '';
+  // });
 }
 
 class CustomScrollBehavior extends ScrollBehavior {
@@ -39,7 +47,52 @@ class CustomScrollBehavior extends ScrollBehavior {
   }
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
+  const MyApp({super.key});
+
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  bool isLoading = false;
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    autoLoginByGetCookie(Provider.of<UserProvider>(context, listen: false));
+  }
+
+  void autoLoginByGetCookie(UserProvider userProvider) async {
+    // await Future.delayed(Duration(seconds: 1));
+// 로컬에서 쿠키 (세션 아이디 + 토큰 )가져오는 코드 추가해야함.
+// 1. 스토리지에서 쿠키를 가져오는 게 성공해야함.
+// 2. 스토리지에서 가져온 쿠키로 api/me를 가져왔을 때 성공해야함.
+// 3. 그럼 로그인 성공 -> 스토리지에서 가져온 쿠키를 provider 쿠키에 저장
+// # 로그인 할 때 로컬 스토리지에서 쿠키 갱신, 로그아웃 할 때 로컬 스토리지에서 쿠키 삭제.
+
+    // Provider.of<UserProvider>(initStateContext, listen: false).setHasData(true);
+    FlutterSecureStorage secureStorage = const FlutterSecureStorage();
+    var cookiesBySecureStorage = await secureStorage.read(key: 'cookie');
+
+    debugPrint("main.dart : $cookiesBySecureStorage");
+    if (cookiesBySecureStorage != null) {
+      setState(() {
+        isLoading = true;
+      });
+      bool tf = await userProvider.apiMeUserInfo(
+          initCookieString: cookiesBySecureStorage);
+      if (tf) {
+        userProvider.setHasData(true);
+        userProvider.setCookieToList(cookiesBySecureStorage);
+      }
+      setState(() {
+        isLoading = false;
+      });
+    } else {}
+  }
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -55,7 +108,11 @@ class MyApp extends StatelessWidget {
         },
 
         /// hasData true -> newarahomepage, false -> loginpage.
-        home: context.watch<UserProvider>().hasData ? const NewAraHomePage() : const LoginPage());
+        home: isLoading == true
+            ? const LoadingIndicator() // 자동 로그인 시 로컬 쿠키에서 가져오는 동안 공백이 생긴다. 그 동안 띄어주는 indicator
+            : context.watch<UserProvider>().hasData
+                ? const NewAraHomePage()
+                : const LoginPage());
   }
 
   ThemeData _setThemeData() {

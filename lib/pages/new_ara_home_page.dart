@@ -1,12 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:new_ara_app/pages/main_page.dart';
-import 'package:new_ara_app/pages/bulletin_page.dart';
+import 'package:new_ara_app/pages/bulletin_list_page.dart';
 import 'package:new_ara_app/pages/chat_list_page.dart';
 import 'package:new_ara_app/pages/notification_page.dart';
 import 'package:new_ara_app/pages/user_page.dart';
-import 'package:new_ara_app/providers/user_provider.dart';
-import 'package:provider/provider.dart';
 
 class NewAraHomePage extends StatefulWidget {
   const NewAraHomePage({Key? key}) : super(key: key);
@@ -16,9 +14,10 @@ class NewAraHomePage extends StatefulWidget {
 
 class _NewAraHomePageState extends State<NewAraHomePage> {
   int _selectedIndex = 0;
+
   final List<Widget> _widgetOptions = <Widget>[
     const MainPage(),
-    const BulletinPage(),
+    const BulletinListPage(),
     const ChatListPage(),
     const NotificationPage(),
     const UserPage(),
@@ -29,19 +28,19 @@ class _NewAraHomePageState extends State<NewAraHomePage> {
       _selectedIndex = index;
     });
   }
+
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
-
-    //api/me 해서 유저 정보를 모델에 저장하기.
-    downloadUserInfo();
   }
-  void downloadUserInfo() async{
-    var userProvider = context.read<UserProvider>();
-    await userProvider.getCookies("https://newara.dev.sparcs.org/");
-    await userProvider.apiMeUserInfo();
-  }
+  // void downloadUserInfo(initStateContext) async {
+  //
+  //   await Provider.of<UserProvider>(initStateContext, listen: false)
+  //        .setCookiesFromUrl("https://newara.dev.sparcs.org/");
+  //   await Provider.of<UserProvider>(initStateContext, listen: false)
+  //       .apiMeUserInfo(message: "new-ara-home-page");
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -64,19 +63,19 @@ class _NewAraHomePageState extends State<NewAraHomePage> {
       items: [
         BottomNavigationBarItem(
           icon: SvgPicture.asset(
-            'assets/icons/house-door-fill.svg',
+            'assets/icons/home-1.svg',
             color: _selectedIndex == 0 ? Colors.black : Colors.grey,
-            width: 20.31,
-            height: 21.88,
+            width: 36,
+            height: 36,
           ),
           label: 'Home',
         ),
         BottomNavigationBarItem(
           icon: SvgPicture.asset(
-            'assets/icons/list-ul.svg',
+            'assets/icons/post_list.svg',
             color: _selectedIndex == 1 ? Colors.black : Colors.grey,
-            width: 25,
-            height: 17.86,
+            width: 23,
+            height: 20,
           ),
           label: 'Bulletin',
         ),
@@ -91,19 +90,19 @@ class _NewAraHomePageState extends State<NewAraHomePage> {
         ),
         BottomNavigationBarItem(
           icon: SvgPicture.asset(
-            'assets/icons/bell.svg',
+            'assets/icons/notification.svg',
             color: _selectedIndex == 3 ? Colors.black : Colors.grey,
-            width: 21.88,
-            height: 25,
+            width: 36,
+            height: 36,
           ),
           label: 'Notification',
         ),
         BottomNavigationBarItem(
           icon: SvgPicture.asset(
-            'assets/icons/person-circle.svg',
+            'assets/icons/member.svg',
             color: _selectedIndex == 4 ? Colors.black : Colors.grey,
-            width: 25,
-            height: 25,
+            width: 36,
+            height: 36,
           ),
           label: 'MyPage',
         ),
