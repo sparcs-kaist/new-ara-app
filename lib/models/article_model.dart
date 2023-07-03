@@ -1,6 +1,5 @@
 import 'package:new_ara_app/models/topic_model.dart';
 import 'package:new_ara_app/models/board_model.dart';
-import 'package:new_ara_app/models/scrap_model.dart';
 import 'package:new_ara_app/models/public_user.dart';
 import 'package:new_ara_app/models/comment_list_action.dart';
 import 'package:new_ara_app/models/scrap_create_action_model.dart';
