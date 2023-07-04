@@ -1,4 +1,4 @@
-class NAUserModel {
+class UserProfileModel {
   final int user;
   final String? email;
   final String nickname;
@@ -22,7 +22,7 @@ class NAUserModel {
   final String agree_terms_of_service_at;
   final inactive_due_at = null;
 
-  NAUserModel({
+  UserProfileModel({
     required this.user,
     required this.email,
     required this.nickname,
@@ -47,7 +47,7 @@ class NAUserModel {
   });
 
   //아래 코드는 NAUser 클래스에 대한 fromJson 팩토리 메소드를 정의한 것입니다. 이 메소드는 JSON 데이터를 파라미터로 받아서 NAUser 객체를 생성하고 반환합니다.
-  NAUserModel.fromJson(Map<String, dynamic> json)
+  UserProfileModel.fromJson(Map<String, dynamic> json)
       : user = json['user'],
         email = json['email'],
         nickname = json['nickname'],
@@ -69,7 +69,6 @@ class NAUserModel {
         is_newara = json['is_newara'],
         ara_id = json['ara_id'],
         agree_terms_of_service_at = json['agree_terms_of_service_at'];
-
 
   Map<String, dynamic> toJson() => {
         'user': user,

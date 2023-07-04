@@ -3,21 +3,19 @@ import 'dart:io';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:new_ara_app/constants/url_info.dart';
-import 'package:new_ara_app/models/nauser_model.dart';
+import 'package:new_ara_app/models/user_profile_model.dart';
 import 'package:webview_cookie_manager/webview_cookie_manager.dart';
 
 //Provider.of<UserProvider>(context, listen: false).increment()
 class UserProvider with ChangeNotifier {
-  NAUserModel? _naUser; // api/me 했을 때 받는 유저의 정보
+  UserProfileModel? _naUser; // api/me 했을 때 받는 유저의 정보
   bool _hasData = false; // api/me 했을 때 유저의 정보가 있는가?
   List<Cookie> _loginCookie = [];
   final Map<String, dynamic> _apiRes = {};
 
-  NAUserModel? get naUser => _naUser;
+  UserProfileModel? get naUser => _naUser;
   bool get hasData => _hasData;
   dynamic get apiRes => _apiRes;
-
-
 
   void setHasData(bool tf) {
     _hasData = tf;
@@ -81,7 +79,7 @@ class UserProvider with ChangeNotifier {
       Map<String, dynamic> responseData =
           jsonDecode(utf8.decode(response.bodyBytes));
 
-      _naUser = NAUserModel.fromJson(responseData);
+      _naUser = UserProfileModel.fromJson(responseData);
       // 유저 정보 출력
       debugPrint("user_provider.dart($message) : $responseData");
       //유저 정보를 사용하는 곳에서 재 실행!
@@ -96,7 +94,8 @@ class UserProvider with ChangeNotifier {
     }
   }
 
-  Future<bool> synApiRes(String mapKey, {String? initCookieString,File? multipartFile}) async {
+  Future<bool> synApiRes(String mapKey,
+      {String? initCookieString, File? multipartFile}) async {
     //initCookieString 이 없으면 현재 프로바이더의 쿠키로 한다.
 
     String cookieString = "";
@@ -123,11 +122,10 @@ class UserProvider with ChangeNotifier {
     );
     if (response.statusCode == 200) {
       // 요청이 성공적으로 처리됨
-      var responseData =
-          jsonDecode(utf8.decode(response.bodyBytes));
+      var responseData = jsonDecode(utf8.decode(response.bodyBytes));
 
       _apiRes[mapKey] = responseData;
-     // debugPrint("user_provider.dart responseData: $responseData");
+      // debugPrint("user_provider.dart responseData: $responseData");
 
       //getApiRes 하는 곳에서 재 실행!
       notifyListeners();
