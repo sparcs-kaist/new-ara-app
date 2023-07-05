@@ -15,7 +15,7 @@ class UserProfileModel {
   final String nickname_updated_at;
   final bool see_sexual;
   final bool see_social;
-  final Map<String, dynamic> extra_preferences;
+  final Map<String, dynamic>? extra_preferences;
   final int group;
   final bool is_newara;
   final String ara_id;
