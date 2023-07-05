@@ -25,6 +25,7 @@ class BoardDetailActionModel {
   final String? ko_banner_description;
   final String? en_banner_description;
   final String? banner_url;
+  final int? top_threshold;
 
   BoardDetailActionModel({
     this.id,
@@ -51,13 +52,14 @@ class BoardDetailActionModel {
     this.ko_banner_description,
     this.en_banner_description,
     this.banner_url,
+    this.top_threshold,
   });
 
   factory BoardDetailActionModel.fromJson(Map<String, dynamic> json) {
     return BoardDetailActionModel(
       id: json['id'],
-      topics: (json['topics'] as List<dynamic>?)
-          ?.map((topicJson) => TopicModel.fromJson(topicJson))
+      topics: (json['topics'] as List<dynamic>)
+          .map((topicJson) => TopicModel.fromJson(topicJson))
           .toList(),
       user_readable: json['user_readable'],
       user_writable: json['user_writable'],
@@ -81,6 +83,7 @@ class BoardDetailActionModel {
       ko_banner_description: json['ko_banner_description'],
       en_banner_description: json['en_banner_description'],
       banner_url: json['banner_url'],
+      top_threshold: json['top_threshold'],
     );
   }
 
@@ -110,6 +113,7 @@ class BoardDetailActionModel {
       'ko_banner_description': ko_banner_description,
       'en_banner_description': en_banner_description,
       'banner_url': banner_url,
+      'top_threshold': top_threshold,
     };
   }
 }
