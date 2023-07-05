@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:provider/provider.dart';
+
 import 'package:new_ara_app/constants/board_type.dart';
 import 'package:new_ara_app/constants/colors_info.dart';
 import 'package:new_ara_app/pages/free_bulletin_board_page.dart';
 import 'package:new_ara_app/providers/user_provider.dart';
 import 'package:new_ara_app/widgetclasses/loading_indicator.dart';
-import 'package:provider/provider.dart';
+import 'package:new_ara_app/models/board_detail_action_model.dart';
 
 const boardsByGroupLength = 5;
 
@@ -32,18 +34,22 @@ class _BulletinListPageState extends State<BulletinListPage> {
   }
 
   void refreshBoardList(UserProvider userProvider) async {
-    //Provider에  api res 주입
-    await userProvider.synApiRes("boards/");
-    //Provider에 api res 정보 사용
     //var boardsByGroup = List<dynamic>.filled(6, List< dynamic >.filled(0, null, growable: true) , growable: true);
 
-    var apiResBoards = userProvider.getApiRes("boards/");
+    List<dynamic> jsonBoards = await userProvider.getApiRes2("boards/") ?? [];
+
+    List<BoardDetailActionModel> apiResBoards2 = [];
+    for (Map<String, dynamic> jsonBoard in jsonBoards) {
+      apiResBoards2.add(BoardDetailActionModel.fromJson(jsonBoard));
+    }
+    //debugPrint(apiResBoards2[0].ko_name.toString());
+
     if (mounted) {
       setState(() {
-        for (var element in apiResBoards) {
+        for (var element in apiResBoards2) {
           // debugPrint("${element["ko_name"]}, group_id: ${element["group_id"]}, id: ${element["id"]}, lenght: ${element["topics"]}");
           // debugPrint("-------------------------");
-          boardsByGroup[element["group_id"]].add(element);
+          boardsByGroup[element.group_id!.toInt()].add(element);
           // for(var topic in element["topics"]){
           //   debugPrint("${topic["ko_name"]} ,id: ${topic["id"]}");
           // }
@@ -314,7 +320,7 @@ class BoardExpansionTile extends StatelessWidget {
                       );
                     },
                     child: Text(
-                      subMenu["ko_name"],
+                      subMenu.ko_name.toString(),
                       style: const TextStyle(
                         color: Color(0xFF333333),
                         fontSize: 16,
