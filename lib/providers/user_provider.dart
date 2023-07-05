@@ -120,6 +120,7 @@ class UserProvider with ChangeNotifier {
     if (response.statusCode == 200) {
       return response.data;
     } else {
+      debugPrint("Get /api/$apiUrl ${response.statusCode}");
       return null;
     }
   }
