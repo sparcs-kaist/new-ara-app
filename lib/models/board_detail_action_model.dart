@@ -3,8 +3,8 @@ import 'package:new_ara_app/models/topic_model.dart';
 class BoardDetailActionModel {
   final int? id;
   final List<TopicModel>? topics;
-  final String? user_readable;
-  final String? user_writable;
+  final bool? user_readable;
+  final bool? user_writable;
   final String? created_at;
   final String? updated_at;
   final String? deleted_at;
