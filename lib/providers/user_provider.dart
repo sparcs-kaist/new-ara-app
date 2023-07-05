@@ -97,7 +97,7 @@ class UserProvider with ChangeNotifier {
 
   // 아래의 getApiRes 와는 다른 함수
   // apiUrl을 받고 요청을 보낸 후 결과를 리턴해줌
-  Future<dynamic>? getApiRes2(String apiUrl, {String? initCookieString}) async {
+  Future<dynamic> getApiRes2(String apiUrl, {String? initCookieString}) async {
     String cookieString = "";
 
     var totUrl = "$newAraDefaultUrl/api/$apiUrl";
