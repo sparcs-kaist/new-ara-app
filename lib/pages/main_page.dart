@@ -67,17 +67,18 @@ class _MainPageState extends State<MainPage> {
     refreshUndergradAssocNotice(userProvider);
     refreshFreshmanCouncil(userProvider);
   }
-  List<int> findBoardID(String slug1, String slug2){
+
+  List<int> findBoardID(String slug1, String slug2) {
     //topic 이 없는 경우 slug2로 ""을 넘겨준다.
 
-    List<int> returnValue = [-1,-1];
-    for(int i=0; i<boardList.length ; i++){
-      if(boardList[i]["slug"]==slug1){
-        returnValue[0]=boardList[i]["id"];
-        if(slug2!=""){
-          for(int j=0; j< boardList[i]["topics"].length ; j++){
-            if(boardList[i]["topics"][j]["slug"]==slug2){
-              returnValue[1]=boardList[i]["topics"][j]["id"];
+    List<int> returnValue = [-1, -1];
+    for (int i = 0; i < boardList.length; i++) {
+      if (boardList[i]["slug"] == slug1) {
+        returnValue[0] = boardList[i]["id"];
+        if (slug2 != "") {
+          for (int j = 0; j < boardList[i]["topics"].length; j++) {
+            if (boardList[i]["topics"][j]["slug"] == slug2) {
+              returnValue[1] = boardList[i]["topics"][j]["id"];
             }
           }
         }
@@ -85,6 +86,7 @@ class _MainPageState extends State<MainPage> {
     }
     return returnValue;
   }
+
   void refreshPortalNotice(UserProvider userProvider) async {
     //포탈 공지
     //  articles/?parent_board=1
@@ -93,7 +95,8 @@ class _MainPageState extends State<MainPage> {
     await userProvider.synApiRes("articles/?parent_board=$boardID");
     if (mounted) {
       setState(() {
-        portalContent = userProvider.getApiRes("articles/?parent_board=$boardID");
+        portalContent =
+            userProvider.getApiRes("articles/?parent_board=$boardID");
         isLoading[1] = false;
       });
     }
@@ -107,7 +110,8 @@ class _MainPageState extends State<MainPage> {
     await userProvider.synApiRes("articles/?parent_board=$boardID");
     if (mounted) {
       setState(() {
-        facilityContent = userProvider.getApiRes("articles/?parent_board=$boardID");
+        facilityContent =
+            userProvider.getApiRes("articles/?parent_board=$boardID");
         isLoading[2] = false;
       });
     }
@@ -116,11 +120,12 @@ class _MainPageState extends State<MainPage> {
   void refreshNewAraNotice(UserProvider userProvider) async {
     //뉴아라
     //        "slug": "newara-feedback",
-    int boardID= findBoardID("newara-feedback", "")[0];
+    int boardID = findBoardID("newara-feedback", "")[0];
     await userProvider.synApiRes("articles/?parent_board=$boardID");
     if (mounted) {
       setState(() {
-        newAraContent = userProvider.getApiRes("articles/?parent_board=$boardID");
+        newAraContent =
+            userProvider.getApiRes("articles/?parent_board=$boardID");
         isLoading[3] = false;
       });
     }
@@ -134,11 +139,12 @@ class _MainPageState extends State<MainPage> {
     //https://newara.sparcs.org/api/articles/?parent_board=2&parent_topic=24
     int boardID = findBoardID("students-group", "grad-assoc")[0];
     int topicID = findBoardID("students-group", "grad-assoc")[1];
-    await userProvider.synApiRes("articles/?parent_board=$boardID&parent_topic=$topicID");
+    await userProvider
+        .synApiRes("articles/?parent_board=$boardID&parent_topic=$topicID");
     if (mounted) {
       setState(() {
-        gradContent =
-            userProvider.getApiRes("articles/?parent_board=$boardID&parent_topic=$topicID");
+        gradContent = userProvider
+            .getApiRes("articles/?parent_board=$boardID&parent_topic=$topicID");
         isLoading[4] = false;
       });
     }
@@ -150,11 +156,12 @@ class _MainPageState extends State<MainPage> {
     // "slug": "undergrad-assoc",
     int boardID = findBoardID("students-group", "undergrad-assoc")[0];
     int topicID = findBoardID("students-group", "undergrad-assoc")[1];
-    await userProvider.synApiRes("articles/?parent_board=$boardID&parent_topic=$topicID");
+    await userProvider
+        .synApiRes("articles/?parent_board=$boardID&parent_topic=$topicID");
     if (mounted) {
       setState(() {
-        underGradContent =
-            userProvider.getApiRes("articles/?parent_board=$boardID&parent_topic=$topicID");
+        underGradContent = userProvider
+            .getApiRes("articles/?parent_board=$boardID&parent_topic=$topicID");
         isLoading[5] = false;
       });
     }
@@ -166,11 +173,12 @@ class _MainPageState extends State<MainPage> {
     // "slug": "freshman-council",
     int boardID = findBoardID("students-group", "freshman-council")[0];
     int topicID = findBoardID("students-group", "freshman-council")[1];
-    await userProvider.synApiRes("articles/?parent_board=$boardID&parent_topic=$topicID");
+    await userProvider
+        .synApiRes("articles/?parent_board=$boardID&parent_topic=$topicID");
     if (mounted) {
       setState(() {
-        freshmanContent =
-            userProvider.getApiRes("articles/?parent_board=$boardID&parent_topic=$topicID");
+        freshmanContent = userProvider
+            .getApiRes("articles/?parent_board=$boardID&parent_topic=$topicID");
         isLoading[6] = false;
       });
     }
@@ -197,8 +205,8 @@ class _MainPageState extends State<MainPage> {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                    builder: (context) =>
-                    PostWritePage(),),
+                  builder: (context) => PostWritePage(),
+                ),
               );
             },
           ),
@@ -239,7 +247,7 @@ class _MainPageState extends State<MainPage> {
                                 builder: (context) =>
                                     const FreeBulletinBoardPage(
                                       boardType: BoardType.recent,
-                                      boardInfo: {},
+                                      boardInfo: null,
                                     )),
                           );
                         },
@@ -490,7 +498,7 @@ class _MainPageState extends State<MainPage> {
                       MainPageTextButton('main_page.stu_community', () {}),
                       Container(
                         width: MediaQuery.of(context).size.width - 40,
-                     //   height: 110,
+                        //   height: 110,
                         padding: const EdgeInsets.all(12),
                         decoration: BoxDecoration(
                           border: Border.all(
@@ -501,8 +509,8 @@ class _MainPageState extends State<MainPage> {
                               const BorderRadius.all(Radius.circular(20)),
                         ),
                         child: Column(
-                       //  padding: const EdgeInsets.only(
-                       //       top: 10, bottom: 10, left: 15, right: 15),
+                          //  padding: const EdgeInsets.only(
+                          //       top: 10, bottom: 10, left: 15, right: 15),
                           children: [
                             SizedBox(
                               height: 28,
