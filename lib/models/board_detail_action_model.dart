@@ -19,6 +19,8 @@ class BoardDetailActionModel {
   final bool? is_readonly;
   final bool? is_hidden;
   final int? name_type;
+  final bool? is_school_communication;
+  final int? group_id;
   final String? banner_image;
   final String? ko_banner_description;
   final String? en_banner_description;
@@ -43,6 +45,8 @@ class BoardDetailActionModel {
     this.is_readonly,
     this.is_hidden,
     this.name_type,
+    this.is_school_communication,
+    this.group_id,
     this.banner_image,
     this.ko_banner_description,
     this.en_banner_description,
@@ -71,6 +75,8 @@ class BoardDetailActionModel {
       is_readonly: json['is_readonly'],
       is_hidden: json['is_hidden'],
       name_type: json['name_type'],
+      is_school_communication: json['is_school_communication'],
+      group_id: json['group_id'],
       banner_image: json['banner_image'],
       ko_banner_description: json['ko_banner_description'],
       en_banner_description: json['en_banner_description'],
@@ -98,6 +104,8 @@ class BoardDetailActionModel {
       'is_readonly': is_readonly,
       'is_hidden': is_hidden,
       'name_type': name_type,
+      'is_school_communication': is_school_communication,
+      'group_id': group_id,
       'banner_image': banner_image,
       'ko_banner_description': ko_banner_description,
       'en_banner_description': en_banner_description,

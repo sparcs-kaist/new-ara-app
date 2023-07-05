@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
-import 'package:http/http.dart' as http;
+import 'package:http/http.dart' as http; // 추후에 dio 로 완전히 전환할 예정
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:new_ara_app/constants/url_info.dart';
 import 'package:new_ara_app/models/user_profile_model.dart';
@@ -91,6 +92,35 @@ class UserProvider with ChangeNotifier {
       debugPrint(
           'api/me request failed with status code: ${response.statusCode}');
       return false;
+    }
+  }
+
+  // 아래의 getApiRes 와는 다른 함수
+  // apiUrl을 받고 요청을 보낸 후 결과를 리턴해줌
+  Future<dynamic>? getApiRes2(String apiUrl, {String? initCookieString}) async {
+    String cookieString = "";
+
+    var totUrl = "$newAraDefaultUrl/api/$apiUrl";
+    if (initCookieString == null) {
+      cookieString = getCookiesToString();
+    } else {
+      cookieString = initCookieString;
+    }
+
+    var dio = Dio();
+    dio.options.headers['Cookie'] = cookieString;
+
+    late dynamic response;
+    try {
+      response = await dio.get(totUrl);
+    } catch (error) {
+      debugPrint("GET /api/$apiUrl failed with error: $error");
+      return null;
+    }
+    if (response.statusCode == 200) {
+      return response.data;
+    } else {
+      return null;
     }
   }
 
