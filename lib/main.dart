@@ -100,6 +100,7 @@ class _MyAppState extends State<MyApp> {
         localizationsDelegates: context.localizationDelegates,
         supportedLocales: context.supportedLocales,
         locale: context.locale,
+
         theme: _setThemeData(),
         builder: (context, child) {
           return ScrollConfiguration(

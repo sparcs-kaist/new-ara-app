@@ -120,7 +120,7 @@ class _MainPageState extends State<MainPage> {
   void refreshNewAraNotice(UserProvider userProvider) async {
     //뉴아라
     //        "slug": "newara-feedback",
-    int boardID = findBoardID("newara-feedback", "")[0];
+    int boardID = findBoardID("ara-feedback", "")[0];
     await userProvider.synApiRes("articles/?parent_board=$boardID");
     if (mounted) {
       setState(() {
