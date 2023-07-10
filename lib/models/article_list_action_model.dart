@@ -28,38 +28,35 @@ class ArticleListActionModel {
   final dynamic url; // 변수의 타입 정확하게 모르겠음
   final dynamic content_updated_at; // 변수의 타입 정확하게 모르겠음
   final dynamic hidden; // 변수의 타입 정확하게 모르겠음
-  final Map<String, dynamic>? scrapped_by;
 
-  ArticleListActionModel({
-    required this.id,
-    this.is_hidden,
-    this.why_hidden,
-    this.can_override_hidden,
-    this.parent_topic,
-    this.parent_board,
-    this.title,
-    this.created_by,
-    this.read_status,
-    this.attachment_type,
-    this.communication_article_status,
-    this.days_left,
-    required this.created_at,
-    required this.updated_at,
-    required this.deleted_at,
-    this.name_type,
-    this.is_content_sexual,
-    this.is_content_social,
-    this.hit_count,
-    this.comment_count,
-    this.report_count,
-    this.positive_vote_count,
-    this.negative_vote_count,
-    this.commented_at,
-    this.url,
-    this.content_updated_at,
-    this.hidden,
-    this.scrapped_by,
-  });
+  ArticleListActionModel(
+      {required this.id,
+      this.is_hidden,
+      this.why_hidden,
+      this.can_override_hidden,
+      this.parent_topic,
+      this.parent_board,
+      this.title,
+      this.created_by,
+      this.read_status,
+      this.attachment_type,
+      this.communication_article_status,
+      this.days_left,
+      required this.created_at,
+      required this.updated_at,
+      required this.deleted_at,
+      this.name_type,
+      this.is_content_sexual,
+      this.is_content_social,
+      this.hit_count,
+      this.comment_count,
+      this.report_count,
+      this.positive_vote_count,
+      this.negative_vote_count,
+      this.commented_at,
+      this.url,
+      this.content_updated_at,
+      this.hidden});
 
   ArticleListActionModel.fromJson(Map<String, dynamic> json)
       : id = json['id'],
@@ -88,8 +85,7 @@ class ArticleListActionModel {
         commented_at = json['commented_at'],
         url = json['url'],
         content_updated_at = json['content_updated_at'],
-        hidden = json['hidden'],
-        scrapped_by = json['scrapped_by'];
+        hidden = json['hidden'];
 
   Map<String, dynamic> toJson() => {
         'id': id,
@@ -118,6 +114,5 @@ class ArticleListActionModel {
         'url': url,
         'content_updated_at': content_updated_at,
         'hidden': hidden,
-        'scrapped_by': scrapped_by
       };
 }
