@@ -2,10 +2,12 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
+import 'package:new_ara_app/models/article_list_action_model.dart';
+
 class PostPreview extends StatefulWidget {
-  final Map<String, dynamic> json;
-  PostPreview({super.key, required Map<String, dynamic>? json})
-      : json = json ?? {};
+  final ArticleListActionModel model;
+  PostPreview({super.key, required ArticleListActionModel model})
+      : model = model ?? ArticleListActionModel.fromJson({});
 
   @override
   State<PostPreview> createState() => _PostPreviewState();
@@ -16,7 +18,8 @@ class _PostPreviewState extends State<PostPreview> {
   Widget build(BuildContext context) {
     DateTime now = DateTime.now();
 
-    DateTime date = DateTime.parse(widget.json["created_at"]).toLocal();
+    DateTime date =
+        DateTime.parse(widget.model.created_at.toString()).toLocal();
     var difference = now.difference(date);
     String time = "미정";
     if (difference.inMinutes < 1) {
@@ -44,7 +47,9 @@ class _PostPreviewState extends State<PostPreview> {
             children: [
               Flexible(
                 child: Text(
-                  widget.json["is_hidden"] ? "숨겨진 글 입니다." : widget.json["title"],
+                  widget.model.is_hidden!
+                      ? "숨겨진 글 입니다."
+                      : widget.model.title.toString(),
                   style: const TextStyle(
                     fontWeight: FontWeight.w500,
                     fontSize: 16,
@@ -56,29 +61,30 @@ class _PostPreviewState extends State<PostPreview> {
               const SizedBox(
                 width: 5,
               ),
-              widget.json["attachment_type"] == "BOTH" 
+              widget.model.attachment_type.toString() == "BOTH"
                   ? Row(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      SvgPicture.asset(
-                        'assets/icons/image_post_preview.svg',
-                      ),
-                      SizedBox(
-                        width: 9,
-                      ),
-                      SvgPicture.asset(
-                        'assets/icons/clip_post_preview.svg', 
-                      ),
-                    ],
-                  ):widget.json["attachment_type"] == "IMAGE"
-                  ? SvgPicture.asset(
-                        'assets/icons/image_post_preview.svg',
-                      )
-                  : widget.json["attachment_type"] == "NON_IMAGE"
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        SvgPicture.asset(
+                          'assets/icons/image_post_preview.svg',
+                        ),
+                        SizedBox(
+                          width: 9,
+                        ),
+                        SvgPicture.asset(
+                          'assets/icons/clip_post_preview.svg',
+                        ),
+                      ],
+                    )
+                  : widget.model.attachment_type.toString() == "IMAGE"
                       ? SvgPicture.asset(
-                        'assets/icons/clip_post_preview.svg', 
-                      )
-                      : Container()
+                          'assets/icons/image_post_preview.svg',
+                        )
+                      : widget.model.attachment_type.toString() == "NON_IMAGE"
+                          ? SvgPicture.asset(
+                              'assets/icons/clip_post_preview.svg',
+                            )
+                          : Container()
             ],
             //attachment_type
           ),
@@ -91,7 +97,7 @@ class _PostPreviewState extends State<PostPreview> {
                 children: [
                   Flexible(
                     child: Text(
-                      widget.json["created_by"]["profile"]["nickname"],
+                      widget.model.created_by!.profile!.nickname.toString(),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: const TextStyle(
@@ -125,7 +131,7 @@ class _PostPreviewState extends State<PostPreview> {
                   color: Color(0xFFED3A3A),
                 ),
                 Text(
-                  widget.json["positive_vote_count"].toString(),
+                  widget.model.positive_vote_count.toString(),
                   style: const TextStyle(
                     fontWeight: FontWeight.w500,
                     fontSize: 12,
@@ -143,7 +149,7 @@ class _PostPreviewState extends State<PostPreview> {
                   color: Color(0xFF538DD1),
                 ),
                 Text(
-                  widget.json["negative_vote_count"].toString(),
+                  widget.model.negative_vote_count.toString(),
                   style: const TextStyle(
                       fontWeight: FontWeight.w500,
                       fontSize: 12,
@@ -160,7 +166,7 @@ class _PostPreviewState extends State<PostPreview> {
                   color: Color(0xFF636363),
                 ),
                 Text(
-                  widget.json["comment_count"].toString(),
+                  widget.model.comment_count.toString(),
                   style: const TextStyle(
                     fontWeight: FontWeight.w500,
                     fontSize: 12,
