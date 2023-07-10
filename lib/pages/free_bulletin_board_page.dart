@@ -8,6 +8,7 @@ import 'package:new_ara_app/providers/user_provider.dart';
 import 'package:new_ara_app/widgetclasses/loading_indicator.dart';
 import 'package:new_ara_app/widgetclasses/post_preview.dart';
 import 'package:new_ara_app/models/board_detail_action_model.dart';
+import 'package:new_ara_app/models/article_list_action_model.dart';
 
 class FreeBulletinBoardPage extends StatefulWidget {
   final BoardDetailActionModel? boardInfo;
@@ -20,7 +21,7 @@ class FreeBulletinBoardPage extends StatefulWidget {
 }
 
 class _FreeBulletinBoardPageState extends State<FreeBulletinBoardPage> {
-  List<Map<String, dynamic>> postPreviewList = [];
+  List<ArticleListActionModel> postPreviewList = [];
   int currentPage = 1;
   bool isLoading = true;
   String apiUrl = "";
@@ -55,15 +56,15 @@ class _FreeBulletinBoardPageState extends State<FreeBulletinBoardPage> {
 
     //https://newara.dev.sparcs.org/api/articles/recent/?page=1
     //                                  articles/?parent_board=${this.widget.boardInfo["id"]}&page=1
-    await userProvider.synApiRes("${apiUrl}1");
     // await Future.delayed(Duration(seconds: 1));
-    var myMap = userProvider.getApiRes("${apiUrl}1");
+    Map<String, dynamic>? myMap = await userProvider.getApiRes2("${apiUrl}1");
 
     if (mounted) {
       setState(() {
         postPreviewList.clear();
-        for (int i = 0; i < (myMap?["results"].length ?? 0); i++) {
-          postPreviewList.add(myMap?["results"][i] ?? {});
+        for (int i = 0; i < (myMap!["results"].length ?? 0); i++) {
+          postPreviewList
+              .add(ArticleListActionModel.fromJson(myMap["results"][i] ?? {}));
         }
         isLoading = false;
       });
@@ -76,19 +77,20 @@ class _FreeBulletinBoardPageState extends State<FreeBulletinBoardPage> {
         _scrollController.position.maxScrollExtent) {
       currentPage = currentPage + 1;
       // api 호출과 Provider 정보 동기화.
-      await userProvider.synApiRes("$apiUrl$currentPage");
       // await Future.delayed(Duration(seconds: 1));
-      var myMap = userProvider.getApiRes("$apiUrl$currentPage");
+      Map<String, dynamic>? myMap =
+          await userProvider.getApiRes2("$apiUrl$currentPage");
       if (mounted) {
         setState(() {
           // "is_hidden": true,
           // "why_hidden": [
           // "REPORTED_CONTENT"
           // ]
-          for (int i = 0; i < (myMap?["results"].length ?? 0); i++) {
+          for (int i = 0; i < (myMap!["results"].length ?? 0); i++) {
             //???/
             if (myMap["results"][i]["created_by"]["profile"] != null) {
-              postPreviewList.add(myMap?["results"][i] ?? {});
+              postPreviewList.add(
+                  ArticleListActionModel.fromJson(myMap["results"][i] ?? {}));
             }
           }
           isLoading = false;
@@ -191,14 +193,14 @@ class _FreeBulletinBoardPageState extends State<FreeBulletinBoardPage> {
                       // 각 아이템을 위한 위젯 생성
 
                       // 숨겨진 게시물이면 일단 표현 안하는 걸로 함.
-                      return postPreviewList[index]["is_hidden"]
+                      return postPreviewList[index].is_hidden ?? false
                           ? Container()
                           : Column(
                               children: [
                                 Padding(
                                   padding: const EdgeInsets.all(11.0),
-                                  child:
-                                      PostPreview(json: postPreviewList[index]),
+                                  child: PostPreview(
+                                      model: postPreviewList[index]),
                                 ),
                                 Container(
                                   height: 1,
