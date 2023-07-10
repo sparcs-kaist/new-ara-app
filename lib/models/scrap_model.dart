@@ -1,4 +1,4 @@
-import 'package:new_ara_app/models/public_user.dart';
+import 'package:new_ara_app/models/public_user_model.dart';
 import 'package:new_ara_app/models/article_list_action_model.dart';
 
 class ScrapModel {

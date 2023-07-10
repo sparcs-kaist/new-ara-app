@@ -1,4 +1,4 @@
-import 'package:new_ara_app/models/public_user.dart';
+import 'package:new_ara_app/models/public_user_model.dart';
 
 class ArticleListActionModel {
   final int id; // 글 마다 부여되는 id, 모든 글에 있는 듯함
