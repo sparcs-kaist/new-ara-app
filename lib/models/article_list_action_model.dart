@@ -29,7 +29,6 @@ class ArticleListActionModel {
   final dynamic content_updated_at; // 변수의 타입 정확하게 모르겠음
   final dynamic hidden; // 변수의 타입 정확하게 모르겠음
   final Map<String, dynamic>? scrapped_by;
-  final dynamic parent_article;
 
   ArticleListActionModel({
     required this.id,
@@ -60,7 +59,6 @@ class ArticleListActionModel {
     this.content_updated_at,
     this.hidden,
     this.scrapped_by,
-    this.parent_article,
   });
 
   ArticleListActionModel.fromJson(Map<String, dynamic> json)
@@ -91,8 +89,7 @@ class ArticleListActionModel {
         url = json['url'],
         content_updated_at = json['content_updated_at'],
         hidden = json['hidden'],
-        scrapped_by = json['scrapped_by'],
-        parent_article = json['parent_article'];
+        scrapped_by = json['scrapped_by'];
 
   Map<String, dynamic> toJson() => {
         'id': id,
@@ -121,7 +118,6 @@ class ArticleListActionModel {
         'url': url,
         'content_updated_at': content_updated_at,
         'hidden': hidden,
-        'scrapped_by': scrapped_by,
-        'parent_article': parent_article,
+        'scrapped_by': scrapped_by
       };
 }
