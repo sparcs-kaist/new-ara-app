@@ -1,4 +1,3 @@
-import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:new_ara_app/constants/url_info.dart';
@@ -11,6 +10,7 @@ import 'package:new_ara_app/pages/setting_page.dart';
 import 'package:new_ara_app/providers/user_provider.dart';
 import 'package:new_ara_app/widgetclasses/loading_indicator.dart';
 import 'package:new_ara_app/models/article_list_action_model.dart';
+import 'package:new_ara_app/models/scrap_model.dart';
 import 'package:new_ara_app/pages/post_page.dart';
 
 class UserPage extends StatefulWidget {
@@ -22,11 +22,22 @@ class UserPage extends StatefulWidget {
 class _UserPageState extends State<UserPage>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
+  List<ScrollController> scrollControllerList = [
+    ScrollController(), // 작성한 글 ListView
+    ScrollController(), // 담아둔 글 ListView
+    ScrollController() // 최근 본 글 ListView
+  ];
 
-  List<List<ArticleListActionModel>> tabList = [[], [], []];
+  List<ArticleListActionModel> createdArticleList = [];
+  List<ScrapModel> scrappedArticleList = [];
+  List<ArticleListActionModel> recentArticleList = [];
+
+  // List 의 경우
+  // 0: 작성한 글, 1: 담아둔 글, 2: 최근 본 글
   List<int> tabCount = [0, 0, 0];
   int curCount = 0; // "총 N개의 글"에 사용되는 변수
   List<bool> isLoadedList = [false, false, false];
+  List<int> nextPage = [2, 2, 2];
 
   final List<String> _tabs = [
     'myPage.mypost'.tr(),
@@ -41,20 +52,52 @@ class _UserPageState extends State<UserPage>
       length: _tabs.length,
       vsync: this,
     );
-    fetchArticleList(context, 0); // 작성한 글 fetch
-    fetchArticleList(context, 1); // 담아둔 글 fetch
-    fetchArticleList(context, 2); // 최근 본 글 fetch
+
+    scrollControllerList[0].addListener(_scrollListener0);
+    scrollControllerList[1].addListener(_scrollListener1);
+    scrollControllerList[2].addListener(_scrollListener2);
+
+    fetchCreatedArticles(context, 1);
+    fetchScrappedArticles(context, 1);
+    fetchRecentArticles(context, 1);
+  }
+
+  void _scrollListener0() {
+    if (isLoadedList[0] &&
+        scrollControllerList[0].position.pixels ==
+            scrollControllerList[0].position.maxScrollExtent) {
+      fetchCreatedArticles(context, nextPage[0]);
+    }
+  }
+
+  void _scrollListener1() {
+    if (isLoadedList[1] &&
+        scrollControllerList[1].position.pixels ==
+            scrollControllerList[1].position.maxScrollExtent) {
+      fetchScrappedArticles(context, nextPage[1]);
+    }
+  }
+
+  void _scrollListener2() {
+    if (isLoadedList[2] &&
+        scrollControllerList[2].position.pixels ==
+            scrollControllerList[2].position.maxScrollExtent) {
+      fetchRecentArticles(context, nextPage[2]);
+    }
   }
 
   @override
   void dispose() {
     _tabController.dispose();
+    for (int i = 0; i < 3; i++) {
+      scrollControllerList[i].dispose();
+    }
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    var userProvider = context.watch<UserProvider>();
+    UserProvider userProvider = context.watch<UserProvider>();
 
     return Scaffold(
       appBar: AppBar(
@@ -170,9 +213,8 @@ class _UserPageState extends State<UserPage>
                   }).toList(),
                   controller: _tabController,
                   indicatorSize: TabBarIndicatorSize.tab,
-                  onTap: (index) {
+                  onTap: (index) async {
                     setState(() => curCount = tabCount[index]);
-                    //debugPrint('curIndex: $curIndex');
                   },
                 ),
                 Container(
@@ -197,372 +239,13 @@ class _UserPageState extends State<UserPage>
                     children: [
                       !isLoadedList[0]
                           ? const LoadingIndicator()
-                          : ListView.separated(
-                              itemCount: tabList[0].length,
-                              itemBuilder: (context, index) {
-                                var curPost = tabList[0][index];
-                                return GestureDetector(
-                                    onTap: () {
-                                      Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                              builder: (context) =>
-                                                  PostPage()));
-                                    },
-                                    child: SizedBox(
-                                      height: 61,
-                                      child: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
-                                        children: [
-                                          Text(
-                                              curPost.title == null
-                                                  ? "null"
-                                                  : curPost.title!.substring(
-                                                      0,
-                                                      min(
-                                                          20,
-                                                          curPost
-                                                              .title!.length)),
-                                              style: const TextStyle(
-                                                  fontSize: 18,
-                                                  fontWeight: FontWeight.w500)),
-                                          const SizedBox(height: 5),
-                                          Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.spaceBetween,
-                                            children: [
-                                              Row(
-                                                children: [
-                                                  Text(
-                                                      curPost.created_by == null
-                                                          ? 'null'
-                                                          : curPost.created_by![
-                                                                  'profile']
-                                                              ['nickname'],
-                                                      style: const TextStyle(
-                                                          fontSize: 14,
-                                                          fontWeight:
-                                                              FontWeight.w500,
-                                                          color: Color.fromRGBO(
-                                                              177,
-                                                              177,
-                                                              177,
-                                                              1))),
-                                                  const SizedBox(width: 10),
-                                                  Text(
-                                                      '조회 ${curPost.hit_count}',
-                                                      style: const TextStyle(
-                                                          fontSize: 14,
-                                                          fontWeight:
-                                                              FontWeight.w500,
-                                                          color: Color.fromRGBO(
-                                                              177,
-                                                              177,
-                                                              177,
-                                                              1))),
-                                                ],
-                                              ),
-                                              Row(
-                                                children: [
-                                                  SvgPicture.asset(
-                                                    'assets/icons/like.svg',
-                                                    width: 13,
-                                                    height: 15,
-                                                    color: ColorsInfo.newara,
-                                                  ),
-                                                  const SizedBox(width: 3),
-                                                  Text(
-                                                      '${curPost.positive_vote_count}',
-                                                      style: const TextStyle(
-                                                          fontSize: 14,
-                                                          fontWeight:
-                                                              FontWeight.w500,
-                                                          color: ColorsInfo
-                                                              .newara)),
-                                                  const SizedBox(width: 10),
-                                                  SvgPicture.asset(
-                                                    'assets/icons/dislike.svg',
-                                                    width: 13,
-                                                    height: 15,
-                                                    color: const Color.fromRGBO(
-                                                        83, 141, 209, 1),
-                                                  ),
-                                                  const SizedBox(width: 3),
-                                                  Text(
-                                                      '${curPost.negative_vote_count}',
-                                                      style: const TextStyle(
-                                                          fontSize: 14,
-                                                          fontWeight:
-                                                              FontWeight.w500,
-                                                          color: Color.fromRGBO(
-                                                              83,
-                                                              141,
-                                                              209,
-                                                              1))),
-                                                  const SizedBox(width: 10),
-                                                  SvgPicture.asset(
-                                                    'assets/icons/comment.svg',
-                                                    width: 13,
-                                                    height: 15,
-                                                    color: const Color.fromRGBO(
-                                                        99, 99, 99, 1),
-                                                  ),
-                                                  const SizedBox(width: 3),
-                                                  Text(
-                                                      '${curPost.comment_count}',
-                                                      style: const TextStyle(
-                                                          fontSize: 14,
-                                                          fontWeight:
-                                                              FontWeight.w500,
-                                                          color: Color.fromRGBO(
-                                                              99, 99, 99, 1))),
-                                                ],
-                                              ),
-                                            ],
-                                          ),
-                                        ],
-                                      ),
-                                    ));
-                              },
-                              separatorBuilder: (context, index) {
-                                return const Divider();
-                              },
-                            ),
+                          : _buildPostList(0),
                       !isLoadedList[1]
                           ? const LoadingIndicator()
-                          : ListView.separated(
-                              itemCount: tabList[1].length,
-                              itemBuilder: (context, index) {
-                                var curPost = tabList[1][index].parent_article;
-                                return SizedBox(
-                                  height: 61,
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Text(
-                                          curPost['title'] == null
-                                              ? 'null'
-                                              : curPost['title']!.substring(
-                                                  0,
-                                                  min(
-                                                      20,
-                                                      curPost['title']!
-                                                          .toString()
-                                                          .length)),
-                                          style: const TextStyle(
-                                              fontSize: 18,
-                                              fontWeight: FontWeight.w500)),
-                                      const SizedBox(height: 5),
-                                      Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceBetween,
-                                        children: [
-                                          Row(
-                                            children: [
-                                              Text(
-                                                  curPost['created_by'] == null
-                                                      ? 'null'
-                                                      : curPost['created_by']
-                                                              ['profile']
-                                                          ['nickname'],
-                                                  style: const TextStyle(
-                                                      fontSize: 14,
-                                                      fontWeight:
-                                                          FontWeight.w500,
-                                                      color: Color.fromRGBO(
-                                                          177, 177, 177, 1))),
-                                              const SizedBox(width: 10),
-                                              Text('조회 ${curPost['hit_count']}',
-                                                  style: const TextStyle(
-                                                      fontSize: 14,
-                                                      fontWeight:
-                                                          FontWeight.w500,
-                                                      color: Color.fromRGBO(
-                                                          177, 177, 177, 1))),
-                                            ],
-                                          ),
-                                          Row(
-                                            children: [
-                                              SvgPicture.asset(
-                                                'assets/icons/like.svg',
-                                                width: 13,
-                                                height: 15,
-                                                color: ColorsInfo.newara,
-                                              ),
-                                              const SizedBox(width: 3),
-                                              Text(
-                                                  '${curPost['positive_vote_count']}',
-                                                  style: const TextStyle(
-                                                      fontSize: 14,
-                                                      fontWeight:
-                                                          FontWeight.w500,
-                                                      color:
-                                                          ColorsInfo.newara)),
-                                              const SizedBox(width: 10),
-                                              SvgPicture.asset(
-                                                'assets/icons/dislike.svg',
-                                                width: 13,
-                                                height: 15,
-                                                color: const Color.fromRGBO(
-                                                    83, 141, 209, 1),
-                                              ),
-                                              const SizedBox(width: 3),
-                                              Text(
-                                                  '${curPost['negative_vote_count']}',
-                                                  style: const TextStyle(
-                                                      fontSize: 14,
-                                                      fontWeight:
-                                                          FontWeight.w500,
-                                                      color: Color.fromRGBO(
-                                                          83, 141, 209, 1))),
-                                              const SizedBox(width: 10),
-                                              SvgPicture.asset(
-                                                'assets/icons/comment.svg',
-                                                width: 13,
-                                                height: 15,
-                                                color: const Color.fromRGBO(
-                                                    99, 99, 99, 1),
-                                              ),
-                                              const SizedBox(width: 3),
-                                              Text(
-                                                  '${curPost['comment_count']}',
-                                                  style: const TextStyle(
-                                                      fontSize: 14,
-                                                      fontWeight:
-                                                          FontWeight.w500,
-                                                      color: Color.fromRGBO(
-                                                          99, 99, 99, 1))),
-                                            ],
-                                          ),
-                                        ],
-                                      ),
-                                    ],
-                                  ),
-                                );
-                              },
-                              separatorBuilder: (context, index) {
-                                return const Divider();
-                              },
-                            ),
+                          : _buildPostList(1),
                       !isLoadedList[2]
                           ? const LoadingIndicator()
-                          : ListView.separated(
-                              itemCount: tabList[2].length,
-                              itemBuilder: (context, index) {
-                                var curPost = tabList[2][index];
-                                return SizedBox(
-                                  height: 61,
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Text(
-                                          curPost.title == null
-                                              ? "null"
-                                              : curPost.title!.substring(
-                                                  0,
-                                                  min(20,
-                                                      curPost.title!.length)),
-                                          style: const TextStyle(
-                                              fontSize: 18,
-                                              fontWeight: FontWeight.w500)),
-                                      const SizedBox(height: 5),
-                                      Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceBetween,
-                                        children: [
-                                          Row(
-                                            children: [
-                                              Text(
-                                                  curPost.created_by == null
-                                                      ? 'null'
-                                                      : curPost.created_by![
-                                                              'profile']
-                                                          ['nickname'],
-                                                  style: const TextStyle(
-                                                      fontSize: 14,
-                                                      fontWeight:
-                                                          FontWeight.w500,
-                                                      color: Color.fromRGBO(
-                                                          177, 177, 177, 1))),
-                                              const SizedBox(width: 10),
-                                              Text('조회 ${curPost.hit_count}',
-                                                  style: const TextStyle(
-                                                      fontSize: 14,
-                                                      fontWeight:
-                                                          FontWeight.w500,
-                                                      color: Color.fromRGBO(
-                                                          177, 177, 177, 1))),
-                                            ],
-                                          ),
-                                          Row(
-                                            children: [
-                                              SvgPicture.asset(
-                                                'assets/icons/like.svg',
-                                                width: 13,
-                                                height: 15,
-                                                color: ColorsInfo.newara,
-                                              ),
-                                              const SizedBox(width: 3),
-                                              Text(
-                                                  '${curPost.positive_vote_count}',
-                                                  style: const TextStyle(
-                                                      fontSize: 14,
-                                                      fontWeight:
-                                                          FontWeight.w500,
-                                                      color:
-                                                          ColorsInfo.newara)),
-                                              const SizedBox(width: 10),
-                                              SvgPicture.asset(
-                                                'assets/icons/dislike.svg',
-                                                width: 13,
-                                                height: 15,
-                                                color: const Color.fromRGBO(
-                                                    83, 141, 209, 1),
-                                              ),
-                                              const SizedBox(width: 3),
-                                              Text(
-                                                  '${curPost.negative_vote_count}',
-                                                  style: const TextStyle(
-                                                      fontSize: 14,
-                                                      fontWeight:
-                                                          FontWeight.w500,
-                                                      color: Color.fromRGBO(
-                                                          83, 141, 209, 1))),
-                                              const SizedBox(width: 10),
-                                              SvgPicture.asset(
-                                                'assets/icons/comment.svg',
-                                                width: 13,
-                                                height: 15,
-                                                color: const Color.fromRGBO(
-                                                    99, 99, 99, 1),
-                                              ),
-                                              const SizedBox(width: 3),
-                                              Text('${curPost.comment_count}',
-                                                  style: const TextStyle(
-                                                      fontSize: 14,
-                                                      fontWeight:
-                                                          FontWeight.w500,
-                                                      color: Color.fromRGBO(
-                                                          99, 99, 99, 1))),
-                                            ],
-                                          ),
-                                        ],
-                                      ),
-                                    ],
-                                  ),
-                                );
-                              },
-                              separatorBuilder: (context, index) {
-                                return const Divider();
-                              },
-                            ),
+                          : _buildPostList(2),
                     ],
                   ),
                 ),
@@ -574,34 +257,123 @@ class _UserPageState extends State<UserPage>
     );
   }
 
-  void fetchArticleList(BuildContext initStateContext, int tabIndex) async {
-    // tabIndex 0 : 작성한 글, 1 : 담아둔 글, 2 : 최근 본 글
+  Future<void> fetchCreatedArticles(
+      BuildContext initStateContext, int page) async {
     int user = initStateContext.read<UserProvider>().naUser!.user;
-    List<String> apiUrlList = [
-      '/api/articles/?page=1&created_by=$user',
-      '/api/scraps/?page=1&created_by=$user',
-      '/api/articles/recent/?page=1'
-    ];
-
-    tabList[tabIndex] = []; // 먼저 초기화하기
-    var dio = Dio();
-    dio.options.headers['Cookie'] =
-        initStateContext.read<UserProvider>().getCookiesToString();
+    String apiUrl = "/api/articles/?page=$page&created_by=$user";
+    if (page == 1) createdArticleList = [];
+    Dio dio = Dio();
     try {
-      var response = await dio.get('$newAraDefaultUrl${apiUrlList[tabIndex]}');
-      setMyCount(response.data['num_items'], tabIndex);
+      dio.options.headers['Cookie'] =
+          initStateContext.read<UserProvider>().getCookiesToString();
+    } catch (error) {
+      debugPrint(
+          "fetchCreatedArticles() failed to get Cookies from Provider: $error");
+    }
+    try {
+      var response = await dio.get('$newAraDefaultUrl$apiUrl');
+      debugPrint(
+          "fetchCreatedArticles() GET request (page: $page): ${response.statusCode}");
       if (response.statusCode == 200) {
-        debugPrint("fetchArticleList() $tabIndex succeed!");
+        setMyCount(response.data['num_items'], 0); // "총 N개의 글" 설정
         List<dynamic> rawPostList = response.data['results'];
         for (int i = 0; i < rawPostList.length; i++) {
-          Map<String, dynamic> rawPost = rawPostList[i];
-          tabList[tabIndex].add(ArticleListActionModel.fromJson(rawPost));
+          Map<String, dynamic>? rawPost = rawPostList[i];
+          if (rawPost == null) {
+            continue; // 가끔 형식에 맞지 않은 데이터를 가진 글이 있어 넣어놓음(2023.05.26)
+          }
+          try {
+            createdArticleList.add(ArticleListActionModel.fromJson(rawPost));
+          } catch (error) {
+            // 여기서 에러가 발생하게 된다면
+            // 1. models 에 있는 모델의 타입이 올바르지 않은 경우 -> 수정하기
+            // 2. models 의 타입은 올바르게 설계됨. 그러나 이전 개발 과정에서 필드 설정을 잘못한(또는 달랐던) 경우 -> 그냥 넘어가기
+            debugPrint(
+                "createdArticleList.add failed at index $i (id: ${rawPost['id']}) : $error");
+          }
         }
-        setIsLoaded(true, tabIndex);
-        debugPrint('$tabIndex count: ${tabCount[tabIndex]}');
+        nextPage[0] += 1;
+        setIsLoaded(true, 0);
       }
     } catch (error) {
-      debugPrint("fetchArticleList() $tabIndex failed with error: $error");
+      debugPrint("fetchCreatedArticles() failed with error: $error");
+    }
+  }
+
+  Future<void> fetchScrappedArticles(
+      BuildContext initStateContext, int page) async {
+    int user = initStateContext.read<UserProvider>().naUser!.user;
+    String apiUrl = "/api/scraps/?page=$page&created_by=$user";
+    if (page == 1) scrappedArticleList = [];
+    Dio dio = Dio();
+    try {
+      dio.options.headers['Cookie'] =
+          initStateContext.read<UserProvider>().getCookiesToString();
+    } catch (error) {
+      debugPrint(
+          "fetchScrappedArticles() failed to get Cookies from Provider: $error");
+    }
+    try {
+      var response = await dio.get('$newAraDefaultUrl$apiUrl');
+      debugPrint(
+          "fetchScrappedArticles() GET request (page: $page): ${response.statusCode}");
+      setMyCount(response.data['num_items'], 1);
+      if (response.statusCode == 200) {
+        debugPrint("fetchScrappedArticles() succeed!");
+        List<dynamic> rawPostList = response.data['results'];
+        for (int i = 0; i < rawPostList.length; i++) {
+          Map<String, dynamic>? rawPost = rawPostList[i];
+          if (rawPost == null) continue;
+          try {
+            scrappedArticleList.add(ScrapModel.fromJson(rawPost));
+          } catch (error) {
+            debugPrint(
+                "scrappedArticleList.add failed at index $i (id: ${rawPost['id']}) : $error");
+          }
+        }
+        nextPage[1] += 1;
+        setIsLoaded(true, 1);
+      }
+    } catch (error) {
+      debugPrint("fetchScrappedArticles() failed with error: $error");
+    }
+  }
+
+  Future<void> fetchRecentArticles(
+      BuildContext initStateContext, int page) async {
+    String apiUrl = "/api/articles/recent/?page=$page";
+    if (page == 1) recentArticleList = [];
+    Dio dio = Dio();
+    try {
+      dio.options.headers['Cookie'] =
+          initStateContext.read<UserProvider>().getCookiesToString();
+    } catch (error) {
+      debugPrint(
+          "fetchRecentArticles() failed to get Cookies from Provider: $error");
+    }
+    try {
+      var response = await dio.get('$newAraDefaultUrl$apiUrl');
+      debugPrint(
+          "fetchRecentArticles() GET request (page: $page): ${response.statusCode}");
+      setMyCount(response.data['num_items'], 2);
+      if (response.statusCode == 200) {
+        debugPrint("fetchRecentArticles() succeed!");
+        List<dynamic> rawPostList = response.data['results'];
+        for (int i = 0; i < rawPostList.length; i++) {
+          Map<String, dynamic>? rawPost = rawPostList[i];
+          if (rawPost == null) continue;
+          try {
+            recentArticleList.add(ArticleListActionModel.fromJson(rawPost));
+          } catch (error) {
+            debugPrint(
+                "recentArticleList.add failed at index $i (id: ${rawPost['id']}) : $error");
+          }
+        }
+        nextPage[2] += 1;
+        setIsLoaded(true, 2);
+      }
+    } catch (error) {
+      debugPrint("fetchRecentArticles() failed with error: $error");
     }
   }
 
@@ -612,8 +384,166 @@ class _UserPageState extends State<UserPage>
     setState(() => tabCount[tabIndex] = value);
     setState(() => curCount = tabCount[0]);
   }
+
+  String getCreatedTime(String createdAt) {
+    DateTime now = DateTime.now();
+
+    DateTime date = DateTime.parse(createdAt).toLocal();
+    var difference = now.difference(date);
+    String time = "미정";
+    if (difference.inMinutes < 1) {
+      time = "${difference.inSeconds}초 전";
+    } else if (difference.inHours < 1) {
+      time = '${difference.inMinutes}분 전';
+    } else if (date.day == now.day) {
+      time =
+          '${DateFormat('HH').format(date)}:${DateFormat('mm').format(date)}';
+    } else if (date.year == now.year) {
+      time =
+          '${DateFormat('MM').format(date)}/${DateFormat('dd').format(date)}';
+    } else {
+      time =
+          '${DateFormat('yyyy').format(date)}/${DateFormat('MM').format(date)}/${DateFormat('dd').format(date)}';
+    }
+
+    return time;
+  }
+
+  Widget _buildPostList(int tabIndex) {
+    return ListView.separated(
+      itemCount: !isLoadedList[tabIndex]
+          ? 0
+          : (tabIndex == 0
+              ? createdArticleList.length
+              : (tabIndex == 1
+                  ? scrappedArticleList.length
+                  : recentArticleList.length)),
+      controller: scrollControllerList[tabIndex],
+      itemBuilder: (context, index) {
+        late ArticleListActionModel curPost;
+        late ScrapModel scrapInfo;
+        if (tabIndex == 0) {
+          curPost = createdArticleList[index];
+        } else if (tabIndex == 1) {
+          scrapInfo = scrappedArticleList[index];
+          curPost = scrapInfo.parent_article;
+        } else {
+          curPost = recentArticleList[index];
+        }
+        return GestureDetector(
+            onTap: () {
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => PostPage())); // 나중에 수정되어야 함.
+            },
+            child: SizedBox(
+              height: 61,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    curPost.title.toString(),
+                    style: const TextStyle(
+                        fontSize: 18, fontWeight: FontWeight.w500),
+                    overflow: TextOverflow.ellipsis,
+                    maxLines: 1,
+                  ),
+                  const SizedBox(height: 5),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Flexible(
+                        child: Row(
+                          children: [
+                            Flexible(
+                              child: Text(
+                                curPost.created_by!.profile!.nickname
+                                    .toString(),
+                                style: const TextStyle(
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w500,
+                                    color: Color.fromRGBO(177, 177, 177, 1)),
+                                overflow: TextOverflow.ellipsis,
+                                maxLines: 1,
+                              ),
+                            ),
+                            const SizedBox(width: 10),
+                            Text(
+                              getCreatedTime(tabIndex == 1
+                                  ? scrapInfo.created_at.toString()
+                                  : curPost.created_at.toString()),
+                              style: const TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w500,
+                                  color: Color.fromRGBO(177, 177, 177, 1)),
+                            ),
+                            const SizedBox(width: 10),
+                            Text('조회 ${curPost.hit_count}',
+                                style: const TextStyle(
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w500,
+                                    color: Color.fromRGBO(177, 177, 177, 1))),
+                          ],
+                        ),
+                      ),
+                      Row(
+                        children: [
+                          SvgPicture.asset(
+                            'assets/icons/like.svg',
+                            width: 13,
+                            height: 15,
+                            color: ColorsInfo.newara,
+                          ),
+                          const SizedBox(width: 3),
+                          Text('${curPost.positive_vote_count}',
+                              style: const TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w500,
+                                  color: ColorsInfo.newara)),
+                          const SizedBox(width: 10),
+                          SvgPicture.asset(
+                            'assets/icons/dislike.svg',
+                            width: 13,
+                            height: 15,
+                            color: const Color.fromRGBO(83, 141, 209, 1),
+                          ),
+                          const SizedBox(width: 3),
+                          Text('${curPost.negative_vote_count}',
+                              style: const TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w500,
+                                  color: Color.fromRGBO(83, 141, 209, 1))),
+                          const SizedBox(width: 10),
+                          SvgPicture.asset(
+                            'assets/icons/comment.svg',
+                            width: 13,
+                            height: 15,
+                            color: const Color.fromRGBO(99, 99, 99, 1),
+                          ),
+                          const SizedBox(width: 3),
+                          Text('${curPost.comment_count}',
+                              style: const TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w500,
+                                  color: Color.fromRGBO(99, 99, 99, 1))),
+                        ],
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ));
+      },
+      separatorBuilder: (context, index) {
+        return const Divider();
+      },
+    );
+  }
 }
 
+// 설정 페이지가 슬라이드로 나오기 위해서 필요한 Route
 Route _createRoute() {
   return PageRouteBuilder(
     pageBuilder: (context, animation, secondaryAnimation) =>

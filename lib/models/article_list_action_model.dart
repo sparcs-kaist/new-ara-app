@@ -1,3 +1,5 @@
+import 'package:new_ara_app/models/public_user.dart';
+
 class ArticleListActionModel {
   final int id; // 글 마다 부여되는 id, 모든 글에 있는 듯함
   final bool? is_hidden; // 숨김처리 되었는지 여부, 담아둔 글에서는 존재하지 않는다
@@ -6,8 +8,8 @@ class ArticleListActionModel {
   final dynamic parent_topic; // 변수의 타입 정확하게 모르겠음
   final Map<String, dynamic>? parent_board;
   final String? title;
-  final Map<String, dynamic>? created_by;
-  final String? read_status;
+  final PublicUserModel? created_by;
+  final dynamic read_status;
   final String? attachment_type;
   final dynamic communication_article_status; // 변수의 타입 및 용도 정확하게 모르겠음
   final dynamic days_left; // 변수의 타입 및 용도 정확하게 모르겠음
@@ -69,7 +71,7 @@ class ArticleListActionModel {
         parent_topic = json['parent_topic'],
         parent_board = json['parent_board'],
         title = json['title'],
-        created_by = json['created_by'],
+        created_by = PublicUserModel.fromJson(json['created_by']),
         read_status = json['read_status'],
         attachment_type = json['attachment_type'],
         communication_article_status = json['communication_article_status'],
