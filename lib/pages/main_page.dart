@@ -11,6 +11,8 @@ import 'package:new_ara_app/widgetclasses/loading_indicator.dart';
 import 'package:new_ara_app/widgetclasses/post_preview.dart';
 import 'package:provider/provider.dart';
 
+import 'package:new_ara_app/models/article_list_action_model.dart';
+
 class MainPage extends StatefulWidget {
   const MainPage({Key? key}) : super(key: key);
   @override
@@ -645,7 +647,8 @@ class PopularBoard extends StatelessWidget {
           const SizedBox(
             width: 15,
           ),
-          Expanded(child: PostPreview(json: json)),
+          Expanded(
+              child: PostPreview(model: ArticleListActionModel.fromJson(json))),
         ],
       ),
     );
