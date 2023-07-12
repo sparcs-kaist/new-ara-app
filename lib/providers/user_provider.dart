@@ -97,7 +97,7 @@ class UserProvider with ChangeNotifier {
 
   // 아래의 getApiRes 와는 다른 함수
   // apiUrl을 받고 요청을 보낸 후 결과를 리턴해줌
-  Future<dynamic> getApiRes2(String apiUrl, {String? initCookieString}) async {
+  Future<dynamic> getApiRes(String apiUrl, {String? initCookieString}) async {
     String cookieString = "";
 
     var totUrl = "$newAraDefaultUrl/api/$apiUrl";
@@ -121,58 +121,6 @@ class UserProvider with ChangeNotifier {
       return response.data;
     } else {
       debugPrint("Get /api/$apiUrl ${response.statusCode}");
-      return null;
-    }
-  }
-
-  Future<bool> synApiRes(String mapKey,
-      {String? initCookieString, File? multipartFile}) async {
-    //initCookieString 이 없으면 현재 프로바이더의 쿠키로 한다.
-
-    String cookieString = "";
-    //  String apiUrl = 'https://newara.dev.sparcs.org/api/me';
-    var apiUrl = "$newAraDefaultUrl/api/$mapKey";
-    if (initCookieString == null) {
-      // 쿠키를 문자열로 변환하여 HTTP 요청의 헤더에 추가
-
-      cookieString = _loginCookie
-          .map((cookie) => '${cookie.name}=${cookie.value}')
-          .join('; ');
-    } else {
-      cookieString = initCookieString;
-    }
-    // HTTP 요청을 위한 헤더 및 쿠키 추가
-    Map<String, String> headers = {
-      'Cookie': cookieString, // 쿠키 추가
-    };
-
-    // HTTP GET 요청 보내기
-    http.Response response = await http.get(
-      Uri.parse(apiUrl),
-      headers: headers,
-    );
-    if (response.statusCode == 200) {
-      // 요청이 성공적으로 처리됨
-      var responseData = jsonDecode(utf8.decode(response.bodyBytes));
-
-      _apiRes[mapKey] = responseData;
-      // debugPrint("user_provider.dart responseData: $responseData");
-
-      //getApiRes 하는 곳에서 재 실행!
-      notifyListeners();
-      return true;
-    } else {
-      // 요청이 실패함
-      debugPrint(
-          '$apiUrl request failed with status code: ${response.statusCode}');
-      return false;
-    }
-  }
-
-  dynamic getApiRes(String mapKey) {
-    if (_apiRes.containsKey(mapKey)) {
-      return apiRes[mapKey];
-    } else {
       return null;
     }
   }

@@ -36,7 +36,7 @@ class _BulletinListPageState extends State<BulletinListPage> {
   void refreshBoardList(UserProvider userProvider) async {
     //var boardsByGroup = List<dynamic>.filled(6, List< dynamic >.filled(0, null, growable: true) , growable: true);
 
-    List<dynamic> jsonBoards = await userProvider.getApiRes2("boards/") ?? [];
+    List<dynamic> jsonBoards = await userProvider.getApiRes("boards/") ?? [];
 
     List<BoardDetailActionModel> apiResBoards2 = [];
     for (Map<String, dynamic> jsonBoard in jsonBoards) {

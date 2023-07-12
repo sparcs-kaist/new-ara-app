@@ -43,7 +43,7 @@ class _SpecificBulletinBoardPageState extends State<SpecificBulletinBoardPage> {
     // await Future.delayed(Duration(seconds: 1));
     // api 호출과 Provider 정보 동기화
     Map<String, dynamic>? myMap =
-        await userProvider.getApiRes2("articles/?parent_board=7&page=1");
+        await userProvider.getApiRes("articles/?parent_board=7&page=1");
     if (mounted) {
       setState(() {
         postPreviewList.clear();
@@ -64,7 +64,7 @@ class _SpecificBulletinBoardPageState extends State<SpecificBulletinBoardPage> {
       // await Future.delayed(Duration(seconds: 1));
       // api 호출과 Provider 정보 동기화
       Map<String, dynamic>? myMap = await userProvider
-          .getApiRes2("articles/?parent_board=7&page=$currentPage");
+          .getApiRes("articles/?parent_board=7&page=$currentPage");
       if (mounted) {
         setState(() {
           // "is_hidden": true,

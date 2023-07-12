@@ -44,7 +44,7 @@ class _MainPageState extends State<MainPage> {
   void refreshDailyBest(UserProvider userProvider) async {
     // api 호출과 Provider 정보 동기화.
     List<dynamic> recentJson =
-        (await userProvider.getApiRes2("articles/recent/"))['results'];
+        (await userProvider.getApiRes("articles/recent/"))['results'];
     if (mounted) {
       setState(() {
         for (Map<String, dynamic> json in recentJson) {
@@ -63,7 +63,7 @@ class _MainPageState extends State<MainPage> {
 
   void refreshBoardList(UserProvider userProvider) async {
     //Provider 에  api res 주입
-    List<dynamic> boardJson = await userProvider.getApiRes2("boards/");
+    List<dynamic> boardJson = await userProvider.getApiRes("boards/");
     if (mounted) {
       setState(() {
         for (Map<String, dynamic> json in boardJson) {
@@ -111,7 +111,7 @@ class _MainPageState extends State<MainPage> {
     // "slug": "portal-notice",
     int boardID = findBoardID("portal-notice", "")[0];
     List<dynamic> boardArticlesJson = (await userProvider
-        .getApiRes2("articles/?parent_board=$boardID"))['results'];
+        .getApiRes("articles/?parent_board=$boardID"))['results'];
     if (mounted) {
       setState(() {
         for (Map<String, dynamic> json in boardArticlesJson) {
@@ -133,7 +133,7 @@ class _MainPageState extends State<MainPage> {
     // "slug": "facility-feedback",
     int boardID = findBoardID("facility-feedback", "")[0];
     List<dynamic> facilityJson = (await userProvider
-        .getApiRes2("articles/?parent_board=$boardID"))['results'];
+        .getApiRes("articles/?parent_board=$boardID"))['results'];
     if (mounted) {
       setState(() {
         for (Map<String, dynamic> json in facilityJson) {
@@ -154,7 +154,7 @@ class _MainPageState extends State<MainPage> {
     //        "slug": "newara-feedback",
     int boardID = findBoardID("ara-feedback", "")[0];
     List<dynamic> newAraNoticeJson = (await userProvider
-        .getApiRes2("articles/?parent_board=$boardID"))['results'];
+        .getApiRes("articles/?parent_board=$boardID"))['results'];
     if (mounted) {
       setState(() {
         for (Map<String, dynamic> json in newAraNoticeJson) {
@@ -178,7 +178,7 @@ class _MainPageState extends State<MainPage> {
     //https://newara.sparcs.org/api/articles/?parent_board=2&parent_topic=24
     int boardID = findBoardID("students-group", "grad-assoc")[0];
     int topicID = findBoardID("students-group", "grad-assoc")[1];
-    List<dynamic> gradJson = (await userProvider.getApiRes2(
+    List<dynamic> gradJson = (await userProvider.getApiRes(
         "articles/?parent_board=$boardID&parent_topic=$topicID"))['results'];
     if (mounted) {
       setState(() {
@@ -201,7 +201,7 @@ class _MainPageState extends State<MainPage> {
     // "slug": "undergrad-assoc",
     int boardID = findBoardID("students-group", "undergrad-assoc")[0];
     int topicID = findBoardID("students-group", "undergrad-assoc")[1];
-    List<dynamic> underGradJson = (await userProvider.getApiRes2(
+    List<dynamic> underGradJson = (await userProvider.getApiRes(
         "articles/?parent_board=$boardID&parent_topic=$topicID"))['results'];
     if (mounted) {
       setState(() {
@@ -224,7 +224,7 @@ class _MainPageState extends State<MainPage> {
     // "slug": "freshman-council",
     int boardID = findBoardID("students-group", "freshman-council")[0];
     int topicID = findBoardID("students-group", "freshman-council")[1];
-    List<dynamic> freshmanJson = (await userProvider.getApiRes2(
+    List<dynamic> freshmanJson = (await userProvider.getApiRes(
         "articles/?parent_board=$boardID&parent_topic=$topicID"))['results'];
     if (mounted) {
       setState(() {

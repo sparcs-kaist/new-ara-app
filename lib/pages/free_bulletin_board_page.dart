@@ -57,7 +57,7 @@ class _FreeBulletinBoardPageState extends State<FreeBulletinBoardPage> {
     //https://newara.dev.sparcs.org/api/articles/recent/?page=1
     //                                  articles/?parent_board=${this.widget.boardInfo["id"]}&page=1
     // await Future.delayed(Duration(seconds: 1));
-    Map<String, dynamic>? myMap = await userProvider.getApiRes2("${apiUrl}1");
+    Map<String, dynamic>? myMap = await userProvider.getApiRes("${apiUrl}1");
 
     if (mounted) {
       setState(() {
@@ -84,7 +84,7 @@ class _FreeBulletinBoardPageState extends State<FreeBulletinBoardPage> {
       // api 호출과 Provider 정보 동기화.
       // await Future.delayed(Duration(seconds: 1));
       Map<String, dynamic>? myMap =
-          await userProvider.getApiRes2("$apiUrl$currentPage");
+          await userProvider.getApiRes("$apiUrl$currentPage");
       if (mounted) {
         setState(() {
           // "is_hidden": true,
