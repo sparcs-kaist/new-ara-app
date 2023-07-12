@@ -62,9 +62,14 @@ class _FreeBulletinBoardPageState extends State<FreeBulletinBoardPage> {
     if (mounted) {
       setState(() {
         postPreviewList.clear();
-        for (int i = 0; i < (myMap!["results"].length ?? 0); i++) {
-          postPreviewList
-              .add(ArticleListActionModel.fromJson(myMap["results"][i] ?? {}));
+        for (int i = 0; i < (myMap?["results"].length ?? 0); i++) {
+          try {
+            postPreviewList
+                .add(ArticleListActionModel.fromJson(myMap!["results"][i]));
+          } catch (error) {
+            debugPrint(
+                "refreshPostList error at $i : $error"); // invalid json 걸러내기
+          }
         }
         isLoading = false;
       });

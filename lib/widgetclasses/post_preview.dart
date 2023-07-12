@@ -7,7 +7,7 @@ import 'package:new_ara_app/models/article_list_action_model.dart';
 class PostPreview extends StatefulWidget {
   final ArticleListActionModel model;
   PostPreview({super.key, required ArticleListActionModel model})
-      : model = model ?? ArticleListActionModel.fromJson({});
+      : model = model;
 
   @override
   State<PostPreview> createState() => _PostPreviewState();
@@ -47,7 +47,7 @@ class _PostPreviewState extends State<PostPreview> {
             children: [
               Flexible(
                 child: Text(
-                  widget.model.is_hidden!
+                  widget.model.is_hidden
                       ? "숨겨진 글 입니다."
                       : widget.model.title.toString(),
                   style: const TextStyle(
@@ -97,7 +97,7 @@ class _PostPreviewState extends State<PostPreview> {
                 children: [
                   Flexible(
                     child: Text(
-                      widget.model.created_by!.profile!.nickname.toString(),
+                      widget.model.created_by.profile.nickname.toString(),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: const TextStyle(
