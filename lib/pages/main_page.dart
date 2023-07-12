@@ -3,6 +3,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:new_ara_app/constants/board_type.dart';
 import 'package:new_ara_app/constants/colors_info.dart';
+import 'package:new_ara_app/models/board_detail_action_model.dart';
 import 'package:new_ara_app/pages/free_bulletin_board_page.dart';
 import 'package:new_ara_app/pages/post_write_page.dart';
 import 'package:new_ara_app/pages/specific_bulletin_board_page.dart';
@@ -21,14 +22,14 @@ class MainPage extends StatefulWidget {
 
 class _MainPageState extends State<MainPage> {
   List<bool> isLoading = [true, true, true, true, true, true, true, true];
-  List<dynamic> boardList = [];
-  Map<String, dynamic> dailyBestContent = {};
-  Map<String, dynamic> portalContent = {};
-  Map<String, dynamic> facilityContent = {};
-  Map<String, dynamic> newAraContent = {};
-  Map<String, dynamic> gradContent = {};
-  Map<String, dynamic> underGradContent = {};
-  Map<String, dynamic> freshmanContent = {};
+  List<BoardDetailActionModel> boardList = [];
+  List<ArticleListActionModel> dailyBestContentList = [];
+  List<ArticleListActionModel> portalContentList = [];
+  List<ArticleListActionModel> facilityContentList = [];
+  List<ArticleListActionModel> newAraContentList = [];
+  List<ArticleListActionModel> gradContentList = [];
+  List<ArticleListActionModel> underGradContentList = [];
+  List<ArticleListActionModel> freshmanContentList = [];
 
   @override
   void initState() {
@@ -42,11 +43,19 @@ class _MainPageState extends State<MainPage> {
 
   void refreshDailyBest(UserProvider userProvider) async {
     // api 호출과 Provider 정보 동기화.
-    await userProvider.synApiRes("articles/recent/");
+    List<dynamic> recentJson =
+        (await userProvider.getApiRes2("articles/recent/"))['results'];
     if (mounted) {
       setState(() {
-        dailyBestContent = userProvider.getApiRes("articles/recent/");
-        debugPrint(" ----- ${dailyBestContent["results"][0]}");
+        for (Map<String, dynamic> json in recentJson) {
+          try {
+            dailyBestContentList.add(ArticleListActionModel.fromJson(json));
+          } catch (error) {
+            debugPrint(
+                "refreshDailyBest ArticleListActionModel.fromJson error: $error");
+          }
+        }
+        //debugPrint(" ----- ${dailyBestContent["results"][0]}");
         isLoading[0] = false;
       });
     }
@@ -54,10 +63,17 @@ class _MainPageState extends State<MainPage> {
 
   void refreshBoardList(UserProvider userProvider) async {
     //Provider 에  api res 주입
-    await userProvider.synApiRes("boards/");
+    List<dynamic> boardJson = await userProvider.getApiRes2("boards/");
     if (mounted) {
       setState(() {
-        boardList = userProvider.getApiRes("boards/");
+        for (Map<String, dynamic> json in boardJson) {
+          try {
+            boardList.add(BoardDetailActionModel.fromJson(json));
+          } catch (error) {
+            debugPrint(
+                "refreshBoardList BoardDetailActionModel.fromJson failed: $error");
+          }
+        }
         isLoading[7] = false;
       });
     }
@@ -75,12 +91,12 @@ class _MainPageState extends State<MainPage> {
 
     List<int> returnValue = [-1, -1];
     for (int i = 0; i < boardList.length; i++) {
-      if (boardList[i]["slug"] == slug1) {
-        returnValue[0] = boardList[i]["id"];
+      if (boardList[i].slug == slug1) {
+        returnValue[0] = boardList[i].id;
         if (slug2 != "") {
-          for (int j = 0; j < boardList[i]["topics"].length; j++) {
-            if (boardList[i]["topics"][j]["slug"] == slug2) {
-              returnValue[1] = boardList[i]["topics"][j]["id"];
+          for (int j = 0; j < boardList[i].topics.length; j++) {
+            if (boardList[i].topics[j].slug == slug2) {
+              returnValue[1] = boardList[i].topics[j].id;
             }
           }
         }
@@ -94,11 +110,18 @@ class _MainPageState extends State<MainPage> {
     //  articles/?parent_board=1
     // "slug": "portal-notice",
     int boardID = findBoardID("portal-notice", "")[0];
-    await userProvider.synApiRes("articles/?parent_board=$boardID");
+    List<dynamic> boardArticlesJson = (await userProvider
+        .getApiRes2("articles/?parent_board=$boardID"))['results'];
     if (mounted) {
       setState(() {
-        portalContent =
-            userProvider.getApiRes("articles/?parent_board=$boardID");
+        for (Map<String, dynamic> json in boardArticlesJson) {
+          try {
+            portalContentList.add(ArticleListActionModel.fromJson(json));
+          } catch (error) {
+            debugPrint(
+                "refreshPortalNotice ArticleListActionModel.fromJson error: $error");
+          }
+        }
         isLoading[1] = false;
       });
     }
@@ -109,11 +132,18 @@ class _MainPageState extends State<MainPage> {
     //입주 업체
     // "slug": "facility-feedback",
     int boardID = findBoardID("facility-feedback", "")[0];
-    await userProvider.synApiRes("articles/?parent_board=$boardID");
+    List<dynamic> facilityJson = (await userProvider
+        .getApiRes2("articles/?parent_board=$boardID"))['results'];
     if (mounted) {
       setState(() {
-        facilityContent =
-            userProvider.getApiRes("articles/?parent_board=$boardID");
+        for (Map<String, dynamic> json in facilityJson) {
+          try {
+            facilityContentList.add(ArticleListActionModel.fromJson(json));
+          } catch (error) {
+            debugPrint(
+                "refreshFacilityNotice ArticleListActionModel.fromJson failed: $error");
+          }
+        }
         isLoading[2] = false;
       });
     }
@@ -123,11 +153,18 @@ class _MainPageState extends State<MainPage> {
     //뉴아라
     //        "slug": "newara-feedback",
     int boardID = findBoardID("ara-feedback", "")[0];
-    await userProvider.synApiRes("articles/?parent_board=$boardID");
+    List<dynamic> newAraNoticeJson = (await userProvider
+        .getApiRes2("articles/?parent_board=$boardID"))['results'];
     if (mounted) {
       setState(() {
-        newAraContent =
-            userProvider.getApiRes("articles/?parent_board=$boardID");
+        for (Map<String, dynamic> json in newAraNoticeJson) {
+          try {
+            newAraContentList.add(ArticleListActionModel.fromJson(json));
+          } catch (error) {
+            debugPrint(
+                "refreshNewAraNotice ArticleListActionModel.fromJson failed: $error");
+          }
+        }
         isLoading[3] = false;
       });
     }
@@ -141,29 +178,41 @@ class _MainPageState extends State<MainPage> {
     //https://newara.sparcs.org/api/articles/?parent_board=2&parent_topic=24
     int boardID = findBoardID("students-group", "grad-assoc")[0];
     int topicID = findBoardID("students-group", "grad-assoc")[1];
-    await userProvider
-        .synApiRes("articles/?parent_board=$boardID&parent_topic=$topicID");
+    List<dynamic> gradJson = (await userProvider.getApiRes2(
+        "articles/?parent_board=$boardID&parent_topic=$topicID"))['results'];
     if (mounted) {
       setState(() {
-        gradContent = userProvider
-            .getApiRes("articles/?parent_board=$boardID&parent_topic=$topicID");
+        for (Map<String, dynamic> json in gradJson) {
+          try {
+            gradContentList.add(ArticleListActionModel.fromJson(json));
+          } catch (error) {
+            debugPrint(
+                "refreshGradAssocNotice ArticleListActionModel.fromJson failed: $error");
+          }
+        }
         isLoading[4] = false;
       });
     }
   }
 
   void refreshUndergradAssocNotice(UserProvider userProvider) async {
-    //총학
+    // 총학
     // "slug": "students-group",
     // "slug": "undergrad-assoc",
     int boardID = findBoardID("students-group", "undergrad-assoc")[0];
     int topicID = findBoardID("students-group", "undergrad-assoc")[1];
-    await userProvider
-        .synApiRes("articles/?parent_board=$boardID&parent_topic=$topicID");
+    List<dynamic> underGradJson = (await userProvider.getApiRes2(
+        "articles/?parent_board=$boardID&parent_topic=$topicID"))['results'];
     if (mounted) {
       setState(() {
-        underGradContent = userProvider
-            .getApiRes("articles/?parent_board=$boardID&parent_topic=$topicID");
+        for (Map<String, dynamic> json in underGradJson) {
+          try {
+            underGradContentList.add(ArticleListActionModel.fromJson(json));
+          } catch (error) {
+            debugPrint(
+                "refreshUndergradAssocNotice ArticleListActionModel.fromJson failed: $error");
+          }
+        }
         isLoading[5] = false;
       });
     }
@@ -175,12 +224,18 @@ class _MainPageState extends State<MainPage> {
     // "slug": "freshman-council",
     int boardID = findBoardID("students-group", "freshman-council")[0];
     int topicID = findBoardID("students-group", "freshman-council")[1];
-    await userProvider
-        .synApiRes("articles/?parent_board=$boardID&parent_topic=$topicID");
+    List<dynamic> freshmanJson = (await userProvider.getApiRes2(
+        "articles/?parent_board=$boardID&parent_topic=$topicID"))['results'];
     if (mounted) {
       setState(() {
-        freshmanContent = userProvider
-            .getApiRes("articles/?parent_board=$boardID&parent_topic=$topicID");
+        for (Map<String, dynamic> json in freshmanJson) {
+          try {
+            freshmanContentList.add(ArticleListActionModel.fromJson(json));
+          } catch (error) {
+            debugPrint(
+                "refreshFreshmanCouncil ArticleListActionModel.fromJson failed: $error");
+          }
+        }
         isLoading[6] = false;
       });
     }
@@ -260,7 +315,7 @@ class _MainPageState extends State<MainPage> {
                         child: Column(
                           children: [
                             PopularBoard(
-                              json: dailyBestContent["results"][0],
+                              model: dailyBestContentList[0],
                               ingiNum: 1,
                             ),
                             Row(
@@ -277,7 +332,7 @@ class _MainPageState extends State<MainPage> {
                               ],
                             ),
                             PopularBoard(
-                              json: dailyBestContent["results"][1],
+                              model: dailyBestContentList[1],
                               ingiNum: 2,
                             ),
                             Row(
@@ -294,7 +349,7 @@ class _MainPageState extends State<MainPage> {
                               ],
                             ),
                             PopularBoard(
-                              json: dailyBestContent["results"][2],
+                              model: dailyBestContentList[2],
                               ingiNum: 3,
                             ),
                           ],
@@ -380,7 +435,7 @@ class _MainPageState extends State<MainPage> {
                               height: 10,
                             ),
                             Text(
-                              portalContent["results"][0]["title"],
+                              portalContentList[0].title.toString(),
                               style: const TextStyle(
                                   fontSize: 14, fontWeight: FontWeight.w400),
                               maxLines: 1,
@@ -390,7 +445,7 @@ class _MainPageState extends State<MainPage> {
                               height: 10,
                             ),
                             Text(
-                              portalContent["results"][1]["title"],
+                              portalContentList[1].title.toString(),
                               style: const TextStyle(
                                   fontSize: 14, fontWeight: FontWeight.w400),
                               maxLines: 1,
@@ -400,7 +455,7 @@ class _MainPageState extends State<MainPage> {
                               height: 10,
                             ),
                             Text(
-                              portalContent["results"][2]["title"],
+                              portalContentList[2].title.toString(),
                               style: const TextStyle(
                                   fontSize: 14, fontWeight: FontWeight.w400),
                               maxLines: 1,
@@ -443,7 +498,7 @@ class _MainPageState extends State<MainPage> {
                                 ),
                                 Expanded(
                                   child: Text(
-                                    facilityContent["results"][0]["title"],
+                                    facilityContentList[0].title.toString(),
                                     style: const TextStyle(
                                         fontSize: 14,
                                         fontWeight: FontWeight.w400),
@@ -483,7 +538,7 @@ class _MainPageState extends State<MainPage> {
                                 ),
                                 Expanded(
                                   child: Text(
-                                    newAraContent["results"][0]["title"],
+                                    newAraContentList[0].title.toString(),
                                     style: const TextStyle(
                                         fontSize: 14,
                                         fontWeight: FontWeight.w400),
@@ -531,7 +586,7 @@ class _MainPageState extends State<MainPage> {
                                   ),
                                   Expanded(
                                     child: Text(
-                                      gradContent["results"][0]["title"],
+                                      gradContentList[0].title.toString(),
                                       style: const TextStyle(
                                           fontSize: 14,
                                           fontWeight: FontWeight.w400),
@@ -559,7 +614,7 @@ class _MainPageState extends State<MainPage> {
                                   ),
                                   Expanded(
                                     child: Text(
-                                      underGradContent["results"][0]["title"],
+                                      underGradContentList[0].title.toString(),
                                       style: const TextStyle(
                                           fontSize: 14,
                                           fontWeight: FontWeight.w400),
@@ -587,7 +642,7 @@ class _MainPageState extends State<MainPage> {
                                   ),
                                   Expanded(
                                     child: Text(
-                                      freshmanContent["results"][0]["title"],
+                                      freshmanContentList[0].title.toString(),
                                       style: const TextStyle(
                                           fontSize: 14,
                                           fontWeight: FontWeight.w400),
@@ -612,12 +667,12 @@ class _MainPageState extends State<MainPage> {
 }
 
 class PopularBoard extends StatelessWidget {
-  final Map<String, dynamic> json;
+  final ArticleListActionModel model;
   final int boardNum;
 
   PopularBoard(
-      {super.key, required Map<String, dynamic>? json, int ingiNum = 1})
-      : json = json ?? {},
+      {super.key, required ArticleListActionModel model, int ingiNum = 1})
+      : model = model,
         boardNum = ingiNum;
 
   @override
@@ -647,8 +702,7 @@ class PopularBoard extends StatelessWidget {
           const SizedBox(
             width: 15,
           ),
-          Expanded(
-              child: PostPreview(model: ArticleListActionModel.fromJson(json))),
+          Expanded(child: PostPreview(model: model)),
         ],
       ),
     );
