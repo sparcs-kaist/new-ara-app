@@ -21,18 +21,18 @@ class SettingPage extends StatefulWidget {
 }
 
 class SettingPageState extends State<SettingPage> {
-
-  bool see_sexual=true;
-  bool see_social=true;
+  bool see_sexual = true;
+  bool see_social = true;
 
   @override
   void initState() {
     var userProvider = context.read<UserProvider>();
     // TODO: implement initState
     super.initState();
-    see_sexual = userProvider.naUser!.see_sexual; // 웹과 동일하게 하기 위해 snake_case 변수명 사용
-    see_social  = userProvider.naUser!.see_social; // 위와 같은 이유로 snake_case
-
+    see_sexual = userProvider.naUser?.see_sexual ??
+        true; // 웹과 동일하게 하기 위해 snake_case 변수명 사용
+    see_social =
+        userProvider.naUser?.see_social ?? true; // 위와 같은 이유로 snake_case
   }
 
   @override
@@ -176,7 +176,9 @@ class SettingPageState extends State<SettingPage> {
                                   activeColor: ColorsInfo.newara,
                                   value: see_social,
                                   onChanged: (value) async {
-                                    setState((){see_social = value;});
+                                    setState(() {
+                                      see_social = value;
+                                    });
                                     try {
                                       await dio.patch(
                                           '$newAraDefaultUrl/api/user_profiles/${userProvider.naUser!.user}/',
