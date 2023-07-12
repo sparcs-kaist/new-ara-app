@@ -1,45 +1,45 @@
 import 'package:new_ara_app/models/topic_model.dart';
 
 class BoardDetailActionModel {
-  final int? id;
-  final List<TopicModel>? topics;
-  final bool? user_readable;
-  final bool? user_writable;
-  final String? created_at;
-  final String? updated_at;
-  final String? deleted_at;
-  final String? slug;
+  final int id;
+  final List<TopicModel> topics;
+  final bool user_readable;
+  final bool user_writable;
+  final String created_at; // $date-time
+  final String updated_at; // $date-time
+  final String deleted_at; // $date-time, default
+  final String slug;
   final String? ko_name;
   final String? en_name;
-  final String? ko_description;
-  final String? en_description;
+  final String ko_description;
+  final String en_description;
   final int? read_access_mask;
   final int? write_access_mask;
   final int? comment_access_mask;
-  final bool? is_readonly;
-  final bool? is_hidden;
+  final bool? is_readonly; // 활성화했을 때 관리자만 글을 쓸 수 있음
+  final bool? is_hidden; // 활성화했을 때 메인페이지 상단바 리스트에 나타나지 않음
   final int? name_type;
   final bool? is_school_communication;
   final int? group_id;
-  final String? banner_image;
+  final String? banner_image; // $uri
   final String? ko_banner_description;
   final String? en_banner_description;
   final String? banner_url;
-  final int? top_threshold;
+  final int? top_threshold; // 인기글 달성 기준 좋아요 갯수
 
   BoardDetailActionModel({
-    this.id,
-    this.topics,
-    this.user_readable,
-    this.user_writable,
-    this.created_at,
-    this.updated_at,
-    this.deleted_at,
-    this.slug,
-    this.ko_name,
-    this.en_name,
-    this.ko_description,
-    this.en_description,
+    required this.id,
+    required this.topics,
+    required this.user_readable,
+    required this.user_writable,
+    required this.created_at,
+    required this.updated_at,
+    this.deleted_at = "0001-01-01T08:27:52+08:27:52",
+    required this.slug,
+    required this.ko_name,
+    required this.en_name,
+    required this.ko_description,
+    required this.en_description,
     this.read_access_mask,
     this.write_access_mask,
     this.comment_access_mask,
@@ -90,7 +90,7 @@ class BoardDetailActionModel {
   Map<String, dynamic> toJson() {
     return {
       'id': id,
-      'topics': topics?.map((topic) => topic.toJson()).toList(),
+      'topics': topics.map((topic) => topic.toJson()).toList(),
       'user_readable': user_readable,
       'user_writable': user_writable,
       'created_at': created_at,

@@ -1,16 +1,16 @@
 import 'package:new_ara_app/models/public_user_profile_model.dart';
 
 class PublicUserModel {
-  dynamic id;
-  String? username;
-  PublicUserProfileModel? profile;
-  bool? is_blocked;
+  final dynamic id;
+  final String username;
+  final PublicUserProfileModel profile;
+  final bool? is_blocked;
 
   PublicUserModel({
     required this.id,
     required this.username,
     required this.profile,
-    required this.is_blocked,
+    this.is_blocked,
   });
 
   factory PublicUserModel.fromJson(Map<String, dynamic> json) {
@@ -25,7 +25,7 @@ class PublicUserModel {
     return {
       'id': id,
       'username': username,
-      'profile': profile?.toJson(),
+      'profile': profile.toJson(),
       'is_blocked': is_blocked,
     };
   }

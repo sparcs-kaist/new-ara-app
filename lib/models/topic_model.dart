@@ -1,26 +1,26 @@
 class TopicModel {
-  final int? id;
-  final String? created_at;
-  final String? updated_at;
-  final String? deleted_at;
-  final String? slug;
-  final String? ko_name;
-  final String? en_name;
-  final String? ko_description;
-  final String? en_description;
-  final int? parent_board;
+  final int id;
+  final String created_at;
+  final String updated_at;
+  final String deleted_at;
+  final String slug;
+  final String ko_name;
+  final String en_name;
+  final String ko_description;
+  final String en_description;
+  final int parent_board;
 
   TopicModel({
-    this.id,
-    this.created_at,
-    this.updated_at,
-    this.deleted_at,
-    this.slug,
-    this.ko_name,
-    this.en_name,
-    this.ko_description,
-    this.en_description,
-    this.parent_board,
+    required this.id,
+    required this.created_at,
+    required this.updated_at,
+    this.deleted_at = "0001-01-01T08:27:52+08:27:52",
+    required this.slug,
+    required this.ko_name,
+    required this.en_name,
+    required this.ko_description,
+    required this.en_description,
+    required this.parent_board,
   });
 
   factory TopicModel.fromJson(Map<String, dynamic> json) {

@@ -6,8 +6,8 @@ class PublicUserProfileModel {
   bool? is_school_admin;
 
   PublicUserProfileModel({
-    required this.picture,
-    required this.nickname,
+    this.picture,
+    this.nickname,
     required this.user,
     required this.is_official,
     required this.is_school_admin,

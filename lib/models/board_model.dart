@@ -1,36 +1,37 @@
 class BoardModel {
-  int? id;
-  String? created_at;
-  String? updated_at;
-  String? deleted_at;
-  String? slug;
-  String? ko_name;
-  String? en_name;
-  String? ko_description;
-  String? en_description;
-  int? read_access_mask;
-  int? write_access_mask;
-  int? comment_access_mask;
-  bool? is_readonly;
-  bool? is_hidden;
-  int? name_type;
-  bool? is_school_communication;
-  int? group_id;
-  String? banner_image;
-  String? ko_banner_description;
-  String? en_banner_description;
-  String? banner_url;
+  final int id;
+  final String created_at;
+  final String updated_at;
+  final String deleted_at;
+  final String slug;
+  final String ko_name;
+  final String en_name;
+  final String ko_description;
+  final String en_description;
+  final int? read_access_mask;
+  final int? write_access_mask;
+  final int? comment_access_mask;
+  final bool? is_readonly; // 활성화 했을 때 관리자만 글을 쓸 수 있음
+  final bool? is_hidden; // 활성화 했을 때 메인페이지 상단바 리스트에 나타나지 않음
+  final int? name_type; // 닉네임, 익명, 실명글 허용 여부 설정
+  final bool? is_school_communication; // 학교 소통 게시판 글임을 표시
+  final int? group_id;
+  final String? banner_image; // 게시판 배너 이미지 URI
+  final String? ko_banner_description; // 게시판 배너에 삽입되는 국문 소개
+  final String? en_banner_description; // 게시판 배너에 삽입되는 염문 소개
+  final String? banner_url; // 게시판 배너를 클릭 시에 이동하는 링크
+  final int? top_threshold; // 인기글 달성 기준 좋아요 갯수
 
   BoardModel({
-    this.id,
-    this.created_at,
-    this.updated_at,
-    this.deleted_at,
-    this.slug,
-    this.ko_name,
-    this.en_name,
-    this.ko_description,
-    this.en_description,
+    required this.id,
+    required this.created_at,
+    required this.updated_at,
+    this.deleted_at = "0001-01-01T08:27:52+08:27:52",
+    required this.slug,
+    required this.ko_name,
+    required this.en_name,
+    required this.ko_description,
+    required this.en_description,
     this.read_access_mask,
     this.write_access_mask,
     this.comment_access_mask,
@@ -43,6 +44,7 @@ class BoardModel {
     this.ko_banner_description,
     this.en_banner_description,
     this.banner_url,
+    this.top_threshold,
   });
 
   factory BoardModel.fromJson(Map<String, dynamic> json) {
@@ -68,6 +70,7 @@ class BoardModel {
       ko_banner_description: json['ko_banner_description'],
       en_banner_description: json['en_banner_description'],
       banner_url: json['banner_url'],
+      top_threshold: json['top_threshold'],
     );
   }
 
@@ -94,6 +97,7 @@ class BoardModel {
       'ko_banner_description': ko_banner_description,
       'en_banner_description': en_banner_description,
       'banner_url': banner_url,
+      'top_threshold': top_threshold,
     };
   }
 }
