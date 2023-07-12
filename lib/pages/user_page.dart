@@ -149,9 +149,11 @@ class _UserPageState extends State<UserPage>
                               const BorderRadius.all(Radius.circular(100)),
                           child: SizedBox.fromSize(
                             size: const Size.fromRadius(48),
-                            child: Image.network(
-                                fit: BoxFit.cover,
-                                userProvider.naUser!.picture),
+                            child: userProvider.naUser?.picture == null
+                                ? Container()
+                                : Image.network(
+                                    fit: BoxFit.cover,
+                                    userProvider.naUser!.picture.toString()),
                           ),
                         ),
                       ),
@@ -171,9 +173,9 @@ class _UserPageState extends State<UserPage>
                                 ),
                               ),
                               Text(
-                                userProvider.naUser!.email == null
-                                    ? "이메일에 지정된 정보가 없습니다."
-                                    : userProvider.naUser!.email!,
+                                userProvider.naUser == null
+                                    ? "이메일 정보가 없습니다."
+                                    : "${userProvider.naUser?.email}",
                                 style: const TextStyle(
                                   fontSize: 14,
                                   fontWeight: FontWeight.w500,
@@ -459,8 +461,7 @@ class _UserPageState extends State<UserPage>
                           children: [
                             Flexible(
                               child: Text(
-                                curPost.created_by!.profile!.nickname
-                                    .toString(),
+                                curPost.created_by.profile.nickname.toString(),
                                 style: const TextStyle(
                                     fontSize: 14,
                                     fontWeight: FontWeight.w500,
