@@ -12,6 +12,7 @@ import 'package:new_ara_app/widgetclasses/loading_indicator.dart';
 import 'package:new_ara_app/models/article_list_action_model.dart';
 import 'package:new_ara_app/models/scrap_model.dart';
 import 'package:new_ara_app/pages/post_view_page.dart';
+import 'package:new_ara_app/utils/time_utils.dart';
 
 class UserPage extends StatefulWidget {
   const UserPage({Key? key}) : super(key: key);
@@ -387,30 +388,6 @@ class _UserPageState extends State<UserPage>
     setState(() => curCount = tabCount[0]);
   }
 
-  String getCreatedTime(String createdAt) {
-    DateTime now = DateTime.now();
-
-    DateTime date = DateTime.parse(createdAt).toLocal();
-    var difference = now.difference(date);
-    String time = "미정";
-    if (difference.inMinutes < 1) {
-      time = "${difference.inSeconds}초 전";
-    } else if (difference.inHours < 1) {
-      time = '${difference.inMinutes}분 전';
-    } else if (date.day == now.day) {
-      time =
-          '${DateFormat('HH').format(date)}:${DateFormat('mm').format(date)}';
-    } else if (date.year == now.year) {
-      time =
-          '${DateFormat('MM').format(date)}/${DateFormat('dd').format(date)}';
-    } else {
-      time =
-          '${DateFormat('yyyy').format(date)}/${DateFormat('MM').format(date)}/${DateFormat('dd').format(date)}';
-    }
-
-    return time;
-  }
-
   Widget _buildPostList(int tabIndex) {
     return ListView.separated(
       itemCount: !isLoadedList[tabIndex]
@@ -437,7 +414,8 @@ class _UserPageState extends State<UserPage>
               Navigator.push(
                   context,
                   MaterialPageRoute(
-                      builder: (context) => PostPage())); // 나중에 수정되어야 함.
+                      builder: (context) =>
+                          PostViewPage(id: curPost.id))); // 나중에 수정되어야 함.
             },
             child: SizedBox(
               height: 61,
@@ -472,7 +450,7 @@ class _UserPageState extends State<UserPage>
                             ),
                             const SizedBox(width: 10),
                             Text(
-                              getCreatedTime(tabIndex == 1
+                              getTime(tabIndex == 1
                                   ? scrapInfo.created_at.toString()
                                   : curPost.created_at.toString()),
                               style: const TextStyle(
