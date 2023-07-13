@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:provider/provider.dart';
+
 import 'package:new_ara_app/constants/board_type.dart';
 import 'package:new_ara_app/constants/colors_info.dart';
 import 'package:new_ara_app/models/board_detail_action_model.dart';
@@ -10,9 +12,8 @@ import 'package:new_ara_app/pages/specific_bulletin_board_page.dart';
 import 'package:new_ara_app/providers/user_provider.dart';
 import 'package:new_ara_app/widgetclasses/loading_indicator.dart';
 import 'package:new_ara_app/widgetclasses/post_preview.dart';
-import 'package:provider/provider.dart';
-
 import 'package:new_ara_app/models/article_list_action_model.dart';
+import 'package:new_ara_app/pages/post_view_page.dart';
 
 class MainPage extends StatefulWidget {
   const MainPage({Key? key}) : super(key: key);
@@ -434,33 +435,60 @@ class _MainPageState extends State<MainPage> {
                             const SizedBox(
                               height: 10,
                             ),
-                            Text(
-                              portalContentList[0].title.toString(),
-                              style: const TextStyle(
-                                  fontSize: 14, fontWeight: FontWeight.w400),
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
+                            InkWell(
+                              onTap: () {
+                                Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) => PostViewPage(
+                                            id: portalContentList[0].id)));
+                              },
+                              child: Text(
+                                portalContentList[0].title.toString(),
+                                style: const TextStyle(
+                                    fontSize: 14, fontWeight: FontWeight.w400),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
                             ),
                             const SizedBox(
                               height: 10,
                             ),
-                            Text(
-                              portalContentList[1].title.toString(),
-                              style: const TextStyle(
-                                  fontSize: 14, fontWeight: FontWeight.w400),
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                            ),
+                            InkWell(
+                                onTap: () {
+                                  Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (context) => PostViewPage(
+                                              id: portalContentList[1].id)));
+                                },
+                                child: Text(
+                                  portalContentList[1].title.toString(),
+                                  style: const TextStyle(
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w400),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                )),
                             const SizedBox(
                               height: 10,
                             ),
-                            Text(
-                              portalContentList[2].title.toString(),
-                              style: const TextStyle(
-                                  fontSize: 14, fontWeight: FontWeight.w400),
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                            ),
+                            InkWell(
+                                onTap: () {
+                                  Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (context) => PostViewPage(
+                                              id: portalContentList[2].id)));
+                                },
+                                child: Text(
+                                  portalContentList[2].title.toString(),
+                                  style: const TextStyle(
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w400),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                )),
                             const SizedBox(
                               height: 14,
                             ),
@@ -497,14 +525,25 @@ class _MainPageState extends State<MainPage> {
                                   width: 10,
                                 ),
                                 Expanded(
-                                  child: Text(
-                                    facilityContentList[0].title.toString(),
-                                    style: const TextStyle(
-                                        fontSize: 14,
-                                        fontWeight: FontWeight.w400),
-                                    maxLines: 1,
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
+                                  child: InkWell(
+                                      onTap: () {
+                                        Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                                builder: (context) =>
+                                                    PostViewPage(
+                                                        id: facilityContentList[
+                                                                0]
+                                                            .id)));
+                                      },
+                                      child: Text(
+                                        facilityContentList[0].title.toString(),
+                                        style: const TextStyle(
+                                            fontSize: 14,
+                                            fontWeight: FontWeight.w400),
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                      )),
                                 )
                               ],
                             ),
@@ -537,14 +576,24 @@ class _MainPageState extends State<MainPage> {
                                   width: 10,
                                 ),
                                 Expanded(
-                                  child: Text(
-                                    newAraContentList[0].title.toString(),
-                                    style: const TextStyle(
-                                        fontSize: 14,
-                                        fontWeight: FontWeight.w400),
-                                    maxLines: 1,
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
+                                  child: InkWell(
+                                      onTap: () {
+                                        Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                                builder: (context) =>
+                                                    PostViewPage(
+                                                        id: newAraContentList[0]
+                                                            .id)));
+                                      },
+                                      child: Text(
+                                        newAraContentList[0].title.toString(),
+                                        style: const TextStyle(
+                                            fontSize: 14,
+                                            fontWeight: FontWeight.w400),
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                      )),
                                 ),
                               ],
                             ),
@@ -585,14 +634,24 @@ class _MainPageState extends State<MainPage> {
                                     width: 10,
                                   ),
                                   Expanded(
-                                    child: Text(
-                                      gradContentList[0].title.toString(),
-                                      style: const TextStyle(
-                                          fontSize: 14,
-                                          fontWeight: FontWeight.w400),
-                                      maxLines: 1,
-                                      overflow: TextOverflow.ellipsis,
-                                    ),
+                                    child: InkWell(
+                                        onTap: () {
+                                          Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                  builder: (context) =>
+                                                      PostViewPage(
+                                                          id: gradContentList[0]
+                                                              .id)));
+                                        },
+                                        child: Text(
+                                          gradContentList[0].title.toString(),
+                                          style: const TextStyle(
+                                              fontSize: 14,
+                                              fontWeight: FontWeight.w400),
+                                          maxLines: 1,
+                                          overflow: TextOverflow.ellipsis,
+                                        )),
                                   ),
                                 ],
                               ),
@@ -613,14 +672,27 @@ class _MainPageState extends State<MainPage> {
                                     width: 10,
                                   ),
                                   Expanded(
-                                    child: Text(
-                                      underGradContentList[0].title.toString(),
-                                      style: const TextStyle(
-                                          fontSize: 14,
-                                          fontWeight: FontWeight.w400),
-                                      maxLines: 1,
-                                      overflow: TextOverflow.ellipsis,
-                                    ),
+                                    child: InkWell(
+                                        onTap: () {
+                                          Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                  builder: (context) =>
+                                                      PostViewPage(
+                                                          id: underGradContentList[
+                                                                  0]
+                                                              .id)));
+                                        },
+                                        child: Text(
+                                          underGradContentList[0]
+                                              .title
+                                              .toString(),
+                                          style: const TextStyle(
+                                              fontSize: 14,
+                                              fontWeight: FontWeight.w400),
+                                          maxLines: 1,
+                                          overflow: TextOverflow.ellipsis,
+                                        )),
                                   ),
                                 ],
                               ),
@@ -641,14 +713,27 @@ class _MainPageState extends State<MainPage> {
                                     width: 10,
                                   ),
                                   Expanded(
-                                    child: Text(
-                                      freshmanContentList[0].title.toString(),
-                                      style: const TextStyle(
-                                          fontSize: 14,
-                                          fontWeight: FontWeight.w400),
-                                      maxLines: 1,
-                                      overflow: TextOverflow.ellipsis,
-                                    ),
+                                    child: InkWell(
+                                        onTap: () {
+                                          Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                  builder: (context) =>
+                                                      PostViewPage(
+                                                          id: freshmanContentList[
+                                                                  0]
+                                                              .id)));
+                                        },
+                                        child: Text(
+                                          freshmanContentList[0]
+                                              .title
+                                              .toString(),
+                                          style: const TextStyle(
+                                              fontSize: 14,
+                                              fontWeight: FontWeight.w400),
+                                          maxLines: 1,
+                                          overflow: TextOverflow.ellipsis,
+                                        )),
                                   ),
                                 ],
                               ),
@@ -677,35 +762,42 @@ class PopularBoard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      // height: 100,
-      padding: const EdgeInsets.all(10),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          SizedBox(
-            width: 13,
-            child: Center(
-              child: Container(
-                padding: const EdgeInsets.only(right: 10),
-                child: Text(
-                  boardNum.toString(),
-                  style: const TextStyle(
-                    color: Colors.red,
-                    fontSize: 22,
-                    fontWeight: FontWeight.bold,
+    return InkWell(
+        onTap: () {
+          Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (context) => PostViewPage(id: model.id)));
+        },
+        child: Container(
+          // height: 100,
+          padding: const EdgeInsets.all(10),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              SizedBox(
+                width: 13,
+                child: Center(
+                  child: Container(
+                    padding: const EdgeInsets.only(right: 10),
+                    child: Text(
+                      boardNum.toString(),
+                      style: const TextStyle(
+                        color: Colors.red,
+                        fontSize: 22,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
                   ),
                 ),
               ),
-            ),
+              const SizedBox(
+                width: 15,
+              ),
+              Expanded(child: PostPreview(model: model)),
+            ],
           ),
-          const SizedBox(
-            width: 15,
-          ),
-          Expanded(child: PostPreview(model: model)),
-        ],
-      ),
-    );
+        ));
   }
 }
 
