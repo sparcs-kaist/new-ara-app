@@ -1,8 +1,8 @@
-import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 import 'package:new_ara_app/models/article_list_action_model.dart';
+import 'package:new_ara_app/utils/time_utils.dart';
 
 class PostPreview extends StatefulWidget {
   final ArticleListActionModel model;
@@ -16,26 +16,7 @@ class PostPreview extends StatefulWidget {
 class _PostPreviewState extends State<PostPreview> {
   @override
   Widget build(BuildContext context) {
-    DateTime now = DateTime.now();
-
-    DateTime date =
-        DateTime.parse(widget.model.created_at.toString()).toLocal();
-    var difference = now.difference(date);
-    String time = "미정";
-    if (difference.inMinutes < 1) {
-      time = "${difference.inSeconds}초 전";
-    } else if (difference.inHours < 1) {
-      time = '${difference.inMinutes}분 전';
-    } else if (date.day == now.day) {
-      time =
-          '${DateFormat('HH').format(date)}:${DateFormat('mm').format(date)}';
-    } else if (date.year == now.year) {
-      time =
-          '${DateFormat('MM').format(date)}/${DateFormat('dd').format(date)}';
-    } else {
-      time =
-          '${DateFormat('yyyy').format(date)}/${DateFormat('MM').format(date)}/${DateFormat('dd').format(date)}';
-    }
+    String time = getTime(widget.model.created_at.toString());
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       crossAxisAlignment: CrossAxisAlignment.start,
