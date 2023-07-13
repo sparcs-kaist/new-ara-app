@@ -409,7 +409,7 @@ class _UserPageState extends State<UserPage>
         } else {
           curPost = recentArticleList[index];
         }
-        return GestureDetector(
+        return InkWell(
             onTap: () {
               Navigator.push(
                   context,

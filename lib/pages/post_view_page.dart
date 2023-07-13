@@ -18,13 +18,32 @@ class PostViewPage extends StatefulWidget {
 }
 
 class _PostViewPageState extends State<PostViewPage> {
+  WebViewController _webViewController = WebViewController();
   late ArticleModel article;
   bool isValid = false;
 
   @override
   void initState() {
     super.initState();
+    _webViewController = WebViewController()
+      ..setJavaScriptMode(JavaScriptMode.unrestricted)
+      ..setBackgroundColor(const Color(0x00000000))
+      ..setNavigationDelegate(NavigationDelegate(
+        onProgress: (int progress) {
+          debugPrint('WebView is loading (progress: $progress)');
+        },
+        onPageStarted: (String url) {},
+        onPageFinished: (String url) {},
+        onWebResourceError: (WebResourceError error) {
+          debugPrint(
+              'code: ${error.errorCode}\ndescription: ${error.description}\nerrorType: ${error.errorType}\nisForMainFrame: ${error.isForMainFrame}');
+        },
+      ));
     UserProvider userProvider = context.read<UserProvider>();
+    fetchArticle(userProvider);
+  }
+
+  void fetchArticle(UserProvider userProvider) {
     userProvider.getApiRes("articles/${widget.articleID}").then((dynamic json) {
       if (json != null) {
         try {
@@ -61,6 +80,7 @@ class _PostViewPageState extends State<PostViewPage> {
                 child: Container(
                   padding: const EdgeInsets.symmetric(horizontal: 20),
                   child: Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
@@ -190,9 +210,24 @@ class _PostViewPageState extends State<PostViewPage> {
                       ),
                       // 본문 내용이 들어가는 부분 (이미지 처리 등 어떻게 할지 논의해보기)
                       SizedBox(
-                        height: 400,
+                        height: 500,
                         child: Center(
-                          child: Text(article.content.toString()),
+                          child: WebViewWidget(
+                            controller: _webViewController..loadHtmlString('''
+                              <html>
+                                  <head>
+                                      <meta charset="UTF-8">
+                                      <meta http-equiv="X-UA-Compatible" content="IE=edge">
+                                      <meta name="viewport" content="width=<device-width> initial-scale=1.0">
+                                  </head>
+                                  <body>
+                                      <div style="object-fit: contain;">
+                                          ${article.content}
+                                      </div>
+                                  </body>
+                              </html>
+                              '''),
+                          ),
                         ),
                       ),
                       Row(
@@ -238,7 +273,8 @@ class _PostViewPageState extends State<PostViewPage> {
                           // 담아두기,공유 버튼 Row
                           Row(
                             children: [
-                              GestureDetector(
+                              InkWell(
+                                onTap: () {},
                                 child: Container(
                                   width: 90,
                                   height: 40,
@@ -275,7 +311,8 @@ class _PostViewPageState extends State<PostViewPage> {
                                 ),
                               ),
                               const SizedBox(width: 15),
-                              GestureDetector(
+                              InkWell(
+                                onTap: () {},
                                 child: Container(
                                   width: 90,
                                   height: 40,
@@ -316,7 +353,8 @@ class _PostViewPageState extends State<PostViewPage> {
                           //신고버튼 Row
                           Row(
                             children: [
-                              GestureDetector(
+                              InkWell(
+                                onTap: () {},
                                 child: Container(
                                   width: 90,
                                   height: 40,
