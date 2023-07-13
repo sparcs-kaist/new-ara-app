@@ -32,7 +32,7 @@ class _FreeBulletinBoardPageState extends State<FreeBulletinBoardPage> {
     // TODO: implement initState
     super.initState();
     if (widget.boardType == BoardType.free) {
-      apiUrl = "articles/?parent_board=${widget.boardInfo!.id!.toInt()}&page=";
+      apiUrl = "articles/?parent_board=${widget.boardInfo!.id.toInt()}&page=";
     } else if (widget.boardType == BoardType.recent) {
       apiUrl = "articles/recent/?page=";
     }
@@ -198,7 +198,7 @@ class _FreeBulletinBoardPageState extends State<FreeBulletinBoardPage> {
                       // 각 아이템을 위한 위젯 생성
 
                       // 숨겨진 게시물이면 일단 표현 안하는 걸로 함.
-                      return postPreviewList[index].is_hidden ?? false
+                      return postPreviewList[index].is_hidden
                           ? Container()
                           : Column(
                               children: [
