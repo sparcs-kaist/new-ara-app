@@ -1,3 +1,4 @@
+import 'dart:core';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
@@ -210,18 +211,23 @@ class _PostViewPageState extends State<PostViewPage> {
                       ),
                       // 본문 내용이 들어가는 부분 (이미지 처리 등 어떻게 할지 논의해보기)
                       SizedBox(
-                        height: 500,
+                        height: 800,
                         child: Center(
                           child: WebViewWidget(
                             controller: _webViewController..loadHtmlString('''
                               <html>
                                   <head>
+                                      <style>
+                                        img {
+                                          width: ${MediaQuery.of(context).size.width - 30}px;
+                                          height: auto;
+                                        }
+                                      </style>
                                       <meta charset="UTF-8">
-                                      <meta http-equiv="X-UA-Compatible" content="IE=edge">
-                                      <meta name="viewport" content="width=<device-width> initial-scale=1.0">
+                                      <meta name="viewport" content="initial-scale=1.0">
                                   </head>
                                   <body>
-                                      <div style="object-fit: contain;">
+                                      <div class="container">
                                           ${article.content}
                                       </div>
                                   </body>
@@ -230,6 +236,7 @@ class _PostViewPageState extends State<PostViewPage> {
                           ),
                         ),
                       ),
+                      const SizedBox(height: 10),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
