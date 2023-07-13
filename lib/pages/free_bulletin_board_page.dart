@@ -9,6 +9,7 @@ import 'package:new_ara_app/widgetclasses/loading_indicator.dart';
 import 'package:new_ara_app/widgetclasses/post_preview.dart';
 import 'package:new_ara_app/models/board_detail_action_model.dart';
 import 'package:new_ara_app/models/article_list_action_model.dart';
+import 'package:new_ara_app/pages/post_view_page.dart';
 
 class FreeBulletinBoardPage extends StatefulWidget {
   final BoardDetailActionModel? boardInfo;
@@ -200,19 +201,27 @@ class _FreeBulletinBoardPageState extends State<FreeBulletinBoardPage> {
                       // 숨겨진 게시물이면 일단 표현 안하는 걸로 함.
                       return postPreviewList[index].is_hidden
                           ? Container()
-                          : Column(
-                              children: [
-                                Padding(
-                                  padding: const EdgeInsets.all(11.0),
-                                  child: PostPreview(
-                                      model: postPreviewList[index]),
-                                ),
-                                Container(
-                                  height: 1,
-                                  color: const Color(0xFFF0F0F0),
-                                ),
-                              ],
-                            );
+                          : InkWell(
+                              onTap: () {
+                                Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) => PostViewPage(
+                                            id: postPreviewList[index].id)));
+                              },
+                              child: Column(
+                                children: [
+                                  Padding(
+                                    padding: const EdgeInsets.all(11.0),
+                                    child: PostPreview(
+                                        model: postPreviewList[index]),
+                                  ),
+                                  Container(
+                                    height: 1,
+                                    color: const Color(0xFFF0F0F0),
+                                  ),
+                                ],
+                              ));
                     },
                   ),
                 ),
