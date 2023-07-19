@@ -268,25 +268,8 @@ class _PostViewPageState extends State<PostViewPage> {
                         } else if (idx == 3) {
                           return SizedBox(
                               height: 500,
-                              child: WebViewWidget(
-                                controller: _webViewController
-                                  ..loadHtmlString('''
-                              <html>
-                                  <head>
-                                      <style>
-                                        
-                                      </style>
-                                      <meta charset="UTF-8">
-                                      <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                                  </head>
-                                  <body>
-                                      <div class="container">
-                                          ${article.content}
-                                      </div>
-                                  </body>
-                              </html>
-                              '''),
-                              ));
+                              child: WebViewWidgetClass(
+                                  content: article.content.toString()));
                         } else if (idx == 4) {
                           return SizedBox(
                             width: MediaQuery.of(context).size.width - 40,
@@ -580,8 +563,8 @@ class _PostViewPageState extends State<PostViewPage> {
                                           onTap: () {},
                                           child: SvgPicture.asset(
                                             'assets/icons/like.svg',
-                                            width: 17,
-                                            height: 17,
+                                            width: 25,
+                                            height: 25,
                                             color: const Color.fromRGBO(
                                                 237, 58, 58, 1),
                                           ),
@@ -595,13 +578,13 @@ class _PostViewPageState extends State<PostViewPage> {
                                               color: Color.fromRGBO(
                                                   237, 58, 58, 1)),
                                         ),
-                                        const SizedBox(width: 5),
+                                        const SizedBox(width: 6),
                                         InkWell(
                                           onTap: () {},
                                           child: SvgPicture.asset(
                                             'assets/icons/dislike.svg',
-                                            width: 17,
-                                            height: 17,
+                                            width: 25,
+                                            height: 25,
                                             color: const Color.fromRGBO(
                                                 83, 141, 209, 1),
                                           ),
@@ -615,7 +598,7 @@ class _PostViewPageState extends State<PostViewPage> {
                                               color: Color.fromRGBO(
                                                   83, 141, 209, 1)),
                                         ),
-                                        const SizedBox(width: 5),
+                                        const SizedBox(width: 6),
                                         curComment.parent_comment != null
                                             ? Container()
                                             : InkWell(
@@ -626,7 +609,7 @@ class _PostViewPageState extends State<PostViewPage> {
                                                   height: 12,
                                                 ),
                                               ),
-                                        const SizedBox(width: 3),
+                                        const SizedBox(width: 5),
                                         curComment.parent_comment != null
                                             ? Container()
                                             : InkWell(
@@ -672,10 +655,11 @@ class _PostViewPageState extends State<PostViewPage> {
                             ),
                           ),
                           InkWell(
+                            onTap: () {},
                             child: SvgPicture.asset(
                               'assets/icons/send.svg',
-                              width: 25,
-                              height: 25,
+                              width: 30,
+                              height: 30,
                             ),
                           ),
                         ],
@@ -720,6 +704,59 @@ class _PostViewPageState extends State<PostViewPage> {
           },
         ),
       ),
+    );
+  }
+}
+
+class WebViewWidgetClass extends StatefulWidget {
+  final String content;
+  const WebViewWidgetClass({super.key, required String content})
+      : content = content;
+
+  @override
+  State<WebViewWidgetClass> createState() => _WebViewWidgetClassState();
+}
+
+class _WebViewWidgetClassState extends State<WebViewWidgetClass> {
+  WebViewController _webViewController = WebViewController();
+  @override
+  void initState() {
+    super.initState();
+    _webViewController = WebViewController()
+      ..setJavaScriptMode(JavaScriptMode.unrestricted)
+      ..setBackgroundColor(const Color(0x00000000))
+      ..setNavigationDelegate(NavigationDelegate(
+        onProgress: (int progress) {
+          debugPrint('WebView is loading (progress: $progress)');
+        },
+        onPageStarted: (String url) {},
+        onPageFinished: (String url) {},
+        onWebResourceError: (WebResourceError error) {
+          debugPrint(
+              'code: ${error.errorCode}\ndescription: ${error.description}\nerrorType: ${error.errorType}\nisForMainFrame: ${error.isForMainFrame}');
+        },
+      ));
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return WebViewWidget(
+      controller: _webViewController..loadHtmlString('''
+                              <html>
+                                  <head>
+                                      <style>
+                                        
+                                      </style>
+                                      <meta charset="UTF-8">
+                                      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                                  </head>
+                                  <body>
+                                      <div class="container">
+                                          ${widget.content}
+                                      </div>
+                                  </body>
+                              </html>
+                              '''),
     );
   }
 }
