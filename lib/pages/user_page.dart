@@ -426,7 +426,7 @@ class _UserPageState extends State<UserPage>
                   Text(
                     curPost.title.toString(),
                     style: const TextStyle(
-                        fontSize: 18, fontWeight: FontWeight.w500),
+                        fontSize: 16, fontWeight: FontWeight.w500),
                     overflow: TextOverflow.ellipsis,
                     maxLines: 1,
                   ),

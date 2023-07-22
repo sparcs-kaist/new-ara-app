@@ -21,13 +21,10 @@ class PostViewPage extends StatefulWidget {
 }
 
 class _PostViewPageState extends State<PostViewPage> {
-  WebViewController _webViewController = WebViewController();
-
   late ArticleModel article;
   bool isValid = false;
 
   final _formKey = GlobalKey<FormState>();
-  TextEditingController _textEditingController = TextEditingController();
   String _commentContent = "";
 
   ScrollController _scrollController = ScrollController();
@@ -37,20 +34,6 @@ class _PostViewPageState extends State<PostViewPage> {
   @override
   void initState() {
     super.initState();
-    _webViewController = WebViewController()
-      ..setJavaScriptMode(JavaScriptMode.unrestricted)
-      ..setBackgroundColor(const Color(0x00000000))
-      ..setNavigationDelegate(NavigationDelegate(
-        onProgress: (int progress) {
-          debugPrint('WebView is loading (progress: $progress)');
-        },
-        onPageStarted: (String url) {},
-        onPageFinished: (String url) {},
-        onWebResourceError: (WebResourceError error) {
-          debugPrint(
-              'code: ${error.errorCode}\ndescription: ${error.description}\nerrorType: ${error.errorType}\nisForMainFrame: ${error.isForMainFrame}');
-        },
-      ));
     UserProvider userProvider = context.read<UserProvider>();
     fetchArticle(userProvider);
   }
@@ -122,10 +105,10 @@ class _PostViewPageState extends State<PostViewPage> {
               child: GestureDetector(
                 onTap: () => FocusScope.of(context).unfocus(),
                 child: Container(
+                  height: MediaQuery.of(context).size.height,
                   margin: const EdgeInsets.symmetric(horizontal: 20),
                   child: Column(children: [
                     Expanded(
-                        //height: MediaQuery.of(context).size.height - 200,
                         child: ListView.separated(
                       shrinkWrap: true,
                       controller: _scrollController,
@@ -639,32 +622,39 @@ class _PostViewPageState extends State<PostViewPage> {
                         }
                       },
                     )),
-                    SizedBox(
-                      height: 60,
-                      child: Row(
-                        children: [
-                          Expanded(
-                            child: Container(
-                              margin: const EdgeInsets.only(
-                                  top: 7, right: 15, bottom: 7),
-                              decoration: BoxDecoration(
-                                color: const Color.fromRGBO(235, 235, 235, 1),
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                              child: _buildForm(),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Container(
+                            constraints: const BoxConstraints(
+                              minHeight: 45,
                             ),
-                          ),
-                          InkWell(
-                            onTap: () {},
-                            child: SvgPicture.asset(
-                              'assets/icons/send.svg',
-                              width: 30,
-                              height: 30,
+                            decoration: const BoxDecoration(
+                              color: Color.fromRGBO(235, 235, 235, 1),
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(10)),
                             ),
+                            child: _buildForm(),
                           ),
-                        ],
-                      ),
+                        ),
+                        const SizedBox(width: 10),
+                        InkWell(
+                          onTap: () {
+                            if (_formKey.currentState == null) return;
+                            if (_formKey.currentState!.validate()) {
+                              _formKey.currentState!.save();
+                            }
+                            debugPrint("작성된 댓글: $_commentContent");
+                          },
+                          child: SvgPicture.asset(
+                            'assets/icons/send.svg',
+                            width: 30,
+                            height: 30,
+                          ),
+                        ),
+                      ],
                     ),
+                    const SizedBox(height: 10),
                   ]),
                 ),
               ),
@@ -676,34 +666,25 @@ class _PostViewPageState extends State<PostViewPage> {
     return Form(
       key: _formKey,
       child: Container(
-        margin: const EdgeInsets.only(left: 8),
-        child: TextFormField(
-          controller: _textEditingController,
-          decoration: const InputDecoration(
-            border: InputBorder.none,
-            hintText: '댓글을 입력해주세요',
-          ),
-          validator: (value) {
-            if (value == null) return null;
-            if (value.isEmpty) {
-              return 'Please enter your name';
-            }
-            return null;
-          },
-          onTapOutside: (value) {
-            FocusScope.of(context).unfocus();
-          },
-          onFieldSubmitted: (value) {
-            FocusScope.of(context).unfocus();
-            _commentContent = value.toString();
-            _textEditingController.clear();
-            debugPrint("작성된 댓글: $_commentContent");
-          },
-          onSaved: (value) {
-            _commentContent = value.toString();
-          },
-        ),
-      ),
+          margin: const EdgeInsets.only(left: 15),
+          child: TextFormField(
+            minLines: 1,
+            maxLines: 5,
+            keyboardType: TextInputType.multiline,
+            decoration: const InputDecoration(
+              border: InputBorder.none,
+              hintText: '댓글을 입력해주세요',
+            ),
+            validator: (value) {
+              if (value == null || value.isEmpty) {
+                return 'Please enter the comment';
+              }
+              return null;
+            },
+            onSaved: (value) {
+              _commentContent = value ?? '';
+            },
+          )),
     );
   }
 }
