@@ -104,13 +104,16 @@ class _PostViewPageState extends State<PostViewPage> {
             body: SafeArea(
               child: GestureDetector(
                 onTap: () => FocusScope.of(context).unfocus(),
-                child: SingleChildScrollView(
-                    controller: _scrollController,
-                    child: Container(
-                      height: MediaQuery.of(context).size.height,
-                      margin: const EdgeInsets.symmetric(horizontal: 20),
-                      child: Column(children: [
-                        Expanded(
+                child: Container(
+                  margin: const EdgeInsets.symmetric(horizontal: 20),
+                  child: Column(children: [
+                    Expanded(
+                      child: SingleChildScrollView(
+                        controller: _scrollController,
+                        child: Container(
+                          constraints: BoxConstraints(
+                            minHeight: MediaQuery.of(context).size.height,
+                          ),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
@@ -249,15 +252,14 @@ class _PostViewPageState extends State<PostViewPage> {
                               const Divider(
                                 thickness: 1,
                               ),
-                              Expanded(
-                                child: Container(
-                                  constraints: const BoxConstraints(
-                                    minHeight: 200,
-                                  ),
-                                  child: WebViewWidgetClass(
-                                      content: article.content ??
-                                          '<p>내용이 존재하지 않습니다</p>'),
+                              Container(
+                                constraints: const BoxConstraints(
+                                  minHeight: 200,
+                                  maxHeight: 1000,
                                 ),
+                                child: WebViewWidgetClass(
+                                    content: article.content ??
+                                        '<p>내용이 존재하지 않습니다</p>'),
                               ),
                               const SizedBox(height: 10),
                               Row(
@@ -449,18 +451,274 @@ class _PostViewPageState extends State<PostViewPage> {
                                 ),
                               ),
                               const SizedBox(height: 15),
-                              Expanded(
-                                  child: Container(
+                              Container(
                                 constraints: const BoxConstraints(
-                                  minHeight: 100,
+                                  minHeight: 200,
                                 ),
                                 child: ListView.separated(
+                                  shrinkWrap: true,
+                                  physics: const NeverScrollableScrollPhysics(),
                                   controller: _scrollController,
                                   itemCount: commentList.length,
                                   itemBuilder: (BuildContext context, int idx) {
+                                    CommentNestedCommentListActionModel
+                                        curComment = commentList[idx];
                                     return Container(
-                                      child: Text(
-                                          commentList[idx].content.toString()),
+                                      margin: EdgeInsets.only(
+                                          left:
+                                              (curComment.parent_comment == null
+                                                  ? 0
+                                                  : 30)),
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceBetween,
+                                            children: [
+                                              Row(
+                                                children: [
+                                                  Container(
+                                                    width: 25,
+                                                    height: 25,
+                                                    decoration:
+                                                        const BoxDecoration(
+                                                      shape: BoxShape.circle,
+                                                      color: Colors.grey,
+                                                    ),
+                                                    child: ClipRRect(
+                                                      borderRadius:
+                                                          const BorderRadius
+                                                                  .all(
+                                                              Radius.circular(
+                                                                  100)),
+                                                      child: Image.network(
+                                                          curComment.created_by
+                                                              .profile.picture
+                                                              .toString()),
+                                                    ),
+                                                  ),
+                                                  const SizedBox(width: 5),
+                                                  Container(
+                                                      constraints:
+                                                          BoxConstraints(
+                                                        maxWidth: MediaQuery.of(
+                                                                    context)
+                                                                .size
+                                                                .width -
+                                                            200,
+                                                      ),
+                                                      child: Text(
+                                                        curComment.created_by
+                                                            .profile.nickname
+                                                            .toString(),
+                                                        style: const TextStyle(
+                                                          fontSize: 14,
+                                                          fontWeight:
+                                                              FontWeight.w500,
+                                                        ),
+                                                        maxLines: 1,
+                                                        overflow: TextOverflow
+                                                            .ellipsis,
+                                                      )),
+                                                  const SizedBox(width: 7),
+                                                  Text(
+                                                    getTime(
+                                                        curComment.created_at),
+                                                    style: const TextStyle(
+                                                        fontSize: 14,
+                                                        fontWeight:
+                                                            FontWeight.w400,
+                                                        color: Color.fromRGBO(
+                                                            51, 51, 51, 1)),
+                                                  ),
+                                                ],
+                                              ),
+                                              InkWell(
+                                                onTap: () {},
+                                                child: SvgPicture.asset(
+                                                  'assets/icons/three_dots_1.svg',
+                                                  width: 25,
+                                                  height: 25,
+                                                  color: const Color.fromRGBO(
+                                                      177, 177, 177, 1),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                          Container(
+                                            margin: const EdgeInsets.only(
+                                                left: 30, right: 0),
+                                            child: curComment.is_hidden == false
+                                                ? Text(
+                                                    curComment.content
+                                                        .toString(),
+                                                    style: const TextStyle(
+                                                      fontSize: 14,
+                                                      fontWeight:
+                                                          FontWeight.w400,
+                                                      color: Color.fromRGBO(
+                                                          51, 51, 51, 1),
+                                                    ),
+                                                  )
+                                                : const Text(
+                                                    '삭제된 댓글입니다.',
+                                                    style: TextStyle(
+                                                      fontSize: 14,
+                                                      fontWeight:
+                                                          FontWeight.w400,
+                                                      color: Colors.grey,
+                                                    ),
+                                                  ),
+                                          ),
+                                          const SizedBox(height: 5),
+                                          Container(
+                                              margin: const EdgeInsets.only(
+                                                  left: 30),
+                                              child: curComment.is_hidden ==
+                                                      false
+                                                  ? Row(
+                                                      children: [
+                                                        InkWell(
+                                                          onTap: () {},
+                                                          child:
+                                                              SvgPicture.asset(
+                                                            'assets/icons/like.svg',
+                                                            width: 25,
+                                                            height: 25,
+                                                            color: const Color
+                                                                    .fromRGBO(
+                                                                237, 58, 58, 1),
+                                                          ),
+                                                        ),
+                                                        Text(
+                                                          curComment
+                                                              .positive_vote_count
+                                                              .toString(),
+                                                          style:
+                                                              const TextStyle(
+                                                                  fontSize: 13,
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .w500,
+                                                                  color: Color
+                                                                      .fromRGBO(
+                                                                          237,
+                                                                          58,
+                                                                          58,
+                                                                          1)),
+                                                        ),
+                                                        const SizedBox(
+                                                            width: 6),
+                                                        InkWell(
+                                                          onTap: () {},
+                                                          child:
+                                                              SvgPicture.asset(
+                                                            'assets/icons/dislike.svg',
+                                                            width: 25,
+                                                            height: 25,
+                                                            color: const Color
+                                                                    .fromRGBO(
+                                                                83,
+                                                                141,
+                                                                209,
+                                                                1),
+                                                          ),
+                                                        ),
+                                                        Text(
+                                                          curComment
+                                                              .negative_vote_count
+                                                              .toString(),
+                                                          style:
+                                                              const TextStyle(
+                                                                  fontSize: 13,
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .w500,
+                                                                  color: Color
+                                                                      .fromRGBO(
+                                                                          83,
+                                                                          141,
+                                                                          209,
+                                                                          1)),
+                                                        ),
+                                                        const SizedBox(
+                                                            width: 6),
+                                                        curComment.parent_comment !=
+                                                                null
+                                                            ? Container()
+                                                            : InkWell(
+                                                                onTap: () {},
+                                                                child:
+                                                                    SvgPicture
+                                                                        .asset(
+                                                                  'assets/icons/arrow_uturn_left_1.svg',
+                                                                  width: 11,
+                                                                  height: 12,
+                                                                ),
+                                                              ),
+                                                        const SizedBox(
+                                                            width: 5),
+                                                        curComment.parent_comment !=
+                                                                null
+                                                            ? Container()
+                                                            : InkWell(
+                                                                onTap: () {},
+                                                                child:
+                                                                    const Text(
+                                                                  '답글 쓰기',
+                                                                  style:
+                                                                      TextStyle(
+                                                                    fontSize:
+                                                                        13,
+                                                                    fontWeight:
+                                                                        FontWeight
+                                                                            .w500,
+                                                                  ),
+                                                                ),
+                                                              ),
+                                                      ],
+                                                    )
+                                                  : Row(
+                                                      children: [
+                                                        curComment.parent_comment !=
+                                                                null
+                                                            ? Container()
+                                                            : InkWell(
+                                                                onTap: () {},
+                                                                child:
+                                                                    SvgPicture
+                                                                        .asset(
+                                                                  'assets/icons/arrow_uturn_left_1.svg',
+                                                                  width: 11,
+                                                                  height: 12,
+                                                                ),
+                                                              ),
+                                                        const SizedBox(
+                                                            width: 5),
+                                                        curComment.parent_comment !=
+                                                                null
+                                                            ? Container()
+                                                            : InkWell(
+                                                                onTap: () {},
+                                                                child:
+                                                                    const Text(
+                                                                  '답글 쓰기',
+                                                                  style:
+                                                                      TextStyle(
+                                                                    fontSize:
+                                                                        13,
+                                                                    fontWeight:
+                                                                        FontWeight
+                                                                            .w500,
+                                                                  ),
+                                                                ),
+                                                              ),
+                                                      ],
+                                                    )),
+                                        ],
+                                      ),
                                     );
                                   },
                                   separatorBuilder:
@@ -468,45 +726,49 @@ class _PostViewPageState extends State<PostViewPage> {
                                     return const Divider();
                                   },
                                 ),
-                              )),
+                              ),
                             ],
                           ),
                         ),
-                        Row(
-                          children: [
-                            Expanded(
-                              child: Container(
-                                constraints: const BoxConstraints(
-                                  minHeight: 45,
-                                ),
-                                decoration: const BoxDecoration(
-                                  color: Color.fromRGBO(235, 235, 235, 1),
-                                  borderRadius:
-                                      BorderRadius.all(Radius.circular(10)),
-                                ),
-                                child: _buildForm(),
-                              ),
+                      ),
+                    ),
+                    const SizedBox(height: 15),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Container(
+                            constraints: const BoxConstraints(
+                              minHeight: 45,
                             ),
-                            const SizedBox(width: 10),
-                            InkWell(
-                              onTap: () {
-                                if (_formKey.currentState == null) return;
-                                if (_formKey.currentState!.validate()) {
-                                  _formKey.currentState!.save();
-                                }
-                                debugPrint("작성된 댓글: $_commentContent");
-                              },
-                              child: SvgPicture.asset(
-                                'assets/icons/send.svg',
-                                width: 30,
-                                height: 30,
-                              ),
+                            decoration: const BoxDecoration(
+                              color: Color.fromRGBO(235, 235, 235, 1),
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(10)),
                             ),
-                          ],
+                            child: _buildForm(),
+                          ),
                         ),
-                        const SizedBox(height: 10),
-                      ]),
-                    )),
+                        const SizedBox(width: 10),
+                        InkWell(
+                          onTap: () {
+                            if (_formKey.currentState == null) return;
+                            if (_formKey.currentState!.validate()) {
+                              _formKey.currentState!.save();
+                              _formKey.currentState!.reset();
+                              debugPrint("작성된 댓글: $_commentContent");
+                            }
+                          },
+                          child: SvgPicture.asset(
+                            'assets/icons/send.svg',
+                            width: 30,
+                            height: 30,
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 10),
+                  ]),
+                ),
               ),
             ),
           );
@@ -527,7 +789,7 @@ class _PostViewPageState extends State<PostViewPage> {
             ),
             validator: (value) {
               if (value == null || value.isEmpty) {
-                return 'Please enter the comment';
+                return '댓글이 작성되지 않았습니다!';
               }
               return null;
             },
@@ -574,15 +836,82 @@ class _WebViewWidgetClassState extends State<WebViewWidgetClass> {
       controller: _webViewController..loadHtmlString('''
                               <html>
                                   <head>
-                                      <style>
-                                        
+                                      <meta charset="utf-8">
+                                      <meta property="og:locale" content="ko-KR">
+                                      <meta property="og:locale:alternate" content="en-US">
+                                      <meta name="theme-color" content="#ed3a3a">
+                                      <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons|Material+Icons+Outlined">
+                                      <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&amp;display=swap">
+                                      <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Raleway:wght@300;400;500;700&amp;display=swap">
+                                      <style>*:focus {
+                                          outline: none;
+                                      }
                                       </style>
-                                      <meta charset="UTF-8">
-                                      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                                      <meta name="viewport" content="width=${MediaQuery.of(context).size.width - 40},height=<device-height>>">
+                                      <style type="text/css">.ProseMirror {
+  position: relative;
+}
+
+.ProseMirror {
+  word-wrap: break-word;
+  white-space: pre-wrap;
+  -webkit-font-variant-ligatures: none;
+  font-variant-ligatures: none;
+}
+
+.ProseMirror pre {
+  white-space: pre-wrap;
+}
+
+.ProseMirror-gapcursor {
+  display: none;
+  pointer-events: none;
+  position: absolute;
+}
+
+.ProseMirror-gapcursor:after {
+  content: "";
+  display: block;
+  position: absolute;
+  top: -2px;
+  width: 20px;
+  border-top: 1px solid black;
+  animation: ProseMirror-cursor-blink 1.1s steps(2, start) infinite;
+}
+
+@keyframes ProseMirror-cursor-blink {
+  to {
+    visibility: hidden;
+  }
+}
+
+.ProseMirror-hideselection *::selection {
+  background: transparent;
+}
+
+.ProseMirror-hideselection *::-moz-selection {
+  background: transparent;
+}
+
+.ProseMirror-hideselection * {
+  caret-color: transparent;
+}
+
+.ProseMirror-focused .ProseMirror-gapcursor {
+  display: block;
+}
+                                      </style>
+                                      <script>
+                                          window.dataLayer = window.dataLayer || [];function gtag(){dataLayer.push(arguments);}gtag('js', new Date());gtag('config', 'G-S6SZ22QX6X');
+                                      </script>
                                   </head>
                                   <body>
-                                      <div class="container">
-                                          ${widget.content}
+                                      <div class="content">
+                                          <div class="content">
+                                              <div class="editor-content">
+                                                  ${widget.content}
+                                              </div>
+                                          </div>
                                       </div>
                                   </body>
                               </html>
