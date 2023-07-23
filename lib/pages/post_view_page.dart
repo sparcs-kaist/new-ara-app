@@ -31,11 +31,22 @@ class _PostViewPageState extends State<PostViewPage> {
 
   List<CommentNestedCommentListActionModel> commentList = [];
 
+  int parentCommentID = 0;
+
+  late FocusNode textFocusNode;
+
   @override
   void initState() {
     super.initState();
     UserProvider userProvider = context.read<UserProvider>();
+    textFocusNode = FocusNode();
     fetchArticle(userProvider);
+  }
+
+  @override
+  void dispose() {
+    textFocusNode.dispose();
+    super.dispose();
   }
 
   void setIsValid(bool value) {
@@ -78,7 +89,7 @@ class _PostViewPageState extends State<PostViewPage> {
           commentList.add(cnc);
         } catch (error) {
           debugPrint(
-              "\nCommentModel.fromJson failed at ID ${cnc.id}: $error\n");
+              "\nCommentNestedCommentListActionModel.fromJson failed at ID ${cnc.id}: $error\n");
           continue;
         }
       }
@@ -88,6 +99,7 @@ class _PostViewPageState extends State<PostViewPage> {
 
   @override
   Widget build(BuildContext context) {
+    UserProvider userProvider = context.read<UserProvider>();
     return !isValid
         ? const LoadingIndicator()
         : Scaffold(
@@ -103,7 +115,11 @@ class _PostViewPageState extends State<PostViewPage> {
             ),
             body: SafeArea(
               child: GestureDetector(
-                onTap: () => FocusScope.of(context).unfocus(),
+                onTap: () {
+                  parentCommentID = 0;
+                  debugPrint("parentCommentID: 0");
+                  FocusScope.of(context).unfocus();
+                },
                 child: Container(
                   margin: const EdgeInsets.symmetric(horizontal: 20),
                   child: Column(children: [
@@ -664,7 +680,15 @@ class _PostViewPageState extends State<PostViewPage> {
                                                                 null
                                                             ? Container()
                                                             : InkWell(
-                                                                onTap: () {},
+                                                                onTap: () {
+                                                                  parentCommentID =
+                                                                      curComment
+                                                                          .id;
+                                                                  textFocusNode
+                                                                      .requestFocus();
+                                                                  debugPrint(
+                                                                      "parentCommentID: $parentCommentID");
+                                                                },
                                                                 child:
                                                                     const Text(
                                                                   '답글 쓰기',
@@ -750,13 +774,32 @@ class _PostViewPageState extends State<PostViewPage> {
                         ),
                         const SizedBox(width: 10),
                         InkWell(
-                          onTap: () {
+                          onTap: () async {
                             if (_formKey.currentState == null) return;
-                            if (_formKey.currentState!.validate()) {
-                              _formKey.currentState!.save();
-                              _formKey.currentState!.reset();
-                              debugPrint("작성된 댓글: $_commentContent");
+                            if (!(_formKey.currentState!.validate())) return;
+                            _formKey.currentState!.save();
+                            _formKey.currentState!.reset();
+                            debugPrint("작성된 댓글: $_commentContent");
+                            debugPrint(
+                                "payload 정보: name_type=${article.name_type}, parent_comment=$parentCommentID");
+                            dynamic defaultPayload = {
+                              "content": _commentContent,
+                              "name_type": article.name_type,
+                              "attachment": null,
+                            };
+                            defaultPayload.addAll(parentCommentID != 0
+                                ? {"parent_comment": parentCommentID}
+                                : {"parent_article": article.id});
+                            dynamic postRes = await userProvider.postApiRes(
+                              'comments/',
+                              defaultPayload,
+                            );
+                            if (postRes == null) {
+                              // 나중에 사용자용 안내 위젯 등 추가하면 좋을 듯
+                              debugPrint("POST /api/comments failed");
+                              return;
                             }
+                            fetchArticle(userProvider);
                           },
                           child: SvgPicture.asset(
                             'assets/icons/send.svg',
@@ -780,6 +823,7 @@ class _PostViewPageState extends State<PostViewPage> {
       child: Container(
           margin: const EdgeInsets.only(left: 15),
           child: TextFormField(
+            focusNode: textFocusNode,
             minLines: 1,
             maxLines: 5,
             keyboardType: TextInputType.multiline,
@@ -843,11 +887,19 @@ class _WebViewWidgetClassState extends State<WebViewWidgetClass> {
                                       <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons|Material+Icons+Outlined">
                                       <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&amp;display=swap">
                                       <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Raleway:wght@300;400;500;700&amp;display=swap">
-                                      <style>*:focus {
-                                          outline: none;
-                                      }
+                                      <style>
+                                          *:focus {
+                                              outline: none;
+                                          }
+                                          body {
+                                              max-height: 1000px;
+                                          }
+                                          img {
+                                              max-width: 100%;
+                                              max-height: 800px;
+                                          }
                                       </style>
-                                      <meta name="viewport" content="width=${MediaQuery.of(context).size.width - 40},height=<device-height>>">
+                                      <meta name="viewport" content="width=${MediaQuery.of(context).size.width - 40}">
                                       <style type="text/css">.ProseMirror {
   position: relative;
 }
