@@ -30,10 +30,11 @@ class _PostViewPageState extends State<PostViewPage> {
   final ScrollController _scrollController = ScrollController();
 
   List<CommentNestedCommentListActionModel> commentList = [];
-
   int parentCommentID = 0;
-
   late FocusNode textFocusNode;
+
+  late int articlePosCnt, articleNegCnt;
+  bool? myVote;
 
   @override
   void initState() {
@@ -69,6 +70,10 @@ class _PostViewPageState extends State<PostViewPage> {
       setIsValid(false);
       return;
     }
+
+    articlePosCnt = article.positive_vote_count ?? 0;
+    articleNegCnt = article.negative_vote_count ?? 0;
+    myVote = article.my_vote;
 
     commentList.clear();
     for (ArticleNestedCommentListAction anc in article.comments) {
@@ -180,7 +185,7 @@ class _PostViewPageState extends State<PostViewPage> {
                                         color: ColorsInfo.newara,
                                       ),
                                       const SizedBox(width: 3),
-                                      Text('${article.positive_vote_count}',
+                                      Text('$articlePosCnt',
                                           style: const TextStyle(
                                               fontSize: 14,
                                               fontWeight: FontWeight.w500,
@@ -194,7 +199,7 @@ class _PostViewPageState extends State<PostViewPage> {
                                             83, 141, 209, 1),
                                       ),
                                       const SizedBox(width: 3),
-                                      Text('${article.negative_vote_count}',
+                                      Text('$articleNegCnt',
                                           style: const TextStyle(
                                               fontSize: 14,
                                               fontWeight: FontWeight.w500,
@@ -282,7 +287,40 @@ class _PostViewPageState extends State<PostViewPage> {
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
                                   InkWell(
-                                    onTap: () {},
+                                    onTap: () async {
+                                      if (article.is_mine) {
+                                        debugPrint("자신의 글에는 좋아요, 싫어요를 할 수 없음");
+                                        return;
+                                      }
+                                      if (myVote == true) {
+                                        var cancelRes =
+                                            await userProvider.postApiRes(
+                                          "articles/${article.id}/vote_cancel/",
+                                        );
+                                        if (cancelRes.statusCode != 200) {
+                                          debugPrint(
+                                              "POST /api/articles/${article.id}/vote_cancel ${cancelRes.statusCode}");
+                                          return;
+                                        }
+                                      } else {
+                                        var postRes =
+                                            await userProvider.postApiRes(
+                                          "articles/${article.id}/vote_positive/",
+                                        );
+                                        if (postRes.statusCode != 200) {
+                                          debugPrint(
+                                              "POST /api/articles/${article.id}/vote_positive ${postRes.statusCode}");
+                                          return;
+                                        }
+                                      }
+                                      setState(() {
+                                        articlePosCnt = articlePosCnt +
+                                            (myVote == true ? -1 : 1);
+                                        articleNegCnt = articleNegCnt +
+                                            (myVote == false ? -1 : 0);
+                                        myVote = (myVote == true) ? null : true;
+                                      });
+                                    },
                                     child: SvgPicture.asset(
                                       'assets/icons/like.svg',
                                       width: 30,
@@ -291,14 +329,48 @@ class _PostViewPageState extends State<PostViewPage> {
                                     ),
                                   ),
                                   const SizedBox(width: 3),
-                                  Text('${article.positive_vote_count}',
+                                  Text('$articlePosCnt',
                                       style: const TextStyle(
                                           fontSize: 20,
                                           fontWeight: FontWeight.w500,
                                           color: ColorsInfo.newara)),
                                   const SizedBox(width: 20),
                                   InkWell(
-                                    onTap: () {},
+                                    onTap: () async {
+                                      if (article.is_mine) {
+                                        debugPrint("자신의 글에는 좋아요, 싫어요를 할 수 없음");
+                                        return;
+                                      }
+                                      if (myVote == false) {
+                                        var cancelRes =
+                                            await userProvider.postApiRes(
+                                          "articles/${article.id}/vote_cancel/",
+                                        );
+                                        if (cancelRes.statusCode != 200) {
+                                          debugPrint(
+                                              "POST /api/articles/${article.id}/vote_cancel ${cancelRes.statusCode}");
+                                          return;
+                                        }
+                                      } else {
+                                        var postRes =
+                                            await userProvider.postApiRes(
+                                          "articles/${article.id}/vote_positive/",
+                                        );
+                                        if (postRes.statusCode != 200) {
+                                          debugPrint(
+                                              "POST /api/articles/${article.id}/vote_positive ${postRes.statusCode}");
+                                          return;
+                                        }
+                                      }
+                                      setState(() {
+                                        articlePosCnt = articlePosCnt +
+                                            (myVote == true ? -1 : 0);
+                                        articleNegCnt = articleNegCnt +
+                                            (myVote == false ? -1 : 1);
+                                        myVote =
+                                            (myVote == false) ? null : false;
+                                      });
+                                    },
                                     child: SvgPicture.asset(
                                       'assets/icons/dislike.svg',
                                       width: 30,
@@ -308,7 +380,7 @@ class _PostViewPageState extends State<PostViewPage> {
                                     ),
                                   ),
                                   const SizedBox(width: 3),
-                                  Text('${article.negative_vote_count}',
+                                  Text('$articleNegCnt',
                                       style: const TextStyle(
                                           fontSize: 20,
                                           fontWeight: FontWeight.w500,
@@ -790,11 +862,11 @@ class _PostViewPageState extends State<PostViewPage> {
                             defaultPayload.addAll(parentCommentID != 0
                                 ? {"parent_comment": parentCommentID}
                                 : {"parent_article": article.id});
-                            dynamic postRes = await userProvider.postApiRes(
+                            var postRes = await userProvider.postApiRes(
                               'comments/',
-                              defaultPayload,
+                              payload: defaultPayload,
                             );
-                            if (postRes == null) {
+                            if (postRes.statusCode != 201) {
                               // 나중에 사용자용 안내 위젯 등 추가하면 좋을 듯
                               debugPrint("POST /api/comments failed");
                               return;
