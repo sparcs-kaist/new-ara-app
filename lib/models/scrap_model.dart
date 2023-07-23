@@ -2,12 +2,12 @@ import 'package:new_ara_app/models/public_user_model.dart';
 import 'package:new_ara_app/models/article_list_action_model.dart';
 
 class ScrapModel {
-  final int id;
-  final ArticleListActionModel parent_article;
-  final PublicUserModel scrapped_by;
-  final String created_at;
-  final String updated_at;
-  final String deleted_at; // default: 0001-01-01T08:28:00+08:28
+  int id;
+  ArticleListActionModel parent_article;
+  PublicUserModel scrapped_by;
+  String created_at;
+  String updated_at;
+  String deleted_at; // default: 0001-01-01T08:28:00+08:28
 
   ScrapModel({
     required this.id,
