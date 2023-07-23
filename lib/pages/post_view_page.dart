@@ -33,9 +33,6 @@ class _PostViewPageState extends State<PostViewPage> {
   int parentCommentID = 0;
   late FocusNode textFocusNode;
 
-  late int articlePosCnt, articleNegCnt;
-  bool? myVote;
-
   @override
   void initState() {
     super.initState();
@@ -70,10 +67,6 @@ class _PostViewPageState extends State<PostViewPage> {
       setIsValid(false);
       return;
     }
-
-    articlePosCnt = article.positive_vote_count ?? 0;
-    articleNegCnt = article.negative_vote_count ?? 0;
-    myVote = article.my_vote;
 
     commentList.clear();
     for (ArticleNestedCommentListAction anc in article.comments) {
@@ -185,7 +178,7 @@ class _PostViewPageState extends State<PostViewPage> {
                                         color: ColorsInfo.newara,
                                       ),
                                       const SizedBox(width: 3),
-                                      Text('$articlePosCnt',
+                                      Text('${article.positive_vote_count}',
                                           style: const TextStyle(
                                               fontSize: 14,
                                               fontWeight: FontWeight.w500,
@@ -199,7 +192,7 @@ class _PostViewPageState extends State<PostViewPage> {
                                             83, 141, 209, 1),
                                       ),
                                       const SizedBox(width: 3),
-                                      Text('$articleNegCnt',
+                                      Text('${article.negative_vote_count}',
                                           style: const TextStyle(
                                               fontSize: 14,
                                               fontWeight: FontWeight.w500,
@@ -292,7 +285,7 @@ class _PostViewPageState extends State<PostViewPage> {
                                         debugPrint("자신의 글에는 좋아요, 싫어요를 할 수 없음");
                                         return;
                                       }
-                                      if (myVote == true) {
+                                      if (article.my_vote == true) {
                                         var cancelRes =
                                             await userProvider.postApiRes(
                                           "articles/${article.id}/vote_cancel/",
@@ -314,11 +307,16 @@ class _PostViewPageState extends State<PostViewPage> {
                                         }
                                       }
                                       setState(() {
-                                        articlePosCnt = articlePosCnt +
-                                            (myVote == true ? -1 : 1);
-                                        articleNegCnt = articleNegCnt +
-                                            (myVote == false ? -1 : 0);
-                                        myVote = (myVote == true) ? null : true;
+                                        article.positive_vote_count = article
+                                                .positive_vote_count! +
+                                            (article.my_vote == true ? -1 : 1);
+                                        article.negative_vote_count = article
+                                                .negative_vote_count! +
+                                            (article.my_vote == false ? -1 : 0);
+                                        article.my_vote =
+                                            (article.my_vote == true)
+                                                ? null
+                                                : true;
                                       });
                                     },
                                     child: SvgPicture.asset(
@@ -329,7 +327,7 @@ class _PostViewPageState extends State<PostViewPage> {
                                     ),
                                   ),
                                   const SizedBox(width: 3),
-                                  Text('$articlePosCnt',
+                                  Text('${article.positive_vote_count}',
                                       style: const TextStyle(
                                           fontSize: 20,
                                           fontWeight: FontWeight.w500,
@@ -337,11 +335,11 @@ class _PostViewPageState extends State<PostViewPage> {
                                   const SizedBox(width: 20),
                                   InkWell(
                                     onTap: () async {
-                                      if (article.is_mine) {
+                                      if (article.is_mine == true) {
                                         debugPrint("자신의 글에는 좋아요, 싫어요를 할 수 없음");
                                         return;
                                       }
-                                      if (myVote == false) {
+                                      if (article.my_vote == false) {
                                         var cancelRes =
                                             await userProvider.postApiRes(
                                           "articles/${article.id}/vote_cancel/",
@@ -354,21 +352,25 @@ class _PostViewPageState extends State<PostViewPage> {
                                       } else {
                                         var postRes =
                                             await userProvider.postApiRes(
-                                          "articles/${article.id}/vote_positive/",
+                                          "articles/${article.id}/vote_negative/",
                                         );
                                         if (postRes.statusCode != 200) {
                                           debugPrint(
-                                              "POST /api/articles/${article.id}/vote_positive ${postRes.statusCode}");
+                                              "POST /api/articles/${article.id}/vote_negative/ ${postRes.statusCode}");
                                           return;
                                         }
                                       }
                                       setState(() {
-                                        articlePosCnt = articlePosCnt +
-                                            (myVote == true ? -1 : 0);
-                                        articleNegCnt = articleNegCnt +
-                                            (myVote == false ? -1 : 1);
-                                        myVote =
-                                            (myVote == false) ? null : false;
+                                        article.positive_vote_count = article
+                                                .positive_vote_count! +
+                                            (article.my_vote == true ? -1 : 0);
+                                        article.negative_vote_count = article
+                                                .negative_vote_count! +
+                                            (article.my_vote == false ? -1 : 1);
+                                        article.my_vote =
+                                            (article.my_vote == false)
+                                                ? null
+                                                : false;
                                       });
                                     },
                                     child: SvgPicture.asset(
@@ -380,7 +382,7 @@ class _PostViewPageState extends State<PostViewPage> {
                                     ),
                                   ),
                                   const SizedBox(width: 3),
-                                  Text('$articleNegCnt',
+                                  Text('${article.negative_vote_count}',
                                       style: const TextStyle(
                                           fontSize: 20,
                                           fontWeight: FontWeight.w500,
@@ -669,7 +671,65 @@ class _PostViewPageState extends State<PostViewPage> {
                                                   ? Row(
                                                       children: [
                                                         InkWell(
-                                                          onTap: () {},
+                                                          onTap: () async {
+                                                            if (curComment
+                                                                    .is_mine ==
+                                                                true) {
+                                                              return;
+                                                            }
+                                                            if (curComment
+                                                                    .my_vote ==
+                                                                true) {
+                                                              var postRes =
+                                                                  await userProvider
+                                                                      .postApiRes(
+                                                                "comments/${curComment.id}/vote_cancel/",
+                                                              );
+                                                              if (postRes
+                                                                      .statusCode !=
+                                                                  200) {
+                                                                debugPrint(
+                                                                    "POST /api/comments/${curComment.id}/vote_cancel/ ${postRes.statusCode}");
+                                                                return;
+                                                              }
+                                                            } else {
+                                                              var postRes =
+                                                                  await userProvider
+                                                                      .postApiRes(
+                                                                          "comments/${curComment.id}/vote_positive/");
+                                                              if (postRes
+                                                                      .statusCode !=
+                                                                  200) {
+                                                                debugPrint(
+                                                                    "POST /api/comments/${curComment.id}/vote_positive/ ${postRes.statusCode}");
+                                                                return;
+                                                              }
+                                                            }
+                                                            setState(() {
+                                                              curComment
+                                                                  .positive_vote_count = (curComment
+                                                                          .positive_vote_count ??
+                                                                      0) +
+                                                                  (curComment.my_vote ==
+                                                                          true
+                                                                      ? -1
+                                                                      : 1);
+                                                              curComment
+                                                                  .negative_vote_count = (curComment
+                                                                          .negative_vote_count ??
+                                                                      0) +
+                                                                  (curComment.my_vote ==
+                                                                          false
+                                                                      ? -1
+                                                                      : 0);
+                                                              curComment
+                                                                      .my_vote =
+                                                                  (curComment.my_vote ==
+                                                                          true)
+                                                                      ? null
+                                                                      : true;
+                                                            });
+                                                          },
                                                           child:
                                                               SvgPicture.asset(
                                                             'assets/icons/like.svg',
@@ -700,7 +760,65 @@ class _PostViewPageState extends State<PostViewPage> {
                                                         const SizedBox(
                                                             width: 6),
                                                         InkWell(
-                                                          onTap: () {},
+                                                          onTap: () async {
+                                                            if (curComment
+                                                                    .is_mine ==
+                                                                true) {
+                                                              return;
+                                                            }
+                                                            if (curComment
+                                                                    .my_vote ==
+                                                                false) {
+                                                              var postRes =
+                                                                  await userProvider
+                                                                      .postApiRes(
+                                                                "comments/${curComment.id}/vote_cancel/",
+                                                              );
+                                                              if (postRes
+                                                                      .statusCode !=
+                                                                  200) {
+                                                                debugPrint(
+                                                                    "POST /api/comments/${curComment.id}/vote_cancel/ ${postRes.statusCode}");
+                                                                return;
+                                                              }
+                                                            } else {
+                                                              var postRes =
+                                                                  await userProvider
+                                                                      .postApiRes(
+                                                                          "comments/${curComment.id}/vote_negative/");
+                                                              if (postRes
+                                                                      .statusCode !=
+                                                                  200) {
+                                                                debugPrint(
+                                                                    "POST /api/comments/${curComment.id}/vote_negative/ ${postRes.statusCode}");
+                                                                return;
+                                                              }
+                                                            }
+                                                            setState(() {
+                                                              curComment
+                                                                  .positive_vote_count = (curComment
+                                                                          .positive_vote_count ??
+                                                                      0) +
+                                                                  (curComment.my_vote ==
+                                                                          true
+                                                                      ? -1
+                                                                      : 0);
+                                                              curComment
+                                                                  .negative_vote_count = (curComment
+                                                                          .negative_vote_count ??
+                                                                      0) +
+                                                                  (curComment.my_vote ==
+                                                                          false
+                                                                      ? -1
+                                                                      : 1);
+                                                              curComment
+                                                                      .my_vote =
+                                                                  (curComment.my_vote ==
+                                                                          false)
+                                                                      ? null
+                                                                      : false;
+                                                            });
+                                                          },
                                                           child:
                                                               SvgPicture.asset(
                                                             'assets/icons/dislike.svg',
@@ -797,7 +915,15 @@ class _PostViewPageState extends State<PostViewPage> {
                                                                 null
                                                             ? Container()
                                                             : InkWell(
-                                                                onTap: () {},
+                                                                onTap: () {
+                                                                  parentCommentID =
+                                                                      curComment
+                                                                          .id;
+                                                                  textFocusNode
+                                                                      .requestFocus();
+                                                                  debugPrint(
+                                                                      "parentCommentID: $parentCommentID");
+                                                                },
                                                                 child:
                                                                     const Text(
                                                                   '답글 쓰기',
