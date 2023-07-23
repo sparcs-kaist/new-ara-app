@@ -4,6 +4,7 @@ import 'package:new_ara_app/models/topic_model.dart';
 import 'package:new_ara_app/models/board_model.dart';
 import 'package:new_ara_app/models/article_nested_comment_list_action_model.dart';
 import 'package:new_ara_app/models/public_user_model.dart';
+import 'package:new_ara_app/models/scrap_create_action_model.dart';
 
 class ArticleModel {
   int id;
@@ -19,7 +20,7 @@ class ArticleModel {
   String? title;
   String? content;
   bool? my_vote;
-  dynamic my_scrap; // 변수의 타입 및 용도 불분명
+  ScrapCreateActionModel? my_scrap; // 변수의 타입 및 용도 불분명
   PublicUserModel created_by;
   int? article_current_page;
   dynamic side_articles; // 변수의 타입 및 용도 불분명
@@ -106,7 +107,9 @@ class ArticleModel {
       title: json['title'],
       content: json['content'],
       my_vote: json['my_vote'],
-      my_scrap: json['my_scrap'],
+      my_scrap: json['my_scrap'] == null
+          ? null
+          : ScrapCreateActionModel.fromJson(json['my_scrap']),
       created_by: PublicUserModel.fromJson(json['created_by']),
       article_current_page: json['article_current_page'],
       side_articles: json['side_articles'],
@@ -147,7 +150,7 @@ class ArticleModel {
         'title': title,
         'content': content,
         'my_vote': my_vote,
-        'my_scrap': my_scrap,
+        'my_scrap': my_scrap?.toJson(),
         'created_by': created_by.toJson(),
         'article_current_page': article_current_page,
         'side_articles': side_articles,
