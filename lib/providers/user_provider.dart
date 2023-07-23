@@ -125,8 +125,8 @@ class UserProvider with ChangeNotifier {
     }
   }
 
-  Future<dynamic> postApiRes(String apiUrl, dynamic payload,
-      {String? initCookieString}) async {
+  Future<dynamic> postApiRes(String apiUrl,
+      {dynamic payload, String? initCookieString}) async {
     String cookieString = initCookieString ?? getCookiesToString();
     String totUrl = "$newAraDefaultUrl/api/$apiUrl";
 
@@ -138,11 +138,7 @@ class UserProvider with ChangeNotifier {
       response = await dio.post(totUrl, data: payload);
     } catch (error) {
       debugPrint("POST /api/$apiUrl failed with error: $error");
-      return null;
     }
-    if (response.statusCode == 201) {
-      return response.data;
-    }
-    return null;
+    return response;
   }
 }
