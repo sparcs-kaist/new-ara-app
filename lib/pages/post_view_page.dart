@@ -11,6 +11,7 @@ import 'package:new_ara_app/widgetclasses/loading_indicator.dart';
 import 'package:new_ara_app/utils/time_utils.dart';
 import 'package:new_ara_app/models/article_nested_comment_list_action_model.dart';
 import 'package:new_ara_app/models/comment_nested_comment_list_action_model.dart';
+import 'package:new_ara_app/models/scrap_create_action_model.dart';
 
 class PostViewPage extends StatefulWidget {
   final int articleID;
@@ -175,29 +176,42 @@ class _PostViewPageState extends State<PostViewPage> {
                                         'assets/icons/like.svg',
                                         width: 13,
                                         height: 15,
-                                        color: ColorsInfo.newara,
+                                        color: article.my_vote == true
+                                            ? ColorsInfo.newara
+                                            : const Color.fromRGBO(
+                                                100, 100, 100, 1),
                                       ),
                                       const SizedBox(width: 3),
                                       Text('${article.positive_vote_count}',
-                                          style: const TextStyle(
+                                          style: TextStyle(
                                               fontSize: 14,
                                               fontWeight: FontWeight.w500,
-                                              color: ColorsInfo.newara)),
+                                              color: article.my_vote == true
+                                                  ? ColorsInfo.newara
+                                                  : const Color.fromRGBO(
+                                                      100, 100, 100, 1))),
                                       const SizedBox(width: 10),
                                       SvgPicture.asset(
                                         'assets/icons/dislike.svg',
                                         width: 13,
                                         height: 15,
-                                        color: const Color.fromRGBO(
-                                            83, 141, 209, 1),
+                                        color: article.my_vote == false
+                                            ? const Color.fromRGBO(
+                                                83, 141, 209, 1)
+                                            : const Color.fromRGBO(
+                                                100, 100, 100, 1),
                                       ),
                                       const SizedBox(width: 3),
                                       Text('${article.negative_vote_count}',
-                                          style: const TextStyle(
-                                              fontSize: 14,
-                                              fontWeight: FontWeight.w500,
-                                              color: Color.fromRGBO(
-                                                  83, 141, 209, 1))),
+                                          style: TextStyle(
+                                            fontSize: 14,
+                                            fontWeight: FontWeight.w500,
+                                            color: article.my_vote == false
+                                                ? const Color.fromRGBO(
+                                                    83, 141, 209, 1)
+                                                : const Color.fromRGBO(
+                                                    100, 100, 100, 1),
+                                          )),
                                       const SizedBox(width: 10),
                                       SvgPicture.asset(
                                         'assets/icons/comment.svg',
@@ -323,15 +337,22 @@ class _PostViewPageState extends State<PostViewPage> {
                                       'assets/icons/like.svg',
                                       width: 30,
                                       height: 30,
-                                      color: ColorsInfo.newara,
+                                      color: article.my_vote == true
+                                          ? ColorsInfo.newara
+                                          : const Color.fromRGBO(
+                                              100, 100, 100, 1),
                                     ),
                                   ),
                                   const SizedBox(width: 3),
                                   Text('${article.positive_vote_count}',
-                                      style: const TextStyle(
-                                          fontSize: 20,
-                                          fontWeight: FontWeight.w500,
-                                          color: ColorsInfo.newara)),
+                                      style: TextStyle(
+                                        fontSize: 20,
+                                        fontWeight: FontWeight.w500,
+                                        color: article.my_vote == true
+                                            ? ColorsInfo.newara
+                                            : const Color.fromRGBO(
+                                                100, 100, 100, 1),
+                                      )),
                                   const SizedBox(width: 20),
                                   InkWell(
                                     onTap: () async {
@@ -377,17 +398,24 @@ class _PostViewPageState extends State<PostViewPage> {
                                       'assets/icons/dislike.svg',
                                       width: 30,
                                       height: 30,
-                                      color:
-                                          const Color.fromRGBO(83, 141, 209, 1),
+                                      color: article.my_vote == false
+                                          ? const Color.fromRGBO(
+                                              83, 141, 209, 1)
+                                          : const Color.fromRGBO(
+                                              100, 100, 100, 1),
                                     ),
                                   ),
                                   const SizedBox(width: 3),
                                   Text('${article.negative_vote_count}',
-                                      style: const TextStyle(
-                                          fontSize: 20,
-                                          fontWeight: FontWeight.w500,
-                                          color:
-                                              Color.fromRGBO(83, 141, 209, 1))),
+                                      style: TextStyle(
+                                        fontSize: 20,
+                                        fontWeight: FontWeight.w500,
+                                        color: article.my_vote == false
+                                            ? const Color.fromRGBO(
+                                                83, 141, 209, 1)
+                                            : const Color.fromRGBO(
+                                                100, 100, 100, 1),
+                                      )),
                                 ],
                               ),
                               const SizedBox(height: 5),
@@ -399,11 +427,42 @@ class _PostViewPageState extends State<PostViewPage> {
                                   Row(
                                     children: [
                                       InkWell(
-                                        onTap: () {},
+                                        onTap: () async {
+                                          if (article.my_scrap == null) {
+                                            var postRes =
+                                                await userProvider.postApiRes(
+                                              "scraps/",
+                                              payload: {
+                                                "parent_article": article.id,
+                                              },
+                                            );
+                                            if (postRes.statusCode != 201) {
+                                              return;
+                                            }
+                                            setState(() {
+                                              article.my_scrap =
+                                                  ScrapCreateActionModel
+                                                      .fromJson(postRes.data);
+                                            });
+                                          } else {
+                                            var delRes =
+                                                await userProvider.delApiRes(
+                                                    "scraps/${article.my_scrap!.id}/");
+                                            if (delRes.statusCode != 204) {
+                                              return;
+                                            }
+                                            setState(() {
+                                              article.my_scrap = null;
+                                            });
+                                          }
+                                        },
                                         child: Container(
                                           width: 90,
                                           height: 40,
                                           decoration: BoxDecoration(
+                                            color: article.my_scrap == null
+                                                ? Colors.white
+                                                : ColorsInfo.newara,
                                             borderRadius:
                                                 BorderRadius.circular(8),
                                             border: Border.all(
@@ -421,13 +480,20 @@ class _PostViewPageState extends State<PostViewPage> {
                                                   'assets/icons/bookmark-circle-fill.svg',
                                                   width: 20,
                                                   height: 20,
-                                                  color: const Color.fromRGBO(
-                                                      100, 100, 100, 1),
+                                                  color: article.my_scrap ==
+                                                          null
+                                                      ? const Color.fromRGBO(
+                                                          100, 100, 100, 1)
+                                                      : Colors.white,
                                                 ),
                                                 const SizedBox(width: 5),
-                                                const Text(
+                                                Text(
                                                   '담아두기',
                                                   style: TextStyle(
+                                                    color:
+                                                        article.my_scrap == null
+                                                            ? Colors.black
+                                                            : Colors.white,
                                                     fontSize: 15,
                                                     fontWeight: FontWeight.w500,
                                                   ),
@@ -735,27 +801,39 @@ class _PostViewPageState extends State<PostViewPage> {
                                                             'assets/icons/like.svg',
                                                             width: 25,
                                                             height: 25,
-                                                            color: const Color
-                                                                    .fromRGBO(
-                                                                237, 58, 58, 1),
+                                                            color: curComment
+                                                                        .my_vote ==
+                                                                    true
+                                                                ? ColorsInfo
+                                                                    .newara
+                                                                : const Color
+                                                                        .fromRGBO(
+                                                                    100,
+                                                                    100,
+                                                                    100,
+                                                                    1),
                                                           ),
                                                         ),
                                                         Text(
                                                           curComment
                                                               .positive_vote_count
                                                               .toString(),
-                                                          style:
-                                                              const TextStyle(
-                                                                  fontSize: 13,
-                                                                  fontWeight:
-                                                                      FontWeight
-                                                                          .w500,
-                                                                  color: Color
-                                                                      .fromRGBO(
-                                                                          237,
-                                                                          58,
-                                                                          58,
-                                                                          1)),
+                                                          style: TextStyle(
+                                                            fontSize: 13,
+                                                            fontWeight:
+                                                                FontWeight.w500,
+                                                            color: curComment
+                                                                        .my_vote ==
+                                                                    true
+                                                                ? ColorsInfo
+                                                                    .newara
+                                                                : const Color
+                                                                        .fromRGBO(
+                                                                    100,
+                                                                    100,
+                                                                    100,
+                                                                    1),
+                                                          ),
                                                         ),
                                                         const SizedBox(
                                                             width: 6),
@@ -824,30 +902,47 @@ class _PostViewPageState extends State<PostViewPage> {
                                                             'assets/icons/dislike.svg',
                                                             width: 25,
                                                             height: 25,
-                                                            color: const Color
-                                                                    .fromRGBO(
-                                                                83,
-                                                                141,
-                                                                209,
-                                                                1),
+                                                            color: curComment
+                                                                        .my_vote ==
+                                                                    false
+                                                                ? const Color
+                                                                        .fromRGBO(
+                                                                    83,
+                                                                    141,
+                                                                    209,
+                                                                    1)
+                                                                : const Color
+                                                                        .fromRGBO(
+                                                                    100,
+                                                                    100,
+                                                                    100,
+                                                                    1),
                                                           ),
                                                         ),
                                                         Text(
                                                           curComment
                                                               .negative_vote_count
                                                               .toString(),
-                                                          style:
-                                                              const TextStyle(
-                                                                  fontSize: 13,
-                                                                  fontWeight:
-                                                                      FontWeight
-                                                                          .w500,
-                                                                  color: Color
-                                                                      .fromRGBO(
-                                                                          83,
-                                                                          141,
-                                                                          209,
-                                                                          1)),
+                                                          style: TextStyle(
+                                                            fontSize: 13,
+                                                            fontWeight:
+                                                                FontWeight.w500,
+                                                            color: curComment
+                                                                        .my_vote ==
+                                                                    false
+                                                                ? const Color
+                                                                        .fromRGBO(
+                                                                    83,
+                                                                    141,
+                                                                    209,
+                                                                    1)
+                                                                : const Color
+                                                                        .fromRGBO(
+                                                                    100,
+                                                                    100,
+                                                                    100,
+                                                                    1),
+                                                          ),
                                                         ),
                                                         const SizedBox(
                                                             width: 6),
