@@ -1,24 +1,24 @@
 import 'package:new_ara_app/models/public_user_model.dart';
 
 class CommentNestedCommentListActionModel {
-  final int id;
-  final bool is_hidden;
-  final List<dynamic> why_hidden;
-  final bool? can_override_hidden;
-  final bool? my_vote;
-  final bool is_mine;
-  final String? content;
-  final PublicUserModel created_by;
-  final String created_at;
-  final String updated_at;
-  final String deleted_at;
-  final int? name_type;
-  final int? report_count;
-  final int? positive_vote_count;
-  final int? negative_vote_count;
-  final String? hidden_at;
-  final int? parent_article;
-  final int? parent_comment;
+  int id;
+  bool is_hidden;
+  List<dynamic> why_hidden;
+  bool? can_override_hidden;
+  bool? my_vote;
+  bool is_mine;
+  String? content;
+  PublicUserModel created_by;
+  String created_at;
+  String updated_at;
+  String deleted_at;
+  int? name_type;
+  int? report_count;
+  int? positive_vote_count;
+  int? negative_vote_count;
+  String? hidden_at;
+  int? parent_article;
+  int? parent_comment;
 
   CommentNestedCommentListActionModel({
     required this.id,

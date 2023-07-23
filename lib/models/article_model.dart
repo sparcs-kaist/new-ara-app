@@ -6,41 +6,41 @@ import 'package:new_ara_app/models/article_nested_comment_list_action_model.dart
 import 'package:new_ara_app/models/public_user_model.dart';
 
 class ArticleModel {
-  final int id;
-  final bool is_hidden;
-  final List<dynamic> why_hidden;
-  final bool? can_override_hidden;
-  final TopicModel? parent_topic;
-  final BoardModel parent_board;
-  final List<dynamic> attachments;
-  final Map<String, dynamic> my_comment_profile;
-  final List<ArticleNestedCommentListAction> comments;
-  final bool is_mine;
-  final String? title;
-  final String? content;
-  final bool? my_vote;
-  final dynamic my_scrap; // 변수의 타입 및 용도 불분명
-  final PublicUserModel created_by;
-  final int? article_current_page;
-  final dynamic side_articles; // 변수의 타입 및 용도 불분명
-  final dynamic communication_article_status; // 타입 및 용도 불분명
-  final dynamic days_left; // 타입 불분명
-  final String created_at;
-  final String updated_at;
-  final String deleted_at;
-  final int? name_type;
-  final bool? is_content_sexual;
-  final bool? is_content_social;
-  final int? hit_count;
-  final int? comment_count;
-  final int? report_count;
-  final int? positive_vote_count;
-  final int? negative_vote_count;
-  final String? commented_at;
-  final String? url;
-  final String? content_updated_at;
-  final String? hidden_at;
-  final String? topped_at;
+  int id;
+  bool is_hidden;
+  List<dynamic> why_hidden;
+  bool? can_override_hidden;
+  TopicModel? parent_topic;
+  BoardModel parent_board;
+  List<dynamic> attachments;
+  Map<String, dynamic> my_comment_profile;
+  List<ArticleNestedCommentListAction> comments;
+  bool is_mine;
+  String? title;
+  String? content;
+  bool? my_vote;
+  dynamic my_scrap; // 변수의 타입 및 용도 불분명
+  PublicUserModel created_by;
+  int? article_current_page;
+  dynamic side_articles; // 변수의 타입 및 용도 불분명
+  dynamic communication_article_status; // 타입 및 용도 불분명
+  dynamic days_left; // 타입 불분명
+  String created_at;
+  String updated_at;
+  String deleted_at;
+  int? name_type;
+  bool? is_content_sexual;
+  bool? is_content_social;
+  int? hit_count;
+  int? comment_count;
+  int? report_count;
+  int? positive_vote_count;
+  int? negative_vote_count;
+  String? commented_at;
+  String? url;
+  String? content_updated_at;
+  String? hidden_at;
+  String? topped_at;
 
   ArticleModel({
     required this.id,
