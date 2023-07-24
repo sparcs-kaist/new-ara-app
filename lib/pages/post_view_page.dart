@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
 import 'package:webview_flutter/webview_flutter.dart';
+import 'package:dio/dio.dart';
 
 import 'package:new_ara_app/constants/colors_info.dart';
 import 'package:new_ara_app/models/article_model.dart';
@@ -588,11 +589,18 @@ class _PostViewPageState extends State<PostViewPage> {
                                         ),
                                       ],
                                     ),
-                                    //신고버튼 Row
+                                    // 신고버튼 Row
                                     article.is_mine == true
                                         ? Container()
                                         : InkWell(
-                                            onTap: () {},
+                                            onTap: () {
+                                              showDialog(
+                                                  context: context,
+                                                  builder: (context) {
+                                                    return ReportDialogWidget(
+                                                        articleID: article.id);
+                                                  });
+                                            },
                                             child: Container(
                                               width: 90,
                                               height: 40,
@@ -752,7 +760,8 @@ class _PostViewPageState extends State<PostViewPage> {
                                                               curComment.id,
                                                               userProvider,
                                                               idx)
-                                                          : _buildOthersPopupMenuButton()),
+                                                          : _buildOthersPopupMenuButton(
+                                                              curComment.id)),
                                                 ),
                                               ],
                                             ),
@@ -1292,7 +1301,7 @@ class _PostViewPageState extends State<PostViewPage> {
     );
   }
 
-  PopupMenuButton<String> _buildOthersPopupMenuButton() {
+  PopupMenuButton<String> _buildOthersPopupMenuButton(int commentID) {
     return PopupMenuButton<String>(
       splashRadius: 5,
       shape: const RoundedRectangleBorder(
@@ -1352,6 +1361,11 @@ class _PostViewPageState extends State<PostViewPage> {
           case 'Chat':
             break;
           case 'Report':
+            showDialog(
+                context: context,
+                builder: (context) {
+                  return ReportDialogWidget(commentID: commentID);
+                });
             break;
         }
       },
@@ -1386,6 +1400,316 @@ class _PostViewPageState extends State<PostViewPage> {
               _commentContent = value ?? '';
             },
           )),
+    );
+  }
+}
+
+class ReportDialogWidget extends StatefulWidget {
+  final int? articleID, commentID;
+  const ReportDialogWidget({super.key, this.articleID, this.commentID});
+
+  @override
+  State<ReportDialogWidget> createState() => _ReportDialogWidgetState();
+}
+
+class _ReportDialogWidgetState extends State<ReportDialogWidget> {
+  List<String> reportContents = [
+    "hate_speech",
+    "unauthorized_sales_articles",
+    "spam",
+    "fake_information",
+    "defamation",
+    "other"
+  ];
+  late List<bool> isChosen;
+  @override
+  void initState() {
+    super.initState();
+    isChosen = [false, false, false, false, false, false];
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Dialog(
+      child: Container(
+        decoration: const BoxDecoration(
+          borderRadius: BorderRadius.all(Radius.circular(15)),
+        ),
+        width: 380,
+        height: 500,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            SvgPicture.asset(
+              "assets/icons/exclamationmark-bubble-fill.svg",
+              width: 30,
+              height: 30,
+              color: ColorsInfo.newara,
+            ),
+            const SizedBox(height: 5),
+            Text(
+              '${widget.articleID == null ? '댓글' : '게시글'} 신고 사유를 알려주세요.',
+              style: const TextStyle(
+                fontSize: 17,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+            const SizedBox(height: 20),
+            InkWell(
+              onTap: () {
+                setState(() => isChosen[0] = !isChosen[0]);
+              },
+              child: Container(
+                decoration: BoxDecoration(
+                  borderRadius: const BorderRadius.all(Radius.circular(20)),
+                  color: isChosen[0]
+                      ? ColorsInfo.newara
+                      : const Color.fromRGBO(220, 220, 220, 1),
+                ),
+                width: 90,
+                height: 40,
+                child: Center(
+                  child: Text(
+                    '혐오 발언',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w500,
+                      color: isChosen[0] ? Colors.white : Colors.black,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(height: 10),
+            InkWell(
+              onTap: () {
+                setState(() => isChosen[1] = !isChosen[1]);
+              },
+              child: Container(
+                decoration: BoxDecoration(
+                  borderRadius: const BorderRadius.all(Radius.circular(20)),
+                  color: isChosen[1]
+                      ? ColorsInfo.newara
+                      : const Color.fromRGBO(220, 220, 220, 1),
+                ),
+                width: 170,
+                height: 40,
+                child: Center(
+                  child: Text(
+                    '허가되지 않은 판매글',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w500,
+                      color: isChosen[1] ? Colors.white : Colors.black,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(height: 10),
+            InkWell(
+              onTap: () {
+                setState(() => isChosen[2] = !isChosen[2]);
+              },
+              child: Container(
+                decoration: BoxDecoration(
+                  borderRadius: const BorderRadius.all(Radius.circular(20)),
+                  color: isChosen[2]
+                      ? ColorsInfo.newara
+                      : const Color.fromRGBO(220, 220, 220, 1),
+                ),
+                width: 60,
+                height: 40,
+                child: Center(
+                  child: Text(
+                    '스팸',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w500,
+                      color: isChosen[2] ? Colors.white : Colors.black,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(height: 10),
+            InkWell(
+              onTap: () {
+                setState(() => isChosen[3] = !isChosen[3]);
+              },
+              child: Container(
+                decoration: BoxDecoration(
+                  borderRadius: const BorderRadius.all(Radius.circular(20)),
+                  color: isChosen[3]
+                      ? ColorsInfo.newara
+                      : const Color.fromRGBO(220, 220, 220, 1),
+                ),
+                width: 100,
+                height: 40,
+                child: Center(
+                  child: Text(
+                    '거짓 정보',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w500,
+                      color: isChosen[3] ? Colors.white : Colors.black,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(height: 10),
+            InkWell(
+              onTap: () {
+                setState(() => isChosen[4] = !isChosen[4]);
+              },
+              child: Container(
+                decoration: BoxDecoration(
+                  borderRadius: const BorderRadius.all(Radius.circular(20)),
+                  color: isChosen[4]
+                      ? ColorsInfo.newara
+                      : const Color.fromRGBO(220, 220, 220, 1),
+                ),
+                width: 100,
+                height: 40,
+                child: Center(
+                  child: Text(
+                    '명예훼손',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w500,
+                      color: isChosen[4] ? Colors.white : Colors.black,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(height: 10),
+            InkWell(
+              onTap: () {
+                setState(() => isChosen[5] = !isChosen[5]);
+              },
+              child: Container(
+                decoration: BoxDecoration(
+                  borderRadius: const BorderRadius.all(Radius.circular(20)),
+                  color: isChosen[5]
+                      ? ColorsInfo.newara
+                      : const Color.fromRGBO(220, 220, 220, 1),
+                ),
+                width: 60,
+                height: 40,
+                child: Center(
+                  child: Text(
+                    '기타',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w500,
+                      color: isChosen[5] ? Colors.white : Colors.black,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(height: 20),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                InkWell(
+                  onTap: () {
+                    Navigator.pop(context);
+                  },
+                  child: Container(
+                    decoration: BoxDecoration(
+                      border: Border.all(
+                        color: Colors.grey, // 테두리 색상을 빨간색으로 지정
+                        width: 1, // 테두리의 두께를 2로 지정
+                      ),
+                      borderRadius: const BorderRadius.all(Radius.circular(20)),
+                      color: Colors.white,
+                    ),
+                    width: 60,
+                    height: 40,
+                    child: const Center(
+                      child: Text(
+                        '취소',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w500,
+                          color: Colors.black,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 20),
+                InkWell(
+                  onTap: () async {
+                    if (!isChosen[0] &&
+                        !isChosen[1] &&
+                        !isChosen[2] &&
+                        !isChosen[3] &&
+                        !isChosen[4] &&
+                        !isChosen[5]) {
+                      // 나중에 알림 해주기
+                      return;
+                    }
+                    String reportContent = "";
+                    for (int i = 0; i < 6; i++) {
+                      if (!isChosen[i]) continue;
+                      if (reportContent != "") reportContent += ", ";
+                      reportContent += reportContents[i];
+                    }
+                    debugPrint("reportContent: $reportContent");
+                    Map<String, dynamic> defaultPayload = {
+                      "content": reportContent,
+                      "type": "others",
+                    };
+                    defaultPayload.addAll(widget.articleID == null
+                        ? {"parent_comment": widget.commentID ?? 0}
+                        : {"parent_article": widget.articleID ?? 0});
+                    UserProvider userProvider = context.read<UserProvider>();
+                    try {
+                      Response? response = await userProvider.postApiRes(
+                        "reports/",
+                        payload: defaultPayload,
+                      );
+                      debugPrint("Report statusCode: ${response?.statusCode}");
+                    } catch (error) {
+                      debugPrint("Report error: $error");
+                    }
+                  },
+                  child: Container(
+                    decoration: BoxDecoration(
+                      borderRadius: const BorderRadius.all(Radius.circular(20)),
+                      color: ColorsInfo.newara.withOpacity((isChosen[0] ||
+                              isChosen[1] ||
+                              isChosen[2] ||
+                              isChosen[3] ||
+                              isChosen[4] ||
+                              isChosen[5])
+                          ? 1
+                          : 0.5),
+                    ),
+                    width: 100,
+                    height: 40,
+                    child: const Center(
+                      child: Text(
+                        '신고하기',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w500,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
     );
   }
 }
