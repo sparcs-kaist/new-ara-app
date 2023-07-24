@@ -33,7 +33,9 @@ class _PostViewPageState extends State<PostViewPage> {
   List<CommentNestedCommentListActionModel> commentList = [];
   int parentCommentID = 0;
   late FocusNode textFocusNode;
-  String initialContent = '';
+  bool isModify = false, isNestedComment = false;
+  int? modifyTarget;
+  final TextEditingController _textEditingController = TextEditingController();
 
   @override
   void initState() {
@@ -53,8 +55,12 @@ class _PostViewPageState extends State<PostViewPage> {
     setState(() => isValid = value);
   }
 
-  void setInitialContent(String content) {
-    setState(() => initialContent = content);
+  void setIsNestedComment(bool value) {
+    setState(() => isNestedComment = value);
+  }
+
+  void setIsModify(bool value) {
+    setState(() => isModify = value);
   }
 
   Future<bool> delComment(int id, UserProvider userProvider) async {
@@ -135,8 +141,6 @@ class _PostViewPageState extends State<PostViewPage> {
             body: SafeArea(
               child: GestureDetector(
                 onTap: () {
-                  parentCommentID = 0;
-                  debugPrint("parentCommentID: 0");
                   FocusScope.of(context).unfocus();
                 },
                 child: Container(
@@ -994,6 +998,10 @@ class _PostViewPageState extends State<PostViewPage> {
                                                                       .requestFocus();
                                                                   debugPrint(
                                                                       "parentCommentID: $parentCommentID");
+                                                                  setIsNestedComment(
+                                                                      true);
+                                                                  setIsModify(
+                                                                      false);
                                                                 },
                                                                 child:
                                                                     const Text(
@@ -1087,6 +1095,25 @@ class _PostViewPageState extends State<PostViewPage> {
                           ),
                         ),
                         const SizedBox(width: 10),
+                        (!isModify && !isNestedComment)
+                            ? Container()
+                            : InkWell(
+                                onTap: () {
+                                  _textEditingController.text = "";
+                                  setIsNestedComment(false);
+                                  parentCommentID = 0;
+                                  debugPrint("parentCommentID: 0");
+                                  setIsModify(false);
+                                  modifyTarget = null;
+                                },
+                                child: SvgPicture.asset(
+                                  'assets/icons/close.svg',
+                                  width: 30,
+                                  height: 30,
+                                  color: ColorsInfo.newara,
+                                ),
+                              ),
+                        !isModify ? Container() : const SizedBox(width: 5),
                         InkWell(
                           onTap: () async {
                             if (_formKey.currentState == null) return;
@@ -1096,24 +1123,45 @@ class _PostViewPageState extends State<PostViewPage> {
                             debugPrint("작성된 댓글: $_commentContent");
                             debugPrint(
                                 "payload 정보: name_type=${article.name_type}, parent_comment=$parentCommentID");
-                            dynamic defaultPayload = {
-                              "content": _commentContent,
-                              "name_type": article.name_type,
-                              "attachment": null,
-                            };
-                            defaultPayload.addAll(parentCommentID != 0
-                                ? {"parent_comment": parentCommentID}
-                                : {"parent_article": article.id});
-                            var postRes = await userProvider.postApiRes(
-                              'comments/',
-                              payload: defaultPayload,
-                            );
-                            if (postRes.statusCode != 201) {
-                              // 나중에 사용자용 안내 위젯 등 추가하면 좋을 듯
-                              debugPrint("POST /api/comments failed");
-                              return;
+                            if (!isModify) {
+                              dynamic defaultPayload = {
+                                "content": _commentContent,
+                                "name_type": article.name_type,
+                                "attachment": null,
+                              };
+                              defaultPayload.addAll(parentCommentID != 0
+                                  ? {"parent_comment": parentCommentID}
+                                  : {"parent_article": article.id});
+                              var postRes = await userProvider.postApiRes(
+                                'comments/',
+                                payload: defaultPayload,
+                              );
+                              if (postRes.statusCode != 201) {
+                                // 나중에 사용자용 안내 위젯 등 추가하면 좋을 듯
+                                debugPrint("POST /api/comments failed");
+                                return;
+                              }
+                              setIsNestedComment(false);
+                              fetchArticle(userProvider);
+                            } else {
+                              dynamic defaultPayload = {
+                                "content": _commentContent,
+                                "is_mine": true,
+                                "name_type": article.name_type,
+                              };
+                              var patchRes = await userProvider.patchApiRes(
+                                "comments/$modifyTarget/",
+                                payload: defaultPayload,
+                              );
+                              if (patchRes.statusCode != 200) {
+                                debugPrint(
+                                    "PATCH /api/comments/$modifyTarget/ failed");
+                                return;
+                              }
+                              _textEditingController.text = "";
+                              setIsModify(false);
+                              fetchArticle(userProvider);
                             }
-                            fetchArticle(userProvider);
                           },
                           child: SvgPicture.asset(
                             'assets/icons/send.svg',
@@ -1134,6 +1182,8 @@ class _PostViewPageState extends State<PostViewPage> {
   PopupMenuButton<String> _buildMyPopupMenuButton(
       int id, UserProvider userProvider, int idx) {
     return PopupMenuButton<String>(
+      shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.all(Radius.circular(12.0))),
       padding: const EdgeInsets.all(2.0),
       icon: SvgPicture.asset(
         'assets/icons/three_dots_1.svg',
@@ -1188,7 +1238,11 @@ class _PostViewPageState extends State<PostViewPage> {
       onSelected: (String result) async {
         switch (result) {
           case 'Modify':
+            _textEditingController.text = commentList[idx].content.toString();
             textFocusNode.requestFocus();
+            setIsModify(true);
+            setIsNestedComment(false);
+            modifyTarget = id;
             break;
           case 'Delete':
             bool res = await delComment(id, userProvider);
@@ -1204,6 +1258,8 @@ class _PostViewPageState extends State<PostViewPage> {
 
   PopupMenuButton<String> _buildOthersPopupMenuButton() {
     return PopupMenuButton<String>(
+      shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.all(Radius.circular(12.0))),
       padding: const EdgeInsets.all(2.0),
       icon: SvgPicture.asset(
         'assets/icons/three_dots_1.svg',
@@ -1271,7 +1327,7 @@ class _PostViewPageState extends State<PostViewPage> {
       child: Container(
           margin: const EdgeInsets.only(left: 15),
           child: TextFormField(
-            initialValue: initialContent,
+            controller: _textEditingController,
             focusNode: textFocusNode,
             minLines: 1,
             maxLines: 5,
@@ -1285,6 +1341,9 @@ class _PostViewPageState extends State<PostViewPage> {
                 return '댓글이 작성되지 않았습니다!';
               }
               return null;
+            },
+            onChanged: (value) {
+              _commentContent = value;
             },
             onSaved: (value) {
               _commentContent = value ?? '';

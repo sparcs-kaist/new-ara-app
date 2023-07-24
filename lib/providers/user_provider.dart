@@ -158,4 +158,21 @@ class UserProvider with ChangeNotifier {
     }
     return response;
   }
+
+  Future<dynamic> patchApiRes(String apiUrl,
+      {dynamic payload, String? initCookieString}) async {
+    String cookieString = initCookieString ?? getCookiesToString();
+    String totUrl = "$newAraDefaultUrl/api/$apiUrl";
+
+    var dio = Dio();
+    dio.options.headers['Cookie'] = cookieString;
+
+    late dynamic response;
+    try {
+      response = await dio.patch(totUrl, data: payload);
+    } catch (error) {
+      debugPrint("PATCH /api/$apiUrl failed with error: $error");
+    }
+    return response;
+  }
 }
