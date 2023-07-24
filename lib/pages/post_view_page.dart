@@ -691,15 +691,13 @@ class _PostViewPageState extends State<PostViewPage> {
                                                   ),
                                                 ],
                                               ),
-                                              InkWell(
-                                                onTap: () {},
-                                                child: SvgPicture.asset(
-                                                  'assets/icons/three_dots_1.svg',
-                                                  width: 25,
-                                                  height: 25,
-                                                  color: const Color.fromRGBO(
-                                                      177, 177, 177, 1),
-                                                ),
+                                              SizedBox(
+                                                width: 30,
+                                                height: 25,
+                                                child: curComment.is_mine ==
+                                                        true
+                                                    ? _buildMyPopupMenuButton()
+                                                    : _buildOthersPopupMenuButton(),
                                               ),
                                             ],
                                           ),
@@ -1108,6 +1106,132 @@ class _PostViewPageState extends State<PostViewPage> {
               ),
             ),
           );
+  }
+
+  PopupMenuButton<String> _buildMyPopupMenuButton() {
+    return PopupMenuButton<String>(
+      padding: const EdgeInsets.all(2.0),
+      icon: SvgPicture.asset(
+        'assets/icons/three_dots_1.svg',
+        width: 25,
+        height: 25,
+      ),
+      itemBuilder: (BuildContext context) => [
+        PopupMenuItem<String>(
+          value: 'Modify',
+          child: Row(
+            children: [
+              SvgPicture.asset(
+                'assets/icons/modify.svg',
+                width: 25,
+                height: 25,
+                color: const Color.fromRGBO(51, 51, 51, 1),
+              ),
+              const SizedBox(width: 10),
+              const Text(
+                '수정',
+                style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w700,
+                    color: Color.fromRGBO(51, 51, 51, 1)),
+              ),
+            ],
+          ),
+        ),
+        PopupMenuItem<String>(
+          value: 'Delete',
+          child: Row(
+            children: [
+              SvgPicture.asset(
+                'assets/icons/delete.svg',
+                width: 25,
+                height: 25,
+                color: const Color.fromRGBO(51, 51, 51, 1),
+              ),
+              const SizedBox(width: 10),
+              const Text(
+                '삭제',
+                style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w700,
+                    color: Color.fromRGBO(51, 51, 51, 1)),
+              ),
+            ],
+          ),
+        ),
+      ],
+      onSelected: (String result) {
+        switch (result) {
+          case 'Chat':
+            break;
+          case 'Report':
+            break;
+        }
+      },
+    );
+  }
+
+  PopupMenuButton<String> _buildOthersPopupMenuButton() {
+    return PopupMenuButton<String>(
+      padding: const EdgeInsets.all(2.0),
+      icon: SvgPicture.asset(
+        'assets/icons/three_dots_1.svg',
+        width: 25,
+        height: 25,
+      ),
+      itemBuilder: (BuildContext context) => [
+        PopupMenuItem<String>(
+          value: 'Chat',
+          child: Row(
+            children: [
+              SvgPicture.asset(
+                'assets/icons/chat.svg',
+                width: 20,
+                height: 20,
+                color: const Color.fromRGBO(51, 51, 51, 1),
+              ),
+              const SizedBox(width: 10),
+              const Text(
+                '채팅',
+                style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w700,
+                    color: Color.fromRGBO(51, 51, 51, 1)),
+              ),
+            ],
+          ),
+        ),
+        PopupMenuItem<String>(
+          value: 'Report',
+          child: Row(
+            children: [
+              SvgPicture.asset(
+                'assets/icons/information.svg',
+                width: 20,
+                height: 20,
+                color: const Color.fromRGBO(51, 51, 51, 1),
+              ),
+              const SizedBox(width: 10),
+              const Text(
+                '신고',
+                style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w700,
+                    color: Color.fromRGBO(51, 51, 51, 1)),
+              ),
+            ],
+          ),
+        ),
+      ],
+      onSelected: (String result) {
+        switch (result) {
+          case 'Chat':
+            break;
+          case 'Report':
+            break;
+        }
+      },
+    );
   }
 
   Form _buildForm() {
