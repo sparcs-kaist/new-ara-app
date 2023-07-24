@@ -256,50 +256,51 @@ class _PostViewPageState extends State<PostViewPage> {
                                 ],
                               ),
                               const SizedBox(height: 10),
-                              Row(
-                                children: [
-                                  Container(
-                                    width: 30,
-                                    height: 30,
-                                    decoration: const BoxDecoration(
-                                      shape: BoxShape.circle,
-                                      color: Colors.grey,
+                              InkWell(
+                                onTap: () {},
+                                child: Row(
+                                  children: [
+                                    Container(
+                                      width: 30,
+                                      height: 30,
+                                      decoration: const BoxDecoration(
+                                        shape: BoxShape.circle,
+                                        color: Colors.grey,
+                                      ),
+                                      child: ClipRRect(
+                                        borderRadius: const BorderRadius.all(
+                                            Radius.circular(100)),
+                                        child: Image.network(article
+                                            .created_by.profile.picture
+                                            .toString()),
+                                      ),
                                     ),
-                                    child: ClipRRect(
-                                      borderRadius: const BorderRadius.all(
-                                          Radius.circular(100)),
-                                      child: Image.network(article
-                                          .created_by.profile.picture
-                                          .toString()),
-                                    ),
-                                  ),
-                                  const SizedBox(width: 10),
-                                  Container(
-                                      constraints: BoxConstraints(
-                                          maxWidth: MediaQuery.of(context)
-                                                  .size
-                                                  .width -
-                                              150),
-                                      child: Text(
-                                        article.created_by.profile.nickname
-                                            .toString(),
-                                        style: const TextStyle(
-                                          fontSize: 14,
-                                          fontWeight: FontWeight.w500,
-                                        ),
-                                        maxLines: 1,
-                                        overflow: TextOverflow.ellipsis,
-                                      )),
-                                  IconButton(
-                                    icon: SvgPicture.asset(
+                                    const SizedBox(width: 10),
+                                    Container(
+                                        constraints: BoxConstraints(
+                                            maxWidth: MediaQuery.of(context)
+                                                    .size
+                                                    .width -
+                                                150),
+                                        child: Text(
+                                          article.created_by.profile.nickname
+                                              .toString(),
+                                          style: const TextStyle(
+                                            fontSize: 14,
+                                            fontWeight: FontWeight.w500,
+                                          ),
+                                          maxLines: 1,
+                                          overflow: TextOverflow.ellipsis,
+                                        )),
+                                    const SizedBox(width: 10),
+                                    SvgPicture.asset(
                                       'assets/icons/right_chevron.svg',
                                       color: Colors.black,
                                       width: 5,
                                       height: 9,
                                     ),
-                                    onPressed: () {}, // 추후 구현 예정
-                                  ),
-                                ],
+                                  ],
+                                ),
                               ),
                               const Divider(
                                 thickness: 1,
@@ -718,13 +719,16 @@ class _PostViewPageState extends State<PostViewPage> {
                                               SizedBox(
                                                 width: 30,
                                                 height: 25,
-                                                child: curComment.is_mine ==
+                                                child: curComment.is_hidden ==
                                                         true
-                                                    ? _buildMyPopupMenuButton(
-                                                        curComment.id,
-                                                        userProvider,
-                                                        idx)
-                                                    : _buildOthersPopupMenuButton(),
+                                                    ? Container()
+                                                    : (curComment.is_mine ==
+                                                            true
+                                                        ? _buildMyPopupMenuButton(
+                                                            curComment.id,
+                                                            userProvider,
+                                                            idx)
+                                                        : _buildOthersPopupMenuButton()),
                                               ),
                                             ],
                                           ),
