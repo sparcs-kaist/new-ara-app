@@ -571,49 +571,48 @@ class _PostViewPageState extends State<PostViewPage> {
                                     ],
                                   ),
                                   //신고버튼 Row
-                                  Row(
-                                    children: [
-                                      InkWell(
-                                        onTap: () {},
-                                        child: Container(
-                                          width: 90,
-                                          height: 40,
-                                          decoration: BoxDecoration(
-                                            borderRadius:
-                                                BorderRadius.circular(8),
-                                            border: Border.all(
-                                              color: const Color.fromRGBO(
-                                                  230, 230, 230, 1),
+                                  article.is_mine == true
+                                      ? Container()
+                                      : InkWell(
+                                          onTap: () {},
+                                          child: Container(
+                                            width: 90,
+                                            height: 40,
+                                            decoration: BoxDecoration(
+                                              borderRadius:
+                                                  BorderRadius.circular(8),
+                                              border: Border.all(
+                                                color: const Color.fromRGBO(
+                                                    230, 230, 230, 1),
+                                              ),
                                             ),
-                                          ),
-                                          child: Center(
-                                            child: Row(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment.center,
-                                              children: [
-                                                const SizedBox(width: 2),
-                                                SvgPicture.asset(
-                                                  'assets/icons/exclamationmark-bubble-fill.svg',
-                                                  width: 20,
-                                                  height: 20,
-                                                  color: const Color.fromRGBO(
-                                                      100, 100, 100, 1),
-                                                ),
-                                                const SizedBox(width: 10),
-                                                const Text(
-                                                  '신고',
-                                                  style: TextStyle(
-                                                    fontSize: 15,
-                                                    fontWeight: FontWeight.w500,
+                                            child: Center(
+                                              child: Row(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment.center,
+                                                children: [
+                                                  const SizedBox(width: 2),
+                                                  SvgPicture.asset(
+                                                    'assets/icons/exclamationmark-bubble-fill.svg',
+                                                    width: 20,
+                                                    height: 20,
+                                                    color: const Color.fromRGBO(
+                                                        100, 100, 100, 1),
                                                   ),
-                                                ),
-                                              ],
+                                                  const SizedBox(width: 10),
+                                                  const Text(
+                                                    '신고',
+                                                    style: TextStyle(
+                                                      fontSize: 15,
+                                                      fontWeight:
+                                                          FontWeight.w500,
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
                                             ),
                                           ),
                                         ),
-                                      ),
-                                    ],
-                                  ),
                                 ],
                               ),
                               const SizedBox(height: 15),
