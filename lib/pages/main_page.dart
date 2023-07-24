@@ -8,7 +8,6 @@ import 'package:new_ara_app/constants/colors_info.dart';
 import 'package:new_ara_app/models/board_detail_action_model.dart';
 import 'package:new_ara_app/pages/free_bulletin_board_page.dart';
 import 'package:new_ara_app/pages/post_write_page.dart';
-import 'package:new_ara_app/pages/specific_bulletin_board_page.dart';
 import 'package:new_ara_app/providers/user_provider.dart';
 import 'package:new_ara_app/widgetclasses/loading_indicator.dart';
 import 'package:new_ara_app/widgetclasses/post_preview.dart';
@@ -132,7 +131,7 @@ class _MainPageState extends State<MainPage> {
     //articles/?parent_board=11
     //입주 업체
     // "slug": "facility-feedback",
-    int boardID = findBoardID("facility-feedback", "")[0];
+    int boardID = findBoardID("facility-notice", "")[0];
     List<dynamic> facilityJson = (await userProvider
         .getApiRes("articles/?parent_board=$boardID"))['results'];
     if (mounted) {
@@ -357,18 +356,18 @@ class _MainPageState extends State<MainPage> {
                         ),
                       ),
                       const SizedBox(height: 10),
-                      MainPageTextButton(
-                        'main_page.notice',
-                        () {
-                          //잠시 free_bulletin_board들 테스트 하기 위한
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) =>
-                                    const SpecificBulletinBoardPage()),
-                          );
-                        },
+                      SizedBox(
+                        width: MediaQuery.of(context).size.width - 60,
+                        child: const Text(
+                          '공지',
+                          style: TextStyle(
+                            fontWeight: FontWeight.w600,
+                            fontSize: 20,
+                            color: Colors.black,
+                          ),
+                        ),
                       ),
+                      const SizedBox(height: 7),
                       Container(
                         padding: const EdgeInsets.all(12),
                         width: MediaQuery.of(context).size.width - 40,
@@ -499,109 +498,147 @@ class _MainPageState extends State<MainPage> {
                             const SizedBox(
                               height: 14,
                             ),
-                            Row(
-                              children: [
-                                const Text(
-                                  "입주 업체",
-                                  style: TextStyle(
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.w700,
-                                    color: Color(0xFF646464),
+                            InkWell(
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) =>
+                                          FreeBulletinBoardPage(
+                                            boardType: BoardType.free,
+                                            boardInfo: boardList[7],
+                                          )),
+                                );
+                              },
+                              child: Row(
+                                children: [
+                                  const Text(
+                                    "입주 업체",
+                                    style: TextStyle(
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w700,
+                                      color: Color(0xFF646464),
+                                    ),
                                   ),
-                                ),
-                                const SizedBox(
-                                  width: 5,
-                                ),
-                                SizedBox(
-                                  height: 11,
-                                  width: 6,
-                                  child: SvgPicture.asset(
-                                    'assets/icons/right_chevron.svg',
-                                    color: const Color(0xFF646464),
-                                    fit: BoxFit.fill,
+                                  const SizedBox(
+                                    width: 5,
                                   ),
-                                ),
-                                const SizedBox(
-                                  width: 10,
-                                ),
-                                Expanded(
-                                  child: InkWell(
-                                      onTap: () {
-                                        Navigator.push(
-                                            context,
-                                            MaterialPageRoute(
-                                                builder: (context) =>
-                                                    PostViewPage(
-                                                        id: facilityContentList[
-                                                                0]
-                                                            .id)));
-                                      },
-                                      child: Text(
-                                        facilityContentList[0].title.toString(),
-                                        style: const TextStyle(
-                                            fontSize: 14,
-                                            fontWeight: FontWeight.w400),
-                                        maxLines: 1,
-                                        overflow: TextOverflow.ellipsis,
-                                      )),
-                                )
-                              ],
+                                  SizedBox(
+                                    height: 11,
+                                    width: 6,
+                                    child: SvgPicture.asset(
+                                      'assets/icons/right_chevron.svg',
+                                      color: const Color(0xFF646464),
+                                      fit: BoxFit.fill,
+                                    ),
+                                  ),
+                                  const SizedBox(
+                                    width: 10,
+                                  ),
+                                  Expanded(
+                                    child: InkWell(
+                                        onTap: () {
+                                          Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                  builder: (context) =>
+                                                      PostViewPage(
+                                                          id: facilityContentList[
+                                                                  0]
+                                                              .id)));
+                                        },
+                                        child: Text(
+                                          facilityContentList[0]
+                                              .title
+                                              .toString(),
+                                          style: const TextStyle(
+                                              fontSize: 14,
+                                              fontWeight: FontWeight.w400),
+                                          maxLines: 1,
+                                          overflow: TextOverflow.ellipsis,
+                                        )),
+                                  )
+                                ],
+                              ),
                             ),
                             const SizedBox(
                               height: 10,
                             ),
-                            Row(
-                              children: [
-                                const Text(
-                                  "뉴아라",
-                                  style: TextStyle(
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.w700,
-                                    color: Color(0xFFED3A3A),
+                            InkWell(
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) =>
+                                          FreeBulletinBoardPage(
+                                            boardType: BoardType.free,
+                                            boardInfo: boardList[11],
+                                          )),
+                                );
+                              },
+                              child: Row(
+                                children: [
+                                  const Text(
+                                    "뉴아라",
+                                    style: TextStyle(
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w700,
+                                      color: Color(0xFFED3A3A),
+                                    ),
                                   ),
-                                ),
-                                const SizedBox(
-                                  width: 5,
-                                ),
-                                SizedBox(
-                                  height: 11,
-                                  width: 6,
-                                  child: SvgPicture.asset(
-                                    'assets/icons/right_chevron.svg',
-                                    color: const Color(0xFFED3A3A),
-                                    fit: BoxFit.fill,
+                                  const SizedBox(
+                                    width: 5,
                                   ),
-                                ),
-                                const SizedBox(
-                                  width: 10,
-                                ),
-                                Expanded(
-                                  child: InkWell(
-                                      onTap: () {
-                                        Navigator.push(
-                                            context,
-                                            MaterialPageRoute(
-                                                builder: (context) =>
-                                                    PostViewPage(
-                                                        id: newAraContentList[0]
-                                                            .id)));
-                                      },
-                                      child: Text(
-                                        newAraContentList[0].title.toString(),
-                                        style: const TextStyle(
-                                            fontSize: 14,
-                                            fontWeight: FontWeight.w400),
-                                        maxLines: 1,
-                                        overflow: TextOverflow.ellipsis,
-                                      )),
-                                ),
-                              ],
+                                  SizedBox(
+                                    height: 11,
+                                    width: 6,
+                                    child: SvgPicture.asset(
+                                      'assets/icons/right_chevron.svg',
+                                      color: const Color(0xFFED3A3A),
+                                      fit: BoxFit.fill,
+                                    ),
+                                  ),
+                                  const SizedBox(
+                                    width: 10,
+                                  ),
+                                  Expanded(
+                                    child: InkWell(
+                                        onTap: () {
+                                          Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                  builder: (context) =>
+                                                      PostViewPage(
+                                                          id: newAraContentList[
+                                                                  0]
+                                                              .id)));
+                                        },
+                                        child: Text(
+                                          newAraContentList[0].title.toString(),
+                                          style: const TextStyle(
+                                              fontSize: 14,
+                                              fontWeight: FontWeight.w400),
+                                          maxLines: 1,
+                                          overflow: TextOverflow.ellipsis,
+                                        )),
+                                  ),
+                                ],
+                              ),
                             ),
                           ],
                         ),
                       ),
                       const SizedBox(height: 10),
-                      MainPageTextButton('main_page.stu_community', () {}),
+                      MainPageTextButton('main_page.stu_community', () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => FreeBulletinBoardPage(
+                                    boardType: BoardType.free,
+                                    boardInfo: boardList[1],
+                                  )),
+                        );
+                      }),
                       Container(
                         width: MediaQuery.of(context).size.width - 40,
                         //   height: 110,

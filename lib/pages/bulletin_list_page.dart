@@ -21,9 +21,8 @@ class BulletinListPage extends StatefulWidget {
 class _BulletinListPageState extends State<BulletinListPage> {
   bool isLoading = true;
 
-  var boardsByGroup = List.generate(boardsByGroupLength + 1, (row) {
-    return <dynamic>[];
-  });
+  List<List<BoardDetailActionModel>> boardsByGroup =
+      List.generate(boardsByGroupLength + 1, (_) => []);
   List<Map<String, dynamic>> textContent = [];
   @override
   void initState() {
@@ -37,23 +36,15 @@ class _BulletinListPageState extends State<BulletinListPage> {
     //var boardsByGroup = List<dynamic>.filled(6, List< dynamic >.filled(0, null, growable: true) , growable: true);
 
     List<dynamic> jsonBoards = await userProvider.getApiRes("boards/") ?? [];
-
-    List<BoardDetailActionModel> apiResBoards2 = [];
-    for (Map<String, dynamic> jsonBoard in jsonBoards) {
-      apiResBoards2.add(BoardDetailActionModel.fromJson(jsonBoard));
+    List<BoardDetailActionModel> boardModels = [];
+    for (dynamic jsonBoard in jsonBoards) {
+      boardModels.add(BoardDetailActionModel.fromJson(jsonBoard));
     }
-    //debugPrint(apiResBoards2[0].ko_name.toString());
 
     if (mounted) {
       setState(() {
-        for (var element in apiResBoards2) {
-          // debugPrint("${element["ko_name"]}, group_id: ${element["group_id"]}, id: ${element["id"]}, lenght: ${element["topics"]}");
-          // debugPrint("-------------------------");
-          boardsByGroup[element.group_id!.toInt()].add(element);
-          // for(var topic in element["topics"]){
-          //   debugPrint("${topic["ko_name"]} ,id: ${topic["id"]}");
-          // }
-          // debugPrint("=========================");
+        for (BoardDetailActionModel model in boardModels) {
+          boardsByGroup[model.group.id].add(model);
         }
         isLoading = false;
       });
@@ -242,10 +233,47 @@ class _BulletinListPageState extends State<BulletinListPage> {
                         ),
 
                         BoardExpansionTile(1, "공지", boardsByGroup[1]),
-                        BoardExpansionTile(2, "잡담", boardsByGroup[2]),
+                        BoardExpansionTile(5, "소통", boardsByGroup[5]),
+                        InkWell(
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => FreeBulletinBoardPage(
+                                        boardType: BoardType.free,
+                                        boardInfo: boardsByGroup[2][0])),
+                              );
+                            },
+                            child: SizedBox(
+                              height: 48,
+                              child: Row(
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  const SizedBox(
+                                    width: 3,
+                                  ),
+                                  SvgPicture.asset(
+                                    'assets/icons/notify.svg',
+                                    height: 32,
+                                    width: 32,
+                                    color: const Color(0xFF333333),
+                                  ),
+                                  const SizedBox(
+                                    width: 5,
+                                  ),
+                                  Text(
+                                    boardsByGroup[2][0].ko_name,
+                                    style: const TextStyle(
+                                      color: Color(0xFF333333),
+                                      fontSize: 20,
+                                      fontWeight: FontWeight.w700,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            )),
                         BoardExpansionTile(3, "학생 단체 및 동아리", boardsByGroup[3]),
                         BoardExpansionTile(4, "거래", boardsByGroup[4]),
-                        BoardExpansionTile(5, "소통", boardsByGroup[5]),
                       ],
                     ),
                   ),
@@ -259,7 +287,7 @@ class _BulletinListPageState extends State<BulletinListPage> {
 class BoardExpansionTile extends StatelessWidget {
   final int titleNum;
   final String title;
-  final dynamic boardsByGroup;
+  final List<BoardDetailActionModel> boardsByGroup;
   const BoardExpansionTile(this.titleNum, this.title, this.boardsByGroup,
       {super.key});
 
@@ -302,7 +330,7 @@ class BoardExpansionTile extends StatelessWidget {
               ],
             ),
           ),
-          children: boardsByGroup.map<Widget>((subMenu) {
+          children: boardsByGroup.map<Widget>((model) {
             return SizedBox(
               height: 39,
               child: Row(
@@ -316,11 +344,11 @@ class BoardExpansionTile extends StatelessWidget {
                         context,
                         MaterialPageRoute(
                             builder: (context) => FreeBulletinBoardPage(
-                                boardType: BoardType.free, boardInfo: subMenu)),
+                                boardType: BoardType.free, boardInfo: model)),
                       );
                     },
                     child: Text(
-                      subMenu.ko_name.toString(),
+                      model.ko_name,
                       style: const TextStyle(
                         color: Color(0xFF333333),
                         fontSize: 16,
