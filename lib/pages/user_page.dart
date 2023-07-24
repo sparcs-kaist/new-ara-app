@@ -137,144 +137,131 @@ class _UserPageState extends State<UserPage>
         ],
       ),
       body: SafeArea(
-        child: RefreshIndicator(
-          color: ColorsInfo.newara,
-          onRefresh: () async {
-            fetchCreatedArticles(context, 1).then((_) {
-              fetchScrappedArticles(context, 1).then((_) {
-                fetchRecentArticles(context, 1).then((_) {
-                  setState(() => curCount = tabCount[_tabController.index]);
-                });
-              });
-            });
-          },
-          child: SingleChildScrollView(
-            child: SizedBox(
-              width: MediaQuery.of(context).size.width,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  SizedBox(
-                    width: MediaQuery.of(context).size.width - 40,
-                    height: 60,
-                    child: Row(
-                      children: [
-                        Container(
-                          width: 50,
-                          height: 50,
-                          decoration: const BoxDecoration(
-                            shape: BoxShape.circle,
-                          ),
-                          child: ClipRRect(
-                            borderRadius:
-                                const BorderRadius.all(Radius.circular(100)),
-                            child: SizedBox.fromSize(
-                              size: const Size.fromRadius(48),
-                              child: userProvider.naUser?.picture == null
-                                  ? Container()
-                                  : Image.network(
-                                      fit: BoxFit.cover,
-                                      userProvider.naUser!.picture.toString()),
-                            ),
+        child: SingleChildScrollView(
+          child: SizedBox(
+            width: MediaQuery.of(context).size.width,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                SizedBox(
+                  width: MediaQuery.of(context).size.width - 40,
+                  height: 60,
+                  child: Row(
+                    children: [
+                      Container(
+                        width: 50,
+                        height: 50,
+                        decoration: const BoxDecoration(
+                          shape: BoxShape.circle,
+                        ),
+                        child: ClipRRect(
+                          borderRadius:
+                              const BorderRadius.all(Radius.circular(100)),
+                          child: SizedBox.fromSize(
+                            size: const Size.fromRadius(48),
+                            child: userProvider.naUser?.picture == null
+                                ? Container()
+                                : Image.network(
+                                    fit: BoxFit.cover,
+                                    userProvider.naUser!.picture.toString()),
                           ),
                         ),
-                        const SizedBox(width: 10),
-                        Expanded(
-                          child: SizedBox(
-                            height: 50,
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Text(
-                                  "${userProvider.naUser!.sso_user_info['first_name']} ${userProvider.naUser!.sso_user_info['last_name']}",
-                                  style: const TextStyle(
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.w700,
-                                  ),
-                                ),
-                                Text(
-                                  userProvider.naUser == null
-                                      ? "이메일 정보가 없습니다."
-                                      : "${userProvider.naUser?.email}",
-                                  style: const TextStyle(
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.w500,
-                                    color: Color.fromRGBO(177, 177, 177, 1),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                        const SizedBox(width: 30),
-                        SizedBox(
-                          width: 26,
-                          height: 21,
-                          child: GestureDetector(
-                            onTap: () {}, // 추후에 프로필 수정 기능 구현 예정
-                            child: Text(
-                              'myPage.change'.tr(),
-                              style: const TextStyle(
-                                color: Color.fromRGBO(100, 100, 100, 1),
-                                fontSize: 14,
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(height: 10),
-                  TabBar(
-                    unselectedLabelColor:
-                        const Color.fromRGBO(177, 177, 177, 1),
-                    labelColor: ColorsInfo.newara,
-                    indicatorColor: ColorsInfo.newara,
-                    tabs: _tabs.map((String tab) {
-                      return Tab(text: tab);
-                    }).toList(),
-                    controller: _tabController,
-                    indicatorSize: TabBarIndicatorSize.tab,
-                    onTap: (index) async {
-                      setState(() => curCount = tabCount[index]);
-                    },
-                  ),
-                  Container(
-                    margin: const EdgeInsets.only(top: 14),
-                    width: MediaQuery.of(context).size.width - 40,
-                    height: 24,
-                    child: Text(
-                      '총 $curCount개의 글',
-                      style: const TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w700,
-                        color: Color.fromRGBO(177, 177, 177, 1),
                       ),
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: SizedBox(
+                          height: 50,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text(
+                                "${userProvider.naUser!.sso_user_info['first_name']} ${userProvider.naUser!.sso_user_info['last_name']}",
+                                style: const TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.w700,
+                                ),
+                              ),
+                              Text(
+                                userProvider.naUser == null
+                                    ? "이메일 정보가 없습니다."
+                                    : "${userProvider.naUser?.email}",
+                                style: const TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w500,
+                                  color: Color.fromRGBO(177, 177, 177, 1),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 30),
+                      SizedBox(
+                        width: 26,
+                        height: 21,
+                        child: GestureDetector(
+                          onTap: () {}, // 추후에 프로필 수정 기능 구현 예정
+                          child: Text(
+                            'myPage.change'.tr(),
+                            style: const TextStyle(
+                              color: Color.fromRGBO(100, 100, 100, 1),
+                              fontSize: 14,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 10),
+                TabBar(
+                  unselectedLabelColor: const Color.fromRGBO(177, 177, 177, 1),
+                  labelColor: ColorsInfo.newara,
+                  indicatorColor: ColorsInfo.newara,
+                  tabs: _tabs.map((String tab) {
+                    return Tab(text: tab);
+                  }).toList(),
+                  controller: _tabController,
+                  indicatorSize: TabBarIndicatorSize.tab,
+                  onTap: (index) async {
+                    setState(() => curCount = tabCount[index]);
+                  },
+                ),
+                Container(
+                  margin: const EdgeInsets.only(top: 14),
+                  width: MediaQuery.of(context).size.width - 40,
+                  height: 24,
+                  child: Text(
+                    '총 $curCount개의 글',
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w700,
+                      color: Color.fromRGBO(177, 177, 177, 1),
                     ),
                   ),
-                  const SizedBox(height: 15),
-                  SizedBox(
-                    width: MediaQuery.of(context).size.width - 40,
-                    height: 500,
-                    child: TabBarView(
-                      controller: _tabController,
-                      children: [
-                        !isLoadedList[0]
-                            ? const LoadingIndicator()
-                            : _buildPostList(0),
-                        !isLoadedList[1]
-                            ? const LoadingIndicator()
-                            : _buildPostList(1),
-                        !isLoadedList[2]
-                            ? const LoadingIndicator()
-                            : _buildPostList(2),
-                      ],
-                    ),
+                ),
+                const SizedBox(height: 15),
+                SizedBox(
+                  width: MediaQuery.of(context).size.width - 40,
+                  height: 500,
+                  child: TabBarView(
+                    controller: _tabController,
+                    children: [
+                      !isLoadedList[0]
+                          ? const LoadingIndicator()
+                          : _buildPostList(0),
+                      !isLoadedList[1]
+                          ? const LoadingIndicator()
+                          : _buildPostList(1),
+                      !isLoadedList[2]
+                          ? const LoadingIndicator()
+                          : _buildPostList(2),
+                    ],
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
           ),
         ),
@@ -411,135 +398,150 @@ class _UserPageState extends State<UserPage>
   }
 
   Widget _buildPostList(int tabIndex) {
-    return ListView.separated(
-      itemCount: !isLoadedList[tabIndex]
-          ? 0
-          : (tabIndex == 0
-              ? createdArticleList.length
-              : (tabIndex == 1
-                  ? scrappedArticleList.length
-                  : recentArticleList.length)),
-      controller: scrollControllerList[tabIndex],
-      itemBuilder: (context, index) {
-        late ArticleListActionModel curPost;
-        late ScrapModel scrapInfo;
+    return RefreshIndicator(
+      color: ColorsInfo.newara,
+      onRefresh: () async {
+        setIsLoaded(false, tabIndex);
         if (tabIndex == 0) {
-          curPost = createdArticleList[index];
+          fetchCreatedArticles(context, 1);
         } else if (tabIndex == 1) {
-          scrapInfo = scrappedArticleList[index];
-          curPost = scrapInfo.parent_article;
+          fetchScrappedArticles(context, 1);
         } else {
-          curPost = recentArticleList[index];
+          fetchRecentArticles(context, 1);
         }
-        return InkWell(
-            onTap: () {
-              Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) =>
-                          PostViewPage(id: curPost.id))); // 나중에 수정되어야 함.
-            },
-            child: SizedBox(
-              height: 61,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    curPost.title.toString(),
-                    style: const TextStyle(
-                        fontSize: 16, fontWeight: FontWeight.w500),
-                    overflow: TextOverflow.ellipsis,
-                    maxLines: 1,
-                  ),
-                  const SizedBox(height: 5),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Flexible(
-                        child: Row(
-                          children: [
-                            Flexible(
-                              child: Text(
-                                curPost.created_by.profile.nickname.toString(),
+      },
+      child: ListView.separated(
+        physics: const AlwaysScrollableScrollPhysics(),
+        itemCount: !isLoadedList[tabIndex]
+            ? 0
+            : (tabIndex == 0
+                ? createdArticleList.length
+                : (tabIndex == 1
+                    ? scrappedArticleList.length
+                    : recentArticleList.length)),
+        controller: scrollControllerList[tabIndex],
+        itemBuilder: (context, index) {
+          late ArticleListActionModel curPost;
+          late ScrapModel scrapInfo;
+          if (tabIndex == 0) {
+            curPost = createdArticleList[index];
+          } else if (tabIndex == 1) {
+            scrapInfo = scrappedArticleList[index];
+            curPost = scrapInfo.parent_article;
+          } else {
+            curPost = recentArticleList[index];
+          }
+          return InkWell(
+              onTap: () {
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) =>
+                            PostViewPage(id: curPost.id))); // 나중에 수정되어야 함.
+              },
+              child: SizedBox(
+                height: 61,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      curPost.title.toString(),
+                      style: const TextStyle(
+                          fontSize: 16, fontWeight: FontWeight.w500),
+                      overflow: TextOverflow.ellipsis,
+                      maxLines: 1,
+                    ),
+                    const SizedBox(height: 5),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Flexible(
+                          child: Row(
+                            children: [
+                              Flexible(
+                                child: Text(
+                                  curPost.created_by.profile.nickname
+                                      .toString(),
+                                  style: const TextStyle(
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w500,
+                                      color: Color.fromRGBO(177, 177, 177, 1)),
+                                  overflow: TextOverflow.ellipsis,
+                                  maxLines: 1,
+                                ),
+                              ),
+                              const SizedBox(width: 10),
+                              Text(
+                                getTime(tabIndex == 1
+                                    ? scrapInfo.created_at.toString()
+                                    : curPost.created_at.toString()),
                                 style: const TextStyle(
                                     fontSize: 14,
                                     fontWeight: FontWeight.w500,
                                     color: Color.fromRGBO(177, 177, 177, 1)),
-                                overflow: TextOverflow.ellipsis,
-                                maxLines: 1,
                               ),
+                              const SizedBox(width: 10),
+                              Text('조회 ${curPost.hit_count}',
+                                  style: const TextStyle(
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w500,
+                                      color: Color.fromRGBO(177, 177, 177, 1))),
+                            ],
+                          ),
+                        ),
+                        Row(
+                          children: [
+                            SvgPicture.asset(
+                              'assets/icons/like.svg',
+                              width: 13,
+                              height: 15,
+                              color: ColorsInfo.newara,
                             ),
-                            const SizedBox(width: 10),
-                            Text(
-                              getTime(tabIndex == 1
-                                  ? scrapInfo.created_at.toString()
-                                  : curPost.created_at.toString()),
-                              style: const TextStyle(
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w500,
-                                  color: Color.fromRGBO(177, 177, 177, 1)),
-                            ),
-                            const SizedBox(width: 10),
-                            Text('조회 ${curPost.hit_count}',
+                            const SizedBox(width: 3),
+                            Text('${curPost.positive_vote_count}',
                                 style: const TextStyle(
                                     fontSize: 14,
                                     fontWeight: FontWeight.w500,
-                                    color: Color.fromRGBO(177, 177, 177, 1))),
+                                    color: ColorsInfo.newara)),
+                            const SizedBox(width: 10),
+                            SvgPicture.asset(
+                              'assets/icons/dislike.svg',
+                              width: 13,
+                              height: 15,
+                              color: const Color.fromRGBO(83, 141, 209, 1),
+                            ),
+                            const SizedBox(width: 3),
+                            Text('${curPost.negative_vote_count}',
+                                style: const TextStyle(
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w500,
+                                    color: Color.fromRGBO(83, 141, 209, 1))),
+                            const SizedBox(width: 10),
+                            SvgPicture.asset(
+                              'assets/icons/comment.svg',
+                              width: 13,
+                              height: 15,
+                              color: const Color.fromRGBO(99, 99, 99, 1),
+                            ),
+                            const SizedBox(width: 3),
+                            Text('${curPost.comment_count}',
+                                style: const TextStyle(
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w500,
+                                    color: Color.fromRGBO(99, 99, 99, 1))),
                           ],
                         ),
-                      ),
-                      Row(
-                        children: [
-                          SvgPicture.asset(
-                            'assets/icons/like.svg',
-                            width: 13,
-                            height: 15,
-                            color: ColorsInfo.newara,
-                          ),
-                          const SizedBox(width: 3),
-                          Text('${curPost.positive_vote_count}',
-                              style: const TextStyle(
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w500,
-                                  color: ColorsInfo.newara)),
-                          const SizedBox(width: 10),
-                          SvgPicture.asset(
-                            'assets/icons/dislike.svg',
-                            width: 13,
-                            height: 15,
-                            color: const Color.fromRGBO(83, 141, 209, 1),
-                          ),
-                          const SizedBox(width: 3),
-                          Text('${curPost.negative_vote_count}',
-                              style: const TextStyle(
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w500,
-                                  color: Color.fromRGBO(83, 141, 209, 1))),
-                          const SizedBox(width: 10),
-                          SvgPicture.asset(
-                            'assets/icons/comment.svg',
-                            width: 13,
-                            height: 15,
-                            color: const Color.fromRGBO(99, 99, 99, 1),
-                          ),
-                          const SizedBox(width: 3),
-                          Text('${curPost.comment_count}',
-                              style: const TextStyle(
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w500,
-                                  color: Color.fromRGBO(99, 99, 99, 1))),
-                        ],
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ));
-      },
-      separatorBuilder: (context, index) {
-        return const Divider();
-      },
+                      ],
+                    ),
+                  ],
+                ),
+              ));
+        },
+        separatorBuilder: (context, index) {
+          return const Divider();
+        },
+      ),
     );
   }
 }
