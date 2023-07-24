@@ -1146,7 +1146,9 @@ class _PostViewPageState extends State<PostViewPage> {
                                   color: ColorsInfo.newara,
                                 ),
                               ),
-                        !isModify ? Container() : const SizedBox(width: 5),
+                        (!isModify && !isNestedComment)
+                            ? Container()
+                            : const SizedBox(width: 10),
                         InkWell(
                           onTap: () async {
                             if (_formKey.currentState == null) return;

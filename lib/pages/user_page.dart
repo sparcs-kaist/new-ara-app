@@ -137,131 +137,144 @@ class _UserPageState extends State<UserPage>
         ],
       ),
       body: SafeArea(
-        child: SingleChildScrollView(
-          child: SizedBox(
-            width: MediaQuery.of(context).size.width,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                SizedBox(
-                  width: MediaQuery.of(context).size.width - 40,
-                  height: 60,
-                  child: Row(
-                    children: [
-                      Container(
-                        width: 50,
-                        height: 50,
-                        decoration: const BoxDecoration(
-                          shape: BoxShape.circle,
-                        ),
-                        child: ClipRRect(
-                          borderRadius:
-                              const BorderRadius.all(Radius.circular(100)),
-                          child: SizedBox.fromSize(
-                            size: const Size.fromRadius(48),
-                            child: userProvider.naUser?.picture == null
-                                ? Container()
-                                : Image.network(
-                                    fit: BoxFit.cover,
-                                    userProvider.naUser!.picture.toString()),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(width: 10),
-                      Expanded(
-                        child: SizedBox(
+        child: RefreshIndicator(
+          color: ColorsInfo.newara,
+          onRefresh: () async {
+            fetchCreatedArticles(context, 1).then((_) {
+              fetchScrappedArticles(context, 1).then((_) {
+                fetchRecentArticles(context, 1).then((_) {
+                  setState(() => curCount = tabCount[_tabController.index]);
+                });
+              });
+            });
+          },
+          child: SingleChildScrollView(
+            child: SizedBox(
+              width: MediaQuery.of(context).size.width,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  SizedBox(
+                    width: MediaQuery.of(context).size.width - 40,
+                    height: 60,
+                    child: Row(
+                      children: [
+                        Container(
+                          width: 50,
                           height: 50,
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Text(
-                                "${userProvider.naUser!.sso_user_info['first_name']} ${userProvider.naUser!.sso_user_info['last_name']}",
-                                style: const TextStyle(
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.w700,
-                                ),
-                              ),
-                              Text(
-                                userProvider.naUser == null
-                                    ? "이메일 정보가 없습니다."
-                                    : "${userProvider.naUser?.email}",
-                                style: const TextStyle(
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w500,
-                                  color: Color.fromRGBO(177, 177, 177, 1),
-                                ),
-                              ),
-                            ],
+                          decoration: const BoxDecoration(
+                            shape: BoxShape.circle,
                           ),
-                        ),
-                      ),
-                      const SizedBox(width: 30),
-                      SizedBox(
-                        width: 26,
-                        height: 21,
-                        child: GestureDetector(
-                          onTap: () {}, // 추후에 프로필 수정 기능 구현 예정
-                          child: Text(
-                            'myPage.change'.tr(),
-                            style: const TextStyle(
-                              color: Color.fromRGBO(100, 100, 100, 1),
-                              fontSize: 14,
-                              fontWeight: FontWeight.w500,
+                          child: ClipRRect(
+                            borderRadius:
+                                const BorderRadius.all(Radius.circular(100)),
+                            child: SizedBox.fromSize(
+                              size: const Size.fromRadius(48),
+                              child: userProvider.naUser?.picture == null
+                                  ? Container()
+                                  : Image.network(
+                                      fit: BoxFit.cover,
+                                      userProvider.naUser!.picture.toString()),
                             ),
                           ),
                         ),
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 10),
-                TabBar(
-                  unselectedLabelColor: const Color.fromRGBO(177, 177, 177, 1),
-                  labelColor: ColorsInfo.newara,
-                  indicatorColor: ColorsInfo.newara,
-                  tabs: _tabs.map((String tab) {
-                    return Tab(text: tab);
-                  }).toList(),
-                  controller: _tabController,
-                  indicatorSize: TabBarIndicatorSize.tab,
-                  onTap: (index) async {
-                    setState(() => curCount = tabCount[index]);
-                  },
-                ),
-                Container(
-                  margin: const EdgeInsets.only(top: 14),
-                  width: MediaQuery.of(context).size.width - 40,
-                  height: 24,
-                  child: Text(
-                    '총 $curCount개의 글',
-                    style: const TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w700,
-                      color: Color.fromRGBO(177, 177, 177, 1),
+                        const SizedBox(width: 10),
+                        Expanded(
+                          child: SizedBox(
+                            height: 50,
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Text(
+                                  "${userProvider.naUser!.sso_user_info['first_name']} ${userProvider.naUser!.sso_user_info['last_name']}",
+                                  style: const TextStyle(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.w700,
+                                  ),
+                                ),
+                                Text(
+                                  userProvider.naUser == null
+                                      ? "이메일 정보가 없습니다."
+                                      : "${userProvider.naUser?.email}",
+                                  style: const TextStyle(
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w500,
+                                    color: Color.fromRGBO(177, 177, 177, 1),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 30),
+                        SizedBox(
+                          width: 26,
+                          height: 21,
+                          child: GestureDetector(
+                            onTap: () {}, // 추후에 프로필 수정 기능 구현 예정
+                            child: Text(
+                              'myPage.change'.tr(),
+                              style: const TextStyle(
+                                color: Color.fromRGBO(100, 100, 100, 1),
+                                fontSize: 14,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                   ),
-                ),
-                const SizedBox(height: 15),
-                SizedBox(
-                  width: MediaQuery.of(context).size.width - 40,
-                  height: 500,
-                  child: TabBarView(
+                  const SizedBox(height: 10),
+                  TabBar(
+                    unselectedLabelColor:
+                        const Color.fromRGBO(177, 177, 177, 1),
+                    labelColor: ColorsInfo.newara,
+                    indicatorColor: ColorsInfo.newara,
+                    tabs: _tabs.map((String tab) {
+                      return Tab(text: tab);
+                    }).toList(),
                     controller: _tabController,
-                    children: [
-                      !isLoadedList[0]
-                          ? const LoadingIndicator()
-                          : _buildPostList(0),
-                      !isLoadedList[1]
-                          ? const LoadingIndicator()
-                          : _buildPostList(1),
-                      !isLoadedList[2]
-                          ? const LoadingIndicator()
-                          : _buildPostList(2),
-                    ],
+                    indicatorSize: TabBarIndicatorSize.tab,
+                    onTap: (index) async {
+                      setState(() => curCount = tabCount[index]);
+                    },
                   ),
-                ),
-              ],
+                  Container(
+                    margin: const EdgeInsets.only(top: 14),
+                    width: MediaQuery.of(context).size.width - 40,
+                    height: 24,
+                    child: Text(
+                      '총 $curCount개의 글',
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w700,
+                        color: Color.fromRGBO(177, 177, 177, 1),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 15),
+                  SizedBox(
+                    width: MediaQuery.of(context).size.width - 40,
+                    height: 500,
+                    child: TabBarView(
+                      controller: _tabController,
+                      children: [
+                        !isLoadedList[0]
+                            ? const LoadingIndicator()
+                            : _buildPostList(0),
+                        !isLoadedList[1]
+                            ? const LoadingIndicator()
+                            : _buildPostList(1),
+                        !isLoadedList[2]
+                            ? const LoadingIndicator()
+                            : _buildPostList(2),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
         ),
@@ -394,7 +407,7 @@ class _UserPageState extends State<UserPage>
 
   void setMyCount(int value, int tabIndex) {
     setState(() => tabCount[tabIndex] = value);
-    setState(() => curCount = tabCount[0]);
+    setState(() => curCount = tabCount[tabIndex]);
   }
 
   Widget _buildPostList(int tabIndex) {
