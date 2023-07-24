@@ -33,6 +33,7 @@ class _PostViewPageState extends State<PostViewPage> {
   List<CommentNestedCommentListActionModel> commentList = [];
   int parentCommentID = 0;
   late FocusNode textFocusNode;
+  String initialContent = '';
 
   @override
   void initState() {
@@ -50,6 +51,25 @@ class _PostViewPageState extends State<PostViewPage> {
 
   void setIsValid(bool value) {
     setState(() => isValid = value);
+  }
+
+  void setInitialContent(String content) {
+    setState(() => initialContent = content);
+  }
+
+  Future<bool> delComment(int id, UserProvider userProvider) async {
+    late dynamic delRes;
+    try {
+      delRes = await userProvider.delApiRes("comments/$id/");
+    } catch (error) {
+      debugPrint("DELETE /api/comments/$id failed: $error");
+      return false;
+    }
+    if (delRes.statusCode != 204) {
+      debugPrint("DELETE /api/comments/$id ${delRes.statusCode}");
+      return false;
+    }
+    return true;
   }
 
   void fetchArticle(UserProvider userProvider) async {
@@ -696,7 +716,10 @@ class _PostViewPageState extends State<PostViewPage> {
                                                 height: 25,
                                                 child: curComment.is_mine ==
                                                         true
-                                                    ? _buildMyPopupMenuButton()
+                                                    ? _buildMyPopupMenuButton(
+                                                        curComment.id,
+                                                        userProvider,
+                                                        idx)
                                                     : _buildOthersPopupMenuButton(),
                                               ),
                                             ],
@@ -1108,7 +1131,8 @@ class _PostViewPageState extends State<PostViewPage> {
           );
   }
 
-  PopupMenuButton<String> _buildMyPopupMenuButton() {
+  PopupMenuButton<String> _buildMyPopupMenuButton(
+      int id, UserProvider userProvider, int idx) {
     return PopupMenuButton<String>(
       padding: const EdgeInsets.all(2.0),
       icon: SvgPicture.asset(
@@ -1146,25 +1170,32 @@ class _PostViewPageState extends State<PostViewPage> {
                 'assets/icons/delete.svg',
                 width: 25,
                 height: 25,
-                color: const Color.fromRGBO(51, 51, 51, 1),
+                color: ColorsInfo.newara,
               ),
               const SizedBox(width: 10),
               const Text(
                 '삭제',
                 style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w700,
-                    color: Color.fromRGBO(51, 51, 51, 1)),
+                  fontSize: 16,
+                  fontWeight: FontWeight.w700,
+                  color: ColorsInfo.newara,
+                ),
               ),
             ],
           ),
         ),
       ],
-      onSelected: (String result) {
+      onSelected: (String result) async {
         switch (result) {
-          case 'Chat':
+          case 'Modify':
+            textFocusNode.requestFocus();
             break;
-          case 'Report':
+          case 'Delete':
+            bool res = await delComment(id, userProvider);
+            if (res == false) {
+              break;
+            }
+            fetchArticle(userProvider);
             break;
         }
       },
@@ -1206,7 +1237,7 @@ class _PostViewPageState extends State<PostViewPage> {
           child: Row(
             children: [
               SvgPicture.asset(
-                'assets/icons/information.svg',
+                'assets/icons/exclamationmark-bubble-fill.svg',
                 width: 20,
                 height: 20,
                 color: const Color.fromRGBO(51, 51, 51, 1),
@@ -1240,6 +1271,7 @@ class _PostViewPageState extends State<PostViewPage> {
       child: Container(
           margin: const EdgeInsets.only(left: 15),
           child: TextFormField(
+            initialValue: initialContent,
             focusNode: textFocusNode,
             minLines: 1,
             maxLines: 5,
