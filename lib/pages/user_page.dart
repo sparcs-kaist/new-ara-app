@@ -54,6 +54,8 @@ class _UserPageState extends State<UserPage>
       vsync: this,
     );
 
+    _tabController.addListener(_handleTabChange);
+
     scrollControllerList[0].addListener(_scrollListener0);
     scrollControllerList[1].addListener(_scrollListener1);
     scrollControllerList[2].addListener(_scrollListener2);
@@ -61,6 +63,13 @@ class _UserPageState extends State<UserPage>
     fetchCreatedArticles(context, 1);
     fetchScrappedArticles(context, 1);
     fetchRecentArticles(context, 1);
+  }
+
+  void _handleTabChange() {
+    if (_tabController.previousIndex != _tabController.index) {
+      debugPrint("Tab is changed to ${_tabController.index}");
+      setState(() => curCount = tabCount[_tabController.index]);
+    }
   }
 
   void _scrollListener0() {
