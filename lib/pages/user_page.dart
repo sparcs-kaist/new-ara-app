@@ -66,9 +66,9 @@ class _UserPageState extends State<UserPage>
   }
 
   Future<void> loadAllData(UserProvider userProvider) async {
-    await fetchCreatedArticles(userProvider, 1);
     await fetchScrappedArticles(userProvider, 1);
     await fetchRecentArticles(userProvider, 1);
+    await fetchCreatedArticles(userProvider, 1);
   }
 
   void _handleTabChange() {
