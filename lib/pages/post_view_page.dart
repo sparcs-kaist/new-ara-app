@@ -312,15 +312,9 @@ class _PostViewPageState extends State<PostViewPage> {
                                 const Divider(
                                   thickness: 1,
                                 ),
-                                Container(
-                                  constraints: const BoxConstraints(
-                                    minHeight: 200,
-                                    maxHeight: 1000,
-                                  ),
-                                  child: WebViewWidgetClass(
-                                      content: article.content ??
-                                          '<p>내용이 존재하지 않습니다</p>'),
-                                ),
+                                WebViewWidgetClass(
+                                    content: article.content ??
+                                        '<p>내용이 존재하지 않습니다</p>'),
                                 const SizedBox(height: 10),
                                 Row(
                                   mainAxisAlignment: MainAxisAlignment.center,
@@ -1724,6 +1718,8 @@ class WebViewWidgetClass extends StatefulWidget {
 
 class _WebViewWidgetClassState extends State<WebViewWidgetClass> {
   WebViewController _webViewController = WebViewController();
+  double webViewHeight = 400;
+
   @override
   void initState() {
     super.initState();
@@ -1735,7 +1731,29 @@ class _WebViewWidgetClassState extends State<WebViewWidgetClass> {
           debugPrint('WebView is loading (progress: $progress)');
         },
         onPageStarted: (String url) {},
-        onPageFinished: (String url) {},
+        onPageFinished: (String url) async {
+          final String pageHeightStr =
+              (await _webViewController.runJavaScriptReturningResult('''
+            function getPageHeight() {
+              return Math.max(
+                document.body.scrollHeight,
+                document.documentElement.scrollHeight,
+                document.body.offsetHeight,
+                document.documentElement.offsetHeight,
+                document.body.clientHeight,
+                document.documentElement.clientHeight
+              ).toString();
+            }
+            getPageHeight();
+          ''')).toString();
+          // JavaScript에서 리턴된 높이 값을 가져온 후 원하는 동작을 수행합니다.
+          double pageHeight = double.parse(
+              pageHeightStr.substring(1, pageHeightStr.length - 1));
+          debugPrint("$pageHeight");
+          if (webViewHeight < pageHeight && mounted) {
+            setWebViewHeight(pageHeight);
+          }
+        },
         onWebResourceError: (WebResourceError error) {
           debugPrint(
               'code: ${error.errorCode}\ndescription: ${error.description}\nerrorType: ${error.errorType}\nisForMainFrame: ${error.isForMainFrame}');
@@ -1743,10 +1761,18 @@ class _WebViewWidgetClassState extends State<WebViewWidgetClass> {
       ));
   }
 
+  void setWebViewHeight(double value) {
+    setState(() => webViewHeight = value);
+  }
+
   @override
   Widget build(BuildContext context) {
-    return WebViewWidget(
-      controller: _webViewController..loadHtmlString('''
+    return Container(
+      constraints: BoxConstraints(
+        maxHeight: webViewHeight,
+      ),
+      child: WebViewWidget(
+        controller: _webViewController..loadHtmlString('''
                               <html>
                                   <head>
                                       <meta charset="utf-8">
@@ -1760,12 +1786,13 @@ class _WebViewWidgetClassState extends State<WebViewWidgetClass> {
                                           *:focus {
                                               outline: none;
                                           }
-                                          body {
-                                              max-height: 1000px;
+                                          html, body {
+                                              margin: 0;
+                                              padding: 0;
                                           }
                                           img {
                                               max-width: 100%;
-                                              max-height: 800px;
+                                              
                                           }
                                       </style>
                                       <meta name="viewport" content="width=${MediaQuery.of(context).size.width - 40}">
@@ -1837,6 +1864,7 @@ class _WebViewWidgetClassState extends State<WebViewWidgetClass> {
                                   </body>
                               </html>
                               '''),
+      ),
     );
   }
 }
