@@ -79,7 +79,7 @@ class _PostViewPageState extends State<PostViewPage> {
     return true;
   }
 
-  void fetchArticle(UserProvider userProvider) async {
+  Future<void> fetchArticle(UserProvider userProvider) async {
     dynamic articleJson, commentJson;
 
     articleJson = await userProvider.getApiRes("articles/${widget.articleID}");
@@ -152,7 +152,7 @@ class _PostViewPageState extends State<PostViewPage> {
                         color: ColorsInfo.newara,
                         onRefresh: () async {
                           setIsValid(false);
-                          fetchArticle(userProvider);
+                          await fetchArticle(userProvider);
                         },
                         child: SingleChildScrollView(
                           controller: _scrollController,
@@ -1184,7 +1184,7 @@ class _PostViewPageState extends State<PostViewPage> {
                                 return;
                               }
                               setIsNestedComment(false);
-                              fetchArticle(userProvider);
+                              await fetchArticle(userProvider);
                             } else {
                               dynamic defaultPayload = {
                                 "content": _commentContent,
@@ -1202,7 +1202,7 @@ class _PostViewPageState extends State<PostViewPage> {
                               }
                               _textEditingController.text = "";
                               setIsModify(false);
-                              fetchArticle(userProvider);
+                              await fetchArticle(userProvider);
                             }
                           },
                           child: SvgPicture.asset(
@@ -1288,11 +1288,100 @@ class _PostViewPageState extends State<PostViewPage> {
             modifyTarget = id;
             break;
           case 'Delete':
-            bool res = await delComment(id, userProvider);
-            if (res == false) {
-              break;
-            }
-            fetchArticle(userProvider);
+            showDialog(
+              context: context,
+              builder: (context) {
+                return Dialog(
+                  child: Container(
+                    decoration: const BoxDecoration(
+                      borderRadius: BorderRadius.all(Radius.circular(15)),
+                    ),
+                    width: 200,
+                    height: 100,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const Text(
+                          '정말로 이 댓글을 삭제하시겠습니까?',
+                          style: TextStyle(
+                            fontSize: 17,
+                            fontWeight: FontWeight.w700,
+                            color: Colors.black,
+                          ),
+                        ),
+                        const SizedBox(height: 10),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            InkWell(
+                              onTap: () {
+                                Navigator.pop(context);
+                              },
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  border: Border.all(
+                                    color: Colors.grey, // 테두리 색상을 빨간색으로 지정
+                                    width: 1, // 테두리의 두께를 2로 지정
+                                  ),
+                                  borderRadius: const BorderRadius.all(
+                                      Radius.circular(20)),
+                                  color: Colors.white,
+                                ),
+                                width: 60,
+                                height: 40,
+                                child: const Center(
+                                  child: Text(
+                                    '취소',
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w500,
+                                      color: Colors.black,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: 20),
+                            InkWell(
+                              onTap: () {
+                                delComment(id, userProvider).then((res) async {
+                                  if (res == false) {
+                                    return;
+                                  } else {
+                                    await fetchArticle(userProvider);
+                                  }
+                                });
+                                Navigator.pop(context);
+                              },
+                              child: Container(
+                                decoration: const BoxDecoration(
+                                  borderRadius:
+                                      BorderRadius.all(Radius.circular(20)),
+                                  color: ColorsInfo.newara,
+                                ),
+                                width: 60,
+                                height: 40,
+                                child: const Center(
+                                  child: Text(
+                                    '확인',
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w500,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        )
+                      ],
+                    ),
+                  ),
+                );
+              },
+            );
             break;
         }
       },
