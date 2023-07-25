@@ -1081,6 +1081,10 @@ class _PostViewPageState extends State<PostViewPage> {
                                                                             curComment.id;
                                                                         textFocusNode
                                                                             .requestFocus();
+                                                                        setIsModify(
+                                                                            false);
+                                                                        setIsNestedComment(
+                                                                            true);
                                                                         debugPrint(
                                                                             "parentCommentID: $parentCommentID");
                                                                       },
