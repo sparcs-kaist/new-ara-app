@@ -60,9 +60,15 @@ class _UserPageState extends State<UserPage>
     scrollControllerList[1].addListener(_scrollListener1);
     scrollControllerList[2].addListener(_scrollListener2);
 
-    fetchCreatedArticles(context, 1);
-    fetchScrappedArticles(context, 1);
-    fetchRecentArticles(context, 1);
+    UserProvider userProvider = context.read<UserProvider>();
+
+    loadAllData(userProvider);
+  }
+
+  Future<void> loadAllData(UserProvider userProvider) async {
+    await fetchCreatedArticles(userProvider, 1);
+    await fetchScrappedArticles(userProvider, 1);
+    await fetchRecentArticles(userProvider, 1);
   }
 
   void _handleTabChange() {
@@ -76,7 +82,7 @@ class _UserPageState extends State<UserPage>
     if (isLoadedList[0] &&
         scrollControllerList[0].position.pixels ==
             scrollControllerList[0].position.maxScrollExtent) {
-      fetchCreatedArticles(context, nextPage[0]);
+      fetchCreatedArticles(context.read<UserProvider>(), nextPage[0]);
     }
   }
 
@@ -84,7 +90,7 @@ class _UserPageState extends State<UserPage>
     if (isLoadedList[1] &&
         scrollControllerList[1].position.pixels ==
             scrollControllerList[1].position.maxScrollExtent) {
-      fetchScrappedArticles(context, nextPage[1]);
+      fetchScrappedArticles(context.read<UserProvider>(), nextPage[1]);
     }
   }
 
@@ -92,7 +98,7 @@ class _UserPageState extends State<UserPage>
     if (isLoadedList[2] &&
         scrollControllerList[2].position.pixels ==
             scrollControllerList[2].position.maxScrollExtent) {
-      fetchRecentArticles(context, nextPage[2]);
+      fetchRecentArticles(context.read<UserProvider>(), nextPage[2]);
     }
   }
 
@@ -269,15 +275,16 @@ class _UserPageState extends State<UserPage>
     );
   }
 
-  Future<void> fetchCreatedArticles(
-      BuildContext initStateContext, int page) async {
-    int user = initStateContext.read<UserProvider>().naUser!.user;
+  Future<void> fetchCreatedArticles(UserProvider userProvider, int page) async {
+    int user = userProvider.naUser!.user;
     String apiUrl = "/api/articles/?page=$page&created_by=$user";
-    if (page == 1) createdArticleList = [];
+    if (page == 1) {
+      createdArticleList.clear();
+      nextPage[0] = 1;
+    }
     Dio dio = Dio();
     try {
-      dio.options.headers['Cookie'] =
-          initStateContext.read<UserProvider>().getCookiesToString();
+      dio.options.headers['Cookie'] = userProvider.getCookiesToString();
     } catch (error) {
       debugPrint(
           "fetchCreatedArticles() failed to get Cookies from Provider: $error");
@@ -313,14 +320,16 @@ class _UserPageState extends State<UserPage>
   }
 
   Future<void> fetchScrappedArticles(
-      BuildContext initStateContext, int page) async {
-    int user = initStateContext.read<UserProvider>().naUser!.user;
+      UserProvider userProvider, int page) async {
+    int user = userProvider.naUser!.user;
     String apiUrl = "/api/scraps/?page=$page&created_by=$user";
-    if (page == 1) scrappedArticleList = [];
+    if (page == 1) {
+      scrappedArticleList.clear();
+      nextPage[1] = 1;
+    }
     Dio dio = Dio();
     try {
-      dio.options.headers['Cookie'] =
-          initStateContext.read<UserProvider>().getCookiesToString();
+      dio.options.headers['Cookie'] = userProvider.getCookiesToString();
     } catch (error) {
       debugPrint(
           "fetchScrappedArticles() failed to get Cookies from Provider: $error");
@@ -351,14 +360,15 @@ class _UserPageState extends State<UserPage>
     }
   }
 
-  Future<void> fetchRecentArticles(
-      BuildContext initStateContext, int page) async {
+  Future<void> fetchRecentArticles(UserProvider userProvider, int page) async {
     String apiUrl = "/api/articles/recent/?page=$page";
-    if (page == 1) recentArticleList = [];
+    if (page == 1) {
+      recentArticleList.clear();
+      nextPage[2] = 1;
+    }
     Dio dio = Dio();
     try {
-      dio.options.headers['Cookie'] =
-          initStateContext.read<UserProvider>().getCookiesToString();
+      dio.options.headers['Cookie'] = userProvider.getCookiesToString();
     } catch (error) {
       debugPrint(
           "fetchRecentArticles() failed to get Cookies from Provider: $error");
@@ -402,12 +412,13 @@ class _UserPageState extends State<UserPage>
       color: ColorsInfo.newara,
       onRefresh: () async {
         setIsLoaded(false, tabIndex);
+        UserProvider userProvider = context.read<UserProvider>();
         if (tabIndex == 0) {
-          fetchCreatedArticles(context, 1);
+          await fetchCreatedArticles(userProvider, 1);
         } else if (tabIndex == 1) {
-          fetchScrappedArticles(context, 1);
+          await fetchScrappedArticles(userProvider, 1);
         } else {
-          fetchRecentArticles(context, 1);
+          await fetchRecentArticles(userProvider, 1);
         }
       },
       child: ListView.separated(
