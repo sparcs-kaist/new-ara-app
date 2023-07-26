@@ -4,6 +4,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 import 'package:dio/dio.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import 'package:new_ara_app/constants/colors_info.dart';
 import 'package:new_ara_app/models/article_model.dart';
@@ -53,10 +54,12 @@ class _PostViewPageState extends State<PostViewPage> {
   }
 
   void setIsValid(bool value) {
+    if (!mounted) return;
     setState(() => isValid = value);
   }
 
   void setCommentMode(bool? isNestedVal, bool? isModifyVal) {
+    if (!mounted) return;
     setState(() {
       isNestedComment = isNestedVal ?? isNestedComment;
       isModify = isModifyVal ?? isModify;
@@ -354,6 +357,7 @@ class _PostViewPageState extends State<PostViewPage> {
                                             return;
                                           }
                                         }
+                                        if (!mounted) return;
                                         setState(() {
                                           article.positive_vote_count =
                                               article.positive_vote_count! +
@@ -420,6 +424,7 @@ class _PostViewPageState extends State<PostViewPage> {
                                             return;
                                           }
                                         }
+                                        if (!mounted) return;
                                         setState(() {
                                           article.positive_vote_count =
                                               article.positive_vote_count! +
@@ -482,6 +487,7 @@ class _PostViewPageState extends State<PostViewPage> {
                                               if (postRes.statusCode != 201) {
                                                 return;
                                               }
+                                              if (!mounted) return;
                                               setState(() {
                                                 article.my_scrap =
                                                     ScrapCreateActionModel
@@ -494,6 +500,7 @@ class _PostViewPageState extends State<PostViewPage> {
                                               if (delRes.statusCode != 204) {
                                                 return;
                                               }
+                                              if (!mounted) return;
                                               setState(() {
                                                 article.my_scrap = null;
                                               });
@@ -835,6 +842,8 @@ class _PostViewPageState extends State<PostViewPage> {
                                                                   return;
                                                                 }
                                                               }
+                                                              if (!mounted)
+                                                                return;
                                                               setState(() {
                                                                 curComment
                                                                     .positive_vote_count = (curComment
@@ -937,6 +946,8 @@ class _PostViewPageState extends State<PostViewPage> {
                                                                   return;
                                                                 }
                                                               }
+                                                              if (!mounted)
+                                                                return;
                                                               setState(() {
                                                                 curComment
                                                                     .positive_vote_count = (curComment
@@ -1126,9 +1137,13 @@ class _PostViewPageState extends State<PostViewPage> {
                       children: [
                         isNestedComment
                             ? Text(
-                                '${parentComment!.is_mine ? '나에게' : "${parentComment!.created_by.profile.nickname}님께"} 답글을 작성하는 중',
+                                '${parentComment!.is_mine ? '\'나\'에게' : "'${parentComment!.created_by.profile.nickname}'님께"} 답글을 작성하는 중',
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
+                                style: const TextStyle(
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.w500,
+                                ),
                               )
                             : Container(),
                         isNestedComment
@@ -1571,6 +1586,7 @@ class _ReportDialogWidgetState extends State<ReportDialogWidget> {
             const SizedBox(height: 20),
             InkWell(
               onTap: () {
+                if (!mounted) return;
                 setState(() => isChosen[0] = !isChosen[0]);
               },
               child: Container(
@@ -1597,6 +1613,7 @@ class _ReportDialogWidgetState extends State<ReportDialogWidget> {
             const SizedBox(height: 10),
             InkWell(
               onTap: () {
+                if (!mounted) return;
                 setState(() => isChosen[1] = !isChosen[1]);
               },
               child: Container(
@@ -1623,6 +1640,7 @@ class _ReportDialogWidgetState extends State<ReportDialogWidget> {
             const SizedBox(height: 10),
             InkWell(
               onTap: () {
+                if (!mounted) return;
                 setState(() => isChosen[2] = !isChosen[2]);
               },
               child: Container(
@@ -1649,6 +1667,7 @@ class _ReportDialogWidgetState extends State<ReportDialogWidget> {
             const SizedBox(height: 10),
             InkWell(
               onTap: () {
+                if (!mounted) return;
                 setState(() => isChosen[3] = !isChosen[3]);
               },
               child: Container(
@@ -1675,6 +1694,7 @@ class _ReportDialogWidgetState extends State<ReportDialogWidget> {
             const SizedBox(height: 10),
             InkWell(
               onTap: () {
+                if (!mounted) return;
                 setState(() => isChosen[4] = !isChosen[4]);
               },
               child: Container(
@@ -1701,6 +1721,7 @@ class _ReportDialogWidgetState extends State<ReportDialogWidget> {
             const SizedBox(height: 10),
             InkWell(
               onTap: () {
+                if (!mounted) return;
                 setState(() => isChosen[5] = !isChosen[5]);
               },
               child: Container(
@@ -1840,6 +1861,7 @@ class _OuterArticleWebViewState extends State<OuterArticleWebView> {
   String? curTitle;
 
   void setTitle(String? value) {
+    if (!mounted) return;
     setState(() => curTitle = value);
   }
 
@@ -1854,11 +1876,11 @@ class _OuterArticleWebViewState extends State<OuterArticleWebView> {
           debugPrint('WebView is loading (progress: $progress)');
         },
         onPageStarted: (String url) {
-          setTitle("이동 중...");
+          if (mounted) setTitle("이동 중...");
         },
         onPageFinished: (String url) async {
           String? title = await _webViewController.getTitle();
-          setTitle(title);
+          if (mounted) setTitle(title);
           debugPrint("$curTitle");
         },
         onWebResourceError: (WebResourceError error) {
@@ -1867,6 +1889,16 @@ class _OuterArticleWebViewState extends State<OuterArticleWebView> {
         },
       ))
       ..loadRequest(Uri.parse(widget.targetUrl));
+  }
+
+  Future<void> _launchUrl(String url) async {
+    final Uri uri = Uri.parse(url);
+    if (await canLaunchUrl(uri)) {
+      debugPrint("available");
+      await launchUrl(uri);
+    } else {
+      debugPrint("$url Launch 불가능");
+    }
   }
 
   @override
@@ -1903,21 +1935,8 @@ class _OuterArticleWebViewState extends State<OuterArticleWebView> {
             _buildWebViewPopupMenuButton(),
           ],
         ),
-        body: RefreshIndicator(
-          color: ColorsInfo.newara,
-          onRefresh: () async {
-            debugPrint("Refresh!!");
-            _webViewController.reload();
-          },
-          child: SingleChildScrollView(
-            child: SizedBox(
-              width: MediaQuery.of(context).size.width,
-              height: MediaQuery.of(context).size.height,
-              child: WebViewWidget(
-                controller: _webViewController,
-              ),
-            ),
-          ),
+        body: WebViewWidget(
+          controller: _webViewController,
         ),
       ),
     );
@@ -1956,12 +1975,26 @@ class _OuterArticleWebViewState extends State<OuterArticleWebView> {
             ),
           ),
         ),
+        const PopupMenuItem<String>(
+          value: 'Refresh',
+          child: Text(
+            '새로 고침',
+            style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.w700,
+                color: Color.fromRGBO(51, 51, 51, 1)),
+          ),
+        ),
       ],
       onSelected: (String result) async {
         switch (result) {
-          case 'Browser':
+          case 'Refresh':
+            _webViewController.reload();
             break;
-          case 'Delete':
+          case 'Browser':
+            _launchUrl(widget.targetUrl);
+            break;
+          case 'link':
             break;
         }
       },
@@ -2035,14 +2068,18 @@ class _InnerArticleWebViewState extends State<InnerArticleWebView> {
             debugPrint("\n\nHeight is Fitted!\n\n");
           }
         },
-        onWebResourceError: (WebResourceError error) {
+        onWebResourceError: (WebResourceError error) async {
+          debugPrint("웹뷰에서 에러 발생");
           debugPrint(
               'code: ${error.errorCode}\ndescription: ${error.description}\nerrorType: ${error.errorType}\nisForMainFrame: ${error.isForMainFrame}');
+          await _webViewController
+              .goBack(); // 에러가 생겨도 Outer에서 처리하고 일단 inner는 goBack
         },
       ));
   }
 
   void setWebViewHeight(double value) {
+    if (!mounted) return;
     setState(() => webViewHeight = value);
   }
 
