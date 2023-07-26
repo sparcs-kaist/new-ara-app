@@ -2027,13 +2027,18 @@ class _InnerArticleWebViewState extends State<InnerArticleWebView> {
       ..setJavaScriptMode(JavaScriptMode.unrestricted)
       ..setBackgroundColor(const Color(0x00000000))
       ..setNavigationDelegate(NavigationDelegate(
-        onUrlChange: (change) async {
-          return;
+        onUrlChange: (urlChange) async {
+          String url = urlChange.url ?? "about:blank";
+          if (url == "about:blank") return;
+          await launchInBrowser(url);
+          if (await _webViewController.canGoBack())
+            await _webViewController.goBack();
         },
         onProgress: (int progress) {
           debugPrint('WebView is loading (progress: $progress)');
         },
         onPageStarted: (String url) async {
+          return;
           if (url == "about:blank") return;
           await launchInBrowser(url);
           _webViewController.goBack();
@@ -2071,11 +2076,12 @@ class _InnerArticleWebViewState extends State<InnerArticleWebView> {
           }
         },
         onWebResourceError: (WebResourceError error) async {
-          debugPrint("웹뷰에서 에러 발생");
           debugPrint(
               'code: ${error.errorCode}\ndescription: ${error.description}\nerrorType: ${error.errorType}\nisForMainFrame: ${error.isForMainFrame}');
-          await _webViewController
-              .goBack(); // 에러가 생겨도 Outer에서 처리하고 일단 inner는 goBack
+          if (await _webViewController.canGoBack()) {
+            await _webViewController
+                .goBack(); // 에러가 생겨도 Outer에서 처리하고 일단 inner는 goBack
+          }
         },
       ));
   }
