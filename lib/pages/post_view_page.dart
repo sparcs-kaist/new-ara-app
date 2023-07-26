@@ -1891,16 +1891,6 @@ class _OuterArticleWebViewState extends State<OuterArticleWebView> {
       ..loadRequest(Uri.parse(widget.targetUrl));
   }
 
-  Future<void> _launchUrl(String url) async {
-    final Uri uri = Uri.parse(url);
-    if (await canLaunchUrl(uri)) {
-      debugPrint("available");
-      await launchUrl(uri);
-    } else {
-      debugPrint("$url Launch 불가능");
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     return WillPopScope(
@@ -1992,7 +1982,7 @@ class _OuterArticleWebViewState extends State<OuterArticleWebView> {
             _webViewController.reload();
             break;
           case 'Browser':
-            _launchUrl(widget.targetUrl);
+            //_launchUrl(widget.targetUrl);
             break;
           case 'link':
             break;
@@ -2015,6 +2005,20 @@ class _InnerArticleWebViewState extends State<InnerArticleWebView> {
   double webViewHeight = 400;
   late bool isFitted;
 
+  Future<void> launchInBrowser(String url) async {
+    final Uri targetUrl = Uri.parse(url);
+    if (!await canLaunchUrl(targetUrl)) {
+      debugPrint("$url을 열 수 없습니다.");
+      return;
+    }
+    if (!await launchUrl(
+      Uri.parse(url),
+      mode: LaunchMode.externalApplication,
+    )) {
+      throw Exception('Could not launch $url');
+    }
+  }
+
   @override
   void initState() {
     super.initState();
@@ -2023,17 +2027,15 @@ class _InnerArticleWebViewState extends State<InnerArticleWebView> {
       ..setJavaScriptMode(JavaScriptMode.unrestricted)
       ..setBackgroundColor(const Color(0x00000000))
       ..setNavigationDelegate(NavigationDelegate(
+        onUrlChange: (change) async {
+          return;
+        },
         onProgress: (int progress) {
           debugPrint('WebView is loading (progress: $progress)');
         },
-        onPageStarted: (String url) {
+        onPageStarted: (String url) async {
           if (url == "about:blank") return;
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => OuterArticleWebView(targetUrl: url),
-            ),
-          );
+          await launchInBrowser(url);
           _webViewController.goBack();
           debugPrint("url: $url");
         },
