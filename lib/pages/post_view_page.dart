@@ -319,7 +319,7 @@ class _PostViewPageState extends State<PostViewPage> {
                                 const Divider(
                                   thickness: 1,
                                 ),
-                                WebViewWidgetClass(
+                                InnerArticleWebView(
                                     content: article.content ??
                                         '<p>내용이 존재하지 않습니다</p>'),
                                 const SizedBox(height: 10),
@@ -1827,15 +1827,157 @@ class _ReportDialogWidgetState extends State<ReportDialogWidget> {
   }
 }
 
-class WebViewWidgetClass extends StatefulWidget {
-  final String content;
-  const WebViewWidgetClass({super.key, required this.content});
+class OuterArticleWebView extends StatefulWidget {
+  final String targetUrl;
+  const OuterArticleWebView({super.key, required this.targetUrl});
 
   @override
-  State<WebViewWidgetClass> createState() => _WebViewWidgetClassState();
+  State<OuterArticleWebView> createState() => _OuterArticleWebViewState();
 }
 
-class _WebViewWidgetClassState extends State<WebViewWidgetClass> {
+class _OuterArticleWebViewState extends State<OuterArticleWebView> {
+  WebViewController _webViewController = WebViewController();
+  String? curTitle;
+
+  void setTitle(String? value) {
+    setState(() => curTitle = value);
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _webViewController = WebViewController()
+      ..setJavaScriptMode(JavaScriptMode.unrestricted)
+      ..setBackgroundColor(const Color(0x00000000))
+      ..setNavigationDelegate(NavigationDelegate(
+        onProgress: (int progress) {
+          debugPrint('WebView is loading (progress: $progress)');
+        },
+        onPageStarted: (String url) {
+          setTitle("이동 중...");
+        },
+        onPageFinished: (String url) async {
+          String? title = await _webViewController.getTitle();
+          setTitle(title);
+          debugPrint("$curTitle");
+        },
+        onWebResourceError: (WebResourceError error) {
+          debugPrint(
+              'code: ${error.errorCode}\ndescription: ${error.description}\nerrorType: ${error.errorType}\nisForMainFrame: ${error.isForMainFrame}');
+        },
+      ))
+      ..loadRequest(Uri.parse(widget.targetUrl));
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return WillPopScope(
+      onWillPop: () async {
+        if (await _webViewController.canGoBack()) {
+          await _webViewController.goBack();
+          return false;
+        } else {
+          return true;
+        }
+      },
+      child: Scaffold(
+        appBar: AppBar(
+          leading: IconButton(
+            color: ColorsInfo.newara,
+            icon: SvgPicture.asset('assets/icons/close.svg',
+                color: Colors.black, width: 30, height: 30),
+            onPressed: () {
+              Navigator.pop(context);
+            },
+          ),
+          title: Text(
+            curTitle ?? "이동 중...",
+            style: const TextStyle(
+              color: Colors.black,
+              fontSize: 18,
+              fontWeight: FontWeight.w500,
+            ),
+            overflow: TextOverflow.ellipsis,
+          ),
+          actions: [
+            _buildWebViewPopupMenuButton(),
+          ],
+        ),
+        body: RefreshIndicator(
+          color: ColorsInfo.newara,
+          onRefresh: () async {
+            debugPrint("Refresh!!");
+            _webViewController.reload();
+          },
+          child: SingleChildScrollView(
+            child: SizedBox(
+              width: MediaQuery.of(context).size.width,
+              height: MediaQuery.of(context).size.height,
+              child: WebViewWidget(
+                controller: _webViewController,
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  PopupMenuButton<String> _buildWebViewPopupMenuButton() {
+    return PopupMenuButton<String>(
+      splashRadius: 5,
+      shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.all(Radius.circular(10.0))),
+      padding: const EdgeInsets.all(2.0),
+      icon: SvgPicture.asset(
+        'assets/icons/three_dots_1.svg',
+        width: 25,
+        height: 25,
+      ),
+      itemBuilder: (BuildContext context) => [
+        const PopupMenuItem<String>(
+          value: 'Browser',
+          child: Text(
+            '브라우저로 내보내기',
+            style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.w700,
+                color: Color.fromRGBO(51, 51, 51, 1)),
+          ),
+        ),
+        const PopupMenuItem<String>(
+          value: 'link',
+          child: Text(
+            '링크 복사',
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.w700,
+              color: Color.fromRGBO(51, 51, 51, 1),
+            ),
+          ),
+        ),
+      ],
+      onSelected: (String result) async {
+        switch (result) {
+          case 'Browser':
+            break;
+          case 'Delete':
+            break;
+        }
+      },
+    );
+  }
+}
+
+class InnerArticleWebView extends StatefulWidget {
+  final String content;
+  const InnerArticleWebView({super.key, required this.content});
+
+  @override
+  State<InnerArticleWebView> createState() => _InnerArticleWebViewState();
+}
+
+class _InnerArticleWebViewState extends State<InnerArticleWebView> {
   WebViewController _webViewController = WebViewController();
   double webViewHeight = 400;
   late bool isFitted;
@@ -1851,7 +1993,17 @@ class _WebViewWidgetClassState extends State<WebViewWidgetClass> {
         onProgress: (int progress) {
           debugPrint('WebView is loading (progress: $progress)');
         },
-        onPageStarted: (String url) {},
+        onPageStarted: (String url) {
+          if (url == "about:blank") return;
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => OuterArticleWebView(targetUrl: url),
+            ),
+          );
+          _webViewController.goBack();
+          debugPrint("url: $url");
+        },
         onPageFinished: (String url) async {
           if (isFitted == true) return;
           final String pageHeightStr =
