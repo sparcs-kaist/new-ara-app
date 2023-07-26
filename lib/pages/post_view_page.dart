@@ -1194,7 +1194,7 @@ class _PostViewPageState extends State<PostViewPage> {
                                 _formKey.currentState!.reset();
                                 debugPrint("작성된 댓글: $_commentContent");
                                 debugPrint(
-                                    "payload 정보: name_type=${article.name_type}, parent_comment=${parentComment!.id}");
+                                    "payload 정보: name_type=${article.name_type}, parent_comment=${parentComment?.id}");
                                 if (!isModify) {
                                   dynamic defaultPayload = {
                                     "content": _commentContent,
