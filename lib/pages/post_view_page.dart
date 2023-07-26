@@ -24,6 +24,7 @@ class PostViewPage extends StatefulWidget {
 
 class _PostViewPageState extends State<PostViewPage> {
   late ArticleModel article;
+  FocusNode textFocusNode = FocusNode();
   bool isValid = false;
 
   final _formKey = GlobalKey<FormState>();
@@ -32,8 +33,8 @@ class _PostViewPageState extends State<PostViewPage> {
   final ScrollController _scrollController = ScrollController();
 
   List<CommentNestedCommentListActionModel> commentList = [];
-  int parentCommentID = 0;
-  late FocusNode textFocusNode;
+
+  CommentNestedCommentListActionModel? parentComment;
   bool isModify = false, isNestedComment = false;
   int? modifyTarget;
   final TextEditingController _textEditingController = TextEditingController();
@@ -42,8 +43,7 @@ class _PostViewPageState extends State<PostViewPage> {
   void initState() {
     super.initState();
     UserProvider userProvider = context.read<UserProvider>();
-    textFocusNode = FocusNode();
-    fetchArticle(userProvider);
+    fetchArticle(userProvider).then((value) => setIsValid(value));
   }
 
   @override
@@ -56,12 +56,11 @@ class _PostViewPageState extends State<PostViewPage> {
     setState(() => isValid = value);
   }
 
-  void setIsNestedComment(bool value) {
-    setState(() => isNestedComment = value);
-  }
-
-  void setIsModify(bool value) {
-    setState(() => isModify = value);
+  void setCommentMode(bool? isNestedVal, bool? isModifyVal) {
+    setState(() {
+      isNestedComment = isNestedVal ?? isNestedComment;
+      isModify = isModifyVal ?? isModify;
+    });
   }
 
   Future<bool> delComment(int id, UserProvider userProvider) async {
@@ -79,21 +78,20 @@ class _PostViewPageState extends State<PostViewPage> {
     return true;
   }
 
-  Future<void> fetchArticle(UserProvider userProvider) async {
+  Future<bool> fetchArticle(UserProvider userProvider) async {
     dynamic articleJson, commentJson;
 
     articleJson = await userProvider.getApiRes("articles/${widget.articleID}");
     if (articleJson == null) {
       debugPrint("\nArticleJson is null\n");
-      return;
+      return false;
     }
     try {
       article = ArticleModel.fromJson(articleJson);
     } catch (error) {
       debugPrint(
           "ArticleModel.fromJson failed at articleID = ${widget.articleID}: $error");
-      setIsValid(false);
-      return;
+      return false;
     }
 
     commentList.clear();
@@ -101,31 +99,39 @@ class _PostViewPageState extends State<PostViewPage> {
       commentJson = await userProvider.getApiRes("comments/${anc.id}");
       if (commentJson == null) continue;
       late CommentNestedCommentListActionModel tmpModel;
+
+      // 댓글을 추가하는 과정
       try {
-        tmpModel = CommentNestedCommentListActionModel.fromJson(
-            commentJson); // ArticleNestedCommentListActionModel은 CommentNestedCommentListActino의 모든 필드를 가지고 있음
+        // ArticleNestedCommentListActionModel 은 CommentNestedCommentListAction 의 모든 필드를 가지고 있음
+        // 따라서 원래 댓글은 ArticleNestedCommentListActionModel 에 저장되고,
+        // 대댓글을 CommentNestedCommentListActionModel 에 저장되지만 댓글도 CommentNestedCommentListActionModel 에 저장하여 더 편하게 함.
+        tmpModel = CommentNestedCommentListActionModel.fromJson(commentJson);
         commentList.add(tmpModel);
       } catch (error) {
         debugPrint(
             "CommentNestedCommentListActionModel.fromJson failed at ID ${anc.id}: $error");
-        continue;
+        return false;
       }
+
+      // 대댓글을 추가하는 과정
       for (CommentNestedCommentListActionModel cnc in anc.comments) {
         try {
           commentList.add(cnc);
         } catch (error) {
           debugPrint(
-              "\nCommentNestedCommentListActionModel.fromJson failed at ID ${cnc.id}: $error\n");
-          continue;
+              "CommentNestedCommentListActionModel.fromJson failed at ID ${cnc.id}: $error\n");
+          return false;
         }
       }
     }
-    setIsValid(true);
+
+    return true;
   }
 
   @override
   Widget build(BuildContext context) {
     UserProvider userProvider = context.read<UserProvider>();
+
     return !isValid
         ? const LoadingIndicator()
         : Scaffold(
@@ -152,7 +158,8 @@ class _PostViewPageState extends State<PostViewPage> {
                         color: ColorsInfo.newara,
                         onRefresh: () async {
                           setIsValid(false);
-                          await fetchArticle(userProvider);
+                          bool res = await fetchArticle(userProvider);
+                          setIsValid(res);
                         },
                         child: SingleChildScrollView(
                           controller: _scrollController,
@@ -789,319 +796,314 @@ class _PostViewPageState extends State<PostViewPage> {
                                             Container(
                                                 margin: const EdgeInsets.only(
                                                     left: 30),
-                                                child:
-                                                    curComment.is_hidden ==
-                                                            false
-                                                        ? Row(
-                                                            children: [
-                                                              InkWell(
-                                                                onTap:
-                                                                    () async {
-                                                                  if (curComment
-                                                                          .is_mine ==
-                                                                      true) {
-                                                                    return;
-                                                                  }
-                                                                  if (curComment
-                                                                          .my_vote ==
-                                                                      true) {
-                                                                    var postRes =
-                                                                        await userProvider
-                                                                            .postApiRes(
-                                                                      "comments/${curComment.id}/vote_cancel/",
-                                                                    );
-                                                                    if (postRes
-                                                                            .statusCode !=
-                                                                        200) {
-                                                                      debugPrint(
-                                                                          "POST /api/comments/${curComment.id}/vote_cancel/ ${postRes.statusCode}");
-                                                                      return;
-                                                                    }
-                                                                  } else {
-                                                                    var postRes =
-                                                                        await userProvider
-                                                                            .postApiRes("comments/${curComment.id}/vote_positive/");
-                                                                    if (postRes
-                                                                            .statusCode !=
-                                                                        200) {
-                                                                      debugPrint(
-                                                                          "POST /api/comments/${curComment.id}/vote_positive/ ${postRes.statusCode}");
-                                                                      return;
-                                                                    }
-                                                                  }
-                                                                  setState(() {
-                                                                    curComment
-                                                                        .positive_vote_count = (curComment.positive_vote_count ??
-                                                                            0) +
-                                                                        (curComment.my_vote ==
-                                                                                true
-                                                                            ? -1
-                                                                            : 1);
-                                                                    curComment
-                                                                        .negative_vote_count = (curComment.negative_vote_count ??
-                                                                            0) +
-                                                                        (curComment.my_vote ==
-                                                                                false
-                                                                            ? -1
-                                                                            : 0);
-                                                                    curComment
-                                                                        .my_vote = (curComment.my_vote ==
+                                                child: curComment.is_hidden ==
+                                                        false
+                                                    ? Row(
+                                                        children: [
+                                                          InkWell(
+                                                            onTap: () async {
+                                                              if (curComment
+                                                                      .is_mine ==
+                                                                  true) {
+                                                                return;
+                                                              }
+                                                              if (curComment
+                                                                      .my_vote ==
+                                                                  true) {
+                                                                var postRes =
+                                                                    await userProvider
+                                                                        .postApiRes(
+                                                                  "comments/${curComment.id}/vote_cancel/",
+                                                                );
+                                                                if (postRes
+                                                                        .statusCode !=
+                                                                    200) {
+                                                                  debugPrint(
+                                                                      "POST /api/comments/${curComment.id}/vote_cancel/ ${postRes.statusCode}");
+                                                                  return;
+                                                                }
+                                                              } else {
+                                                                var postRes =
+                                                                    await userProvider
+                                                                        .postApiRes(
+                                                                            "comments/${curComment.id}/vote_positive/");
+                                                                if (postRes
+                                                                        .statusCode !=
+                                                                    200) {
+                                                                  debugPrint(
+                                                                      "POST /api/comments/${curComment.id}/vote_positive/ ${postRes.statusCode}");
+                                                                  return;
+                                                                }
+                                                              }
+                                                              setState(() {
+                                                                curComment
+                                                                    .positive_vote_count = (curComment
+                                                                            .positive_vote_count ??
+                                                                        0) +
+                                                                    (curComment.my_vote ==
+                                                                            true
+                                                                        ? -1
+                                                                        : 1);
+                                                                curComment
+                                                                    .negative_vote_count = (curComment
+                                                                            .negative_vote_count ??
+                                                                        0) +
+                                                                    (curComment.my_vote ==
+                                                                            false
+                                                                        ? -1
+                                                                        : 0);
+                                                                curComment
+                                                                        .my_vote =
+                                                                    (curComment.my_vote ==
                                                                             true)
                                                                         ? null
                                                                         : true;
-                                                                  });
-                                                                },
-                                                                child:
-                                                                    SvgPicture
-                                                                        .asset(
-                                                                  'assets/icons/like.svg',
-                                                                  width: 25,
-                                                                  height: 25,
-                                                                  color: curComment
-                                                                              .my_vote ==
-                                                                          true
-                                                                      ? ColorsInfo
-                                                                          .newara
-                                                                      : const Color
-                                                                              .fromRGBO(
-                                                                          100,
-                                                                          100,
-                                                                          100,
-                                                                          1),
-                                                                ),
-                                                              ),
-                                                              Text(
-                                                                curComment
-                                                                    .positive_vote_count
-                                                                    .toString(),
-                                                                style:
-                                                                    TextStyle(
-                                                                  fontSize: 13,
-                                                                  fontWeight:
-                                                                      FontWeight
-                                                                          .w500,
-                                                                  color: curComment
-                                                                              .my_vote ==
-                                                                          true
-                                                                      ? ColorsInfo
-                                                                          .newara
-                                                                      : const Color
-                                                                              .fromRGBO(
-                                                                          100,
-                                                                          100,
-                                                                          100,
-                                                                          1),
-                                                                ),
-                                                              ),
-                                                              const SizedBox(
-                                                                  width: 6),
-                                                              InkWell(
-                                                                onTap:
-                                                                    () async {
-                                                                  if (curComment
-                                                                          .is_mine ==
-                                                                      true) {
-                                                                    return;
-                                                                  }
-                                                                  if (curComment
+                                                              });
+                                                            },
+                                                            child: SvgPicture
+                                                                .asset(
+                                                              'assets/icons/like.svg',
+                                                              width: 25,
+                                                              height: 25,
+                                                              color: curComment
                                                                           .my_vote ==
-                                                                      false) {
-                                                                    var postRes =
-                                                                        await userProvider
-                                                                            .postApiRes(
-                                                                      "comments/${curComment.id}/vote_cancel/",
-                                                                    );
-                                                                    if (postRes
-                                                                            .statusCode !=
-                                                                        200) {
-                                                                      debugPrint(
-                                                                          "POST /api/comments/${curComment.id}/vote_cancel/ ${postRes.statusCode}");
-                                                                      return;
-                                                                    }
-                                                                  } else {
-                                                                    var postRes =
-                                                                        await userProvider
-                                                                            .postApiRes("comments/${curComment.id}/vote_negative/");
-                                                                    if (postRes
-                                                                            .statusCode !=
-                                                                        200) {
-                                                                      debugPrint(
-                                                                          "POST /api/comments/${curComment.id}/vote_negative/ ${postRes.statusCode}");
-                                                                      return;
-                                                                    }
-                                                                  }
-                                                                  setState(() {
-                                                                    curComment
-                                                                        .positive_vote_count = (curComment.positive_vote_count ??
-                                                                            0) +
-                                                                        (curComment.my_vote ==
-                                                                                true
-                                                                            ? -1
-                                                                            : 0);
-                                                                    curComment
-                                                                        .negative_vote_count = (curComment.negative_vote_count ??
-                                                                            0) +
-                                                                        (curComment.my_vote ==
-                                                                                false
-                                                                            ? -1
-                                                                            : 1);
-                                                                    curComment
-                                                                        .my_vote = (curComment.my_vote ==
+                                                                      true
+                                                                  ? ColorsInfo
+                                                                      .newara
+                                                                  : const Color
+                                                                          .fromRGBO(
+                                                                      100,
+                                                                      100,
+                                                                      100,
+                                                                      1),
+                                                            ),
+                                                          ),
+                                                          Text(
+                                                            curComment
+                                                                .positive_vote_count
+                                                                .toString(),
+                                                            style: TextStyle(
+                                                              fontSize: 13,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .w500,
+                                                              color: curComment
+                                                                          .my_vote ==
+                                                                      true
+                                                                  ? ColorsInfo
+                                                                      .newara
+                                                                  : const Color
+                                                                          .fromRGBO(
+                                                                      100,
+                                                                      100,
+                                                                      100,
+                                                                      1),
+                                                            ),
+                                                          ),
+                                                          const SizedBox(
+                                                              width: 6),
+                                                          InkWell(
+                                                            onTap: () async {
+                                                              if (curComment
+                                                                      .is_mine ==
+                                                                  true) {
+                                                                return;
+                                                              }
+                                                              if (curComment
+                                                                      .my_vote ==
+                                                                  false) {
+                                                                var postRes =
+                                                                    await userProvider
+                                                                        .postApiRes(
+                                                                  "comments/${curComment.id}/vote_cancel/",
+                                                                );
+                                                                if (postRes
+                                                                        .statusCode !=
+                                                                    200) {
+                                                                  debugPrint(
+                                                                      "POST /api/comments/${curComment.id}/vote_cancel/ ${postRes.statusCode}");
+                                                                  return;
+                                                                }
+                                                              } else {
+                                                                var postRes =
+                                                                    await userProvider
+                                                                        .postApiRes(
+                                                                            "comments/${curComment.id}/vote_negative/");
+                                                                if (postRes
+                                                                        .statusCode !=
+                                                                    200) {
+                                                                  debugPrint(
+                                                                      "POST /api/comments/${curComment.id}/vote_negative/ ${postRes.statusCode}");
+                                                                  return;
+                                                                }
+                                                              }
+                                                              setState(() {
+                                                                curComment
+                                                                    .positive_vote_count = (curComment
+                                                                            .positive_vote_count ??
+                                                                        0) +
+                                                                    (curComment.my_vote ==
+                                                                            true
+                                                                        ? -1
+                                                                        : 0);
+                                                                curComment
+                                                                    .negative_vote_count = (curComment
+                                                                            .negative_vote_count ??
+                                                                        0) +
+                                                                    (curComment.my_vote ==
+                                                                            false
+                                                                        ? -1
+                                                                        : 1);
+                                                                curComment
+                                                                        .my_vote =
+                                                                    (curComment.my_vote ==
                                                                             false)
                                                                         ? null
                                                                         : false;
-                                                                  });
-                                                                },
-                                                                child:
-                                                                    SvgPicture
-                                                                        .asset(
-                                                                  'assets/icons/dislike.svg',
-                                                                  width: 25,
-                                                                  height: 25,
-                                                                  color: curComment
-                                                                              .my_vote ==
-                                                                          false
-                                                                      ? const Color
-                                                                              .fromRGBO(
-                                                                          83,
-                                                                          141,
-                                                                          209,
-                                                                          1)
-                                                                      : const Color
-                                                                              .fromRGBO(
-                                                                          100,
-                                                                          100,
-                                                                          100,
-                                                                          1),
-                                                                ),
-                                                              ),
-                                                              Text(
-                                                                curComment
-                                                                    .negative_vote_count
-                                                                    .toString(),
-                                                                style:
-                                                                    TextStyle(
-                                                                  fontSize: 13,
-                                                                  fontWeight:
-                                                                      FontWeight
-                                                                          .w500,
-                                                                  color: curComment
-                                                                              .my_vote ==
-                                                                          false
-                                                                      ? const Color
-                                                                              .fromRGBO(
-                                                                          83,
-                                                                          141,
-                                                                          209,
-                                                                          1)
-                                                                      : const Color
-                                                                              .fromRGBO(
-                                                                          100,
-                                                                          100,
-                                                                          100,
-                                                                          1),
-                                                                ),
-                                                              ),
-                                                              const SizedBox(
-                                                                  width: 6),
-                                                              curComment.parent_comment !=
-                                                                      null
-                                                                  ? Container()
-                                                                  : InkWell(
-                                                                      onTap:
-                                                                          () {},
-                                                                      child: SvgPicture
+                                                              });
+                                                            },
+                                                            child: SvgPicture
+                                                                .asset(
+                                                              'assets/icons/dislike.svg',
+                                                              width: 25,
+                                                              height: 25,
+                                                              color: curComment
+                                                                          .my_vote ==
+                                                                      false
+                                                                  ? const Color
+                                                                          .fromRGBO(
+                                                                      83,
+                                                                      141,
+                                                                      209,
+                                                                      1)
+                                                                  : const Color
+                                                                          .fromRGBO(
+                                                                      100,
+                                                                      100,
+                                                                      100,
+                                                                      1),
+                                                            ),
+                                                          ),
+                                                          Text(
+                                                            curComment
+                                                                .negative_vote_count
+                                                                .toString(),
+                                                            style: TextStyle(
+                                                              fontSize: 13,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .w500,
+                                                              color: curComment
+                                                                          .my_vote ==
+                                                                      false
+                                                                  ? const Color
+                                                                          .fromRGBO(
+                                                                      83,
+                                                                      141,
+                                                                      209,
+                                                                      1)
+                                                                  : const Color
+                                                                          .fromRGBO(
+                                                                      100,
+                                                                      100,
+                                                                      100,
+                                                                      1),
+                                                            ),
+                                                          ),
+                                                          const SizedBox(
+                                                              width: 6),
+                                                          curComment.parent_comment !=
+                                                                  null
+                                                              ? Container()
+                                                              : InkWell(
+                                                                  onTap: () {},
+                                                                  child:
+                                                                      SvgPicture
                                                                           .asset(
-                                                                        'assets/icons/arrow_uturn_left_1.svg',
-                                                                        width:
-                                                                            11,
-                                                                        height:
-                                                                            12,
-                                                                      ),
+                                                                    'assets/icons/arrow_uturn_left_1.svg',
+                                                                    width: 11,
+                                                                    height: 12,
+                                                                  ),
+                                                                ),
+                                                          const SizedBox(
+                                                              width: 5),
+                                                          curComment.parent_comment !=
+                                                                  null
+                                                              ? Container()
+                                                              : InkWell(
+                                                                  onTap: () {
+                                                                    parentComment =
+                                                                        curComment;
+                                                                    debugPrint(
+                                                                        "parentCommentID: ${parentComment!.id}");
+                                                                    setCommentMode(
+                                                                        true,
+                                                                        false);
+                                                                    textFocusNode
+                                                                        .requestFocus();
+                                                                  },
+                                                                  child:
+                                                                      const Text(
+                                                                    '답글 쓰기',
+                                                                    style:
+                                                                        TextStyle(
+                                                                      fontSize:
+                                                                          13,
+                                                                      fontWeight:
+                                                                          FontWeight
+                                                                              .w500,
                                                                     ),
-                                                              const SizedBox(
-                                                                  width: 5),
-                                                              curComment.parent_comment !=
-                                                                      null
-                                                                  ? Container()
-                                                                  : InkWell(
-                                                                      onTap:
-                                                                          () {
-                                                                        parentCommentID =
-                                                                            curComment.id;
-                                                                        textFocusNode
-                                                                            .requestFocus();
-                                                                        debugPrint(
-                                                                            "parentCommentID: $parentCommentID");
-                                                                        setIsNestedComment(
-                                                                            true);
-                                                                        setIsModify(
-                                                                            false);
-                                                                      },
-                                                                      child:
-                                                                          const Text(
-                                                                        '답글 쓰기',
-                                                                        style:
-                                                                            TextStyle(
-                                                                          fontSize:
-                                                                              13,
-                                                                          fontWeight:
-                                                                              FontWeight.w500,
-                                                                        ),
-                                                                      ),
-                                                                    ),
-                                                            ],
-                                                          )
-                                                        : Row(
-                                                            children: [
-                                                              curComment.parent_comment !=
-                                                                      null
-                                                                  ? Container()
-                                                                  : InkWell(
-                                                                      onTap:
-                                                                          () {},
-                                                                      child: SvgPicture
+                                                                  ),
+                                                                ),
+                                                        ],
+                                                      )
+                                                    : Row(
+                                                        children: [
+                                                          curComment.parent_comment !=
+                                                                  null
+                                                              ? Container()
+                                                              : InkWell(
+                                                                  onTap: () {},
+                                                                  child:
+                                                                      SvgPicture
                                                                           .asset(
-                                                                        'assets/icons/arrow_uturn_left_1.svg',
-                                                                        width:
-                                                                            11,
-                                                                        height:
-                                                                            12,
-                                                                      ),
+                                                                    'assets/icons/arrow_uturn_left_1.svg',
+                                                                    width: 11,
+                                                                    height: 12,
+                                                                  ),
+                                                                ),
+                                                          const SizedBox(
+                                                              width: 5),
+                                                          curComment.parent_comment !=
+                                                                  null
+                                                              ? Container()
+                                                              : InkWell(
+                                                                  onTap: () {
+                                                                    parentComment =
+                                                                        curComment;
+                                                                    debugPrint(
+                                                                        "parentCommentID: ${parentComment!.id}");
+                                                                    setCommentMode(
+                                                                        true,
+                                                                        false);
+                                                                    textFocusNode
+                                                                        .requestFocus();
+                                                                  },
+                                                                  child:
+                                                                      const Text(
+                                                                    '답글 쓰기',
+                                                                    style:
+                                                                        TextStyle(
+                                                                      fontSize:
+                                                                          13,
+                                                                      fontWeight:
+                                                                          FontWeight
+                                                                              .w500,
                                                                     ),
-                                                              const SizedBox(
-                                                                  width: 5),
-                                                              curComment.parent_comment !=
-                                                                      null
-                                                                  ? Container()
-                                                                  : InkWell(
-                                                                      onTap:
-                                                                          () {
-                                                                        parentCommentID =
-                                                                            curComment.id;
-                                                                        textFocusNode
-                                                                            .requestFocus();
-                                                                        setIsModify(
-                                                                            false);
-                                                                        setIsNestedComment(
-                                                                            true);
-                                                                        debugPrint(
-                                                                            "parentCommentID: $parentCommentID");
-                                                                      },
-                                                                      child:
-                                                                          const Text(
-                                                                        '답글 쓰기',
-                                                                        style:
-                                                                            TextStyle(
-                                                                          fontSize:
-                                                                              13,
-                                                                          fontWeight:
-                                                                              FontWeight.w500,
-                                                                        ),
-                                                                      ),
-                                                                    ),
-                                                            ],
-                                                          )),
+                                                                  ),
+                                                                ),
+                                                        ],
+                                                      )),
                                           ],
                                         ),
                                       );
@@ -1119,97 +1121,114 @@ class _PostViewPageState extends State<PostViewPage> {
                       ),
                     ),
                     const SizedBox(height: 15),
-                    Row(
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Expanded(
-                          child: Container(
-                            constraints: const BoxConstraints(
-                              minHeight: 45,
-                            ),
-                            decoration: const BoxDecoration(
-                              color: Color.fromRGBO(235, 235, 235, 1),
-                              borderRadius:
-                                  BorderRadius.all(Radius.circular(10)),
-                            ),
-                            child: _buildForm(),
-                          ),
-                        ),
-                        const SizedBox(width: 10),
-                        (!isModify && !isNestedComment)
-                            ? Container()
-                            : InkWell(
-                                onTap: () {
-                                  _textEditingController.text = "";
-                                  setIsNestedComment(false);
-                                  parentCommentID = 0;
-                                  debugPrint("parentCommentID: 0");
-                                  setIsModify(false);
-                                  modifyTarget = null;
-                                },
-                                child: SvgPicture.asset(
-                                  'assets/icons/close.svg',
-                                  width: 30,
-                                  height: 30,
-                                  color: ColorsInfo.newara,
+                        isNestedComment
+                            ? Text(
+                                '${parentComment!.is_mine ? '나에게' : "${parentComment!.created_by.profile.nickname}님께"} 답글을 작성하는 중',
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              )
+                            : Container(),
+                        isNestedComment
+                            ? const SizedBox(height: 5)
+                            : Container(),
+                        Row(
+                          children: [
+                            Expanded(
+                              child: Container(
+                                constraints: const BoxConstraints(
+                                  minHeight: 45,
                                 ),
+                                decoration: const BoxDecoration(
+                                  color: Color.fromRGBO(235, 235, 235, 1),
+                                  borderRadius:
+                                      BorderRadius.all(Radius.circular(10)),
+                                ),
+                                child: _buildForm(),
                               ),
-                        (!isModify && !isNestedComment)
-                            ? Container()
-                            : const SizedBox(width: 10),
-                        InkWell(
-                          onTap: () async {
-                            if (_formKey.currentState == null) return;
-                            if (!(_formKey.currentState!.validate())) return;
-                            _formKey.currentState!.save();
-                            _formKey.currentState!.reset();
-                            debugPrint("작성된 댓글: $_commentContent");
-                            debugPrint(
-                                "payload 정보: name_type=${article.name_type}, parent_comment=$parentCommentID");
-                            if (!isModify) {
-                              dynamic defaultPayload = {
-                                "content": _commentContent,
-                                "name_type": article.name_type,
-                                "attachment": null,
-                              };
-                              defaultPayload.addAll(parentCommentID != 0
-                                  ? {"parent_comment": parentCommentID}
-                                  : {"parent_article": article.id});
-                              var postRes = await userProvider.postApiRes(
-                                'comments/',
-                                payload: defaultPayload,
-                              );
-                              if (postRes.statusCode != 201) {
-                                // 나중에 사용자용 안내 위젯 등 추가하면 좋을 듯
-                                debugPrint("POST /api/comments failed");
-                                return;
-                              }
-                              setIsNestedComment(false);
-                              await fetchArticle(userProvider);
-                            } else {
-                              dynamic defaultPayload = {
-                                "content": _commentContent,
-                                "is_mine": true,
-                                "name_type": article.name_type,
-                              };
-                              var patchRes = await userProvider.patchApiRes(
-                                "comments/$modifyTarget/",
-                                payload: defaultPayload,
-                              );
-                              if (patchRes.statusCode != 200) {
+                            ),
+                            const SizedBox(width: 10),
+                            (!isModify && !isNestedComment)
+                                ? Container()
+                                : InkWell(
+                                    onTap: () {
+                                      _textEditingController.text = "";
+                                      parentComment = null;
+                                      debugPrint("Parent Comment null");
+                                      modifyTarget = null;
+                                      setCommentMode(false, false);
+                                    },
+                                    child: SvgPicture.asset(
+                                      'assets/icons/close.svg',
+                                      width: 30,
+                                      height: 30,
+                                      color: ColorsInfo.newara,
+                                    ),
+                                  ),
+                            (!isModify && !isNestedComment)
+                                ? Container()
+                                : const SizedBox(width: 10),
+                            InkWell(
+                              onTap: () async {
+                                if (_formKey.currentState == null) return;
+                                if (!(_formKey.currentState!.validate()))
+                                  return;
+                                _formKey.currentState!.save();
+                                _formKey.currentState!.reset();
+                                debugPrint("작성된 댓글: $_commentContent");
                                 debugPrint(
-                                    "PATCH /api/comments/$modifyTarget/ failed");
-                                return;
-                              }
-                              _textEditingController.text = "";
-                              setIsModify(false);
-                              await fetchArticle(userProvider);
-                            }
-                          },
-                          child: SvgPicture.asset(
-                            'assets/icons/send.svg',
-                            width: 30,
-                            height: 30,
-                          ),
+                                    "payload 정보: name_type=${article.name_type}, parent_comment=${parentComment!.id}");
+                                if (!isModify) {
+                                  dynamic defaultPayload = {
+                                    "content": _commentContent,
+                                    "name_type": article.name_type,
+                                    "attachment": null,
+                                  };
+                                  defaultPayload.addAll(parentComment != null
+                                      ? {"parent_comment": parentComment!.id}
+                                      : {"parent_article": article.id});
+                                  var postRes = await userProvider.postApiRes(
+                                    'comments/',
+                                    payload: defaultPayload,
+                                  );
+                                  if (postRes.statusCode != 201) {
+                                    // 나중에 사용자용 안내 위젯 등 추가하면 좋을 듯
+                                    debugPrint("POST /api/comments failed");
+                                    return;
+                                  }
+                                  setCommentMode(false, null);
+                                  bool res = await fetchArticle(userProvider);
+                                  setIsValid(res);
+                                } else {
+                                  dynamic defaultPayload = {
+                                    "content": _commentContent,
+                                    "is_mine": true,
+                                    "name_type": article.name_type,
+                                  };
+                                  var patchRes = await userProvider.patchApiRes(
+                                    "comments/$modifyTarget/",
+                                    payload: defaultPayload,
+                                  );
+                                  if (patchRes.statusCode != 200) {
+                                    debugPrint(
+                                        "PATCH /api/comments/$modifyTarget/ failed");
+                                    return;
+                                  }
+                                  _textEditingController.text = "";
+                                  setCommentMode(null, false);
+                                  bool res = await fetchArticle(userProvider);
+                                  setIsValid(res);
+                                }
+                              },
+                              child: SvgPicture.asset(
+                                'assets/icons/send.svg',
+                                width: 30,
+                                height: 30,
+                              ),
+                            ),
+                          ],
                         ),
                       ],
                     ),
@@ -1283,8 +1302,7 @@ class _PostViewPageState extends State<PostViewPage> {
           case 'Modify':
             _textEditingController.text = commentList[idx].content.toString();
             textFocusNode.requestFocus();
-            setIsModify(true);
-            setIsNestedComment(false);
+            setCommentMode(false, true);
             modifyTarget = id;
             break;
           case 'Delete':
@@ -1296,12 +1314,18 @@ class _PostViewPageState extends State<PostViewPage> {
                     decoration: const BoxDecoration(
                       borderRadius: BorderRadius.all(Radius.circular(15)),
                     ),
-                    width: 200,
-                    height: 100,
+                    width: 350,
+                    height: 200,
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.center,
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
+                        SvgPicture.asset(
+                          'assets/icons/close_check.svg',
+                          width: 55,
+                          height: 55,
+                          color: ColorsInfo.newara,
+                        ),
                         const Text(
                           '정말로 이 댓글을 삭제하시겠습니까?',
                           style: TextStyle(
@@ -1310,7 +1334,7 @@ class _PostViewPageState extends State<PostViewPage> {
                             color: Colors.black,
                           ),
                         ),
-                        const SizedBox(height: 10),
+                        const SizedBox(height: 20),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
@@ -1342,14 +1366,15 @@ class _PostViewPageState extends State<PostViewPage> {
                                 ),
                               ),
                             ),
-                            const SizedBox(width: 20),
+                            const SizedBox(width: 10),
                             InkWell(
                               onTap: () {
                                 delComment(id, userProvider).then((res) async {
                                   if (res == false) {
                                     return;
                                   } else {
-                                    await fetchArticle(userProvider);
+                                    bool res = await fetchArticle(userProvider);
+                                    setIsValid(res);
                                   }
                                 });
                                 Navigator.pop(context);
@@ -1429,15 +1454,16 @@ class _PostViewPageState extends State<PostViewPage> {
                 'assets/icons/exclamationmark-bubble-fill.svg',
                 width: 20,
                 height: 20,
-                color: const Color.fromRGBO(51, 51, 51, 1),
+                color: ColorsInfo.newara,
               ),
               const SizedBox(width: 10),
               const Text(
                 '신고',
                 style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w700,
-                    color: Color.fromRGBO(51, 51, 51, 1)),
+                  fontSize: 16,
+                  fontWeight: FontWeight.w700,
+                  color: ColorsInfo.newara,
+                ),
               ),
             ],
           ),
@@ -1529,9 +1555,9 @@ class _ReportDialogWidgetState extends State<ReportDialogWidget> {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             SvgPicture.asset(
-              "assets/icons/exclamationmark-bubble-fill.svg",
-              width: 30,
-              height: 30,
+              "assets/icons/close_check.svg",
+              width: 45,
+              height: 45,
               color: ColorsInfo.newara,
             ),
             const SizedBox(height: 5),
@@ -1812,10 +1838,12 @@ class WebViewWidgetClass extends StatefulWidget {
 class _WebViewWidgetClassState extends State<WebViewWidgetClass> {
   WebViewController _webViewController = WebViewController();
   double webViewHeight = 400;
+  late bool isFitted;
 
   @override
   void initState() {
     super.initState();
+    isFitted = false;
     _webViewController = WebViewController()
       ..setJavaScriptMode(JavaScriptMode.unrestricted)
       ..setBackgroundColor(const Color(0x00000000))
@@ -1825,6 +1853,7 @@ class _WebViewWidgetClassState extends State<WebViewWidgetClass> {
         },
         onPageStarted: (String url) {},
         onPageFinished: (String url) async {
+          if (isFitted == true) return;
           final String pageHeightStr =
               (await _webViewController.runJavaScriptReturningResult('''
             function getPageHeight() {
@@ -1842,9 +1871,16 @@ class _WebViewWidgetClassState extends State<WebViewWidgetClass> {
           // JavaScript에서 리턴된 높이 값을 가져온 후 원하는 동작을 수행합니다.
           double pageHeight = double.parse(
               pageHeightStr.substring(1, pageHeightStr.length - 1));
+          if (webViewHeight > pageHeight) {
+            isFitted = true;
+            debugPrint("\n\nHeight is Fitted!\n\n");
+            return;
+          }
           debugPrint("$pageHeight");
-          if (webViewHeight < pageHeight && mounted) {
+          if (mounted) {
             setWebViewHeight(pageHeight);
+            isFitted = true;
+            debugPrint("\n\nHeight is Fitted!\n\n");
           }
         },
         onWebResourceError: (WebResourceError error) {
