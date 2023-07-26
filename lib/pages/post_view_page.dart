@@ -2027,23 +2027,15 @@ class _InnerArticleWebViewState extends State<InnerArticleWebView> {
       ..setJavaScriptMode(JavaScriptMode.unrestricted)
       ..setBackgroundColor(const Color(0x00000000))
       ..setNavigationDelegate(NavigationDelegate(
-        onUrlChange: (urlChange) async {
-          String url = urlChange.url ?? "about:blank";
-          if (url == "about:blank") return;
-          await launchInBrowser(url);
-          if (await _webViewController.canGoBack())
-            await _webViewController.goBack();
+        onNavigationRequest: (NavigationRequest request) async {
+          Uri uri = Uri.parse(request.url);
+          if (uri.scheme != "https") await launchInBrowser(request.url);
+          return NavigationDecision.prevent;
         },
         onProgress: (int progress) {
           debugPrint('WebView is loading (progress: $progress)');
         },
-        onPageStarted: (String url) async {
-          return;
-          if (url == "about:blank") return;
-          await launchInBrowser(url);
-          _webViewController.goBack();
-          debugPrint("url: $url");
-        },
+        onPageStarted: (String url) async {},
         onPageFinished: (String url) async {
           if (isFitted == true) return;
           final String pageHeightStr =
