@@ -2038,7 +2038,10 @@ class _InnerArticleWebViewState extends State<InnerArticleWebView> {
         },
         onPageStarted: (String url) async {},
         onPageFinished: (String url) async {
-          if (isFitted == true) return;
+          if (isFitted == true) {
+            debugPrint("Height fitting is already finished!");
+            return;
+          }
           final String pageHeightStr =
               (await _webViewController.runJavaScriptReturningResult('''
             function getPageHeight() {

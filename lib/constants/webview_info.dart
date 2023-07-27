@@ -23,7 +23,6 @@ String getNewAraAppHtml(double width, String content) {
   <link href="https://newara.dev.sparcs.org/css/app.34a79d34.css" rel="preload" as="style">
   <link href="https://newara.dev.sparcs.org/js/app.25acc41a.js" rel="preload" as="script">
   <link href="https://newara.dev.sparcs.org/css/app.34a79d34.css" rel="stylesheet">
-  <link rel="manifest" href="/manifest.json">
   <meta name="theme-color" content="#4DBA87">
 </head>
 
