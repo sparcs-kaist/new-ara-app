@@ -14,6 +14,7 @@ import 'package:new_ara_app/utils/time_utils.dart';
 import 'package:new_ara_app/models/article_nested_comment_list_action_model.dart';
 import 'package:new_ara_app/models/comment_nested_comment_list_action_model.dart';
 import 'package:new_ara_app/models/scrap_create_action_model.dart';
+import 'package:new_ara_app/constants/webview_info.dart';
 
 class PostViewPage extends StatefulWidget {
   final int articleID;
@@ -2029,7 +2030,7 @@ class _InnerArticleWebViewState extends State<InnerArticleWebView> {
       ..setNavigationDelegate(NavigationDelegate(
         onNavigationRequest: (NavigationRequest request) async {
           Uri uri = Uri.parse(request.url);
-          if (uri.scheme != "https") await launchInBrowser(request.url);
+          if (uri.scheme == "https") await launchInBrowser(request.url);
           return NavigationDecision.prevent;
         },
         onProgress: (int progress) {
@@ -2090,98 +2091,11 @@ class _InnerArticleWebViewState extends State<InnerArticleWebView> {
         maxHeight: webViewHeight,
       ),
       child: WebViewWidget(
-        controller: _webViewController..loadHtmlString('''
-                              <html>
-                                  <head>
-                                      <meta charset="utf-8">
-                                      <meta property="og:locale" content="ko-KR">
-                                      <meta property="og:locale:alternate" content="en-US">
-                                      <meta name="theme-color" content="#ed3a3a">
-                                      <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons|Material+Icons+Outlined">
-                                      <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&amp;display=swap">
-                                      <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Raleway:wght@300;400;500;700&amp;display=swap">
-                                      <style>
-                                          *:focus {
-                                              outline: none;
-                                          }
-                                          html, body {
-                                              margin: 0;
-                                              padding: 0;
-                                          }
-                                          img {
-                                              max-width: 100%;
-                                              
-                                          }
-                                      </style>
-                                      <meta name="viewport" content="width=${MediaQuery.of(context).size.width - 40}">
-                                      <style type="text/css">.ProseMirror {
-  position: relative;
-}
-
-.ProseMirror {
-  word-wrap: break-word;
-  white-space: pre-wrap;
-  -webkit-font-variant-ligatures: none;
-  font-variant-ligatures: none;
-}
-
-.ProseMirror pre {
-  white-space: pre-wrap;
-}
-
-.ProseMirror-gapcursor {
-  display: none;
-  pointer-events: none;
-  position: absolute;
-}
-
-.ProseMirror-gapcursor:after {
-  content: "";
-  display: block;
-  position: absolute;
-  top: -2px;
-  width: 20px;
-  border-top: 1px solid black;
-  animation: ProseMirror-cursor-blink 1.1s steps(2, start) infinite;
-}
-
-@keyframes ProseMirror-cursor-blink {
-  to {
-    visibility: hidden;
-  }
-}
-
-.ProseMirror-hideselection *::selection {
-  background: transparent;
-}
-
-.ProseMirror-hideselection *::-moz-selection {
-  background: transparent;
-}
-
-.ProseMirror-hideselection * {
-  caret-color: transparent;
-}
-
-.ProseMirror-focused .ProseMirror-gapcursor {
-  display: block;
-}
-                                      </style>
-                                      <script>
-                                          window.dataLayer = window.dataLayer || [];function gtag(){dataLayer.push(arguments);}gtag('js', new Date());gtag('config', 'G-S6SZ22QX6X');
-                                      </script>
-                                  </head>
-                                  <body>
-                                      <div class="content">
-                                          <div class="content">
-                                              <div class="editor-content">
-                                                  ${widget.content}
-                                              </div>
-                                          </div>
-                                      </div>
-                                  </body>
-                              </html>
-                              '''),
+        controller: _webViewController
+          ..loadHtmlString(
+            getNewAraAppHtml(
+                MediaQuery.of(context).size.width - 40, widget.content),
+          ),
       ),
     );
   }
