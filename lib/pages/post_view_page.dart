@@ -324,8 +324,10 @@ class _PostViewPageState extends State<PostViewPage> {
                                   thickness: 1,
                                 ),
                                 InnerArticleWebView(
-                                    content: article.content ??
-                                        '<p>내용이 존재하지 않습니다</p>'),
+                                  content:
+                                      article.content ?? '<p>내용이 존재하지 않습니다</p>',
+                                  width: MediaQuery.of(context).size.width - 40,
+                                ),
                                 const SizedBox(height: 10),
                                 Row(
                                   mainAxisAlignment: MainAxisAlignment.center,
@@ -1848,7 +1850,9 @@ class _ReportDialogWidgetState extends State<ReportDialogWidget> {
 
 class InnerArticleWebView extends StatefulWidget {
   final String content;
-  const InnerArticleWebView({super.key, required this.content});
+  final double width;
+  const InnerArticleWebView(
+      {super.key, required this.content, required this.width});
 
   @override
   State<InnerArticleWebView> createState() => _InnerArticleWebViewState();
@@ -1856,8 +1860,12 @@ class InnerArticleWebView extends StatefulWidget {
 
 class _InnerArticleWebViewState extends State<InnerArticleWebView> {
   WebViewController _webViewController = WebViewController();
-  double webViewHeight = 400;
+  double webViewHeight = 500;
   late bool isFitted;
+
+  void setWebViewHeight(value) {
+    setState(() => webViewHeight = value);
+  }
 
   Future<void> launchInBrowser(String url) async {
     final Uri targetUrl = Uri.parse(url);
@@ -1871,6 +1879,36 @@ class _InnerArticleWebViewState extends State<InnerArticleWebView> {
     )) {
       throw Exception('Could not launch $url');
     }
+  }
+
+  Future<double> getPageHeight() async {
+    final String pageHeightStr =
+        (await _webViewController.runJavaScriptReturningResult('''
+            function getPageHeight() {
+              return Math.max(
+                document.body.scrollHeight || 0,
+                document.documentElement.scrollHeight || 0,
+                document.body.offsetHeight || 0,
+                document.documentElement.offsetHeight || 0,
+                document.body.clientHeight || 0,
+                document.documentElement.clientHeight || 0
+              ).toString();
+            }
+            getPageHeight();
+          ''')).toString();
+    debugPrint(
+        "******************\npageHeight: $pageHeightStr \n******************");
+    double pageHeight =
+        double.parse(pageHeightStr.substring(1, pageHeightStr.length - 1));
+
+    return pageHeight;
+  }
+
+  Future<void> setPageHeight() async {
+    getPageHeight().then((height) {
+      if (!mounted) return;
+      setState(() => webViewHeight = height);
+    });
   }
 
   @override
@@ -1891,38 +1929,9 @@ class _InnerArticleWebViewState extends State<InnerArticleWebView> {
         },
         onPageStarted: (String url) async {},
         onPageFinished: (String url) async {
-          if (isFitted == true) {
-            debugPrint("Height fitting is already finished!");
-            return;
-          }
-          final String pageHeightStr =
-              (await _webViewController.runJavaScriptReturningResult('''
-            function getPageHeight() {
-              return Math.max(
-                document.body.scrollHeight,
-                document.documentElement.scrollHeight,
-                document.body.offsetHeight,
-                document.documentElement.offsetHeight,
-                document.body.clientHeight,
-                document.documentElement.clientHeight
-              ).toString();
-            }
-            getPageHeight();
-          ''')).toString();
-          // JavaScript에서 리턴된 높이 값을 가져온 후 원하는 동작을 수행합니다.
-          double pageHeight = double.parse(
-              pageHeightStr.substring(1, pageHeightStr.length - 1));
-          if (webViewHeight > pageHeight) {
-            isFitted = true;
-            debugPrint("\n\nHeight is Fitted!\n\n");
-            return;
-          }
-          debugPrint("$pageHeight");
-          if (mounted) {
-            setWebViewHeight(pageHeight);
-            isFitted = true;
-            debugPrint("\n\nHeight is Fitted!\n\n");
-          }
+          if (isFitted) return;
+          await setPageHeight();
+          isFitted = true;
         },
         onWebResourceError: (WebResourceError error) async {
           debugPrint(
@@ -1932,26 +1941,19 @@ class _InnerArticleWebViewState extends State<InnerArticleWebView> {
                 .goBack(); // 에러가 생겨도 Outer에서 처리하고 일단 inner는 goBack
           }
         },
-      ));
-  }
-
-  void setWebViewHeight(double value) {
-    if (!mounted) return;
-    setState(() => webViewHeight = value);
+      ))
+      ..loadHtmlString(
+        getNewAraAppHtml(widget.width, widget.content),
+      );
+    setPageHeight();
   }
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      constraints: BoxConstraints(
-        maxHeight: webViewHeight,
-      ),
+      height: webViewHeight,
       child: WebViewWidget(
-        controller: _webViewController
-          ..loadHtmlString(
-            getNewAraAppHtml(
-                MediaQuery.of(context).size.width - 40, widget.content),
-          ),
+        controller: _webViewController,
       ),
     );
   }
