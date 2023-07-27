@@ -1921,7 +1921,12 @@ class _InnerArticleWebViewState extends State<InnerArticleWebView> {
       ..setNavigationDelegate(NavigationDelegate(
         onNavigationRequest: (NavigationRequest request) async {
           Uri uri = Uri.parse(request.url);
-          if (uri.scheme == "https") await launchInBrowser(request.url);
+          if (uri.scheme == "https" || uri.scheme == "http") {
+            await launchInBrowser(request.url);
+          } else {
+            // mailto, sms, tel 등의 scheme 은 아직 지원하지 않음
+            debugPrint("Denied Scheme: ${uri.scheme}");
+          }
           return NavigationDecision.prevent;
         },
         onProgress: (int progress) {
@@ -1945,7 +1950,6 @@ class _InnerArticleWebViewState extends State<InnerArticleWebView> {
       ..loadHtmlString(
         getNewAraAppHtml(widget.width, widget.content),
       );
-    setPageHeight();
   }
 
   @override
