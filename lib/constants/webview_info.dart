@@ -29,11 +29,36 @@ String getNewAraAppHtml(double width, String content) {
 <body>
   <div data-v-605472e2="" data-v-88de712e="" class="editor"><!---->
     <div data-v-605472e2="" class="content">
-      <div data-v-605472e2="" editor="[object Object]" class="editor-content">
+      <div data-v-605472e2="" class="editor-content">
         $content
       </div>
     </div><!---->
   </div><!---->
+  <script>
+  const allCandidates = document.getElementsByTagName("a");
+
+    for (const cand of allCandidates) {
+      const isBookMark = cand.getAttribute('data-bookmark');
+      if (!isBookMark) continue;
+      const attributes = {
+        "data-v-3fc8d1c4" : "",
+        "data-v-88de712e" : "",
+        "class": "bookmark-box content__bookmark",
+        "target": "_blank"
+      };
+      cand.removeAttribute("data-bookmark");
+      cand.removeAttribute("rel");
+      for (const key in attributes) {
+        cand.setAttribute(key, attributes[key]);
+      }
+      const link = cand.getAttribute("href");
+      console.log(link);
+      const newTitle = '<p data-v-3fc8d1c4 class="box-title">' + cand.textContent + '</p>';
+      cand.textContent = "";
+      const newContent = '<p data-v-3fc8d1c4 class="box-info">' + link + '</p>';
+      cand.innerHTML = newTitle + newContent;
+    }
+  </script>
   <script src="https://newara.dev.sparcs.org/js/app.25acc41a.js"></script>
 </body>
 
