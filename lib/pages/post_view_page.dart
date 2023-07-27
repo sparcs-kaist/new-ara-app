@@ -26,19 +26,19 @@ class PostViewPage extends StatefulWidget {
 
 class _PostViewPageState extends State<PostViewPage> {
   late ArticleModel article;
-  FocusNode textFocusNode = FocusNode();
   bool isValid = false;
 
+  FocusNode textFocusNode = FocusNode();
   final _formKey = GlobalKey<FormState>();
   String _commentContent = "";
 
-  final ScrollController _scrollController = ScrollController();
+  final ScrollController _scrollController =
+      ScrollController(); // 페이지 전체에 대한 컨트롤러
 
   List<CommentNestedCommentListActionModel> commentList = [];
 
-  CommentNestedCommentListActionModel? parentComment;
+  CommentNestedCommentListActionModel? targetComment;
   bool isModify = false, isNestedComment = false;
-  int? modifyTarget;
   final TextEditingController _textEditingController = TextEditingController();
 
   @override
@@ -59,11 +59,11 @@ class _PostViewPageState extends State<PostViewPage> {
     setState(() => isValid = value);
   }
 
-  void setCommentMode(bool? isNestedVal, bool? isModifyVal) {
+  void setCommentMode(bool isNestedVal, bool isModifyVal) {
     if (!mounted) return;
     setState(() {
-      isNestedComment = isNestedVal ?? isNestedComment;
-      isModify = isModifyVal ?? isModify;
+      isNestedComment = isNestedVal;
+      isModify = isModifyVal;
     });
   }
 
@@ -1044,10 +1044,10 @@ class _PostViewPageState extends State<PostViewPage> {
                                                               ? Container()
                                                               : InkWell(
                                                                   onTap: () {
-                                                                    parentComment =
+                                                                    targetComment =
                                                                         curComment;
                                                                     debugPrint(
-                                                                        "parentCommentID: ${parentComment!.id}");
+                                                                        "parentCommentID: ${targetComment!.id}");
                                                                     setCommentMode(
                                                                         true,
                                                                         false);
@@ -1091,10 +1091,10 @@ class _PostViewPageState extends State<PostViewPage> {
                                                               ? Container()
                                                               : InkWell(
                                                                   onTap: () {
-                                                                    parentComment =
+                                                                    targetComment =
                                                                         curComment;
                                                                     debugPrint(
-                                                                        "parentCommentID: ${parentComment!.id}");
+                                                                        "parentCommentID: ${targetComment!.id}");
                                                                     setCommentMode(
                                                                         true,
                                                                         false);
@@ -1138,7 +1138,7 @@ class _PostViewPageState extends State<PostViewPage> {
                       children: [
                         isNestedComment
                             ? Text(
-                                '${parentComment!.is_mine ? '\'나\'에게' : "'${parentComment!.created_by.profile.nickname}'님께"} 답글을 작성하는 중',
+                                '${targetComment!.is_mine ? '\'나\'에게' : "'${targetComment!.created_by.profile.nickname}'님께"} 답글을 작성하는 중',
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
                                 style: const TextStyle(
@@ -1171,9 +1171,8 @@ class _PostViewPageState extends State<PostViewPage> {
                                 : InkWell(
                                     onTap: () {
                                       _textEditingController.text = "";
-                                      parentComment = null;
+                                      targetComment = null;
                                       debugPrint("Parent Comment null");
-                                      modifyTarget = null;
                                       setCommentMode(false, false);
                                     },
                                     child: SvgPicture.asset(
@@ -1188,35 +1187,33 @@ class _PostViewPageState extends State<PostViewPage> {
                                 : const SizedBox(width: 10),
                             InkWell(
                               onTap: () async {
-                                if (_formKey.currentState == null) return;
-                                if (!(_formKey.currentState!.validate()))
+                                if (_formKey.currentState == null ||
+                                    !(_formKey.currentState!.validate())) {
                                   return;
+                                }
                                 _formKey.currentState!.save();
-                                _formKey.currentState!.reset();
-                                debugPrint("작성된 댓글: $_commentContent");
-                                debugPrint(
-                                    "payload 정보: name_type=${article.name_type}, parent_comment=${parentComment?.id}");
                                 if (!isModify) {
                                   dynamic defaultPayload = {
                                     "content": _commentContent,
                                     "name_type": article.name_type,
                                     "attachment": null,
                                   };
-                                  defaultPayload.addAll(parentComment != null
-                                      ? {"parent_comment": parentComment!.id}
+                                  defaultPayload.addAll(targetComment != null
+                                      ? {"parent_comment": targetComment!.id}
                                       : {"parent_article": article.id});
                                   var postRes = await userProvider.postApiRes(
                                     'comments/',
                                     payload: defaultPayload,
                                   );
                                   if (postRes.statusCode != 201) {
-                                    // 나중에 사용자용 안내 위젯 등 추가하면 좋을 듯
+                                    // 나중에 사용자용 알림 기능 추가해야 함
                                     debugPrint("POST /api/comments failed");
                                     return;
                                   }
-                                  setCommentMode(false, null);
-                                  bool res = await fetchArticle(userProvider);
-                                  setIsValid(res);
+                                  targetComment = null;
+                                  _textEditingController.text = "";
+                                  setCommentMode(false, false);
+                                  setIsValid(await fetchArticle(userProvider));
                                 } else {
                                   dynamic defaultPayload = {
                                     "content": _commentContent,
@@ -1224,18 +1221,18 @@ class _PostViewPageState extends State<PostViewPage> {
                                     "name_type": article.name_type,
                                   };
                                   var patchRes = await userProvider.patchApiRes(
-                                    "comments/$modifyTarget/",
+                                    "comments/${targetComment!.id}/",
                                     payload: defaultPayload,
                                   );
                                   if (patchRes.statusCode != 200) {
                                     debugPrint(
-                                        "PATCH /api/comments/$modifyTarget/ failed");
+                                        "PATCH /api/comments/${targetComment!.id}/ failed");
                                     return;
                                   }
+                                  targetComment = null;
                                   _textEditingController.text = "";
-                                  setCommentMode(null, false);
-                                  bool res = await fetchArticle(userProvider);
-                                  setIsValid(res);
+                                  setCommentMode(false, false);
+                                  setIsValid(await fetchArticle(userProvider));
                                 }
                               },
                               child: SvgPicture.asset(
@@ -1319,7 +1316,7 @@ class _PostViewPageState extends State<PostViewPage> {
             _textEditingController.text = commentList[idx].content.toString();
             textFocusNode.requestFocus();
             setCommentMode(false, true);
-            modifyTarget = id;
+            targetComment = commentList[idx];
             break;
           case 'Delete':
             showDialog(
@@ -1845,150 +1842,6 @@ class _ReportDialogWidgetState extends State<ReportDialogWidget> {
           ],
         ),
       ),
-    );
-  }
-}
-
-class OuterArticleWebView extends StatefulWidget {
-  final String targetUrl;
-  const OuterArticleWebView({super.key, required this.targetUrl});
-
-  @override
-  State<OuterArticleWebView> createState() => _OuterArticleWebViewState();
-}
-
-class _OuterArticleWebViewState extends State<OuterArticleWebView> {
-  WebViewController _webViewController = WebViewController();
-  String? curTitle;
-
-  void setTitle(String? value) {
-    if (!mounted) return;
-    setState(() => curTitle = value);
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    _webViewController = WebViewController()
-      ..setJavaScriptMode(JavaScriptMode.unrestricted)
-      ..setBackgroundColor(const Color(0x00000000))
-      ..setNavigationDelegate(NavigationDelegate(
-        onProgress: (int progress) {
-          debugPrint('WebView is loading (progress: $progress)');
-        },
-        onPageStarted: (String url) {
-          if (mounted) setTitle("이동 중...");
-        },
-        onPageFinished: (String url) async {
-          String? title = await _webViewController.getTitle();
-          if (mounted) setTitle(title);
-          debugPrint("$curTitle");
-        },
-        onWebResourceError: (WebResourceError error) {
-          debugPrint(
-              'code: ${error.errorCode}\ndescription: ${error.description}\nerrorType: ${error.errorType}\nisForMainFrame: ${error.isForMainFrame}');
-        },
-      ))
-      ..loadRequest(Uri.parse(widget.targetUrl));
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return WillPopScope(
-      onWillPop: () async {
-        if (await _webViewController.canGoBack()) {
-          await _webViewController.goBack();
-          return false;
-        } else {
-          return true;
-        }
-      },
-      child: Scaffold(
-        appBar: AppBar(
-          leading: IconButton(
-            color: ColorsInfo.newara,
-            icon: SvgPicture.asset('assets/icons/close.svg',
-                color: Colors.black, width: 30, height: 30),
-            onPressed: () {
-              Navigator.pop(context);
-            },
-          ),
-          title: Text(
-            curTitle ?? "이동 중...",
-            style: const TextStyle(
-              color: Colors.black,
-              fontSize: 18,
-              fontWeight: FontWeight.w500,
-            ),
-            overflow: TextOverflow.ellipsis,
-          ),
-          actions: [
-            _buildWebViewPopupMenuButton(),
-          ],
-        ),
-        body: WebViewWidget(
-          controller: _webViewController,
-        ),
-      ),
-    );
-  }
-
-  PopupMenuButton<String> _buildWebViewPopupMenuButton() {
-    return PopupMenuButton<String>(
-      splashRadius: 5,
-      shape: const RoundedRectangleBorder(
-          borderRadius: BorderRadius.all(Radius.circular(10.0))),
-      padding: const EdgeInsets.all(2.0),
-      icon: SvgPicture.asset(
-        'assets/icons/three_dots_1.svg',
-        width: 25,
-        height: 25,
-      ),
-      itemBuilder: (BuildContext context) => [
-        const PopupMenuItem<String>(
-          value: 'Browser',
-          child: Text(
-            '브라우저로 내보내기',
-            style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w700,
-                color: Color.fromRGBO(51, 51, 51, 1)),
-          ),
-        ),
-        const PopupMenuItem<String>(
-          value: 'link',
-          child: Text(
-            '링크 복사',
-            style: TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.w700,
-              color: Color.fromRGBO(51, 51, 51, 1),
-            ),
-          ),
-        ),
-        const PopupMenuItem<String>(
-          value: 'Refresh',
-          child: Text(
-            '새로 고침',
-            style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w700,
-                color: Color.fromRGBO(51, 51, 51, 1)),
-          ),
-        ),
-      ],
-      onSelected: (String result) async {
-        switch (result) {
-          case 'Refresh':
-            _webViewController.reload();
-            break;
-          case 'Browser':
-            //_launchUrl(widget.targetUrl);
-            break;
-          case 'link':
-            break;
-        }
-      },
     );
   }
 }

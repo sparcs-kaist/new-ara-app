@@ -14,12 +14,6 @@ String getNewAraAppHtml(double width, String content) {
   <link rel="stylesheet"
     href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&amp;display=swap">
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Raleway:wght@300;400;500;700&amp;display=swap">
-  <style>
-    html, body {
-      padding: 0;
-      margin: 0;
-    }
-  </style>
   <link href="https://newara.dev.sparcs.org/css/app.34a79d34.css" rel="preload" as="style">
   <link href="https://newara.dev.sparcs.org/js/app.25acc41a.js" rel="preload" as="script">
   <link href="https://newara.dev.sparcs.org/css/app.34a79d34.css" rel="stylesheet">
