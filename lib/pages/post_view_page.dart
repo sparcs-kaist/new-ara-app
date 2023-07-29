@@ -1,10 +1,11 @@
 import 'dart:core';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:new_ara_app/constants/url_info.dart';
 import 'package:provider/provider.dart';
 import 'package:webview_flutter/webview_flutter.dart';
-import 'package:dio/dio.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:flutter/services.dart';
 
 import 'package:new_ara_app/constants/colors_info.dart';
 import 'package:new_ara_app/models/article_model.dart';
@@ -559,7 +560,13 @@ class _PostViewPageState extends State<PostViewPage> {
                                         ),
                                         const SizedBox(width: 15),
                                         InkWell(
-                                          onTap: () {},
+                                          onTap: () async {
+                                            String url =
+                                                "$newAraDefaultUrl/post/${article.id}";
+                                            await Clipboard.setData(
+                                                ClipboardData(text: url));
+                                            debugPrint("클립보드에 복사됨: $url");
+                                          },
                                           child: Container(
                                             width: 90,
                                             height: 40,
@@ -1703,7 +1710,7 @@ class _ReportDialogWidgetState extends State<ReportDialogWidget> {
         : {"parent_article": widget.articleID ?? 0});
     UserProvider userProvider = context.read<UserProvider>();
     try {
-      Response? response = await userProvider.postApiRes(
+      await userProvider.postApiRes(
         "reports/",
         payload: defaultPayload,
       );

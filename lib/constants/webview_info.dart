@@ -47,7 +47,7 @@ String getNewAraAppHtml(double width, String content) {
       }
       const link = cand.getAttribute("href");
       console.log(link);
-      const newTitle = '<p data-v-3fc8d1c4 class="box-title">' + cand.textContent + '</p>';
+      const newTitle = '<p data-v-3fc8d1c4 class="box-title">' + cand.textContent + ' ></p>';
       cand.textContent = "";
       const newContent = '<p data-v-3fc8d1c4 class="box-info">' + link + '</p>';
       cand.innerHTML = newTitle + newContent;
