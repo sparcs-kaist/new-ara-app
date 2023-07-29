@@ -1638,39 +1638,10 @@ class _ReportDialogWidgetState extends State<ReportDialogWidget> {
                 const SizedBox(width: 20),
                 InkWell(
                   onTap: () async {
-                    if (!isChosen[0] &&
-                        !isChosen[1] &&
-                        !isChosen[2] &&
-                        !isChosen[3] &&
-                        !isChosen[4] &&
-                        !isChosen[5]) {
-                      // 나중에 알림 해주기
-                      return;
-                    }
-                    String reportContent = "";
-                    for (int i = 0; i < 6; i++) {
-                      if (!isChosen[i]) continue;
-                      if (reportContent != "") reportContent += ", ";
-                      reportContent += reportContents[i];
-                    }
-                    debugPrint("reportContent: $reportContent");
-                    Map<String, dynamic> defaultPayload = {
-                      "content": reportContent,
-                      "type": "others",
-                    };
-                    defaultPayload.addAll(widget.articleID == null
-                        ? {"parent_comment": widget.commentID ?? 0}
-                        : {"parent_article": widget.articleID ?? 0});
-                    UserProvider userProvider = context.read<UserProvider>();
-                    try {
-                      Response? response = await userProvider.postApiRes(
-                        "reports/",
-                        payload: defaultPayload,
-                      );
-                      debugPrint("Report statusCode: ${response?.statusCode}");
-                    } catch (error) {
-                      debugPrint("Report error: $error");
-                    }
+                    postReport().then((res) {
+                      debugPrint("신고가 ${res ? '성공' : '실패'}하였습니다.");
+                      if (res) Navigator.pop(context);
+                    });
                   },
                   child: Container(
                     decoration: BoxDecoration(
@@ -1704,6 +1675,44 @@ class _ReportDialogWidgetState extends State<ReportDialogWidget> {
         ),
       ),
     );
+  }
+
+  Future<bool> postReport() async {
+    if (!isChosen[0] &&
+        !isChosen[1] &&
+        !isChosen[2] &&
+        !isChosen[3] &&
+        !isChosen[4] &&
+        !isChosen[5]) {
+      // 나중에 알림 해주기
+      return false;
+    }
+    String reportContent = "";
+    for (int i = 0; i < 6; i++) {
+      if (!isChosen[i]) continue;
+      if (reportContent != "") reportContent += ", ";
+      reportContent += reportContents[i];
+    }
+    debugPrint("reportContent: $reportContent");
+    Map<String, dynamic> defaultPayload = {
+      "content": reportContent,
+      "type": "others",
+    };
+    defaultPayload.addAll(widget.articleID == null
+        ? {"parent_comment": widget.commentID ?? 0}
+        : {"parent_article": widget.articleID ?? 0});
+    UserProvider userProvider = context.read<UserProvider>();
+    try {
+      Response? response = await userProvider.postApiRes(
+        "reports/",
+        payload: defaultPayload,
+      );
+    } catch (error) {
+      debugPrint("postReport() failed with error: $error");
+      return false;
+    }
+
+    return true;
   }
 
   InkWell _buildReportButton(int idx) {
