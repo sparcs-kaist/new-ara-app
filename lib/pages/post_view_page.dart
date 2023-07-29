@@ -1549,7 +1549,16 @@ class _ReportDialogWidgetState extends State<ReportDialogWidget> {
     "defamation",
     "other"
   ];
+  List<String> reportContentKor = [
+    "혐오 발언",
+    "허가되지 않은 판매글",
+    "스팸",
+    "거짓 정보",
+    "명예훼손",
+    "기타"
+  ];
   late List<bool> isChosen;
+
   @override
   void initState() {
     super.initState();
@@ -1584,167 +1593,17 @@ class _ReportDialogWidgetState extends State<ReportDialogWidget> {
               ),
             ),
             const SizedBox(height: 20),
-            InkWell(
-              onTap: () {
-                if (!mounted) return;
-                setState(() => isChosen[0] = !isChosen[0]);
-              },
-              child: Container(
-                decoration: BoxDecoration(
-                  borderRadius: const BorderRadius.all(Radius.circular(20)),
-                  color: isChosen[0]
-                      ? ColorsInfo.newara
-                      : const Color.fromRGBO(220, 220, 220, 1),
-                ),
-                width: 90,
-                height: 40,
-                child: Center(
-                  child: Text(
-                    '혐오 발언',
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w500,
-                      color: isChosen[0] ? Colors.white : Colors.black,
-                    ),
-                  ),
-                ),
-              ),
-            ),
+            _buildReportButton(0),
             const SizedBox(height: 10),
-            InkWell(
-              onTap: () {
-                if (!mounted) return;
-                setState(() => isChosen[1] = !isChosen[1]);
-              },
-              child: Container(
-                decoration: BoxDecoration(
-                  borderRadius: const BorderRadius.all(Radius.circular(20)),
-                  color: isChosen[1]
-                      ? ColorsInfo.newara
-                      : const Color.fromRGBO(220, 220, 220, 1),
-                ),
-                width: 170,
-                height: 40,
-                child: Center(
-                  child: Text(
-                    '허가되지 않은 판매글',
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w500,
-                      color: isChosen[1] ? Colors.white : Colors.black,
-                    ),
-                  ),
-                ),
-              ),
-            ),
+            _buildReportButton(1),
             const SizedBox(height: 10),
-            InkWell(
-              onTap: () {
-                if (!mounted) return;
-                setState(() => isChosen[2] = !isChosen[2]);
-              },
-              child: Container(
-                decoration: BoxDecoration(
-                  borderRadius: const BorderRadius.all(Radius.circular(20)),
-                  color: isChosen[2]
-                      ? ColorsInfo.newara
-                      : const Color.fromRGBO(220, 220, 220, 1),
-                ),
-                width: 60,
-                height: 40,
-                child: Center(
-                  child: Text(
-                    '스팸',
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w500,
-                      color: isChosen[2] ? Colors.white : Colors.black,
-                    ),
-                  ),
-                ),
-              ),
-            ),
+            _buildReportButton(2),
             const SizedBox(height: 10),
-            InkWell(
-              onTap: () {
-                if (!mounted) return;
-                setState(() => isChosen[3] = !isChosen[3]);
-              },
-              child: Container(
-                decoration: BoxDecoration(
-                  borderRadius: const BorderRadius.all(Radius.circular(20)),
-                  color: isChosen[3]
-                      ? ColorsInfo.newara
-                      : const Color.fromRGBO(220, 220, 220, 1),
-                ),
-                width: 100,
-                height: 40,
-                child: Center(
-                  child: Text(
-                    '거짓 정보',
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w500,
-                      color: isChosen[3] ? Colors.white : Colors.black,
-                    ),
-                  ),
-                ),
-              ),
-            ),
+            _buildReportButton(3),
             const SizedBox(height: 10),
-            InkWell(
-              onTap: () {
-                if (!mounted) return;
-                setState(() => isChosen[4] = !isChosen[4]);
-              },
-              child: Container(
-                decoration: BoxDecoration(
-                  borderRadius: const BorderRadius.all(Radius.circular(20)),
-                  color: isChosen[4]
-                      ? ColorsInfo.newara
-                      : const Color.fromRGBO(220, 220, 220, 1),
-                ),
-                width: 100,
-                height: 40,
-                child: Center(
-                  child: Text(
-                    '명예훼손',
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w500,
-                      color: isChosen[4] ? Colors.white : Colors.black,
-                    ),
-                  ),
-                ),
-              ),
-            ),
+            _buildReportButton(4),
             const SizedBox(height: 10),
-            InkWell(
-              onTap: () {
-                if (!mounted) return;
-                setState(() => isChosen[5] = !isChosen[5]);
-              },
-              child: Container(
-                decoration: BoxDecoration(
-                  borderRadius: const BorderRadius.all(Radius.circular(20)),
-                  color: isChosen[5]
-                      ? ColorsInfo.newara
-                      : const Color.fromRGBO(220, 220, 220, 1),
-                ),
-                width: 60,
-                height: 40,
-                child: Center(
-                  child: Text(
-                    '기타',
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w500,
-                      color: isChosen[5] ? Colors.white : Colors.black,
-                    ),
-                  ),
-                ),
-              ),
-            ),
+            _buildReportButton(5),
             const SizedBox(height: 20),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -1842,6 +1701,35 @@ class _ReportDialogWidgetState extends State<ReportDialogWidget> {
               ],
             ),
           ],
+        ),
+      ),
+    );
+  }
+
+  InkWell _buildReportButton(int idx) {
+    return InkWell(
+      onTap: () {
+        if (!mounted) return;
+        setState(() => isChosen[idx] = !isChosen[idx]);
+      },
+      child: Container(
+        decoration: BoxDecoration(
+          borderRadius: const BorderRadius.all(Radius.circular(20)),
+          color: isChosen[idx]
+              ? ColorsInfo.newara
+              : const Color.fromRGBO(220, 220, 220, 1),
+        ),
+        width: 180,
+        height: 40,
+        child: Center(
+          child: Text(
+            reportContentKor[idx],
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.w500,
+              color: isChosen[idx] ? Colors.white : Colors.black,
+            ),
+          ),
         ),
       ),
     );
@@ -1954,7 +1842,7 @@ class _InnerArticleWebViewState extends State<InnerArticleWebView> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return SizedBox(
       height: webViewHeight,
       child: WebViewWidget(
         controller: _webViewController,
