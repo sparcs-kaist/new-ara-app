@@ -15,7 +15,8 @@ import 'package:new_ara_app/utils/time_utils.dart';
 import 'package:new_ara_app/models/article_nested_comment_list_action_model.dart';
 import 'package:new_ara_app/models/comment_nested_comment_list_action_model.dart';
 import 'package:new_ara_app/models/scrap_create_action_model.dart';
-import 'package:new_ara_app/constants/webview_info.dart';
+import 'package:new_ara_app/utils/article_content_info.dart';
+import 'package:new_ara_app/utils/comment_content_info.dart';
 
 class PostViewPage extends StatefulWidget {
   final int articleID;
@@ -169,8 +170,8 @@ class _PostViewPageState extends State<PostViewPage> {
                         child: SingleChildScrollView(
                           controller: _scrollController,
                           child: Container(
-                            constraints: BoxConstraints(
-                              minHeight: MediaQuery.of(context).size.height,
+                            constraints: const BoxConstraints(
+                              minHeight: 200,
                             ),
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
@@ -691,6 +692,7 @@ class _PostViewPageState extends State<PostViewPage> {
                                       CommentNestedCommentListActionModel
                                           curComment = commentList[idx];
                                       return Container(
+                                        //height: 400,
                                         margin: EdgeInsets.only(
                                             left: (curComment.parent_comment ==
                                                     null
@@ -788,16 +790,18 @@ class _PostViewPageState extends State<PostViewPage> {
                                                   left: 30, right: 0),
                                               child: curComment.is_hidden ==
                                                       false
-                                                  ? Text(
-                                                      curComment.content
-                                                          .toString(),
-                                                      style: const TextStyle(
-                                                        fontSize: 14,
-                                                        fontWeight:
-                                                            FontWeight.w400,
-                                                        color: Color.fromRGBO(
-                                                            51, 51, 51, 1),
-                                                      ),
+                                                  ? InnerCommentWebView(
+                                                      htmlStr: getCommentContentHtml(
+                                                          MediaQuery.of(context)
+                                                                  .size
+                                                                  .width -
+                                                              70 -
+                                                              (curComment.parent_comment !=
+                                                                      null
+                                                                  ? 30
+                                                                  : 0),
+                                                          curComment.content
+                                                              .toString()),
                                                     )
                                                   : const Text(
                                                       '삭제된 댓글입니다.',
@@ -1752,6 +1756,110 @@ class _ReportDialogWidgetState extends State<ReportDialogWidget> {
   }
 }
 
+class InnerCommentWebView extends StatefulWidget {
+  final String htmlStr;
+  const InnerCommentWebView({super.key, required this.htmlStr});
+
+  @override
+  State<InnerCommentWebView> createState() => _InnerCommentWebViewState();
+}
+
+class _InnerCommentWebViewState extends State<InnerCommentWebView> {
+  WebViewController _webViewController = WebViewController();
+  double webViewHeight = 10;
+  bool isFitted = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _webViewController = WebViewController()
+      ..setJavaScriptMode(JavaScriptMode.unrestricted)
+      ..setBackgroundColor(const Color(0x00000000))
+      ..setNavigationDelegate(NavigationDelegate(
+        onNavigationRequest: (NavigationRequest request) async {
+          Uri uri = Uri.parse(request.url);
+          if (uri.scheme == "https" || uri.scheme == "http") {
+            await launchInBrowser(request.url);
+          } else {
+            // mailto, sms, tel 등의 scheme 은 아직 지원하지 않음
+            debugPrint("Denied Scheme: ${uri.scheme}");
+          }
+          return NavigationDecision.prevent;
+        },
+        onProgress: (int progress) {
+          debugPrint('WebView is loading (progress: $progress)');
+        },
+        onPageStarted: (String url) async {},
+        onPageFinished: (String url) async {
+          if (isFitted) return;
+          await setPageHeight();
+          isFitted = true;
+        },
+        onWebResourceError: (WebResourceError error) async {
+          debugPrint(
+              'code: ${error.errorCode}\ndescription: ${error.description}\nerrorType: ${error.errorType}\nisForMainFrame: ${error.isForMainFrame}');
+          if (await _webViewController.canGoBack()) {
+            await _webViewController.goBack();
+          }
+        },
+      ))
+      ..loadHtmlString(widget.htmlStr);
+  }
+
+  Future<double> getPageHeight() async {
+    final String pageHeightStr =
+        (await _webViewController.runJavaScriptReturningResult('''
+            function getPageHeight() {
+              return Math.max(
+                document.body.scrollHeight || 0,
+                document.documentElement.scrollHeight || 0,
+                document.body.offsetHeight || 0,
+                document.documentElement.offsetHeight || 0,
+                document.body.clientHeight || 0,
+                document.documentElement.clientHeight || 0
+              ).toString();
+            }
+            getPageHeight();
+          ''')).toString();
+    debugPrint(
+        "******************\npageHeight: $pageHeightStr \n******************");
+    double pageHeight =
+        double.parse(pageHeightStr.substring(1, pageHeightStr.length - 1));
+
+    return pageHeight;
+  }
+
+  Future<void> setPageHeight() async {
+    getPageHeight().then((height) {
+      if (!mounted) return;
+      setState(() => webViewHeight = height);
+    });
+  }
+
+  Future<void> launchInBrowser(String url) async {
+    final Uri targetUrl = Uri.parse(url);
+    if (!await canLaunchUrl(targetUrl)) {
+      debugPrint("$url을 열 수 없습니다.");
+      return;
+    }
+    if (!await launchUrl(
+      Uri.parse(url),
+      mode: LaunchMode.externalApplication,
+    )) {
+      throw Exception('Could not launch $url');
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+        height: webViewHeight,
+        child: WebViewWidget(
+          controller: _webViewController,
+        ));
+  }
+}
+
 class InnerArticleWebView extends StatefulWidget {
   final String content;
   final double width;
@@ -1852,7 +1960,7 @@ class _InnerArticleWebViewState extends State<InnerArticleWebView> {
         },
       ))
       ..loadHtmlString(
-        getNewAraAppHtml(widget.width, widget.content),
+        getArticleContentHtml(widget.width, widget.content),
       );
   }
 

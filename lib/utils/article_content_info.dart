@@ -1,4 +1,4 @@
-String getNewAraAppHtml(double width, String content) {
+String getArticleContentHtml(double width, String content) {
   return '''
 <html>
 
