@@ -1,4 +1,4 @@
-String getCommentContentHtml(double width, String content) {
+String getCommentContentHtml(String content) {
   return '''
 <html>
 
@@ -7,7 +7,7 @@ String getCommentContentHtml(double width, String content) {
   <meta property="og:url" content="https://newara.sparcs.org">
   <meta property="og:locale" content="ko_KR">
   <meta property="og:locale:alternate" content="en_US">
-  <meta name="viewport" content="width=$width,initial-scale=1">
+  <meta name="viewport" content="width=<device-width>,initial-scale=1">
   <meta name="theme-color" content="#ed3a3a">
   <meta name="apple-mobile-web-app-status-bar-style" content="#ed3a3a">
   <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons|Material+Icons+Outlined">
@@ -21,6 +21,10 @@ String getCommentContentHtml(double width, String content) {
   <style>
     body {
       min-height: 100vh;
+    }
+    a {
+      color: blue;
+      text-decoration: underline;
     }
   </style>
 </head>
