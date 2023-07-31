@@ -19,11 +19,8 @@ String getCommentContentHtml(String content) {
   <link href="https://newara.dev.sparcs.org/css/app.34a79d34.css" rel="stylesheet">
   <meta name="theme-color" content="#4DBA87">
   <style>
-    body {
-      min-height: 100vh;
-    }
     a {
-      color: blue;
+      color: #00b8d4;
       text-decoration: underline;
     }
   </style>

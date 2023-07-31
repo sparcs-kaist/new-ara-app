@@ -424,14 +424,14 @@ class _PostViewPageState extends State<PostViewPage> {
                                           width: 90,
                                           height: 40,
                                           decoration: BoxDecoration(
-                                            color: article.my_scrap == null
-                                                ? Colors.white
-                                                : ColorsInfo.newara,
+                                            color: Colors.white,
                                             borderRadius:
                                                 BorderRadius.circular(8),
                                             border: Border.all(
-                                              color: const Color.fromRGBO(
-                                                  230, 230, 230, 1),
+                                              color: article.my_scrap == null
+                                                  ? const Color.fromRGBO(
+                                                      230, 230, 230, 1)
+                                                  : ColorsInfo.newaraSoft,
                                             ),
                                           ),
                                           child: Center(
@@ -448,16 +448,16 @@ class _PostViewPageState extends State<PostViewPage> {
                                                           null
                                                       ? const Color.fromRGBO(
                                                           100, 100, 100, 1)
-                                                      : Colors.white,
+                                                      : ColorsInfo.newaraSoft,
                                                 ),
                                                 const SizedBox(width: 5),
                                                 Text(
                                                   '담아두기',
                                                   style: TextStyle(
-                                                    color:
-                                                        article.my_scrap == null
-                                                            ? Colors.black
-                                                            : Colors.white,
+                                                    color: article.my_scrap ==
+                                                            null
+                                                        ? Colors.black
+                                                        : ColorsInfo.newaraSoft,
                                                     fontSize: 15,
                                                     fontWeight: FontWeight.w500,
                                                   ),
@@ -1154,9 +1154,12 @@ class _PostViewPageState extends State<PostViewPage> {
   PopupMenuButton<String> _buildMyPopupMenuButton(
       int id, UserProvider userProvider, int idx) {
     return PopupMenuButton<String>(
+      shadowColor: const Color.fromRGBO(0, 0, 0, 0.2),
       splashRadius: 5,
       shape: const RoundedRectangleBorder(
-          borderRadius: BorderRadius.all(Radius.circular(12.0))),
+        side: BorderSide(color: Color.fromRGBO(217, 217, 217, 1), width: 0.5),
+        borderRadius: BorderRadius.all(Radius.circular(12.0)),
+      ),
       padding: const EdgeInsets.all(2.0),
       icon: SvgPicture.asset(
         'assets/icons/three_dots_1.svg',
@@ -1326,8 +1329,10 @@ class _PostViewPageState extends State<PostViewPage> {
 
   PopupMenuButton<String> _buildOthersPopupMenuButton(int commentID) {
     return PopupMenuButton<String>(
+      shadowColor: const Color.fromRGBO(0, 0, 0, 0.2),
       splashRadius: 5,
       shape: const RoundedRectangleBorder(
+          side: BorderSide(color: Color.fromRGBO(217, 217, 217, 1), width: 0.5),
           borderRadius: BorderRadius.all(Radius.circular(12.0))),
       padding: const EdgeInsets.all(2.0),
       icon: SvgPicture.asset(
