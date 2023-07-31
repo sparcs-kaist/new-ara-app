@@ -13,6 +13,7 @@ import 'package:new_ara_app/models/article_list_action_model.dart';
 import 'package:new_ara_app/models/scrap_model.dart';
 import 'package:new_ara_app/pages/post_view_page.dart';
 import 'package:new_ara_app/utils/time_utils.dart';
+import 'package:new_ara_app/utils/slide_routing.dart';
 
 class UserPage extends StatefulWidget {
   const UserPage({Key? key}) : super(key: key);
@@ -136,7 +137,7 @@ class _UserPageState extends State<UserPage>
               height: 25,
             ),
             onPressed: () {
-              Navigator.of(context).push(_createRoute());
+              Navigator.of(context).push(slideRoute(const SettingPage()));
             },
           ),
           const SizedBox(width: 11),
@@ -444,11 +445,8 @@ class _UserPageState extends State<UserPage>
           }
           return InkWell(
               onTap: () {
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) =>
-                            PostViewPage(id: curPost.id))); // 나중에 수정되어야 함.
+                Navigator.of(context)
+                    .push(slideRoute(PostViewPage(id: curPost.id)));
               },
               child: SizedBox(
                 height: 61,
@@ -555,24 +553,4 @@ class _UserPageState extends State<UserPage>
       ),
     );
   }
-}
-
-// 설정 페이지가 슬라이드로 나오기 위해서 필요한 Route
-Route _createRoute() {
-  return PageRouteBuilder(
-    pageBuilder: (context, animation, secondaryAnimation) =>
-        const SettingPage(),
-    transitionsBuilder: ((context, animation, secondaryAnimation, child) {
-      var begin = const Offset(1, 0);
-      var end = const Offset(0, 0);
-      var curve = Curves.ease;
-
-      var tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
-      var offsetAnimation = animation.drive(tween);
-      return SlideTransition(
-        position: offsetAnimation,
-        child: child,
-      );
-    }),
-  );
 }
