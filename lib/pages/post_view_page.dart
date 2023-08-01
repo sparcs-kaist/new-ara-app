@@ -28,9 +28,9 @@ class PostViewPage extends StatefulWidget {
 
 class _PostViewPageState extends State<PostViewPage> {
   late ArticleModel article;
-  bool isValid = false;
   late bool isReportable;
 
+  bool isValid = false;
   FocusNode textFocusNode = FocusNode();
   final _formKey = GlobalKey<FormState>();
   String _commentContent = "";
@@ -40,8 +40,8 @@ class _PostViewPageState extends State<PostViewPage> {
 
   List<CommentNestedCommentListActionModel> commentList = [];
 
-  CommentNestedCommentListActionModel? targetComment;
-  bool isModify = false, isNestedComment = false;
+  CommentNestedCommentListActionModel? targetComment; // 수정 or 대댓글이 달릴 댓글
+  bool isModify = false, isNestedComment = false; // 수정 or 대댓글 or 그냥 댓글
   final TextEditingController _textEditingController = TextEditingController();
 
   @override
@@ -85,6 +85,7 @@ class _PostViewPageState extends State<PostViewPage> {
                 child: Container(
                   margin: const EdgeInsets.symmetric(horizontal: 20),
                   child: Column(children: [
+                    // article 부분
                     Expanded(
                       child: RefreshIndicator(
                         color: ColorsInfo.newara,
@@ -144,8 +145,7 @@ class _PostViewPageState extends State<PostViewPage> {
                                         height: 15,
                                         color: article.my_vote == true
                                             ? ColorsInfo.newara
-                                            : const Color.fromRGBO(
-                                                100, 100, 100, 1),
+                                            : ColorsInfo.noneVote,
                                       ),
                                       const SizedBox(width: 3),
                                       Text('${article.positive_vote_count}',
@@ -154,18 +154,15 @@ class _PostViewPageState extends State<PostViewPage> {
                                               fontWeight: FontWeight.w500,
                                               color: article.my_vote == true
                                                   ? ColorsInfo.newara
-                                                  : const Color.fromRGBO(
-                                                      100, 100, 100, 1))),
+                                                  : ColorsInfo.noneVote)),
                                       const SizedBox(width: 10),
                                       SvgPicture.asset(
                                         'assets/icons/dislike.svg',
                                         width: 13,
                                         height: 15,
                                         color: article.my_vote == false
-                                            ? const Color.fromRGBO(
-                                                83, 141, 209, 1)
-                                            : const Color.fromRGBO(
-                                                100, 100, 100, 1),
+                                            ? ColorsInfo.negVote
+                                            : ColorsInfo.noneVote,
                                       ),
                                       const SizedBox(width: 3),
                                       Text('${article.negative_vote_count}',
@@ -173,10 +170,8 @@ class _PostViewPageState extends State<PostViewPage> {
                                             fontSize: 14,
                                             fontWeight: FontWeight.w500,
                                             color: article.my_vote == false
-                                                ? const Color.fromRGBO(
-                                                    83, 141, 209, 1)
-                                                : const Color.fromRGBO(
-                                                    100, 100, 100, 1),
+                                                ? ColorsInfo.negVote
+                                                : ColorsInfo.noneVote,
                                           )),
                                       const SizedBox(width: 10),
                                       SvgPicture.asset(
@@ -198,8 +193,10 @@ class _PostViewPageState extends State<PostViewPage> {
                                 ],
                               ),
                               const SizedBox(height: 10),
+                              // 유저 정보 (프로필 이미지, 닉네임)
                               InkWell(
-                                onTap: () {},
+                                onTap:
+                                    () {}, // (2023.08.01) 유저 정보 확인 기능은 추후 구현 예정
                                 child: Row(
                                   children: [
                                     Container(
@@ -303,9 +300,8 @@ class _PostViewPageState extends State<PostViewPage> {
                                       width: 30,
                                       height: 30,
                                       color: article.my_vote == true
-                                          ? ColorsInfo.newara
-                                          : const Color.fromRGBO(
-                                              100, 100, 100, 1),
+                                          ? ColorsInfo.posVote
+                                          : ColorsInfo.noneVote,
                                     ),
                                   ),
                                   const SizedBox(width: 3),
@@ -314,9 +310,8 @@ class _PostViewPageState extends State<PostViewPage> {
                                         fontSize: 20,
                                         fontWeight: FontWeight.w500,
                                         color: article.my_vote == true
-                                            ? ColorsInfo.newara
-                                            : const Color.fromRGBO(
-                                                100, 100, 100, 1),
+                                            ? ColorsInfo.posVote
+                                            : ColorsInfo.noneVote,
                                       )),
                                   const SizedBox(width: 20),
                                   InkWell(
@@ -365,10 +360,8 @@ class _PostViewPageState extends State<PostViewPage> {
                                       width: 30,
                                       height: 30,
                                       color: article.my_vote == false
-                                          ? const Color.fromRGBO(
-                                              83, 141, 209, 1)
-                                          : const Color.fromRGBO(
-                                              100, 100, 100, 1),
+                                          ? ColorsInfo.negVote
+                                          : ColorsInfo.noneVote,
                                     ),
                                   ),
                                   const SizedBox(width: 3),
@@ -377,10 +370,8 @@ class _PostViewPageState extends State<PostViewPage> {
                                         fontSize: 20,
                                         fontWeight: FontWeight.w500,
                                         color: article.my_vote == false
-                                            ? const Color.fromRGBO(
-                                                83, 141, 209, 1)
-                                            : const Color.fromRGBO(
-                                                100, 100, 100, 1),
+                                            ? ColorsInfo.negVote
+                                            : ColorsInfo.noneVote,
                                       )),
                                 ],
                               ),
@@ -785,13 +776,9 @@ class _PostViewPageState extends State<PostViewPage> {
                                                                         .my_vote ==
                                                                     true
                                                                 ? ColorsInfo
-                                                                    .newara
-                                                                : const Color
-                                                                        .fromRGBO(
-                                                                    100,
-                                                                    100,
-                                                                    100,
-                                                                    1),
+                                                                    .posVote
+                                                                : ColorsInfo
+                                                                    .noneVote,
                                                           ),
                                                         ),
                                                         Text(
@@ -806,13 +793,9 @@ class _PostViewPageState extends State<PostViewPage> {
                                                                         .my_vote ==
                                                                     true
                                                                 ? ColorsInfo
-                                                                    .newara
-                                                                : const Color
-                                                                        .fromRGBO(
-                                                                    100,
-                                                                    100,
-                                                                    100,
-                                                                    1),
+                                                                    .posVote
+                                                                : ColorsInfo
+                                                                    .noneVote,
                                                           ),
                                                         ),
                                                         const SizedBox(
@@ -887,18 +870,10 @@ class _PostViewPageState extends State<PostViewPage> {
                                                             color: curComment
                                                                         .my_vote ==
                                                                     false
-                                                                ? const Color
-                                                                        .fromRGBO(
-                                                                    83,
-                                                                    141,
-                                                                    209,
-                                                                    1)
-                                                                : const Color
-                                                                        .fromRGBO(
-                                                                    100,
-                                                                    100,
-                                                                    100,
-                                                                    1),
+                                                                ? ColorsInfo
+                                                                    .negVote
+                                                                : ColorsInfo
+                                                                    .noneVote,
                                                           ),
                                                         ),
                                                         Text(
@@ -912,18 +887,10 @@ class _PostViewPageState extends State<PostViewPage> {
                                                             color: curComment
                                                                         .my_vote ==
                                                                     false
-                                                                ? const Color
-                                                                        .fromRGBO(
-                                                                    83,
-                                                                    141,
-                                                                    209,
-                                                                    1)
-                                                                : const Color
-                                                                        .fromRGBO(
-                                                                    100,
-                                                                    100,
-                                                                    100,
-                                                                    1),
+                                                                ? ColorsInfo
+                                                                    .negVote
+                                                                : ColorsInfo
+                                                                    .noneVote,
                                                           ),
                                                         ),
                                                         const SizedBox(
@@ -1036,6 +1003,7 @@ class _PostViewPageState extends State<PostViewPage> {
                       ),
                     ),
                     const SizedBox(height: 15),
+                    // 댓글 입력 부분
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -1055,6 +1023,7 @@ class _PostViewPageState extends State<PostViewPage> {
                             : Container(),
                         Row(
                           children: [
+                            // TextFormField
                             Expanded(
                               child: Container(
                                 constraints: const BoxConstraints(
@@ -1068,6 +1037,7 @@ class _PostViewPageState extends State<PostViewPage> {
                                 child: _buildForm(),
                               ),
                             ),
+                            // Close button
                             const SizedBox(width: 10),
                             (!isModify && !isNestedComment)
                                 ? Container()
@@ -1088,54 +1058,14 @@ class _PostViewPageState extends State<PostViewPage> {
                             (!isModify && !isNestedComment)
                                 ? Container()
                                 : const SizedBox(width: 10),
+                            // send button
                             InkWell(
                               onTap: () async {
-                                if (_formKey.currentState == null ||
-                                    !(_formKey.currentState!.validate())) {
-                                  return;
-                                }
-                                _formKey.currentState!.save();
-                                if (!isModify) {
-                                  dynamic defaultPayload = {
-                                    "content": _commentContent,
-                                    "name_type": article.name_type,
-                                    "attachment": null,
-                                  };
-                                  defaultPayload.addAll(targetComment != null
-                                      ? {"parent_comment": targetComment!.id}
-                                      : {"parent_article": article.id});
-                                  var postRes = await userProvider.postApiRes(
-                                    'comments/',
-                                    payload: defaultPayload,
-                                  );
-                                  if (postRes.statusCode != 201) {
-                                    // 나중에 사용자용 알림 기능 추가해야 함
-                                    debugPrint("POST /api/comments failed");
-                                    return;
-                                  }
-                                  targetComment = null;
-                                  _textEditingController.text = "";
-                                  setCommentMode(false, false);
+                                bool sendRes = await sendComment(userProvider);
+                                if (sendRes) {
                                   setIsValid(await fetchArticle(userProvider));
                                 } else {
-                                  dynamic defaultPayload = {
-                                    "content": _commentContent,
-                                    "is_mine": true,
-                                    "name_type": article.name_type,
-                                  };
-                                  var patchRes = await userProvider.patchApiRes(
-                                    "comments/${targetComment!.id}/",
-                                    payload: defaultPayload,
-                                  );
-                                  if (patchRes.statusCode != 200) {
-                                    debugPrint(
-                                        "PATCH /api/comments/${targetComment!.id}/ failed");
-                                    return;
-                                  }
-                                  targetComment = null;
-                                  _textEditingController.text = "";
-                                  setCommentMode(false, false);
-                                  setIsValid(await fetchArticle(userProvider));
+                                  debugPrint("Send Comment Failed");
                                 }
                               },
                               child: SvgPicture.asset(
@@ -1156,6 +1086,7 @@ class _PostViewPageState extends State<PostViewPage> {
           );
   }
 
+  // 자신의 댓글
   PopupMenuButton<String> _buildMyPopupMenuButton(
       int id, UserProvider userProvider, int idx) {
     return PopupMenuButton<String>(
@@ -1332,6 +1263,7 @@ class _PostViewPageState extends State<PostViewPage> {
     );
   }
 
+  // 다른 유저의 댓글
   PopupMenuButton<String> _buildOthersPopupMenuButton(int commentID) {
     return PopupMenuButton<String>(
       shadowColor: const Color.fromRGBO(0, 0, 0, 0.2),
@@ -1393,6 +1325,7 @@ class _PostViewPageState extends State<PostViewPage> {
       onSelected: (String result) {
         switch (result) {
           case 'Chat':
+            // (2023.08.01) 채팅 기능은 추후에 구현 예정이기 때문에 아직은 Placeholder
             break;
           case 'Report':
             showDialog(
@@ -1406,6 +1339,7 @@ class _PostViewPageState extends State<PostViewPage> {
     );
   }
 
+  // 댓글 입력 Form
   Form _buildForm() {
     return Form(
       key: _formKey,
@@ -1437,8 +1371,10 @@ class _PostViewPageState extends State<PostViewPage> {
     );
   }
 
+  // curComment.content 를 Text() or InArticleWebView() 로 렌더링할 지 결정
   Widget _buildCommentContent(String content) {
     RegExp pattern = RegExp(r'<[^>]+>');
+    // HTML 태그가 존재하는지 검사 (완벽한 방법은 아님)
     if (!content.contains(pattern)) {
       return Text(
         content,
@@ -1455,11 +1391,13 @@ class _PostViewPageState extends State<PostViewPage> {
     );
   }
 
+  // isValid: article 에 적절한 정보가 있는지 나타냄
   void setIsValid(bool value) {
     if (!mounted) return;
     setState(() => isValid = value);
   }
 
+  // 둘 다 false 면 일반적인 댓글
   void setCommentMode(bool isNestedVal, bool isModifyVal) {
     if (!mounted) return;
     setState(() {
@@ -1483,6 +1421,7 @@ class _PostViewPageState extends State<PostViewPage> {
     return true;
   }
 
+  // Article 모델에 필요한 정보
   Future<bool> fetchArticle(UserProvider userProvider) async {
     dynamic articleJson, commentJson;
 
@@ -1532,8 +1471,56 @@ class _PostViewPageState extends State<PostViewPage> {
 
     return true;
   }
+
+  Future<bool> sendComment(UserProvider userProvider) async {
+    if (_formKey.currentState == null || !(_formKey.currentState!.validate())) {
+      return false;
+    }
+    _formKey.currentState!.save();
+    if (!isModify) {
+      dynamic defaultPayload = {
+        "content": _commentContent,
+        "name_type": article.name_type,
+        "attachment": null,
+      };
+      defaultPayload.addAll(targetComment != null
+          ? {"parent_comment": targetComment!.id}
+          : {"parent_article": article.id});
+      var postRes = await userProvider.postApiRes(
+        'comments/',
+        payload: defaultPayload,
+      );
+      if (postRes.statusCode != 201) {
+        // 나중에 사용자용 알림 기능 추가해야 함
+        debugPrint("POST /api/comments failed");
+        return false;
+      }
+      targetComment = null;
+      _textEditingController.text = "";
+      setCommentMode(false, false);
+    } else {
+      dynamic defaultPayload = {
+        "content": _commentContent,
+        "is_mine": true,
+        "name_type": article.name_type,
+      };
+      var patchRes = await userProvider.patchApiRes(
+        "comments/${targetComment!.id}/",
+        payload: defaultPayload,
+      );
+      if (patchRes.statusCode != 200) {
+        debugPrint("PATCH /api/comments/${targetComment!.id}/ failed");
+        return false;
+      }
+      targetComment = null;
+      _textEditingController.text = "";
+      setCommentMode(false, false);
+    }
+    return true;
+  }
 }
 
+// 신고 기능 Dialog
 class ReportDialogWidget extends StatefulWidget {
   final int? articleID, commentID;
   const ReportDialogWidget({super.key, this.articleID, this.commentID});
@@ -1717,6 +1704,7 @@ class _ReportDialogWidgetState extends State<ReportDialogWidget> {
     return true;
   }
 
+  // 각각의 신고항목에 대한 button
   InkWell _buildReportButton(int idx) {
     return InkWell(
       onTap: () {
@@ -1747,6 +1735,9 @@ class _ReportDialogWidgetState extends State<ReportDialogWidget> {
   }
 }
 
+// PostViewPage 내에 삽입되는 WebViewWidget
+// article.content or curComment.content 렌더링을 위한 WebViewWidget
+// WebViewWidget 과의 차이점은 JS를 이용한 자동 높이 조정
 class InArticleWebView extends StatefulWidget {
   final String content;
   final double initialHeight;
