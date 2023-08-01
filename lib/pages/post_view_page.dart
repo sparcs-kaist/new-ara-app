@@ -29,6 +29,7 @@ class PostViewPage extends StatefulWidget {
 class _PostViewPageState extends State<PostViewPage> {
   late ArticleModel article;
   bool isValid = false;
+  late bool isReportable;
 
   FocusNode textFocusNode = FocusNode();
   final _formKey = GlobalKey<FormState>();
@@ -47,7 +48,10 @@ class _PostViewPageState extends State<PostViewPage> {
   void initState() {
     super.initState();
     UserProvider userProvider = context.read<UserProvider>();
-    fetchArticle(userProvider).then((value) => setIsValid(value));
+    fetchArticle(userProvider).then((value) {
+      isReportable = value ? !article.is_mine : false;
+      setIsValid(value);
+    });
   }
 
   @override
@@ -431,7 +435,7 @@ class _PostViewPageState extends State<PostViewPage> {
                                               color: article.my_scrap == null
                                                   ? const Color.fromRGBO(
                                                       230, 230, 230, 1)
-                                                  : ColorsInfo.newaraSoft,
+                                                  : ColorsInfo.newara,
                                             ),
                                           ),
                                           child: Center(
@@ -448,16 +452,16 @@ class _PostViewPageState extends State<PostViewPage> {
                                                           null
                                                       ? const Color.fromRGBO(
                                                           100, 100, 100, 1)
-                                                      : ColorsInfo.newaraSoft,
+                                                      : ColorsInfo.newara,
                                                 ),
                                                 const SizedBox(width: 5),
                                                 Text(
                                                   '담아두기',
                                                   style: TextStyle(
-                                                    color: article.my_scrap ==
-                                                            null
-                                                        ? Colors.black
-                                                        : ColorsInfo.newaraSoft,
+                                                    color:
+                                                        article.my_scrap == null
+                                                            ? Colors.black
+                                                            : ColorsInfo.newara,
                                                     fontSize: 15,
                                                     fontWeight: FontWeight.w500,
                                                   ),
@@ -516,55 +520,56 @@ class _PostViewPageState extends State<PostViewPage> {
                                     ],
                                   ),
                                   // 신고버튼 Row
-                                  article.is_mine == true
-                                      ? Container()
-                                      : InkWell(
-                                          onTap: () {
-                                            showDialog(
-                                                context: context,
-                                                builder: (context) {
-                                                  return ReportDialogWidget(
-                                                      articleID: article.id);
-                                                });
-                                          },
-                                          child: Container(
-                                            width: 90,
-                                            height: 40,
-                                            decoration: BoxDecoration(
-                                              borderRadius:
-                                                  BorderRadius.circular(8),
-                                              border: Border.all(
-                                                color: const Color.fromRGBO(
-                                                    230, 230, 230, 1),
-                                              ),
-                                            ),
-                                            child: Center(
-                                              child: Row(
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment.center,
-                                                children: [
-                                                  const SizedBox(width: 2),
-                                                  SvgPicture.asset(
-                                                    'assets/icons/exclamationmark-bubble-fill.svg',
-                                                    width: 20,
-                                                    height: 20,
-                                                    color: const Color.fromRGBO(
-                                                        100, 100, 100, 1),
-                                                  ),
-                                                  const SizedBox(width: 10),
-                                                  const Text(
-                                                    '신고',
-                                                    style: TextStyle(
-                                                      fontSize: 15,
-                                                      fontWeight:
-                                                          FontWeight.w500,
-                                                    ),
-                                                  ),
-                                                ],
-                                              ),
-                                            ),
+                                  Opacity(
+                                    opacity: isReportable ? 1 : 0.3,
+                                    child: InkWell(
+                                      onTap: () {
+                                        if (!isReportable) return;
+                                        showDialog(
+                                            context: context,
+                                            builder: (context) {
+                                              return ReportDialogWidget(
+                                                  articleID: article.id);
+                                            });
+                                      },
+                                      child: Container(
+                                        width: 90,
+                                        height: 40,
+                                        decoration: BoxDecoration(
+                                          borderRadius:
+                                              BorderRadius.circular(8),
+                                          border: Border.all(
+                                            color: const Color.fromRGBO(
+                                                230, 230, 230, 1),
                                           ),
                                         ),
+                                        child: Center(
+                                          child: Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.center,
+                                            children: [
+                                              const SizedBox(width: 2),
+                                              SvgPicture.asset(
+                                                'assets/icons/exclamationmark-bubble-fill.svg',
+                                                width: 20,
+                                                height: 20,
+                                                color: const Color.fromRGBO(
+                                                    100, 100, 100, 1),
+                                              ),
+                                              const SizedBox(width: 10),
+                                              const Text(
+                                                '신고',
+                                                style: TextStyle(
+                                                  fontSize: 15,
+                                                  fontWeight: FontWeight.w500,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
                                 ],
                               ),
                               const SizedBox(height: 15),
