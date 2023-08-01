@@ -7,7 +7,7 @@ String getCommentContentHtml(String content) {
   <meta property="og:url" content="https://newara.sparcs.org">
   <meta property="og:locale" content="ko_KR">
   <meta property="og:locale:alternate" content="en_US">
-  <meta name="viewport" content="width=<device-width>,initial-scale=1">
+  <meta name="viewport" content="initial-scale=1">
   <meta name="theme-color" content="#ed3a3a">
   <meta name="apple-mobile-web-app-status-bar-style" content="#ed3a3a">
   <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons|Material+Icons+Outlined">
@@ -19,6 +19,10 @@ String getCommentContentHtml(String content) {
   <link href="https://newara.dev.sparcs.org/css/app.34a79d34.css" rel="stylesheet">
   <meta name="theme-color" content="#4DBA87">
   <style>
+    html, body {
+      padding: 0;
+      margin: 0;
+    }
     a {
       color: #00b8d4;
       text-decoration: underline;

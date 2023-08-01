@@ -1741,8 +1741,11 @@ class _ReportDialogWidgetState extends State<ReportDialogWidget> {
 class InArticleWebView extends StatefulWidget {
   final String content;
   final double initialHeight;
-  const InArticleWebView(
-      {super.key, required this.content, required this.initialHeight});
+  const InArticleWebView({
+    super.key,
+    required this.content,
+    required this.initialHeight,
+  });
 
   @override
   State<InArticleWebView> createState() => _InArticleWebViewState();
