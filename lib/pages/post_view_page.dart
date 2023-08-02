@@ -1837,7 +1837,7 @@ class _InArticleWebViewState extends State<InArticleWebView> {
               'code: ${error.errorCode}\ndescription: ${error.description}\nerrorType: ${error.errorType}\nisForMainFrame: ${error.isForMainFrame}');
         },
       ))
-      ..loadHtmlString(widget.content);
+      ..loadFlutterAsset('assets/webview/article_content.html');
   }
 
   @override
