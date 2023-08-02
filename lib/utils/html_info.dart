@@ -1,4 +1,8 @@
+import 'package:sanitize_html/sanitize_html.dart' show sanitizeHtml;
+
 String getContentHtml(String content) {
+  String sanitized = sanitizeHtml(content);
+
   return '''
   <html>
     <head>
@@ -18,7 +22,7 @@ String getContentHtml(String content) {
       </style>
     </head>
     <body>
-      $content
+      $sanitized
     </body>
   </html>
   ''';
