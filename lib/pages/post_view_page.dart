@@ -15,8 +15,7 @@ import 'package:new_ara_app/utils/time_utils.dart';
 import 'package:new_ara_app/models/article_nested_comment_list_action_model.dart';
 import 'package:new_ara_app/models/comment_nested_comment_list_action_model.dart';
 import 'package:new_ara_app/models/scrap_create_action_model.dart';
-import 'package:new_ara_app/utils/article_content_info.dart';
-import 'package:new_ara_app/utils/comment_content_info.dart';
+import 'package:new_ara_app/utils/html_info.dart';
 
 class PostViewPage extends StatefulWidget {
   final int articleID;
@@ -245,8 +244,7 @@ class _PostViewPageState extends State<PostViewPage> {
                                 thickness: 1,
                               ),
                               InArticleWebView(
-                                content: getArticleContentHtml(
-                                    MediaQuery.of(context).size.width - 40,
+                                content: getContentHtml(
                                     article.content ?? "내용이 존재하지 않습니다."),
                                 initialHeight: 150,
                               ),
@@ -1386,7 +1384,7 @@ class _PostViewPageState extends State<PostViewPage> {
       );
     }
     return InArticleWebView(
-      content: getCommentContentHtml(content),
+      content: getContentHtml(content),
       initialHeight: 10,
     );
   }
@@ -1837,7 +1835,7 @@ class _InArticleWebViewState extends State<InArticleWebView> {
               'code: ${error.errorCode}\ndescription: ${error.description}\nerrorType: ${error.errorType}\nisForMainFrame: ${error.isForMainFrame}');
         },
       ))
-      ..loadFlutterAsset('assets/webview/article_content.html');
+      ..loadHtmlString(widget.content);
   }
 
   @override
