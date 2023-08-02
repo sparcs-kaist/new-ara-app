@@ -57,7 +57,8 @@ class _PostWritePageState extends State<PostWritePage> {
   late bool _permissionReady;
   late TargetPlatform? platform;
 
-  HtmlEditorController htmlController = HtmlEditorController();
+  var _titleController = TextEditingController();
+  final HtmlEditorController _htmlController = HtmlEditorController();
 
   @override
   void initState() {
@@ -202,18 +203,57 @@ class _PostWritePageState extends State<PostWritePage> {
           ),
         ),
         actions: [
-          ElevatedButton(
+          // ElevatedButton(
+          //   onPressed: () async {
+          //     Dio dio = Dio();
+          //     dio.options.headers['Cookie'] = userProvider.getCookiesToString();
+          //     try {
+          //       var response = await dio.post(
+          //         '$newAraDefaultUrl/api/articles/',
+          //         data: {
+          //           'title': 'post 테스트 03:11',
+          //           'content':
+          //               '<p><img src="https://sparcs-newara-dev.s3.amazonaws.com/files/%E1%84%89%E1%85%B3%E1%84%8F%E1%85%B3%E1%84%85%E1%85%B5%E1%86%AB%E1%84%89%E1%85%A3%E1%86%BA_2023-05-24_%E1%84%8B%E1%85%A9%E1%84%8C%E1%85%A5%E1%86%AB_6.01.21.png" width="500" data-attachment="210"></p>',
+          //           'attachments': [210],
+          //           'parent_topic': '',
+          //           'is_content_sexual': false,
+          //           'is_content_social': false,
+          //           'parent_board': 2,
+          //           'name_type': 'REGULAR'
+          //         },
+          //       );
+          //       debugPrint('Response data: ${response.data}');
+          //     } catch (e) {
+          //       debugPrint('Error: $e');
+          //     }
+          //   },
+          //   child: Text("게시물 내용"),
+          // ),
+          MaterialButton(
             onPressed: () async {
-              Dio dio = Dio();
-              dio.options.headers['Cookie'] = userProvider.getCookiesToString();
+              var titleValue;
+              var contentValue;
               try {
+                titleValue = _titleController.text;
+                contentValue = await _htmlController.getText();
+                debugPrint("title: $titleValue");
+                debugPrint("content: $contentValue");
+              } catch (error) {
+                debugPrint(error.toString());
+                return;
+              }
+
+              try {
+                Dio dio = Dio();
+                dio.options.headers['Cookie'] =
+                    userProvider.getCookiesToString();
+
                 var response = await dio.post(
                   '$newAraDefaultUrl/api/articles/',
                   data: {
-                    'title': 'post 테스트 03:11',
-                    'content':
-                        '<p><img src="https://sparcs-newara-dev.s3.amazonaws.com/files/%E1%84%89%E1%85%B3%E1%84%8F%E1%85%B3%E1%84%85%E1%85%B5%E1%86%AB%E1%84%89%E1%85%A3%E1%86%BA_2023-05-24_%E1%84%8B%E1%85%A9%E1%84%8C%E1%85%A5%E1%86%AB_6.01.21.png" width="500" data-attachment="210"></p>',
-                    'attachments': [210],
+                    'title': titleValue,
+                    'content': contentValue,
+                    'attachments': [],
                     'parent_topic': '',
                     'is_content_sexual': false,
                     'is_content_social': false,
@@ -222,36 +262,35 @@ class _PostWritePageState extends State<PostWritePage> {
                   },
                 );
                 debugPrint('Response data: ${response.data}');
-              } catch (e) {
-                debugPrint('Error: $e');
+              } catch (error) {
+                debugPrint('Error: $error');
+                return;
               }
-            },
-            child: Text("게시물 내용"),
-          ),
-          MaterialButton(
-            onPressed: () async {
-              if (imagePickerFile != null) {
-                var filePath = imagePickerResult.path;
-                var filename = filePath.split("/").last;
-                var formData = FormData.fromMap({
-                  "file":
-                      await MultipartFile.fromFile(filePath, filename: filename)
-                });
-                Dio dio = Dio();
-                dio.options.headers['Cookie'] =
-                    userProvider.getCookiesToString();
-                try {
-                  var response = await dio.post(
-                      '$newAraDefaultUrl/api/attachments/',
-                      data: formData);
-                  print('Post request successful');
-                  print('Response: $response.data');
-                } catch (error) {
-                  // Request failed
-                  print('Post request failed with status code $error');
-                  //  print('Response: $responseData');
-                }
-              }
+              // htmlController.getText().then((value) {
+              //   debugPrint(value);
+              // });
+              // if (imagePickerFile != null) {
+              //   var filePath = imagePickerResult.path;
+              //   var filename = filePath.split("/").last;
+              //   var formData = FormData.fromMap({
+              //     "file":
+              //         await MultipartFile.fromFile(filePath, filename: filename)
+              //   });
+              //   Dio dio = Dio();
+              //   dio.options.headers['Cookie'] =
+              //       userProvider.getCookiesToString();
+              //   try {
+              //     var response = await dio.post(
+              //         '$newAraDefaultUrl/api/attachments/',
+              //         data: formData);
+              //     print('Post request successful');
+              //     print('Response: $response.data');
+              //   } catch (error) {
+              //     // Request failed
+              //     print('Post request failed with status code $error');
+              //     //  print('Response: $responseData');
+              //   }
+              // }
             },
             // 버튼이 클릭되었을 때 수행할 동작
             padding: EdgeInsets.zero, // 패딩 제거
@@ -270,58 +309,58 @@ class _PostWritePageState extends State<PostWritePage> {
               ),
             ),
           ),
-          ElevatedButton(
-            onPressed: () async {
-              for (int i = 0; i < attachmentsList.length; i++) {
-                var attachFile = File(attachmentsList[i].filePath!);
+          // ElevatedButton(
+          //   onPressed: () async {
+          //     for (int i = 0; i < attachmentsList.length; i++) {
+          //       var attachFile = File(attachmentsList[i].filePath!);
 
-                // 파일이 존재하는지 확인
-                if (attachFile.existsSync()) {
-                  var dio = Dio();
-                  dio.options.headers['Cookie'] =
-                      userProvider.getCookiesToString();
-                  var formData = FormData.fromMap({
-                    "file": await MultipartFile.fromFile(attachFile.path,
-                        filename: attachFile.path
-                            .split('/')
-                            .last), // You may need to replace '/' with '\\' if you're using Windows.
-                  });
-                  try {
-                    var response = await dio.post(
-                        "$newAraDefaultUrl/api/attachments/",
-                        data: formData);
-                    print(response.data);
-                  } catch (error) {
-                    debugPrint("$error");
-                  }
-                } else {
-                  debugPrint("File does not exist: ${attachFile.path}");
-                }
-              }
-            },
-            child: Text("파일 올리기 테스트"),
-          ),
-          ElevatedButton(
-            onPressed: () async {
-              final String fileUrl =
-                  "https://sparcs-newara-dev.s3.amazonaws.com/files/lizard-7938887_1280_eAHShfM.webp";
+          //       // 파일이 존재하는지 확인
+          //       if (attachFile.existsSync()) {
+          //         var dio = Dio();
+          //         dio.options.headers['Cookie'] =
+          //             userProvider.getCookiesToString();
+          //         var formData = FormData.fromMap({
+          //           "file": await MultipartFile.fromFile(attachFile.path,
+          //               filename: attachFile.path
+          //                   .split('/')
+          //                   .last), // You may need to replace '/' with '\\' if you're using Windows.
+          //         });
+          //         try {
+          //           var response = await dio.post(
+          //               "$newAraDefaultUrl/api/attachments/",
+          //               data: formData);
+          //           print(response.data);
+          //         } catch (error) {
+          //           debugPrint("$error");
+          //         }
+          //       } else {
+          //         debugPrint("File does not exist: ${attachFile.path}");
+          //       }
+          //     }
+          //   },
+          //   child: Text("파일 올리기 테스트"),
+          // ),
+          // ElevatedButton(
+          //   onPressed: () async {
+          //     final String fileUrl =
+          //         "https://sparcs-newara-dev.s3.amazonaws.com/files/lizard-7938887_1280_eAHShfM.webp";
 
-              _permissionReady = await _checkPermission();
-              debugPrint("Click");
-              if (_permissionReady) {
-                await _prepareSaveDir();
-                debugPrint("Downloading");
-                try {
-                  await Dio()
-                      .download(fileUrl, _localPath + "/" + "filename.jpg");
-                  debugPrint("Download Completed.");
-                } catch (e) {
-                  debugPrint("Download Failed.\n\n" + e.toString());
-                }
-              }
-            },
-            child: Text("파일 다운"),
-          ),
+          //     _permissionReady = await _checkPermission();
+          //     debugPrint("Click");
+          //     if (_permissionReady) {
+          //       await _prepareSaveDir();
+          //       debugPrint("Downloading");
+          //       try {
+          //         await Dio()
+          //             .download(fileUrl, _localPath + "/" + "filename.jpg");
+          //         debugPrint("Download Completed.");
+          //       } catch (e) {
+          //         debugPrint("Download Failed.\n\n" + e.toString());
+          //       }
+          //     }
+          //   },
+          //   child: Text("파일 다운"),
+          // ),
         ],
       ),
       body: SafeArea(
@@ -441,7 +480,8 @@ class _PostWritePageState extends State<PostWritePage> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const TextField(
+                  TextField(
+                    controller: _titleController,
                     minLines: 1,
                     maxLines: 1,
                     style: TextStyle(
@@ -450,7 +490,7 @@ class _PostWritePageState extends State<PostWritePage> {
                       fontWeight: FontWeight.w700,
                     ),
                     decoration: InputDecoration(
-                      hintText: "제목을 입력하세요",
+                      hintText: "제목을 입력해주세요.",
                       hintStyle: TextStyle(
                           fontSize: 22,
                           color: Color(0xFFBBBBBB),
@@ -481,14 +521,35 @@ class _PostWritePageState extends State<PostWritePage> {
                     height: 1,
                     color: Color(0xFFF0F0F0),
                   ),
-                  HtmlEditor(
-                    controller: htmlController, //required
-                    htmlEditorOptions: HtmlEditorOptions(
-                      hint: "Your text here...",
-                      //initalText: "text content initial, if any",
-                    ),
-                    otherOptions: OtherOptions(
-                      height: 1000,
+                  Expanded(
+                    child: HtmlEditor(
+                      controller: _htmlController, //required
+                      htmlEditorOptions: HtmlEditorOptions(
+                        hint: "내용을 입력해주세요.",
+
+                        //initalText: "text content initial, if any",
+                      ),
+                      htmlToolbarOptions: HtmlToolbarOptions(
+                          toolbarType: ToolbarType.nativeGrid,
+                          defaultToolbarButtons: [
+                            // FontSettingButtons(),
+                            FontButtons(
+                              bold: true,
+                              italic: true,
+                              underline: true,
+                              clearAll: true,
+                              strikethrough: true,
+                              superscript: false,
+                              subscript: false,
+
+                              // StyleButtons(
+                            ),
+                            // ColorButtons(),
+                          ]),
+
+                      otherOptions: OtherOptions(
+                        height: 1000,
+                      ),
                     ),
                   ),
                   // Text(
