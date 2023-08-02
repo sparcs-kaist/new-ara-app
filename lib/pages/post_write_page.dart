@@ -311,6 +311,32 @@ class _PostWritePageState extends State<PostWritePage> {
                 Dio dio = Dio();
                 dio.options.headers['Cookie'] =
                     userProvider.getCookiesToString();
+                    for (int i = 0; i < attachmentsList.length; i++) {
+                var attachFile = File(attachmentsList[i].filePath!);
+
+                // 파일이 존재하는지 확인
+                if (attachFile.existsSync()) {
+                  var dio = Dio();
+                  dio.options.headers['Cookie'] =
+                      userProvider.getCookiesToString();
+                  var formData = FormData.fromMap({
+                    "file": await MultipartFile.fromFile(attachFile.path,
+                        filename: attachFile.path
+                            .split('/')
+                            .last), // You may need to replace '/' with '\\' if you're using Windows.
+                  });
+                  try {
+                    var response = await dio.post(
+                        "$newAraDefaultUrl/api/attachments/",
+                        data: formData);
+                    print(response.data);
+                  } catch (error) {
+                    debugPrint("$error");
+                  }
+                } else {
+                  debugPrint("File does not exist: ${attachFile.path}");
+                }
+              }
 
                 var response = await dio.post(
                   '$newAraDefaultUrl/api/articles/',
