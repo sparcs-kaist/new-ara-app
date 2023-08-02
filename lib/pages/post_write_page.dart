@@ -9,6 +9,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:new_ara_app/constants/colors_info.dart';
+import 'package:new_ara_app/models/board_detail_action_model.dart';
+import 'package:new_ara_app/models/board_group_model.dart';
+import 'package:new_ara_app/models/board_model.dart';
+import 'package:new_ara_app/models/simple_board_model.dart';
+import 'package:new_ara_app/models/topic_model.dart';
+import 'package:new_ara_app/widgetclasses/loading_indicator.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
 
@@ -42,18 +48,35 @@ class AttachmentsFormat {
 }
 
 class _PostWritePageState extends State<PostWritePage> {
+
+  final MALNO = TopicModel(
+      id: -1,
+      slug: "",
+      ko_name: "말머리 없음",
+      en_name: "No Topic",
+    );
+  final SELECTBOARD = BoardDetailActionModel(id: -1, topics: [], user_readable: true, user_writable: true, slug: '', ko_name: '게시판을 선택하세요', en_name: 'No Board', group: SimpleBoardModel(id: -1, slug: '', ko_name: '', en_name: ''),);
+  
+
   List<bool?> selectedCheckboxes = [true, false, false];
-  bool isFileMenuBarSelected = false;
-  String? _chosenBoardValue = "학생 단체";
-  String? _chosenTopicValue = "학생 단체";
+  bool isFileMenuBarSelected = false; // 첨부파일 메뉴바가 선택되었는가?
+
+  BoardDetailActionModel? _chosenBoardValue;
+  TopicModel? _chosenTopicValue;
+
+  List<BoardDetailActionModel> _boardList = [];
+  List<TopicModel> _specTopicList = [];
+
   File? imagePickerFile;
   File? filePickerFile;
+  bool _isLoading = true;
   var imagePickerResult;
   FilePickerResult? filePickerResult;
 
   List<AttachmentsFormat> attachmentsList = [];
 
   late String _localPath;
+
   late bool _permissionReady;
   late TargetPlatform? platform;
 
@@ -69,6 +92,7 @@ class _PostWritePageState extends State<PostWritePage> {
     } else {
       platform = TargetPlatform.iOS;
     }
+    _getBoardList();
   }
 
   Future<bool> _checkPermission() async {
@@ -111,8 +135,48 @@ class _PostWritePageState extends State<PostWritePage> {
     }
   }
 
+  Future<void> _getBoardList() async {
+    var userProvider = context.read<UserProvider>();
+    try {
+      Dio dio = Dio();
+      dio.options.headers['Cookie'] = userProvider.getCookiesToString();
+      var response = await dio.get('$newAraDefaultUrl/api/boards/');
+      debugPrint(response.data.toString());
+
+      _boardList = [SELECTBOARD];
+      for (Map<String, dynamic> json in response.data) {
+        try {
+          BoardDetailActionModel boardDetail =
+              BoardDetailActionModel.fromJson(json);
+
+          if (boardDetail.user_writable == true) {
+            _boardList.add(boardDetail);
+          } else {
+            // Optionally, you can do something with entries where user_writable is false
+            // For example, you can skip them or perform any other action
+          }
+        } catch (error) {
+          debugPrint(
+              "refreshBoardList BoardDetailActionModel.fromJson failed: $error");
+          return;
+        }
+      }
+    } catch (error) {
+      return;
+    }
+    setState(() {
+      _specTopicList.add(MALNO);
+
+      _chosenTopicValue = _specTopicList[0];
+      _chosenBoardValue = _boardList[0];
+      _isLoading = false;
+    });
+    return;
+  }
+
   @override
   Widget build(BuildContext context) {
+    if (_isLoading) return LoadingIndicator();
     var userProvider = context.watch<UserProvider>();
 
     Future<void> _filePick() async {
@@ -254,10 +318,10 @@ class _PostWritePageState extends State<PostWritePage> {
                     'title': titleValue,
                     'content': contentValue,
                     'attachments': [],
-                    'parent_topic': '',
+                    'parent_topic': _chosenTopicValue!.id ==-1? '' : _chosenTopicValue!.id,
                     'is_content_sexual': false,
                     'is_content_social': false,
-                    'parent_board': 2,
+                    'parent_board': _chosenBoardValue!.id,
                     'name_type': 'REGULAR'
                   },
                 );
@@ -378,7 +442,7 @@ class _PostWritePageState extends State<PostWritePage> {
                         borderRadius: BorderRadius.circular(20.0),
                       ),
                       child: DropdownButtonHideUnderline(
-                        child: DropdownButton<String>(
+                        child: DropdownButton<BoardDetailActionModel>(
                           //  isDense: true,
                           //isExpanded: true,
 
@@ -388,16 +452,18 @@ class _PostWritePageState extends State<PostWritePage> {
                           //isExpanded: true,
                           value: _chosenBoardValue,
                           style: TextStyle(color: Colors.red),
-                          items: <String>['학생 단체', '구인구직', '중고거래', '교내업체피드백']
-                              .map<DropdownMenuItem<String>>((String value) {
-                            return DropdownMenuItem<String>(
+                          items: _boardList
+                              .map<DropdownMenuItem<BoardDetailActionModel>>(
+                                  (BoardDetailActionModel value) {
+                            return DropdownMenuItem<BoardDetailActionModel>(
+                              enabled: value.id != -1,
                               value: value,
                               child: Padding(
                                 padding: const EdgeInsets.only(left: 12.0),
                                 child: Text(
-                                  value,
+                                  value.ko_name,
                                   style: TextStyle(
-                                    color: value == "말머리 없음"
+                                    color: value.id==-1
                                         ? Color(0xFFBBBBBB)
                                         : ColorsInfo.newara,
                                     fontWeight: FontWeight.w500,
@@ -407,8 +473,14 @@ class _PostWritePageState extends State<PostWritePage> {
                               ),
                             );
                           }).toList(),
-                          onChanged: (String? value) {
+                          onChanged: (BoardDetailActionModel? value) {
                             setState(() {
+                              _specTopicList = [];
+                              _specTopicList.add(MALNO);
+                              for (TopicModel topic in value!.topics) {
+                                _specTopicList.add(topic);
+                              }
+                              _chosenTopicValue = _specTopicList[0];
                               _chosenBoardValue = value;
                             });
                           },
@@ -426,7 +498,7 @@ class _PostWritePageState extends State<PostWritePage> {
                         borderRadius: BorderRadius.circular(20.0),
                       ),
                       child: DropdownButtonHideUnderline(
-                        child: DropdownButton<String>(
+                        child: DropdownButton<TopicModel>(
                           //  isDense: true,
                           //isExpanded: true,
 
@@ -436,23 +508,19 @@ class _PostWritePageState extends State<PostWritePage> {
                           //isExpanded: true,
                           value: _chosenTopicValue,
                           style: TextStyle(color: Colors.red),
-                          items: <String>[
-                            '말머리 없음',
-                            '학생 단체',
-                            '구인구직',
-                            '중고거래',
-                            '교내업체피드백'
-                          ].map<DropdownMenuItem<String>>((String value) {
-                            return DropdownMenuItem<String>(
+                          items: _specTopicList
+                              .map<DropdownMenuItem<TopicModel>>(
+                                  (TopicModel value) {
+                            return DropdownMenuItem<TopicModel>(
                               value: value,
                               child: Padding(
                                 padding: const EdgeInsets.only(left: 12.0),
                                 child: Text(
-                                  value,
+                                  value.ko_name,
                                   style: TextStyle(
-                                    color: value == "말머리 없음"
+                                    color: value.id==-1
                                         ? Color(0xFFBBBBBB)
-                                        : ColorsInfo.newara,
+                                        : Colors.black,
                                     fontWeight: FontWeight.w500,
                                     fontSize: 16,
                                   ),
@@ -460,7 +528,7 @@ class _PostWritePageState extends State<PostWritePage> {
                               ),
                             );
                           }).toList(),
-                          onChanged: (String? value) {
+                          onChanged: (TopicModel? value) {
                             setState(() {
                               _chosenTopicValue = value;
                             });
