@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:dio/dio.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:html_editor_enhanced/html_editor.dart';
 import 'package:new_ara_app/constants/url_info.dart';
 import 'dart:io';
 import 'package:http/http.dart' as http;
@@ -29,7 +30,7 @@ enum FileType {
 
 class AttachmentsFormat {
   FileType fileType;
-  bool isNewFile;
+  bool isNewFile; // 수정 시에 추가한 파일인가?
   String? filePath;
   Map<String, dynamic>? json;
   AttachmentsFormat({
@@ -49,12 +50,14 @@ class _PostWritePageState extends State<PostWritePage> {
   File? filePickerFile;
   var imagePickerResult;
   FilePickerResult? filePickerResult;
-  
+
   List<AttachmentsFormat> attachmentsList = [];
 
   late String _localPath;
   late bool _permissionReady;
-  late TargetPlatform? platform;  
+  late TargetPlatform? platform;
+
+  HtmlEditorController htmlController = HtmlEditorController();
 
   @override
   void initState() {
@@ -66,6 +69,7 @@ class _PostWritePageState extends State<PostWritePage> {
       platform = TargetPlatform.iOS;
     }
   }
+
   Future<bool> _checkPermission() async {
     if (platform == TargetPlatform.android) {
       final status = await Permission.storage.status;
@@ -85,7 +89,8 @@ class _PostWritePageState extends State<PostWritePage> {
     }
     return false;
   }
-   Future<String?> _findLocalPath() async {
+
+  Future<String?> _findLocalPath() async {
     if (platform == TargetPlatform.android) {
       return "/sdcard/download/";
     } else {
@@ -93,7 +98,7 @@ class _PostWritePageState extends State<PostWritePage> {
       return directory.path + Platform.pathSeparator + 'Download';
     }
   }
-  
+
   Future<void> _prepareSaveDir() async {
     _localPath = (await _findLocalPath())!;
 
@@ -113,18 +118,34 @@ class _PostWritePageState extends State<PostWritePage> {
       filePickerResult = await FilePicker.platform.pickFiles();
       if (filePickerResult != null) {
         debugPrint(filePickerResult!.files.single.path!);
+        File file = File(filePickerResult!.files.single.path!);
+        if (Platform.isIOS) {
+          // iOS에서는 파일을 복사해서 사용해야 함. 캐쉬로 날라가는 문제 발생.
+          final documentPath = (await getApplicationDocumentsDirectory()).path;
+          file = await file.copy('$documentPath/${path.basename(file.path)}');
+          debugPrint("IOS run");
+          debugPrint(file.path);
+          debugPrint(filePickerResult!.files.single.path);
+        }
+
         setState(() {
           isFileMenuBarSelected = true;
-          attachmentsList.add(AttachmentsFormat(fileType: FileType.Other, isNewFile: true, filePath: filePickerResult!.files.single.path!));
+          attachmentsList.add(AttachmentsFormat(
+            fileType: FileType.Other,
+            isNewFile: true,
+            filePath: file.path,
+          ));
         });
       }
     }
-    Future<void> _imagePick()async{
-      imagePickerResult = await ImagePicker().pickImage(source: ImageSource.gallery);
+
+    Future<void> _imagePick() async {
+      imagePickerResult =
+          await ImagePicker().pickImage(source: ImageSource.gallery);
       if (imagePickerResult != null) {
         debugPrint(imagePickerResult.path);
         setState(() {
-          imagePickerFile =File(imagePickerResult.path);
+          imagePickerFile = File(imagePickerResult.path);
         });
       }
     }
@@ -143,6 +164,7 @@ class _PostWritePageState extends State<PostWritePage> {
         return '${gb.toStringAsFixed(2)} GB'; // 기가바이트(GB) 단위로 표시
       }
     }
+
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
@@ -189,8 +211,9 @@ class _PostWritePageState extends State<PostWritePage> {
                   '$newAraDefaultUrl/api/articles/',
                   data: {
                     'title': 'post 테스트 03:11',
-                    'content': '<p><img src="https://sparcs-newara-dev.s3.amazonaws.com/files/%E1%84%89%E1%85%B3%E1%84%8F%E1%85%B3%E1%84%85%E1%85%B5%E1%86%AB%E1%84%89%E1%85%A3%E1%86%BA_2023-05-24_%E1%84%8B%E1%85%A9%E1%84%8C%E1%85%A5%E1%86%AB_6.01.21.png" width="500" data-attachment="170"></p>',
-                    'attachments': [170],
+                    'content':
+                        '<p><img src="https://sparcs-newara-dev.s3.amazonaws.com/files/%E1%84%89%E1%85%B3%E1%84%8F%E1%85%B3%E1%84%85%E1%85%B5%E1%86%AB%E1%84%89%E1%85%A3%E1%86%BA_2023-05-24_%E1%84%8B%E1%85%A9%E1%84%8C%E1%85%A5%E1%86%AB_6.01.21.png" width="500" data-attachment="210"></p>',
+                    'attachments': [210],
                     'parent_topic': '',
                     'is_content_sexual': false,
                     'is_content_social': false,
@@ -210,11 +233,17 @@ class _PostWritePageState extends State<PostWritePage> {
               if (imagePickerFile != null) {
                 var filePath = imagePickerResult.path;
                 var filename = filePath.split("/").last;
-                var formData = FormData.fromMap({"file": await MultipartFile.fromFile(filePath, filename: filename)});
+                var formData = FormData.fromMap({
+                  "file":
+                      await MultipartFile.fromFile(filePath, filename: filename)
+                });
                 Dio dio = Dio();
-                dio.options.headers['Cookie'] = userProvider.getCookiesToString();
+                dio.options.headers['Cookie'] =
+                    userProvider.getCookiesToString();
                 try {
-                  var response = await dio.post('$newAraDefaultUrl/api/attachments/', data: formData);
+                  var response = await dio.post(
+                      '$newAraDefaultUrl/api/attachments/',
+                      data: formData);
                   print('Post request successful');
                   print('Response: $response.data');
                 } catch (error) {
@@ -243,51 +272,56 @@ class _PostWritePageState extends State<PostWritePage> {
           ),
           ElevatedButton(
             onPressed: () async {
-              if (filePickerResult != null) {
-                filePickerFile = File(filePickerResult!.files.single.path!);
-                debugPrint("!null");
-                // Create dio
-                var dio = Dio();
-                dio.options.headers['Cookie'] = userProvider.getCookiesToString();
+              for (int i = 0; i < attachmentsList.length; i++) {
+                var attachFile = File(attachmentsList[i].filePath!);
 
-                // Create FormData
-                var formData = FormData.fromMap({
-                  "file": await MultipartFile.fromFile(filePickerFile!.path, filename: filePickerFile!.path.split('/').last), // You may need to replace '/' with '\\' if you're using Windows.
-                });
-
-                // Post data with dio
-                try {
-                  var response = await dio.post("$newAraDefaultUrl/api/attachments/", data: formData);
-                  print(response.data);
-                } catch (error) {
-                  debugPrint("$error");
+                // 파일이 존재하는지 확인
+                if (attachFile.existsSync()) {
+                  var dio = Dio();
+                  dio.options.headers['Cookie'] =
+                      userProvider.getCookiesToString();
+                  var formData = FormData.fromMap({
+                    "file": await MultipartFile.fromFile(attachFile.path,
+                        filename: attachFile.path
+                            .split('/')
+                            .last), // You may need to replace '/' with '\\' if you're using Windows.
+                  });
+                  try {
+                    var response = await dio.post(
+                        "$newAraDefaultUrl/api/attachments/",
+                        data: formData);
+                    print(response.data);
+                  } catch (error) {
+                    debugPrint("$error");
+                  }
+                } else {
+                  debugPrint("File does not exist: ${attachFile.path}");
                 }
               }
             },
-            child: Text("파일"),
+            child: Text("파일 올리기 테스트"),
           ),
           ElevatedButton(
             onPressed: () async {
-                  final String fileUrl = "https://sparcs-newara-dev.s3.amazonaws.com/files/lizard-7938887_1280_eAHShfM.webp";
+              final String fileUrl =
+                  "https://sparcs-newara-dev.s3.amazonaws.com/files/lizard-7938887_1280_eAHShfM.webp";
 
-                
-                  _permissionReady = await _checkPermission();
-                  debugPrint("Click");
-          if (_permissionReady) {
-            await _prepareSaveDir();
-            debugPrint("Downloading");
-            try {
-              await Dio().download(fileUrl,
-                  _localPath + "/" + "filename.jpg");
-              debugPrint("Download Completed.");
-            } catch (e) {
-              debugPrint("Download Failed.\n\n" + e.toString());
-            }
-          }
+              _permissionReady = await _checkPermission();
+              debugPrint("Click");
+              if (_permissionReady) {
+                await _prepareSaveDir();
+                debugPrint("Downloading");
+                try {
+                  await Dio()
+                      .download(fileUrl, _localPath + "/" + "filename.jpg");
+                  debugPrint("Download Completed.");
+                } catch (e) {
+                  debugPrint("Download Failed.\n\n" + e.toString());
+                }
+              }
             },
             child: Text("파일 다운"),
           ),
-          
         ],
       ),
       body: SafeArea(
@@ -315,7 +349,8 @@ class _PostWritePageState extends State<PostWritePage> {
                           //isExpanded: true,
                           value: _chosenBoardValue,
                           style: TextStyle(color: Colors.red),
-                          items: <String>['학생 단체', '구인구직', '중고거래', '교내업체피드백'].map<DropdownMenuItem<String>>((String value) {
+                          items: <String>['학생 단체', '구인구직', '중고거래', '교내업체피드백']
+                              .map<DropdownMenuItem<String>>((String value) {
                             return DropdownMenuItem<String>(
                               value: value,
                               child: Padding(
@@ -323,7 +358,9 @@ class _PostWritePageState extends State<PostWritePage> {
                                 child: Text(
                                   value,
                                   style: TextStyle(
-                                    color: value == "말머리 없음" ? Color(0xFFBBBBBB) : ColorsInfo.newara,
+                                    color: value == "말머리 없음"
+                                        ? Color(0xFFBBBBBB)
+                                        : ColorsInfo.newara,
                                     fontWeight: FontWeight.w500,
                                     fontSize: 16,
                                   ),
@@ -360,7 +397,13 @@ class _PostWritePageState extends State<PostWritePage> {
                           //isExpanded: true,
                           value: _chosenTopicValue,
                           style: TextStyle(color: Colors.red),
-                          items: <String>['말머리 없음', '학생 단체', '구인구직', '중고거래', '교내업체피드백'].map<DropdownMenuItem<String>>((String value) {
+                          items: <String>[
+                            '말머리 없음',
+                            '학생 단체',
+                            '구인구직',
+                            '중고거래',
+                            '교내업체피드백'
+                          ].map<DropdownMenuItem<String>>((String value) {
                             return DropdownMenuItem<String>(
                               value: value,
                               child: Padding(
@@ -368,7 +411,9 @@ class _PostWritePageState extends State<PostWritePage> {
                                 child: Text(
                                   value,
                                   style: TextStyle(
-                                    color: value == "말머리 없음" ? Color(0xFFBBBBBB) : ColorsInfo.newara,
+                                    color: value == "말머리 없음"
+                                        ? Color(0xFFBBBBBB)
+                                        : ColorsInfo.newara,
                                     fontWeight: FontWeight.w500,
                                     fontSize: 16,
                                   ),
@@ -406,7 +451,10 @@ class _PostWritePageState extends State<PostWritePage> {
                     ),
                     decoration: InputDecoration(
                       hintText: "제목을 입력하세요",
-                      hintStyle: TextStyle(fontSize: 22, color: Color(0xFFBBBBBB), fontWeight: FontWeight.w700),
+                      hintStyle: TextStyle(
+                          fontSize: 22,
+                          color: Color(0xFFBBBBBB),
+                          fontWeight: FontWeight.w700),
 
                       filled: true,
                       fillColor: Colors.white,
@@ -433,14 +481,24 @@ class _PostWritePageState extends State<PostWritePage> {
                     height: 1,
                     color: Color(0xFFF0F0F0),
                   ),
-                  Text(
-                    "내용도 입력해봐=ㅆ어ㅛ내용도 입력해봐=ㅆ어ㅛ내용도 입력해봐=ㅆ어ㅛ내용도 입력해봐=ㅆ어ㅛ내용도 입력해봐=ㅆ어ㅛ내용도 입력해봐=ㅆ어ㅛ내용도 입력해봐=ㅆ어ㅛ내용도 입력해봐=ㅆ어ㅛ내용도 입력해봐=ㅆ어ㅛ내용도 입력해봐=ㅆ어ㅛ",
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w500,
+                  HtmlEditor(
+                    controller: htmlController, //required
+                    htmlEditorOptions: HtmlEditorOptions(
+                      hint: "Your text here...",
+                      //initalText: "text content initial, if any",
+                    ),
+                    otherOptions: OtherOptions(
+                      height: 1000,
                     ),
                   ),
-                  if (imagePickerFile != null) Image.file(imagePickerFile!),
+                  // Text(
+                  //   "내용도 입력해봐=ㅆ어ㅛ내용도 입력해봐=ㅆ어ㅛ내용도 입력해봐=ㅆ어ㅛ내용도 입력해봐=ㅆ어ㅛ내용도 입력해봐=ㅆ어ㅛ내용도 입력해봐=ㅆ어ㅛ내용도 입력해봐=ㅆ어ㅛ내용도 입력해봐=ㅆ어ㅛ내용도 입력해봐=ㅆ어ㅛ내용도 입력해봐=ㅆ어ㅛ",
+                  //   style: TextStyle(
+                  //     fontSize: 16,
+                  //     fontWeight: FontWeight.w500,
+                  //   ),
+                  // ),
+                  // if (imagePickerFile != null) Image.file(imagePickerFile!),
                 ],
               ),
             ),
@@ -480,7 +538,10 @@ class _PostWritePageState extends State<PostWritePage> {
                                   ),
                                   Text(
                                     "첨부파일 추가",
-                                    style: TextStyle(fontWeight: FontWeight.w500, fontSize: 16, color: Color(0xFF636363)),
+                                    style: TextStyle(
+                                        fontWeight: FontWeight.w500,
+                                        fontSize: 16,
+                                        color: Color(0xFF636363)),
                                   ),
                                 ],
                               ),
@@ -524,7 +585,8 @@ class _PostWritePageState extends State<PostWritePage> {
                               InkWell(
                                 onTap: () {
                                   setState(() {
-                                    isFileMenuBarSelected = !isFileMenuBarSelected;
+                                    isFileMenuBarSelected =
+                                        !isFileMenuBarSelected;
                                   });
                                 },
                                 child: SvgPicture.asset(
@@ -551,7 +613,8 @@ class _PostWritePageState extends State<PostWritePage> {
                           ),
                           if (isFileMenuBarSelected) ...[
                             Padding(
-                              padding: const EdgeInsets.symmetric(horizontal: 15),
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 15),
                               child: Column(
                                 children: [
                                   SizedBox(
@@ -571,10 +634,13 @@ class _PostWritePageState extends State<PostWritePage> {
                                             height: 44,
                                             decoration: BoxDecoration(
                                               border: Border.all(
-                                                color: Color(0xFFF0F0F0), // #F0F0F0 색상
+                                                color: Color(
+                                                    0xFFF0F0F0), // #F0F0F0 색상
                                                 width: 1, // 테두리 두께 1픽셀
                                               ),
-                                              borderRadius: BorderRadius.circular(15), // 반지름 15
+                                              borderRadius:
+                                                  BorderRadius.circular(
+                                                      15), // 반지름 15
                                             ),
                                             child: Row(
                                               children: [
@@ -598,20 +664,30 @@ class _PostWritePageState extends State<PostWritePage> {
                                                 ),
                                                 Expanded(
                                                   child: Text(
-                                                    path.basename(attachmentsList[index].filePath!),
+                                                    path.basename(
+                                                        attachmentsList[index]
+                                                            .filePath!),
                                                   ),
                                                 ),
                                                 SizedBox(
                                                   width: 3,
                                                 ),
                                                 Text(
-                                                  formatBytes(File(attachmentsList[index].filePath!).lengthSync()),
-                                                  style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500, color: Color(0xFFBBBBBB)),
+                                                  formatBytes(File(
+                                                          attachmentsList[index]
+                                                              .filePath!)
+                                                      .lengthSync()),
+                                                  style: TextStyle(
+                                                      fontSize: 14,
+                                                      fontWeight:
+                                                          FontWeight.w500,
+                                                      color: Color(0xFFBBBBBB)),
                                                 ),
                                                 InkWell(
-                                                  onTap: (){
-                                                    setState((){
-                                                      attachmentsList.removeAt(index);
+                                                  onTap: () {
+                                                    setState(() {
+                                                      attachmentsList
+                                                          .removeAt(index);
                                                     });
                                                   },
                                                   child: SvgPicture.asset(
@@ -657,7 +733,9 @@ class _PostWritePageState extends State<PostWritePage> {
                           width: 20,
                           height: 20,
                           decoration: BoxDecoration(
-                            color: selectedCheckboxes[0]! ? ColorsInfo.newara : Color(0xFFF0F0F0),
+                            color: selectedCheckboxes[0]!
+                                ? ColorsInfo.newara
+                                : Color(0xFFF0F0F0),
                             borderRadius: BorderRadius.circular(5.0),
                           ),
                           alignment: Alignment.center,
@@ -677,7 +755,9 @@ class _PostWritePageState extends State<PostWritePage> {
                         style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w500,
-                          color: selectedCheckboxes[0]! ? ColorsInfo.newara : Color(0xFFBBBBBB),
+                          color: selectedCheckboxes[0]!
+                              ? ColorsInfo.newara
+                              : Color(0xFFBBBBBB),
                         ),
                       ),
                       SizedBox(
@@ -693,7 +773,9 @@ class _PostWritePageState extends State<PostWritePage> {
                           width: 20,
                           height: 20,
                           decoration: BoxDecoration(
-                            color: selectedCheckboxes[1]! ? ColorsInfo.newara : Color(0xFFF0F0F0),
+                            color: selectedCheckboxes[1]!
+                                ? ColorsInfo.newara
+                                : Color(0xFFF0F0F0),
                             borderRadius: BorderRadius.circular(5.0),
                           ),
                           alignment: Alignment.center,
@@ -713,7 +795,9 @@ class _PostWritePageState extends State<PostWritePage> {
                         style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w500,
-                          color: selectedCheckboxes[1]! ? ColorsInfo.newara : Color(0xFFBBBBBB),
+                          color: selectedCheckboxes[1]!
+                              ? ColorsInfo.newara
+                              : Color(0xFFBBBBBB),
                         ),
                       ),
                       SizedBox(
@@ -729,7 +813,9 @@ class _PostWritePageState extends State<PostWritePage> {
                           width: 20,
                           height: 20,
                           decoration: BoxDecoration(
-                            color: selectedCheckboxes[2]! ? ColorsInfo.newara : Color(0xFFF0F0F0),
+                            color: selectedCheckboxes[2]!
+                                ? ColorsInfo.newara
+                                : Color(0xFFF0F0F0),
                             borderRadius: BorderRadius.circular(5.0),
                           ),
                           alignment: Alignment.center,
@@ -749,7 +835,9 @@ class _PostWritePageState extends State<PostWritePage> {
                         style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w500,
-                          color: selectedCheckboxes[2]! ? ColorsInfo.newara : Color(0xFFBBBBBB),
+                          color: selectedCheckboxes[2]!
+                              ? ColorsInfo.newara
+                              : Color(0xFFBBBBBB),
                         ),
                       ),
                       Spacer(),
@@ -781,6 +869,4 @@ class _PostWritePageState extends State<PostWritePage> {
       ),
     );
   }
-
-  
 }
