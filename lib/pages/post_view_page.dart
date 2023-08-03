@@ -139,38 +139,42 @@ class _PostViewPageState extends State<PostViewPage> {
                                   Row(
                                     children: [
                                       SvgPicture.asset(
-                                        'assets/icons/like.svg',
+                                        article.my_vote == true
+                                            ? 'assets/icons/like_filled.svg'
+                                            : 'assets/icons/like.svg',
                                         width: 13,
                                         height: 15,
-                                        color: article.my_vote == true
-                                            ? ColorsInfo.newara
-                                            : ColorsInfo.noneVote,
+                                        color: article.my_vote == false
+                                            ? ColorsInfo.noneVote
+                                            : ColorsInfo.newara,
                                       ),
                                       const SizedBox(width: 3),
                                       Text('${article.positive_vote_count}',
                                           style: TextStyle(
                                               fontSize: 14,
                                               fontWeight: FontWeight.w500,
-                                              color: article.my_vote == true
-                                                  ? ColorsInfo.newara
-                                                  : ColorsInfo.noneVote)),
+                                              color: article.my_vote == false
+                                                  ? ColorsInfo.noneVote
+                                                  : ColorsInfo.newara)),
                                       const SizedBox(width: 10),
                                       SvgPicture.asset(
-                                        'assets/icons/dislike.svg',
+                                        article.my_vote == false
+                                            ? 'assets/icons/dislike_filled.svg'
+                                            : 'assets/icons/dislike.svg',
                                         width: 13,
                                         height: 15,
-                                        color: article.my_vote == false
-                                            ? ColorsInfo.negVote
-                                            : ColorsInfo.noneVote,
+                                        color: article.my_vote == true
+                                            ? ColorsInfo.noneVote
+                                            : ColorsInfo.negVote,
                                       ),
                                       const SizedBox(width: 3),
                                       Text('${article.negative_vote_count}',
                                           style: TextStyle(
                                             fontSize: 14,
                                             fontWeight: FontWeight.w500,
-                                            color: article.my_vote == false
-                                                ? ColorsInfo.negVote
-                                                : ColorsInfo.noneVote,
+                                            color: article.my_vote == true
+                                                ? ColorsInfo.noneVote
+                                                : ColorsInfo.negVote,
                                           )),
                                       const SizedBox(width: 10),
                                       SvgPicture.asset(
@@ -293,13 +297,17 @@ class _PostViewPageState extends State<PostViewPage> {
                                                 : true;
                                       });
                                     },
-                                    child: SvgPicture.asset(
-                                      'assets/icons/like.svg',
-                                      width: 30,
-                                      height: 30,
-                                      color: article.my_vote == true
-                                          ? ColorsInfo.posVote
-                                          : ColorsInfo.noneVote,
+                                    child: SizedBox(
+                                      width: 25,
+                                      height: 25,
+                                      child: SvgPicture.asset(
+                                        article.my_vote == true
+                                            ? 'assets/icons/like_filled.svg'
+                                            : 'assets/icons/like.svg',
+                                        color: article.my_vote == false
+                                            ? ColorsInfo.noneVote
+                                            : ColorsInfo.newara,
+                                      ),
                                     ),
                                   ),
                                   const SizedBox(width: 3),
@@ -307,69 +315,77 @@ class _PostViewPageState extends State<PostViewPage> {
                                       style: TextStyle(
                                         fontSize: 20,
                                         fontWeight: FontWeight.w500,
-                                        color: article.my_vote == true
-                                            ? ColorsInfo.posVote
-                                            : ColorsInfo.noneVote,
+                                        color: article.my_vote == false
+                                            ? ColorsInfo.noneVote
+                                            : ColorsInfo.posVote,
                                       )),
                                   const SizedBox(width: 20),
                                   InkWell(
-                                    onTap: () async {
-                                      if (article.is_mine == true) {
-                                        debugPrint("자신의 글에는 좋아요, 싫어요를 할 수 없음");
-                                        return;
-                                      }
-                                      if (article.my_vote == false) {
-                                        var cancelRes =
-                                            await userProvider.postApiRes(
-                                          "articles/${article.id}/vote_cancel/",
-                                        );
-                                        if (cancelRes.statusCode != 200) {
+                                      onTap: () async {
+                                        if (article.is_mine == true) {
                                           debugPrint(
-                                              "POST /api/articles/${article.id}/vote_cancel ${cancelRes.statusCode}");
+                                              "자신의 글에는 좋아요, 싫어요를 할 수 없음");
                                           return;
                                         }
-                                      } else {
-                                        var postRes =
-                                            await userProvider.postApiRes(
-                                          "articles/${article.id}/vote_negative/",
-                                        );
-                                        if (postRes.statusCode != 200) {
-                                          debugPrint(
-                                              "POST /api/articles/${article.id}/vote_negative/ ${postRes.statusCode}");
-                                          return;
+                                        if (article.my_vote == false) {
+                                          var cancelRes =
+                                              await userProvider.postApiRes(
+                                            "articles/${article.id}/vote_cancel/",
+                                          );
+                                          if (cancelRes.statusCode != 200) {
+                                            debugPrint(
+                                                "POST /api/articles/${article.id}/vote_cancel ${cancelRes.statusCode}");
+                                            return;
+                                          }
+                                        } else {
+                                          var postRes =
+                                              await userProvider.postApiRes(
+                                            "articles/${article.id}/vote_negative/",
+                                          );
+                                          if (postRes.statusCode != 200) {
+                                            debugPrint(
+                                                "POST /api/articles/${article.id}/vote_negative/ ${postRes.statusCode}");
+                                            return;
+                                          }
                                         }
-                                      }
-                                      if (!mounted) return;
-                                      setState(() {
-                                        article.positive_vote_count = article
-                                                .positive_vote_count! +
-                                            (article.my_vote == true ? -1 : 0);
-                                        article.negative_vote_count = article
-                                                .negative_vote_count! +
-                                            (article.my_vote == false ? -1 : 1);
-                                        article.my_vote =
-                                            (article.my_vote == false)
-                                                ? null
-                                                : false;
-                                      });
-                                    },
-                                    child: SvgPicture.asset(
-                                      'assets/icons/dislike.svg',
-                                      width: 30,
-                                      height: 30,
-                                      color: article.my_vote == false
-                                          ? ColorsInfo.negVote
-                                          : ColorsInfo.noneVote,
-                                    ),
-                                  ),
+                                        if (!mounted) return;
+                                        setState(() {
+                                          article.positive_vote_count =
+                                              article.positive_vote_count! +
+                                                  (article.my_vote == true
+                                                      ? -1
+                                                      : 0);
+                                          article.negative_vote_count =
+                                              article.negative_vote_count! +
+                                                  (article.my_vote == false
+                                                      ? -1
+                                                      : 1);
+                                          article.my_vote =
+                                              (article.my_vote == false)
+                                                  ? null
+                                                  : false;
+                                        });
+                                      },
+                                      child: SizedBox(
+                                        width: 25,
+                                        height: 25,
+                                        child: SvgPicture.asset(
+                                          article.my_vote == false
+                                              ? 'assets/icons/dislike_filled.svg'
+                                              : 'assets/icons/dislike.svg',
+                                          color: article.my_vote == true
+                                              ? ColorsInfo.noneVote
+                                              : ColorsInfo.negVote,
+                                        ),
+                                      )),
                                   const SizedBox(width: 3),
                                   Text('${article.negative_vote_count}',
                                       style: TextStyle(
                                         fontSize: 20,
                                         fontWeight: FontWeight.w500,
-                                        color: article.my_vote == false
-                                            ? ColorsInfo.negVote
-                                            : ColorsInfo.noneVote,
+                                        color: article.my_vote == true
+                                            ? ColorsInfo.noneVote
+                                            : ColorsInfo.negVote,
                                       )),
                                 ],
                               ),
@@ -769,16 +785,19 @@ class _PostViewPageState extends State<PostViewPage> {
                                                           },
                                                           child:
                                                               SvgPicture.asset(
-                                                            'assets/icons/like.svg',
-                                                            width: 25,
-                                                            height: 25,
-                                                            color: curComment
-                                                                        .my_vote ==
+                                                            curComment.my_vote ==
                                                                     true
-                                                                ? ColorsInfo
-                                                                    .posVote
-                                                                : ColorsInfo
-                                                                    .noneVote,
+                                                                ? 'assets/icons/like_filled.svg'
+                                                                : 'assets/icons/like.svg',
+                                                            width: 13,
+                                                            height: 15,
+                                                            color:
+                                                                curComment.my_vote ==
+                                                                        false
+                                                                    ? ColorsInfo
+                                                                        .noneVote
+                                                                    : ColorsInfo
+                                                                        .newara,
                                                           ),
                                                         ),
                                                         Text(
@@ -789,13 +808,13 @@ class _PostViewPageState extends State<PostViewPage> {
                                                             fontSize: 13,
                                                             fontWeight:
                                                                 FontWeight.w500,
-                                                            color: curComment
-                                                                        .my_vote ==
-                                                                    true
-                                                                ? ColorsInfo
-                                                                    .posVote
-                                                                : ColorsInfo
-                                                                    .noneVote,
+                                                            color:
+                                                                curComment.my_vote ==
+                                                                        false
+                                                                    ? ColorsInfo
+                                                                        .noneVote
+                                                                    : ColorsInfo
+                                                                        .posVote,
                                                           ),
                                                         ),
                                                         const SizedBox(
@@ -864,16 +883,19 @@ class _PostViewPageState extends State<PostViewPage> {
                                                           },
                                                           child:
                                                               SvgPicture.asset(
-                                                            'assets/icons/dislike.svg',
-                                                            width: 25,
-                                                            height: 25,
+                                                            curComment.my_vote ==
+                                                                    false
+                                                                ? 'assets/icons/dislike_filled.svg'
+                                                                : 'assets/icons/dislike.svg',
+                                                            width: 13,
+                                                            height: 15,
                                                             color: curComment
                                                                         .my_vote ==
-                                                                    false
+                                                                    true
                                                                 ? ColorsInfo
-                                                                    .negVote
+                                                                    .noneVote
                                                                 : ColorsInfo
-                                                                    .noneVote,
+                                                                    .negVote,
                                                           ),
                                                         ),
                                                         Text(
@@ -886,11 +908,11 @@ class _PostViewPageState extends State<PostViewPage> {
                                                                 FontWeight.w500,
                                                             color: curComment
                                                                         .my_vote ==
-                                                                    false
+                                                                    true
                                                                 ? ColorsInfo
-                                                                    .negVote
+                                                                    .noneVote
                                                                 : ColorsInfo
-                                                                    .noneVote,
+                                                                    .negVote,
                                                           ),
                                                         ),
                                                         const SizedBox(
