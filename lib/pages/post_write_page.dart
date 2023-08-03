@@ -761,7 +761,7 @@ class _PostWritePageState extends State<PostWritePage> {
                         ),
                         if (_isFileMenuBarSelected) ...[
                           Container(
-                           // constraints: BoxConstraints(maxHeight: 186),
+                            // constraints: BoxConstraints(maxHeight: 186),
                             child: Padding(
                               padding:
                                   const EdgeInsets.symmetric(horizontal: 15),
@@ -771,7 +771,6 @@ class _PostWritePageState extends State<PostWritePage> {
                                     height: 10,
                                   ),
                                   Scrollbar(
-                                    
                                     child: ListView.builder(
                                       shrinkWrap: true,
                                       itemCount: attachmentList.length,
@@ -826,14 +825,16 @@ class _PostWritePageState extends State<PostWritePage> {
                                                   ),
                                                   Text(
                                                     formatBytes(File(
-                                                            attachmentList[index]
+                                                            attachmentList[
+                                                                    index]
                                                                 .filePath!)
                                                         .lengthSync()),
                                                     style: TextStyle(
                                                         fontSize: 14,
                                                         fontWeight:
                                                             FontWeight.w500,
-                                                        color: Color(0xFFBBBBBB)),
+                                                        color:
+                                                            Color(0xFFBBBBBB)),
                                                   ),
                                                   InkWell(
                                                     onTap: () async {
@@ -843,7 +844,7 @@ class _PostWritePageState extends State<PostWritePage> {
                                                           await _htmlController
                                                               .getText();
                                                       // debugPrint("text $text");
-                                  
+
                                                       String nextText =
                                                           updateImgSrc(
                                                               text,
@@ -855,7 +856,7 @@ class _PostWritePageState extends State<PostWritePage> {
                                                           "next : $nextText");
                                                       _htmlController
                                                           .setText(nextText);
-                                  
+
                                                       setState(() {
                                                         //             _htmlController.setText(
                                                         // "이미지가 삭제되었습니다.");
