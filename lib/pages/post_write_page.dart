@@ -94,8 +94,9 @@ class _PostWritePageState extends State<PostWritePage> {
   late bool _permissionReady;
   late TargetPlatform? platform;
 
-  var _titleController = TextEditingController();
+  final TextEditingController _titleController = TextEditingController();
   final HtmlEditorController _htmlController = HtmlEditorController();
+  String _currentHtmlContent = "";
 
   @override
   void initState() {
@@ -190,8 +191,13 @@ class _PostWritePageState extends State<PostWritePage> {
 
   @override
   Widget build(BuildContext context) {
-    if (_isLoading) return LoadingIndicator();
+    if (_isLoading) return const LoadingIndicator();
+
     var userProvider = context.watch<UserProvider>();
+    bool canIupload = _titleController.text != '' &&
+        _chosenBoardValue!.id != -1 &&
+        _currentHtmlContent != '' &&
+        _currentHtmlContent != '<p><br></p>';
 
     String updateImgSrc(htmlString, uuid, fileUrl) {
       var document = parse(htmlString);
@@ -300,199 +306,120 @@ class _PostWritePageState extends State<PostWritePage> {
           ),
         ),
         actions: [
-          // ElevatedButton(
-          //   onPressed: () async {
-          //     Dio dio = Dio();
-          //     dio.options.headers['Cookie'] = userProvider.getCookiesToString();
-          //     try {
-          //       var response = await dio.post(
-          //         '$newAraDefaultUrl/api/articles/',
-          //         data: {
-          //           'title': 'post 테스트 03:11',
-          //           'content':
-          //               '<p><img src="https://sparcs-newara-dev.s3.amazonaws.com/files/%E1%84%89%E1%85%B3%E1%84%8F%E1%85%B3%E1%84%85%E1%85%B5%E1%86%AB%E1%84%89%E1%85%A3%E1%86%BA_2023-05-24_%E1%84%8B%E1%85%A9%E1%84%8C%E1%85%A5%E1%86%AB_6.01.21.png" width="500" data-attachment="210"></p>',
-          //           'attachments': [210],
-          //           'parent_topic': '',
-          //           'is_content_sexual': false,
-          //           'is_content_social': false,
-          //           'parent_board': 2,
-          //           'name_type': 'REGULAR'
-          //         },
-          //       );
-          //       debugPrint('Response data: ${response.data}');
-          //     } catch (e) {
-          //       debugPrint('Error: $e');
-          //     }
-          //   },
-          //   child: Text("게시물 내용"),
-          // ),
           MaterialButton(
-            onPressed: () async {
-              String titleValue;
-              String contentValue;
-              List<int> attachmentIds = [];
-              try {
-                titleValue = _titleController.text;
-                contentValue = await _htmlController.getText();
-                debugPrint("title: $titleValue");
-                debugPrint("content: $contentValue");
-              } catch (error) {
-                debugPrint(error.toString());
-                return;
-              }
-
-              try {
-                Dio dio = Dio();
-                dio.options.headers['Cookie'] =
-                    userProvider.getCookiesToString();
-                for (int i = 0; i < attachmentList.length; i++) {
-                  var attachFile = File(attachmentList[i].filePath!);
-                  //이 파일 uuid 에 해당하는 img 태그가 html 안에 있다면 변경해야한다.
-
-                  // 파일이 존재하는지 확인
-                  if (attachFile.existsSync()) {
-                    var dio = Dio();
-                    dio.options.headers['Cookie'] =
-                        userProvider.getCookiesToString();
-                    var formData = FormData.fromMap({
-                      "file": await MultipartFile.fromFile(attachFile.path,
-                          filename: attachFile.path
-                              .split('/')
-                              .last), // You may need to replace '/' with '\\' if you're using Windows.
-                    });
+            onPressed: canIupload
+                ? () async {
+                    String titleValue;
+                    String contentValue;
+                    List<int> attachmentIds = [];
                     try {
-                      var response = await dio.post(
-                          "$newAraDefaultUrl/api/attachments/",
-                          data: formData);
-                      debugPrint("Response: ${response.data}");
-                      final attachmentModel =
-                          AttachmentModel.fromJson(response.data);
-                      attachmentIds.add(attachmentModel.id);
-                      contentValue = updateImgSrc(contentValue,
-                          attachmentList[i].uuid, attachmentModel.file);
+                      titleValue = _titleController.text;
+                      contentValue = await _htmlController.getText();
+                      debugPrint("title: $titleValue");
+                      debugPrint("content: $contentValue");
                     } catch (error) {
-                      debugPrint("$error");
+                      debugPrint(error.toString());
+                      return;
                     }
-                  } else {
-                    debugPrint("File does not exist: ${attachFile.path}");
-                  }
-                }
 
-                var response = await dio.post(
-                  '$newAraDefaultUrl/api/articles/',
-                  data: {
-                    'title': titleValue,
-                    'content': contentValue,
-                    'attachments': attachmentIds,
-                    'parent_topic': _chosenTopicValue!.id == -1
-                        ? ''
-                        : _chosenTopicValue!.id,
-                    'is_content_sexual': false,
-                    'is_content_social': false,
-                    'parent_board': _chosenBoardValue!.id,
-                    'name_type': 'REGULAR'
-                  },
-                );
-                debugPrint('Response data: ${response.data}');
-              } on DioException catch (error) {
-                debugPrint('post Error: ${error.response!.data}');
-                return;
-              }
-              // htmlController.getText().then((value) {
-              //   debugPrint(value);S
-              // });
-              // if (imagePickerFile != null) {S
-              //   var filePath = imagePickerResult.path;
-              //   var filename = filePath.split("/").last;
-              //   var formData = FormData.fromMap({
-              //     "file":
-              //         await MultipartFile.fromFile(filePath, filename: filename)
-              //   });
-              //   Dio dio = Dio();
-              //   dio.options.headers['Cookie'] =
-              //       userProvider.getCookiesToString();
-              //   try {
-              //     var response = await dio.post(
-              //         '$newAraDefaultUrl/api/attachments/',
-              //         data: formData);
-              //     print('Post request successful');
-              //     print('Response: $response.data');
-              //   } catch (error) {
-              //     // Request failed
-              //     print('Post request failed with status code $error');
-              //     //  print('Response: $responseData');
-              //   }
-              // }
-            },
+                    try {
+                      Dio dio = Dio();
+                      dio.options.headers['Cookie'] =
+                          userProvider.getCookiesToString();
+                      for (int i = 0; i < attachmentList.length; i++) {
+                        var attachFile = File(attachmentList[i].filePath!);
+                        //이 파일 uuid 에 해당하는 img 태그가 html 안에 있다면 변경해야한다.
+
+                        // 파일이 존재하는지 확인
+                        if (attachFile.existsSync()) {
+                          var dio = Dio();
+                          dio.options.headers['Cookie'] =
+                              userProvider.getCookiesToString();
+                          var formData = FormData.fromMap({
+                            "file": await MultipartFile.fromFile(
+                                attachFile.path,
+                                filename: attachFile.path
+                                    .split('/')
+                                    .last), // You may need to replace '/' with '\\' if you're using Windows.
+                          });
+                          try {
+                            var response = await dio.post(
+                                "$newAraDefaultUrl/api/attachments/",
+                                data: formData);
+                            debugPrint("Response: ${response.data}");
+                            final attachmentModel =
+                                AttachmentModel.fromJson(response.data);
+                            attachmentIds.add(attachmentModel.id);
+                            contentValue = updateImgSrc(contentValue,
+                                attachmentList[i].uuid, attachmentModel.file);
+                          } catch (error) {
+                            debugPrint("$error");
+                          }
+                        } else {
+                          debugPrint("File does not exist: ${attachFile.path}");
+                        }
+                      }
+                      debugPrint(_selectedCheckboxes.toString());
+
+                      var response = await dio.post(
+                        '$newAraDefaultUrl/api/articles/',
+                        data: {
+                          'title': titleValue,
+                          'content': contentValue,
+                          'attachments': attachmentIds,
+                          'parent_topic': _chosenTopicValue!.id == -1
+                              ? ''
+                              : _chosenTopicValue!.id,
+                          'is_content_sexual': _selectedCheckboxes[1],
+                          'is_content_social': _selectedCheckboxes[2],
+                          'parent_board': _chosenBoardValue!.id,
+                          'name_type': 'REGULAR'
+                        },
+                      );
+                      debugPrint('Response data: ${response.data}');
+                    } on DioException catch (error) {
+                      debugPrint('post Error: ${error.response!.data}');
+                      return;
+                    }
+                  }
+                : null,
             // 버튼이 클릭되었을 때 수행할 동작
             padding: EdgeInsets.zero, // 패딩 제거
-            child: Ink(
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(10.0),
-                color: ColorsInfo.newara,
-              ),
-              child: Container(
-                constraints: BoxConstraints(maxWidth: 65.0, maxHeight: 35.0),
-                alignment: Alignment.center,
-                child: Text(
-                  '올리기',
-                  style: TextStyle(color: Colors.white),
-                ),
-              ),
-            ),
+            child: canIupload
+                ? Ink(
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(10.0),
+                      color: ColorsInfo.newara,
+                    ),
+                    child: Container(
+                      constraints:
+                          BoxConstraints(maxWidth: 65.0, maxHeight: 35.0),
+                      alignment: Alignment.center,
+                      child: Text(
+                        '올리기',
+                        style: TextStyle(color: Colors.white),
+                      ),
+                    ),
+                  )
+                : Ink(
+                    decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(10.0),
+                        color: Colors.transparent,
+                        border: Border.all(
+                          color: Color(0xFFF0F0F0), // #F0F0F0 색상
+                          width: 1, // 테두리 두께 1픽셀
+                        )),
+                    child: Container(
+                      constraints:
+                          BoxConstraints(maxWidth: 65.0, maxHeight: 35.0),
+                      alignment: Alignment.center,
+                      child: Text(
+                        '올리기',
+                        style: TextStyle(color: Color(0xFFBBBBBB)),
+                      ),
+                    ),
+                  ),
           ),
-          // ElevatedButton(
-          //   onPressed: () async {
-          //     for (int i = 0; i < attachmentsList.length; i++) {
-          //       var attachFile = File(attachmentsList[i].filePath!);
-
-          //       // 파일이 존재하는지 확인
-          //       if (attachFile.existsSync()) {
-          //         var dio = Dio();
-          //         dio.options.headers['Cookie'] =
-          //             userProvider.getCookiesToString();
-          //         var formData = FormData.fromMap({
-          //           "file": await MultipartFile.fromFile(attachFile.path,
-          //               filename: attachFile.path
-          //                   .split('/')
-          //                   .last), // You may need to replace '/' with '\\' if you're using Windows.
-          //         });
-          //         try {
-          //           var response = await dio.post(
-          //               "$newAraDefaultUrl/api/attachments/",
-          //               data: formData);
-          //           print(response.data);
-          //         } catch (error) {
-          //           debugPrint("$error");
-          //         }
-          //       } else {
-          //         debugPrint("File does not exist: ${attachFile.path}");
-          //       }
-          //     }
-          //   },
-          //   child: Text("파일 올리기 테스트"),
-          // ),
-          // ElevatedButton(
-          //   onPressed: () async {
-          //     final String fileUrl =
-          //         "https://sparcs-newara-dev.s3.amazonaws.com/files/lizard-7938887_1280_eAHShfM.webp";
-
-          //     _permissionReady = await _checkPermission();
-          //     debugPrint("Click");
-          //     if (_permissionReady) {
-          //       await _prepareSaveDir();
-          //       debugPrint("Downloading");
-          //       try {
-          //         await Dio()
-          //             .download(fileUrl, _localPath + "/" + "filename.jpg");
-          //         debugPrint("Download Completed.");
-          //       } catch (e) {
-          //         debugPrint("Download Failed.\n\n" + e.toString());
-          //       }
-          //     }
-          //   },
-          //   child: Text("파일 다운"),
-          // ),
         ],
       ),
       body: SafeArea(
@@ -617,6 +544,9 @@ class _PostWritePageState extends State<PostWritePage> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   TextField(
+                    onChanged: (value) {
+                      setState(() {});
+                    },
                     controller: _titleController,
                     minLines: 1,
                     maxLines: 1,
@@ -658,171 +588,181 @@ class _PostWritePageState extends State<PostWritePage> {
                     color: Color(0xFFF0F0F0),
                   ),
                   Expanded(
-                    child: HtmlEditor(
-                      controller: _htmlController, //required
-                      htmlEditorOptions: HtmlEditorOptions(
-                        hint: "내용을 입력해주세요.",
+                    child: SingleChildScrollView(
+                      child: HtmlEditor(
+                        callbacks: Callbacks(onChangeContent: (String? value) {
+                          debugPrint("onChangeContent: $value");
+                          setState(() {
+                            _currentHtmlContent = value!;
+                          });
+                        }),
+                        controller: _htmlController, //required
+                        htmlEditorOptions: HtmlEditorOptions(
+                          hint: "내용을 입력해주세요.",
+                          shouldEnsureVisible: true,
 
-                        //initalText: "text content initial, if any",
-                      ),
-                      htmlToolbarOptions: HtmlToolbarOptions(
-                          toolbarType: ToolbarType.nativeGrid,
-                          mediaUploadInterceptor:
-                              (PlatformFile file, InsertFileType type) async {
-                            if (type == InsertFileType.image) {
-                              // var uuid = Uuid();
-                              String uuid = const Uuid().v4();
-                              setState(() {
-                                _isFileMenuBarSelected = true;
-                                attachmentList.add(AttachmentsFormat(
-                                  fileType: FileType.Other,
-                                  isNewFile: true,
-                                  filePath: file.path,
-                                  uuid: uuid,
-                                ));
-                              });
+                          //initalText: "text content initial, if any",
+                        ),
+                        htmlToolbarOptions: HtmlToolbarOptions(
+                            toolbarType: ToolbarType.nativeGrid,
+                            mediaUploadInterceptor:
+                                (PlatformFile file, InsertFileType type) async {
+                              if (type == InsertFileType.image) {
+                                // var uuid = Uuid();
+                                String uuid = const Uuid().v4();
+                                setState(() {
+                                  _isFileMenuBarSelected = true;
+                                  attachmentList.add(AttachmentsFormat(
+                                    fileType: FileType.Other,
+                                    isNewFile: true,
+                                    filePath: file.path,
+                                    uuid: uuid,
+                                  ));
+                                });
 
-                              ///src랑 file.path랑 연결해줘야함.
-                              String base64Data = base64.encode(file.bytes!);
-                              String base64Image =
-                                  """<img data-uuid=$uuid  src="data:image/${file.extension};base64,$base64Data" data-filename="${file.name}" width=100% />""";
-                              // String base64Image =
-                              //     """<img src="https://sparcs-newara-dev.s3.amazonaws.com/files/IMG_0003_8FJEMU6.jpeg" data-filename="${file.name}" width=100% />""";
-                              _htmlController.insertHtml(base64Image);
-                            }
-                            return false;
-                          },
-                          defaultToolbarButtons: [
-                            // FontSettingButtons(),
-                            const FontButtons(
-                              bold: true,
-                              italic: true,
-                              underline: true,
-                              clearAll: true,
-                              strikethrough: true,
-                              superscript: false,
-                              subscript: false,
+                                ///src랑 file.path랑 연결해줘야함.
+                                String base64Data = base64.encode(file.bytes!);
+                                String base64Image =
+                                    """<img data-uuid=$uuid  src="data:image/${file.extension};base64,$base64Data" data-filename="${file.name}" width=100% />""";
+                                // String base64Image =
+                                //     """<img src="https://sparcs-newara-dev.s3.amazonaws.com/files/IMG_0003_8FJEMU6.jpeg" data-filename="${file.name}" width=100% />""";
+                                _htmlController.insertHtml(base64Image);
+                              }
+                              return false;
+                            },
+                            defaultToolbarButtons: [
+                              // FontSettingButtons(),
+                              const FontButtons(
+                                bold: true,
+                                italic: true,
+                                underline: true,
+                                clearAll: true,
+                                strikethrough: true,
+                                superscript: false,
+                                subscript: false,
 
-                              // StyleButtons(
-                            ),
-                            const InsertButtons(
-                              link: true,
-                              picture: true,
-                              audio: false,
-                              video: false,
-                              otherFile: false,
-                              table: false,
-                              hr: true,
-                            )
-                            // ColorButtons(),
-                          ]),
+                                // StyleButtons(
+                              ),
+                              const InsertButtons(
+                                link: true,
+                                picture: true,
+                                audio: false,
+                                video: false,
+                                otherFile: false,
+                                table: false,
+                                hr: true,
+                              )
+                              // ColorButtons(),
+                            ]),
 
-                      otherOptions: OtherOptions(
-                        height: 1000,
+                        otherOptions: OtherOptions(
+                          height: 1000,
+                        ),
                       ),
                     ),
                   ),
                 ],
               ),
             ),
-            Container(
-              child: Column(
-                children: [
-                  if (attachmentList.length == 0)
-                    Row(
+            Column(
+              children: [
+                if (attachmentList.length == 0)
+                  Row(
+                    children: [
+                      Row(
+                        children: [
+                          SizedBox(
+                            width: 10,
+                          ),
+                          InkWell(
+                            onTap: _filePick,
+                            child: Row(
+                              children: [
+                                SvgPicture.asset(
+                                  'assets/icons/clip.svg',
+                                  color: Color(0xFF636363),
+                                  width: 34,
+                                  height: 34,
+                                ),
+                                Text(
+                                  "첨부파일 추가",
+                                  style: TextStyle(
+                                      fontWeight: FontWeight.w500,
+                                      fontSize: 16,
+                                      color: Color(0xFF636363)),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  )
+                else
+                  AnimatedSize(
+                    duration: Duration(milliseconds: 100),
+                    alignment: AlignmentDirectional.topCenter,
+                    child: Column(
                       children: [
                         Row(
                           children: [
                             SizedBox(
-                              width: 10,
+                              width: 20,
+                            ),
+                            Text(
+                              "첨부파일",
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                            SizedBox(
+                              width: 8,
+                            ),
+                            Text(
+                              attachmentList.length.toString(),
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w500,
+                                color: ColorsInfo.newara,
+                              ),
+                            ),
+                            SizedBox(
+                              width: 5,
                             ),
                             InkWell(
-                              onTap: _filePick,
-                              child: Row(
-                                children: [
-                                  SvgPicture.asset(
-                                    'assets/icons/clip.svg',
-                                    color: Color(0xFF636363),
-                                    width: 34,
-                                    height: 34,
-                                  ),
-                                  Text(
-                                    "첨부파일 추가",
-                                    style: TextStyle(
-                                        fontWeight: FontWeight.w500,
-                                        fontSize: 16,
-                                        color: Color(0xFF636363)),
-                                  ),
-                                ],
+                              onTap: () {
+                                setState(() {
+                                  _isFileMenuBarSelected =
+                                      !_isFileMenuBarSelected;
+                                });
+                              },
+                              child: SvgPicture.asset(
+                                'assets/icons/chevron_down.svg',
+                                width: 20,
+                                height: 20,
+                                color: Colors.red,
                               ),
+                            ),
+                            Spacer(),
+                            InkWell(
+                              onTap: () => _filePick(),
+                              child: SvgPicture.asset(
+                                'assets/icons/add.svg',
+                                width: 34,
+                                height: 34,
+                                color: Color(0xFFED3A3A),
+                              ),
+                            ),
+                            SizedBox(
+                              width: 14,
                             ),
                           ],
                         ),
-                      ],
-                    )
-                  else
-                    AnimatedSize(
-                      duration: Duration(milliseconds: 100),
-                      alignment: AlignmentDirectional.topCenter,
-                      child: Column(
-                        children: [
-                          Row(
-                            children: [
-                              SizedBox(
-                                width: 20,
-                              ),
-                              Text(
-                                "첨부파일",
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w500,
-                                ),
-                              ),
-                              SizedBox(
-                                width: 8,
-                              ),
-                              Text(
-                                attachmentList.length.toString(),
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w500,
-                                  color: ColorsInfo.newara,
-                                ),
-                              ),
-                              SizedBox(
-                                width: 5,
-                              ),
-                              InkWell(
-                                onTap: () {
-                                  setState(() {
-                                    _isFileMenuBarSelected =
-                                        !_isFileMenuBarSelected;
-                                  });
-                                },
-                                child: SvgPicture.asset(
-                                  'assets/icons/chevron_down.svg',
-                                  width: 20,
-                                  height: 20,
-                                  color: Colors.red,
-                                ),
-                              ),
-                              Spacer(),
-                              InkWell(
-                                onTap: () => _filePick(),
-                                child: SvgPicture.asset(
-                                  'assets/icons/add.svg',
-                                  width: 34,
-                                  height: 34,
-                                  color: Color(0xFFED3A3A),
-                                ),
-                              ),
-                              SizedBox(
-                                width: 14,
-                              ),
-                            ],
-                          ),
-                          if (_isFileMenuBarSelected) ...[
-                            Padding(
+                        if (_isFileMenuBarSelected) ...[
+                          Container(
+                           // constraints: BoxConstraints(maxHeight: 186),
+                            child: Padding(
                               padding:
                                   const EdgeInsets.symmetric(horizontal: 15),
                               child: Column(
@@ -830,271 +770,274 @@ class _PostWritePageState extends State<PostWritePage> {
                                   SizedBox(
                                     height: 10,
                                   ),
-                                  ListView.builder(
-                                    shrinkWrap: true,
-                                    itemCount: attachmentList.length,
-                                    itemBuilder: (context, index) {
-                                      return Column(
-                                        children: [
-                                          if (index != 0)
-                                            SizedBox(
-                                              height: 5,
-                                            ),
-                                          Container(
-                                            height: 44,
-                                            decoration: BoxDecoration(
-                                              border: Border.all(
-                                                color: Color(
-                                                    0xFFF0F0F0), // #F0F0F0 색상
-                                                width: 1, // 테두리 두께 1픽셀
+                                  Scrollbar(
+                                    
+                                    child: ListView.builder(
+                                      shrinkWrap: true,
+                                      itemCount: attachmentList.length,
+                                      itemBuilder: (context, index) {
+                                        return Column(
+                                          children: [
+                                            if (index != 0)
+                                              SizedBox(
+                                                height: 5,
                                               ),
-                                              borderRadius:
-                                                  BorderRadius.circular(
-                                                      15), // 반지름 15
-                                            ),
-                                            child: Row(
-                                              children: [
-                                                // SvgPicture.asset(
-                                                //   'assets/icons/pdf.svg',
-                                                //   width: 16,
-                                                //   height: 16,
-                                                //   color: Colors.black,
-                                                // ),
-                                                SizedBox(
-                                                  width: 6,
+                                            Container(
+                                              height: 44,
+                                              decoration: BoxDecoration(
+                                                border: Border.all(
+                                                  color: Color(
+                                                      0xFFF0F0F0), // #F0F0F0 색상
+                                                  width: 1, // 테두리 두께 1픽셀
                                                 ),
-                                                SvgPicture.asset(
-                                                  'assets/icons/pdf.svg',
-                                                  width: 30,
-                                                  height: 30,
-                                                  color: Colors.black,
-                                                ),
-                                                SizedBox(
-                                                  width: 3,
-                                                ),
-                                                Expanded(
-                                                  child: Text(
-                                                    path.basename(
-                                                        attachmentList[index]
-                                                            .filePath!),
+                                                borderRadius:
+                                                    BorderRadius.circular(
+                                                        15), // 반지름 15
+                                              ),
+                                              child: Row(
+                                                children: [
+                                                  // SvgPicture.asset(
+                                                  //   'assets/icons/pdf.svg',
+                                                  //   width: 16,
+                                                  //   height: 16,
+                                                  //   color: Colors.black,
+                                                  // ),
+                                                  SizedBox(
+                                                    width: 6,
                                                   ),
-                                                ),
-                                                SizedBox(
-                                                  width: 3,
-                                                ),
-                                                Text(
-                                                  formatBytes(File(
-                                                          attachmentList[index]
-                                                              .filePath!)
-                                                      .lengthSync()),
-                                                  style: TextStyle(
-                                                      fontSize: 14,
-                                                      fontWeight:
-                                                          FontWeight.w500,
-                                                      color: Color(0xFFBBBBBB)),
-                                                ),
-                                                InkWell(
-                                                  onTap: () async {
-                                                    // _htmlController
-                                                    //     .setText("<p>test</p>");
-                                                    String text =
-                                                        await _htmlController
-                                                            .getText();
-                                                    // debugPrint("text $text");
-
-                                                    String nextText =
-                                                        updateImgSrc(
-                                                            text,
-                                                            attachmentList[
-                                                                    index]
-                                                                .uuid,
-                                                            null);
-                                                    debugPrint(
-                                                        "next : $nextText");
-                                                    _htmlController
-                                                        .setText(nextText);
-
-                                                    setState(() {
-                                                      //             _htmlController.setText(
-                                                      // "이미지가 삭제되었습니다.");
-                                                      attachmentList
-                                                          .removeAt(index);
-                                                      _isLoading = false;
-                                                    });
-                                                  },
-                                                  child: SvgPicture.asset(
-                                                    'assets/icons/close.svg',
+                                                  SvgPicture.asset(
+                                                    'assets/icons/pdf.svg',
                                                     width: 30,
                                                     height: 30,
-                                                    color: Color(0xFFBBBBBB),
+                                                    color: Colors.black,
                                                   ),
-                                                ),
-                                                SizedBox(
-                                                  width: 8.52,
-                                                ),
-                                              ],
+                                                  SizedBox(
+                                                    width: 3,
+                                                  ),
+                                                  Expanded(
+                                                    child: Text(
+                                                      path.basename(
+                                                          attachmentList[index]
+                                                              .filePath!),
+                                                    ),
+                                                  ),
+                                                  SizedBox(
+                                                    width: 3,
+                                                  ),
+                                                  Text(
+                                                    formatBytes(File(
+                                                            attachmentList[index]
+                                                                .filePath!)
+                                                        .lengthSync()),
+                                                    style: TextStyle(
+                                                        fontSize: 14,
+                                                        fontWeight:
+                                                            FontWeight.w500,
+                                                        color: Color(0xFFBBBBBB)),
+                                                  ),
+                                                  InkWell(
+                                                    onTap: () async {
+                                                      // _htmlController
+                                                      //     .setText("<p>test</p>");
+                                                      String text =
+                                                          await _htmlController
+                                                              .getText();
+                                                      // debugPrint("text $text");
+                                  
+                                                      String nextText =
+                                                          updateImgSrc(
+                                                              text,
+                                                              attachmentList[
+                                                                      index]
+                                                                  .uuid,
+                                                              null);
+                                                      debugPrint(
+                                                          "next : $nextText");
+                                                      _htmlController
+                                                          .setText(nextText);
+                                  
+                                                      setState(() {
+                                                        //             _htmlController.setText(
+                                                        // "이미지가 삭제되었습니다.");
+                                                        attachmentList
+                                                            .removeAt(index);
+                                                        _isLoading = false;
+                                                      });
+                                                    },
+                                                    child: SvgPicture.asset(
+                                                      'assets/icons/close.svg',
+                                                      width: 30,
+                                                      height: 30,
+                                                      color: Color(0xFFBBBBBB),
+                                                    ),
+                                                  ),
+                                                  SizedBox(
+                                                    width: 8.52,
+                                                  ),
+                                                ],
+                                              ),
                                             ),
-                                          ),
-                                        ],
-                                      );
-                                    },
+                                          ],
+                                        );
+                                      },
+                                    ),
                                   ),
                                 ],
                               ),
                             ),
-                          ],
+                          ),
                         ],
-                      ),
+                      ],
                     ),
-                  SizedBox(
-                    height: 15,
                   ),
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.end,
-                    children: [
-                      SizedBox(
+                SizedBox(
+                  height: 15,
+                ),
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    SizedBox(
+                      width: 20,
+                    ),
+                    // GestureDetector(
+                    //   onTap: () {
+                    //     setState(() {
+                    //       _selectedCheckboxes[0] = !_selectedCheckboxes[0]!;
+                    //     });
+                    //   },
+                    //   child: Container(
+                    //     width: 20,
+                    //     height: 20,
+                    //     decoration: BoxDecoration(
+                    //       color: _selectedCheckboxes[0]!
+                    //           ? ColorsInfo.newara
+                    //           : Color(0xFFF0F0F0),
+                    //       borderRadius: BorderRadius.circular(5.0),
+                    //     ),
+                    //     alignment: Alignment.center,
+                    //     child: SvgPicture.asset(
+                    //       'assets/icons/check.svg',
+                    //       width: 16,
+                    //       height: 16,
+                    //       color: Colors.white,
+                    //     ),
+                    //   ),
+                    // ),
+                    // SizedBox(
+                    //   width: 6,
+                    // ),
+                    // Text(
+                    //   "익명",
+                    //   style: TextStyle(
+                    //     fontSize: 16,
+                    //     fontWeight: FontWeight.w500,
+                    //     color: _selectedCheckboxes[0]!
+                    //         ? ColorsInfo.newara
+                    //         : Color(0xFFBBBBBB),
+                    //   ),
+                    // ),
+                    // SizedBox(
+                    //   width: 15,
+                    // ),
+                    GestureDetector(
+                      onTap: () {
+                        setState(() {
+                          _selectedCheckboxes[1] = !_selectedCheckboxes[1]!;
+                        });
+                      },
+                      child: Container(
                         width: 20,
-                      ),
-                      GestureDetector(
-                        onTap: () {
-                          setState(() {
-                            _selectedCheckboxes[0] = !_selectedCheckboxes[0]!;
-                          });
-                        },
-                        child: Container(
-                          width: 20,
-                          height: 20,
-                          decoration: BoxDecoration(
-                            color: _selectedCheckboxes[0]!
-                                ? ColorsInfo.newara
-                                : Color(0xFFF0F0F0),
-                            borderRadius: BorderRadius.circular(5.0),
-                          ),
-                          alignment: Alignment.center,
-                          child: SvgPicture.asset(
-                            'assets/icons/check.svg',
-                            width: 16,
-                            height: 16,
-                            color: Colors.white,
-                          ),
-                        ),
-                      ),
-                      SizedBox(
-                        width: 6,
-                      ),
-                      Text(
-                        "익명",
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w500,
-                          color: _selectedCheckboxes[0]!
-                              ? ColorsInfo.newara
-                              : Color(0xFFBBBBBB),
-                        ),
-                      ),
-                      SizedBox(
-                        width: 15,
-                      ),
-                      GestureDetector(
-                        onTap: () {
-                          setState(() {
-                            _selectedCheckboxes[1] = !_selectedCheckboxes[1]!;
-                          });
-                        },
-                        child: Container(
-                          width: 20,
-                          height: 20,
-                          decoration: BoxDecoration(
-                            color: _selectedCheckboxes[1]!
-                                ? ColorsInfo.newara
-                                : Color(0xFFF0F0F0),
-                            borderRadius: BorderRadius.circular(5.0),
-                          ),
-                          alignment: Alignment.center,
-                          child: SvgPicture.asset(
-                            'assets/icons/check.svg',
-                            width: 16,
-                            height: 16,
-                            color: Colors.white,
-                          ),
-                        ),
-                      ),
-                      SizedBox(
-                        width: 6,
-                      ),
-                      Text(
-                        "성인",
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w500,
+                        height: 20,
+                        decoration: BoxDecoration(
                           color: _selectedCheckboxes[1]!
                               ? ColorsInfo.newara
-                              : Color(0xFFBBBBBB),
+                              : Color(0xFFF0F0F0),
+                          borderRadius: BorderRadius.circular(5.0),
+                        ),
+                        alignment: Alignment.center,
+                        child: SvgPicture.asset(
+                          'assets/icons/check.svg',
+                          width: 16,
+                          height: 16,
+                          color: Colors.white,
                         ),
                       ),
-                      SizedBox(
-                        width: 15,
+                    ),
+                    SizedBox(
+                      width: 6,
+                    ),
+                    Text(
+                      "성인",
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w500,
+                        color: _selectedCheckboxes[1]!
+                            ? ColorsInfo.newara
+                            : Color(0xFFBBBBBB),
                       ),
-                      GestureDetector(
-                        onTap: () {
-                          setState(() {
-                            _selectedCheckboxes[2] = !_selectedCheckboxes[2]!;
-                          });
-                        },
-                        child: Container(
-                          width: 20,
-                          height: 20,
-                          decoration: BoxDecoration(
-                            color: _selectedCheckboxes[2]!
-                                ? ColorsInfo.newara
-                                : Color(0xFFF0F0F0),
-                            borderRadius: BorderRadius.circular(5.0),
-                          ),
-                          alignment: Alignment.center,
-                          child: SvgPicture.asset(
-                            'assets/icons/check.svg',
-                            width: 16,
-                            height: 16,
-                            color: Colors.white,
-                          ),
-                        ),
-                      ),
-                      SizedBox(
-                        width: 6,
-                      ),
-                      Text(
-                        "정치",
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w500,
+                    ),
+                    SizedBox(
+                      width: 15,
+                    ),
+                    GestureDetector(
+                      onTap: () {
+                        setState(() {
+                          _selectedCheckboxes[2] = !_selectedCheckboxes[2]!;
+                        });
+                      },
+                      child: Container(
+                        width: 20,
+                        height: 20,
+                        decoration: BoxDecoration(
                           color: _selectedCheckboxes[2]!
                               ? ColorsInfo.newara
-                              : Color(0xFFBBBBBB),
+                              : Color(0xFFF0F0F0),
+                          borderRadius: BorderRadius.circular(5.0),
+                        ),
+                        alignment: Alignment.center,
+                        child: SvgPicture.asset(
+                          'assets/icons/check.svg',
+                          width: 16,
+                          height: 16,
+                          color: Colors.white,
                         ),
                       ),
-                      Spacer(),
-                      GestureDetector(
-                        onTap: _imagePick,
-                        child: Text(
-                          "이용약관",
-                          style: TextStyle(
-                            decoration: TextDecoration.underline,
-                            fontSize: 16,
-                            fontWeight: FontWeight.w500,
-                            color: Color(0xFFBBBBBB),
-                          ),
+                    ),
+                    SizedBox(
+                      width: 6,
+                    ),
+                    Text(
+                      "정치",
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w500,
+                        color: _selectedCheckboxes[2]!
+                            ? ColorsInfo.newara
+                            : Color(0xFFBBBBBB),
+                      ),
+                    ),
+                    Spacer(),
+                    GestureDetector(
+                      onTap: _imagePick,
+                      child: Text(
+                        "이용약관",
+                        style: TextStyle(
+                          decoration: TextDecoration.underline,
+                          fontSize: 16,
+                          fontWeight: FontWeight.w500,
+                          color: Color(0xFFBBBBBB),
                         ),
                       ),
-                      SizedBox(
-                        width: 20,
-                      ),
-                    ],
-                  ),
-                  SizedBox(
-                    height: 20,
-                  )
-                ],
-              ),
+                    ),
+                    SizedBox(
+                      width: 20,
+                    ),
+                  ],
+                ),
+                SizedBox(
+                  height: 20,
+                )
+              ],
             ),
           ],
         ),
