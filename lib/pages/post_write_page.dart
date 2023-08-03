@@ -18,10 +18,14 @@ import 'package:new_ara_app/models/topic_model.dart';
 import 'package:new_ara_app/widgetclasses/loading_indicator.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
+import 'package:uuid/uuid.dart';
 
 import '../providers/user_provider.dart';
 import 'package:path/path.dart' as path;
 import 'package:path_provider/path_provider.dart';
+
+import 'package:html/parser.dart' show parse;
+import 'package:html/dom.dart' as html;
 
 class PostWritePage extends StatefulWidget {
   const PostWritePage({Key? key}) : super(key: key);
@@ -40,11 +44,13 @@ class AttachmentsFormat {
   bool isNewFile; // 수정 시에 추가한 파일인가?
   String? filePath;
   Map<String, dynamic>? json;
+  String? uuid;
   AttachmentsFormat({
     required this.fileType,
     required this.isNewFile,
     this.filePath,
     this.json,
+    this.uuid,
   });
 }
 
@@ -66,8 +72,8 @@ class _PostWritePageState extends State<PostWritePage> {
     group: SimpleBoardModel(id: -1, slug: '', ko_name: '', en_name: ''),
   );
 
-  List<bool?> selectedCheckboxes = [true, false, false];
-  bool isFileMenuBarSelected = false; // 첨부파일 메뉴바가 선택되었는가?
+  List<bool?> _selectedCheckboxes = [true, false, false];
+  bool _isFileMenuBarSelected = false; // 첨부파일 메뉴바가 선택되었는가?
 
   BoardDetailActionModel? _chosenBoardValue;
   TopicModel? _chosenTopicValue;
@@ -187,6 +193,26 @@ class _PostWritePageState extends State<PostWritePage> {
     if (_isLoading) return LoadingIndicator();
     var userProvider = context.watch<UserProvider>();
 
+    String updateImgSrc(htmlString, uuid, fileUrl) {
+      
+      var document = parse(htmlString);
+      debugPrint(document.body?.innerHtml ?? '');
+      List<html.Element> imgTags = document.getElementsByTagName('img');
+
+      for (var imgTag in imgTags) {
+        if (imgTag.attributes['data-uuid'] == uuid) {
+          if (fileUrl != null) {
+            imgTag.attributes['src'] = fileUrl;
+          } else {
+            // fileUrl이 null인 경우 이미지 태그를 삭제
+            imgTag.remove();
+          }
+        }
+      }
+      debugPrint(document.body?.innerHtml ?? '');
+      return document.body?.innerHtml ?? '';
+    }
+
     Future<void> _filePick() async {
       filePickerResult = await FilePicker.platform.pickFiles();
       if (filePickerResult != null) {
@@ -202,7 +228,7 @@ class _PostWritePageState extends State<PostWritePage> {
         }
 
         setState(() {
-          isFileMenuBarSelected = true;
+          _isFileMenuBarSelected = true;
           attachmentList.add(AttachmentsFormat(
             fileType: FileType.Other,
             isNewFile: true,
@@ -322,6 +348,7 @@ class _PostWritePageState extends State<PostWritePage> {
                     userProvider.getCookiesToString();
                 for (int i = 0; i < attachmentList.length; i++) {
                   var attachFile = File(attachmentList[i].filePath!);
+                  //이 파일 uuid 에 해당하는 img 태그가 html 안에 있다면 변경해야한다.
 
                   // 파일이 존재하는지 확인
                   if (attachFile.existsSync()) {
@@ -338,9 +365,12 @@ class _PostWritePageState extends State<PostWritePage> {
                       var response = await dio.post(
                           "$newAraDefaultUrl/api/attachments/",
                           data: formData);
-
-                      attachmentIds
-                          .add(AttachmentModel.fromJson(response.data).id);
+                      debugPrint("Response: ${response.data}");
+                      final attachmentModel =
+                          AttachmentModel.fromJson(response.data);
+                      attachmentIds.add(attachmentModel.id);
+                      contentValue = updateImgSrc(contentValue,
+                          attachmentList[i].uuid, attachmentModel.file);
                     } catch (error) {
                       debugPrint("$error");
                     }
@@ -365,14 +395,14 @@ class _PostWritePageState extends State<PostWritePage> {
                   },
                 );
                 debugPrint('Response data: ${response.data}');
-              } catch (error) {
-                debugPrint('Error: $error');
+              } on DioException catch (error) {
+                debugPrint('post Error: ${error.response!.data}');
                 return;
               }
               // htmlController.getText().then((value) {
-              //   debugPrint(value);
+              //   debugPrint(value);S
               // });
-              // if (imagePickerFile != null) {
+              // if (imagePickerFile != null) {S
               //   var filePath = imagePickerResult.path;
               //   var filename = filePath.split("/").last;
               //   var formData = FormData.fromMap({
@@ -638,9 +668,34 @@ class _PostWritePageState extends State<PostWritePage> {
                       ),
                       htmlToolbarOptions: HtmlToolbarOptions(
                           toolbarType: ToolbarType.nativeGrid,
+                          mediaUploadInterceptor:
+                              (PlatformFile file, InsertFileType type) async {
+                            if (type == InsertFileType.image) {
+                              // var uuid = Uuid();
+                              String uuid = const Uuid().v4();
+                              setState(() {
+                                _isFileMenuBarSelected = true;
+                                attachmentList.add(AttachmentsFormat(
+                                  fileType: FileType.Other,
+                                  isNewFile: true,
+                                  filePath: file.path,
+                                  uuid: uuid,
+                                ));
+                              });
+
+                              ///src랑 file.path랑 연결해줘야함.
+                              String base64Data = base64.encode(file.bytes!);
+                              String base64Image =
+                                  """<img data-uuid=$uuid  src="data:image/${file.extension};base64,$base64Data" data-filename="${file.name}" width=100% />""";
+                              // String base64Image =
+                              //     """<img src="https://sparcs-newara-dev.s3.amazonaws.com/files/IMG_0003_8FJEMU6.jpeg" data-filename="${file.name}" width=100% />""";
+                              _htmlController.insertHtml(base64Image);
+                            }
+                            return false;
+                          },
                           defaultToolbarButtons: [
                             // FontSettingButtons(),
-                            FontButtons(
+                            const FontButtons(
                               bold: true,
                               italic: true,
                               underline: true,
@@ -651,6 +706,15 @@ class _PostWritePageState extends State<PostWritePage> {
 
                               // StyleButtons(
                             ),
+                            const InsertButtons(
+                              link: true,
+                              picture: true,
+                              audio: false,
+                              video: false,
+                              otherFile: false,
+                              table: false,
+                              hr: true,
+                            )
                             // ColorButtons(),
                           ]),
 
@@ -659,14 +723,6 @@ class _PostWritePageState extends State<PostWritePage> {
                       ),
                     ),
                   ),
-                  // Text(
-                  //   "내용도 입력해봐=ㅆ어ㅛ내용도 입력해봐=ㅆ어ㅛ내용도 입력해봐=ㅆ어ㅛ내용도 입력해봐=ㅆ어ㅛ내용도 입력해봐=ㅆ어ㅛ내용도 입력해봐=ㅆ어ㅛ내용도 입력해봐=ㅆ어ㅛ내용도 입력해봐=ㅆ어ㅛ내용도 입력해봐=ㅆ어ㅛ내용도 입력해봐=ㅆ어ㅛ",
-                  //   style: TextStyle(
-                  //     fontSize: 16,
-                  //     fontWeight: FontWeight.w500,
-                  //   ),
-                  // ),
-                  // if (imagePickerFile != null) Image.file(imagePickerFile!),
                 ],
               ),
             ),
@@ -676,19 +732,6 @@ class _PostWritePageState extends State<PostWritePage> {
                   if (attachmentList.length == 0)
                     Row(
                       children: [
-                        // InkWell(
-                        //   onTap: () async {
-                        //     imagePickerResult = await ImagePicker()
-                        //         .pickImage(source: ImageSource.gallery);
-                        //     if (imagePickerResult != null) {
-                        //       setState(() {
-                        //         imagePickerFile =
-                        //             File(imagePickerResult.path);
-                        //       });
-                        //     }
-                        //   },
-                        //   child: Text("첨부파일 추가"),
-                        // ),
                         Row(
                           children: [
                             SizedBox(
@@ -753,8 +796,8 @@ class _PostWritePageState extends State<PostWritePage> {
                               InkWell(
                                 onTap: () {
                                   setState(() {
-                                    isFileMenuBarSelected =
-                                        !isFileMenuBarSelected;
+                                    _isFileMenuBarSelected =
+                                        !_isFileMenuBarSelected;
                                   });
                                 },
                                 child: SvgPicture.asset(
@@ -779,7 +822,7 @@ class _PostWritePageState extends State<PostWritePage> {
                               ),
                             ],
                           ),
-                          if (isFileMenuBarSelected) ...[
+                          if (_isFileMenuBarSelected) ...[
                             Padding(
                               padding:
                                   const EdgeInsets.symmetric(horizontal: 15),
@@ -852,10 +895,17 @@ class _PostWritePageState extends State<PostWritePage> {
                                                       color: Color(0xFFBBBBBB)),
                                                 ),
                                                 InkWell(
-                                                  onTap: () {
+                                                  onTap: () async {
+                                                    
+                                                    // String text =
+                                                    //     await _htmlController
+                                                    //         .getText();
                                                     setState(() {
+                                          //             _htmlController.setText(
+                                          // "이미지가 삭제되었습니다.");
                                                       attachmentList
                                                           .removeAt(index);
+                                                      _isLoading = false;
                                                     });
                                                   },
                                                   child: SvgPicture.asset(
@@ -894,14 +944,14 @@ class _PostWritePageState extends State<PostWritePage> {
                       GestureDetector(
                         onTap: () {
                           setState(() {
-                            selectedCheckboxes[0] = !selectedCheckboxes[0]!;
+                            _selectedCheckboxes[0] = !_selectedCheckboxes[0]!;
                           });
                         },
                         child: Container(
                           width: 20,
                           height: 20,
                           decoration: BoxDecoration(
-                            color: selectedCheckboxes[0]!
+                            color: _selectedCheckboxes[0]!
                                 ? ColorsInfo.newara
                                 : Color(0xFFF0F0F0),
                             borderRadius: BorderRadius.circular(5.0),
@@ -923,7 +973,7 @@ class _PostWritePageState extends State<PostWritePage> {
                         style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w500,
-                          color: selectedCheckboxes[0]!
+                          color: _selectedCheckboxes[0]!
                               ? ColorsInfo.newara
                               : Color(0xFFBBBBBB),
                         ),
@@ -934,14 +984,14 @@ class _PostWritePageState extends State<PostWritePage> {
                       GestureDetector(
                         onTap: () {
                           setState(() {
-                            selectedCheckboxes[1] = !selectedCheckboxes[1]!;
+                            _selectedCheckboxes[1] = !_selectedCheckboxes[1]!;
                           });
                         },
                         child: Container(
                           width: 20,
                           height: 20,
                           decoration: BoxDecoration(
-                            color: selectedCheckboxes[1]!
+                            color: _selectedCheckboxes[1]!
                                 ? ColorsInfo.newara
                                 : Color(0xFFF0F0F0),
                             borderRadius: BorderRadius.circular(5.0),
@@ -963,7 +1013,7 @@ class _PostWritePageState extends State<PostWritePage> {
                         style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w500,
-                          color: selectedCheckboxes[1]!
+                          color: _selectedCheckboxes[1]!
                               ? ColorsInfo.newara
                               : Color(0xFFBBBBBB),
                         ),
@@ -974,14 +1024,14 @@ class _PostWritePageState extends State<PostWritePage> {
                       GestureDetector(
                         onTap: () {
                           setState(() {
-                            selectedCheckboxes[2] = !selectedCheckboxes[2]!;
+                            _selectedCheckboxes[2] = !_selectedCheckboxes[2]!;
                           });
                         },
                         child: Container(
                           width: 20,
                           height: 20,
                           decoration: BoxDecoration(
-                            color: selectedCheckboxes[2]!
+                            color: _selectedCheckboxes[2]!
                                 ? ColorsInfo.newara
                                 : Color(0xFFF0F0F0),
                             borderRadius: BorderRadius.circular(5.0),
@@ -1003,7 +1053,7 @@ class _PostWritePageState extends State<PostWritePage> {
                         style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w500,
-                          color: selectedCheckboxes[2]!
+                          color: _selectedCheckboxes[2]!
                               ? ColorsInfo.newara
                               : Color(0xFFBBBBBB),
                         ),

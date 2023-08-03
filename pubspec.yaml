@@ -51,6 +51,8 @@ dependencies:
   permission_handler: ^10.2.0
   url_launcher: ^6.1.12
   html_editor_enhanced: ^2.5.1
+  uuid: ^3.0.7
+  html: ^0.15.4
 
 dev_dependencies:
   flutter_test:
