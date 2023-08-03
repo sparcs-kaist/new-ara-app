@@ -414,7 +414,7 @@ class _PostViewPageState extends State<PostViewPage> {
                                           }
                                         },
                                         child: Container(
-                                          width: 90,
+                                          width: 100,
                                           height: 40,
                                           decoration: BoxDecoration(
                                             color: Colors.white,
@@ -445,7 +445,9 @@ class _PostViewPageState extends State<PostViewPage> {
                                                 ),
                                                 const SizedBox(width: 5),
                                                 Text(
-                                                  '담아두기',
+                                                  article.my_scrap == null
+                                                      ? '담아두기'
+                                                      : '담아둔 글',
                                                   style: TextStyle(
                                                     color:
                                                         article.my_scrap == null
