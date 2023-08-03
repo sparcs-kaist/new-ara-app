@@ -9,6 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:new_ara_app/constants/colors_info.dart';
+import 'package:new_ara_app/models/attachment_model.dart';
 import 'package:new_ara_app/models/board_detail_action_model.dart';
 import 'package:new_ara_app/models/board_group_model.dart';
 import 'package:new_ara_app/models/board_model.dart';
@@ -48,15 +49,22 @@ class AttachmentsFormat {
 }
 
 class _PostWritePageState extends State<PostWritePage> {
-
   final MALNO = TopicModel(
-      id: -1,
-      slug: "",
-      ko_name: "말머리 없음",
-      en_name: "No Topic",
-    );
-  final SELECTBOARD = BoardDetailActionModel(id: -1, topics: [], user_readable: true, user_writable: true, slug: '', ko_name: '게시판을 선택하세요', en_name: 'No Board', group: SimpleBoardModel(id: -1, slug: '', ko_name: '', en_name: ''),);
-  
+    id: -1,
+    slug: "",
+    ko_name: "말머리 없음",
+    en_name: "No Topic",
+  );
+  final SELECTBOARD = BoardDetailActionModel(
+    id: -1,
+    topics: [],
+    user_readable: true,
+    user_writable: true,
+    slug: '',
+    ko_name: '게시판을 선택하세요',
+    en_name: 'No Board',
+    group: SimpleBoardModel(id: -1, slug: '', ko_name: '', en_name: ''),
+  );
 
   List<bool?> selectedCheckboxes = [true, false, false];
   bool isFileMenuBarSelected = false; // 첨부파일 메뉴바가 선택되었는가?
@@ -73,7 +81,7 @@ class _PostWritePageState extends State<PostWritePage> {
   var imagePickerResult;
   FilePickerResult? filePickerResult;
 
-  List<AttachmentsFormat> attachmentsList = [];
+  List<AttachmentsFormat> attachmentList = [];
 
   late String _localPath;
 
@@ -195,7 +203,7 @@ class _PostWritePageState extends State<PostWritePage> {
 
         setState(() {
           isFileMenuBarSelected = true;
-          attachmentsList.add(AttachmentsFormat(
+          attachmentList.add(AttachmentsFormat(
             fileType: FileType.Other,
             isNewFile: true,
             filePath: file.path,
@@ -295,8 +303,9 @@ class _PostWritePageState extends State<PostWritePage> {
           // ),
           MaterialButton(
             onPressed: () async {
-              var titleValue;
-              var contentValue;
+              String titleValue;
+              String contentValue;
+              List<int> attachmentIds = [];
               try {
                 titleValue = _titleController.text;
                 contentValue = await _htmlController.getText();
@@ -311,40 +320,44 @@ class _PostWritePageState extends State<PostWritePage> {
                 Dio dio = Dio();
                 dio.options.headers['Cookie'] =
                     userProvider.getCookiesToString();
-                    for (int i = 0; i < attachmentsList.length; i++) {
-                var attachFile = File(attachmentsList[i].filePath!);
+                for (int i = 0; i < attachmentList.length; i++) {
+                  var attachFile = File(attachmentList[i].filePath!);
 
-                // 파일이 존재하는지 확인
-                if (attachFile.existsSync()) {
-                  var dio = Dio();
-                  dio.options.headers['Cookie'] =
-                      userProvider.getCookiesToString();
-                  var formData = FormData.fromMap({
-                    "file": await MultipartFile.fromFile(attachFile.path,
-                        filename: attachFile.path
-                            .split('/')
-                            .last), // You may need to replace '/' with '\\' if you're using Windows.
-                  });
-                  try {
-                    var response = await dio.post(
-                        "$newAraDefaultUrl/api/attachments/",
-                        data: formData);
-                    print(response.data);
-                  } catch (error) {
-                    debugPrint("$error");
+                  // 파일이 존재하는지 확인
+                  if (attachFile.existsSync()) {
+                    var dio = Dio();
+                    dio.options.headers['Cookie'] =
+                        userProvider.getCookiesToString();
+                    var formData = FormData.fromMap({
+                      "file": await MultipartFile.fromFile(attachFile.path,
+                          filename: attachFile.path
+                              .split('/')
+                              .last), // You may need to replace '/' with '\\' if you're using Windows.
+                    });
+                    try {
+                      var response = await dio.post(
+                          "$newAraDefaultUrl/api/attachments/",
+                          data: formData);
+
+                      attachmentIds
+                          .add(AttachmentModel.fromJson(response.data).id);
+                    } catch (error) {
+                      debugPrint("$error");
+                    }
+                  } else {
+                    debugPrint("File does not exist: ${attachFile.path}");
                   }
-                } else {
-                  debugPrint("File does not exist: ${attachFile.path}");
                 }
-              }
 
                 var response = await dio.post(
                   '$newAraDefaultUrl/api/articles/',
                   data: {
                     'title': titleValue,
                     'content': contentValue,
-                    'attachments': [],
-                    'parent_topic': _chosenTopicValue!.id ==-1? '' : _chosenTopicValue!.id,
+                    'attachments': attachmentIds,
+                    'parent_topic': _chosenTopicValue!.id == -1
+                        ? ''
+                        : _chosenTopicValue!.id,
                     'is_content_sexual': false,
                     'is_content_social': false,
                     'parent_board': _chosenBoardValue!.id,
@@ -489,7 +502,7 @@ class _PostWritePageState extends State<PostWritePage> {
                                 child: Text(
                                   value.ko_name,
                                   style: TextStyle(
-                                    color: value.id==-1
+                                    color: value.id == -1
                                         ? Color(0xFFBBBBBB)
                                         : ColorsInfo.newara,
                                     fontWeight: FontWeight.w500,
@@ -544,7 +557,7 @@ class _PostWritePageState extends State<PostWritePage> {
                                 child: Text(
                                   value.ko_name,
                                   style: TextStyle(
-                                    color: value.id==-1
+                                    color: value.id == -1
                                         ? Color(0xFFBBBBBB)
                                         : Colors.black,
                                     fontWeight: FontWeight.w500,
@@ -660,7 +673,7 @@ class _PostWritePageState extends State<PostWritePage> {
             Container(
               child: Column(
                 children: [
-                  if (attachmentsList.length == 0)
+                  if (attachmentList.length == 0)
                     Row(
                       children: [
                         // InkWell(
@@ -727,7 +740,7 @@ class _PostWritePageState extends State<PostWritePage> {
                                 width: 8,
                               ),
                               Text(
-                                attachmentsList.length.toString(),
+                                attachmentList.length.toString(),
                                 style: TextStyle(
                                   fontSize: 16,
                                   fontWeight: FontWeight.w500,
@@ -777,7 +790,7 @@ class _PostWritePageState extends State<PostWritePage> {
                                   ),
                                   ListView.builder(
                                     shrinkWrap: true,
-                                    itemCount: attachmentsList.length,
+                                    itemCount: attachmentList.length,
                                     itemBuilder: (context, index) {
                                       return Column(
                                         children: [
@@ -820,7 +833,7 @@ class _PostWritePageState extends State<PostWritePage> {
                                                 Expanded(
                                                   child: Text(
                                                     path.basename(
-                                                        attachmentsList[index]
+                                                        attachmentList[index]
                                                             .filePath!),
                                                   ),
                                                 ),
@@ -829,7 +842,7 @@ class _PostWritePageState extends State<PostWritePage> {
                                                 ),
                                                 Text(
                                                   formatBytes(File(
-                                                          attachmentsList[index]
+                                                          attachmentList[index]
                                                               .filePath!)
                                                       .lengthSync()),
                                                   style: TextStyle(
@@ -841,7 +854,7 @@ class _PostWritePageState extends State<PostWritePage> {
                                                 InkWell(
                                                   onTap: () {
                                                     setState(() {
-                                                      attachmentsList
+                                                      attachmentList
                                                           .removeAt(index);
                                                     });
                                                   },
