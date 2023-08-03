@@ -194,9 +194,8 @@ class _PostWritePageState extends State<PostWritePage> {
     var userProvider = context.watch<UserProvider>();
 
     String updateImgSrc(htmlString, uuid, fileUrl) {
-      
       var document = parse(htmlString);
-      debugPrint(document.body?.innerHtml ?? '');
+      // debugPrint(document.body?.innerHtml ?? '');
       List<html.Element> imgTags = document.getElementsByTagName('img');
 
       for (var imgTag in imgTags) {
@@ -209,7 +208,7 @@ class _PostWritePageState extends State<PostWritePage> {
           }
         }
       }
-      debugPrint(document.body?.innerHtml ?? '');
+      //  debugPrint(document.body?.innerHtml ?? '');
       return document.body?.innerHtml ?? '';
     }
 
@@ -896,13 +895,28 @@ class _PostWritePageState extends State<PostWritePage> {
                                                 ),
                                                 InkWell(
                                                   onTap: () async {
-                                                    
-                                                    // String text =
-                                                    //     await _htmlController
-                                                    //         .getText();
+                                                    // _htmlController
+                                                    //     .setText("<p>test</p>");
+                                                    String text =
+                                                        await _htmlController
+                                                            .getText();
+                                                    // debugPrint("text $text");
+
+                                                    String nextText =
+                                                        updateImgSrc(
+                                                            text,
+                                                            attachmentList[
+                                                                    index]
+                                                                .uuid,
+                                                            null);
+                                                    debugPrint(
+                                                        "next : $nextText");
+                                                    _htmlController
+                                                        .setText(nextText);
+
                                                     setState(() {
-                                          //             _htmlController.setText(
-                                          // "이미지가 삭제되었습니다.");
+                                                      //             _htmlController.setText(
+                                                      // "이미지가 삭제되었습니다.");
                                                       attachmentList
                                                           .removeAt(index);
                                                       _isLoading = false;
