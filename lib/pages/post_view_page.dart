@@ -1043,24 +1043,21 @@ class _PostViewPageState extends State<PostViewPage> {
                         isNestedComment
                             ? const SizedBox(height: 5)
                             : Container(),
+                        isModify
+                            ? Text(
+                                '나의 댓글 "${targetComment!.content}" 수정 중',
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: const TextStyle(
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              )
+                            : Container(),
+                        isModify ? const SizedBox(height: 5) : Container(),
                         Row(
                           children: [
-                            // TextFormField
-                            Expanded(
-                              child: Container(
-                                constraints: const BoxConstraints(
-                                  minHeight: 45,
-                                ),
-                                decoration: const BoxDecoration(
-                                  color: Color.fromRGBO(235, 235, 235, 1),
-                                  borderRadius:
-                                      BorderRadius.all(Radius.circular(10)),
-                                ),
-                                child: _buildForm(),
-                              ),
-                            ),
                             // Close button
-                            const SizedBox(width: 10),
                             (!isModify && !isNestedComment)
                                 ? Container()
                                 : InkWell(
@@ -1079,7 +1076,22 @@ class _PostViewPageState extends State<PostViewPage> {
                                   ),
                             (!isModify && !isNestedComment)
                                 ? Container()
-                                : const SizedBox(width: 10),
+                                : const SizedBox(width: 5),
+                            // TextFormField
+                            Expanded(
+                              child: Container(
+                                constraints: const BoxConstraints(
+                                  minHeight: 45,
+                                ),
+                                decoration: const BoxDecoration(
+                                  color: Color.fromRGBO(235, 235, 235, 1),
+                                  borderRadius:
+                                      BorderRadius.all(Radius.circular(10)),
+                                ),
+                                child: _buildForm(),
+                              ),
+                            ),
+                            const SizedBox(width: 5),
                             // send button
                             InkWell(
                               onTap: () async {
@@ -1490,7 +1502,6 @@ class _PostViewPageState extends State<PostViewPage> {
         }
       }
     }
-
     return true;
   }
 
