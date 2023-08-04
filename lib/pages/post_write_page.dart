@@ -55,13 +55,13 @@ class AttachmentsFormat {
 }
 
 class _PostWritePageState extends State<PostWritePage> {
-  final MALNO = TopicModel(
+  final _defaultTopicModel = TopicModel(
     id: -1,
     slug: "",
     ko_name: "말머리 없음",
     en_name: "No Topic",
   );
-  final SELECTBOARD = BoardDetailActionModel(
+  final _defaultBoardDetailActionModel = BoardDetailActionModel(
     id: -1,
     topics: [],
     user_readable: true,
@@ -110,26 +110,6 @@ class _PostWritePageState extends State<PostWritePage> {
     _getBoardList();
   }
 
-  Future<bool> _checkPermission() async {
-    if (platform == TargetPlatform.android) {
-      final status = await Permission.storage.status;
-      debugPrint("Android");
-      if (status != PermissionStatus.granted) {
-        debugPrint("not granted");
-        final result = await Permission.storage.request();
-        if (result == PermissionStatus.granted) {
-          return true;
-        }
-        debugPrint("not granted again");
-      } else {
-        return true;
-      }
-    } else {
-      return true;
-    }
-    return false;
-  }
-
   Future<String?> _findLocalPath() async {
     if (platform == TargetPlatform.android) {
       return "/sdcard/download/";
@@ -158,7 +138,7 @@ class _PostWritePageState extends State<PostWritePage> {
       var response = await dio.get('$newAraDefaultUrl/api/boards/');
       debugPrint(response.data.toString());
 
-      _boardList = [SELECTBOARD];
+      _boardList = [_defaultBoardDetailActionModel];
       for (Map<String, dynamic> json in response.data) {
         try {
           BoardDetailActionModel boardDetail =
@@ -180,7 +160,7 @@ class _PostWritePageState extends State<PostWritePage> {
       return;
     }
     setState(() {
-      _specTopicList.add(MALNO);
+      _specTopicList.add(_defaultTopicModel);
 
       _chosenTopicValue = _specTopicList[0];
       _chosenBoardValue = _boardList[0];
@@ -471,7 +451,7 @@ class _PostWritePageState extends State<PostWritePage> {
                           onChanged: (BoardDetailActionModel? value) {
                             setState(() {
                               _specTopicList = [];
-                              _specTopicList.add(MALNO);
+                              _specTopicList.add(_defaultTopicModel);
                               for (TopicModel topic in value!.topics) {
                                 _specTopicList.add(topic);
                               }
@@ -550,6 +530,7 @@ class _PostWritePageState extends State<PostWritePage> {
                     controller: _titleController,
                     minLines: 1,
                     maxLines: 1,
+                    maxLength: 255,
                     style: TextStyle(
                       height: 1,
                       fontSize: 22,
