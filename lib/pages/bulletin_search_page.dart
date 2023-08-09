@@ -13,6 +13,7 @@ import 'package:provider/provider.dart';
 class BulletinSearchPage extends StatefulWidget {
   final BoardDetailActionModel? boardInfo;
   final BoardType boardType;
+
   const BulletinSearchPage(
       {super.key, required this.boardType, required this.boardInfo});
 
@@ -28,7 +29,7 @@ class _BulletinSearchPageState extends State<BulletinSearchPage> {
   String _hintText = "";
   String _searchWord = "";
   final ScrollController _scrollController = ScrollController();
-
+  final FocusNode _focusNode = FocusNode();
   @override
   void initState() {
     // TODO: implement initState
@@ -168,6 +169,7 @@ ${_apiUrl}1&main_search__contains=${_searchWord}
               child: TextField(
                 minLines: 1,
                 maxLines: 1,
+                focusNode: _focusNode,
                 textInputAction: TextInputAction.search,
                 onSubmitted: (String text) {
                   setState(() {

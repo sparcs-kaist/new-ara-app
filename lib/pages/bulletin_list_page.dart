@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:new_ara_app/pages/bulletin_search_page.dart';
 import 'package:provider/provider.dart';
 
 import 'package:new_ara_app/constants/board_type.dart';
@@ -24,6 +25,8 @@ class _BulletinListPageState extends State<BulletinListPage> {
   List<List<BoardDetailActionModel>> boardsByGroup =
       List.generate(boardsByGroupLength + 1, (_) => []);
   List<Map<String, dynamic>> textContent = [];
+  FocusNode _focusNode = FocusNode();
+
   @override
   void initState() {
     // TODO: implement initState
@@ -78,6 +81,19 @@ class _BulletinListPageState extends State<BulletinListPage> {
                         TextField(
                           minLines: 1,
                           maxLines: 1,
+                          focusNode: _focusNode,
+                          onTap: () async {
+                            debugPrint("onTap");
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => BulletinSearchPage(
+                                      boardType: BoardType.all,
+                                      boardInfo: null)),
+                            );
+
+                            FocusScope.of(context).requestFocus(FocusNode());
+                          },
                           textInputAction: TextInputAction.search,
                           onSubmitted: (String text) {},
                           style: const TextStyle(
