@@ -1,42 +1,52 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:new_ara_app/pages/bulletin_search_page.dart';
-import 'package:provider/provider.dart';
-
 import 'package:new_ara_app/constants/board_type.dart';
 import 'package:new_ara_app/constants/colors_info.dart';
+import 'package:new_ara_app/models/article_list_action_model.dart';
+import 'package:new_ara_app/models/board_detail_action_model.dart';
+import 'package:new_ara_app/pages/post_view_page.dart';
 import 'package:new_ara_app/providers/user_provider.dart';
 import 'package:new_ara_app/widgetclasses/loading_indicator.dart';
 import 'package:new_ara_app/widgetclasses/post_preview.dart';
-import 'package:new_ara_app/models/board_detail_action_model.dart';
-import 'package:new_ara_app/models/article_list_action_model.dart';
-import 'package:new_ara_app/pages/post_view_page.dart';
+import 'package:provider/provider.dart';
 
-class FreeBulletinBoardPage extends StatefulWidget {
+class BulletinSearchPage extends StatefulWidget {
   final BoardDetailActionModel? boardInfo;
   final BoardType boardType;
-  const FreeBulletinBoardPage(
+  const BulletinSearchPage(
       {super.key, required this.boardType, required this.boardInfo});
 
   @override
-  State<FreeBulletinBoardPage> createState() => _FreeBulletinBoardPageState();
+  State<BulletinSearchPage> createState() => _BulletinSearchPageState();
 }
 
-class _FreeBulletinBoardPageState extends State<FreeBulletinBoardPage> {
+class _BulletinSearchPageState extends State<BulletinSearchPage> {
   List<ArticleListActionModel> postPreviewList = [];
-  int currentPage = 1;
-  bool isLoading = true;
-  String apiUrl = "";
+  int _currentPage = 1;
+  bool _isLoading = true;
+  String _apiUrl = "";
+  String _hintText = "";
+  String _searchWord = "";
   final ScrollController _scrollController = ScrollController();
 
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
-    if (widget.boardType == BoardType.free) {
-      apiUrl = "articles/?parent_board=${widget.boardInfo!.id.toInt()}&page=";
-    } else if (widget.boardType == BoardType.recent) {
-      apiUrl = "articles/recent/?page=";
+
+    switch (widget.boardType) {
+      case BoardType.free:
+        _apiUrl =
+            "articles/?parent_board=${widget.boardInfo!.id.toInt()}&page=";
+        _hintText = widget.boardInfo!.ko_name + "에서 검색";
+        break;
+      case BoardType.all:
+        _apiUrl = "articles/?page=";
+        _hintText = "전체 보기에서 검색";
+        break;
+      default:
+        _apiUrl = "articles/recent/?page=";
+        break;
     }
 
     var userProvider = context.read<UserProvider>();
@@ -52,14 +62,19 @@ class _FreeBulletinBoardPageState extends State<FreeBulletinBoardPage> {
   }
 
   void refreshPostList(UserProvider userProvider) async {
-    //example
-    //프로바이더에 있는 정보 사용.
-    // api 호출과 Provider 정보 동기화.
+    if (_searchWord == "") {
+      if (mounted) {
+        setState(() {
+          postPreviewList.clear();
+          _isLoading = false;
+        });
+      }
+      return;
+    }
 
-    //https://newara.dev.sparcs.org/api/articles/recent/?page=1
-    //                                  articles/?parent_board=${this.widget.boardInfo["id"]}&page=1
-    // await Future.delayed(Duration(seconds: 1));
-    Map<String, dynamic>? myMap = await userProvider.getApiRes("${apiUrl}1");
+    Map<String, dynamic>? myMap = await userProvider.getApiRes("""
+${_apiUrl}1&main_search__contains=${_searchWord}
+""");
 
     if (mounted) {
       setState(() {
@@ -73,20 +88,30 @@ class _FreeBulletinBoardPageState extends State<FreeBulletinBoardPage> {
                 "refreshPostList error at $i : $error"); // invalid json 걸러내기
           }
         }
-        isLoading = false;
+        _isLoading = false;
       });
     }
   }
 
   void _scrollListener() async {
+    if (_searchWord == "") {
+      if (mounted) {
+        setState(() {
+          postPreviewList.clear();
+          _isLoading = false;
+        });
+      }
+      return;
+    }
+
     var userProvider = context.read<UserProvider>();
     if (_scrollController.position.pixels ==
         _scrollController.position.maxScrollExtent) {
-      currentPage = currentPage + 1;
+      _currentPage = _currentPage + 1;
       // api 호출과 Provider 정보 동기화.
       // await Future.delayed(Duration(seconds: 1));
-      Map<String, dynamic>? myMap =
-          await userProvider.getApiRes("$apiUrl$currentPage");
+      Map<String, dynamic>? myMap = await userProvider.getApiRes(
+          "$_apiUrl$_currentPage&main_search__contains=$_searchWord");
       if (mounted) {
         setState(() {
           // "is_hidden": true,
@@ -100,7 +125,7 @@ class _FreeBulletinBoardPageState extends State<FreeBulletinBoardPage> {
                   ArticleListActionModel.fromJson(myMap["results"][i] ?? {}));
             }
           }
-          isLoading = false;
+          _isLoading = false;
         });
       }
     }
@@ -110,7 +135,7 @@ class _FreeBulletinBoardPageState extends State<FreeBulletinBoardPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        centerTitle: true,
+        centerTitle: false,
         leadingWidth: 100,
         leading: Row(
           children: [
@@ -132,70 +157,76 @@ class _FreeBulletinBoardPageState extends State<FreeBulletinBoardPage> {
                 },
               ),
             ),
-            const Text(
-              "게시판",
-              style: TextStyle(
-                color: Color(0xFFED3A3A),
-                fontSize: 17,
-                fontWeight: FontWeight.w500,
-              ),
-            ),
+            // Expanded(child: TextField()),
           ],
         ),
-        title: SizedBox(
-          child: Text(
-            widget.boardInfo?.ko_name ?? "실시간 인기글",
-            style: const TextStyle(
-              color: ColorsInfo.newara,
-              fontSize: 18,
-              fontWeight: FontWeight.w700,
-            ),
-          ),
-        ),
         actions: [
-          IconButton(
-            icon: SvgPicture.asset(
-              'assets/icons/search.svg',
-              color: ColorsInfo.newara,
-              width: 35,
-              height: 35,
-            ),
-            onPressed: () async {
-              await Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => BulletinSearchPage(
-                            boardType: widget.boardType,
-                            boardInfo: widget.boardInfo,
-                          )));
-            },
-          ),
-        ],
-      ),
-      floatingActionButton: Column(
-        mainAxisAlignment: MainAxisAlignment.end,
-        children: [
-          FloatingActionButton(
-            onPressed: () {
-              // FloatingActionButton을 누를 때 실행될 동작을 정의합니다.
-              debugPrint('FloatingActionButton pressed');
-            },
-            backgroundColor: Colors.white,
-            child: SizedBox(
-              width: 42,
-              height: 42,
-              child: SvgPicture.asset(
-                'assets/icons/modify.svg',
-                fit: BoxFit.fill,
+          SizedBox(
+            width: MediaQuery.of(context).size.width - 40,
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(0, 10, 15, 10),
+              child: TextField(
+                minLines: 1,
+                maxLines: 1,
+                textInputAction: TextInputAction.search,
+                onSubmitted: (String text) {
+                  setState(() {
+                    _searchWord = text;
+                    _isLoading = true;
+                  });
+                  refreshPostList(context.read<UserProvider>());
+                },
+                style: const TextStyle(
+                  height: 1,
+                  fontSize: 16,
+                  fontWeight: FontWeight.w500,
+                ),
+                decoration: InputDecoration(
+                  prefixIconConstraints:
+                      const BoxConstraints(maxHeight: 28, maxWidth: 28),
+                  prefixIcon: SizedBox(
+                    // 원하는 세로 크기
+                    child: SvgPicture.asset(
+                      'assets/icons/search.svg',
+                      color: Colors.grey,
+                      fit: BoxFit.contain,
+                    ),
+                  ),
+                  hintText: _hintText,
+                  hintStyle: const TextStyle(
+                    color: Color(0xFFBBBBBB),
+                    fontSize: 16,
+                    fontWeight: FontWeight.w500,
+                  ),
+                  filled: true,
+                  fillColor: const Color(0xFFF6F6F6),
+                  isDense: true,
+                  contentPadding: const EdgeInsets.fromLTRB(
+                    10.0,
+                    10.0,
+                    10.0,
+                    10.0,
+                  ), // 모서리를 둥글게 설정
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10.0),
+                    borderSide: const BorderSide(
+                      color: Colors.transparent, // 테두리 색상 설정
+                    ), // 모서리를 둥글게 설정
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10.0),
+                    borderSide: const BorderSide(
+                      color: Colors.transparent, // 테두리 색상 설정
+                    ), // 모서리를 둥글게 설정
+                  ),
+                ),
+                cursorColor: Colors.transparent,
               ),
             ),
           ),
-          const SizedBox(
-            height: 20,
-          )
         ],
       ),
-      body: isLoading
+      body: _isLoading
           ? const LoadingIndicator()
           : SafeArea(
               child: Center(

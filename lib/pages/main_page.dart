@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:new_ara_app/pages/bulletin_search_page.dart';
 import 'package:provider/provider.dart';
 
 import 'package:new_ara_app/constants/board_type.dart';
@@ -258,8 +259,8 @@ class _MainPageState extends State<MainPage> {
               width: 35,
               height: 35,
             ),
-            onPressed: () {
-              Navigator.push(
+            onPressed: () async {
+              await Navigator.push(
                 context,
                 MaterialPageRoute(
                   builder: (context) => PostWritePage(),
@@ -274,7 +275,15 @@ class _MainPageState extends State<MainPage> {
               width: 35,
               height: 35,
             ),
-            onPressed: () {},
+            onPressed: () async {
+              debugPrint("BulletinSearch");
+              await Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => BulletinSearchPage(
+                        boardType: BoardType.all, boardInfo: null)),
+              );
+            },
           ),
         ],
       ),
