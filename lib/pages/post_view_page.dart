@@ -1,4 +1,5 @@
 import 'dart:core';
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:new_ara_app/constants/url_info.dart';
@@ -6,6 +7,7 @@ import 'package:provider/provider.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:flutter/services.dart';
+import 'package:path_provider/path_provider.dart';
 
 import 'package:new_ara_app/constants/colors_info.dart';
 import 'package:new_ara_app/models/article_model.dart';
@@ -16,6 +18,7 @@ import 'package:new_ara_app/models/article_nested_comment_list_action_model.dart
 import 'package:new_ara_app/models/comment_nested_comment_list_action_model.dart';
 import 'package:new_ara_app/models/scrap_create_action_model.dart';
 import 'package:new_ara_app/utils/html_info.dart';
+import 'package:new_ara_app/models/attachment_model.dart';
 
 class PostViewPage extends StatefulWidget {
   final int articleID;
@@ -243,6 +246,36 @@ class _PostViewPageState extends State<PostViewPage> {
                                     ),
                                   ],
                                 ),
+                              ),
+                              // (2023.08.09)첨부파일 리스트뷰 프로토타입. 추후 디자이너와 조율 예정
+                              SizedBox(
+                                height: 150,
+                                child: ListView.separated(
+                                  itemCount: article.attachments.length,
+                                  itemBuilder: (BuildContext context, int idx) {
+                                    AttachmentModel curFile = article.attachments[idx];
+                                    String initFileName = Uri.parse(article.attachments[idx].file).path.substring(7);
+                                    return InkWell(
+                                      onTap: () async {
+                                        late String targetDir;
+                                        try {
+                                          targetDir = await getDownloadPath();
+                                        } catch (error) {
+                                          debugPrint("getDownloadPath failed: $error");
+                                          return;
+                                        }
+                                        String fileName = addTimestampToFileName(initFileName);
+                                        bool res = await downloadFile(userProvider, curFile.file, "$targetDir${Platform.pathSeparator}$fileName");
+                                        debugPrint(res ? "$fileName 파일 저장 성공" : "$fileName 파일 저장 실패");
+                                      },
+                                      child: Text(
+                                        initFileName,
+                                        overflow: TextOverflow.ellipsis,
+                                      )
+                                    );
+                                  },
+                                  separatorBuilder: (BuildContext context, int idx) => const Divider(thickness: 1),
+                                )
                               ),
                               const Divider(
                                 thickness: 1,
@@ -789,8 +822,8 @@ class _PostViewPageState extends State<PostViewPage> {
                                                                     true
                                                                 ? 'assets/icons/like_filled.svg'
                                                                 : 'assets/icons/like.svg',
-                                                            width: 13,
-                                                            height: 15,
+                                                            width: 17,
+                                                            height: 17,
                                                             color:
                                                                 curComment.my_vote ==
                                                                         false
@@ -800,6 +833,8 @@ class _PostViewPageState extends State<PostViewPage> {
                                                                         .newara,
                                                           ),
                                                         ),
+                                                        const SizedBox(
+                                                            width: 3),
                                                         Text(
                                                           curComment
                                                               .positive_vote_count
@@ -887,8 +922,8 @@ class _PostViewPageState extends State<PostViewPage> {
                                                                     false
                                                                 ? 'assets/icons/dislike_filled.svg'
                                                                 : 'assets/icons/dislike.svg',
-                                                            width: 13,
-                                                            height: 15,
+                                                            width: 17,
+                                                            height: 17,
                                                             color: curComment
                                                                         .my_vote ==
                                                                     true
@@ -898,6 +933,8 @@ class _PostViewPageState extends State<PostViewPage> {
                                                                     .negVote,
                                                           ),
                                                         ),
+                                                        const SizedBox(
+                                                            width: 3),
                                                         Text(
                                                           curComment
                                                               .negative_vote_count
@@ -1423,6 +1460,41 @@ class _PostViewPageState extends State<PostViewPage> {
       content: getContentHtml(content),
       initialHeight: 10,
     );
+  }
+
+  // 파일 다운로드 경로 찾기
+  Future<String> getDownloadPath() async {
+    late Directory directory;
+    if (Platform.isIOS) {
+      directory = await getApplicationDocumentsDirectory();
+    } else {
+      directory = Directory('/storage/emulated/0/Download');
+      if (!await directory.exists()) {
+        directory = (await getExternalStorageDirectory())!;  // Android 에서는 존재가 보장됨
+      }
+    }
+    return directory.path;
+  }
+
+  String addTimestampToFileName(String fileName) {
+    String timestamp = DateTime.now().millisecondsSinceEpoch.toString();
+    int dotIndex = fileName.lastIndexOf('.');
+    if (dotIndex != -1) {
+      String nameWithoutExtension = fileName.substring(0, dotIndex);
+      String extension = fileName.substring(dotIndex + 1);
+      return '$nameWithoutExtension-$timestamp.$extension';
+    }
+    return '$fileName-$timestamp';
+  }
+
+  // 파일 다운로드 하기
+  Future<bool> downloadFile(UserProvider userProvider, String uri, String totalPath) async {
+    try {
+      await userProvider.myDio().download(uri, totalPath);
+    } catch (error) {
+      return false;
+    }
+    return true;
   }
 
   // isValid: article 에 적절한 정보가 있는지 나타냄
