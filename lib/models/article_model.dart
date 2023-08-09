@@ -5,6 +5,7 @@ import 'package:new_ara_app/models/board_model.dart';
 import 'package:new_ara_app/models/article_nested_comment_list_action_model.dart';
 import 'package:new_ara_app/models/public_user_model.dart';
 import 'package:new_ara_app/models/scrap_create_action_model.dart';
+import 'package:new_ara_app/models/attachment_model.dart';
 
 class ArticleModel {
   int id;
@@ -13,7 +14,7 @@ class ArticleModel {
   bool? can_override_hidden;
   TopicModel? parent_topic;
   BoardModel parent_board;
-  List<dynamic> attachments;
+  List<AttachmentModel> attachments;
   Map<String, dynamic> my_comment_profile;
   List<ArticleNestedCommentListAction> comments;
   bool is_mine;
@@ -91,6 +92,14 @@ class ArticleModel {
             "During ArticleModel.fromJson, adding commentID ${commentJson['id']} failed: $error");
       }
     }
+    List<AttachmentModel> fileList = [];
+    for (dynamic fileJson in json['attachments']) {
+      try {
+        fileList.add(AttachmentModel.fromJson(fileJson));
+      } catch (error) {
+        debugPrint("During ArticleModel.fromJson, adding attachment ${fileJson['id']} failed: $error");
+      }
+    }
     return ArticleModel(
       id: json['id'],
       is_hidden: json['is_hidden'],
@@ -100,7 +109,7 @@ class ArticleModel {
           ? null
           : TopicModel.fromJson(json['parent_topic']),
       parent_board: BoardModel.fromJson(json['parent_board']),
-      attachments: json['attachments'],
+      attachments: fileList,
       my_comment_profile: json['my_comment_profile'],
       comments: tmpList,
       is_mine: json['is_mine'],
@@ -141,7 +150,7 @@ class ArticleModel {
         'can_override_hidden': can_override_hidden,
         'parent_topic': parent_topic?.toJson(),
         'parent_board': parent_board.toJson(),
-        'attachments': attachments,
+        'attachments': attachments == [] ? [] : attachments.map((model) => model.toJson()).toList(),
         'my_comment_profile': my_comment_profile,
         'comments': comments == []
             ? []

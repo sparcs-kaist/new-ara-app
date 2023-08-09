@@ -1,31 +1,41 @@
 class AttachmentModel {
-  final int id;
-  final String file;
-  final int size;
-  final String mimetype;
+  int id;
+  String created_at;
+  String updated_at;
+  String deleted_at;
+  String file;
+  int? size;
+  String? mimetype;
 
   AttachmentModel({
     required this.id,
+    required this.created_at,
+    required this.updated_at,
+    required this.deleted_at,
     required this.file,
-    required this.size,
-    required this.mimetype,
+    this.size,
+    this.mimetype,
   });
 
   factory AttachmentModel.fromJson(Map<String, dynamic> json) {
     return AttachmentModel(
-      id: json['id'] as int,
-      file: json['file'] as String,
-      size: json['size'] as int,
-      mimetype: json['mimetype'] as String,
+      id: json['id'],
+      created_at: json['created_at'],
+      updated_at: json['updated_at'],
+      deleted_at: json['deleted_at'],
+      file: json['file'],
+      size: json['size'],
+      mimetype: json['mimetype'],
     );
   }
 
-  Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = Map<String, dynamic>();
-    data['id'] = id;
-    data['file'] = file;
-    data['size'] = size;
-    data['mimetype'] = mimetype;
-    return data;
-  }
+  Map<String, dynamic> toJson() => {
+    'id': id,
+    'created_at': created_at,
+    'updated_at': updated_at,
+    'deleted_at': deleted_at,
+    'file': file,
+    'size': size,
+    'mimetype': mimetype,
+  };
 }
