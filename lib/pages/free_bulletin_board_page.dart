@@ -52,15 +52,7 @@ class _FreeBulletinBoardPageState extends State<FreeBulletinBoardPage> {
   }
 
   void refreshPostList(UserProvider userProvider) async {
-    //example
-    //프로바이더에 있는 정보 사용.
-    // api 호출과 Provider 정보 동기화.
-
-    //https://newara.dev.sparcs.org/api/articles/recent/?page=1
-    //                                  articles/?parent_board=${this.widget.boardInfo["id"]}&page=1
-    // await Future.delayed(Duration(seconds: 1));
     Map<String, dynamic>? myMap = await userProvider.getApiRes("${apiUrl}1");
-
     if (mounted) {
       setState(() {
         postPreviewList.clear();
@@ -89,10 +81,6 @@ class _FreeBulletinBoardPageState extends State<FreeBulletinBoardPage> {
           await userProvider.getApiRes("$apiUrl$currentPage");
       if (mounted) {
         setState(() {
-          // "is_hidden": true,
-          // "why_hidden": [
-          // "REPORTED_CONTENT"
-          // ]
           for (int i = 0; i < (myMap!["results"].length ?? 0); i++) {
             //???/
             if (myMap["results"][i]["created_by"]["profile"] != null) {
@@ -108,6 +96,29 @@ class _FreeBulletinBoardPageState extends State<FreeBulletinBoardPage> {
 
   @override
   Widget build(BuildContext context) {
+    Future<void> updateAllBulletinList() async {
+      List<ArticleListActionModel> _newList = [];
+      UserProvider userProvider = context.read<UserProvider>();
+      for (int j = 1; j <= currentPage; j++) {
+        Map<String, dynamic>? json = await userProvider.getApiRes("$apiUrl$j");
+
+        for (int i = 0; i < (json!["results"].length ?? 0); i++) {
+          //???/
+          if (json["results"][i]["created_by"]["profile"] != null) {
+            _newList
+                .add(ArticleListActionModel.fromJson(json["results"][i] ?? {}));
+          }
+        }
+      }
+      if (mounted) {
+        setState(() {
+          postPreviewList.clear();
+          postPreviewList = [..._newList];
+        });
+      }
+      return Future.value();
+    }
+
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
@@ -177,7 +188,7 @@ class _FreeBulletinBoardPageState extends State<FreeBulletinBoardPage> {
         children: [
           FloatingActionButton(
             onPressed: () {
-              // FloatingActionButton을 누를 때 실행될 동작을 정의합니다.
+              updateAllBulletinList();
               debugPrint('FloatingActionButton pressed');
             },
             backgroundColor: Colors.white,
@@ -211,12 +222,13 @@ class _FreeBulletinBoardPageState extends State<FreeBulletinBoardPage> {
                       return postPreviewList[index].is_hidden
                           ? Container()
                           : InkWell(
-                              onTap: () {
-                                Navigator.push(
+                              onTap: () async {
+                                await Navigator.push(
                                     context,
                                     MaterialPageRoute(
                                         builder: (context) => PostViewPage(
                                             id: postPreviewList[index].id)));
+                                updateAllBulletinList();
                               },
                               child: Column(
                                 children: [
