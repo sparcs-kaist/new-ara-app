@@ -19,6 +19,7 @@ import 'package:new_ara_app/models/comment_nested_comment_list_action_model.dart
 import 'package:new_ara_app/models/scrap_create_action_model.dart';
 import 'package:new_ara_app/utils/html_info.dart';
 import 'package:new_ara_app/models/attachment_model.dart';
+import 'package:new_ara_app/pages/user_view_page.dart';
 
 class PostViewPage extends StatefulWidget {
   final int articleID;
@@ -50,9 +51,9 @@ class _PostViewPageState extends State<PostViewPage> {
   void initState() {
     super.initState();
     UserProvider userProvider = context.read<UserProvider>();
-    fetchArticle(userProvider).then((value) {
+    _fetchArticle(userProvider).then((value) {
       isReportable = value ? !article.is_mine : false;
-      setIsValid(value);
+      _setIsValid(value);
     });
   }
 
@@ -92,9 +93,9 @@ class _PostViewPageState extends State<PostViewPage> {
                       child: RefreshIndicator(
                         color: ColorsInfo.newara,
                         onRefresh: () async {
-                          setIsValid(false);
-                          bool res = await fetchArticle(userProvider);
-                          setIsValid(res);
+                          _setIsValid(false);
+                          bool res = await _fetchArticle(userProvider);
+                          _setIsValid(res);
                         },
                         child: SingleChildScrollView(
                           controller: _scrollController,
@@ -201,8 +202,12 @@ class _PostViewPageState extends State<PostViewPage> {
                               const SizedBox(height: 10),
                               // 유저 정보 (프로필 이미지, 닉네임)
                               InkWell(
-                                onTap:
-                                    () {}, // (2023.08.01) 유저 정보 확인 기능은 추후 구현 예정
+                                onTap: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(builder: (context) => UserViewPage(userID: article.created_by.id)),
+                                  );
+                                }, // (2023.08.01) 유저 정보 확인 기능은 추후 구현 예정
                                 child: Row(
                                   children: [
                                     Container(
@@ -248,9 +253,14 @@ class _PostViewPageState extends State<PostViewPage> {
                                 ),
                               ),
                               // (2023.08.09)첨부파일 리스트뷰 프로토타입. 추후 디자이너와 조율 예정
-                              SizedBox(
-                                height: 150,
+                              article.attachments.isEmpty ? Container() : Container(
+                                margin: const EdgeInsets.only(top: 10, bottom: 10),
+                                constraints: const BoxConstraints(
+                                  minHeight: 10,
+                                ),
                                 child: ListView.separated(
+                                  physics: const NeverScrollableScrollPhysics(),
+                                  shrinkWrap: true,
                                   itemCount: article.attachments.length,
                                   itemBuilder: (BuildContext context, int idx) {
                                     AttachmentModel curFile = article.attachments[idx];
@@ -259,18 +269,21 @@ class _PostViewPageState extends State<PostViewPage> {
                                       onTap: () async {
                                         late String targetDir;
                                         try {
-                                          targetDir = await getDownloadPath();
+                                          targetDir = await _getDownloadPath();
                                         } catch (error) {
                                           debugPrint("getDownloadPath failed: $error");
                                           return;
                                         }
-                                        String fileName = addTimestampToFileName(initFileName);
-                                        bool res = await downloadFile(userProvider, curFile.file, "$targetDir${Platform.pathSeparator}$fileName");
+                                        String fileName = _addTimestampToFileName(initFileName);
+                                        bool res = await _downloadFile(userProvider, curFile.file, "$targetDir${Platform.pathSeparator}$fileName");
                                         debugPrint(res ? "$fileName 파일 저장 성공" : "$fileName 파일 저장 실패");
                                       },
                                       child: Text(
                                         initFileName,
                                         overflow: TextOverflow.ellipsis,
+                                        style: const TextStyle(
+                                          fontWeight: FontWeight.w700,
+                                        ),
                                       )
                                     );
                                   },
@@ -978,7 +991,7 @@ class _PostViewPageState extends State<PostViewPage> {
                                                                       curComment;
                                                                   debugPrint(
                                                                       "parentCommentID: ${targetComment!.id}");
-                                                                  setCommentMode(
+                                                                  _setCommentMode(
                                                                       true,
                                                                       false);
                                                                   textFocusNode
@@ -1025,7 +1038,7 @@ class _PostViewPageState extends State<PostViewPage> {
                                                                       curComment;
                                                                   debugPrint(
                                                                       "parentCommentID: ${targetComment!.id}");
-                                                                  setCommentMode(
+                                                                  _setCommentMode(
                                                                       true,
                                                                       false);
                                                                   textFocusNode
@@ -1102,7 +1115,7 @@ class _PostViewPageState extends State<PostViewPage> {
                                       _textEditingController.text = "";
                                       targetComment = null;
                                       debugPrint("Parent Comment null");
-                                      setCommentMode(false, false);
+                                      _setCommentMode(false, false);
                                     },
                                     child: SvgPicture.asset(
                                       'assets/icons/close.svg',
@@ -1132,9 +1145,9 @@ class _PostViewPageState extends State<PostViewPage> {
                             // send button
                             InkWell(
                               onTap: () async {
-                                bool sendRes = await sendComment(userProvider);
+                                bool sendRes = await _sendComment(userProvider);
                                 if (sendRes) {
-                                  setIsValid(await fetchArticle(userProvider));
+                                  _setIsValid(await _fetchArticle(userProvider));
                                 } else {
                                   debugPrint("Send Comment Failed");
                                 }
@@ -1223,7 +1236,7 @@ class _PostViewPageState extends State<PostViewPage> {
           case 'Modify':
             _textEditingController.text = commentList[idx].content.toString();
             textFocusNode.requestFocus();
-            setCommentMode(false, true);
+            _setCommentMode(false, true);
             targetComment = commentList[idx];
             break;
           case 'Delete':
@@ -1290,12 +1303,12 @@ class _PostViewPageState extends State<PostViewPage> {
                             const SizedBox(width: 10),
                             InkWell(
                               onTap: () {
-                                delComment(id, userProvider).then((res) async {
+                                _delComment(id, userProvider).then((res) async {
                                   if (res == false) {
                                     return;
                                   } else {
-                                    bool res = await fetchArticle(userProvider);
-                                    setIsValid(res);
+                                    bool res = await _fetchArticle(userProvider);
+                                    _setIsValid(res);
                                   }
                                 });
                                 Navigator.pop(context);
@@ -1463,7 +1476,7 @@ class _PostViewPageState extends State<PostViewPage> {
   }
 
   // 파일 다운로드 경로 찾기
-  Future<String> getDownloadPath() async {
+  Future<String> _getDownloadPath() async {
     late Directory directory;
     if (Platform.isIOS) {
       directory = await getApplicationDocumentsDirectory();
@@ -1476,7 +1489,7 @@ class _PostViewPageState extends State<PostViewPage> {
     return directory.path;
   }
 
-  String addTimestampToFileName(String fileName) {
+  String _addTimestampToFileName(String fileName) {
     String timestamp = DateTime.now().millisecondsSinceEpoch.toString();
     int dotIndex = fileName.lastIndexOf('.');
     if (dotIndex != -1) {
@@ -1488,7 +1501,7 @@ class _PostViewPageState extends State<PostViewPage> {
   }
 
   // 파일 다운로드 하기
-  Future<bool> downloadFile(UserProvider userProvider, String uri, String totalPath) async {
+  Future<bool> _downloadFile(UserProvider userProvider, String uri, String totalPath) async {
     try {
       await userProvider.myDio().download(uri, totalPath);
     } catch (error) {
@@ -1498,13 +1511,13 @@ class _PostViewPageState extends State<PostViewPage> {
   }
 
   // isValid: article 에 적절한 정보가 있는지 나타냄
-  void setIsValid(bool value) {
+  void _setIsValid(bool value) {
     if (!mounted) return;
     setState(() => isValid = value);
   }
 
   // 둘 다 false 면 일반적인 댓글
-  void setCommentMode(bool isNestedVal, bool isModifyVal) {
+  void _setCommentMode(bool isNestedVal, bool isModifyVal) {
     if (!mounted) return;
     setState(() {
       isNestedComment = isNestedVal;
@@ -1512,7 +1525,7 @@ class _PostViewPageState extends State<PostViewPage> {
     });
   }
 
-  Future<bool> delComment(int id, UserProvider userProvider) async {
+  Future<bool> _delComment(int id, UserProvider userProvider) async {
     late dynamic delRes;
     try {
       delRes = await userProvider.delApiRes("comments/$id/");
@@ -1528,7 +1541,7 @@ class _PostViewPageState extends State<PostViewPage> {
   }
 
   // Article 모델에 필요한 정보
-  Future<bool> fetchArticle(UserProvider userProvider) async {
+  Future<bool> _fetchArticle(UserProvider userProvider) async {
     dynamic articleJson, commentJson;
 
     articleJson = await userProvider.getApiRes("articles/${widget.articleID}");
@@ -1577,7 +1590,7 @@ class _PostViewPageState extends State<PostViewPage> {
     return true;
   }
 
-  Future<bool> sendComment(UserProvider userProvider) async {
+  Future<bool> _sendComment(UserProvider userProvider) async {
     if (_formKey.currentState == null || !(_formKey.currentState!.validate())) {
       return false;
     }
@@ -1602,7 +1615,7 @@ class _PostViewPageState extends State<PostViewPage> {
       }
       targetComment = null;
       _textEditingController.text = "";
-      setCommentMode(false, false);
+      _setCommentMode(false, false);
     } else {
       dynamic defaultPayload = {
         "content": _commentContent,
@@ -1619,7 +1632,7 @@ class _PostViewPageState extends State<PostViewPage> {
       }
       targetComment = null;
       _textEditingController.text = "";
-      setCommentMode(false, false);
+      _setCommentMode(false, false);
     }
     return true;
   }
