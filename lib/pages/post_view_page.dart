@@ -278,16 +278,23 @@ class _PostViewPageState extends State<PostViewPage> {
                                         bool res = await _downloadFile(userProvider, curFile.file, "$targetDir${Platform.pathSeparator}$fileName");
                                         debugPrint(res ? "$fileName 파일 저장 성공" : "$fileName 파일 저장 실패");
                                       },
-                                      child: Text(
-                                        initFileName,
-                                        overflow: TextOverflow.ellipsis,
-                                        style: const TextStyle(
-                                          fontWeight: FontWeight.w700,
+                                      child: Container(
+                                        padding: const EdgeInsets.only(left: 5),
+                                        decoration: BoxDecoration(
+                                          border: Border.all(
+                                            color: const Color(0x00FFFFFF),
+                                            width: 2,
+                                          ),
+                                          borderRadius: const BorderRadius.all(Radius.circular(5)),
                                         ),
-                                      )
+                                        child: Text(
+                                          initFileName,
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                      ),
                                     );
                                   },
-                                  separatorBuilder: (BuildContext context, int idx) => const Divider(thickness: 1),
+                                  separatorBuilder: (BuildContext context, int idx) => const SizedBox(height: 3),
                                 )
                               ),
                               const Divider(
@@ -329,19 +336,7 @@ class _PostViewPageState extends State<PostViewPage> {
                                           return;
                                         }
                                       }
-                                      if (!mounted) return;
-                                      setState(() {
-                                        article.positive_vote_count = article
-                                                .positive_vote_count! +
-                                            (article.my_vote == true ? -1 : 1);
-                                        article.negative_vote_count = article
-                                                .negative_vote_count! +
-                                            (article.my_vote == false ? -1 : 0);
-                                        article.my_vote =
-                                            (article.my_vote == true)
-                                                ? null
-                                                : true;
-                                      });
+                                      setVote(article, true);
                                     },
                                     child: SizedBox(
                                       width: 25,
@@ -394,23 +389,7 @@ class _PostViewPageState extends State<PostViewPage> {
                                             return;
                                           }
                                         }
-                                        if (!mounted) return;
-                                        setState(() {
-                                          article.positive_vote_count =
-                                              article.positive_vote_count! +
-                                                  (article.my_vote == true
-                                                      ? -1
-                                                      : 0);
-                                          article.negative_vote_count =
-                                              article.negative_vote_count! +
-                                                  (article.my_vote == false
-                                                      ? -1
-                                                      : 1);
-                                          article.my_vote =
-                                              (article.my_vote == false)
-                                                  ? null
-                                                  : false;
-                                        });
+                                        setVote(article, false);
                                       },
                                       child: SizedBox(
                                         width: 25,
@@ -802,32 +781,7 @@ class _PostViewPageState extends State<PostViewPage> {
                                                                 return;
                                                               }
                                                             }
-                                                            if (!mounted)
-                                                              return;
-                                                            setState(() {
-                                                              curComment
-                                                                  .positive_vote_count = (curComment
-                                                                          .positive_vote_count ??
-                                                                      0) +
-                                                                  (curComment.my_vote ==
-                                                                          true
-                                                                      ? -1
-                                                                      : 1);
-                                                              curComment
-                                                                  .negative_vote_count = (curComment
-                                                                          .negative_vote_count ??
-                                                                      0) +
-                                                                  (curComment.my_vote ==
-                                                                          false
-                                                                      ? -1
-                                                                      : 0);
-                                                              curComment
-                                                                      .my_vote =
-                                                                  (curComment.my_vote ==
-                                                                          true)
-                                                                      ? null
-                                                                      : true;
-                                                            });
+                                                            setVote(curComment, true);
                                                           },
                                                           child:
                                                               SvgPicture.asset(
@@ -902,32 +856,7 @@ class _PostViewPageState extends State<PostViewPage> {
                                                                 return;
                                                               }
                                                             }
-                                                            if (!mounted)
-                                                              return;
-                                                            setState(() {
-                                                              curComment
-                                                                  .positive_vote_count = (curComment
-                                                                          .positive_vote_count ??
-                                                                      0) +
-                                                                  (curComment.my_vote ==
-                                                                          true
-                                                                      ? -1
-                                                                      : 0);
-                                                              curComment
-                                                                  .negative_vote_count = (curComment
-                                                                          .negative_vote_count ??
-                                                                      0) +
-                                                                  (curComment.my_vote ==
-                                                                          false
-                                                                      ? -1
-                                                                      : 1);
-                                                              curComment
-                                                                      .my_vote =
-                                                                  (curComment.my_vote ==
-                                                                          false)
-                                                                      ? null
-                                                                      : false;
-                                                            });
+                                                            setVote(curComment, false);
                                                           },
                                                           child:
                                                               SvgPicture.asset(
@@ -1473,6 +1402,20 @@ class _PostViewPageState extends State<PostViewPage> {
       content: getContentHtml(content),
       initialHeight: 10,
     );
+  }
+
+  void setVote(dynamic model, bool value) {
+    model.positive_vote_count ??= 0;
+    if (!mounted) return;
+    setState(() {
+      model.positive_vote_count = model.positive_vote_count! +
+          (model.my_vote == true ? -1 : (value ? 1 : 0));
+      model.negative_vote_count = model.negative_vote_count! +
+          (model.my_vote == false ? -1 : (value ? 0 : 1));
+      model.my_vote = (model.my_vote == value)
+          ? null
+          : value;
+    });
   }
 
   // 파일 다운로드 경로 찾기
