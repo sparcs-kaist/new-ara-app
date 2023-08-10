@@ -454,12 +454,43 @@ class _UserPageState extends State<UserPage>
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Text(
-                      curPost.title.toString(),
-                      style: const TextStyle(
-                          fontSize: 16, fontWeight: FontWeight.w500),
-                      overflow: TextOverflow.ellipsis,
-                      maxLines: 1,
+                    Row(
+                      children: [
+                        Flexible(
+                          child: Text(
+                            curPost.title.toString(),
+                            style: const TextStyle(
+                                fontSize: 16, fontWeight: FontWeight.w500),
+                            overflow: TextOverflow.ellipsis,
+                            maxLines: 1,
+                          ),
+                        ),
+                        curPost.attachment_type.toString() == "NONE" ? Container() : const SizedBox(width: 5),
+                        curPost.attachment_type.toString() == "BOTH"
+                            ? Row(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            SvgPicture.asset(
+                              'assets/icons/image_post_preview.svg',
+                            ),
+                            const SizedBox(
+                              width: 9,
+                            ),
+                            SvgPicture.asset(
+                              'assets/icons/clip_post_preview.svg',
+                            ),
+                          ],
+                        )
+                            : curPost.attachment_type.toString() == "IMAGE"
+                            ? SvgPicture.asset(
+                          'assets/icons/image_post_preview.svg',
+                        )
+                            : curPost.attachment_type.toString() == "NON_IMAGE"
+                            ? SvgPicture.asset(
+                          'assets/icons/clip_post_preview.svg',
+                        )
+                            : Container()
+                      ],
                     ),
                     const SizedBox(height: 5),
                     Row(

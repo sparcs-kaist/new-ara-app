@@ -11,14 +11,14 @@ import 'package:path_provider/path_provider.dart';
 
 import 'package:new_ara_app/constants/colors_info.dart';
 import 'package:new_ara_app/models/article_model.dart';
-import 'package:new_ara_app/providers/user_provider.dart';
-import 'package:new_ara_app/widgetclasses/loading_indicator.dart';
-import 'package:new_ara_app/utils/time_utils.dart';
 import 'package:new_ara_app/models/article_nested_comment_list_action_model.dart';
 import 'package:new_ara_app/models/comment_nested_comment_list_action_model.dart';
 import 'package:new_ara_app/models/scrap_create_action_model.dart';
-import 'package:new_ara_app/utils/html_info.dart';
 import 'package:new_ara_app/models/attachment_model.dart';
+import 'package:new_ara_app/providers/user_provider.dart';
+import 'package:new_ara_app/widgetclasses/loading_indicator.dart';
+import 'package:new_ara_app/utils/time_utils.dart';
+import 'package:new_ara_app/utils/html_info.dart';
 import 'package:new_ara_app/pages/user_view_page.dart';
 
 class PostViewPage extends StatefulWidget {
@@ -207,7 +207,7 @@ class _PostViewPageState extends State<PostViewPage> {
                                     context,
                                     MaterialPageRoute(builder: (context) => UserViewPage(userID: article.created_by.id)),
                                   );
-                                }, // (2023.08.01) 유저 정보 확인 기능은 추후 구현 예정
+                                },
                                 child: Row(
                                   children: [
                                     Container(
