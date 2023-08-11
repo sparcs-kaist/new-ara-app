@@ -73,21 +73,20 @@ class _UserPageState extends State<UserPage>
   }
 
   void _handleTabChange() {
+    int tabIndex = _tabController.index;
+    UserProvider userProvider = context.read<UserProvider>();
     if (!_tabController.indexIsChanging) {
       if (_tabController.animation!.isCompleted) {
         return;
       } else {
-        int tabIndex = _tabController.index;
-        UserProvider userProvider = context.read<UserProvider>();
         setIsLoaded(false, tabIndex);
         loadAllData(userProvider, create: tabIndex == 0, scrap: tabIndex == 1, recent: tabIndex == 2).then((_) {
           if (!mounted) return;
           setState(() => curCount = tabCount[tabIndex]);
         });
       }
-    } else {
-      int tabIndex = _tabController.index;
-      UserProvider userProvider = context.read<UserProvider>();
+    }
+    else {
       setIsLoaded(false, tabIndex);
       loadAllData(userProvider, create: tabIndex == 0, scrap: tabIndex == 1, recent: tabIndex == 2).then((_) {
         if (!mounted) return;
@@ -249,9 +248,7 @@ class _UserPageState extends State<UserPage>
                   }).toList(),
                   controller: _tabController,
                   indicatorSize: TabBarIndicatorSize.tab,
-                  onTap: (index) async {
-                    setState(() => curCount = tabCount[index]);
-                  },
+                  onTap: (index) async {},
                 ),
                 Container(
                   margin: const EdgeInsets.only(top: 14),
@@ -312,7 +309,6 @@ class _UserPageState extends State<UserPage>
       debugPrint(
           "fetchCreatedArticles() GET request (page: $page): ${response.statusCode}");
       if (response.statusCode == 200) {
-        setMyCount(response.data['num_items'], 0); // "총 N개의 글" 설정
         List<dynamic> rawPostList = response.data['results'];
         for (int i = 0; i < rawPostList.length; i++) {
           Map<String, dynamic>? rawPost = rawPostList[i];
@@ -330,6 +326,7 @@ class _UserPageState extends State<UserPage>
           }
         }
         nextPage[0] += 1;
+        curCount = tabCount[0] = response.data['num_items'];
         setIsLoaded(true, 0);
       }
     } catch (error) {
@@ -356,7 +353,6 @@ class _UserPageState extends State<UserPage>
       var response = await dio.get('$newAraDefaultUrl$apiUrl');
       debugPrint(
           "fetchScrappedArticles() GET request (page: $page): ${response.statusCode}");
-      setMyCount(response.data['num_items'], 1);
       if (response.statusCode == 200) {
         debugPrint("fetchScrappedArticles() succeed!");
         List<dynamic> rawPostList = response.data['results'];
@@ -370,7 +366,9 @@ class _UserPageState extends State<UserPage>
                 "scrappedArticleList.add failed at index $i (id: ${rawPost['id']}) : $error");
           }
         }
+
         nextPage[1] += 1;
+        curCount = tabCount[1] = response.data['num_items'];
         setIsLoaded(true, 1);
       }
     } catch (error) {
@@ -410,6 +408,7 @@ class _UserPageState extends State<UserPage>
           }
         }
         nextPage[2] += 1;
+        curCount = tabCount[2] = response.data['num_items'];
         setIsLoaded(true, 2);
       }
     } catch (error) {
@@ -450,154 +449,159 @@ class _UserPageState extends State<UserPage>
                     : recentArticleList.length)),
         controller: scrollControllerList[tabIndex],
         itemBuilder: (context, index) {
-          late ArticleListActionModel curPost;
-          late ScrapModel scrapInfo;
-          if (tabIndex == 0) {
-            curPost = createdArticleList[index];
-          } else if (tabIndex == 1) {
-            scrapInfo = scrappedArticleList[index];
-            curPost = scrapInfo.parent_article;
-          } else {
-            curPost = recentArticleList[index];
-          }
-          return InkWell(
-              onTap: () async {
-                await Navigator.of(context)
-                    .push(slideRoute(PostViewPage(id: curPost.id)));
-                var fetchFunc = (tabIndex == 0 ? fetchCreatedArticles : (tabIndex == 1 ? fetchScrappedArticles : fetchRecentArticles));
-                for (int page = 1; page < nextPage[tabIndex]; page++) {
-                  await fetchFunc(userProvider, page);
-                }
-              },
-              child: SizedBox(
-                height: 61,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Row(
-                      children: [
-                        Flexible(
-                          child: Text(
-                            curPost.title.toString(),
-                            style: const TextStyle(
-                                fontSize: 16, fontWeight: FontWeight.w500),
-                            overflow: TextOverflow.ellipsis,
-                            maxLines: 1,
+          try {
+            late ArticleListActionModel curPost;
+            late ScrapModel scrapInfo;
+            if (tabIndex == 0) {
+              curPost = createdArticleList[index];
+            } else if (tabIndex == 1) {
+              scrapInfo = scrappedArticleList[index];
+              curPost = scrapInfo.parent_article;
+            } else {
+              curPost = recentArticleList[index];
+            }
+            return InkWell(
+                onTap: () async {
+                  await Navigator.of(context)
+                      .push(slideRoute(PostViewPage(id: curPost.id)));
+                  var fetchFunc = (tabIndex == 0 ? fetchCreatedArticles : (tabIndex == 1 ? fetchScrappedArticles : fetchRecentArticles));
+                  for (int page = 1; page < nextPage[tabIndex]; page++) {
+                    await fetchFunc(userProvider, page);
+                  }
+                },
+                child: SizedBox(
+                  height: 61,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Row(
+                        children: [
+                          Flexible(
+                            child: Text(
+                              curPost.title.toString(),
+                              style: const TextStyle(
+                                  fontSize: 16, fontWeight: FontWeight.w500),
+                              overflow: TextOverflow.ellipsis,
+                              maxLines: 1,
+                            ),
                           ),
-                        ),
-                        curPost.attachment_type.toString() == "NONE" ? Container() : const SizedBox(width: 5),
-                        curPost.attachment_type.toString() == "BOTH"
-                            ? Row(
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-                            SvgPicture.asset(
-                              'assets/icons/image_post_preview.svg',
-                            ),
-                            const SizedBox(
-                              width: 9,
-                            ),
-                            SvgPicture.asset(
-                              'assets/icons/clip_post_preview.svg',
-                            ),
-                          ],
-                        )
-                            : curPost.attachment_type.toString() == "IMAGE"
-                            ? SvgPicture.asset(
-                          'assets/icons/image_post_preview.svg',
-                        )
-                            : curPost.attachment_type.toString() == "NON_IMAGE"
-                            ? SvgPicture.asset(
-                          'assets/icons/clip_post_preview.svg',
-                        )
-                            : Container()
-                      ],
-                    ),
-                    const SizedBox(height: 5),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Flexible(
-                          child: Row(
+                          curPost.attachment_type.toString() == "NONE" ? Container() : const SizedBox(width: 5),
+                          curPost.attachment_type.toString() == "BOTH"
+                              ? Row(
+                            crossAxisAlignment: CrossAxisAlignment.center,
                             children: [
-                              Flexible(
-                                child: Text(
-                                  curPost.created_by.profile.nickname
-                                      .toString(),
+                              SvgPicture.asset(
+                                'assets/icons/image_post_preview.svg',
+                              ),
+                              const SizedBox(
+                                width: 9,
+                              ),
+                              SvgPicture.asset(
+                                'assets/icons/clip_post_preview.svg',
+                              ),
+                            ],
+                          )
+                              : curPost.attachment_type.toString() == "IMAGE"
+                              ? SvgPicture.asset(
+                            'assets/icons/image_post_preview.svg',
+                          )
+                              : curPost.attachment_type.toString() == "NON_IMAGE"
+                              ? SvgPicture.asset(
+                            'assets/icons/clip_post_preview.svg',
+                          )
+                              : Container()
+                        ],
+                      ),
+                      const SizedBox(height: 5),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Flexible(
+                            child: Row(
+                              children: [
+                                Flexible(
+                                  child: Text(
+                                    curPost.created_by.profile.nickname
+                                        .toString(),
+                                    style: const TextStyle(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.w500,
+                                        color: Color.fromRGBO(177, 177, 177, 1)),
+                                    overflow: TextOverflow.ellipsis,
+                                    maxLines: 1,
+                                  ),
+                                ),
+                                const SizedBox(width: 10),
+                                Text(
+                                  getTime(tabIndex == 1
+                                      ? scrapInfo.created_at.toString()
+                                      : curPost.created_at.toString()),
                                   style: const TextStyle(
                                       fontSize: 14,
                                       fontWeight: FontWeight.w500,
                                       color: Color.fromRGBO(177, 177, 177, 1)),
-                                  overflow: TextOverflow.ellipsis,
-                                  maxLines: 1,
                                 ),
+                                const SizedBox(width: 10),
+                                Text('조회 ${curPost.hit_count}',
+                                    style: const TextStyle(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.w500,
+                                        color: Color.fromRGBO(177, 177, 177, 1))),
+                              ],
+                            ),
+                          ),
+                          Row(
+                            children: [
+                              SvgPicture.asset(
+                                'assets/icons/like.svg',
+                                width: 13,
+                                height: 15,
+                                color: ColorsInfo.newara,
                               ),
-                              const SizedBox(width: 10),
-                              Text(
-                                getTime(tabIndex == 1
-                                    ? scrapInfo.created_at.toString()
-                                    : curPost.created_at.toString()),
-                                style: const TextStyle(
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.w500,
-                                    color: Color.fromRGBO(177, 177, 177, 1)),
-                              ),
-                              const SizedBox(width: 10),
-                              Text('조회 ${curPost.hit_count}',
+                              const SizedBox(width: 3),
+                              Text('${curPost.positive_vote_count}',
                                   style: const TextStyle(
                                       fontSize: 14,
                                       fontWeight: FontWeight.w500,
-                                      color: Color.fromRGBO(177, 177, 177, 1))),
+                                      color: ColorsInfo.newara)),
+                              const SizedBox(width: 10),
+                              SvgPicture.asset(
+                                'assets/icons/dislike.svg',
+                                width: 13,
+                                height: 15,
+                                color: const Color.fromRGBO(83, 141, 209, 1),
+                              ),
+                              const SizedBox(width: 3),
+                              Text('${curPost.negative_vote_count}',
+                                  style: const TextStyle(
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w500,
+                                      color: Color.fromRGBO(83, 141, 209, 1))),
+                              const SizedBox(width: 10),
+                              SvgPicture.asset(
+                                'assets/icons/comment.svg',
+                                width: 13,
+                                height: 15,
+                                color: const Color.fromRGBO(99, 99, 99, 1),
+                              ),
+                              const SizedBox(width: 3),
+                              Text('${curPost.comment_count}',
+                                  style: const TextStyle(
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w500,
+                                      color: Color.fromRGBO(99, 99, 99, 1))),
                             ],
                           ),
-                        ),
-                        Row(
-                          children: [
-                            SvgPicture.asset(
-                              'assets/icons/like.svg',
-                              width: 13,
-                              height: 15,
-                              color: ColorsInfo.newara,
-                            ),
-                            const SizedBox(width: 3),
-                            Text('${curPost.positive_vote_count}',
-                                style: const TextStyle(
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.w500,
-                                    color: ColorsInfo.newara)),
-                            const SizedBox(width: 10),
-                            SvgPicture.asset(
-                              'assets/icons/dislike.svg',
-                              width: 13,
-                              height: 15,
-                              color: const Color.fromRGBO(83, 141, 209, 1),
-                            ),
-                            const SizedBox(width: 3),
-                            Text('${curPost.negative_vote_count}',
-                                style: const TextStyle(
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.w500,
-                                    color: Color.fromRGBO(83, 141, 209, 1))),
-                            const SizedBox(width: 10),
-                            SvgPicture.asset(
-                              'assets/icons/comment.svg',
-                              width: 13,
-                              height: 15,
-                              color: const Color.fromRGBO(99, 99, 99, 1),
-                            ),
-                            const SizedBox(width: 3),
-                            Text('${curPost.comment_count}',
-                                style: const TextStyle(
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.w500,
-                                    color: Color.fromRGBO(99, 99, 99, 1))),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ));
+                        ],
+                      ),
+                    ],
+                  ),
+                ));
+          } catch (error) {
+            debugPrint("ListView error: $error");
+            return null;
+          }
         },
         separatorBuilder: (context, index) {
           return const Divider();
