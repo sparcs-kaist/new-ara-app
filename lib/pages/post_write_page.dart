@@ -9,6 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:new_ara_app/constants/colors_info.dart';
+import 'package:new_ara_app/models/article_model.dart';
 import 'package:new_ara_app/models/attachment_model.dart';
 import 'package:new_ara_app/models/board_detail_action_model.dart';
 import 'package:new_ara_app/models/board_group_model.dart';
@@ -28,7 +29,8 @@ import 'package:html/parser.dart' show parse;
 import 'package:html/dom.dart' as html;
 
 class PostWritePage extends StatefulWidget {
-  const PostWritePage({Key? key}) : super(key: key);
+  final ArticleModel? articleBefore;
+  const PostWritePage({Key? key, this.articleBefore}) : super(key: key);
 
   @override
   State<PostWritePage> createState() => _PostWritePageState();
@@ -84,6 +86,7 @@ class _PostWritePageState extends State<PostWritePage> {
   File? imagePickerFile;
   File? filePickerFile;
   bool _isLoading = true;
+  bool _isUploadingPost = false; // 지금 api 통신으로 포스트 업로드 중이냐
   var imagePickerResult;
   FilePickerResult? filePickerResult;
 
@@ -91,7 +94,6 @@ class _PostWritePageState extends State<PostWritePage> {
 
   late String _localPath;
 
-  late bool _permissionReady;
   late TargetPlatform? platform;
 
   final TextEditingController _titleController = TextEditingController();
@@ -177,7 +179,8 @@ class _PostWritePageState extends State<PostWritePage> {
     bool canIupload = _titleController.text != '' &&
         _chosenBoardValue!.id != -1 &&
         _currentHtmlContent != '' &&
-        _currentHtmlContent != '<p><br></p>';
+        _currentHtmlContent != '<p><br></p>' &&
+        _isUploadingPost == false;
 
     String updateImgSrc(htmlString, uuid, fileUrl) {
       var document = parse(htmlString);
@@ -301,7 +304,9 @@ class _PostWritePageState extends State<PostWritePage> {
                       debugPrint(error.toString());
                       return;
                     }
-
+                    setState(() {
+                      _isUploadingPost = true;
+                    });
                     try {
                       Dio dio = Dio();
                       dio.options.headers['Cookie'] =
@@ -357,10 +362,13 @@ class _PostWritePageState extends State<PostWritePage> {
                         },
                       );
                       debugPrint('Response data: ${response.data}');
+                      Navigator.pop(context);
                     } on DioException catch (error) {
                       debugPrint('post Error: ${error.response!.data}');
-                      return;
                     }
+                    setState(() {
+                      _isUploadingPost = false;
+                    });
                   }
                 : null,
             // 버튼이 클릭되었을 때 수행할 동작
