@@ -16,6 +16,7 @@ import 'package:new_ara_app/pages/user_view_page.dart';
 import 'package:new_ara_app/pages/post_write_page.dart';
 import 'package:new_ara_app/utils/post_view_utils.dart';
 
+
 class PostViewPage extends StatefulWidget {
   final int articleID;
   const PostViewPage({super.key, required int id}) : articleID = id;
@@ -26,7 +27,7 @@ class PostViewPage extends StatefulWidget {
 
 class _PostViewPageState extends State<PostViewPage> {
   late ArticleModel article;
-  late bool isReportable, isValid, isModify, isNestedComment;
+  late bool isReportable, isValid, isModify, isNestedComment, isSending;
   late List<CommentNestedCommentListActionModel> commentList;
 
   String _commentContent = "";
@@ -41,6 +42,7 @@ class _PostViewPageState extends State<PostViewPage> {
     super.initState();
     isValid = false;
     isModify = isNestedComment = false;
+    isSending = false;
     commentList = [];
     UserProvider userProvider = context.read<UserProvider>();
     _fetchArticle(userProvider).then((value) {
@@ -295,13 +297,12 @@ class _PostViewPageState extends State<PostViewPage> {
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
                                   InkWell(
-                                    onTap: () {
-                                      ArticleController(
+                                    onTap: () async {
+                                      bool res = await ArticleController(
                                         model: article,
                                         userProvider: userProvider,
-                                      ).posVote().then((result) {
-                                        if (result) update();
-                                      });
+                                      ).posVote();
+                                      if (res) update();
                                     },
                                     child: SizedBox(
                                       width: 25,
@@ -960,19 +961,25 @@ class _PostViewPageState extends State<PostViewPage> {
                             ),
                             const SizedBox(width: 5),
                             // send button
-                            InkWell(
-                              onTap: () async {
-                                bool sendRes = await _sendComment(userProvider);
-                                if (sendRes) {
-                                  _setIsValid(await _fetchArticle(userProvider));
-                                } else {
-                                  debugPrint("Send Comment Failed");
-                                }
-                              },
-                              child: SvgPicture.asset(
-                                'assets/icons/send.svg',
-                                width: 30,
-                                height: 30,
+                            AbsorbPointer(
+                              absorbing: isSending,
+                              child: InkWell(
+                                onTap: () async {
+                                  setIsSending(true);
+                                  bool sendRes = await _sendComment(userProvider);
+                                  if (sendRes) {
+                                    _setIsValid(await _fetchArticle(userProvider));
+                                    debugPrint("Send Complete!");
+                                  } else {
+                                    debugPrint("Send Comment Failed");
+                                  }
+                                  setIsSending(false);
+                                },
+                                child: SvgPicture.asset(
+                                  'assets/icons/send.svg',
+                                  width: 30,
+                                  height: 30,
+                                ),
                               ),
                             ),
                           ],
@@ -1286,6 +1293,11 @@ class _PostViewPageState extends State<PostViewPage> {
       content: getContentHtml(content),
       initialHeight: 10,
     );
+  }
+
+  void setIsSending(bool value) {
+    if (!mounted) return;
+    setState(() => isSending = value);
   }
 
   void update() {
