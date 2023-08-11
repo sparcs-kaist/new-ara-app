@@ -1,19 +1,12 @@
 import 'dart:core';
-import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
-import 'package:webview_flutter/webview_flutter.dart';
-import 'package:url_launcher/url_launcher.dart';
-import 'package:flutter/services.dart';
-import 'package:path_provider/path_provider.dart';
 
 import 'package:new_ara_app/constants/colors_info.dart';
-import 'package:new_ara_app/constants/url_info.dart';
 import 'package:new_ara_app/models/article_model.dart';
 import 'package:new_ara_app/models/article_nested_comment_list_action_model.dart';
 import 'package:new_ara_app/models/comment_nested_comment_list_action_model.dart';
-import 'package:new_ara_app/models/scrap_create_action_model.dart';
 import 'package:new_ara_app/models/attachment_model.dart';
 import 'package:new_ara_app/providers/user_provider.dart';
 import 'package:new_ara_app/widgetclasses/loading_indicator.dart';
@@ -21,6 +14,7 @@ import 'package:new_ara_app/utils/time_utils.dart';
 import 'package:new_ara_app/utils/html_info.dart';
 import 'package:new_ara_app/pages/user_view_page.dart';
 import 'package:new_ara_app/pages/post_write_page.dart';
+import 'package:new_ara_app/utils/post_view_utils.dart';
 
 class PostViewPage extends StatefulWidget {
   final int articleID;
@@ -32,25 +26,22 @@ class PostViewPage extends StatefulWidget {
 
 class _PostViewPageState extends State<PostViewPage> {
   late ArticleModel article;
-  late bool isReportable;
+  late bool isReportable, isValid, isModify, isNestedComment;
+  late List<CommentNestedCommentListActionModel> commentList;
 
-  bool isValid = false;
-  FocusNode textFocusNode = FocusNode();
-  final _formKey = GlobalKey<FormState>();
   String _commentContent = "";
-
-  final ScrollController _scrollController =
-      ScrollController(); // 페이지 전체에 대한 컨트롤러
-
-  List<CommentNestedCommentListActionModel> commentList = [];
-
+  FocusNode textFocusNode = FocusNode();
   CommentNestedCommentListActionModel? targetComment; // 수정 or 대댓글이 달릴 댓글
-  bool isModify = false, isNestedComment = false; // 수정 or 대댓글 or 그냥 댓글
+  final _formKey = GlobalKey<FormState>();
+  final ScrollController _scrollController = ScrollController();
   final TextEditingController _textEditingController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
+    isValid = false;
+    isModify = isNestedComment = false;
+    commentList = [];
     UserProvider userProvider = context.read<UserProvider>();
     _fetchArticle(userProvider).then((value) {
       isReportable = value ? !article.is_mine : false;
@@ -61,6 +52,8 @@ class _PostViewPageState extends State<PostViewPage> {
   @override
   void dispose() {
     textFocusNode.dispose();
+    _scrollController.dispose();
+    _textEditingController.dispose();
     super.dispose();
   }
 
@@ -76,16 +69,12 @@ class _PostViewPageState extends State<PostViewPage> {
                 color: ColorsInfo.newara,
                 icon: SvgPicture.asset('assets/icons/left_chevron.svg',
                     color: ColorsInfo.newara, width: 10.7, height: 18.99),
-                onPressed: () {
-                  Navigator.pop(context);
-                },
+                onPressed: () => Navigator.pop(context),
               ),
             ),
             body: SafeArea(
               child: GestureDetector(
-                onTap: () {
-                  FocusScope.of(context).unfocus();
-                },
+                onTap: () => FocusScope.of(context).unfocus(),
                 child: Container(
                   margin: const EdgeInsets.symmetric(horizontal: 20),
                   child: Column(children: [
@@ -95,8 +84,7 @@ class _PostViewPageState extends State<PostViewPage> {
                         color: ColorsInfo.newara,
                         onRefresh: () async {
                           _setIsValid(false);
-                          bool res = await _fetchArticle(userProvider);
-                          _setIsValid(res);
+                          _setIsValid(await _fetchArticle(userProvider));
                         },
                         child: SingleChildScrollView(
                           controller: _scrollController,
@@ -203,11 +191,12 @@ class _PostViewPageState extends State<PostViewPage> {
                               const SizedBox(height: 10),
                               // 유저 정보 (프로필 이미지, 닉네임)
                               InkWell(
-                                onTap: () {
-                                  Navigator.push(
+                                onTap: () async {
+                                  await Navigator.push(
                                     context,
                                     MaterialPageRoute(builder: (context) => UserViewPage(userID: article.created_by.id)),
                                   );
+                                  _setIsValid(await _fetchArticle(userProvider));
                                 },
                                 child: Row(
                                   children: [
@@ -267,17 +256,14 @@ class _PostViewPageState extends State<PostViewPage> {
                                     AttachmentModel curFile = article.attachments[idx];
                                     String initFileName = Uri.parse(article.attachments[idx].file).path.substring(7);
                                     return InkWell(
-                                      onTap: () async {
-                                        late String targetDir;
-                                        try {
-                                          targetDir = await _getDownloadPath();
-                                        } catch (error) {
-                                          debugPrint("getDownloadPath failed: $error");
-                                          return;
-                                        }
-                                        String fileName = _addTimestampToFileName(initFileName);
-                                        bool res = await _downloadFile(userProvider, curFile.file, "$targetDir${Platform.pathSeparator}$fileName");
-                                        debugPrint(res ? "$fileName 파일 저장 성공" : "$fileName 파일 저장 실패");
+                                      onTap: () {
+                                        FileController(
+                                          model: curFile,
+                                          userProvider: userProvider,
+                                        ).download().then((result) {
+                                          debugPrint("다운로드 결과: $result");
+                                          // SnackBar 등 필요
+                                        });
                                       },
                                       child: Container(
                                         padding: const EdgeInsets.only(left: 5),
@@ -298,9 +284,7 @@ class _PostViewPageState extends State<PostViewPage> {
                                   separatorBuilder: (BuildContext context, int idx) => const SizedBox(height: 3),
                                 )
                               ),
-                              const Divider(
-                                thickness: 1,
-                              ),
+                              const Divider(thickness: 1,),
                               InArticleWebView(
                                 content: getContentHtml(
                                     article.content ?? "내용이 존재하지 않습니다."),
@@ -311,33 +295,13 @@ class _PostViewPageState extends State<PostViewPage> {
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
                                   InkWell(
-                                    onTap: () async {
-                                      if (article.is_mine) {
-                                        debugPrint("자신의 글에는 좋아요, 싫어요를 할 수 없음");
-                                        return;
-                                      }
-                                      if (article.my_vote == true) {
-                                        var cancelRes =
-                                            await userProvider.postApiRes(
-                                          "articles/${article.id}/vote_cancel/",
-                                        );
-                                        if (cancelRes.statusCode != 200) {
-                                          debugPrint(
-                                              "POST /api/articles/${article.id}/vote_cancel ${cancelRes.statusCode}");
-                                          return;
-                                        }
-                                      } else {
-                                        var postRes =
-                                            await userProvider.postApiRes(
-                                          "articles/${article.id}/vote_positive/",
-                                        );
-                                        if (postRes.statusCode != 200) {
-                                          debugPrint(
-                                              "POST /api/articles/${article.id}/vote_positive ${postRes.statusCode}");
-                                          return;
-                                        }
-                                      }
-                                      setVote(article, true);
+                                    onTap: () {
+                                      ArticleController(
+                                        model: article,
+                                        userProvider: userProvider,
+                                      ).posVote().then((result) {
+                                        if (result) update();
+                                      });
                                     },
                                     child: SizedBox(
                                       width: 25,
@@ -363,34 +327,13 @@ class _PostViewPageState extends State<PostViewPage> {
                                       )),
                                   const SizedBox(width: 20),
                                   InkWell(
-                                      onTap: () async {
-                                        if (article.is_mine == true) {
-                                          debugPrint(
-                                              "자신의 글에는 좋아요, 싫어요를 할 수 없음");
-                                          return;
-                                        }
-                                        if (article.my_vote == false) {
-                                          var cancelRes =
-                                              await userProvider.postApiRes(
-                                            "articles/${article.id}/vote_cancel/",
-                                          );
-                                          if (cancelRes.statusCode != 200) {
-                                            debugPrint(
-                                                "POST /api/articles/${article.id}/vote_cancel ${cancelRes.statusCode}");
-                                            return;
-                                          }
-                                        } else {
-                                          var postRes =
-                                              await userProvider.postApiRes(
-                                            "articles/${article.id}/vote_negative/",
-                                          );
-                                          if (postRes.statusCode != 200) {
-                                            debugPrint(
-                                                "POST /api/articles/${article.id}/vote_negative/ ${postRes.statusCode}");
-                                            return;
-                                          }
-                                        }
-                                        setVote(article, false);
+                                      onTap: () {
+                                        ArticleController(
+                                          model: article,
+                                          userProvider: userProvider,
+                                        ).negVote().then((result) {
+                                          if (result) update();
+                                        });
                                       },
                                       child: SizedBox(
                                         width: 25,
@@ -424,36 +367,13 @@ class _PostViewPageState extends State<PostViewPage> {
                                   Row(
                                     children: [
                                       InkWell(
-                                        onTap: () async {
-                                          if (article.my_scrap == null) {
-                                            var postRes =
-                                                await userProvider.postApiRes(
-                                              "scraps/",
-                                              payload: {
-                                                "parent_article": article.id,
-                                              },
-                                            );
-                                            if (postRes.statusCode != 201) {
-                                              return;
-                                            }
-                                            if (!mounted) return;
-                                            setState(() {
-                                              article.my_scrap =
-                                                  ScrapCreateActionModel
-                                                      .fromJson(postRes.data);
-                                            });
-                                          } else {
-                                            var delRes =
-                                                await userProvider.delApiRes(
-                                                    "scraps/${article.my_scrap!.id}/");
-                                            if (delRes.statusCode != 204) {
-                                              return;
-                                            }
-                                            if (!mounted) return;
-                                            setState(() {
-                                              article.my_scrap = null;
-                                            });
-                                          }
+                                        onTap: () {
+                                          ArticleController(
+                                            model: article,
+                                            userProvider: userProvider,
+                                          ).scrap().then((result) {
+                                            if (result) update();
+                                          });
                                         },
                                         child: Container(
                                           width: 100,
@@ -507,11 +427,10 @@ class _PostViewPageState extends State<PostViewPage> {
                                       const SizedBox(width: 15),
                                       InkWell(
                                         onTap: () async {
-                                          String url =
-                                              "$newAraDefaultUrl/post/${article.id}";
-                                          await Clipboard.setData(
-                                              ClipboardData(text: url));
-                                          debugPrint("클립보드에 복사됨: $url");
+                                          await ArticleController(
+                                            model: article,
+                                            userProvider: userProvider,
+                                          ).share();
                                         },
                                         child: Container(
                                           width: 90,
@@ -555,7 +474,6 @@ class _PostViewPageState extends State<PostViewPage> {
                                   // 신고버튼 Row
                                   isReportable ? InkWell(
                                     onTap: () {
-                                      if (!isReportable) return;
                                       showDialog(
                                           context: context,
                                           builder: (context) {
@@ -604,10 +522,11 @@ class _PostViewPageState extends State<PostViewPage> {
                                       await Navigator.push(
                                         context,
                                         MaterialPageRoute(
-                                          builder: (context) => PostWritePage()
+                                          builder: (context) => PostWritePage(articleBefore: article)
                                         )
                                       );
-                                      await _fetchArticle(userProvider);
+                                      bool result = await _fetchArticle(userProvider);
+                                      if (result) update();
                                     },
                                     child: Container(
                                       width: 90,
@@ -733,17 +652,16 @@ class _PostViewPageState extends State<PostViewPage> {
                                               SizedBox(
                                                 width: 30,
                                                 height: 25,
-                                                child: curComment.is_hidden ==
-                                                        true
-                                                    ? Container()
-                                                    : (curComment.is_mine ==
-                                                            true
-                                                        ? _buildMyPopupMenuButton(
-                                                            curComment.id,
-                                                            userProvider,
-                                                            idx)
-                                                        : _buildOthersPopupMenuButton(
-                                                            curComment.id)),
+                                                child: Visibility(
+                                                  visible: !(curComment.is_hidden),
+                                                  child: (curComment.is_mine ==
+                                                      true
+                                                      ? _buildMyPopupMenuButton(
+                                                      curComment.id,
+                                                      userProvider, idx)
+                                                      : _buildOthersPopupMenuButton(
+                                                      curComment.id))
+                                                ),
                                               ),
                                             ],
                                           ),
@@ -754,7 +672,7 @@ class _PostViewPageState extends State<PostViewPage> {
                                                 ? _buildCommentContent(
                                                     curComment.content ?? "")
                                                 : const Text(
-                                                    '삭제된 댓글입니다.',
+                                                    '삭제된 댓글 입니다.',
                                                     style: TextStyle(
                                                       fontSize: 14,
                                                       fontWeight:
@@ -772,41 +690,13 @@ class _PostViewPageState extends State<PostViewPage> {
                                                   ? Row(
                                                       children: [
                                                         InkWell(
-                                                          onTap: () async {
-                                                            if (curComment
-                                                                    .is_mine ==
-                                                                true) {
-                                                              return;
-                                                            }
-                                                            if (curComment
-                                                                    .my_vote ==
-                                                                true) {
-                                                              var postRes =
-                                                                  await userProvider
-                                                                      .postApiRes(
-                                                                "comments/${curComment.id}/vote_cancel/",
-                                                              );
-                                                              if (postRes
-                                                                      .statusCode !=
-                                                                  200) {
-                                                                debugPrint(
-                                                                    "POST /api/comments/${curComment.id}/vote_cancel/ ${postRes.statusCode}");
-                                                                return;
-                                                              }
-                                                            } else {
-                                                              var postRes =
-                                                                  await userProvider
-                                                                      .postApiRes(
-                                                                          "comments/${curComment.id}/vote_positive/");
-                                                              if (postRes
-                                                                      .statusCode !=
-                                                                  200) {
-                                                                debugPrint(
-                                                                    "POST /api/comments/${curComment.id}/vote_positive/ ${postRes.statusCode}");
-                                                                return;
-                                                              }
-                                                            }
-                                                            setVote(curComment, true);
+                                                          onTap: () {
+                                                            CommentController(
+                                                              model: curComment,
+                                                              userProvider: userProvider,
+                                                            ).posVote().then((result) {
+                                                              if (result) update();
+                                                            });
                                                           },
                                                           child:
                                                               SvgPicture.asset(
@@ -848,40 +738,12 @@ class _PostViewPageState extends State<PostViewPage> {
                                                             width: 6),
                                                         InkWell(
                                                           onTap: () async {
-                                                            if (curComment
-                                                                    .is_mine ==
-                                                                true) {
-                                                              return;
-                                                            }
-                                                            if (curComment
-                                                                    .my_vote ==
-                                                                false) {
-                                                              var postRes =
-                                                                  await userProvider
-                                                                      .postApiRes(
-                                                                "comments/${curComment.id}/vote_cancel/",
-                                                              );
-                                                              if (postRes
-                                                                      .statusCode !=
-                                                                  200) {
-                                                                debugPrint(
-                                                                    "POST /api/comments/${curComment.id}/vote_cancel/ ${postRes.statusCode}");
-                                                                return;
-                                                              }
-                                                            } else {
-                                                              var postRes =
-                                                                  await userProvider
-                                                                      .postApiRes(
-                                                                          "comments/${curComment.id}/vote_negative/");
-                                                              if (postRes
-                                                                      .statusCode !=
-                                                                  200) {
-                                                                debugPrint(
-                                                                    "POST /api/comments/${curComment.id}/vote_negative/ ${postRes.statusCode}");
-                                                                return;
-                                                              }
-                                                            }
-                                                            setVote(curComment, false);
+                                                            CommentController(
+                                                              model: curComment,
+                                                              userProvider: userProvider,
+                                                            ).negVote().then((result) {
+                                                              if (result) update();
+                                                            });
                                                           },
                                                           child:
                                                               SvgPicture.asset(
@@ -936,91 +798,81 @@ class _PostViewPageState extends State<PostViewPage> {
                                                               ),
                                                         const SizedBox(
                                                             width: 5),
-                                                        curComment.parent_comment !=
-                                                                null
-                                                            ? Container()
-                                                            : InkWell(
-                                                                onTap: () {
-                                                                  targetComment =
-                                                                      curComment;
-                                                                  debugPrint(
-                                                                      "parentCommentID: ${targetComment!.id}");
-                                                                  _setCommentMode(
-                                                                      true,
-                                                                      false);
-                                                                  textFocusNode
-                                                                      .requestFocus();
-                                                                },
-                                                                child:
-                                                                    const Text(
-                                                                  '답글 쓰기',
-                                                                  style:
-                                                                      TextStyle(
-                                                                    fontSize:
-                                                                        13,
-                                                                    fontWeight:
-                                                                        FontWeight
-                                                                            .w500,
-                                                                  ),
-                                                                ),
+                                                        Visibility(
+                                                          visible: curComment.parent_comment == null,
+                                                          child: InkWell(
+                                                            onTap: () {
+                                                              targetComment = curComment;
+                                                              _setCommentMode(
+                                                                  true,
+                                                                  false);
+                                                              textFocusNode.requestFocus();
+                                                            },
+                                                            child:
+                                                            const Text(
+                                                              '답글 쓰기',
+                                                              style:
+                                                              TextStyle(
+                                                                fontSize:
+                                                                13,
+                                                                fontWeight:
+                                                                FontWeight
+                                                                    .w500,
                                                               ),
+                                                            ),
+                                                          ),
+                                                        ),
                                                       ],
                                                     )
-                                                  : Row(
-                                                      children: [
-                                                        curComment.parent_comment !=
-                                                                null
-                                                            ? Container()
-                                                            : InkWell(
-                                                                onTap: () {},
-                                                                child:
-                                                                    SvgPicture
-                                                                        .asset(
-                                                                  'assets/icons/arrow_uturn_left_1.svg',
-                                                                  width: 11,
-                                                                  height: 12,
-                                                                ),
-                                                              ),
-                                                        const SizedBox(
-                                                            width: 5),
-                                                        curComment.parent_comment !=
-                                                                null
-                                                            ? Container()
-                                                            : InkWell(
-                                                                onTap: () {
-                                                                  targetComment =
-                                                                      curComment;
-                                                                  debugPrint(
-                                                                      "parentCommentID: ${targetComment!.id}");
-                                                                  _setCommentMode(
-                                                                      true,
-                                                                      false);
-                                                                  textFocusNode
-                                                                      .requestFocus();
-                                                                },
-                                                                child:
-                                                                    const Text(
-                                                                  '답글 쓰기',
-                                                                  style:
-                                                                      TextStyle(
-                                                                    fontSize:
-                                                                        13,
-                                                                    fontWeight:
-                                                                        FontWeight
-                                                                            .w500,
-                                                                  ),
-                                                                ),
-                                                              ),
-                                                      ],
-                                                    )),
+                                                  : Visibility(
+                                                visible: curComment.parent_comment == null,
+                                                child: Row(
+                                                  children: [
+                                                    InkWell(
+                                                      onTap: () {},
+                                                      child:
+                                                      SvgPicture
+                                                          .asset(
+                                                        'assets/icons/arrow_uturn_left_1.svg',
+                                                        width: 11,
+                                                        height: 12,
+                                                      ),
+                                                    ),
+                                                    const SizedBox(width: 5),
+                                                    InkWell(
+                                                      onTap: () {
+                                                        targetComment =
+                                                            curComment;
+                                                        debugPrint(
+                                                            "parentCommentID: ${targetComment!.id}");
+                                                        _setCommentMode(
+                                                            true,
+                                                            false);
+                                                        textFocusNode
+                                                            .requestFocus();
+                                                      },
+                                                      child:
+                                                      const Text(
+                                                        '답글 쓰기',
+                                                        style:
+                                                        TextStyle(
+                                                          fontSize:
+                                                          13,
+                                                          fontWeight:
+                                                          FontWeight
+                                                              .w500,
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                              )),
                                         ],
                                       ),
                                     );
                                   },
                                   separatorBuilder:
-                                      (BuildContext context, int idx) {
-                                    return const Divider();
-                                  },
+                                      (BuildContext context, int idx) => const Divider(),
                                 ),
                               ),
                             ],
@@ -1033,38 +885,48 @@ class _PostViewPageState extends State<PostViewPage> {
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        isNestedComment
-                            ? Text(
-                                '${targetComment!.is_mine ? '\'나\'에게' : "'${targetComment!.created_by.profile.nickname}'님께"} 답글을 작성하는 중',
+                        Visibility(
+                          visible: isNestedComment,
+                          child: Column(
+                            children: [
+                              Text(
+                                '${(targetComment == null ? false : targetComment!.is_mine) ? '\'나\'에게' : "'${targetComment?.created_by.profile.nickname}'님께"} 답글을 작성하는 중',
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
                                 style: const TextStyle(
                                   fontSize: 13,
                                   fontWeight: FontWeight.w500,
                                 ),
-                              )
-                            : Container(),
-                        isNestedComment
-                            ? const SizedBox(height: 5)
-                            : Container(),
-                        isModify
-                            ? Text(
-                                '나의 댓글 "${targetComment!.content}" 수정 중',
+                              ),
+                              const SizedBox(height: 5)
+                            ],
+                          ),
+                        ),
+                        Visibility(
+                          visible: isModify,
+                          child: Column(
+                            children: [
+                              Text(
+                                '나의 댓글 "${targetComment?.content}" 수정 중',
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
                                 style: const TextStyle(
                                   fontSize: 13,
                                   fontWeight: FontWeight.w500,
                                 ),
-                              )
-                            : Container(),
-                        isModify ? const SizedBox(height: 5) : Container(),
+                              ),
+                              const SizedBox(height: 5)
+                            ],
+                          ),
+                        ),
                         Row(
                           children: [
                             // Close button
-                            (!isModify && !isNestedComment)
-                                ? Container()
-                                : InkWell(
+                            Visibility(
+                              visible: (isModify || isNestedComment),
+                              child: Column(
+                                children: [
+                                  InkWell(
                                     onTap: () {
                                       _textEditingController.text = "";
                                       targetComment = null;
@@ -1078,9 +940,10 @@ class _PostViewPageState extends State<PostViewPage> {
                                       color: ColorsInfo.newara,
                                     ),
                                   ),
-                            (!isModify && !isNestedComment)
-                                ? Container()
-                                : const SizedBox(width: 5),
+                                  const SizedBox(width: 5),
+                                ],
+                              ),
+                            ),
                             // TextFormField
                             Expanded(
                               child: Container(
@@ -1116,7 +979,7 @@ class _PostViewPageState extends State<PostViewPage> {
                         ),
                       ],
                     ),
-                    const SizedBox(height: 10),
+                    const SizedBox(height: 15),
                   ]),
                 ),
               ),
@@ -1399,12 +1262,8 @@ class _PostViewPageState extends State<PostViewPage> {
               }
               return null;
             },
-            onChanged: (value) {
-              _commentContent = value;
-            },
-            onSaved: (value) {
-              _commentContent = value ?? '';
-            },
+            onChanged: (value) => _commentContent = value,
+            onSaved: (value) =>  _commentContent = value ?? '',
           )),
     );
   }
@@ -1429,53 +1288,9 @@ class _PostViewPageState extends State<PostViewPage> {
     );
   }
 
-  void setVote(dynamic model, bool value) {
-    model.positive_vote_count ??= 0;
+  void update() {
     if (!mounted) return;
-    setState(() {
-      model.positive_vote_count = model.positive_vote_count! +
-          (model.my_vote == true ? -1 : (value ? 1 : 0));
-      model.negative_vote_count = model.negative_vote_count! +
-          (model.my_vote == false ? -1 : (value ? 0 : 1));
-      model.my_vote = (model.my_vote == value)
-          ? null
-          : value;
-    });
-  }
-
-  // 파일 다운로드 경로 찾기
-  Future<String> _getDownloadPath() async {
-    late Directory directory;
-    if (Platform.isIOS) {
-      directory = await getApplicationDocumentsDirectory();
-    } else {
-      directory = Directory('/storage/emulated/0/Download');
-      if (!await directory.exists()) {
-        directory = (await getExternalStorageDirectory())!;  // Android 에서는 존재가 보장됨
-      }
-    }
-    return directory.path;
-  }
-
-  String _addTimestampToFileName(String fileName) {
-    String timestamp = DateTime.now().millisecondsSinceEpoch.toString();
-    int dotIndex = fileName.lastIndexOf('.');
-    if (dotIndex != -1) {
-      String nameWithoutExtension = fileName.substring(0, dotIndex);
-      String extension = fileName.substring(dotIndex + 1);
-      return '$nameWithoutExtension-$timestamp.$extension';
-    }
-    return '$fileName-$timestamp';
-  }
-
-  // 파일 다운로드 하기
-  Future<bool> _downloadFile(UserProvider userProvider, String uri, String totalPath) async {
-    try {
-      await userProvider.myDio().download(uri, totalPath);
-    } catch (error) {
-      return false;
-    }
-    return true;
+    setState(() {});
   }
 
   // isValid: article 에 적절한 정보가 있는지 나타냄
@@ -1603,357 +1418,5 @@ class _PostViewPageState extends State<PostViewPage> {
       _setCommentMode(false, false);
     }
     return true;
-  }
-}
-
-// 신고 기능 Dialog
-class ReportDialogWidget extends StatefulWidget {
-  final int? articleID, commentID;
-  const ReportDialogWidget({super.key, this.articleID, this.commentID});
-
-  @override
-  State<ReportDialogWidget> createState() => _ReportDialogWidgetState();
-}
-
-class _ReportDialogWidgetState extends State<ReportDialogWidget> {
-  List<String> reportContents = [
-    "hate_speech",
-    "unauthorized_sales_articles",
-    "spam",
-    "fake_information",
-    "defamation",
-    "other"
-  ];
-  List<String> reportContentKor = [
-    "혐오 발언",
-    "허가되지 않은 판매글",
-    "스팸",
-    "거짓 정보",
-    "명예훼손",
-    "기타"
-  ];
-  late List<bool> isChosen;
-
-  @override
-  void initState() {
-    super.initState();
-    isChosen = [false, false, false, false, false, false];
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Dialog(
-      child: Container(
-        decoration: const BoxDecoration(
-          borderRadius: BorderRadius.all(Radius.circular(15)),
-        ),
-        width: 380,
-        height: 500,
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            SvgPicture.asset(
-              "assets/icons/close_check.svg",
-              width: 45,
-              height: 45,
-              color: ColorsInfo.newara,
-            ),
-            const SizedBox(height: 5),
-            Text(
-              '${widget.articleID == null ? '댓글' : '게시글'} 신고 사유를 알려주세요.',
-              style: const TextStyle(
-                fontSize: 17,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-            const SizedBox(height: 20),
-            _buildReportButton(0),
-            const SizedBox(height: 10),
-            _buildReportButton(1),
-            const SizedBox(height: 10),
-            _buildReportButton(2),
-            const SizedBox(height: 10),
-            _buildReportButton(3),
-            const SizedBox(height: 10),
-            _buildReportButton(4),
-            const SizedBox(height: 10),
-            _buildReportButton(5),
-            const SizedBox(height: 20),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                InkWell(
-                  onTap: () {
-                    Navigator.pop(context);
-                  },
-                  child: Container(
-                    decoration: BoxDecoration(
-                      border: Border.all(
-                        color: Colors.grey, // 테두리 색상을 빨간색으로 지정
-                        width: 1, // 테두리의 두께를 2로 지정
-                      ),
-                      borderRadius: const BorderRadius.all(Radius.circular(20)),
-                      color: Colors.white,
-                    ),
-                    width: 60,
-                    height: 40,
-                    child: const Center(
-                      child: Text(
-                        '취소',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w500,
-                          color: Colors.black,
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 20),
-                InkWell(
-                  onTap: () async {
-                    postReport().then((res) {
-                      debugPrint("신고가 ${res ? '성공' : '실패'}하였습니다.");
-                      if (res) Navigator.pop(context);
-                    });
-                  },
-                  child: Container(
-                    decoration: BoxDecoration(
-                      borderRadius: const BorderRadius.all(Radius.circular(20)),
-                      color: ColorsInfo.newara.withOpacity((isChosen[0] ||
-                              isChosen[1] ||
-                              isChosen[2] ||
-                              isChosen[3] ||
-                              isChosen[4] ||
-                              isChosen[5])
-                          ? 1
-                          : 0.5),
-                    ),
-                    width: 100,
-                    height: 40,
-                    child: const Center(
-                      child: Text(
-                        '신고하기',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w500,
-                          color: Colors.white,
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Future<bool> postReport() async {
-    if (!isChosen[0] &&
-        !isChosen[1] &&
-        !isChosen[2] &&
-        !isChosen[3] &&
-        !isChosen[4] &&
-        !isChosen[5]) {
-      // 나중에 알림 해주기
-      return false;
-    }
-    String reportContent = "";
-    for (int i = 0; i < 6; i++) {
-      if (!isChosen[i]) continue;
-      if (reportContent != "") reportContent += ", ";
-      reportContent += reportContents[i];
-    }
-    debugPrint("reportContent: $reportContent");
-    Map<String, dynamic> defaultPayload = {
-      "content": reportContent,
-      "type": "others",
-    };
-    defaultPayload.addAll(widget.articleID == null
-        ? {"parent_comment": widget.commentID ?? 0}
-        : {"parent_article": widget.articleID ?? 0});
-    UserProvider userProvider = context.read<UserProvider>();
-    try {
-      await userProvider.postApiRes(
-        "reports/",
-        payload: defaultPayload,
-      );
-    } catch (error) {
-      debugPrint("postReport() failed with error: $error");
-      return false;
-    }
-
-    return true;
-  }
-
-  // 각각의 신고항목에 대한 button
-  InkWell _buildReportButton(int idx) {
-    return InkWell(
-      onTap: () {
-        if (!mounted) return;
-        setState(() => isChosen[idx] = !isChosen[idx]);
-      },
-      child: Container(
-        decoration: BoxDecoration(
-          borderRadius: const BorderRadius.all(Radius.circular(20)),
-          color: isChosen[idx]
-              ? ColorsInfo.newara
-              : const Color.fromRGBO(220, 220, 220, 1),
-        ),
-        width: 180,
-        height: 40,
-        child: Center(
-          child: Text(
-            reportContentKor[idx],
-            style: TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.w500,
-              color: isChosen[idx] ? Colors.white : Colors.black,
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-// PostViewPage 내에 삽입되는 WebViewWidget
-// article.content or curComment.content 렌더링을 위한 WebViewWidget
-// WebViewWidget 과의 차이점은 JS를 이용한 자동 높이 조정
-class InArticleWebView extends StatefulWidget {
-  final String content;
-  final double initialHeight;
-  const InArticleWebView({
-    super.key,
-    required this.content,
-    required this.initialHeight,
-  });
-
-  @override
-  State<InArticleWebView> createState() => _InArticleWebViewState();
-}
-
-class _InArticleWebViewState extends State<InArticleWebView> {
-  WebViewController _webViewController = WebViewController();
-  late double webViewHeight;
-  late bool isFitted;
-
-  void setWebViewHeight(value) {
-    setState(() => webViewHeight = value);
-  }
-
-  int getPostNum(String path) {
-    final RegExp pattern = RegExp(r'/post/\d+');
-    RegExpMatch? match = pattern.firstMatch(path);
-    if (match == null) return -1;
-    return int.parse(path.substring(6));
-  }
-
-  void launchArticle(int postNum) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => PostViewPage(id: postNum))
-    );
-  }
-
-  Future<void> launchInBrowser(String url) async {
-    final Uri targetUrl = Uri.parse(url);
-    if (!await canLaunchUrl(targetUrl)) {
-      debugPrint("$url을 열 수 없습니다.");
-      return;
-    }
-    if (targetUrl.authority == newAraAuthority) {
-      int postNum = getPostNum(targetUrl.path);
-      if (postNum != -1) {
-        launchArticle(postNum);
-        return;
-      }
-    }
-    if (!await launchUrl(
-      Uri.parse(url),
-      mode: LaunchMode.externalApplication,
-    )) {
-      throw Exception('Could not launch $url');
-    }
-  }
-
-  Future<double> getPageHeight() async {
-    final String pageHeightStr =
-        (await _webViewController.runJavaScriptReturningResult('''
-            function getPageHeight() {
-              return Math.max(
-                document.body.scrollHeight || 0,
-                document.documentElement.scrollHeight || 0,
-                document.body.offsetHeight || 0,
-                document.documentElement.offsetHeight || 0,
-                document.body.clientHeight || 0,
-                document.documentElement.clientHeight || 0
-              ).toString();
-            }
-            getPageHeight();
-          ''')).toString();
-    debugPrint(
-        "******************\npageHeight: $pageHeightStr \n******************");
-    double pageHeight =
-        double.parse(pageHeightStr.substring(1, pageHeightStr.length - 1));
-
-    return pageHeight;
-  }
-
-  Future<void> setPageHeight() async {
-    getPageHeight().then((height) {
-      if (!mounted) return;
-      setState(() => webViewHeight = height);
-    });
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    isFitted = false;
-    webViewHeight = widget.initialHeight;
-    _webViewController = WebViewController()
-      ..setJavaScriptMode(JavaScriptMode.unrestricted)
-      ..setBackgroundColor(const Color(0x00000000))
-      ..setNavigationDelegate(NavigationDelegate(
-        onNavigationRequest: (NavigationRequest request) async {
-          Uri uri = Uri.parse(request.url);
-          if (uri.scheme == "https" || uri.scheme == "http") {
-            await launchInBrowser(request.url);
-          } else {
-            // mailto, sms, tel 등의 scheme 은 아직 지원하지 않음 (2023.07.31)
-            // 추후 PostViewPage 전체적으로 완성되면 기능 추가할 예정
-            debugPrint("Denied Scheme: ${uri.scheme}");
-          }
-          return NavigationDecision.prevent;
-        },
-        onProgress: (int progress) {
-          debugPrint('WebView is loading (progress: $progress)');
-        },
-        onPageFinished: (String url) async {
-          if (isFitted) return;
-          await setPageHeight();
-          isFitted = true;
-        },
-        onWebResourceError: (WebResourceError error) async {
-          debugPrint(
-              'code: ${error.errorCode}\ndescription: ${error.description}\nerrorType: ${error.errorType}\nisForMainFrame: ${error.isForMainFrame}');
-        },
-      ))
-      ..loadHtmlString(widget.content);
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return SizedBox(
-      height: webViewHeight,
-      child: WebViewWidget(
-        controller: _webViewController,
-      ),
-    );
   }
 }
