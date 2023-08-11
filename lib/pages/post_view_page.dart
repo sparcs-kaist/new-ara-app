@@ -2,7 +2,6 @@ import 'dart:core';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:new_ara_app/constants/url_info.dart';
 import 'package:provider/provider.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -10,6 +9,7 @@ import 'package:flutter/services.dart';
 import 'package:path_provider/path_provider.dart';
 
 import 'package:new_ara_app/constants/colors_info.dart';
+import 'package:new_ara_app/constants/url_info.dart';
 import 'package:new_ara_app/models/article_model.dart';
 import 'package:new_ara_app/models/article_nested_comment_list_action_model.dart';
 import 'package:new_ara_app/models/comment_nested_comment_list_action_model.dart';
@@ -20,6 +20,7 @@ import 'package:new_ara_app/widgetclasses/loading_indicator.dart';
 import 'package:new_ara_app/utils/time_utils.dart';
 import 'package:new_ara_app/utils/html_info.dart';
 import 'package:new_ara_app/pages/user_view_page.dart';
+import 'package:new_ara_app/pages/post_write_page.dart';
 
 class PostViewPage extends StatefulWidget {
   final int articleID;
@@ -552,52 +553,76 @@ class _PostViewPageState extends State<PostViewPage> {
                                     ],
                                   ),
                                   // 신고버튼 Row
-                                  Opacity(
-                                    opacity: isReportable ? 1 : 0.3,
-                                    child: InkWell(
-                                      onTap: () {
-                                        if (!isReportable) return;
-                                        showDialog(
-                                            context: context,
-                                            builder: (context) {
-                                              return ReportDialogWidget(
-                                                  articleID: article.id);
-                                            });
-                                      },
-                                      child: Container(
-                                        width: 90,
-                                        height: 40,
-                                        decoration: BoxDecoration(
-                                          borderRadius:
-                                              BorderRadius.circular(8),
-                                          border: Border.all(
-                                            color: const Color.fromRGBO(
-                                                230, 230, 230, 1),
-                                          ),
+                                  isReportable ? InkWell(
+                                    onTap: () {
+                                      if (!isReportable) return;
+                                      showDialog(
+                                          context: context,
+                                          builder: (context) {
+                                            return ReportDialogWidget(
+                                                articleID: article.id);
+                                          });
+                                    },
+                                    child: Container(
+                                      width: 90,
+                                      height: 40,
+                                      decoration: BoxDecoration(
+                                        borderRadius:
+                                        BorderRadius.circular(8),
+                                        border: Border.all(
+                                          color: const Color.fromRGBO(
+                                              230, 230, 230, 1),
                                         ),
-                                        child: Center(
-                                          child: Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.center,
-                                            children: [
-                                              const SizedBox(width: 2),
-                                              SvgPicture.asset(
-                                                'assets/icons/exclamationmark-bubble-fill.svg',
-                                                width: 20,
-                                                height: 20,
-                                                color: const Color.fromRGBO(
-                                                    100, 100, 100, 1),
+                                      ),
+                                      child: Center(
+                                        child: Row(
+                                          mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                          children: [
+                                            const SizedBox(width: 2),
+                                            SvgPicture.asset(
+                                              'assets/icons/exclamationmark-bubble-fill.svg',
+                                              width: 20,
+                                              height: 20,
+                                              color: const Color.fromRGBO(
+                                                  100, 100, 100, 1),
+                                            ),
+                                            const SizedBox(width: 10),
+                                            const Text(
+                                              '신고',
+                                              style: TextStyle(
+                                                fontSize: 15,
+                                                fontWeight: FontWeight.w500,
                                               ),
-                                              const SizedBox(width: 10),
-                                              const Text(
-                                                '신고',
-                                                style: TextStyle(
-                                                  fontSize: 15,
-                                                  fontWeight: FontWeight.w500,
-                                                ),
-                                              ),
-                                            ],
-                                          ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                  ) : InkWell(
+                                    onTap: () async {
+                                      await Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) => PostWritePage()
+                                        )
+                                      );
+                                      await _fetchArticle(userProvider);
+                                    },
+                                    child: Container(
+                                      width: 90,
+                                      height: 40,
+                                      decoration: BoxDecoration(
+                                        borderRadius:
+                                        BorderRadius.circular(8),
+                                        border: Border.all(
+                                          color: const Color.fromRGBO(
+                                              230, 230, 230, 1),
+                                        ),
+                                      ),
+                                      child: const Center(
+                                        child: Text(
+                                          '수정하기',
                                         ),
                                       ),
                                     ),
@@ -1821,11 +1846,32 @@ class _InArticleWebViewState extends State<InArticleWebView> {
     setState(() => webViewHeight = value);
   }
 
+  int getPostNum(String path) {
+    final RegExp pattern = RegExp(r'/post/\d+');
+    RegExpMatch? match = pattern.firstMatch(path);
+    if (match == null) return -1;
+    return int.parse(path.substring(6));
+  }
+
+  void launchArticle(int postNum) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => PostViewPage(id: postNum))
+    );
+  }
+
   Future<void> launchInBrowser(String url) async {
     final Uri targetUrl = Uri.parse(url);
     if (!await canLaunchUrl(targetUrl)) {
       debugPrint("$url을 열 수 없습니다.");
       return;
+    }
+    if (targetUrl.authority == newAraAuthority) {
+      int postNum = getPostNum(targetUrl.path);
+      if (postNum != -1) {
+        launchArticle(postNum);
+        return;
+      }
     }
     if (!await launchUrl(
       Uri.parse(url),
