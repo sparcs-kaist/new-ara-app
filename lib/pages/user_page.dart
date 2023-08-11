@@ -66,16 +66,33 @@ class _UserPageState extends State<UserPage>
     loadAllData(userProvider);
   }
 
-  Future<void> loadAllData(UserProvider userProvider) async {
-    await fetchScrappedArticles(userProvider, 1);
-    await fetchRecentArticles(userProvider, 1);
-    await fetchCreatedArticles(userProvider, 1);
+  Future<void> loadAllData(UserProvider userProvider, {create=true, scrap=true, recent=true}) async {
+    if (scrap) await fetchScrappedArticles(userProvider, 1);
+    if (recent) await fetchRecentArticles(userProvider, 1);
+    if (create) await fetchCreatedArticles(userProvider, 1);
   }
 
   void _handleTabChange() {
-    if (_tabController.previousIndex != _tabController.index) {
-      debugPrint("Tab is changed to ${_tabController.index}");
-      setState(() => curCount = tabCount[_tabController.index]);
+    if (!_tabController.indexIsChanging) {
+      if (_tabController.animation!.isCompleted) {
+        return;
+      } else {
+        int tabIndex = _tabController.index;
+        UserProvider userProvider = context.read<UserProvider>();
+        setIsLoaded(false, tabIndex);
+        loadAllData(userProvider, create: tabIndex == 0, scrap: tabIndex == 1, recent: tabIndex == 2).then((_) {
+          if (!mounted) return;
+          setState(() => curCount = tabCount[tabIndex]);
+        });
+      }
+    } else {
+      int tabIndex = _tabController.index;
+      UserProvider userProvider = context.read<UserProvider>();
+      setIsLoaded(false, tabIndex);
+      loadAllData(userProvider, create: tabIndex == 0, scrap: tabIndex == 1, recent: tabIndex == 2).then((_) {
+        if (!mounted) return;
+        setState(() => curCount = tabCount[tabIndex]);
+      });
     }
   }
 
