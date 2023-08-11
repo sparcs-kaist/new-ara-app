@@ -258,13 +258,13 @@ class _UserPageState extends State<UserPage>
                     children: [
                       !isLoadedList[0]
                           ? const LoadingIndicator()
-                          : _buildPostList(0),
+                          : _buildPostList(0, userProvider),
                       !isLoadedList[1]
                           ? const LoadingIndicator()
-                          : _buildPostList(1),
+                          : _buildPostList(1, userProvider),
                       !isLoadedList[2]
                           ? const LoadingIndicator()
-                          : _buildPostList(2),
+                          : _buildPostList(2, userProvider),
                     ],
                   ),
                 ),
@@ -408,7 +408,7 @@ class _UserPageState extends State<UserPage>
     setState(() => curCount = tabCount[tabIndex]);
   }
 
-  Widget _buildPostList(int tabIndex) {
+  Widget _buildPostList(int tabIndex, UserProvider userProvider) {
     return RefreshIndicator(
       color: ColorsInfo.newara,
       onRefresh: () async {
@@ -444,9 +444,14 @@ class _UserPageState extends State<UserPage>
             curPost = recentArticleList[index];
           }
           return InkWell(
-              onTap: () {
-                Navigator.of(context)
+              onTap: () async {
+                await Navigator.of(context)
                     .push(slideRoute(PostViewPage(id: curPost.id)));
+                setIsLoaded(false, tabIndex);
+                var fetchFunc = (tabIndex == 0 ? fetchCreatedArticles : (tabIndex == 1 ? fetchScrappedArticles : fetchRecentArticles));
+                for (int page = 1; page < nextPage[tabIndex]; page++) {
+                  await fetchFunc(userProvider, page);
+                }
               },
               child: SizedBox(
                 height: 61,
@@ -454,12 +459,43 @@ class _UserPageState extends State<UserPage>
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Text(
-                      curPost.title.toString(),
-                      style: const TextStyle(
-                          fontSize: 16, fontWeight: FontWeight.w500),
-                      overflow: TextOverflow.ellipsis,
-                      maxLines: 1,
+                    Row(
+                      children: [
+                        Flexible(
+                          child: Text(
+                            curPost.title.toString(),
+                            style: const TextStyle(
+                                fontSize: 16, fontWeight: FontWeight.w500),
+                            overflow: TextOverflow.ellipsis,
+                            maxLines: 1,
+                          ),
+                        ),
+                        curPost.attachment_type.toString() == "NONE" ? Container() : const SizedBox(width: 5),
+                        curPost.attachment_type.toString() == "BOTH"
+                            ? Row(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            SvgPicture.asset(
+                              'assets/icons/image_post_preview.svg',
+                            ),
+                            const SizedBox(
+                              width: 9,
+                            ),
+                            SvgPicture.asset(
+                              'assets/icons/clip_post_preview.svg',
+                            ),
+                          ],
+                        )
+                            : curPost.attachment_type.toString() == "IMAGE"
+                            ? SvgPicture.asset(
+                          'assets/icons/image_post_preview.svg',
+                        )
+                            : curPost.attachment_type.toString() == "NON_IMAGE"
+                            ? SvgPicture.asset(
+                          'assets/icons/clip_post_preview.svg',
+                        )
+                            : Container()
+                      ],
                     ),
                     const SizedBox(height: 5),
                     Row(

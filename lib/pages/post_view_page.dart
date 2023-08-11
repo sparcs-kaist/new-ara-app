@@ -1,22 +1,26 @@
 import 'dart:core';
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:new_ara_app/constants/url_info.dart';
 import 'package:provider/provider.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:flutter/services.dart';
+import 'package:path_provider/path_provider.dart';
 
 import 'package:new_ara_app/constants/colors_info.dart';
+import 'package:new_ara_app/constants/url_info.dart';
 import 'package:new_ara_app/models/article_model.dart';
-import 'package:new_ara_app/providers/user_provider.dart';
-import 'package:new_ara_app/widgetclasses/loading_indicator.dart';
-import 'package:new_ara_app/utils/time_utils.dart';
 import 'package:new_ara_app/models/article_nested_comment_list_action_model.dart';
 import 'package:new_ara_app/models/comment_nested_comment_list_action_model.dart';
 import 'package:new_ara_app/models/scrap_create_action_model.dart';
-import 'package:new_ara_app/utils/article_content_info.dart';
-import 'package:new_ara_app/utils/comment_content_info.dart';
+import 'package:new_ara_app/models/attachment_model.dart';
+import 'package:new_ara_app/providers/user_provider.dart';
+import 'package:new_ara_app/widgetclasses/loading_indicator.dart';
+import 'package:new_ara_app/utils/time_utils.dart';
+import 'package:new_ara_app/utils/html_info.dart';
+import 'package:new_ara_app/pages/user_view_page.dart';
+import 'package:new_ara_app/pages/post_write_page.dart';
 
 class PostViewPage extends StatefulWidget {
   final int articleID;
@@ -48,9 +52,9 @@ class _PostViewPageState extends State<PostViewPage> {
   void initState() {
     super.initState();
     UserProvider userProvider = context.read<UserProvider>();
-    fetchArticle(userProvider).then((value) {
+    _fetchArticle(userProvider).then((value) {
       isReportable = value ? !article.is_mine : false;
-      setIsValid(value);
+      _setIsValid(value);
     });
   }
 
@@ -90,9 +94,9 @@ class _PostViewPageState extends State<PostViewPage> {
                       child: RefreshIndicator(
                         color: ColorsInfo.newara,
                         onRefresh: () async {
-                          setIsValid(false);
-                          bool res = await fetchArticle(userProvider);
-                          setIsValid(res);
+                          _setIsValid(false);
+                          bool res = await _fetchArticle(userProvider);
+                          _setIsValid(res);
                         },
                         child: SingleChildScrollView(
                           controller: _scrollController,
@@ -140,38 +144,42 @@ class _PostViewPageState extends State<PostViewPage> {
                                   Row(
                                     children: [
                                       SvgPicture.asset(
-                                        'assets/icons/like.svg',
+                                        article.my_vote == true
+                                            ? 'assets/icons/like_filled.svg'
+                                            : 'assets/icons/like.svg',
                                         width: 13,
                                         height: 15,
-                                        color: article.my_vote == true
-                                            ? ColorsInfo.newara
-                                            : ColorsInfo.noneVote,
+                                        color: article.my_vote == false
+                                            ? ColorsInfo.noneVote
+                                            : ColorsInfo.newara,
                                       ),
                                       const SizedBox(width: 3),
                                       Text('${article.positive_vote_count}',
                                           style: TextStyle(
                                               fontSize: 14,
                                               fontWeight: FontWeight.w500,
-                                              color: article.my_vote == true
-                                                  ? ColorsInfo.newara
-                                                  : ColorsInfo.noneVote)),
+                                              color: article.my_vote == false
+                                                  ? ColorsInfo.noneVote
+                                                  : ColorsInfo.newara)),
                                       const SizedBox(width: 10),
                                       SvgPicture.asset(
-                                        'assets/icons/dislike.svg',
+                                        article.my_vote == false
+                                            ? 'assets/icons/dislike_filled.svg'
+                                            : 'assets/icons/dislike.svg',
                                         width: 13,
                                         height: 15,
-                                        color: article.my_vote == false
-                                            ? ColorsInfo.negVote
-                                            : ColorsInfo.noneVote,
+                                        color: article.my_vote == true
+                                            ? ColorsInfo.noneVote
+                                            : ColorsInfo.negVote,
                                       ),
                                       const SizedBox(width: 3),
                                       Text('${article.negative_vote_count}',
                                           style: TextStyle(
                                             fontSize: 14,
                                             fontWeight: FontWeight.w500,
-                                            color: article.my_vote == false
-                                                ? ColorsInfo.negVote
-                                                : ColorsInfo.noneVote,
+                                            color: article.my_vote == true
+                                                ? ColorsInfo.noneVote
+                                                : ColorsInfo.negVote,
                                           )),
                                       const SizedBox(width: 10),
                                       SvgPicture.asset(
@@ -195,8 +203,12 @@ class _PostViewPageState extends State<PostViewPage> {
                               const SizedBox(height: 10),
                               // 유저 정보 (프로필 이미지, 닉네임)
                               InkWell(
-                                onTap:
-                                    () {}, // (2023.08.01) 유저 정보 확인 기능은 추후 구현 예정
+                                onTap: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(builder: (context) => UserViewPage(userID: article.created_by.id)),
+                                  );
+                                },
                                 child: Row(
                                   children: [
                                     Container(
@@ -241,12 +253,56 @@ class _PostViewPageState extends State<PostViewPage> {
                                   ],
                                 ),
                               ),
+                              // (2023.08.09)첨부파일 리스트뷰 프로토타입. 추후 디자이너와 조율 예정
+                              article.attachments.isEmpty ? Container() : Container(
+                                margin: const EdgeInsets.only(top: 10, bottom: 10),
+                                constraints: const BoxConstraints(
+                                  minHeight: 10,
+                                ),
+                                child: ListView.separated(
+                                  physics: const NeverScrollableScrollPhysics(),
+                                  shrinkWrap: true,
+                                  itemCount: article.attachments.length,
+                                  itemBuilder: (BuildContext context, int idx) {
+                                    AttachmentModel curFile = article.attachments[idx];
+                                    String initFileName = Uri.parse(article.attachments[idx].file).path.substring(7);
+                                    return InkWell(
+                                      onTap: () async {
+                                        late String targetDir;
+                                        try {
+                                          targetDir = await _getDownloadPath();
+                                        } catch (error) {
+                                          debugPrint("getDownloadPath failed: $error");
+                                          return;
+                                        }
+                                        String fileName = _addTimestampToFileName(initFileName);
+                                        bool res = await _downloadFile(userProvider, curFile.file, "$targetDir${Platform.pathSeparator}$fileName");
+                                        debugPrint(res ? "$fileName 파일 저장 성공" : "$fileName 파일 저장 실패");
+                                      },
+                                      child: Container(
+                                        padding: const EdgeInsets.only(left: 5),
+                                        decoration: BoxDecoration(
+                                          border: Border.all(
+                                            color: const Color(0x00FFFFFF),
+                                            width: 2,
+                                          ),
+                                          borderRadius: const BorderRadius.all(Radius.circular(5)),
+                                        ),
+                                        child: Text(
+                                          initFileName,
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                  separatorBuilder: (BuildContext context, int idx) => const SizedBox(height: 3),
+                                )
+                              ),
                               const Divider(
                                 thickness: 1,
                               ),
                               InArticleWebView(
-                                content: getArticleContentHtml(
-                                    MediaQuery.of(context).size.width - 40,
+                                content: getContentHtml(
                                     article.content ?? "내용이 존재하지 않습니다."),
                                 initialHeight: 150,
                               ),
@@ -281,27 +337,19 @@ class _PostViewPageState extends State<PostViewPage> {
                                           return;
                                         }
                                       }
-                                      if (!mounted) return;
-                                      setState(() {
-                                        article.positive_vote_count = article
-                                                .positive_vote_count! +
-                                            (article.my_vote == true ? -1 : 1);
-                                        article.negative_vote_count = article
-                                                .negative_vote_count! +
-                                            (article.my_vote == false ? -1 : 0);
-                                        article.my_vote =
-                                            (article.my_vote == true)
-                                                ? null
-                                                : true;
-                                      });
+                                      setVote(article, true);
                                     },
-                                    child: SvgPicture.asset(
-                                      'assets/icons/like.svg',
-                                      width: 30,
-                                      height: 30,
-                                      color: article.my_vote == true
-                                          ? ColorsInfo.posVote
-                                          : ColorsInfo.noneVote,
+                                    child: SizedBox(
+                                      width: 25,
+                                      height: 25,
+                                      child: SvgPicture.asset(
+                                        article.my_vote == true
+                                            ? 'assets/icons/like_filled.svg'
+                                            : 'assets/icons/like.svg',
+                                        color: article.my_vote == false
+                                            ? ColorsInfo.noneVote
+                                            : ColorsInfo.newara,
+                                      ),
                                     ),
                                   ),
                                   const SizedBox(width: 3),
@@ -309,69 +357,61 @@ class _PostViewPageState extends State<PostViewPage> {
                                       style: TextStyle(
                                         fontSize: 20,
                                         fontWeight: FontWeight.w500,
-                                        color: article.my_vote == true
-                                            ? ColorsInfo.posVote
-                                            : ColorsInfo.noneVote,
+                                        color: article.my_vote == false
+                                            ? ColorsInfo.noneVote
+                                            : ColorsInfo.posVote,
                                       )),
                                   const SizedBox(width: 20),
                                   InkWell(
-                                    onTap: () async {
-                                      if (article.is_mine == true) {
-                                        debugPrint("자신의 글에는 좋아요, 싫어요를 할 수 없음");
-                                        return;
-                                      }
-                                      if (article.my_vote == false) {
-                                        var cancelRes =
-                                            await userProvider.postApiRes(
-                                          "articles/${article.id}/vote_cancel/",
-                                        );
-                                        if (cancelRes.statusCode != 200) {
+                                      onTap: () async {
+                                        if (article.is_mine == true) {
                                           debugPrint(
-                                              "POST /api/articles/${article.id}/vote_cancel ${cancelRes.statusCode}");
+                                              "자신의 글에는 좋아요, 싫어요를 할 수 없음");
                                           return;
                                         }
-                                      } else {
-                                        var postRes =
-                                            await userProvider.postApiRes(
-                                          "articles/${article.id}/vote_negative/",
-                                        );
-                                        if (postRes.statusCode != 200) {
-                                          debugPrint(
-                                              "POST /api/articles/${article.id}/vote_negative/ ${postRes.statusCode}");
-                                          return;
+                                        if (article.my_vote == false) {
+                                          var cancelRes =
+                                              await userProvider.postApiRes(
+                                            "articles/${article.id}/vote_cancel/",
+                                          );
+                                          if (cancelRes.statusCode != 200) {
+                                            debugPrint(
+                                                "POST /api/articles/${article.id}/vote_cancel ${cancelRes.statusCode}");
+                                            return;
+                                          }
+                                        } else {
+                                          var postRes =
+                                              await userProvider.postApiRes(
+                                            "articles/${article.id}/vote_negative/",
+                                          );
+                                          if (postRes.statusCode != 200) {
+                                            debugPrint(
+                                                "POST /api/articles/${article.id}/vote_negative/ ${postRes.statusCode}");
+                                            return;
+                                          }
                                         }
-                                      }
-                                      if (!mounted) return;
-                                      setState(() {
-                                        article.positive_vote_count = article
-                                                .positive_vote_count! +
-                                            (article.my_vote == true ? -1 : 0);
-                                        article.negative_vote_count = article
-                                                .negative_vote_count! +
-                                            (article.my_vote == false ? -1 : 1);
-                                        article.my_vote =
-                                            (article.my_vote == false)
-                                                ? null
-                                                : false;
-                                      });
-                                    },
-                                    child: SvgPicture.asset(
-                                      'assets/icons/dislike.svg',
-                                      width: 30,
-                                      height: 30,
-                                      color: article.my_vote == false
-                                          ? ColorsInfo.negVote
-                                          : ColorsInfo.noneVote,
-                                    ),
-                                  ),
+                                        setVote(article, false);
+                                      },
+                                      child: SizedBox(
+                                        width: 25,
+                                        height: 25,
+                                        child: SvgPicture.asset(
+                                          article.my_vote == false
+                                              ? 'assets/icons/dislike_filled.svg'
+                                              : 'assets/icons/dislike.svg',
+                                          color: article.my_vote == true
+                                              ? ColorsInfo.noneVote
+                                              : ColorsInfo.negVote,
+                                        ),
+                                      )),
                                   const SizedBox(width: 3),
                                   Text('${article.negative_vote_count}',
                                       style: TextStyle(
                                         fontSize: 20,
                                         fontWeight: FontWeight.w500,
-                                        color: article.my_vote == false
-                                            ? ColorsInfo.negVote
-                                            : ColorsInfo.noneVote,
+                                        color: article.my_vote == true
+                                            ? ColorsInfo.noneVote
+                                            : ColorsInfo.negVote,
                                       )),
                                 ],
                               ),
@@ -416,7 +456,7 @@ class _PostViewPageState extends State<PostViewPage> {
                                           }
                                         },
                                         child: Container(
-                                          width: 90,
+                                          width: 100,
                                           height: 40,
                                           decoration: BoxDecoration(
                                             color: Colors.white,
@@ -447,7 +487,9 @@ class _PostViewPageState extends State<PostViewPage> {
                                                 ),
                                                 const SizedBox(width: 5),
                                                 Text(
-                                                  '담아두기',
+                                                  article.my_scrap == null
+                                                      ? '담아두기'
+                                                      : '담아둔 글',
                                                   style: TextStyle(
                                                     color:
                                                         article.my_scrap == null
@@ -511,52 +553,76 @@ class _PostViewPageState extends State<PostViewPage> {
                                     ],
                                   ),
                                   // 신고버튼 Row
-                                  Opacity(
-                                    opacity: isReportable ? 1 : 0.3,
-                                    child: InkWell(
-                                      onTap: () {
-                                        if (!isReportable) return;
-                                        showDialog(
-                                            context: context,
-                                            builder: (context) {
-                                              return ReportDialogWidget(
-                                                  articleID: article.id);
-                                            });
-                                      },
-                                      child: Container(
-                                        width: 90,
-                                        height: 40,
-                                        decoration: BoxDecoration(
-                                          borderRadius:
-                                              BorderRadius.circular(8),
-                                          border: Border.all(
-                                            color: const Color.fromRGBO(
-                                                230, 230, 230, 1),
-                                          ),
+                                  isReportable ? InkWell(
+                                    onTap: () {
+                                      if (!isReportable) return;
+                                      showDialog(
+                                          context: context,
+                                          builder: (context) {
+                                            return ReportDialogWidget(
+                                                articleID: article.id);
+                                          });
+                                    },
+                                    child: Container(
+                                      width: 90,
+                                      height: 40,
+                                      decoration: BoxDecoration(
+                                        borderRadius:
+                                        BorderRadius.circular(8),
+                                        border: Border.all(
+                                          color: const Color.fromRGBO(
+                                              230, 230, 230, 1),
                                         ),
-                                        child: Center(
-                                          child: Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.center,
-                                            children: [
-                                              const SizedBox(width: 2),
-                                              SvgPicture.asset(
-                                                'assets/icons/exclamationmark-bubble-fill.svg',
-                                                width: 20,
-                                                height: 20,
-                                                color: const Color.fromRGBO(
-                                                    100, 100, 100, 1),
+                                      ),
+                                      child: Center(
+                                        child: Row(
+                                          mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                          children: [
+                                            const SizedBox(width: 2),
+                                            SvgPicture.asset(
+                                              'assets/icons/exclamationmark-bubble-fill.svg',
+                                              width: 20,
+                                              height: 20,
+                                              color: const Color.fromRGBO(
+                                                  100, 100, 100, 1),
+                                            ),
+                                            const SizedBox(width: 10),
+                                            const Text(
+                                              '신고',
+                                              style: TextStyle(
+                                                fontSize: 15,
+                                                fontWeight: FontWeight.w500,
                                               ),
-                                              const SizedBox(width: 10),
-                                              const Text(
-                                                '신고',
-                                                style: TextStyle(
-                                                  fontSize: 15,
-                                                  fontWeight: FontWeight.w500,
-                                                ),
-                                              ),
-                                            ],
-                                          ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                  ) : InkWell(
+                                    onTap: () async {
+                                      await Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) => PostWritePage()
+                                        )
+                                      );
+                                      await _fetchArticle(userProvider);
+                                    },
+                                    child: Container(
+                                      width: 90,
+                                      height: 40,
+                                      decoration: BoxDecoration(
+                                        borderRadius:
+                                        BorderRadius.circular(8),
+                                        border: Border.all(
+                                          color: const Color.fromRGBO(
+                                              230, 230, 230, 1),
+                                        ),
+                                      ),
+                                      child: const Center(
+                                        child: Text(
+                                          '수정하기',
                                         ),
                                       ),
                                     ),
@@ -740,47 +806,27 @@ class _PostViewPageState extends State<PostViewPage> {
                                                                 return;
                                                               }
                                                             }
-                                                            if (!mounted)
-                                                              return;
-                                                            setState(() {
-                                                              curComment
-                                                                  .positive_vote_count = (curComment
-                                                                          .positive_vote_count ??
-                                                                      0) +
-                                                                  (curComment.my_vote ==
-                                                                          true
-                                                                      ? -1
-                                                                      : 1);
-                                                              curComment
-                                                                  .negative_vote_count = (curComment
-                                                                          .negative_vote_count ??
-                                                                      0) +
-                                                                  (curComment.my_vote ==
-                                                                          false
-                                                                      ? -1
-                                                                      : 0);
-                                                              curComment
-                                                                      .my_vote =
-                                                                  (curComment.my_vote ==
-                                                                          true)
-                                                                      ? null
-                                                                      : true;
-                                                            });
+                                                            setVote(curComment, true);
                                                           },
                                                           child:
                                                               SvgPicture.asset(
-                                                            'assets/icons/like.svg',
-                                                            width: 25,
-                                                            height: 25,
-                                                            color: curComment
-                                                                        .my_vote ==
+                                                            curComment.my_vote ==
                                                                     true
-                                                                ? ColorsInfo
-                                                                    .posVote
-                                                                : ColorsInfo
-                                                                    .noneVote,
+                                                                ? 'assets/icons/like_filled.svg'
+                                                                : 'assets/icons/like.svg',
+                                                            width: 17,
+                                                            height: 17,
+                                                            color:
+                                                                curComment.my_vote ==
+                                                                        false
+                                                                    ? ColorsInfo
+                                                                        .noneVote
+                                                                    : ColorsInfo
+                                                                        .newara,
                                                           ),
                                                         ),
+                                                        const SizedBox(
+                                                            width: 3),
                                                         Text(
                                                           curComment
                                                               .positive_vote_count
@@ -789,13 +835,13 @@ class _PostViewPageState extends State<PostViewPage> {
                                                             fontSize: 13,
                                                             fontWeight:
                                                                 FontWeight.w500,
-                                                            color: curComment
-                                                                        .my_vote ==
-                                                                    true
-                                                                ? ColorsInfo
-                                                                    .posVote
-                                                                : ColorsInfo
-                                                                    .noneVote,
+                                                            color:
+                                                                curComment.my_vote ==
+                                                                        false
+                                                                    ? ColorsInfo
+                                                                        .noneVote
+                                                                    : ColorsInfo
+                                                                        .posVote,
                                                           ),
                                                         ),
                                                         const SizedBox(
@@ -835,47 +881,27 @@ class _PostViewPageState extends State<PostViewPage> {
                                                                 return;
                                                               }
                                                             }
-                                                            if (!mounted)
-                                                              return;
-                                                            setState(() {
-                                                              curComment
-                                                                  .positive_vote_count = (curComment
-                                                                          .positive_vote_count ??
-                                                                      0) +
-                                                                  (curComment.my_vote ==
-                                                                          true
-                                                                      ? -1
-                                                                      : 0);
-                                                              curComment
-                                                                  .negative_vote_count = (curComment
-                                                                          .negative_vote_count ??
-                                                                      0) +
-                                                                  (curComment.my_vote ==
-                                                                          false
-                                                                      ? -1
-                                                                      : 1);
-                                                              curComment
-                                                                      .my_vote =
-                                                                  (curComment.my_vote ==
-                                                                          false)
-                                                                      ? null
-                                                                      : false;
-                                                            });
+                                                            setVote(curComment, false);
                                                           },
                                                           child:
                                                               SvgPicture.asset(
-                                                            'assets/icons/dislike.svg',
-                                                            width: 25,
-                                                            height: 25,
+                                                            curComment.my_vote ==
+                                                                    false
+                                                                ? 'assets/icons/dislike_filled.svg'
+                                                                : 'assets/icons/dislike.svg',
+                                                            width: 17,
+                                                            height: 17,
                                                             color: curComment
                                                                         .my_vote ==
-                                                                    false
+                                                                    true
                                                                 ? ColorsInfo
-                                                                    .negVote
+                                                                    .noneVote
                                                                 : ColorsInfo
-                                                                    .noneVote,
+                                                                    .negVote,
                                                           ),
                                                         ),
+                                                        const SizedBox(
+                                                            width: 3),
                                                         Text(
                                                           curComment
                                                               .negative_vote_count
@@ -886,11 +912,11 @@ class _PostViewPageState extends State<PostViewPage> {
                                                                 FontWeight.w500,
                                                             color: curComment
                                                                         .my_vote ==
-                                                                    false
+                                                                    true
                                                                 ? ColorsInfo
-                                                                    .negVote
+                                                                    .noneVote
                                                                 : ColorsInfo
-                                                                    .noneVote,
+                                                                    .negVote,
                                                           ),
                                                         ),
                                                         const SizedBox(
@@ -919,7 +945,7 @@ class _PostViewPageState extends State<PostViewPage> {
                                                                       curComment;
                                                                   debugPrint(
                                                                       "parentCommentID: ${targetComment!.id}");
-                                                                  setCommentMode(
+                                                                  _setCommentMode(
                                                                       true,
                                                                       false);
                                                                   textFocusNode
@@ -966,7 +992,7 @@ class _PostViewPageState extends State<PostViewPage> {
                                                                       curComment;
                                                                   debugPrint(
                                                                       "parentCommentID: ${targetComment!.id}");
-                                                                  setCommentMode(
+                                                                  _setCommentMode(
                                                                       true,
                                                                       false);
                                                                   textFocusNode
@@ -1021,8 +1047,40 @@ class _PostViewPageState extends State<PostViewPage> {
                         isNestedComment
                             ? const SizedBox(height: 5)
                             : Container(),
+                        isModify
+                            ? Text(
+                                '나의 댓글 "${targetComment!.content}" 수정 중',
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: const TextStyle(
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              )
+                            : Container(),
+                        isModify ? const SizedBox(height: 5) : Container(),
                         Row(
                           children: [
+                            // Close button
+                            (!isModify && !isNestedComment)
+                                ? Container()
+                                : InkWell(
+                                    onTap: () {
+                                      _textEditingController.text = "";
+                                      targetComment = null;
+                                      debugPrint("Parent Comment null");
+                                      _setCommentMode(false, false);
+                                    },
+                                    child: SvgPicture.asset(
+                                      'assets/icons/close.svg',
+                                      width: 30,
+                                      height: 30,
+                                      color: ColorsInfo.newara,
+                                    ),
+                                  ),
+                            (!isModify && !isNestedComment)
+                                ? Container()
+                                : const SizedBox(width: 5),
                             // TextFormField
                             Expanded(
                               child: Container(
@@ -1037,33 +1095,13 @@ class _PostViewPageState extends State<PostViewPage> {
                                 child: _buildForm(),
                               ),
                             ),
-                            // Close button
-                            const SizedBox(width: 10),
-                            (!isModify && !isNestedComment)
-                                ? Container()
-                                : InkWell(
-                                    onTap: () {
-                                      _textEditingController.text = "";
-                                      targetComment = null;
-                                      debugPrint("Parent Comment null");
-                                      setCommentMode(false, false);
-                                    },
-                                    child: SvgPicture.asset(
-                                      'assets/icons/close.svg',
-                                      width: 30,
-                                      height: 30,
-                                      color: ColorsInfo.newara,
-                                    ),
-                                  ),
-                            (!isModify && !isNestedComment)
-                                ? Container()
-                                : const SizedBox(width: 10),
+                            const SizedBox(width: 5),
                             // send button
                             InkWell(
                               onTap: () async {
-                                bool sendRes = await sendComment(userProvider);
+                                bool sendRes = await _sendComment(userProvider);
                                 if (sendRes) {
-                                  setIsValid(await fetchArticle(userProvider));
+                                  _setIsValid(await _fetchArticle(userProvider));
                                 } else {
                                   debugPrint("Send Comment Failed");
                                 }
@@ -1152,7 +1190,7 @@ class _PostViewPageState extends State<PostViewPage> {
           case 'Modify':
             _textEditingController.text = commentList[idx].content.toString();
             textFocusNode.requestFocus();
-            setCommentMode(false, true);
+            _setCommentMode(false, true);
             targetComment = commentList[idx];
             break;
           case 'Delete':
@@ -1219,12 +1257,12 @@ class _PostViewPageState extends State<PostViewPage> {
                             const SizedBox(width: 10),
                             InkWell(
                               onTap: () {
-                                delComment(id, userProvider).then((res) async {
+                                _delComment(id, userProvider).then((res) async {
                                   if (res == false) {
                                     return;
                                   } else {
-                                    bool res = await fetchArticle(userProvider);
-                                    setIsValid(res);
+                                    bool res = await _fetchArticle(userProvider);
+                                    _setIsValid(res);
                                   }
                                 });
                                 Navigator.pop(context);
@@ -1386,19 +1424,68 @@ class _PostViewPageState extends State<PostViewPage> {
       );
     }
     return InArticleWebView(
-      content: getCommentContentHtml(content),
+      content: getContentHtml(content),
       initialHeight: 10,
     );
   }
 
+  void setVote(dynamic model, bool value) {
+    model.positive_vote_count ??= 0;
+    if (!mounted) return;
+    setState(() {
+      model.positive_vote_count = model.positive_vote_count! +
+          (model.my_vote == true ? -1 : (value ? 1 : 0));
+      model.negative_vote_count = model.negative_vote_count! +
+          (model.my_vote == false ? -1 : (value ? 0 : 1));
+      model.my_vote = (model.my_vote == value)
+          ? null
+          : value;
+    });
+  }
+
+  // 파일 다운로드 경로 찾기
+  Future<String> _getDownloadPath() async {
+    late Directory directory;
+    if (Platform.isIOS) {
+      directory = await getApplicationDocumentsDirectory();
+    } else {
+      directory = Directory('/storage/emulated/0/Download');
+      if (!await directory.exists()) {
+        directory = (await getExternalStorageDirectory())!;  // Android 에서는 존재가 보장됨
+      }
+    }
+    return directory.path;
+  }
+
+  String _addTimestampToFileName(String fileName) {
+    String timestamp = DateTime.now().millisecondsSinceEpoch.toString();
+    int dotIndex = fileName.lastIndexOf('.');
+    if (dotIndex != -1) {
+      String nameWithoutExtension = fileName.substring(0, dotIndex);
+      String extension = fileName.substring(dotIndex + 1);
+      return '$nameWithoutExtension-$timestamp.$extension';
+    }
+    return '$fileName-$timestamp';
+  }
+
+  // 파일 다운로드 하기
+  Future<bool> _downloadFile(UserProvider userProvider, String uri, String totalPath) async {
+    try {
+      await userProvider.myDio().download(uri, totalPath);
+    } catch (error) {
+      return false;
+    }
+    return true;
+  }
+
   // isValid: article 에 적절한 정보가 있는지 나타냄
-  void setIsValid(bool value) {
+  void _setIsValid(bool value) {
     if (!mounted) return;
     setState(() => isValid = value);
   }
 
   // 둘 다 false 면 일반적인 댓글
-  void setCommentMode(bool isNestedVal, bool isModifyVal) {
+  void _setCommentMode(bool isNestedVal, bool isModifyVal) {
     if (!mounted) return;
     setState(() {
       isNestedComment = isNestedVal;
@@ -1406,7 +1493,7 @@ class _PostViewPageState extends State<PostViewPage> {
     });
   }
 
-  Future<bool> delComment(int id, UserProvider userProvider) async {
+  Future<bool> _delComment(int id, UserProvider userProvider) async {
     late dynamic delRes;
     try {
       delRes = await userProvider.delApiRes("comments/$id/");
@@ -1422,7 +1509,7 @@ class _PostViewPageState extends State<PostViewPage> {
   }
 
   // Article 모델에 필요한 정보
-  Future<bool> fetchArticle(UserProvider userProvider) async {
+  Future<bool> _fetchArticle(UserProvider userProvider) async {
     dynamic articleJson, commentJson;
 
     articleJson = await userProvider.getApiRes("articles/${widget.articleID}");
@@ -1468,11 +1555,10 @@ class _PostViewPageState extends State<PostViewPage> {
         }
       }
     }
-
     return true;
   }
 
-  Future<bool> sendComment(UserProvider userProvider) async {
+  Future<bool> _sendComment(UserProvider userProvider) async {
     if (_formKey.currentState == null || !(_formKey.currentState!.validate())) {
       return false;
     }
@@ -1497,7 +1583,7 @@ class _PostViewPageState extends State<PostViewPage> {
       }
       targetComment = null;
       _textEditingController.text = "";
-      setCommentMode(false, false);
+      _setCommentMode(false, false);
     } else {
       dynamic defaultPayload = {
         "content": _commentContent,
@@ -1514,7 +1600,7 @@ class _PostViewPageState extends State<PostViewPage> {
       }
       targetComment = null;
       _textEditingController.text = "";
-      setCommentMode(false, false);
+      _setCommentMode(false, false);
     }
     return true;
   }
@@ -1760,11 +1846,32 @@ class _InArticleWebViewState extends State<InArticleWebView> {
     setState(() => webViewHeight = value);
   }
 
+  int getPostNum(String path) {
+    final RegExp pattern = RegExp(r'/post/\d+');
+    RegExpMatch? match = pattern.firstMatch(path);
+    if (match == null) return -1;
+    return int.parse(path.substring(6));
+  }
+
+  void launchArticle(int postNum) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => PostViewPage(id: postNum))
+    );
+  }
+
   Future<void> launchInBrowser(String url) async {
     final Uri targetUrl = Uri.parse(url);
     if (!await canLaunchUrl(targetUrl)) {
       debugPrint("$url을 열 수 없습니다.");
       return;
+    }
+    if (targetUrl.authority == newAraAuthority) {
+      int postNum = getPostNum(targetUrl.path);
+      if (postNum != -1) {
+        launchArticle(postNum);
+        return;
+      }
     }
     if (!await launchUrl(
       Uri.parse(url),
