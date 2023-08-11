@@ -447,7 +447,6 @@ class _UserPageState extends State<UserPage>
               onTap: () async {
                 await Navigator.of(context)
                     .push(slideRoute(PostViewPage(id: curPost.id)));
-                setIsLoaded(false, tabIndex);
                 var fetchFunc = (tabIndex == 0 ? fetchCreatedArticles : (tabIndex == 1 ? fetchScrappedArticles : fetchRecentArticles));
                 for (int page = 1; page < nextPage[tabIndex]; page++) {
                   await fetchFunc(userProvider, page);
@@ -590,3 +589,4 @@ class _UserPageState extends State<UserPage>
     );
   }
 }
+

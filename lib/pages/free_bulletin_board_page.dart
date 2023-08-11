@@ -217,7 +217,6 @@ class _FreeBulletinBoardPageState extends State<FreeBulletinBoardPage> {
                     itemCount: postPreviewList.length, // 아이템 개수
                     itemBuilder: (BuildContext context, int index) {
                       // 각 아이템을 위한 위젯 생성
-
                       // 숨겨진 게시물이면 일단 표현 안하는 걸로 함.
                       return postPreviewList[index].is_hidden
                           ? Container()
