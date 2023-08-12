@@ -602,7 +602,7 @@ class _PostWritePageState extends State<PostWritePage> {
                                 setState(() {
                                   _isFileMenuBarSelected = true;
                                   attachmentList.add(AttachmentsFormat(
-                                    fileType: FileType.Other,
+                                    fileType: FileType.Image,
                                     isNewFile: true,
                                     filePath: file.path,
                                     uuid: uuid,
@@ -613,8 +613,6 @@ class _PostWritePageState extends State<PostWritePage> {
                                 String base64Data = base64.encode(file.bytes!);
                                 String base64Image =
                                     """<img data-uuid=$uuid  src="data:image/${file.extension};base64,$base64Data" data-filename="${file.name}" width=100% />""";
-                                // String base64Image =
-                                //     """<img src="https://sparcs-newara-dev.s3.amazonaws.com/files/IMG_0003_8FJEMU6.jpeg" data-filename="${file.name}" width=100% />""";
                                 _htmlController.insertHtml(base64Image);
                               }
                               return false;
@@ -784,12 +782,6 @@ class _PostWritePageState extends State<PostWritePage> {
                                               ),
                                               child: Row(
                                                 children: [
-                                                  // SvgPicture.asset(
-                                                  //   'assets/icons/pdf.svg',
-                                                  //   width: 16,
-                                                  //   height: 16,
-                                                  //   color: Colors.black,
-                                                  // ),
                                                   SizedBox(
                                                     width: 6,
                                                   ),
@@ -807,6 +799,9 @@ class _PostWritePageState extends State<PostWritePage> {
                                                       path.basename(
                                                           attachmentList[index]
                                                               .filePath!),
+                                                      maxLines: 1,
+                                                      overflow:
+                                                          TextOverflow.ellipsis,
                                                     ),
                                                   ),
                                                   SizedBox(
