@@ -526,7 +526,7 @@ class _PostViewPageState extends State<PostViewPage> {
                                       await Navigator.push(
                                         context,
                                         MaterialPageRoute(
-                                          builder: (context) => PostWritePage(articleBefore: article)
+                                          builder: (context) => PostWritePage(previousArticle: article)
                                         )
                                       );
                                       bool result = await _fetchArticle(userProvider);

@@ -29,8 +29,8 @@ import 'package:html/parser.dart' show parse;
 import 'package:html/dom.dart' as html;
 
 class PostWritePage extends StatefulWidget {
-  final ArticleModel? articleBefore;
-  const PostWritePage({Key? key, this.articleBefore}) : super(key: key);
+  final ArticleModel? previousArticle;
+  const PostWritePage({Key? key, this.previousArticle}) : super(key: key);
 
   @override
   State<PostWritePage> createState() => _PostWritePageState();
@@ -44,19 +44,32 @@ enum FileType {
 class AttachmentsFormat {
   FileType fileType;
   bool isNewFile; // 수정 시에 추가한 파일인가?
-  String? filePath;
-  Map<String, dynamic>? json;
+
+  // 로컬 파일
+  String? fileLocalPath;
   String? uuid;
+
+  /// 온라인 파일
+  int? id;
+  String? fileUrlPath;
+  String fileUrlName;
+  int fileUrlSize = 0;
+
   AttachmentsFormat({
     required this.fileType,
     required this.isNewFile,
-    this.filePath,
-    this.json,
+    this.fileLocalPath,
     this.uuid,
+    this.id,
+    this.fileUrlPath,
+    this.fileUrlName = "",
+    this.fileUrlSize = 0,
   });
 }
 
 class _PostWritePageState extends State<PostWritePage> {
+  bool _isEditingPost = false;
+
   final _defaultTopicModel = TopicModel(
     id: -1,
     slug: "",
@@ -90,9 +103,7 @@ class _PostWritePageState extends State<PostWritePage> {
   var imagePickerResult;
   FilePickerResult? filePickerResult;
 
-  List<AttachmentsFormat> attachmentList = [];
-
-  late String _localPath;
+  final List<AttachmentsFormat> _attachmentList = [];
 
   late TargetPlatform? platform;
 
@@ -104,32 +115,23 @@ class _PostWritePageState extends State<PostWritePage> {
   void initState() {
     // TODO: implement initState
     super.initState();
+
+    if (widget.previousArticle != null)
+      _isEditingPost = true;
+    else
+      _isEditingPost = false;
+
     if (Platform.isAndroid) {
       platform = TargetPlatform.android;
     } else {
       platform = TargetPlatform.iOS;
     }
-    _getBoardList();
+    _initPostWritePost();
   }
 
-  Future<String?> _findLocalPath() async {
-    if (platform == TargetPlatform.android) {
-      return "/sdcard/download/";
-    } else {
-      var directory = await getApplicationDocumentsDirectory();
-      return directory.path + Platform.pathSeparator + 'Download';
-    }
-  }
-
-  Future<void> _prepareSaveDir() async {
-    _localPath = (await _findLocalPath())!;
-
-    print(_localPath);
-    final savedDir = Directory(_localPath);
-    bool hasExisted = await savedDir.exists();
-    if (!hasExisted) {
-      savedDir.create();
-    }
+  Future<void> _initPostWritePost() async {
+    await _getBoardList();
+    await _getPostContent();
   }
 
   Future<void> _getBoardList() async {
@@ -161,6 +163,7 @@ class _PostWritePageState extends State<PostWritePage> {
     } catch (error) {
       return;
     }
+
     setState(() {
       _specTopicList.add(_defaultTopicModel);
 
@@ -169,6 +172,80 @@ class _PostWritePageState extends State<PostWritePage> {
       _isLoading = false;
     });
     return;
+  }
+
+  Future<void> _getPostContent() async {
+    if (!_isEditingPost) return;
+    setState(() {
+      _isLoading = true;
+    });
+    String? title = widget.previousArticle!.title;
+    _titleController.text = title ?? '';
+
+    for (int i = 0; i < widget.previousArticle!.attachments.length; i++) {
+      // _attachmentList
+      //     .add(AttachmentsFormat(fileType: FileType.Image, isNewFile: false));
+      AttachmentModel attachment = widget.previousArticle!.attachments[i];
+
+      int id = attachment.id;
+      String? fileUrlPath = attachment.file;
+      String fileUrlName = extractAndDecodeFileNameFromUrl(attachment.file);
+      int? fileUrlSize = attachment.size ?? 0;
+      _attachmentList.add(AttachmentsFormat(
+          fileType: FileType.Image,
+          isNewFile: false,
+          id: id,
+          fileUrlPath: fileUrlPath,
+          fileUrlName: fileUrlName,
+          fileUrlSize: fileUrlSize));
+    }
+
+    setState(() {
+      _isFileMenuBarSelected = _attachmentList.length > 0 ? true : false;
+
+      _selectedCheckboxes[1] =
+          widget.previousArticle?.is_content_sexual ?? false;
+      _selectedCheckboxes[2] =
+          widget.previousArticle?.is_content_social ?? false;
+
+      _isLoading = false;
+    });
+    setState(() {
+      BoardDetailActionModel boardDetailActionModel =
+          findBoardListValue(widget.previousArticle!.parent_board.slug);
+      _specTopicList = [];
+      _specTopicList.add(_defaultTopicModel);
+      for (TopicModel topic in boardDetailActionModel.topics) {
+        _specTopicList.add(topic);
+      }
+      _chosenTopicValue = widget.previousArticle!.parent_topic == null
+          ? _specTopicList[0]
+          : findSpecTopicListValue(widget.previousArticle!.parent_topic!.slug);
+      _chosenBoardValue = boardDetailActionModel;
+    });
+  }
+
+  BoardDetailActionModel findBoardListValue(String slug) {
+    for (BoardDetailActionModel board in _boardList) {
+      if (board.slug == slug) {
+        return board;
+      }
+    }
+    return _defaultBoardDetailActionModel;
+  }
+
+  TopicModel findSpecTopicListValue(String slug) {
+    for (TopicModel topic in _specTopicList) {
+      if (topic.slug == slug) {
+        return topic;
+      }
+    }
+    return _defaultTopicModel;
+  }
+
+  String extractAndDecodeFileNameFromUrl(String url) {
+    String encodedFilename = url.split('/').last;
+    return Uri.decodeFull(encodedFilename);
   }
 
   @override
@@ -182,7 +259,7 @@ class _PostWritePageState extends State<PostWritePage> {
         _currentHtmlContent != '<p><br></p>' &&
         _isUploadingPost == false;
 
-    String updateImgSrc(htmlString, uuid, fileUrl) {
+    String updateImgTagSrc(htmlString, uuid, fileUrl) {
       var document = parse(htmlString);
       // debugPrint(document.body?.innerHtml ?? '');
       List<html.Element> imgTags = document.getElementsByTagName('img');
@@ -201,7 +278,7 @@ class _PostWritePageState extends State<PostWritePage> {
       return document.body?.innerHtml ?? '';
     }
 
-    Future<void> _filePick() async {
+    Future<void> filePick() async {
       filePickerResult = await FilePicker.platform.pickFiles();
       if (filePickerResult != null) {
         debugPrint(filePickerResult!.files.single.path!);
@@ -217,25 +294,25 @@ class _PostWritePageState extends State<PostWritePage> {
 
         setState(() {
           _isFileMenuBarSelected = true;
-          attachmentList.add(AttachmentsFormat(
+          _attachmentList.add(AttachmentsFormat(
             fileType: FileType.Other,
             isNewFile: true,
-            filePath: file.path,
+            fileLocalPath: file.path,
           ));
         });
       }
     }
 
-    Future<void> _imagePick() async {
-      imagePickerResult =
-          await ImagePicker().pickImage(source: ImageSource.gallery);
-      if (imagePickerResult != null) {
-        debugPrint(imagePickerResult.path);
-        setState(() {
-          imagePickerFile = File(imagePickerResult.path);
-        });
-      }
-    }
+    // Future<void> _imagePick() async {
+    //   imagePickerResult =
+    //       await ImagePicker().pickImage(source: ImageSource.gallery);
+    //   if (imagePickerResult != null) {
+    //     debugPrint(imagePickerResult.path);
+    //     setState(() {
+    //       imagePickerFile = File(imagePickerResult.path);
+    //     });
+    //   }
+    // }
 
     String formatBytes(int bytes) {
       if (bytes < 1024) {
@@ -250,6 +327,95 @@ class _PostWritePageState extends State<PostWritePage> {
         double gb = bytes / (1024 * 1024 * 1024);
         return '${gb.toStringAsFixed(2)} GB'; // 기가바이트(GB) 단위로 표시
       }
+    }
+
+    void uploadPost() async {
+      // 포스트 업로드;
+      String titleValue;
+      String contentValue;
+      List<int> attachmentIds = [];
+      try {
+        titleValue = _titleController.text;
+        contentValue = await _htmlController.getText();
+        debugPrint("title: $titleValue");
+        debugPrint("content: $contentValue");
+      } catch (error) {
+        debugPrint(error.toString());
+        return;
+      }
+      setState(() {
+        _isUploadingPost = true;
+      });
+      try {
+        Dio dio = Dio();
+        dio.options.headers['Cookie'] = userProvider.getCookiesToString();
+        for (int i = 0; i < _attachmentList.length; i++) {
+          if (_attachmentList[i].isNewFile) {
+            var attachFile = File(_attachmentList[i].fileLocalPath!);
+            //이 파일 uuid 에 해당하는 img 태그가 html 안에 있다면 변경해야한다.
+
+            // 파일이 존재하는지 확인
+            if (attachFile.existsSync()) {
+              var dio = Dio();
+              dio.options.headers['Cookie'] = userProvider.getCookiesToString();
+              var formData = FormData.fromMap({
+                "file": await MultipartFile.fromFile(attachFile.path,
+                    filename: attachFile.path
+                        .split('/')
+                        .last), // You may need to replace '/' with '\\' if you're using Windows.
+              });
+              try {
+                var response = await dio
+                    .post("$newAraDefaultUrl/api/attachments/", data: formData);
+                debugPrint("Response: ${response.data}");
+                final attachmentModel = AttachmentModel.fromJson(response.data);
+                attachmentIds.add(attachmentModel.id);
+                contentValue = updateImgTagSrc(contentValue,
+                    _attachmentList[i].uuid, attachmentModel.file);
+              } catch (error) {
+                debugPrint("$error");
+              }
+            } else {
+              debugPrint("File does not exist: ${attachFile.path}");
+            }
+          }
+        }
+
+        var response = await dio.post(
+          '$newAraDefaultUrl/api/articles/',
+          data: {
+            'title': titleValue,
+            'content': contentValue,
+            'attachments': attachmentIds,
+            'parent_topic':
+                _chosenTopicValue!.id == -1 ? '' : _chosenTopicValue!.id,
+            'is_content_sexual': _selectedCheckboxes[1],
+            'is_content_social': _selectedCheckboxes[2],
+            'parent_board': _chosenBoardValue!.id,
+            'name_type': 'REGULAR'
+          },
+        );
+
+        debugPrint('Response data: ${response.data}');
+        Navigator.pop(context);
+      } on DioException catch (error) {
+        debugPrint('post Error: ${error.response!.data}');
+      }
+      setState(() {
+        _isUploadingPost = false;
+      });
+    }
+
+    void setSpecTopicList(BoardDetailActionModel? value) {
+      setState(() {
+        _specTopicList = [];
+        _specTopicList.add(_defaultTopicModel);
+        for (TopicModel topic in value!.topics) {
+          _specTopicList.add(topic);
+        }
+        _chosenTopicValue = _specTopicList[0];
+        _chosenBoardValue = value;
+      });
     }
 
     return Scaffold(
@@ -290,87 +456,7 @@ class _PostWritePageState extends State<PostWritePage> {
         ),
         actions: [
           MaterialButton(
-            onPressed: canIupload
-                ? () async {
-                    String titleValue;
-                    String contentValue;
-                    List<int> attachmentIds = [];
-                    try {
-                      titleValue = _titleController.text;
-                      contentValue = await _htmlController.getText();
-                      debugPrint("title: $titleValue");
-                      debugPrint("content: $contentValue");
-                    } catch (error) {
-                      debugPrint(error.toString());
-                      return;
-                    }
-                    setState(() {
-                      _isUploadingPost = true;
-                    });
-                    try {
-                      Dio dio = Dio();
-                      dio.options.headers['Cookie'] =
-                          userProvider.getCookiesToString();
-                      for (int i = 0; i < attachmentList.length; i++) {
-                        var attachFile = File(attachmentList[i].filePath!);
-                        //이 파일 uuid 에 해당하는 img 태그가 html 안에 있다면 변경해야한다.
-
-                        // 파일이 존재하는지 확인
-                        if (attachFile.existsSync()) {
-                          var dio = Dio();
-                          dio.options.headers['Cookie'] =
-                              userProvider.getCookiesToString();
-                          var formData = FormData.fromMap({
-                            "file": await MultipartFile.fromFile(
-                                attachFile.path,
-                                filename: attachFile.path
-                                    .split('/')
-                                    .last), // You may need to replace '/' with '\\' if you're using Windows.
-                          });
-                          try {
-                            var response = await dio.post(
-                                "$newAraDefaultUrl/api/attachments/",
-                                data: formData);
-                            debugPrint("Response: ${response.data}");
-                            final attachmentModel =
-                                AttachmentModel.fromJson(response.data);
-                            attachmentIds.add(attachmentModel.id);
-                            contentValue = updateImgSrc(contentValue,
-                                attachmentList[i].uuid, attachmentModel.file);
-                          } catch (error) {
-                            debugPrint("$error");
-                          }
-                        } else {
-                          debugPrint("File does not exist: ${attachFile.path}");
-                        }
-                      }
-                      debugPrint(_selectedCheckboxes.toString());
-
-                      var response = await dio.post(
-                        '$newAraDefaultUrl/api/articles/',
-                        data: {
-                          'title': titleValue,
-                          'content': contentValue,
-                          'attachments': attachmentIds,
-                          'parent_topic': _chosenTopicValue!.id == -1
-                              ? ''
-                              : _chosenTopicValue!.id,
-                          'is_content_sexual': _selectedCheckboxes[1],
-                          'is_content_social': _selectedCheckboxes[2],
-                          'parent_board': _chosenBoardValue!.id,
-                          'name_type': 'REGULAR'
-                        },
-                      );
-                      debugPrint('Response data: ${response.data}');
-                      Navigator.pop(context);
-                    } on DioException catch (error) {
-                      debugPrint('post Error: ${error.response!.data}');
-                    }
-                    setState(() {
-                      _isUploadingPost = false;
-                    });
-                  }
-                : null,
+            onPressed: canIupload ? uploadPost : null,
             // 버튼이 클릭되었을 때 수행할 동작
             padding: EdgeInsets.zero, // 패딩 제거
             child: canIupload
@@ -456,17 +542,7 @@ class _PostWritePageState extends State<PostWritePage> {
                               ),
                             );
                           }).toList(),
-                          onChanged: (BoardDetailActionModel? value) {
-                            setState(() {
-                              _specTopicList = [];
-                              _specTopicList.add(_defaultTopicModel);
-                              for (TopicModel topic in value!.topics) {
-                                _specTopicList.add(topic);
-                              }
-                              _chosenTopicValue = _specTopicList[0];
-                              _chosenBoardValue = value;
-                            });
-                          },
+                          onChanged: setSpecTopicList,
                         ),
                       ),
                     ),
@@ -587,11 +663,11 @@ class _PostWritePageState extends State<PostWritePage> {
                         }),
                         controller: _htmlController, //required
                         htmlEditorOptions: HtmlEditorOptions(
-                          hint: "내용을 입력해주세요.",
-                          shouldEnsureVisible: true,
-
-                          //initalText: "text content initial, if any",
-                        ),
+                            hint: "내용을 입력해주세요.",
+                            shouldEnsureVisible: true,
+                            initialText: widget.previousArticle == null
+                                ? null
+                                : widget.previousArticle!.content),
                         htmlToolbarOptions: HtmlToolbarOptions(
                             toolbarType: ToolbarType.nativeGrid,
                             mediaUploadInterceptor:
@@ -601,10 +677,10 @@ class _PostWritePageState extends State<PostWritePage> {
                                 String uuid = const Uuid().v4();
                                 setState(() {
                                   _isFileMenuBarSelected = true;
-                                  attachmentList.add(AttachmentsFormat(
+                                  _attachmentList.add(AttachmentsFormat(
                                     fileType: FileType.Image,
                                     isNewFile: true,
-                                    filePath: file.path,
+                                    fileLocalPath: file.path,
                                     uuid: uuid,
                                   ));
                                 });
@@ -653,7 +729,7 @@ class _PostWritePageState extends State<PostWritePage> {
             ),
             Column(
               children: [
-                if (attachmentList.length == 0)
+                if (_attachmentList.length == 0)
                   Row(
                     children: [
                       Row(
@@ -662,7 +738,7 @@ class _PostWritePageState extends State<PostWritePage> {
                             width: 10,
                           ),
                           InkWell(
-                            onTap: _filePick,
+                            onTap: filePick,
                             child: Row(
                               children: [
                                 SvgPicture.asset(
@@ -707,7 +783,7 @@ class _PostWritePageState extends State<PostWritePage> {
                               width: 8,
                             ),
                             Text(
-                              attachmentList.length.toString(),
+                              _attachmentList.length.toString(),
                               style: TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.w500,
@@ -733,7 +809,7 @@ class _PostWritePageState extends State<PostWritePage> {
                             ),
                             Spacer(),
                             InkWell(
-                              onTap: () => _filePick(),
+                              onTap: () => filePick(),
                               child: SvgPicture.asset(
                                 'assets/icons/add.svg',
                                 width: 34,
@@ -760,7 +836,7 @@ class _PostWritePageState extends State<PostWritePage> {
                                   Scrollbar(
                                     child: ListView.builder(
                                       shrinkWrap: true,
-                                      itemCount: attachmentList.length,
+                                      itemCount: _attachmentList.length,
                                       itemBuilder: (context, index) {
                                         return Column(
                                           children: [
@@ -796,9 +872,15 @@ class _PostWritePageState extends State<PostWritePage> {
                                                   ),
                                                   Expanded(
                                                     child: Text(
-                                                      path.basename(
-                                                          attachmentList[index]
-                                                              .filePath!),
+                                                      _attachmentList[index]
+                                                              .isNewFile
+                                                          ? path.basename(
+                                                              _attachmentList[
+                                                                      index]
+                                                                  .fileLocalPath!)
+                                                          : _attachmentList[
+                                                                  index]
+                                                              .fileUrlName,
                                                       maxLines: 1,
                                                       overflow:
                                                           TextOverflow.ellipsis,
@@ -808,11 +890,17 @@ class _PostWritePageState extends State<PostWritePage> {
                                                     width: 3,
                                                   ),
                                                   Text(
-                                                    formatBytes(File(
-                                                            attachmentList[
+                                                    _attachmentList[index]
+                                                            .isNewFile
+                                                        ? formatBytes(File(
+                                                                _attachmentList[
+                                                                        index]
+                                                                    .fileLocalPath!)
+                                                            .lengthSync())
+                                                        : formatBytes(
+                                                            _attachmentList[
                                                                     index]
-                                                                .filePath!)
-                                                        .lengthSync()),
+                                                                .fileUrlSize),
                                                     style: TextStyle(
                                                         fontSize: 14,
                                                         fontWeight:
@@ -822,17 +910,14 @@ class _PostWritePageState extends State<PostWritePage> {
                                                   ),
                                                   InkWell(
                                                     onTap: () async {
-                                                      // _htmlController
-                                                      //     .setText("<p>test</p>");
                                                       String text =
                                                           await _htmlController
                                                               .getText();
-                                                      // debugPrint("text $text");
 
                                                       String nextText =
-                                                          updateImgSrc(
+                                                          updateImgTagSrc(
                                                               text,
-                                                              attachmentList[
+                                                              _attachmentList[
                                                                       index]
                                                                   .uuid,
                                                               null);
@@ -842,9 +927,7 @@ class _PostWritePageState extends State<PostWritePage> {
                                                           .setText(nextText);
 
                                                       setState(() {
-                                                        //             _htmlController.setText(
-                                                        // "이미지가 삭제되었습니다.");
-                                                        attachmentList
+                                                        _attachmentList
                                                             .removeAt(index);
                                                         _isLoading = false;
                                                       });
@@ -1003,7 +1086,6 @@ class _PostWritePageState extends State<PostWritePage> {
                     ),
                     Spacer(),
                     GestureDetector(
-                      onTap: _imagePick,
                       child: Text(
                         "이용약관",
                         style: TextStyle(
