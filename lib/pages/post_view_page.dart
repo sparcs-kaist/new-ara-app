@@ -989,8 +989,8 @@ class _PostViewPageState extends State<PostViewPage> {
           );
   }
 
-  PopupMenuButton<String> _buildAttachMenuButton(int fileNum) {
-    return PopupMenuButton(
+  PopupMenuButton<int> _buildAttachMenuButton(int fileNum) {
+    return PopupMenuButton<int>(
       shadowColor: const Color.fromRGBO(0, 0, 0, 0.2),
       splashRadius: 5,
       shape: const RoundedRectangleBorder(
@@ -1005,8 +1005,8 @@ class _PostViewPageState extends State<PostViewPage> {
         List<AttachmentModel> files = article.attachments;
         return List.generate(
             files.length,
-            (idx) => PopupMenuItem(
-              //value: idx,
+            (idx) => PopupMenuItem<int>(
+              value: idx,
               child: Container(
                 padding: const EdgeInsets.only(left: 5),
                 decoration: BoxDecoration(
@@ -1024,6 +1024,12 @@ class _PostViewPageState extends State<PostViewPage> {
             ),
         );
       },
+      onSelected: (int result) async {
+        AttachmentModel model = article.attachments[result];
+        UserProvider userProvider = context.read<UserProvider>();
+        bool res = await FileController(model: model, userProvider: userProvider).download();
+        debugPrint(res ? "파일 다운로드 성공" : "파일 다운로드 실패");
+      }
     );
   }
 

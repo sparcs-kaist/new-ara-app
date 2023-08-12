@@ -498,10 +498,9 @@ class _InArticleWebViewState extends State<InArticleWebView> {
             }
             getPageHeight();
           ''')).toString();
-    debugPrint(
-        "******************\npageHeight: $pageHeightStr \n******************");
     double pageHeight =
-    double.parse(pageHeightStr.substring(1, pageHeightStr.length - 1));
+    double.parse(pageHeightStr.replaceAll('"', '').replaceAll("'", ""));
+    debugPrint("pageHeight: $pageHeightStr -> $pageHeight");
 
     return pageHeight;
   }
