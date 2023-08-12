@@ -278,6 +278,20 @@ class _PostWritePageState extends State<PostWritePage> {
       return document.body?.innerHtml ?? '';
     }
 
+    String deleteImgTagSrc(htmlString, fileUrl) {
+      var document = parse(htmlString);
+      // debugPrint(document.body?.innerHtml ?? '');
+      List<html.Element> imgTags = document.getElementsByTagName('img');
+
+      for (var imgTag in imgTags) {
+        if (imgTag.attributes['src'] == fileUrl) {
+          imgTag.remove();
+        }
+      }
+      //  debugPrint(document.body?.innerHtml ?? '');
+      return document.body?.innerHtml ?? '';
+    }
+
     Future<void> filePick() async {
       filePickerResult = await FilePicker.platform.pickFiles();
       if (filePickerResult != null) {
@@ -406,6 +420,103 @@ class _PostWritePageState extends State<PostWritePage> {
       });
     }
 
+    void updatePost() async {
+      String titleValue;
+      String contentValue;
+      List<int> attachmentIds = [];
+      try {
+        titleValue = _titleController.text;
+        contentValue = await _htmlController.getText();
+        debugPrint("title: $titleValue");
+        debugPrint("content: $contentValue");
+      } catch (error) {
+        debugPrint(error.toString());
+        return;
+      }
+      setState(() {
+        _isUploadingPost = true;
+      });
+
+      try {
+        Dio dio = Dio();
+        dio.options.headers['Cookie'] = userProvider.getCookiesToString();
+        for (int i = 0; i < _attachmentList.length; i++) {
+          if (_attachmentList[i].isNewFile) {
+            var attachFile = File(_attachmentList[i].fileLocalPath!);
+            //이 파일 uuid 에 해당하는 img 태그가 html 안에 있다면 변경해야한다.
+
+            // 파일이 존재하는지 확인
+            if (attachFile.existsSync()) {
+              var dio = Dio();
+              dio.options.headers['Cookie'] = userProvider.getCookiesToString();
+              var formData = FormData.fromMap({
+                "file": await MultipartFile.fromFile(attachFile.path,
+                    filename: attachFile.path
+                        .split('/')
+                        .last), // You may need to replace '/' with '\\' if you're using Windows.
+              });
+              try {
+                var response = await dio
+                    .post("$newAraDefaultUrl/api/attachments/", data: formData);
+                debugPrint("Response: ${response.data}");
+                final attachmentModel = AttachmentModel.fromJson(response.data);
+                attachmentIds.add(attachmentModel.id);
+                contentValue = updateImgTagSrc(contentValue,
+                    _attachmentList[i].uuid, attachmentModel.file);
+              } catch (error) {
+                debugPrint("$error");
+              }
+            } else {
+              debugPrint("File does not exist: ${attachFile.path}");
+            }
+          } else {
+            attachmentIds.add(_attachmentList[i].id!);
+          }
+        }
+
+        var response = await dio.put(
+          '$newAraDefaultUrl/api/articles/${widget.previousArticle!.id}/',
+          data: {
+            'title': titleValue,
+            'content': contentValue,
+            'attachments': attachmentIds,
+            // 'parent_topic':
+            //     _chosenTopicValue!.id == -1 ? '' : _chosenTopicValue!.id,
+            'is_content_sexual': _selectedCheckboxes[1],
+            'is_content_social': _selectedCheckboxes[2],
+            // 'parent_board': _chosenBoardValue!.id,
+            'name_type': 'REGULAR'
+          },
+        );
+
+        debugPrint('Response data: ${response.data}');
+        Navigator.pop(context);
+      } on DioException catch (error) {
+        debugPrint('post Error: ${error.response!.data}');
+      }
+    }
+
+    void onAttachmentDelete(int index) async {
+      String text = await _htmlController.getText();
+
+      if (_attachmentList[index].isNewFile) {
+        String nextText =
+            updateImgTagSrc(text, _attachmentList[index].uuid, null);
+        debugPrint("next : $nextText");
+        _htmlController.setText(nextText);
+      } else {
+        String nextText =
+            deleteImgTagSrc(text, _attachmentList[index].fileUrlPath);
+        debugPrint("next : $nextText");
+        _htmlController.setText(nextText);
+      }
+
+      setState(() {
+        _attachmentList.removeAt(index);
+        _isLoading = false;
+      });
+    }
+
     void setSpecTopicList(BoardDetailActionModel? value) {
       setState(() {
         _specTopicList = [];
@@ -456,7 +567,8 @@ class _PostWritePageState extends State<PostWritePage> {
         ),
         actions: [
           MaterialButton(
-            onPressed: canIupload ? uploadPost : null,
+            onPressed:
+                canIupload ? (_isEditingPost ? updatePost : uploadPost) : null,
             // 버튼이 클릭되었을 때 수행할 동작
             padding: EdgeInsets.zero, // 패딩 제거
             child: canIupload
@@ -909,28 +1021,8 @@ class _PostWritePageState extends State<PostWritePage> {
                                                             Color(0xFFBBBBBB)),
                                                   ),
                                                   InkWell(
-                                                    onTap: () async {
-                                                      String text =
-                                                          await _htmlController
-                                                              .getText();
-
-                                                      String nextText =
-                                                          updateImgTagSrc(
-                                                              text,
-                                                              _attachmentList[
-                                                                      index]
-                                                                  .uuid,
-                                                              null);
-                                                      debugPrint(
-                                                          "next : $nextText");
-                                                      _htmlController
-                                                          .setText(nextText);
-
-                                                      setState(() {
-                                                        _attachmentList
-                                                            .removeAt(index);
-                                                        _isLoading = false;
-                                                      });
+                                                    onTap: () {
+                                                      onAttachmentDelete(index);
                                                     },
                                                     child: SvgPicture.asset(
                                                       'assets/icons/close.svg',
