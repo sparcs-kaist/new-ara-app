@@ -523,6 +523,9 @@ class _InArticleWebViewState extends State<InArticleWebView> {
       ..setBackgroundColor(const Color(0x00000000))
       ..setNavigationDelegate(NavigationDelegate(
         onNavigationRequest: (NavigationRequest request) async {
+          if (request.url == 'about:blank') {
+            return NavigationDecision.navigate;
+          }
           Uri uri = Uri.parse(request.url);
           if (uri.scheme == "https" || uri.scheme == "http") {
             await launchInBrowser(request.url);

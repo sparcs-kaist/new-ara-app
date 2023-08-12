@@ -247,49 +247,18 @@ class _PostViewPageState extends State<PostViewPage> {
                                   ],
                                 ),
                               ),
-                              // (2023.08.09)첨부파일 리스트뷰 프로토타입. 추후 디자이너와 조율 예정
-                              article.attachments.isEmpty ? Container() : Container(
-                                margin: const EdgeInsets.only(top: 10, bottom: 10),
-                                constraints: const BoxConstraints(
-                                  minHeight: 10,
-                                ),
-                                child: ListView.separated(
-                                  physics: const NeverScrollableScrollPhysics(),
-                                  shrinkWrap: true,
-                                  itemCount: article.attachments.length,
-                                  itemBuilder: (BuildContext context, int idx) {
-                                    AttachmentModel curFile = article.attachments[idx];
-                                    String initFileName = Uri.parse(article.attachments[idx].file).path.substring(7);
-                                    return InkWell(
-                                      onTap: () {
-                                        FileController(
-                                          model: curFile,
-                                          userProvider: userProvider,
-                                        ).download().then((result) {
-                                          debugPrint("다운로드 결과: $result");
-                                          // SnackBar 등 필요
-                                        });
-                                      },
-                                      child: Container(
-                                        padding: const EdgeInsets.only(left: 5),
-                                        decoration: BoxDecoration(
-                                          border: Border.all(
-                                            color: const Color(0x00FFFFFF),
-                                            width: 2,
-                                          ),
-                                          borderRadius: const BorderRadius.all(Radius.circular(5)),
-                                        ),
-                                        child: Text(
-                                          initFileName,
-                                          overflow: TextOverflow.ellipsis,
-                                        ),
-                                      ),
-                                    );
-                                  },
-                                  separatorBuilder: (BuildContext context, int idx) => const SizedBox(height: 3),
-                                )
-                              ),
                               const Divider(thickness: 1,),
+                              // (2023.08.09)첨부파일 리스트뷰 프로토타입. 추후 디자이너와 조율 예정
+                              Visibility(
+                                visible: !article.attachments.isEmpty,
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.end,
+                                  children: [
+                                    _buildAttachMenuButton(article.attachments.length),
+                                  ],
+                                ),
+                              ),
+                              const SizedBox(height: 5),
                               InArticleWebView(
                                 content: getContentHtml(
                                     article.content ?? "내용이 존재하지 않습니다."),
@@ -533,7 +502,7 @@ class _PostViewPageState extends State<PostViewPage> {
                                       if (result) update();
                                     },
                                     child: Container(
-                                      width: 90,
+                                      width: 95,
                                       height: 40,
                                       decoration: BoxDecoration(
                                         borderRadius:
@@ -543,9 +512,24 @@ class _PostViewPageState extends State<PostViewPage> {
                                               230, 230, 230, 1),
                                         ),
                                       ),
-                                      child: const Center(
-                                        child: Text(
-                                          '수정하기',
+                                      child: Center(
+                                        child: Row(
+                                          mainAxisAlignment: MainAxisAlignment.center,
+                                          children: [
+                                            SvgPicture.asset(
+                                              'assets/icons/modify.svg',
+                                              width: 30,
+                                              height: 30,
+                                              color: Colors.black,
+                                            ),
+                                            const Text(
+                                              '수정하기',
+                                              style: TextStyle(
+                                                fontSize: 15,
+                                                fontWeight: FontWeight.w500,
+                                              ),
+                                            ),
+                                          ],
                                         ),
                                       ),
                                     ),
@@ -1003,6 +987,44 @@ class _PostViewPageState extends State<PostViewPage> {
               ),
             ),
           );
+  }
+
+  PopupMenuButton<String> _buildAttachMenuButton(int fileNum) {
+    return PopupMenuButton(
+      shadowColor: const Color.fromRGBO(0, 0, 0, 0.2),
+      splashRadius: 5,
+      shape: const RoundedRectangleBorder(
+        side: BorderSide(color: Color.fromRGBO(217, 217, 217, 1), width: 0.5),
+        borderRadius: BorderRadius.all(Radius.circular(12.0)),
+      ),
+      padding: const EdgeInsets.all(2.0),
+      child: Text(
+        '첨부파일 모아보기 $fileNum',
+      ),
+      itemBuilder: (BuildContext context) {
+        List<AttachmentModel> files = article.attachments;
+        return List.generate(
+            files.length,
+            (idx) => PopupMenuItem(
+              //value: idx,
+              child: Container(
+                padding: const EdgeInsets.only(left: 5),
+                decoration: BoxDecoration(
+                  border: Border.all(
+                    color: const Color(0x00FFFFFF),
+                    width: 2,
+                  ),
+                  borderRadius: const BorderRadius.all(Radius.circular(5)),
+                ),
+                child: Text(
+                  Uri.parse(article.attachments[idx].file).path.substring(7),
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+            ),
+        );
+      },
+    );
   }
 
   // 자신의 댓글
