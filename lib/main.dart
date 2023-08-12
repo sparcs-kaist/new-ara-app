@@ -4,7 +4,7 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:new_ara_app/widgetclasses/loading_indicator.dart';
 import 'package:provider/provider.dart';
 
-import 'package:new_ara_app/pages/new_ara_home_page.dart';
+import 'package:new_ara_app/pages/main_navigation_tab_page.dart';
 import 'package:new_ara_app/pages/login_page.dart';
 import 'package:new_ara_app/providers/user_provider.dart';
 
@@ -113,7 +113,7 @@ class _MyAppState extends State<MyApp> {
         home: isLoading == true
             ? const LoadingIndicator() // 자동 로그인 시 로컬 쿠키에서 가져오는 동안 공백이 생긴다. 그 동안 띄어주는 indicator
             : context.watch<UserProvider>().hasData
-                ? const NewAraHomePage()
+                ? const MainNavigationTabPage()
                 : const LoginPage());
   }
 

@@ -6,13 +6,13 @@ import 'package:new_ara_app/pages/chat_list_page.dart';
 import 'package:new_ara_app/pages/notification_page.dart';
 import 'package:new_ara_app/pages/user_page.dart';
 
-class NewAraHomePage extends StatefulWidget {
-  const NewAraHomePage({Key? key}) : super(key: key);
+class MainNavigationTabPage extends StatefulWidget {
+  const MainNavigationTabPage({Key? key}) : super(key: key);
   @override
-  State<StatefulWidget> createState() => _NewAraHomePageState();
+  State<StatefulWidget> createState() => _MainNavigationTabPageState();
 }
 
-class _NewAraHomePageState extends State<NewAraHomePage> {
+class _MainNavigationTabPageState extends State<MainNavigationTabPage> {
   int _selectedIndex = 0;
 
   final List<Widget> _widgetOptions = <Widget>[
