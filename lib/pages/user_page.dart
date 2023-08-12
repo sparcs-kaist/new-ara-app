@@ -3,7 +3,6 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:new_ara_app/constants/url_info.dart';
 import 'package:provider/provider.dart';
 import 'package:easy_localization/easy_localization.dart';
-import 'package:dio/dio.dart';
 
 import 'package:new_ara_app/constants/colors_info.dart';
 import 'package:new_ara_app/pages/setting_page.dart';
@@ -67,9 +66,25 @@ class _UserPageState extends State<UserPage>
   }
 
   Future<void> loadAllData(UserProvider userProvider, {create=true, scrap=true, recent=true}) async {
-    if (scrap) await fetchScrappedArticles(userProvider, 1);
-    if (recent) await fetchRecentArticles(userProvider, 1);
-    if (create) await fetchCreatedArticles(userProvider, 1);
+    if (scrap) {
+      isLoadedList[1] = await fetchScrappedArticles(userProvider, 1);
+      if (!isLoadedList[1]) return;
+      setCurCount(1);
+    }
+    if (recent) {
+      isLoadedList[2] = await fetchRecentArticles(userProvider, 1);
+      if (!isLoadedList[2]) return;
+      setCurCount(2);
+    }
+    if (create) {
+      isLoadedList[0] = await fetchCreatedArticles(userProvider, 1);
+      if (!isLoadedList[0]) return;
+      setCurCount(0);
+    }
+  }
+
+  void update() {
+    if (mounted) setState(() {});
   }
 
   void _handleTabChange() {
@@ -78,16 +93,14 @@ class _UserPageState extends State<UserPage>
     if (!_tabController.indexIsChanging) {
       if (_tabController.animation!.isCompleted) {
         return;
-      } else {
-        setIsLoaded(false, tabIndex);
+      } else {  // Swipe
         loadAllData(userProvider, create: tabIndex == 0, scrap: tabIndex == 1, recent: tabIndex == 2).then((_) {
           if (!mounted) return;
           setState(() => curCount = tabCount[tabIndex]);
         });
       }
     }
-    else {
-      setIsLoaded(false, tabIndex);
+    else {  // Tab
       loadAllData(userProvider, create: tabIndex == 0, scrap: tabIndex == 1, recent: tabIndex == 2).then((_) {
         if (!mounted) return;
         setState(() => curCount = tabCount[tabIndex]);
@@ -99,7 +112,9 @@ class _UserPageState extends State<UserPage>
     if (isLoadedList[0] &&
         scrollControllerList[0].position.pixels ==
             scrollControllerList[0].position.maxScrollExtent) {
-      fetchCreatedArticles(context.read<UserProvider>(), nextPage[0]);
+      fetchCreatedArticles(context.read<UserProvider>(), nextPage[0]).then((res) {
+        if (res) update();
+      });
     }
   }
 
@@ -107,7 +122,9 @@ class _UserPageState extends State<UserPage>
     if (isLoadedList[1] &&
         scrollControllerList[1].position.pixels ==
             scrollControllerList[1].position.maxScrollExtent) {
-      fetchScrappedArticles(context.read<UserProvider>(), nextPage[1]);
+      fetchScrappedArticles(context.read<UserProvider>(), nextPage[1]).then((res) {
+        if (res) update();
+      });
     }
   }
 
@@ -115,7 +132,9 @@ class _UserPageState extends State<UserPage>
     if (isLoadedList[2] &&
         scrollControllerList[2].position.pixels ==
             scrollControllerList[2].position.maxScrollExtent) {
-      fetchRecentArticles(context.read<UserProvider>(), nextPage[2]);
+      fetchRecentArticles(context.read<UserProvider>(), nextPage[2]).then((res) {
+        if (res) update();
+      });
     }
   }
 
@@ -290,129 +309,101 @@ class _UserPageState extends State<UserPage>
     );
   }
 
-  Future<void> fetchCreatedArticles(UserProvider userProvider, int page) async {
+  Future<bool> fetchCreatedArticles(UserProvider userProvider, int page) async {
     int user = userProvider.naUser!.user;
     String apiUrl = "/api/articles/?page=$page&created_by=$user";
     if (page == 1) {
       createdArticleList.clear();
       nextPage[0] = 1;
     }
-    Dio dio = Dio();
     try {
-      dio.options.headers['Cookie'] = userProvider.getCookiesToString();
-    } catch (error) {
-      debugPrint(
-          "fetchCreatedArticles() failed to get Cookies from Provider: $error");
-    }
-    try {
-      var response = await dio.get('$newAraDefaultUrl$apiUrl');
-      debugPrint(
-          "fetchCreatedArticles() GET request (page: $page): ${response.statusCode}");
-      if (response.statusCode == 200) {
-        List<dynamic> rawPostList = response.data['results'];
-        for (int i = 0; i < rawPostList.length; i++) {
-          Map<String, dynamic>? rawPost = rawPostList[i];
-          if (rawPost == null) {
-            continue; // 가끔 형식에 맞지 않은 데이터를 가진 글이 있어 넣어놓음(2023.05.26)
-          }
-          try {
-            createdArticleList.add(ArticleListActionModel.fromJson(rawPost));
-          } catch (error) {
-            // 여기서 에러가 발생하게 된다면
-            // 1. models 에 있는 모델의 타입이 올바르지 않은 경우 -> 수정하기
-            // 2. models 의 타입은 올바르게 설계됨. 그러나 이전 개발 과정에서 필드 설정을 잘못한(또는 달랐던) 경우 -> 그냥 넘어가기
-            debugPrint(
-                "createdArticleList.add failed at index $i (id: ${rawPost['id']}) : $error");
-          }
+      var response = await userProvider.myDio().get("$newAraDefaultUrl$apiUrl");
+      if (response.statusCode != 200) return false;
+      List<dynamic> rawPostList = response.data['results'];
+      for (int i = 0; i < rawPostList.length; i++) {
+        Map<String, dynamic>? rawPost = rawPostList[i];
+        if (rawPost == null) {
+          continue; // 가끔 형식에 맞지 않은 데이터를 가진 글이 있어 넣어놓음(2023.05.26)
         }
-        nextPage[0] += 1;
-        curCount = tabCount[0] = response.data['num_items'];
-        setIsLoaded(true, 0);
+        try {
+          createdArticleList.add(ArticleListActionModel.fromJson(rawPost));
+        } catch (error) {
+          // 여기서 에러가 발생하게 된다면
+          // 1. models 에 있는 모델의 타입이 올바르지 않은 경우 -> 수정하기
+          // 2. models 의 타입은 올바르게 설계됨. 그러나 이전 개발 과정에서 필드 설정을 잘못한(또는 달랐던) 경우 -> 그냥 넘어가기
+          debugPrint(
+              "createdArticleList.add failed at index $i (id: ${rawPost['id']}) : $error");
+        }
       }
+      nextPage[0] += 1;
+      tabCount[0] = response.data['num_items'];
+      return true;
     } catch (error) {
       debugPrint("fetchCreatedArticles() failed with error: $error");
+      return false;
     }
   }
 
-  Future<void> fetchScrappedArticles(
-      UserProvider userProvider, int page) async {
+  Future<bool> fetchScrappedArticles(UserProvider userProvider, int page) async {
     int user = userProvider.naUser!.user;
     String apiUrl = "/api/scraps/?page=$page&created_by=$user";
     if (page == 1) {
       scrappedArticleList.clear();
       nextPage[1] = 1;
     }
-    Dio dio = Dio();
     try {
-      dio.options.headers['Cookie'] = userProvider.getCookiesToString();
-    } catch (error) {
-      debugPrint(
-          "fetchScrappedArticles() failed to get Cookies from Provider: $error");
-    }
-    try {
-      var response = await dio.get('$newAraDefaultUrl$apiUrl');
-      debugPrint(
-          "fetchScrappedArticles() GET request (page: $page): ${response.statusCode}");
-      if (response.statusCode == 200) {
-        debugPrint("fetchScrappedArticles() succeed!");
-        List<dynamic> rawPostList = response.data['results'];
-        for (int i = 0; i < rawPostList.length; i++) {
-          Map<String, dynamic>? rawPost = rawPostList[i];
-          if (rawPost == null) continue;
-          try {
-            scrappedArticleList.add(ScrapModel.fromJson(rawPost));
-          } catch (error) {
-            debugPrint(
-                "scrappedArticleList.add failed at index $i (id: ${rawPost['id']}) : $error");
-          }
+      var response = await userProvider.myDio().get('$newAraDefaultUrl$apiUrl');
+      if (response.statusCode != 200) return false;
+      debugPrint("fetchScrappedArticles() GET request (page: $page): ${response.statusCode}");
+      List<dynamic> rawPostList = response.data['results'];
+      for (int i = 0; i < rawPostList.length; i++) {
+        Map<String, dynamic>? rawPost = rawPostList[i];
+        if (rawPost == null) continue;
+        try {
+          scrappedArticleList.add(ScrapModel.fromJson(rawPost));
+        } catch (error) {
+          debugPrint(
+              "scrappedArticleList.add failed at index $i (id: ${rawPost['id']}) : $error");
         }
-
-        nextPage[1] += 1;
-        curCount = tabCount[1] = response.data['num_items'];
-        setIsLoaded(true, 1);
       }
+      nextPage[1] += 1;
+      tabCount[1] = response.data['num_items'];
+      return true;
     } catch (error) {
       debugPrint("fetchScrappedArticles() failed with error: $error");
+      return false;
     }
   }
 
-  Future<void> fetchRecentArticles(UserProvider userProvider, int page) async {
+  Future<bool> fetchRecentArticles(UserProvider userProvider, int page) async {
     String apiUrl = "/api/articles/recent/?page=$page";
     if (page == 1) {
       recentArticleList.clear();
       nextPage[2] = 1;
     }
-    Dio dio = Dio();
     try {
-      dio.options.headers['Cookie'] = userProvider.getCookiesToString();
-    } catch (error) {
-      debugPrint(
-          "fetchRecentArticles() failed to get Cookies from Provider: $error");
-    }
-    try {
-      var response = await dio.get('$newAraDefaultUrl$apiUrl');
+      var response = await userProvider.myDio().get('$newAraDefaultUrl$apiUrl');
       debugPrint(
           "fetchRecentArticles() GET request (page: $page): ${response.statusCode}");
-      setMyCount(response.data['num_items'], 2);
-      if (response.statusCode == 200) {
-        debugPrint("fetchRecentArticles() succeed!");
-        List<dynamic> rawPostList = response.data['results'];
-        for (int i = 0; i < rawPostList.length; i++) {
-          Map<String, dynamic>? rawPost = rawPostList[i];
-          if (rawPost == null) continue;
-          try {
-            recentArticleList.add(ArticleListActionModel.fromJson(rawPost));
-          } catch (error) {
-            debugPrint(
-                "recentArticleList.add failed at index $i (id: ${rawPost['id']}) : $error");
-          }
+      if (response.statusCode != 200) return false;
+      debugPrint("fetchRecentArticles() succeed!");
+      List<dynamic> rawPostList = response.data['results'];
+      for (int i = 0; i < rawPostList.length; i++) {
+        Map<String, dynamic>? rawPost = rawPostList[i];
+        if (rawPost == null) continue;
+        try {
+          recentArticleList.add(ArticleListActionModel.fromJson(rawPost));
+        } catch (error) {
+          debugPrint(
+              "recentArticleList.add failed at index $i (id: ${rawPost['id']}) : $error");
         }
-        nextPage[2] += 1;
-        curCount = tabCount[2] = response.data['num_items'];
-        setIsLoaded(true, 2);
       }
+      nextPage[2] += 1;
+      tabCount[2] = response.data['num_items'];
+      return true;
     } catch (error) {
       debugPrint("fetchRecentArticles() failed with error: $error");
+      return false;
     }
   }
 
@@ -424,6 +415,10 @@ class _UserPageState extends State<UserPage>
     setState(() => curCount = tabCount[tabIndex]);
   }
 
+  void setCurCount(int tabIndex) {
+    if (mounted) setState(() => curCount = tabCount[tabIndex]);
+  }
+
   Widget _buildPostList(int tabIndex, UserProvider userProvider) {
     return RefreshIndicator(
       color: ColorsInfo.newara,
@@ -431,11 +426,17 @@ class _UserPageState extends State<UserPage>
         setIsLoaded(false, tabIndex);
         UserProvider userProvider = context.read<UserProvider>();
         if (tabIndex == 0) {
-          await fetchCreatedArticles(userProvider, 1);
+          isLoadedList[0] = await fetchCreatedArticles(userProvider, 1);
+          if (!isLoadedList[0]) return;
+          setCurCount(0);
         } else if (tabIndex == 1) {
-          await fetchScrappedArticles(userProvider, 1);
+          isLoadedList[1] = await fetchScrappedArticles(userProvider, 1);
+          if (!isLoadedList[1]) return;
+          setCurCount(1);
         } else {
-          await fetchRecentArticles(userProvider, 1);
+          isLoadedList[2] = await fetchRecentArticles(userProvider, 1);
+          if (!isLoadedList[2]) return;
+          setCurCount(2);
         }
       },
       child: ListView.separated(
@@ -465,9 +466,10 @@ class _UserPageState extends State<UserPage>
                   await Navigator.of(context)
                       .push(slideRoute(PostViewPage(id: curPost.id)));
                   var fetchFunc = (tabIndex == 0 ? fetchCreatedArticles : (tabIndex == 1 ? fetchScrappedArticles : fetchRecentArticles));
-                  for (int page = 1; page < nextPage[tabIndex]; page++) {
+                  for (int page = 1; page <= nextPage[tabIndex]; page++) {
                     await fetchFunc(userProvider, page);
                   }
+                  setCurCount(tabIndex);
                 },
                 child: SizedBox(
                   height: 61,
