@@ -193,7 +193,7 @@ class _PostViewPageState extends State<PostViewPage> {
                               const SizedBox(height: 10),
                               // 유저 정보 (프로필 이미지, 닉네임)
                               InkWell(
-                                onTap: () async {
+                                onTap: article.name_type == 2 ? null : () async {
                                   await Navigator.push(
                                     context,
                                     MaterialPageRoute(builder: (context) => UserViewPage(userID: article.created_by.id)),
@@ -235,11 +235,14 @@ class _PostViewPageState extends State<PostViewPage> {
                                           overflow: TextOverflow.ellipsis,
                                         )),
                                     const SizedBox(width: 10),
-                                    SvgPicture.asset(
-                                      'assets/icons/right_chevron.svg',
-                                      color: Colors.black,
-                                      width: 5,
-                                      height: 9,
+                                    Visibility(
+                                      visible: article.created_by.profile.nickname != "익명",
+                                      child: SvgPicture.asset(
+                                        'assets/icons/right_chevron.svg',
+                                        color: Colors.black,
+                                        width: 5,
+                                        height: 9,
+                                      ),
                                     ),
                                   ],
                                 ),
@@ -592,63 +595,71 @@ class _PostViewPageState extends State<PostViewPage> {
                                             mainAxisAlignment:
                                                 MainAxisAlignment.spaceBetween,
                                             children: [
-                                              Row(
-                                                children: [
-                                                  Container(
-                                                    width: 25,
-                                                    height: 25,
-                                                    decoration:
-                                                        const BoxDecoration(
-                                                      shape: BoxShape.circle,
-                                                      color: Colors.grey,
-                                                    ),
-                                                    child: ClipRRect(
-                                                      borderRadius:
-                                                          const BorderRadius
-                                                                  .all(
-                                                              Radius.circular(
-                                                                  100)),
-                                                      child: Image.network(
-                                                          curComment.created_by
-                                                              .profile.picture
-                                                              .toString()),
-                                                    ),
-                                                  ),
-                                                  const SizedBox(width: 5),
-                                                  Container(
-                                                      constraints:
-                                                          BoxConstraints(
-                                                        maxWidth: MediaQuery.of(
-                                                                    context)
-                                                                .size
-                                                                .width -
-                                                            200,
+                                              InkWell(
+                                                onTap: curComment.name_type == 2 ? null : () {
+                                                  Navigator.push(
+                                                    context,
+                                                    MaterialPageRoute(builder: (context) => UserViewPage(userID: curComment.created_by.id)),
+                                                  );
+                                                },
+                                                child: Row(
+                                                  children: [
+                                                    Container(
+                                                      width: 25,
+                                                      height: 25,
+                                                      decoration:
+                                                      const BoxDecoration(
+                                                        shape: BoxShape.circle,
+                                                        color: Colors.grey,
                                                       ),
-                                                      child: Text(
-                                                        curComment.created_by
-                                                            .profile.nickname
-                                                            .toString(),
-                                                        style: const TextStyle(
+                                                      child: ClipRRect(
+                                                        borderRadius:
+                                                        const BorderRadius
+                                                            .all(
+                                                            Radius.circular(
+                                                                100)),
+                                                        child: Image.network(
+                                                            curComment.created_by
+                                                                .profile.picture
+                                                                .toString()),
+                                                      ),
+                                                    ),
+                                                    const SizedBox(width: 5),
+                                                    Container(
+                                                        constraints:
+                                                        BoxConstraints(
+                                                          maxWidth: MediaQuery.of(
+                                                              context)
+                                                              .size
+                                                              .width -
+                                                              200,
+                                                        ),
+                                                        child: Text(
+                                                          curComment.created_by
+                                                              .profile.nickname
+                                                              .toString(),
+                                                          style: const TextStyle(
+                                                            fontSize: 14,
+                                                            fontWeight:
+                                                            FontWeight.w500,
+                                                          ),
+                                                          maxLines: 1,
+                                                          overflow: TextOverflow
+                                                              .ellipsis,
+                                                        )),
+                                                    const SizedBox(width: 7),
+                                                    Text(
+                                                      getTime(
+                                                          curComment.created_at),
+                                                      style: const TextStyle(
                                                           fontSize: 14,
                                                           fontWeight:
-                                                              FontWeight.w500,
-                                                        ),
-                                                        maxLines: 1,
-                                                        overflow: TextOverflow
-                                                            .ellipsis,
-                                                      )),
-                                                  const SizedBox(width: 7),
-                                                  Text(
-                                                    getTime(
-                                                        curComment.created_at),
-                                                    style: const TextStyle(
-                                                        fontSize: 14,
-                                                        fontWeight:
-                                                            FontWeight.w400,
-                                                        color: Color.fromRGBO(
-                                                            51, 51, 51, 1)),
-                                                  ),
-                                                ],
+                                                          FontWeight.w400,
+                                                          color: Color.fromRGBO(
+                                                              51, 51, 51, 1)),
+                                                    ),
+                                                  ],
+                                                ),
                                               ),
                                               SizedBox(
                                                 width: 30,
