@@ -89,6 +89,7 @@ class _PostViewPageState extends State<PostViewPage> {
                           _setIsValid(await _fetchArticle(userProvider));
                         },
                         child: SingleChildScrollView(
+                          physics: const AlwaysScrollableScrollPhysics(),
                           controller: _scrollController,
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
