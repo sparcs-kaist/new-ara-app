@@ -77,7 +77,6 @@ class _PostViewPageState extends State<PostViewPage> {
             body: SafeArea(
               child: GestureDetector(
                 onTap: () => FocusScope.of(context).unfocus(),
-                onLongPressDown: (_) => FocusScope.of(context).unfocus(),
                 child: Container(
                   margin: const EdgeInsets.symmetric(horizontal: 20),
                   child: Column(children: [

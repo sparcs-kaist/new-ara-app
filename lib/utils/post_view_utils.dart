@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:path_provider/path_provider.dart';
@@ -6,6 +7,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:flutter/foundation.dart';
 
 import 'package:new_ara_app/models/article_model.dart';
 import 'package:new_ara_app/models/comment_nested_comment_list_action_model.dart';
@@ -557,6 +559,15 @@ class _InArticleWebViewState extends State<InArticleWebView> {
       height: webViewHeight,
       child: WebViewWidget(
         controller: _webViewController,
+        gestureRecognizers: {
+          Factory<OneSequenceGestureRecognizer>(() {
+            TapGestureRecognizer tabGestureRecognizer = TapGestureRecognizer();
+            tabGestureRecognizer.onTapDown = (_) {
+              FocusScope.of(context).unfocus();
+            };
+            return tabGestureRecognizer;
+          }),
+        },
       ),
     );
   }
