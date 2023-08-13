@@ -552,237 +552,275 @@ class _PostViewPageState extends State<PostViewPage> {
                                 ),
                               ),
                               const SizedBox(height: 15),
-                              Container(
-                                constraints: const BoxConstraints(
-                                  minHeight: 200,
-                                ),
-                                child: ListView.separated(
-                                  padding: const EdgeInsets.only(bottom: 15),
-                                  shrinkWrap: true,
-                                  physics: const NeverScrollableScrollPhysics(),
-                                  controller: _scrollController,
-                                  itemCount: commentList.length,
-                                  itemBuilder: (BuildContext context, int idx) {
-                                    CommentNestedCommentListActionModel
-                                    curComment = commentList[idx];
-                                    return Container(
-                                      margin: EdgeInsets.only(
-                                          left:
-                                          (curComment.parent_comment == null
-                                              ? 0
-                                              : 30)),
-                                      child: Column(
-                                        crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                        children: [
-                                          Row(
-                                            mainAxisAlignment:
-                                            MainAxisAlignment.spaceBetween,
-                                            children: [
-                                              InkWell(
-                                                onTap: curComment.name_type == 2 ? null : () {
-                                                  Navigator.push(
-                                                    context,
-                                                    MaterialPageRoute(builder: (context) => UserViewPage(userID: curComment.created_by.id)),
-                                                  );
-                                                },
-                                                child: Row(
-                                                  children: [
-                                                    Container(
-                                                      width: 25,
-                                                      height: 25,
-                                                      decoration:
-                                                      const BoxDecoration(
-                                                        shape: BoxShape.circle,
-                                                        color: Colors.grey,
-                                                      ),
-                                                      child: ClipRRect(
-                                                        borderRadius:
-                                                        const BorderRadius
-                                                            .all(
-                                                            Radius.circular(
-                                                                100)),
-                                                        child: Image.network(
-                                                            curComment.created_by
-                                                                .profile.picture
-                                                                .toString()),
-                                                      ),
+                              ListView.separated(
+                                padding: const EdgeInsets.only(bottom: 15),
+                                shrinkWrap: true,
+                                physics: const NeverScrollableScrollPhysics(),
+                                controller: _scrollController,
+                                itemCount: commentList.length,
+                                itemBuilder: (BuildContext context, int idx) {
+                                  CommentNestedCommentListActionModel
+                                  curComment = commentList[idx];
+                                  return Container(
+                                    margin: EdgeInsets.only(
+                                        left:
+                                        (curComment.parent_comment == null
+                                            ? 0
+                                            : 30)),
+                                    child: Column(
+                                      crossAxisAlignment:
+                                      CrossAxisAlignment.start,
+                                      children: [
+                                        Row(
+                                          mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            InkWell(
+                                              onTap: curComment.name_type == 2 ? null : () {
+                                                Navigator.push(
+                                                  context,
+                                                  MaterialPageRoute(builder: (context) => UserViewPage(userID: curComment.created_by.id)),
+                                                );
+                                              },
+                                              child: Row(
+                                                children: [
+                                                  Container(
+                                                    width: 25,
+                                                    height: 25,
+                                                    decoration:
+                                                    const BoxDecoration(
+                                                      shape: BoxShape.circle,
+                                                      color: Colors.grey,
                                                     ),
-                                                    const SizedBox(width: 5),
-                                                    Container(
-                                                        constraints:
-                                                        BoxConstraints(
-                                                          maxWidth: MediaQuery.of(
-                                                              context)
-                                                              .size
-                                                              .width -
-                                                              200,
-                                                        ),
-                                                        child: Text(
+                                                    child: ClipRRect(
+                                                      borderRadius:
+                                                      const BorderRadius
+                                                          .all(
+                                                          Radius.circular(
+                                                              100)),
+                                                      child: Image.network(
                                                           curComment.created_by
-                                                              .profile.nickname
-                                                              .toString(),
-                                                          style: const TextStyle(
-                                                            fontSize: 14,
-                                                            fontWeight:
-                                                            FontWeight.w500,
-                                                          ),
-                                                          maxLines: 1,
-                                                          overflow: TextOverflow
-                                                              .ellipsis,
-                                                        )),
-                                                    const SizedBox(width: 7),
-                                                    Text(
-                                                      getTime(
-                                                          curComment.created_at),
-                                                      style: const TextStyle(
+                                                              .profile.picture
+                                                              .toString()),
+                                                    ),
+                                                  ),
+                                                  const SizedBox(width: 5),
+                                                  Container(
+                                                      constraints:
+                                                      BoxConstraints(
+                                                        maxWidth: MediaQuery.of(
+                                                            context)
+                                                            .size
+                                                            .width -
+                                                            200,
+                                                      ),
+                                                      child: Text(
+                                                        curComment.created_by
+                                                            .profile.nickname
+                                                            .toString(),
+                                                        style: const TextStyle(
                                                           fontSize: 14,
                                                           fontWeight:
-                                                          FontWeight.w400,
-                                                          color: Color.fromRGBO(
-                                                              51, 51, 51, 1)),
-                                                    ),
-                                                  ],
-                                                ),
-                                              ),
-                                              SizedBox(
-                                                width: 30,
-                                                height: 25,
-                                                child: Visibility(
-                                                    visible: !(curComment.is_hidden),
-                                                    child: (curComment.is_mine ==
-                                                        true
-                                                        ? _buildMyPopupMenuButton(
-                                                        curComment.id,
-                                                        userProvider, idx)
-                                                        : _buildOthersPopupMenuButton(
-                                                        curComment.id))
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                          Container(
-                                            margin: const EdgeInsets.only(
-                                                left: 30, right: 0),
-                                            child: curComment.is_hidden == false
-                                                ? _buildCommentContent(
-                                                curComment.content ?? "")
-                                                : const Text(
-                                              '삭제된 댓글 입니다.',
-                                              style: TextStyle(
-                                                fontSize: 14,
-                                                fontWeight:
-                                                FontWeight.w400,
-                                                color: Colors.grey,
+                                                          FontWeight.w500,
+                                                        ),
+                                                        maxLines: 1,
+                                                        overflow: TextOverflow
+                                                            .ellipsis,
+                                                      )),
+                                                  const SizedBox(width: 7),
+                                                  Text(
+                                                    getTime(
+                                                        curComment.created_at),
+                                                    style: const TextStyle(
+                                                        fontSize: 14,
+                                                        fontWeight:
+                                                        FontWeight.w400,
+                                                        color: Color.fromRGBO(
+                                                            51, 51, 51, 1)),
+                                                  ),
+                                                ],
                                               ),
                                             ),
+                                            SizedBox(
+                                              width: 30,
+                                              height: 25,
+                                              child: Visibility(
+                                                  visible: !(curComment.is_hidden),
+                                                  child: (curComment.is_mine ==
+                                                      true
+                                                      ? _buildMyPopupMenuButton(
+                                                      curComment.id,
+                                                      userProvider, idx)
+                                                      : _buildOthersPopupMenuButton(
+                                                      curComment.id))
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                        Container(
+                                          margin: const EdgeInsets.only(
+                                              left: 30, right: 0),
+                                          child: curComment.is_hidden == false
+                                              ? _buildCommentContent(
+                                              curComment.content ?? "")
+                                              : const Text(
+                                            '삭제된 댓글 입니다.',
+                                            style: TextStyle(
+                                              fontSize: 14,
+                                              fontWeight:
+                                              FontWeight.w400,
+                                              color: Colors.grey,
+                                            ),
                                           ),
-                                          const SizedBox(height: 5),
-                                          Container(
-                                              margin: const EdgeInsets.only(
-                                                  left: 30),
-                                              child: curComment.is_hidden ==
-                                                  false
-                                                  ? Row(
+                                        ),
+                                        const SizedBox(height: 5),
+                                        Container(
+                                            margin: const EdgeInsets.only(
+                                                left: 30),
+                                            child: curComment.is_hidden ==
+                                                false
+                                                ? Row(
+                                              children: [
+                                                InkWell(
+                                                  onTap: () {
+                                                    CommentController(
+                                                      model: curComment,
+                                                      userProvider: userProvider,
+                                                    ).posVote().then((result) {
+                                                      if (result) update();
+                                                    });
+                                                  },
+                                                  child:
+                                                  SvgPicture.asset(
+                                                    curComment.my_vote ==
+                                                        true
+                                                        ? 'assets/icons/like_filled.svg'
+                                                        : 'assets/icons/like.svg',
+                                                    width: 17,
+                                                    height: 17,
+                                                    color:
+                                                    curComment.my_vote ==
+                                                        false
+                                                        ? ColorsInfo
+                                                        .noneVote
+                                                        : ColorsInfo
+                                                        .newara,
+                                                  ),
+                                                ),
+                                                const SizedBox(
+                                                    width: 3),
+                                                Text(
+                                                  curComment
+                                                      .positive_vote_count
+                                                      .toString(),
+                                                  style: TextStyle(
+                                                    fontSize: 13,
+                                                    fontWeight:
+                                                    FontWeight.w500,
+                                                    color:
+                                                    curComment.my_vote ==
+                                                        false
+                                                        ? ColorsInfo
+                                                        .noneVote
+                                                        : ColorsInfo
+                                                        .posVote,
+                                                  ),
+                                                ),
+                                                const SizedBox(
+                                                    width: 6),
+                                                InkWell(
+                                                  onTap: () async {
+                                                    CommentController(
+                                                      model: curComment,
+                                                      userProvider: userProvider,
+                                                    ).negVote().then((result) {
+                                                      if (result) update();
+                                                    });
+                                                  },
+                                                  child:
+                                                  SvgPicture.asset(
+                                                    curComment.my_vote ==
+                                                        false
+                                                        ? 'assets/icons/dislike_filled.svg'
+                                                        : 'assets/icons/dislike.svg',
+                                                    width: 17,
+                                                    height: 17,
+                                                    color: curComment
+                                                        .my_vote ==
+                                                        true
+                                                        ? ColorsInfo
+                                                        .noneVote
+                                                        : ColorsInfo
+                                                        .negVote,
+                                                  ),
+                                                ),
+                                                const SizedBox(
+                                                    width: 3),
+                                                Text(
+                                                  curComment
+                                                      .negative_vote_count
+                                                      .toString(),
+                                                  style: TextStyle(
+                                                    fontSize: 13,
+                                                    fontWeight:
+                                                    FontWeight.w500,
+                                                    color: curComment
+                                                        .my_vote ==
+                                                        true
+                                                        ? ColorsInfo
+                                                        .noneVote
+                                                        : ColorsInfo
+                                                        .negVote,
+                                                  ),
+                                                ),
+                                                const SizedBox(
+                                                    width: 6),
+                                                curComment.parent_comment !=
+                                                    null
+                                                    ? Container()
+                                                    : InkWell(
+                                                  onTap: () {},
+                                                  child:
+                                                  SvgPicture
+                                                      .asset(
+                                                    'assets/icons/arrow_uturn_left_1.svg',
+                                                    width: 11,
+                                                    height: 12,
+                                                  ),
+                                                ),
+                                                const SizedBox(
+                                                    width: 5),
+                                                Visibility(
+                                                  visible: curComment.parent_comment == null,
+                                                  child: InkWell(
+                                                    onTap: () {
+                                                      targetComment = curComment;
+                                                      _setCommentMode(
+                                                          true,
+                                                          false);
+                                                      textFocusNode.requestFocus();
+                                                    },
+                                                    child:
+                                                    const Text(
+                                                      '답글 쓰기',
+                                                      style:
+                                                      TextStyle(
+                                                        fontSize:
+                                                        13,
+                                                        fontWeight:
+                                                        FontWeight
+                                                            .w500,
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ),
+                                              ],
+                                            )
+                                                : Visibility(
+                                              visible: curComment.parent_comment == null,
+                                              child: Row(
                                                 children: [
                                                   InkWell(
-                                                    onTap: () {
-                                                      CommentController(
-                                                        model: curComment,
-                                                        userProvider: userProvider,
-                                                      ).posVote().then((result) {
-                                                        if (result) update();
-                                                      });
-                                                    },
-                                                    child:
-                                                    SvgPicture.asset(
-                                                      curComment.my_vote ==
-                                                          true
-                                                          ? 'assets/icons/like_filled.svg'
-                                                          : 'assets/icons/like.svg',
-                                                      width: 17,
-                                                      height: 17,
-                                                      color:
-                                                      curComment.my_vote ==
-                                                          false
-                                                          ? ColorsInfo
-                                                          .noneVote
-                                                          : ColorsInfo
-                                                          .newara,
-                                                    ),
-                                                  ),
-                                                  const SizedBox(
-                                                      width: 3),
-                                                  Text(
-                                                    curComment
-                                                        .positive_vote_count
-                                                        .toString(),
-                                                    style: TextStyle(
-                                                      fontSize: 13,
-                                                      fontWeight:
-                                                      FontWeight.w500,
-                                                      color:
-                                                      curComment.my_vote ==
-                                                          false
-                                                          ? ColorsInfo
-                                                          .noneVote
-                                                          : ColorsInfo
-                                                          .posVote,
-                                                    ),
-                                                  ),
-                                                  const SizedBox(
-                                                      width: 6),
-                                                  InkWell(
-                                                    onTap: () async {
-                                                      CommentController(
-                                                        model: curComment,
-                                                        userProvider: userProvider,
-                                                      ).negVote().then((result) {
-                                                        if (result) update();
-                                                      });
-                                                    },
-                                                    child:
-                                                    SvgPicture.asset(
-                                                      curComment.my_vote ==
-                                                          false
-                                                          ? 'assets/icons/dislike_filled.svg'
-                                                          : 'assets/icons/dislike.svg',
-                                                      width: 17,
-                                                      height: 17,
-                                                      color: curComment
-                                                          .my_vote ==
-                                                          true
-                                                          ? ColorsInfo
-                                                          .noneVote
-                                                          : ColorsInfo
-                                                          .negVote,
-                                                    ),
-                                                  ),
-                                                  const SizedBox(
-                                                      width: 3),
-                                                  Text(
-                                                    curComment
-                                                        .negative_vote_count
-                                                        .toString(),
-                                                    style: TextStyle(
-                                                      fontSize: 13,
-                                                      fontWeight:
-                                                      FontWeight.w500,
-                                                      color: curComment
-                                                          .my_vote ==
-                                                          true
-                                                          ? ColorsInfo
-                                                          .noneVote
-                                                          : ColorsInfo
-                                                          .negVote,
-                                                    ),
-                                                  ),
-                                                  const SizedBox(
-                                                      width: 6),
-                                                  curComment.parent_comment !=
-                                                      null
-                                                      ? Container()
-                                                      : InkWell(
                                                     onTap: () {},
                                                     child:
                                                     SvgPicture
@@ -792,84 +830,41 @@ class _PostViewPageState extends State<PostViewPage> {
                                                       height: 12,
                                                     ),
                                                   ),
-                                                  const SizedBox(
-                                                      width: 5),
-                                                  Visibility(
-                                                    visible: curComment.parent_comment == null,
-                                                    child: InkWell(
-                                                      onTap: () {
-                                                        targetComment = curComment;
-                                                        _setCommentMode(
-                                                            true,
-                                                            false);
-                                                        textFocusNode.requestFocus();
-                                                      },
-                                                      child:
-                                                      const Text(
-                                                        '답글 쓰기',
-                                                        style:
-                                                        TextStyle(
-                                                          fontSize:
-                                                          13,
-                                                          fontWeight:
-                                                          FontWeight
-                                                              .w500,
-                                                        ),
+                                                  const SizedBox(width: 5),
+                                                  InkWell(
+                                                    onTap: () {
+                                                      targetComment =
+                                                          curComment;
+                                                      debugPrint(
+                                                          "parentCommentID: ${targetComment!.id}");
+                                                      _setCommentMode(
+                                                          true,
+                                                          false);
+                                                      textFocusNode
+                                                          .requestFocus();
+                                                    },
+                                                    child:
+                                                    const Text(
+                                                      '답글 쓰기',
+                                                      style:
+                                                      TextStyle(
+                                                        fontSize:
+                                                        13,
+                                                        fontWeight:
+                                                        FontWeight
+                                                            .w500,
                                                       ),
                                                     ),
                                                   ),
                                                 ],
-                                              )
-                                                  : Visibility(
-                                                visible: curComment.parent_comment == null,
-                                                child: Row(
-                                                  children: [
-                                                    InkWell(
-                                                      onTap: () {},
-                                                      child:
-                                                      SvgPicture
-                                                          .asset(
-                                                        'assets/icons/arrow_uturn_left_1.svg',
-                                                        width: 11,
-                                                        height: 12,
-                                                      ),
-                                                    ),
-                                                    const SizedBox(width: 5),
-                                                    InkWell(
-                                                      onTap: () {
-                                                        targetComment =
-                                                            curComment;
-                                                        debugPrint(
-                                                            "parentCommentID: ${targetComment!.id}");
-                                                        _setCommentMode(
-                                                            true,
-                                                            false);
-                                                        textFocusNode
-                                                            .requestFocus();
-                                                      },
-                                                      child:
-                                                      const Text(
-                                                        '답글 쓰기',
-                                                        style:
-                                                        TextStyle(
-                                                          fontSize:
-                                                          13,
-                                                          fontWeight:
-                                                          FontWeight
-                                                              .w500,
-                                                        ),
-                                                      ),
-                                                    ),
-                                                  ],
-                                                ),
-                                              )),
-                                        ],
-                                      ),
-                                    );
-                                  },
-                                  separatorBuilder:
-                                      (BuildContext context, int idx) => const Divider(),
-                                ),
+                                              ),
+                                            )),
+                                      ],
+                                    ),
+                                  );
+                                },
+                                separatorBuilder:
+                                    (BuildContext context, int idx) => const Divider(),
                               ),
                             ],
                           ),
