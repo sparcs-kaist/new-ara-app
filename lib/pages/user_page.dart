@@ -28,6 +28,7 @@ class _UserPageState extends State<UserPage>
     ScrollController(), // 담아둔 글 ListView
     ScrollController() // 최근 본 글 ListView
   ];
+  List<bool> isLoadingNewPage = [ false, false, false ];
 
   List<ArticleListActionModel> createdArticleList = [];
   List<ScrapModel> scrappedArticleList = [];
@@ -63,6 +64,10 @@ class _UserPageState extends State<UserPage>
     UserProvider userProvider = context.read<UserProvider>();
 
     loadAllData(userProvider);
+  }
+
+  void setIsLoadingNewPage(int index, bool value) {
+    if (mounted) setState(() => isLoadingNewPage[index] = value);
   }
 
   Future<void> loadAllData(UserProvider userProvider, {create=true, scrap=true, recent=true}) async {
@@ -108,33 +113,36 @@ class _UserPageState extends State<UserPage>
     }
   }
 
-  void _scrollListener0() {
+  void _scrollListener0() async {
     if (isLoadedList[0] &&
         scrollControllerList[0].position.pixels ==
             scrollControllerList[0].position.maxScrollExtent) {
-      fetchCreatedArticles(context.read<UserProvider>(), nextPage[0]).then((res) {
-        if (res) update();
-      });
+      setIsLoadingNewPage(0, true);
+      bool res = await fetchCreatedArticles(context.read<UserProvider>(), nextPage[0]);
+      if (res) update();
+      setIsLoadingNewPage(0, false);
     }
   }
 
-  void _scrollListener1() {
+  void _scrollListener1() async {
     if (isLoadedList[1] &&
         scrollControllerList[1].position.pixels ==
             scrollControllerList[1].position.maxScrollExtent) {
-      fetchScrappedArticles(context.read<UserProvider>(), nextPage[1]).then((res) {
-        if (res) update();
-      });
+      setIsLoadingNewPage(1, true);
+      bool res = await fetchScrappedArticles(context.read<UserProvider>(), nextPage[1]);
+      if (res) update();
+      setIsLoadingNewPage(1, false);
     }
   }
 
-  void _scrollListener2() {
+  void _scrollListener2() async {
     if (isLoadedList[2] &&
         scrollControllerList[2].position.pixels ==
             scrollControllerList[2].position.maxScrollExtent) {
-      fetchRecentArticles(context.read<UserProvider>(), nextPage[2]).then((res) {
-        if (res) update();
-      });
+      setIsLoadingNewPage(2, true);
+      bool res = await fetchRecentArticles(context.read<UserProvider>(), nextPage[2]);
+      if (res) update();
+      setIsLoadingNewPage(2, false);
     }
   }
 
@@ -420,6 +428,9 @@ class _UserPageState extends State<UserPage>
   }
 
   Widget _buildPostList(int tabIndex, UserProvider userProvider) {
+    int itemCount = (tabIndex == 0 ? createdArticleList.length : (tabIndex == 1
+        ? scrappedArticleList.length
+        : recentArticleList.length));
     return RefreshIndicator(
       color: ColorsInfo.newara,
       onRefresh: () async {
@@ -443,13 +454,20 @@ class _UserPageState extends State<UserPage>
         physics: const AlwaysScrollableScrollPhysics(),
         itemCount: !isLoadedList[tabIndex]
             ? 0
-            : (tabIndex == 0
-                ? createdArticleList.length
-                : (tabIndex == 1
-                    ? scrappedArticleList.length
-                    : recentArticleList.length)),
+            : 1 + itemCount,
         controller: scrollControllerList[tabIndex],
         itemBuilder: (context, index) {
+          if (index == itemCount) {
+            return Visibility(
+              visible: isLoadingNewPage[tabIndex],
+              child: const SizedBox(
+                height: 40,
+                child: Center(
+                  child: LoadingIndicator(),
+                ),
+              ),
+            );
+          }
           try {
             late ArticleListActionModel curPost;
             late ScrapModel scrapInfo;
