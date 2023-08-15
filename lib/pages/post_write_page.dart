@@ -76,6 +76,12 @@ class _PostWritePageState extends State<PostWritePage> {
     ko_name: "말머리 없음",
     en_name: "No Topic",
   );
+  final _defaultTopicModel2 = TopicModel(
+    id: -1,
+    slug: "",
+    ko_name: "말머리를 선택하세요",
+    en_name: "No Topic",
+  );
   final _defaultBoardDetailActionModel = BoardDetailActionModel(
     id: -1,
     topics: [],
@@ -520,7 +526,7 @@ class _PostWritePageState extends State<PostWritePage> {
     void setSpecTopicList(BoardDetailActionModel? value) {
       setState(() {
         _specTopicList = [];
-        _specTopicList.add(_defaultTopicModel);
+        _specTopicList.add(_defaultTopicModel2);
         for (TopicModel topic in value!.topics) {
           _specTopicList.add(topic);
         }
@@ -627,9 +633,6 @@ class _PostWritePageState extends State<PostWritePage> {
                           //  isDense: true,
                           //isExpanded: true,
 
-                          onTap: () {
-                            debugPrint("d");
-                          },
                           //isExpanded: true,
                           value: _chosenBoardValue,
                           style: TextStyle(color: Colors.red),
@@ -644,7 +647,7 @@ class _PostWritePageState extends State<PostWritePage> {
                                 child: Text(
                                   value.ko_name,
                                   style: TextStyle(
-                                    color: value.id == -1
+                                    color: value.id == -1 || _isEditingPost
                                         ? Color(0xFFBBBBBB)
                                         : ColorsInfo.newara,
                                     fontWeight: FontWeight.w500,
@@ -654,7 +657,7 @@ class _PostWritePageState extends State<PostWritePage> {
                               ),
                             );
                           }).toList(),
-                          onChanged: setSpecTopicList,
+                          onChanged: _isEditingPost ? null : setSpecTopicList,
                         ),
                       ),
                     ),
@@ -689,7 +692,7 @@ class _PostWritePageState extends State<PostWritePage> {
                                 child: Text(
                                   value.ko_name,
                                   style: TextStyle(
-                                    color: value.id == -1
+                                    color: value.id == -1 || _isEditingPost
                                         ? Color(0xFFBBBBBB)
                                         : Colors.black,
                                     fontWeight: FontWeight.w500,
@@ -699,11 +702,13 @@ class _PostWritePageState extends State<PostWritePage> {
                               ),
                             );
                           }).toList(),
-                          onChanged: (TopicModel? value) {
-                            setState(() {
-                              _chosenTopicValue = value;
-                            });
-                          },
+                          onChanged: _isEditingPost
+                              ? null
+                              : (TopicModel? value) {
+                                  setState(() {
+                                    _chosenTopicValue = value;
+                                  });
+                                },
                         ),
                       ),
                     ),
