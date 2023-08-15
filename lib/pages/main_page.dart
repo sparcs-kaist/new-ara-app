@@ -44,11 +44,12 @@ class _MainPageState extends State<MainPage> {
 
   void refreshDailyBest(UserProvider userProvider) async {
     // api 호출과 Provider 정보 동기화.
-    List<dynamic> recentJson =
-        (await userProvider.getApiRes("articles/recent/"))['results'];
+
+    List<dynamic> topArticelsJson =
+        (await userProvider.getApiRes("articles/top/"))['results'];
     if (mounted) {
       setState(() {
-        for (Map<String, dynamic> json in recentJson) {
+        for (Map<String, dynamic> json in topArticelsJson) {
           try {
             dailyBestContentList.add(ArticleListActionModel.fromJson(json));
           } catch (error) {
