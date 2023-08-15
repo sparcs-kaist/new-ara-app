@@ -26,6 +26,9 @@ class PostViewPage extends StatefulWidget {
 }
 
 class _PostViewPageState extends State<PostViewPage> {
+  final List<GlobalKey> _commentKeys = [];
+  final GlobalKey _textFieldKey = GlobalKey();
+
   late ArticleModel article;
   late bool isReportable, isValid, isModify, isNestedComment, isSending;
   late List<CommentNestedCommentListActionModel> commentList;
@@ -66,6 +69,7 @@ class _PostViewPageState extends State<PostViewPage> {
     return !isValid
         ? const LoadingIndicator()
         : Scaffold(
+            resizeToAvoidBottomInset: false,
             appBar: AppBar(
               leading: IconButton(
                 color: ColorsInfo.newara,
@@ -557,12 +561,14 @@ class _PostViewPageState extends State<PostViewPage> {
                                 padding: const EdgeInsets.only(bottom: 15),
                                 shrinkWrap: true,
                                 physics: const NeverScrollableScrollPhysics(),
-                                controller: _scrollController,
                                 itemCount: commentList.length,
                                 itemBuilder: (BuildContext context, int idx) {
+                                  if (idx == 0) _commentKeys.clear();
+                                  _commentKeys.add(GlobalKey());
                                   CommentNestedCommentListActionModel
                                   curComment = commentList[idx];
                                   return Container(
+                                    key: _commentKeys[idx],
                                     margin: EdgeInsets.only(
                                         left:
                                         (curComment.parent_comment == null
@@ -674,7 +680,7 @@ class _PostViewPageState extends State<PostViewPage> {
                                             ),
                                           ),
                                         ),
-                                        const SizedBox(height: 5),
+                                        const SizedBox(height: 8),
                                         Container(
                                             margin: const EdgeInsets.only(
                                                 left: 30),
@@ -790,6 +796,7 @@ class _PostViewPageState extends State<PostViewPage> {
                                                           true,
                                                           false);
                                                       textFocusNode.requestFocus();
+                                                      moveCommentContainer(idx);
                                                     },
                                                     child: Row(
                                                       children: [
@@ -830,11 +837,12 @@ class _PostViewPageState extends State<PostViewPage> {
                         ),
                       ),
                     ),
-                    const SizedBox(height: 15),
                     // 댓글 입력 부분
                     Column(
+                    key: _textFieldKey,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
+                      const SizedBox(height: 15),
                       Visibility(
                         visible: isNestedComment,
                         child: Column(
@@ -934,14 +942,14 @@ class _PostViewPageState extends State<PostViewPage> {
                           ),
                         ],
                       ),
+                      const SizedBox(height: 15),
                     ],
                   ),
-                    SizedBox(
-                      height: 15,
-                      child: Container(
-                        color: Colors.white,
-                      ),
+                  Padding(
+                    padding: EdgeInsets.only(
+                      bottom: MediaQuery.of(context).viewInsets.bottom,
                     ),
+                  ),
                   ]),
                 ),
               ),
@@ -1058,9 +1066,10 @@ class _PostViewPageState extends State<PostViewPage> {
         switch (result) {
           case 'Modify':
             _textEditingController.text = commentList[idx].content.toString();
-            textFocusNode.requestFocus();
-            _setCommentMode(false, true);
             targetComment = commentList[idx];
+            _setCommentMode(false, true);
+            textFocusNode.requestFocus();
+            moveCommentContainer(idx);
             break;
           case 'Delete':
             showDialog(
@@ -1291,6 +1300,28 @@ class _PostViewPageState extends State<PostViewPage> {
     return InArticleWebView(
       content: getContentHtml(content),
       initialHeight: 10,
+    );
+  }
+
+  void moveCommentContainer(int idx) {
+    Future.delayed(
+      const Duration(milliseconds: 500), () {
+        if (_commentKeys[idx].currentContext == null || _textFieldKey.currentContext == null) return;
+        MediaQueryData mqd = MediaQuery.of(context);
+        RenderBox commentBox = _commentKeys[idx].currentContext!.findRenderObject() as RenderBox;
+        RenderBox textFieldBox = _textFieldKey.currentContext!.findRenderObject() as RenderBox;
+
+        double widgetHeight = commentBox.localToGlobal(Offset.zero).dy;
+        double bottomHeight = mqd.viewInsets.bottom + textFieldBox.size.height;
+        double diff = (bottomHeight + widgetHeight) - mqd.size.height;
+
+        if (diff > 0) {
+          debugPrint("diff: $diff");
+          _scrollController.jumpTo(
+              _scrollController.position.pixels + diff + commentBox.size.height
+          );
+        }
+      }
     );
   }
 
