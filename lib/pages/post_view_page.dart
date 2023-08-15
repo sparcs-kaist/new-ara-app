@@ -69,7 +69,6 @@ class _PostViewPageState extends State<PostViewPage> {
     return !isValid
         ? const LoadingIndicator()
         : Scaffold(
-            resizeToAvoidBottomInset: false,
             appBar: AppBar(
               leading: IconButton(
                 color: ColorsInfo.newara,
@@ -563,8 +562,6 @@ class _PostViewPageState extends State<PostViewPage> {
                                 physics: const NeverScrollableScrollPhysics(),
                                 itemCount: commentList.length,
                                 itemBuilder: (BuildContext context, int idx) {
-                                  if (idx == 0) _commentKeys.clear();
-                                  _commentKeys.add(GlobalKey());
                                   CommentNestedCommentListActionModel
                                   curComment = commentList[idx];
                                   return Container(
@@ -837,12 +834,12 @@ class _PostViewPageState extends State<PostViewPage> {
                         ),
                       ),
                     ),
+                    const SizedBox(height: 15),
                     // 댓글 입력 부분
                     Column(
                     key: _textFieldKey,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const SizedBox(height: 15),
                       Visibility(
                         visible: isNestedComment,
                         child: Column(
@@ -944,11 +941,6 @@ class _PostViewPageState extends State<PostViewPage> {
                       ),
                       const SizedBox(height: 15),
                     ],
-                  ),
-                  Padding(
-                    padding: EdgeInsets.only(
-                      bottom: MediaQuery.of(context).viewInsets.bottom,
-                    ),
                   ),
                   ]),
                 ),
@@ -1307,18 +1299,19 @@ class _PostViewPageState extends State<PostViewPage> {
     Future.delayed(
       const Duration(milliseconds: 500), () {
         if (_commentKeys[idx].currentContext == null || _textFieldKey.currentContext == null) return;
-        MediaQueryData mqd = MediaQuery.of(context);
         RenderBox commentBox = _commentKeys[idx].currentContext!.findRenderObject() as RenderBox;
         RenderBox textFieldBox = _textFieldKey.currentContext!.findRenderObject() as RenderBox;
 
-        double widgetHeight = commentBox.localToGlobal(Offset.zero).dy;
-        double bottomHeight = mqd.viewInsets.bottom + textFieldBox.size.height;
-        double diff = (bottomHeight + widgetHeight) - mqd.size.height;
+        double commentHeight = commentBox.localToGlobal(Offset.zero).dy;
+        double textFieldHeight = textFieldBox.localToGlobal(Offset.zero).dy;
+        double diff = commentHeight - textFieldHeight;
 
-        if (diff > 0) {
-          debugPrint("diff: $diff");
-          _scrollController.jumpTo(
-              _scrollController.position.pixels + diff + commentBox.size.height
+        debugPrint("diff: $diff");
+        if (diff > -15) {
+          _scrollController.animateTo(
+            _scrollController.position.pixels + diff + textFieldBox.size.height,
+            duration: const Duration(milliseconds: 100),
+            curve: Curves.easeInOut,
           );
         }
       }
@@ -1383,6 +1376,7 @@ class _PostViewPageState extends State<PostViewPage> {
     }
 
     commentList.clear();
+    _commentKeys.clear();
     for (ArticleNestedCommentListAction anc in article.comments) {
       commentJson = await userProvider.getApiRes("comments/${anc.id}");
       if (commentJson == null) continue;
@@ -1395,6 +1389,7 @@ class _PostViewPageState extends State<PostViewPage> {
         // 대댓글을 CommentNestedCommentListActionModel 에 저장되지만 댓글도 CommentNestedCommentListActionModel 에 저장하여 더 편하게 함.
         tmpModel = CommentNestedCommentListActionModel.fromJson(commentJson);
         commentList.add(tmpModel);
+        _commentKeys.add(GlobalKey());
       } catch (error) {
         debugPrint(
             "CommentNestedCommentListActionModel.fromJson failed at ID ${anc.id}: $error");
@@ -1405,6 +1400,7 @@ class _PostViewPageState extends State<PostViewPage> {
       for (CommentNestedCommentListActionModel cnc in anc.comments) {
         try {
           commentList.add(cnc);
+          _commentKeys.add(GlobalKey());
         } catch (error) {
           debugPrint(
               "CommentNestedCommentListActionModel.fromJson failed at ID ${cnc.id}: $error\n");
