@@ -224,7 +224,7 @@ class _PostWritePageState extends State<PostWritePage> {
 
       int id = attachment.id;
       String? fileUrlPath = attachment.file;
-      String fileUrlName = extractAndDecodeFileNameFromUrl(attachment.file);
+      String fileUrlName = _extractAndDecodeFileNameFromUrl(attachment.file);
       int? fileUrlSize = attachment.size ?? 0;
       _attachmentList.add(AttachmentsFormat(
           fileType: FileType.Image,
@@ -247,7 +247,7 @@ class _PostWritePageState extends State<PostWritePage> {
     });
     setState(() {
       BoardDetailActionModel boardDetailActionModel =
-          findBoardListValue(widget.previousArticle!.parent_board.slug);
+          _findBoardListValue(widget.previousArticle!.parent_board.slug);
       _specTopicList = [];
       _specTopicList.add(_defaultTopicModel);
       for (TopicModel topic in boardDetailActionModel.topics) {
@@ -255,12 +255,12 @@ class _PostWritePageState extends State<PostWritePage> {
       }
       _chosenTopicValue = widget.previousArticle!.parent_topic == null
           ? _specTopicList[0]
-          : findSpecTopicListValue(widget.previousArticle!.parent_topic!.slug);
+          : _findSpecTopicListValue(widget.previousArticle!.parent_topic!.slug);
       _chosenBoardValue = boardDetailActionModel;
     });
   }
 
-  BoardDetailActionModel findBoardListValue(String slug) {
+  BoardDetailActionModel _findBoardListValue(String slug) {
     for (BoardDetailActionModel board in _boardList) {
       if (board.slug == slug) {
         return board;
@@ -269,7 +269,7 @@ class _PostWritePageState extends State<PostWritePage> {
     return _defaultBoardDetailActionModel;
   }
 
-  TopicModel findSpecTopicListValue(String slug) {
+  TopicModel _findSpecTopicListValue(String slug) {
     for (TopicModel topic in _specTopicList) {
       if (topic.slug == slug) {
         return topic;
@@ -278,9 +278,22 @@ class _PostWritePageState extends State<PostWritePage> {
     return _defaultTopicModel;
   }
 
-  String extractAndDecodeFileNameFromUrl(String url) {
+  String _extractAndDecodeFileNameFromUrl(String url) {
     String encodedFilename = url.split('/').last;
     return Uri.decodeFull(encodedFilename);
+  }
+
+  void _getCurrentHtmlContent() async {
+    try {
+      String tmp = await _htmlController.getText();
+      setState(() {
+        _currentHtmlContent = tmp;
+      });
+    } catch (error) {
+      debugPrint(
+          "refreshBoardList BoardDetailActionModel.fromJson failed: $error");
+      return;
+    }
   }
 
   @override
@@ -294,6 +307,8 @@ class _PostWritePageState extends State<PostWritePage> {
         _currentHtmlContent != '' &&
         _currentHtmlContent != '<p><br></p>' &&
         _isUploadingPost == false;
+
+    _getCurrentHtmlContent();
 
     String updateImgTagSrc(htmlString, uuid, fileUrl) {
       var document = parse(htmlString);
@@ -803,75 +818,83 @@ class _PostWritePageState extends State<PostWritePage> {
                     color: Color(0xFFF0F0F0),
                   ),
                   Expanded(
-                    child: SingleChildScrollView(
-                      child: HtmlEditor(
-                        callbacks: Callbacks(onChangeContent: (String? value) {
-                          debugPrint("onChangeContent: $value");
-                          setState(() {
-                            _currentHtmlContent = value!;
-                          });
-                        }),
-                        controller: _htmlController, //required
-                        htmlEditorOptions: HtmlEditorOptions(
-                            hint: "내용을 입력해주세요.",
-                            shouldEnsureVisible: true,
-                            initialText: widget.previousArticle == null
-                                ? null
-                                : widget.previousArticle!.content),
-                        htmlToolbarOptions: HtmlToolbarOptions(
-                            toolbarType: ToolbarType.nativeGrid,
-                            mediaUploadInterceptor:
-                                (PlatformFile file, InsertFileType type) async {
-                              if (type == InsertFileType.image) {
-                                // var uuid = Uuid();
-                                String uuid = const Uuid().v4();
-                                setState(() {
-                                  _isFileMenuBarSelected = true;
-                                  _attachmentList.add(AttachmentsFormat(
-                                    fileType: FileType.Image,
-                                    isNewFile: true,
-                                    fileLocalPath: file.path,
-                                    uuid: uuid,
-                                  ));
-                                });
-
-                                ///src랑 file.path랑 연결해줘야함.
-                                String base64Data = base64.encode(file.bytes!);
-                                String base64Image =
-                                    """<img data-uuid=$uuid  src="data:image/${file.extension};base64,$base64Data" data-filename="${file.name}" width=100% />""";
-                                _htmlController.insertHtml(base64Image);
-                              }
-                              return false;
-                            },
-                            defaultToolbarButtons: [
-                              // FontSettingButtons(),
-                              const FontButtons(
-                                bold: true,
-                                italic: true,
-                                underline: true,
-                                clearAll: true,
-                                strikethrough: true,
-                                superscript: false,
-                                subscript: false,
-
-                                // StyleButtons(
-                              ),
-                              const InsertButtons(
-                                link: true,
-                                picture: true,
-                                audio: false,
-                                video: false,
-                                otherFile: false,
-                                table: false,
-                                hr: true,
-                              )
-                              // ColorButtons(),
-                            ]),
-
-                        otherOptions: OtherOptions(
-                          height: 1000,
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        HtmlEditor(
+                          // callbacks:
+                          //     Callbacks(onChangeContent: (String? value) {
+                          //   debugPrint("onChangeContent:R!!!!!!!!!!!!!!!!");
+                          //   setState(() {
+                          //     _currentHtmlContent = value!;
+                          //   });
+                          // }),
+                          controller: _htmlController, //required
+                          htmlEditorOptions: HtmlEditorOptions(
+                              hint: "내용을 입력해주세요.",
+                              initialText: widget.previousArticle == null
+                                  ? null
+                                  : widget.previousArticle!.content),
+                          htmlToolbarOptions: HtmlToolbarOptions(
+                              toolbarType: ToolbarType.nativeGrid,
+                              mediaUploadInterceptor: (PlatformFile file,
+                                  InsertFileType type) async {
+                                if (type == InsertFileType.image) {
+                                  // var uuid = Uuid();
+                                  String uuid = const Uuid().v4();
+                                  setState(() {
+                                    _isFileMenuBarSelected = true;
+                                    _attachmentList.add(AttachmentsFormat(
+                                      fileType: FileType.Image,
+                                      isNewFile: true,
+                                      fileLocalPath: file.path,
+                                      uuid: uuid,
+                                    ));
+                                  });
+                    
+                                  ///src랑 file.path랑 연결해줘야함.
+                                  String base64Data =
+                                      base64.encode(file.bytes!);
+                                  String base64Image =
+                                      """<img data-uuid=$uuid  src="data:image/${file.extension};base64,$base64Data" data-filename="${file.name}" width=100% />""";
+                                  _htmlController.insertHtml(base64Image);
+                                }
+                                return false;
+                              },
+                              defaultToolbarButtons: [
+                                // FontSettingButtons(),
+                                const FontButtons(
+                                  bold: true,
+                                  italic: true,
+                                  underline: true,
+                                  clearAll: true,
+                                  strikethrough: true,
+                                  superscript: false,
+                                  subscript: false,
+                    
+                                  // StyleButtons(
+                                ),
+                                const InsertButtons(
+                                  link: true,
+                                  picture: true,
+                                  audio: false,
+                                  video: false,
+                                  otherFile: false,
+                                  table: false,
+                                  hr: true,
+                                )
+                                // ColorButtons(),
+                              ]),
+                    
+                          otherOptions: OtherOptions(
+                            height: 10000,
+                          ),
                         ),
-                      ),
+                        Container(
+                          color: Colors.blue,
+                          height: 10,
+                        )
+                      ],
                     ),
                   ),
                 ],
