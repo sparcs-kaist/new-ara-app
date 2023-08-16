@@ -1,7 +1,11 @@
 import 'dart:core';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter/gestures.dart';
+import 'package:webview_flutter/webview_flutter.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import 'package:new_ara_app/constants/colors_info.dart';
 import 'package:new_ara_app/models/article_model.dart';
@@ -15,6 +19,7 @@ import 'package:new_ara_app/utils/html_info.dart';
 import 'package:new_ara_app/pages/user_view_page.dart';
 import 'package:new_ara_app/pages/post_write_page.dart';
 import 'package:new_ara_app/utils/post_view_utils.dart';
+import 'package:new_ara_app/constants/url_info.dart';
 
 
 class PostViewPage extends StatefulWidget {
@@ -40,6 +45,8 @@ class _PostViewPageState extends State<PostViewPage> {
   final ScrollController _scrollController = ScrollController();
   final TextEditingController _textEditingController = TextEditingController();
 
+  late InArticleWebView inArticleWebView;
+
   @override
   void initState() {
     super.initState();
@@ -48,8 +55,14 @@ class _PostViewPageState extends State<PostViewPage> {
     isSending = false;
     commentList = [];
     UserProvider userProvider = context.read<UserProvider>();
+    userProvider.setIsWebViewLoaded(false);
     _fetchArticle(userProvider).then((value) {
       isReportable = value ? !article.is_mine : false;
+      inArticleWebView = InArticleWebView(
+        content: getContentHtml(
+            article.content ?? "내용이 존재하지 않습니다."),
+        initialHeight: 150,
+      );
       _setIsValid(value);
     });
   }
@@ -66,777 +79,775 @@ class _PostViewPageState extends State<PostViewPage> {
   Widget build(BuildContext context) {
     UserProvider userProvider = context.read<UserProvider>();
 
-    return !isValid
-        ? const LoadingIndicator()
-        : Scaffold(
-            appBar: AppBar(
-              leading: IconButton(
-                color: ColorsInfo.newara,
-                icon: SvgPicture.asset('assets/icons/left_chevron.svg',
-                    color: ColorsInfo.newara, width: 10.7, height: 18.99),
-                onPressed: () => Navigator.pop(context),
-              ),
+    return Stack(
+      children: [
+        !isValid ? Container() : Scaffold(
+          appBar: AppBar(
+            leading: IconButton(
+              color: ColorsInfo.newara,
+              icon: SvgPicture.asset('assets/icons/left_chevron.svg',
+                  color: ColorsInfo.newara, width: 10.7, height: 18.99),
+              onPressed: () {
+                Navigator.pop(context);
+              },
             ),
-            body: SafeArea(
-              child: GestureDetector(
-                onTap: () => FocusScope.of(context).unfocus(),
-                child: Container(
-                  margin: const EdgeInsets.symmetric(horizontal: 20),
-                  child: Column(children: [
-                    // article 부분
-                    Expanded(
-                      child: RefreshIndicator(
-                        color: ColorsInfo.newara,
-                        onRefresh: () async {
-                          _setIsValid(false);
-                          _setIsValid(await _fetchArticle(userProvider));
-                        },
-                        child: SingleChildScrollView(
-                          physics: const AlwaysScrollableScrollPhysics(),
-                          controller: _scrollController,
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                article.title.toString(),
-                                style: const TextStyle(
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.w700,
-                                ),
+          ),
+          body: SafeArea(
+            child: GestureDetector(
+              onTap: () => FocusScope.of(context).unfocus(),
+              child: Container(
+                margin: const EdgeInsets.symmetric(horizontal: 20),
+                child: Column(children: [
+                  // article 부분
+                  Expanded(
+                    child: RefreshIndicator(
+                      color: ColorsInfo.newara,
+                      onRefresh: () async {
+                        _setIsValid(false);
+                        _setIsValid(await _fetchArticle(userProvider));
+                      },
+                      child: SingleChildScrollView(
+                        physics: const AlwaysScrollableScrollPhysics(),
+                        controller: _scrollController,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              article.title.toString(),
+                              style: const TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.w700,
                               ),
-                              const SizedBox(height: 5),
-                              // 날짜, 조회수, 좋아요, 싫어요, 댓글 수를 표시하는 Row
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  // 날짜, 조회수 표시 Row
-                                  Row(
-                                    children: [
-                                      Text(
-                                        getTime(article.created_at),
-                                        style: const TextStyle(
-                                          fontSize: 12,
-                                          fontWeight: FontWeight.w500,
-                                          color:
-                                              Color.fromRGBO(177, 177, 177, 1),
-                                        ),
+                            ),
+                            const SizedBox(height: 5),
+                            // 날짜, 조회수, 좋아요, 싫어요, 댓글 수를 표시하는 Row
+                            Row(
+                              mainAxisAlignment:
+                              MainAxisAlignment.spaceBetween,
+                              children: [
+                                // 날짜, 조회수 표시 Row
+                                Row(
+                                  children: [
+                                    Text(
+                                      getTime(article.created_at),
+                                      style: const TextStyle(
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.w500,
+                                        color:
+                                        Color.fromRGBO(177, 177, 177, 1),
                                       ),
-                                      const SizedBox(width: 10),
-                                      Text(
-                                        '조회 ${article.hit_count}',
-                                        style: const TextStyle(
-                                          fontSize: 12,
-                                          fontWeight: FontWeight.w500,
-                                          color:
-                                              Color.fromRGBO(177, 177, 177, 1),
-                                        ),
+                                    ),
+                                    const SizedBox(width: 10),
+                                    Text(
+                                      '조회 ${article.hit_count}',
+                                      style: const TextStyle(
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.w500,
+                                        color:
+                                        Color.fromRGBO(177, 177, 177, 1),
                                       ),
-                                    ],
-                                  ),
-                                  // 좋아요, 싫어요, 댓글 갯수 표시 Row
-                                  Row(
-                                    children: [
-                                      SvgPicture.asset(
-                                        article.my_vote == true
-                                            ? 'assets/icons/like_filled.svg'
-                                            : 'assets/icons/like.svg',
-                                        width: 13,
-                                        height: 15,
-                                        color: article.my_vote == false
-                                            ? ColorsInfo.noneVote
-                                            : ColorsInfo.newara,
-                                      ),
-                                      const SizedBox(width: 3),
-                                      Text('${article.positive_vote_count}',
-                                          style: TextStyle(
-                                              fontSize: 14,
-                                              fontWeight: FontWeight.w500,
-                                              color: article.my_vote == false
-                                                  ? ColorsInfo.noneVote
-                                                  : ColorsInfo.newara)),
-                                      const SizedBox(width: 10),
-                                      SvgPicture.asset(
-                                        article.my_vote == false
-                                            ? 'assets/icons/dislike_filled.svg'
-                                            : 'assets/icons/dislike.svg',
-                                        width: 13,
-                                        height: 15,
-                                        color: article.my_vote == true
-                                            ? ColorsInfo.noneVote
-                                            : ColorsInfo.negVote,
-                                      ),
-                                      const SizedBox(width: 3),
-                                      Text('${article.negative_vote_count}',
-                                          style: TextStyle(
+                                    ),
+                                  ],
+                                ),
+                                // 좋아요, 싫어요, 댓글 갯수 표시 Row
+                                Row(
+                                  children: [
+                                    SvgPicture.asset(
+                                      article.my_vote == true
+                                          ? 'assets/icons/like_filled.svg'
+                                          : 'assets/icons/like.svg',
+                                      width: 13,
+                                      height: 15,
+                                      color: article.my_vote == false
+                                          ? ColorsInfo.noneVote
+                                          : ColorsInfo.newara,
+                                    ),
+                                    const SizedBox(width: 3),
+                                    Text('${article.positive_vote_count}',
+                                        style: TextStyle(
                                             fontSize: 14,
                                             fontWeight: FontWeight.w500,
-                                            color: article.my_vote == true
+                                            color: article.my_vote == false
                                                 ? ColorsInfo.noneVote
-                                                : ColorsInfo.negVote,
-                                          )),
-                                      const SizedBox(width: 10),
-                                      SvgPicture.asset(
-                                        'assets/icons/comment.svg',
-                                        width: 13,
-                                        height: 15,
-                                        color:
-                                            const Color.fromRGBO(99, 99, 99, 1),
-                                      ),
-                                      const SizedBox(width: 3),
-                                      Text('${article.comment_count}',
-                                          style: const TextStyle(
-                                              fontSize: 14,
-                                              fontWeight: FontWeight.w500,
-                                              color: Color.fromRGBO(
-                                                  99, 99, 99, 1))),
-                                    ],
+                                                : ColorsInfo.newara)),
+                                    const SizedBox(width: 10),
+                                    SvgPicture.asset(
+                                      article.my_vote == false
+                                          ? 'assets/icons/dislike_filled.svg'
+                                          : 'assets/icons/dislike.svg',
+                                      width: 13,
+                                      height: 15,
+                                      color: article.my_vote == true
+                                          ? ColorsInfo.noneVote
+                                          : ColorsInfo.negVote,
+                                    ),
+                                    const SizedBox(width: 3),
+                                    Text('${article.negative_vote_count}',
+                                        style: TextStyle(
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.w500,
+                                          color: article.my_vote == true
+                                              ? ColorsInfo.noneVote
+                                              : ColorsInfo.negVote,
+                                        )),
+                                    const SizedBox(width: 10),
+                                    SvgPicture.asset(
+                                      'assets/icons/comment.svg',
+                                      width: 13,
+                                      height: 15,
+                                      color:
+                                      const Color.fromRGBO(99, 99, 99, 1),
+                                    ),
+                                    const SizedBox(width: 3),
+                                    Text('${article.comment_count}',
+                                        style: const TextStyle(
+                                            fontSize: 14,
+                                            fontWeight: FontWeight.w500,
+                                            color: Color.fromRGBO(
+                                                99, 99, 99, 1))),
+                                  ],
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 10),
+                            // 유저 정보 (프로필 이미지, 닉네임)
+                            InkWell(
+                              onTap: article.name_type == 2 ? null : () async {
+                                await Navigator.push(
+                                  context,
+                                  MaterialPageRoute(builder: (context) => UserViewPage(userID: article.created_by.id)),
+                                );
+                                _setIsValid(await _fetchArticle(userProvider));
+                              },
+                              child: Row(
+                                children: [
+                                  Container(
+                                    width: 30,
+                                    height: 30,
+                                    decoration: const BoxDecoration(
+                                      shape: BoxShape.circle,
+                                      color: Colors.grey,
+                                    ),
+                                    child: ClipRRect(
+                                      borderRadius: const BorderRadius.all(
+                                          Radius.circular(100)),
+                                      child: Image.network(article
+                                          .created_by.profile.picture
+                                          .toString()),
+                                    ),
+                                  ),
+                                  const SizedBox(width: 10),
+                                  Container(
+                                      constraints: BoxConstraints(
+                                          maxWidth: MediaQuery.of(context)
+                                              .size
+                                              .width -
+                                              150),
+                                      child: Text(
+                                        article.created_by.profile.nickname
+                                            .toString(),
+                                        style: const TextStyle(
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.w500,
+                                        ),
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                      )),
+                                  const SizedBox(width: 10),
+                                  Visibility(
+                                    visible: article.created_by.profile.nickname != "익명",
+                                    child: SvgPicture.asset(
+                                      'assets/icons/right_chevron.svg',
+                                      color: Colors.black,
+                                      width: 5,
+                                      height: 9,
+                                    ),
                                   ),
                                 ],
                               ),
-                              const SizedBox(height: 10),
-                              // 유저 정보 (프로필 이미지, 닉네임)
-                              InkWell(
-                                onTap: article.name_type == 2 ? null : () async {
-                                  await Navigator.push(
-                                    context,
-                                    MaterialPageRoute(builder: (context) => UserViewPage(userID: article.created_by.id)),
-                                  );
-                                  _setIsValid(await _fetchArticle(userProvider));
-                                },
-                                child: Row(
-                                  children: [
-                                    Container(
-                                      width: 30,
-                                      height: 30,
-                                      decoration: const BoxDecoration(
-                                        shape: BoxShape.circle,
-                                        color: Colors.grey,
-                                      ),
-                                      child: ClipRRect(
-                                        borderRadius: const BorderRadius.all(
-                                            Radius.circular(100)),
-                                        child: Image.network(article
-                                            .created_by.profile.picture
-                                            .toString()),
-                                      ),
-                                    ),
-                                    const SizedBox(width: 10),
-                                    Container(
-                                        constraints: BoxConstraints(
-                                            maxWidth: MediaQuery.of(context)
-                                                    .size
-                                                    .width -
-                                                150),
-                                        child: Text(
-                                          article.created_by.profile.nickname
-                                              .toString(),
-                                          style: const TextStyle(
-                                            fontSize: 14,
-                                            fontWeight: FontWeight.w500,
-                                          ),
-                                          maxLines: 1,
-                                          overflow: TextOverflow.ellipsis,
-                                        )),
-                                    const SizedBox(width: 10),
-                                    Visibility(
-                                      visible: article.created_by.profile.nickname != "익명",
-                                      child: SvgPicture.asset(
-                                        'assets/icons/right_chevron.svg',
-                                        color: Colors.black,
-                                        width: 5,
-                                        height: 9,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              const Divider(thickness: 1,),
-                              // (2023.08.09)첨부파일 리스트뷰 프로토타입. 추후 디자이너와 조율 예정
-                              Visibility(
-                                visible: article.attachments.isNotEmpty,
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.end,
-                                  children: [
-                                    _buildAttachMenuButton(article.attachments.length),
-                                  ],
-                                ),
-                              ),
-                              const SizedBox(height: 5),
-                              InArticleWebView(
-                                content: getContentHtml(
-                                    article.content ?? "내용이 존재하지 않습니다."),
-                                initialHeight: 150,
-                              ),
-                              const SizedBox(height: 10),
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
+                            ),
+                            const Divider(thickness: 1,),
+                            // (2023.08.09)첨부파일 리스트뷰 프로토타입. 추후 디자이너와 조율 예정
+                            Visibility(
+                              visible: article.attachments.isNotEmpty,
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.end,
                                 children: [
-                                  InkWell(
-                                    onTap: () async {
-                                      bool res = await ArticleController(
+                                  _buildAttachMenuButton(article.attachments.length),
+                                ],
+                              ),
+                            ),
+                            const SizedBox(height: 5),
+                            inArticleWebView,
+                            const SizedBox(height: 10),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                InkWell(
+                                  onTap: () async {
+                                    bool res = await ArticleController(
+                                      model: article,
+                                      userProvider: userProvider,
+                                    ).posVote();
+                                    if (res) update();
+                                  },
+                                  child: SizedBox(
+                                    width: 25,
+                                    height: 25,
+                                    child: SvgPicture.asset(
+                                      article.my_vote == true
+                                          ? 'assets/icons/like_filled.svg'
+                                          : 'assets/icons/like.svg',
+                                      color: article.my_vote == false
+                                          ? ColorsInfo.noneVote
+                                          : ColorsInfo.newara,
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(width: 3),
+                                Text('${article.positive_vote_count}',
+                                    style: TextStyle(
+                                      fontSize: 20,
+                                      fontWeight: FontWeight.w500,
+                                      color: article.my_vote == false
+                                          ? ColorsInfo.noneVote
+                                          : ColorsInfo.posVote,
+                                    )),
+                                const SizedBox(width: 20),
+                                InkWell(
+                                    onTap: () {
+                                      ArticleController(
                                         model: article,
                                         userProvider: userProvider,
-                                      ).posVote();
-                                      if (res) update();
+                                      ).negVote().then((result) {
+                                        if (result) update();
+                                      });
                                     },
                                     child: SizedBox(
                                       width: 25,
                                       height: 25,
                                       child: SvgPicture.asset(
-                                        article.my_vote == true
-                                            ? 'assets/icons/like_filled.svg'
-                                            : 'assets/icons/like.svg',
-                                        color: article.my_vote == false
+                                        article.my_vote == false
+                                            ? 'assets/icons/dislike_filled.svg'
+                                            : 'assets/icons/dislike.svg',
+                                        color: article.my_vote == true
                                             ? ColorsInfo.noneVote
-                                            : ColorsInfo.newara,
+                                            : ColorsInfo.negVote,
                                       ),
-                                    ),
-                                  ),
-                                  const SizedBox(width: 3),
-                                  Text('${article.positive_vote_count}',
-                                      style: TextStyle(
-                                        fontSize: 20,
-                                        fontWeight: FontWeight.w500,
-                                        color: article.my_vote == false
-                                            ? ColorsInfo.noneVote
-                                            : ColorsInfo.posVote,
-                                      )),
-                                  const SizedBox(width: 20),
-                                  InkWell(
+                                    )),
+                                const SizedBox(width: 3),
+                                Text('${article.negative_vote_count}',
+                                    style: TextStyle(
+                                      fontSize: 20,
+                                      fontWeight: FontWeight.w500,
+                                      color: article.my_vote == true
+                                          ? ColorsInfo.noneVote
+                                          : ColorsInfo.negVote,
+                                    )),
+                              ],
+                            ),
+                            const SizedBox(height: 5),
+                            Row(
+                              mainAxisAlignment:
+                              MainAxisAlignment.spaceBetween,
+                              children: [
+                                // 담아두기,공유 버튼 Row
+                                Row(
+                                  children: [
+                                    InkWell(
                                       onTap: () {
                                         ArticleController(
                                           model: article,
                                           userProvider: userProvider,
-                                        ).negVote().then((result) {
+                                        ).scrap().then((result) {
                                           if (result) update();
                                         });
                                       },
-                                      child: SizedBox(
-                                        width: 25,
-                                        height: 25,
-                                        child: SvgPicture.asset(
-                                          article.my_vote == false
-                                              ? 'assets/icons/dislike_filled.svg'
-                                              : 'assets/icons/dislike.svg',
-                                          color: article.my_vote == true
-                                              ? ColorsInfo.noneVote
-                                              : ColorsInfo.negVote,
-                                        ),
-                                      )),
-                                  const SizedBox(width: 3),
-                                  Text('${article.negative_vote_count}',
-                                      style: TextStyle(
-                                        fontSize: 20,
-                                        fontWeight: FontWeight.w500,
-                                        color: article.my_vote == true
-                                            ? ColorsInfo.noneVote
-                                            : ColorsInfo.negVote,
-                                      )),
-                                ],
-                              ),
-                              const SizedBox(height: 5),
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  // 담아두기,공유 버튼 Row
-                                  Row(
-                                    children: [
-                                      InkWell(
-                                        onTap: () {
-                                          ArticleController(
-                                            model: article,
-                                            userProvider: userProvider,
-                                          ).scrap().then((result) {
-                                            if (result) update();
-                                          });
-                                        },
-                                        child: Container(
-                                          width: 100,
-                                          height: 40,
-                                          decoration: BoxDecoration(
-                                            color: Colors.white,
-                                            borderRadius:
-                                                BorderRadius.circular(8),
-                                            border: Border.all(
-                                              color: article.my_scrap == null
-                                                  ? const Color.fromRGBO(
-                                                      230, 230, 230, 1)
-                                                  : ColorsInfo.newara,
-                                            ),
+                                      child: Container(
+                                        width: 100,
+                                        height: 40,
+                                        decoration: BoxDecoration(
+                                          color: Colors.white,
+                                          borderRadius:
+                                          BorderRadius.circular(8),
+                                          border: Border.all(
+                                            color: article.my_scrap == null
+                                                ? const Color.fromRGBO(
+                                                230, 230, 230, 1)
+                                                : ColorsInfo.newara,
                                           ),
-                                          child: Center(
-                                            child: Row(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment.center,
-                                              children: [
-                                                const SizedBox(width: 2),
-                                                SvgPicture.asset(
-                                                  'assets/icons/bookmark-circle-fill.svg',
-                                                  width: 20,
-                                                  height: 20,
-                                                  color: article.my_scrap ==
-                                                          null
-                                                      ? const Color.fromRGBO(
-                                                          100, 100, 100, 1)
-                                                      : ColorsInfo.newara,
-                                                ),
-                                                const SizedBox(width: 5),
-                                                Text(
+                                        ),
+                                        child: Center(
+                                          child: Row(
+                                            mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                            children: [
+                                              const SizedBox(width: 2),
+                                              SvgPicture.asset(
+                                                'assets/icons/bookmark-circle-fill.svg',
+                                                width: 20,
+                                                height: 20,
+                                                color: article.my_scrap ==
+                                                    null
+                                                    ? const Color.fromRGBO(
+                                                    100, 100, 100, 1)
+                                                    : ColorsInfo.newara,
+                                              ),
+                                              const SizedBox(width: 5),
+                                              Text(
+                                                article.my_scrap == null
+                                                    ? '담아두기'
+                                                    : '담아둔 글',
+                                                style: TextStyle(
+                                                  color:
                                                   article.my_scrap == null
-                                                      ? '담아두기'
-                                                      : '담아둔 글',
-                                                  style: TextStyle(
-                                                    color:
-                                                        article.my_scrap == null
-                                                            ? Colors.black
-                                                            : ColorsInfo.newara,
-                                                    fontSize: 15,
-                                                    fontWeight: FontWeight.w500,
-                                                  ),
+                                                      ? Colors.black
+                                                      : ColorsInfo.newara,
+                                                  fontSize: 15,
+                                                  fontWeight: FontWeight.w500,
                                                 ),
-                                              ],
-                                            ),
+                                              ),
+                                            ],
                                           ),
                                         ),
                                       ),
-                                      const SizedBox(width: 15),
-                                      InkWell(
-                                        onTap: () async {
-                                          await ArticleController(
-                                            model: article,
-                                            userProvider: userProvider,
-                                          ).share();
-                                        },
-                                        child: Container(
-                                          width: 90,
-                                          height: 40,
-                                          decoration: BoxDecoration(
-                                            borderRadius:
-                                                BorderRadius.circular(8),
-                                            border: Border.all(
-                                              color: const Color.fromRGBO(
-                                                  230, 230, 230, 1),
+                                    ),
+                                    const SizedBox(width: 15),
+                                    InkWell(
+                                      onTap: () async {
+                                        await ArticleController(
+                                          model: article,
+                                          userProvider: userProvider,
+                                        ).share();
+                                      },
+                                      child: Container(
+                                        width: 90,
+                                        height: 40,
+                                        decoration: BoxDecoration(
+                                          borderRadius:
+                                          BorderRadius.circular(8),
+                                          border: Border.all(
+                                            color: const Color.fromRGBO(
+                                                230, 230, 230, 1),
+                                          ),
+                                        ),
+                                        child: Center(
+                                          child: Row(
+                                            mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                            children: [
+                                              const SizedBox(width: 2),
+                                              SvgPicture.asset(
+                                                'assets/icons/share.svg',
+                                                width: 20,
+                                                height: 20,
+                                                color: const Color.fromRGBO(
+                                                    100, 100, 100, 1),
+                                              ),
+                                              const SizedBox(width: 10),
+                                              const Text(
+                                                '공유',
+                                                style: TextStyle(
+                                                  fontSize: 15,
+                                                  fontWeight: FontWeight.w500,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                // 신고버튼 Row
+                                isReportable ? InkWell(
+                                  onTap: () {
+                                    showDialog(
+                                        context: context,
+                                        builder: (context) {
+                                          return ReportDialogWidget(
+                                              articleID: article.id);
+                                        });
+                                  },
+                                  child: Container(
+                                    width: 90,
+                                    height: 40,
+                                    decoration: BoxDecoration(
+                                      borderRadius:
+                                      BorderRadius.circular(8),
+                                      border: Border.all(
+                                        color: const Color.fromRGBO(
+                                            230, 230, 230, 1),
+                                      ),
+                                    ),
+                                    child: Center(
+                                      child: Row(
+                                        mainAxisAlignment:
+                                        MainAxisAlignment.center,
+                                        children: [
+                                          const SizedBox(width: 2),
+                                          SvgPicture.asset(
+                                            'assets/icons/exclamationmark-bubble-fill.svg',
+                                            width: 20,
+                                            height: 20,
+                                            color: const Color.fromRGBO(
+                                                100, 100, 100, 1),
+                                          ),
+                                          const SizedBox(width: 10),
+                                          const Text(
+                                            '신고',
+                                            style: TextStyle(
+                                              fontSize: 15,
+                                              fontWeight: FontWeight.w500,
                                             ),
                                           ),
-                                          child: Center(
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                ) : InkWell(
+                                  onTap: () async {
+                                    await Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (context) => PostWritePage(articleBefore: article)
+                                        )
+                                    );
+                                    bool result = await _fetchArticle(userProvider);
+                                    if (result) update();
+                                  },
+                                  child: Container(
+                                    width: 95,
+                                    height: 40,
+                                    decoration: BoxDecoration(
+                                      borderRadius:
+                                      BorderRadius.circular(8),
+                                      border: Border.all(
+                                        color: const Color.fromRGBO(
+                                            230, 230, 230, 1),
+                                      ),
+                                    ),
+                                    child: Center(
+                                      child: Row(
+                                        mainAxisAlignment: MainAxisAlignment.center,
+                                        children: [
+                                          SvgPicture.asset(
+                                            'assets/icons/modify.svg',
+                                            width: 30,
+                                            height: 30,
+                                            color: Colors.black,
+                                          ),
+                                          const Text(
+                                            '수정하기',
+                                            style: TextStyle(
+                                              fontSize: 15,
+                                              fontWeight: FontWeight.w500,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 15),
+                            const Divider(
+                              thickness: 1,
+                            ),
+                            const SizedBox(height: 15),
+                            SizedBox(
+                              width: MediaQuery.of(context).size.width - 40,
+                              child: Text(
+                                '${article.comment_count}개의 댓글',
+                                style: const TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w700,
+                                ),
+                              ),
+                            ),
+                            const SizedBox(height: 15),
+                            ListView.separated(
+                              padding: const EdgeInsets.only(bottom: 15),
+                              shrinkWrap: true,
+                              physics: const NeverScrollableScrollPhysics(),
+                              itemCount: commentList.length,
+                              itemBuilder: (BuildContext context, int idx) {
+                                CommentNestedCommentListActionModel
+                                curComment = commentList[idx];
+                                return Container(
+                                  key: _commentKeys[idx],
+                                  margin: EdgeInsets.only(
+                                      left:
+                                      (curComment.parent_comment == null
+                                          ? 0
+                                          : 30)),
+                                  child: Column(
+                                    crossAxisAlignment:
+                                    CrossAxisAlignment.start,
+                                    children: [
+                                      Row(
+                                        mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          InkWell(
+                                            onTap: curComment.name_type == 2 ? null : () {
+                                              Navigator.push(
+                                                context,
+                                                MaterialPageRoute(builder: (context) => UserViewPage(userID: curComment.created_by.id)),
+                                              );
+                                            },
                                             child: Row(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment.center,
                                               children: [
-                                                const SizedBox(width: 2),
-                                                SvgPicture.asset(
-                                                  'assets/icons/share.svg',
-                                                  width: 20,
-                                                  height: 20,
-                                                  color: const Color.fromRGBO(
-                                                      100, 100, 100, 1),
-                                                ),
-                                                const SizedBox(width: 10),
-                                                const Text(
-                                                  '공유',
-                                                  style: TextStyle(
-                                                    fontSize: 15,
-                                                    fontWeight: FontWeight.w500,
+                                                Container(
+                                                  width: 25,
+                                                  height: 25,
+                                                  decoration:
+                                                  const BoxDecoration(
+                                                    shape: BoxShape.circle,
+                                                    color: Colors.grey,
                                                   ),
+                                                  child: ClipRRect(
+                                                    borderRadius:
+                                                    const BorderRadius
+                                                        .all(
+                                                        Radius.circular(
+                                                            100)),
+                                                    child: Image.network(
+                                                        curComment.created_by
+                                                            .profile.picture
+                                                            .toString()),
+                                                  ),
+                                                ),
+                                                const SizedBox(width: 5),
+                                                Container(
+                                                    constraints:
+                                                    BoxConstraints(
+                                                      maxWidth: MediaQuery.of(
+                                                          context)
+                                                          .size
+                                                          .width -
+                                                          200,
+                                                    ),
+                                                    child: Text(
+                                                      curComment.created_by
+                                                          .profile.nickname
+                                                          .toString(),
+                                                      style: const TextStyle(
+                                                        fontSize: 14,
+                                                        fontWeight:
+                                                        FontWeight.w500,
+                                                      ),
+                                                      maxLines: 1,
+                                                      overflow: TextOverflow
+                                                          .ellipsis,
+                                                    )),
+                                                const SizedBox(width: 7),
+                                                Text(
+                                                  getTime(
+                                                      curComment.created_at),
+                                                  style: const TextStyle(
+                                                      fontSize: 14,
+                                                      fontWeight:
+                                                      FontWeight.w400,
+                                                      color: Color.fromRGBO(
+                                                          51, 51, 51, 1)),
                                                 ),
                                               ],
                                             ),
                                           ),
+                                          SizedBox(
+                                            width: 30,
+                                            height: 25,
+                                            child: Visibility(
+                                                visible: !(curComment.is_hidden),
+                                                child: (curComment.is_mine ==
+                                                    true
+                                                    ? _buildMyPopupMenuButton(
+                                                    curComment.id,
+                                                    userProvider, idx)
+                                                    : _buildOthersPopupMenuButton(
+                                                    curComment.id))
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                      Container(
+                                        margin: const EdgeInsets.only(
+                                            left: 30, right: 0),
+                                        child: curComment.is_hidden == false
+                                            ? _buildCommentContent(
+                                            curComment.content ?? "")
+                                            : const Text(
+                                          '삭제된 댓글 입니다.',
+                                          style: TextStyle(
+                                            fontSize: 14,
+                                            fontWeight:
+                                            FontWeight.w400,
+                                            color: Colors.grey,
+                                          ),
+                                        ),
+                                      ),
+                                      const SizedBox(height: 8),
+                                      Container(
+                                        margin: const EdgeInsets.only(
+                                            left: 30),
+                                        child: Row(
+                                          children: [
+                                            Visibility(
+                                              visible: curComment.is_hidden == false,
+                                              child: Row(
+                                                children: [
+                                                  InkWell(
+                                                    onTap: () {
+                                                      CommentController(
+                                                        model: curComment,
+                                                        userProvider: userProvider,
+                                                      ).posVote().then((result) {
+                                                        if (result) update();
+                                                      });
+                                                    },
+                                                    child:
+                                                    SvgPicture.asset(
+                                                      curComment.my_vote ==
+                                                          true
+                                                          ? 'assets/icons/like_filled.svg'
+                                                          : 'assets/icons/like.svg',
+                                                      width: 17,
+                                                      height: 17,
+                                                      color:
+                                                      curComment.my_vote ==
+                                                          false
+                                                          ? ColorsInfo
+                                                          .noneVote
+                                                          : ColorsInfo
+                                                          .newara,
+                                                    ),
+                                                  ),
+                                                  const SizedBox(
+                                                      width: 3),
+                                                  Text(
+                                                    curComment
+                                                        .positive_vote_count
+                                                        .toString(),
+                                                    style: TextStyle(
+                                                      fontSize: 13,
+                                                      fontWeight:
+                                                      FontWeight.w500,
+                                                      color:
+                                                      curComment.my_vote ==
+                                                          false
+                                                          ? ColorsInfo
+                                                          .noneVote
+                                                          : ColorsInfo
+                                                          .posVote,
+                                                    ),
+                                                  ),
+                                                  const SizedBox(
+                                                      width: 6),
+                                                  InkWell(
+                                                    onTap: () async {
+                                                      CommentController(
+                                                        model: curComment,
+                                                        userProvider: userProvider,
+                                                      ).negVote().then((result) {
+                                                        if (result) update();
+                                                      });
+                                                    },
+                                                    child:
+                                                    SvgPicture.asset(
+                                                      curComment.my_vote ==
+                                                          false
+                                                          ? 'assets/icons/dislike_filled.svg'
+                                                          : 'assets/icons/dislike.svg',
+                                                      width: 17,
+                                                      height: 17,
+                                                      color: curComment
+                                                          .my_vote ==
+                                                          true
+                                                          ? ColorsInfo
+                                                          .noneVote
+                                                          : ColorsInfo
+                                                          .negVote,
+                                                    ),
+                                                  ),
+                                                  const SizedBox(
+                                                      width: 3),
+                                                  Text(
+                                                    curComment
+                                                        .negative_vote_count
+                                                        .toString(),
+                                                    style: TextStyle(
+                                                      fontSize: 13,
+                                                      fontWeight:
+                                                      FontWeight.w500,
+                                                      color: curComment
+                                                          .my_vote ==
+                                                          true
+                                                          ? ColorsInfo
+                                                          .noneVote
+                                                          : ColorsInfo
+                                                          .negVote,
+                                                    ),
+                                                  ),
+                                                  const SizedBox(
+                                                      width: 6),
+                                                ],
+                                              ),
+                                            ),
+                                            Visibility(
+                                              visible: curComment.parent_comment == null,
+                                              child: InkWell(
+                                                onTap: () {
+                                                  targetComment = curComment;
+                                                  _setCommentMode(
+                                                      true,
+                                                      false);
+                                                  textFocusNode.requestFocus();
+                                                  moveCommentContainer(idx);
+                                                },
+                                                child: Row(
+                                                  children: [
+                                                    SvgPicture
+                                                        .asset(
+                                                      'assets/icons/arrow_uturn_left_1.svg',
+                                                      width: 11,
+                                                      height: 12,
+                                                    ),
+                                                    const SizedBox(width: 5),
+                                                    const Text(
+                                                      '답글 쓰기',
+                                                      style:
+                                                      TextStyle(
+                                                        fontSize:
+                                                        13,
+                                                        fontWeight:
+                                                        FontWeight
+                                                            .w500,
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                            ),
+                                          ],
                                         ),
                                       ),
                                     ],
                                   ),
-                                  // 신고버튼 Row
-                                  isReportable ? InkWell(
-                                    onTap: () {
-                                      showDialog(
-                                          context: context,
-                                          builder: (context) {
-                                            return ReportDialogWidget(
-                                                articleID: article.id);
-                                          });
-                                    },
-                                    child: Container(
-                                      width: 90,
-                                      height: 40,
-                                      decoration: BoxDecoration(
-                                        borderRadius:
-                                        BorderRadius.circular(8),
-                                        border: Border.all(
-                                          color: const Color.fromRGBO(
-                                              230, 230, 230, 1),
-                                        ),
-                                      ),
-                                      child: Center(
-                                        child: Row(
-                                          mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                          children: [
-                                            const SizedBox(width: 2),
-                                            SvgPicture.asset(
-                                              'assets/icons/exclamationmark-bubble-fill.svg',
-                                              width: 20,
-                                              height: 20,
-                                              color: const Color.fromRGBO(
-                                                  100, 100, 100, 1),
-                                            ),
-                                            const SizedBox(width: 10),
-                                            const Text(
-                                              '신고',
-                                              style: TextStyle(
-                                                fontSize: 15,
-                                                fontWeight: FontWeight.w500,
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                    ),
-                                  ) : InkWell(
-                                    onTap: () async {
-                                      await Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (context) => PostWritePage(articleBefore: article)
-                                        )
-                                      );
-                                      bool result = await _fetchArticle(userProvider);
-                                      if (result) update();
-                                    },
-                                    child: Container(
-                                      width: 95,
-                                      height: 40,
-                                      decoration: BoxDecoration(
-                                        borderRadius:
-                                        BorderRadius.circular(8),
-                                        border: Border.all(
-                                          color: const Color.fromRGBO(
-                                              230, 230, 230, 1),
-                                        ),
-                                      ),
-                                      child: Center(
-                                        child: Row(
-                                          mainAxisAlignment: MainAxisAlignment.center,
-                                          children: [
-                                            SvgPicture.asset(
-                                              'assets/icons/modify.svg',
-                                              width: 30,
-                                              height: 30,
-                                              color: Colors.black,
-                                            ),
-                                            const Text(
-                                              '수정하기',
-                                              style: TextStyle(
-                                                fontSize: 15,
-                                                fontWeight: FontWeight.w500,
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              const SizedBox(height: 15),
-                              const Divider(
-                                thickness: 1,
-                              ),
-                              const SizedBox(height: 15),
-                              SizedBox(
-                                width: MediaQuery.of(context).size.width - 40,
-                                child: Text(
-                                  '${article.comment_count}개의 댓글',
-                                  style: const TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.w700,
-                                  ),
-                                ),
-                              ),
-                              const SizedBox(height: 15),
-                              ListView.separated(
-                                padding: const EdgeInsets.only(bottom: 15),
-                                shrinkWrap: true,
-                                physics: const NeverScrollableScrollPhysics(),
-                                itemCount: commentList.length,
-                                itemBuilder: (BuildContext context, int idx) {
-                                  CommentNestedCommentListActionModel
-                                  curComment = commentList[idx];
-                                  return Container(
-                                    key: _commentKeys[idx],
-                                    margin: EdgeInsets.only(
-                                        left:
-                                        (curComment.parent_comment == null
-                                            ? 0
-                                            : 30)),
-                                    child: Column(
-                                      crossAxisAlignment:
-                                      CrossAxisAlignment.start,
-                                      children: [
-                                        Row(
-                                          mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
-                                          children: [
-                                            InkWell(
-                                              onTap: curComment.name_type == 2 ? null : () {
-                                                Navigator.push(
-                                                  context,
-                                                  MaterialPageRoute(builder: (context) => UserViewPage(userID: curComment.created_by.id)),
-                                                );
-                                              },
-                                              child: Row(
-                                                children: [
-                                                  Container(
-                                                    width: 25,
-                                                    height: 25,
-                                                    decoration:
-                                                    const BoxDecoration(
-                                                      shape: BoxShape.circle,
-                                                      color: Colors.grey,
-                                                    ),
-                                                    child: ClipRRect(
-                                                      borderRadius:
-                                                      const BorderRadius
-                                                          .all(
-                                                          Radius.circular(
-                                                              100)),
-                                                      child: Image.network(
-                                                          curComment.created_by
-                                                              .profile.picture
-                                                              .toString()),
-                                                    ),
-                                                  ),
-                                                  const SizedBox(width: 5),
-                                                  Container(
-                                                      constraints:
-                                                      BoxConstraints(
-                                                        maxWidth: MediaQuery.of(
-                                                            context)
-                                                            .size
-                                                            .width -
-                                                            200,
-                                                      ),
-                                                      child: Text(
-                                                        curComment.created_by
-                                                            .profile.nickname
-                                                            .toString(),
-                                                        style: const TextStyle(
-                                                          fontSize: 14,
-                                                          fontWeight:
-                                                          FontWeight.w500,
-                                                        ),
-                                                        maxLines: 1,
-                                                        overflow: TextOverflow
-                                                            .ellipsis,
-                                                      )),
-                                                  const SizedBox(width: 7),
-                                                  Text(
-                                                    getTime(
-                                                        curComment.created_at),
-                                                    style: const TextStyle(
-                                                        fontSize: 14,
-                                                        fontWeight:
-                                                        FontWeight.w400,
-                                                        color: Color.fromRGBO(
-                                                            51, 51, 51, 1)),
-                                                  ),
-                                                ],
-                                              ),
-                                            ),
-                                            SizedBox(
-                                              width: 30,
-                                              height: 25,
-                                              child: Visibility(
-                                                  visible: !(curComment.is_hidden),
-                                                  child: (curComment.is_mine ==
-                                                      true
-                                                      ? _buildMyPopupMenuButton(
-                                                      curComment.id,
-                                                      userProvider, idx)
-                                                      : _buildOthersPopupMenuButton(
-                                                      curComment.id))
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                        Container(
-                                          margin: const EdgeInsets.only(
-                                              left: 30, right: 0),
-                                          child: curComment.is_hidden == false
-                                              ? _buildCommentContent(
-                                              curComment.content ?? "")
-                                              : const Text(
-                                            '삭제된 댓글 입니다.',
-                                            style: TextStyle(
-                                              fontSize: 14,
-                                              fontWeight:
-                                              FontWeight.w400,
-                                              color: Colors.grey,
-                                            ),
-                                          ),
-                                        ),
-                                        const SizedBox(height: 8),
-                                        Container(
-                                            margin: const EdgeInsets.only(
-                                                left: 30),
-                                            child: Row(
-                                              children: [
-                                                Visibility(
-                                                  visible: curComment.is_hidden == false,
-                                                  child: Row(
-                                                    children: [
-                                                      InkWell(
-                                                        onTap: () {
-                                                          CommentController(
-                                                            model: curComment,
-                                                            userProvider: userProvider,
-                                                          ).posVote().then((result) {
-                                                            if (result) update();
-                                                          });
-                                                        },
-                                                        child:
-                                                        SvgPicture.asset(
-                                                          curComment.my_vote ==
-                                                              true
-                                                              ? 'assets/icons/like_filled.svg'
-                                                              : 'assets/icons/like.svg',
-                                                          width: 17,
-                                                          height: 17,
-                                                          color:
-                                                          curComment.my_vote ==
-                                                              false
-                                                              ? ColorsInfo
-                                                              .noneVote
-                                                              : ColorsInfo
-                                                              .newara,
-                                                        ),
-                                                      ),
-                                                      const SizedBox(
-                                                          width: 3),
-                                                      Text(
-                                                        curComment
-                                                            .positive_vote_count
-                                                            .toString(),
-                                                        style: TextStyle(
-                                                          fontSize: 13,
-                                                          fontWeight:
-                                                          FontWeight.w500,
-                                                          color:
-                                                          curComment.my_vote ==
-                                                              false
-                                                              ? ColorsInfo
-                                                              .noneVote
-                                                              : ColorsInfo
-                                                              .posVote,
-                                                        ),
-                                                      ),
-                                                      const SizedBox(
-                                                          width: 6),
-                                                      InkWell(
-                                                        onTap: () async {
-                                                          CommentController(
-                                                            model: curComment,
-                                                            userProvider: userProvider,
-                                                          ).negVote().then((result) {
-                                                            if (result) update();
-                                                          });
-                                                        },
-                                                        child:
-                                                        SvgPicture.asset(
-                                                          curComment.my_vote ==
-                                                              false
-                                                              ? 'assets/icons/dislike_filled.svg'
-                                                              : 'assets/icons/dislike.svg',
-                                                          width: 17,
-                                                          height: 17,
-                                                          color: curComment
-                                                              .my_vote ==
-                                                              true
-                                                              ? ColorsInfo
-                                                              .noneVote
-                                                              : ColorsInfo
-                                                              .negVote,
-                                                        ),
-                                                      ),
-                                                      const SizedBox(
-                                                          width: 3),
-                                                      Text(
-                                                        curComment
-                                                            .negative_vote_count
-                                                            .toString(),
-                                                        style: TextStyle(
-                                                          fontSize: 13,
-                                                          fontWeight:
-                                                          FontWeight.w500,
-                                                          color: curComment
-                                                              .my_vote ==
-                                                              true
-                                                              ? ColorsInfo
-                                                              .noneVote
-                                                              : ColorsInfo
-                                                              .negVote,
-                                                        ),
-                                                      ),
-                                                      const SizedBox(
-                                                          width: 6),
-                                                    ],
-                                                  ),
-                                                ),
-                                                Visibility(
-                                                  visible: curComment.parent_comment == null,
-                                                  child: InkWell(
-                                                    onTap: () {
-                                                      targetComment = curComment;
-                                                      _setCommentMode(
-                                                          true,
-                                                          false);
-                                                      textFocusNode.requestFocus();
-                                                      moveCommentContainer(idx);
-                                                    },
-                                                    child: Row(
-                                                      children: [
-                                                        SvgPicture
-                                                            .asset(
-                                                          'assets/icons/arrow_uturn_left_1.svg',
-                                                          width: 11,
-                                                          height: 12,
-                                                        ),
-                                                        const SizedBox(width: 5),
-                                                        const Text(
-                                                          '답글 쓰기',
-                                                          style:
-                                                          TextStyle(
-                                                            fontSize:
-                                                            13,
-                                                            fontWeight:
-                                                            FontWeight
-                                                                .w500,
-                                                          ),
-                                                        ),
-                                                      ],
-                                                    ),
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                        ),
-                                      ],
-                                    ),
-                                  );
-                                },
-                                separatorBuilder:
-                                    (BuildContext context, int idx) => const Divider(),
-                              ),
-                            ],
-                          ),
+                                );
+                              },
+                              separatorBuilder:
+                                  (BuildContext context, int idx) => const Divider(),
+                            ),
+                          ],
                         ),
                       ),
                     ),
-                    const SizedBox(height: 15),
-                    // 댓글 입력 부분
-                    Column(
+                  ),
+                  const SizedBox(height: 15),
+                  // 댓글 입력 부분
+                  Column(
                     key: _textFieldKey,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -942,11 +953,17 @@ class _PostViewPageState extends State<PostViewPage> {
                       const SizedBox(height: 15),
                     ],
                   ),
-                  ]),
-                ),
+                ]),
               ),
             ),
-          );
+          ),
+        ),
+        Visibility(
+          visible: !(context.watch<UserProvider>().isWebViewLoaded),
+          child: const LoadingIndicator(),
+        ),
+      ],
+    );
   }
 
   PopupMenuButton<int> _buildAttachMenuButton(int fileNum) {
@@ -1456,5 +1473,156 @@ class _PostViewPageState extends State<PostViewPage> {
       _setCommentMode(false, false);
     }
     return true;
+  }
+}
+
+class InArticleWebView extends StatefulWidget {
+  final String content;
+  final double initialHeight;
+  const InArticleWebView({
+    super.key,
+    required this.content,
+    required this.initialHeight,
+  });
+
+  @override
+  State<InArticleWebView> createState() => _InArticleWebViewState();
+}
+
+class _InArticleWebViewState extends State<InArticleWebView> {
+  WebViewController _webViewController = WebViewController();
+  late double webViewHeight;
+  late bool isFitted;
+
+  void setWebViewHeight(value) {
+    if (mounted) setState(() => webViewHeight = value);
+  }
+
+  int getPostNum(String path) {
+    final RegExp pattern = RegExp(r'/post/\d+');
+    RegExpMatch? match = pattern.firstMatch(path);
+    if (match == null) return -1;
+    return int.parse(path.substring(6));
+  }
+
+  void launchArticle(int postNum) {
+    Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => PostViewPage(id: postNum))
+    );
+  }
+
+  Future<void> launchInBrowser(String url) async {
+    final Uri targetUrl = Uri.parse(url);
+    if (!await canLaunchUrl(targetUrl)) {
+      debugPrint("$url을 열 수 없습니다.");
+      return;
+    }
+    if (targetUrl.authority == newAraAuthority) {
+      int postNum = getPostNum(targetUrl.path);
+      if (postNum != -1) {
+        launchArticle(postNum);
+        return;
+      }
+    }
+    if (!await launchUrl(
+      Uri.parse(url),
+      mode: LaunchMode.externalApplication,
+    )) {
+      throw Exception('Could not launch $url');
+    }
+  }
+
+  Future<double> getPageHeight() async {
+    final String pageHeightStr =
+    (await _webViewController.runJavaScriptReturningResult('''
+            function getPageHeight() {
+              return Math.max(
+                document.body.scrollHeight || 0,
+                document.documentElement.scrollHeight || 0,
+                document.body.offsetHeight || 0,
+                document.documentElement.offsetHeight || 0,
+                document.body.clientHeight || 0,
+                document.documentElement.clientHeight || 0
+              ).toString();
+            }
+            getPageHeight();
+          ''')).toString();
+    double pageHeight =
+    double.parse(pageHeightStr.replaceAll('"', '').replaceAll("'", ""));
+    debugPrint("pageHeight: $pageHeightStr -> $pageHeight");
+
+    return pageHeight;
+  }
+
+  Future<void> setPageHeight() async {
+    getPageHeight().then((height) {
+      if (!mounted) return;
+      setState(() => webViewHeight = height);
+    });
+  }
+
+  @override
+  void initState() {
+    UserProvider userProvider = context.read<UserProvider>();
+    super.initState();
+    isFitted = false;
+    webViewHeight = widget.initialHeight;
+    _webViewController = WebViewController()
+      ..setJavaScriptMode(JavaScriptMode.unrestricted)
+      ..setBackgroundColor(const Color(0x00000000))
+      ..setNavigationDelegate(NavigationDelegate(
+        onNavigationRequest: (NavigationRequest request) async {
+          if (request.url == 'about:blank') {
+            return NavigationDecision.navigate;
+          }
+          Uri uri = Uri.parse(request.url);
+          if (uri.scheme == "https" || uri.scheme == "http") {
+            await launchInBrowser(request.url);
+          } else {
+            // mailto, sms, tel 등의 scheme 은 아직 지원하지 않음 (2023.07.31)
+            // 추후 PostViewPage 전체적으로 완성되면 기능 추가할 예정
+            debugPrint("Denied Scheme: ${uri.scheme}");
+          }
+          return NavigationDecision.prevent;
+        },
+        onProgress: (int progress) {
+          debugPrint('WebView is loading (progress: $progress)');
+        },
+        onPageStarted: (String url) async {},
+        onPageFinished: (String url) async {
+          if (isFitted) return;
+          await setPageHeight();
+          isFitted = true;
+          await Future.delayed(
+            const Duration(milliseconds: 500), () {}
+          );
+          userProvider.setIsWebViewLoaded(true);
+        },
+        onWebResourceError: (WebResourceError error) async {
+          debugPrint(
+              'code: ${error.errorCode}\ndescription: ${error.description}\nerrorType: ${error.errorType}\nisForMainFrame: ${error.isForMainFrame}');
+        },
+      ))
+      ..loadHtmlString(widget.content);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      height: webViewHeight,
+      child: WebViewWidget(
+        controller: _webViewController,
+        gestureRecognizers: {
+          Factory<OneSequenceGestureRecognizer>(() {
+            TapGestureRecognizer tabGestureRecognizer = TapGestureRecognizer();
+            tabGestureRecognizer.onTapDown = (_) {
+              FocusScope.of(context).unfocus();
+            };
+            return tabGestureRecognizer;
+          }),
+        },
+      ),
+    );
   }
 }
