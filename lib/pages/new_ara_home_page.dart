@@ -54,6 +54,7 @@ class _NewAraHomePageState extends State<NewAraHomePage> {
 
   BottomNavigationBar _buildBottomNavigationBar() {
     return BottomNavigationBar(
+      backgroundColor: Colors.white,
       currentIndex: _selectedIndex,
       showSelectedLabels: false,
       showUnselectedLabels: false,
