@@ -103,6 +103,7 @@ class _PostViewPageState extends State<PostViewPage> {
                     child: RefreshIndicator(
                       color: ColorsInfo.newara,
                       onRefresh: () async {
+                        userProvider.setIsWebViewLoaded(false);
                         _setIsValid(false);
                         _setIsValid(await _fetchArticle(userProvider));
                       },
@@ -847,111 +848,118 @@ class _PostViewPageState extends State<PostViewPage> {
                   ),
                   const SizedBox(height: 15),
                   // 댓글 입력 부분
-                  Column(
-                    key: _textFieldKey,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Visibility(
-                        visible: isNestedComment,
-                        child: Column(
-                          children: [
-                            Text(
-                              '${(targetComment == null ? false : targetComment!.is_mine) ? '\'나\'에게' : "'${targetComment?.created_by.profile.nickname}'님께"} 답글을 작성하는 중',
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                              style: const TextStyle(
-                                fontSize: 13,
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
-                            const SizedBox(height: 5)
-                          ],
-                        ),
+                  Container(
+                    decoration: const BoxDecoration(
+                      border: Border(
+                        top: BorderSide(width: 1.0, color: Color(0x00F0F0F0)), // 원하는 색상과 두께로 설정
                       ),
-                      Visibility(
-                        visible: isModify,
-                        child: Column(
-                          children: [
-                            Text(
-                              '나의 댓글 "${targetComment?.content}" 수정 중',
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                              style: const TextStyle(
-                                fontSize: 13,
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
-                            const SizedBox(height: 5)
-                          ],
-                        ),
-                      ),
-                      Row(
-                        children: [
-                          // Close button
-                          Visibility(
-                            visible: (isModify || isNestedComment),
-                            child: Column(
-                              children: [
-                                InkWell(
-                                  onTap: () {
-                                    _textEditingController.text = "";
-                                    targetComment = null;
-                                    debugPrint("Parent Comment null");
-                                    _setCommentMode(false, false);
-                                  },
-                                  child: SvgPicture.asset(
-                                    'assets/icons/close.svg',
-                                    width: 30,
-                                    height: 30,
-                                    color: ColorsInfo.newara,
-                                  ),
+                    ),
+                    child: Column(
+                      key: _textFieldKey,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Visibility(
+                          visible: isNestedComment,
+                          child: Column(
+                            children: [
+                              Text(
+                                '${(targetComment == null ? false : targetComment!.is_mine) ? '\'나\'에게' : "'${targetComment?.created_by.profile.nickname}'님께"} 답글을 작성하는 중',
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: const TextStyle(
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.w500,
                                 ),
-                                const SizedBox(width: 5),
-                              ],
-                            ),
-                          ),
-                          const SizedBox(width: 8),
-                          // TextFormField
-                          Expanded(
-                            child: Container(
-                              constraints: const BoxConstraints(
-                                minHeight: 45,
                               ),
-                              decoration: const BoxDecoration(
-                                color: Color.fromRGBO(235, 235, 235, 1),
-                                borderRadius:
-                                BorderRadius.all(Radius.circular(10)),
-                              ),
-                              child: _buildForm(),
-                            ),
+                              const SizedBox(height: 5)
+                            ],
                           ),
-                          const SizedBox(width: 5),
-                          // send button
-                          AbsorbPointer(
-                            absorbing: isSending,
-                            child: InkWell(
-                              onTap: () async {
-                                setIsSending(true);
-                                bool sendRes = await _sendComment(userProvider);
-                                if (sendRes) {
-                                  _setIsValid(await _fetchArticle(userProvider));
-                                  debugPrint("Send Complete!");
-                                } else {
-                                  debugPrint("Send Comment Failed");
-                                }
-                                setIsSending(false);
-                              },
-                              child: SvgPicture.asset(
-                                'assets/icons/send.svg',
-                                width: 30,
-                                height: 30,
+                        ),
+                        Visibility(
+                          visible: isModify,
+                          child: Column(
+                            children: [
+                              Text(
+                                '나의 댓글 "${targetComment?.content}" 수정 중',
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: const TextStyle(
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                              const SizedBox(height: 5)
+                            ],
+                          ),
+                        ),
+                        Row(
+                          children: [
+                            // Close button
+                            Visibility(
+                              visible: (isModify || isNestedComment),
+                              child: Column(
+                                children: [
+                                  InkWell(
+                                    onTap: () {
+                                      _textEditingController.text = "";
+                                      targetComment = null;
+                                      debugPrint("Parent Comment null");
+                                      _setCommentMode(false, false);
+                                    },
+                                    child: SvgPicture.asset(
+                                      'assets/icons/close.svg',
+                                      width: 30,
+                                      height: 30,
+                                      color: ColorsInfo.newara,
+                                    ),
+                                  ),
+                                  const SizedBox(width: 5),
+                                ],
                               ),
                             ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 15),
-                    ],
+                            const SizedBox(width: 8),
+                            // TextFormField
+                            Expanded(
+                              child: Container(
+                                constraints: const BoxConstraints(
+                                  minHeight: 45,
+                                ),
+                                decoration: const BoxDecoration(
+                                  color: Color.fromRGBO(235, 235, 235, 1),
+                                  borderRadius:
+                                  BorderRadius.all(Radius.circular(10)),
+                                ),
+                                child: _buildForm(),
+                              ),
+                            ),
+                            const SizedBox(width: 5),
+                            // send button
+                            AbsorbPointer(
+                              absorbing: isSending,
+                              child: InkWell(
+                                onTap: () async {
+                                  setIsSending(true);
+                                  bool sendRes = await _sendComment(userProvider);
+                                  if (sendRes) {
+                                    _setIsValid(await _fetchArticle(userProvider));
+                                    debugPrint("Send Complete!");
+                                  } else {
+                                    debugPrint("Send Comment Failed");
+                                  }
+                                  setIsSending(false);
+                                },
+                                child: SvgPicture.asset(
+                                  'assets/icons/send.svg',
+                                  width: 30,
+                                  height: 30,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 15),
+                      ],
+                    ),
                   ),
                 ]),
               ),
