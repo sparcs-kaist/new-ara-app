@@ -132,6 +132,7 @@ class _PostWritePageState extends State<PostWritePage> {
     } else {
       platform = TargetPlatform.iOS;
     }
+
     _initPostWritePost();
   }
 
@@ -743,7 +744,10 @@ class _PostWritePageState extends State<PostWritePage> {
                           fontSize: 22,
                           color: Color(0xFFBBBBBB),
                           fontWeight: FontWeight.w700),
-
+                      counterStyle: TextStyle(
+                        height: double.minPositive,
+                      ),
+                      counterText: "",
                       filled: true,
                       fillColor: Colors.white,
 

@@ -54,6 +54,7 @@ dependencies:
   uuid: ^3.0.7
   html: ^0.15.4
   sanitize_html: ^2.0.0
+  flutter_keyboard_visibility: ^5.4.1
 
 dev_dependencies:
   flutter_test:
