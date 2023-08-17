@@ -255,7 +255,7 @@ class _ReportDialogWidgetState extends State<ReportDialogWidget> {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             SvgPicture.asset(
-              "assets/icons/close_check.svg",
+              "assets/icons/information.svg",
               width: 45,
               height: 45,
               color: ColorsInfo.newara,

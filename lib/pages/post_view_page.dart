@@ -55,14 +55,9 @@ class _PostViewPageState extends State<PostViewPage> {
     isSending = false;
     commentList = [];
     UserProvider userProvider = context.read<UserProvider>();
-    userProvider.setIsWebViewLoaded(false);
+    userProvider.setIsWebViewLoaded(false, quiet: true);
     _fetchArticle(userProvider).then((value) {
       isReportable = value ? !article.is_mine : false;
-      inArticleWebView = InArticleWebView(
-        content: getContentHtml(
-            article.content ?? "내용이 존재하지 않습니다."),
-        initialHeight: 150,
-      );
       _setIsValid(value);
     });
   }
@@ -86,7 +81,7 @@ class _PostViewPageState extends State<PostViewPage> {
             leading: IconButton(
               color: ColorsInfo.newara,
               icon: SvgPicture.asset('assets/icons/left_chevron.svg',
-                  color: ColorsInfo.newara, width: 10.7, height: 18.99),
+                  color: ColorsInfo.newara, width: 35, height: 35),
               onPressed: () {
                 Navigator.pop(context);
               },
@@ -279,7 +274,10 @@ class _PostViewPageState extends State<PostViewPage> {
                               ),
                             ),
                             const SizedBox(height: 5),
-                            inArticleWebView,
+                            InArticleWebView(
+                              content: article.content ?? "내용이 없습니다.",
+                              initialHeight: 150,
+                            ),
                             const SizedBox(height: 10),
                             Row(
                               mainAxisAlignment: MainAxisAlignment.center,
@@ -385,9 +383,9 @@ class _PostViewPageState extends State<PostViewPage> {
                                             children: [
                                               const SizedBox(width: 2),
                                               SvgPicture.asset(
-                                                'assets/icons/bookmark-circle-fill.svg',
-                                                width: 20,
-                                                height: 20,
+                                                'assets/icons/bookmark.svg',
+                                                width: 25,
+                                                height: 25,
                                                 color: article.my_scrap ==
                                                     null
                                                     ? const Color.fromRGBO(
@@ -440,8 +438,8 @@ class _PostViewPageState extends State<PostViewPage> {
                                               const SizedBox(width: 2),
                                               SvgPicture.asset(
                                                 'assets/icons/share.svg',
-                                                width: 20,
-                                                height: 20,
+                                                width: 25,
+                                                height: 25,
                                                 color: const Color.fromRGBO(
                                                     100, 100, 100, 1),
                                               ),
@@ -488,9 +486,9 @@ class _PostViewPageState extends State<PostViewPage> {
                                         children: [
                                           const SizedBox(width: 2),
                                           SvgPicture.asset(
-                                            'assets/icons/exclamationmark-bubble-fill.svg',
-                                            width: 20,
-                                            height: 20,
+                                            'assets/icons/warning.svg',
+                                            width: 25,
+                                            height: 25,
                                             color: const Color.fromRGBO(
                                                 100, 100, 100, 1),
                                           ),
@@ -536,7 +534,6 @@ class _PostViewPageState extends State<PostViewPage> {
                                             'assets/icons/modify.svg',
                                             width: 30,
                                             height: 30,
-                                            color: Colors.black,
                                           ),
                                           const Text(
                                             '수정하기',
@@ -811,7 +808,7 @@ class _PostViewPageState extends State<PostViewPage> {
                                                   children: [
                                                     SvgPicture
                                                         .asset(
-                                                      'assets/icons/arrow_uturn_left_1.svg',
+                                                      'assets/icons/right_arrow_2.svg',
                                                       width: 11,
                                                       height: 12,
                                                     ),
@@ -907,7 +904,7 @@ class _PostViewPageState extends State<PostViewPage> {
                                       _setCommentMode(false, false);
                                     },
                                     child: SvgPicture.asset(
-                                      'assets/icons/close.svg',
+                                      'assets/icons/close-2.svg',
                                       width: 30,
                                       height: 30,
                                       color: ColorsInfo.newara,
@@ -950,6 +947,7 @@ class _PostViewPageState extends State<PostViewPage> {
                                 },
                                 child: SvgPicture.asset(
                                   'assets/icons/send.svg',
+                                  color: ColorsInfo.newara,
                                   width: 30,
                                   height: 30,
                                 ),
@@ -1030,7 +1028,8 @@ class _PostViewPageState extends State<PostViewPage> {
       ),
       padding: const EdgeInsets.all(2.0),
       icon: SvgPicture.asset(
-        'assets/icons/three_dots_1.svg',
+        'assets/icons/menu_2.svg',
+        color: Colors.grey,
         width: 25,
         height: 25,
       ),
@@ -1104,7 +1103,7 @@ class _PostViewPageState extends State<PostViewPage> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         SvgPicture.asset(
-                          'assets/icons/close_check.svg',
+                          'assets/icons/information.svg',
                           width: 55,
                           height: 55,
                           color: ColorsInfo.newara,
@@ -1206,7 +1205,8 @@ class _PostViewPageState extends State<PostViewPage> {
           borderRadius: BorderRadius.all(Radius.circular(12.0))),
       padding: const EdgeInsets.all(2.0),
       icon: SvgPicture.asset(
-        'assets/icons/three_dots_1.svg',
+        'assets/icons/menu_2.svg',
+        color: Colors.grey,
         width: 25,
         height: 25,
       ),
@@ -1279,6 +1279,7 @@ class _PostViewPageState extends State<PostViewPage> {
       child: Container(
           margin: const EdgeInsets.only(left: 15),
           child: TextFormField(
+            cursorColor: ColorsInfo.newara,
             controller: _textEditingController,
             focusNode: textFocusNode,
             minLines: 1,
@@ -1502,10 +1503,6 @@ class _InArticleWebViewState extends State<InArticleWebView> {
   late double webViewHeight;
   late bool isFitted;
 
-  void setWebViewHeight(value) {
-    if (mounted) setState(() => webViewHeight = value);
-  }
-
   int getPostNum(String path) {
     final RegExp pattern = RegExp(r'/post/\d+');
     RegExpMatch? match = pattern.firstMatch(path);
@@ -1602,17 +1599,18 @@ class _InArticleWebViewState extends State<InArticleWebView> {
           if (isFitted) return;
           await setPageHeight();
           isFitted = true;
-          await Future.delayed(
-            const Duration(milliseconds: 500), () {}
+          debugPrint("height fitted!!");
+          Future.delayed(
+            const Duration(milliseconds: 500), ()
+              => userProvider.setIsWebViewLoaded(true)
           );
-          userProvider.setIsWebViewLoaded(true);
         },
         onWebResourceError: (WebResourceError error) async {
           debugPrint(
               'code: ${error.errorCode}\ndescription: ${error.description}\nerrorType: ${error.errorType}\nisForMainFrame: ${error.isForMainFrame}');
         },
       ))
-      ..loadHtmlString(widget.content);
+      ..loadHtmlString(getContentHtml(widget.content));
   }
 
   @override
