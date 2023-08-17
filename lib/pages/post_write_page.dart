@@ -263,8 +263,8 @@ class _PostWritePageState extends State<PostWritePage> {
               child: IconButton(
                 color: ColorsInfo.newara,
                 icon: SizedBox(
-                  width: 11.58,
-                  height: 21.87,
+                  width: 35,
+                  height: 35,
                   child: SvgPicture.asset(
                     'assets/icons/left_chevron.svg',
                     color: ColorsInfo.newara,

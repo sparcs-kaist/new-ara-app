@@ -312,6 +312,7 @@ class BoardExpansionTile extends StatelessWidget {
     return Theme(
       data: ThemeData(
         dividerColor: Colors.transparent, // 액센트 색상을 투명으로 설정
+        splashColor: Colors.transparent,
       ),
       child: ListTileTheme(
         contentPadding: const EdgeInsets.all(0),

@@ -26,9 +26,9 @@ class UserProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  void setIsWebViewLoaded(bool tf) {
+  void setIsWebViewLoaded(bool tf, {bool quiet=false}) {
     _isWebViewLoaded = tf;
-    notifyListeners();
+    if (!quiet) notifyListeners();
   }
 
   void setCookieToList(String cookieString) {

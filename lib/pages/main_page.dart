@@ -366,7 +366,7 @@ class _MainPageState extends State<MainPage> {
                       ),
                       const SizedBox(height: 10),
                       SizedBox(
-                        width: MediaQuery.of(context).size.width - 60,
+                        width: MediaQuery.of(context).size.width - 40,
                         child: const Text(
                           '공지',
                           style: TextStyle(
@@ -428,14 +428,12 @@ class _MainPageState extends State<MainPage> {
                                   const SizedBox(
                                     width: 5,
                                   ),
-                                  SizedBox(
-                                    height: 11,
-                                    width: 6,
-                                    child: SvgPicture.asset(
-                                      'assets/icons/right_chevron.svg',
-                                      color: const Color(0xFF1F4899),
-                                      fit: BoxFit.fill,
-                                    ),
+                                  SvgPicture.asset(
+                                    'assets/icons/right_chevron.svg',
+                                    color: const Color(0xFF1F4899),
+                                    fit: BoxFit.fill,
+                                    width: 17,
+                                    height: 17,
                                   ),
                                 ],
                               ),
@@ -532,14 +530,12 @@ class _MainPageState extends State<MainPage> {
                                   const SizedBox(
                                     width: 5,
                                   ),
-                                  SizedBox(
-                                    height: 11,
-                                    width: 6,
-                                    child: SvgPicture.asset(
-                                      'assets/icons/right_chevron.svg',
-                                      color: const Color(0xFF646464),
-                                      fit: BoxFit.fill,
-                                    ),
+                                  SvgPicture.asset(
+                                    'assets/icons/right_chevron.svg',
+                                    color: const Color(0xFF646464),
+                                    fit: BoxFit.fill,
+                                    width: 17,
+                                    height: 17,
                                   ),
                                   const SizedBox(
                                     width: 10,
@@ -598,14 +594,12 @@ class _MainPageState extends State<MainPage> {
                                   const SizedBox(
                                     width: 5,
                                   ),
-                                  SizedBox(
-                                    height: 11,
-                                    width: 6,
-                                    child: SvgPicture.asset(
-                                      'assets/icons/right_chevron.svg',
-                                      color: const Color(0xFFED3A3A),
-                                      fit: BoxFit.fill,
-                                    ),
+                                  SvgPicture.asset(
+                                    'assets/icons/right_chevron.svg',
+                                    color: const Color(0xFFED3A3A),
+                                    fit: BoxFit.fill,
+                                    width: 17,
+                                    height: 17,
                                   ),
                                   const SizedBox(
                                     width: 10,
@@ -858,8 +852,8 @@ class MainPageTextButton extends StatelessWidget {
       width: MediaQuery.of(context).size.width - 40,
       child: Row(
         children: [
-          TextButton(
-            onPressed: onPressed,
+          InkWell(
+            onTap: onPressed,
             child: Row(
               children: [
                 Text(
@@ -873,15 +867,11 @@ class MainPageTextButton extends StatelessWidget {
                 const SizedBox(
                   width: 6.56,
                 ),
-                SizedBox(
-                  width: 7.28,
-                  height: 13.75,
-                  child: SvgPicture.asset(
-                    'assets/icons/right_chevron.svg',
-                    color: Colors.black,
-                    width: 35,
-                    height: 35,
-                  ),
+                SvgPicture.asset(
+                  'assets/icons/right_chevron.svg',
+                  color: Colors.black,
+                  width: 22,
+                  height: 22,
                 ),
               ],
             ),

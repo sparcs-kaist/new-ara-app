@@ -121,9 +121,9 @@ class _MyAppState extends State<MyApp> {
     return ThemeData(
       appBarTheme:
           const AppBarTheme(elevation: 0, backgroundColor: Colors.white),
-      //scaffoldBackgroundColor: Colors.white,
       fontFamily: 'NotoSansKR',
       scaffoldBackgroundColor: Colors.white,
+      splashColor: Colors.transparent,
     );
   }
 }

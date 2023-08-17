@@ -1,0 +1,18 @@
+<svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M7 13.8C7 12.1198 7 11.2798 7.32698 10.638C7.6146 10.0735 8.07354 9.6146 8.63803 9.32698C9.27976 9 10.1198 9 11.8 9H20.2C21.8802 9 22.7202 9 23.362 9.32698C23.9265 9.6146 24.3854 10.0735 24.673 10.638C25 11.2798 25 12.1198 25 13.8V18.2C25 19.8802 25 20.7202 24.673 21.362C24.3854 21.9265 23.9265 22.3854 23.362 22.673C22.7202 23 21.8802 23 20.2 23H11.8C10.1198 23 9.27976 23 8.63803 22.673C8.07354 22.3854 7.6146 21.9265 7.32698 21.362C7 20.7202 7 19.8802 7 18.2V13.8Z" stroke="black" stroke-width="2"/>
+<rect x="12" y="19" width="8" height="2" rx="1" fill="black"/>
+<rect x="12" y="16" width="2" height="2" rx="1" fill="black"/>
+<rect x="12" y="11" width="2" height="2" rx="1" fill="black"/>
+<rect x="9" y="16" width="2" height="2" rx="1" fill="black"/>
+<rect x="9" y="11" width="2" height="2" rx="1" fill="black"/>
+<rect x="18" y="16" width="2" height="2" rx="1" fill="black"/>
+<rect x="18" y="11" width="2" height="2" rx="1" fill="black"/>
+<rect x="21" y="16" width="2" height="2" rx="1" fill="black"/>
+<rect x="21" y="11" width="2" height="2" rx="1" fill="black"/>
+<rect x="15" y="16" width="2" height="2" rx="1" fill="black"/>
+<rect x="15" y="11" width="2" height="2" rx="1" fill="black"/>
+<rect x="10.5" y="13.5" width="2" height="2" rx="1" fill="black"/>
+<rect x="16.5" y="13.5" width="2" height="2" rx="1" fill="black"/>
+<rect x="19.5" y="13.5" width="2" height="2" rx="1" fill="black"/>
+<rect x="13.5" y="13.5" width="2" height="2" rx="1" fill="black"/>
+</svg>
