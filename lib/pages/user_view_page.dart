@@ -135,7 +135,7 @@ class _UserViewPageState extends State<UserViewPage> {
                     ),
                   ),
                 ),
-                const SizedBox(height: 10),
+                const SizedBox(height: 5),
                 Expanded(
                   child: SizedBox(
                     width: MediaQuery.of(context).size.width - 40,

@@ -587,8 +587,8 @@ class _UserPageState extends State<UserPage>
                             children: [
                               SvgPicture.asset(
                                 'assets/icons/like.svg',
-                                width: 13,
-                                height: 15,
+                                width: 20,
+                                height: 20,
                                 color: ColorsInfo.newara,
                               ),
                               const SizedBox(width: 3),
@@ -600,8 +600,8 @@ class _UserPageState extends State<UserPage>
                               const SizedBox(width: 10),
                               SvgPicture.asset(
                                 'assets/icons/dislike.svg',
-                                width: 13,
-                                height: 15,
+                                width: 20,
+                                height: 20,
                                 color: const Color.fromRGBO(83, 141, 209, 1),
                               ),
                               const SizedBox(width: 3),
@@ -613,8 +613,8 @@ class _UserPageState extends State<UserPage>
                               const SizedBox(width: 10),
                               SvgPicture.asset(
                                 'assets/icons/comment.svg',
-                                width: 13,
-                                height: 15,
+                                width: 20,
+                                height: 20,
                                 color: const Color.fromRGBO(99, 99, 99, 1),
                               ),
                               const SizedBox(width: 3),
