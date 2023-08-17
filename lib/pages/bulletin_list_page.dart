@@ -10,6 +10,7 @@ import 'package:new_ara_app/pages/free_bulletin_board_page.dart';
 import 'package:new_ara_app/providers/user_provider.dart';
 import 'package:new_ara_app/widgetclasses/loading_indicator.dart';
 import 'package:new_ara_app/models/board_detail_action_model.dart';
+import 'package:new_ara_app/utils/slide_routing.dart';
 
 const boardsByGroupLength = 5;
 
@@ -252,13 +253,9 @@ class _BulletinListPageState extends State<BulletinListPage> {
                         BoardExpansionTile(5, "소통", boardsByGroup[5]),
                         InkWell(
                             onTap: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => FreeBulletinBoardPage(
-                                        boardType: BoardType.free,
-                                        boardInfo: boardsByGroup[2][0])),
-                              );
+                              Navigator.of(context).push(slideRoute(FreeBulletinBoardPage(
+                                  boardType: BoardType.free,
+                                  boardInfo: boardsByGroup[2][0])));
                             },
                             child: SizedBox(
                               height: 48,
@@ -357,12 +354,8 @@ class BoardExpansionTile extends StatelessWidget {
                   ),
                   InkWell(
                     onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => FreeBulletinBoardPage(
-                                boardType: BoardType.free, boardInfo: model)),
-                      );
+                      Navigator.of(context).push(slideRoute(FreeBulletinBoardPage(
+                          boardType: BoardType.free, boardInfo: model)));
                     },
                     child: Text(
                       model.ko_name,

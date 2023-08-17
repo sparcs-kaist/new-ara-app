@@ -20,6 +20,7 @@ import 'package:new_ara_app/pages/user_view_page.dart';
 import 'package:new_ara_app/pages/post_write_page.dart';
 import 'package:new_ara_app/utils/post_view_utils.dart';
 import 'package:new_ara_app/constants/url_info.dart';
+import 'package:new_ara_app/utils/slide_routing.dart';
 
 
 class PostViewPage extends StatefulWidget {
@@ -205,10 +206,7 @@ class _PostViewPageState extends State<PostViewPage> {
                             // 유저 정보 (프로필 이미지, 닉네임)
                             InkWell(
                               onTap: article.name_type == 2 ? null : () async {
-                                await Navigator.push(
-                                  context,
-                                  MaterialPageRoute(builder: (context) => UserViewPage(userID: article.created_by.id)),
-                                );
+                                await Navigator.of(context).push(slideRoute(UserViewPage(userID: article.created_by.id)));
                                 _setIsValid(await _fetchArticle(userProvider));
                               },
                               child: Row(
