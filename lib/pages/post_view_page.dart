@@ -284,15 +284,13 @@ class _PostViewPageState extends State<PostViewPage> {
                                     ).posVote();
                                     if (res) update();
                                   },
-                                  child: SizedBox(
-                                    width: 25,
-                                    height: 25,
-                                    child: SvgPicture.asset(
-                                      'assets/icons/like.svg',
-                                      color: article.my_vote == false
-                                          ? ColorsInfo.noneVote
-                                          : ColorsInfo.newara,
-                                    ),
+                                  child: SvgPicture.asset(
+                                    'assets/icons/like.svg',
+                                    color: article.my_vote == false
+                                        ? ColorsInfo.noneVote
+                                        : ColorsInfo.newara,
+                                    width: 35,
+                                    height: 35,
                                   ),
                                 ),
                                 const SizedBox(width: 3),
@@ -314,16 +312,15 @@ class _PostViewPageState extends State<PostViewPage> {
                                         if (result) update();
                                       });
                                     },
-                                    child: SizedBox(
-                                      width: 25,
-                                      height: 25,
-                                      child: SvgPicture.asset(
-                                        'assets/icons/dislike.svg',
-                                        color: article.my_vote == true
-                                            ? ColorsInfo.noneVote
-                                            : ColorsInfo.negVote,
-                                      ),
-                                    )),
+                                    child: SvgPicture.asset(
+                                      'assets/icons/dislike.svg',
+                                      color: article.my_vote == true
+                                          ? ColorsInfo.noneVote
+                                          : ColorsInfo.negVote,
+                                      width: 35,
+                                      height: 35,
+                                    ),
+                                ),
                                 const SizedBox(width: 3),
                                 Text('${article.negative_vote_count}',
                                     style: TextStyle(
@@ -335,7 +332,7 @@ class _PostViewPageState extends State<PostViewPage> {
                                     )),
                               ],
                             ),
-                            const SizedBox(height: 5),
+                            const SizedBox(height: 10),
                             Row(
                               mainAxisAlignment:
                               MainAxisAlignment.spaceBetween,
@@ -645,7 +642,7 @@ class _PostViewPageState extends State<PostViewPage> {
                                             ),
                                           ),
                                           SizedBox(
-                                            width: 30,
+                                            width: 50,
                                             height: 25,
                                             child: Visibility(
                                                 visible: !(curComment.is_hidden),
@@ -697,12 +694,9 @@ class _PostViewPageState extends State<PostViewPage> {
                                                     },
                                                     child:
                                                     SvgPicture.asset(
-                                                      curComment.my_vote ==
-                                                          true
-                                                          ? 'assets/icons/like_filled.svg'
-                                                          : 'assets/icons/like.svg',
-                                                      width: 17,
-                                                      height: 17,
+                                                      'assets/icons/like.svg',
+                                                      width: 25,
+                                                      height: 25,
                                                       color:
                                                       curComment.my_vote ==
                                                           false
@@ -744,12 +738,9 @@ class _PostViewPageState extends State<PostViewPage> {
                                                     },
                                                     child:
                                                     SvgPicture.asset(
-                                                      curComment.my_vote ==
-                                                          false
-                                                          ? 'assets/icons/dislike_filled.svg'
-                                                          : 'assets/icons/dislike.svg',
-                                                      width: 17,
-                                                      height: 17,
+                                                      'assets/icons/dislike.svg',
+                                                      width: 25,
+                                                      height: 25,
                                                       color: curComment
                                                           .my_vote ==
                                                           true
@@ -1026,8 +1017,6 @@ class _PostViewPageState extends State<PostViewPage> {
       icon: SvgPicture.asset(
         'assets/icons/menu_2.svg',
         color: Colors.grey,
-        width: 25,
-        height: 25,
       ),
       itemBuilder: (BuildContext context) => [
         PopupMenuItem<String>(
@@ -1233,7 +1222,7 @@ class _PostViewPageState extends State<PostViewPage> {
           child: Row(
             children: [
               SvgPicture.asset(
-                'assets/icons/exclamationmark-bubble-fill.svg',
+                'assets/icons/warning.svg',
                 width: 20,
                 height: 20,
                 color: ColorsInfo.newara,

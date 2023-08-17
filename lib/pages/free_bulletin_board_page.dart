@@ -191,6 +191,7 @@ class _FreeBulletinBoardPageState extends State<FreeBulletinBoardPage> {
               child: SvgPicture.asset(
                 'assets/icons/modify.svg',
                 fit: BoxFit.fill,
+                color: ColorsInfo.newara,
               ),
             ),
           ),

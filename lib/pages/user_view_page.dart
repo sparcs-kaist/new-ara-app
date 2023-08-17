@@ -140,6 +140,7 @@ class _UserViewPageState extends State<UserViewPage> {
                   child: SizedBox(
                     width: MediaQuery.of(context).size.width - 40,
                     child: ListView.separated(
+                      physics: const AlwaysScrollableScrollPhysics(),
                       controller: _listViewController,
                       itemCount: articleList.length + 1,
                       itemBuilder: (BuildContext context, int idx) {
