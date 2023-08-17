@@ -149,9 +149,7 @@ class _PostViewPageState extends State<PostViewPage> {
                                 Row(
                                   children: [
                                     SvgPicture.asset(
-                                      article.my_vote == true
-                                          ? 'assets/icons/like_filled.svg'
-                                          : 'assets/icons/like.svg',
+                                      'assets/icons/like.svg',
                                       width: 13,
                                       height: 15,
                                       color: article.my_vote == false
@@ -168,9 +166,7 @@ class _PostViewPageState extends State<PostViewPage> {
                                                 : ColorsInfo.newara)),
                                     const SizedBox(width: 10),
                                     SvgPicture.asset(
-                                      article.my_vote == false
-                                          ? 'assets/icons/dislike_filled.svg'
-                                          : 'assets/icons/dislike.svg',
+                                      'assets/icons/dislike.svg',
                                       width: 13,
                                       height: 15,
                                       color: article.my_vote == true
@@ -294,9 +290,7 @@ class _PostViewPageState extends State<PostViewPage> {
                                     width: 25,
                                     height: 25,
                                     child: SvgPicture.asset(
-                                      article.my_vote == true
-                                          ? 'assets/icons/like_filled.svg'
-                                          : 'assets/icons/like.svg',
+                                      'assets/icons/like.svg',
                                       color: article.my_vote == false
                                           ? ColorsInfo.noneVote
                                           : ColorsInfo.newara,
@@ -326,9 +320,7 @@ class _PostViewPageState extends State<PostViewPage> {
                                       width: 25,
                                       height: 25,
                                       child: SvgPicture.asset(
-                                        article.my_vote == false
-                                            ? 'assets/icons/dislike_filled.svg'
-                                            : 'assets/icons/dislike.svg',
+                                        'assets/icons/dislike.svg',
                                         color: article.my_vote == true
                                             ? ColorsInfo.noneVote
                                             : ColorsInfo.negVote,
@@ -999,9 +991,15 @@ class _PostViewPageState extends State<PostViewPage> {
                   ),
                   borderRadius: const BorderRadius.all(Radius.circular(5)),
                 ),
-                child: Text(
-                  Uri.parse(article.attachments[idx].file).path.substring(7),
-                  overflow: TextOverflow.ellipsis,
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: Text(
+                        Uri.parse(article.attachments[idx].file).path.substring(7),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ),
