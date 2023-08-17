@@ -517,9 +517,6 @@ class _UserPageState extends State<UserPage>
                                 width: 30,
                                 height: 25,
                               ),
-                              const SizedBox(
-                                width: 9,
-                              ),
                               SvgPicture.asset(
                                 'assets/icons/clip.svg',
                                 color: Colors.grey,

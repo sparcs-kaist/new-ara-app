@@ -50,9 +50,6 @@ class _PostPreviewState extends State<PostPreview> {
                           'assets/icons/image.svg',
                           color: Colors.grey,
                         ),
-                        const SizedBox(
-                          width: 9,
-                        ),
                         SvgPicture.asset(
                           'assets/icons/clip.svg',
                           color: Colors.grey,

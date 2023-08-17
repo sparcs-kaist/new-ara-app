@@ -21,6 +21,7 @@ import 'package:new_ara_app/pages/post_write_page.dart';
 import 'package:new_ara_app/utils/post_view_utils.dart';
 import 'package:new_ara_app/constants/url_info.dart';
 import 'package:new_ara_app/utils/slide_routing.dart';
+import 'package:new_ara_app/constants/file_type.dart';
 
 
 class PostViewPage extends StatefulWidget {
@@ -875,27 +876,31 @@ class _PostViewPageState extends State<PostViewPage> {
                             // Close button
                             Visibility(
                               visible: (isModify || isNestedComment),
-                              child: Column(
+                              child: Row(
                                 children: [
-                                  InkWell(
-                                    onTap: () {
-                                      _textEditingController.text = "";
-                                      targetComment = null;
-                                      debugPrint("Parent Comment null");
-                                      _setCommentMode(false, false);
-                                    },
-                                    child: SvgPicture.asset(
-                                      'assets/icons/close-2.svg',
-                                      width: 30,
-                                      height: 30,
-                                      color: ColorsInfo.newara,
-                                    ),
+                                  Column(
+                                    children: [
+                                      InkWell(
+                                        onTap: () {
+                                          _textEditingController.text = "";
+                                          targetComment = null;
+                                          debugPrint("Parent Comment null");
+                                          _setCommentMode(false, false);
+                                        },
+                                        child: SvgPicture.asset(
+                                          'assets/icons/close-2.svg',
+                                          width: 30,
+                                          height: 30,
+                                          color: ColorsInfo.newara,
+                                        ),
+                                      ),
+                                      const SizedBox(width: 5),
+                                    ],
                                   ),
-                                  const SizedBox(width: 5),
+                                  const SizedBox(width: 8),
                                 ],
                               ),
                             ),
-                            const SizedBox(width: 8),
                             // TextFormField
                             Expanded(
                               child: Container(
@@ -953,6 +958,28 @@ class _PostViewPageState extends State<PostViewPage> {
     );
   }
 
+  SvgPicture _getFileTypeImage(String ext) {
+    late String assetPath;
+    if (AttachFileType.imageExt.contains(ext)) {
+      assetPath = "assets/icons/image.svg";
+    } else if (AttachFileType.videoExt.contains(ext)) {
+      assetPath = "assets/icons/video.svg";
+    } else if (AttachFileType.docx == ext){
+      assetPath = "assets/icons/docx.svg";
+    } else if (AttachFileType.pdf == ext) {
+      assetPath = "assets/icons/pdf.svg";
+    } else {
+      assetPath = "assets/icons/clip.svg";
+    }
+    debugPrint("$ext");
+    return SvgPicture.asset(
+      assetPath,
+      color: Colors.black,
+      width: 30,
+      height: 30,
+    );
+  }
+
   PopupMenuButton<int> _buildAttachMenuButton(int fileNum) {
     return PopupMenuButton<int>(
       shadowColor: const Color.fromRGBO(0, 0, 0, 0.2),
@@ -964,34 +991,55 @@ class _PostViewPageState extends State<PostViewPage> {
       padding: const EdgeInsets.all(2.0),
       child: Text(
         '첨부파일 모아보기 $fileNum',
+        style: const TextStyle(
+          fontSize: 16,
+          fontWeight: FontWeight.w500,
+        ),
       ),
       itemBuilder: (BuildContext context) {
         List<AttachmentModel> files = article.attachments;
         return List.generate(
             files.length,
-            (idx) => PopupMenuItem<int>(
-              value: idx,
-              child: Container(
-                padding: const EdgeInsets.only(left: 5),
-                decoration: BoxDecoration(
-                  border: Border.all(
-                    color: const Color(0x00FFFFFF),
-                    width: 2,
-                  ),
-                  borderRadius: const BorderRadius.all(Radius.circular(5)),
-                ),
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: Text(
-                        Uri.parse(article.attachments[idx].file).path.substring(7),
-                        overflow: TextOverflow.ellipsis,
-                      ),
+            (idx) {
+              String fullFileName = Uri.parse(files[idx].file).path.substring(7);
+              int dotIndex = fullFileName.lastIndexOf(".");
+              String fileName = dotIndex == -1 ? fullFileName : fullFileName.substring(0, dotIndex - 1);
+              String extension = dotIndex == -1 ? "" : fullFileName.substring(dotIndex);
+              return PopupMenuItem<int>(
+                value: idx,
+                child: Container(
+                  padding: const EdgeInsets.only(left: 3),
+                  decoration: BoxDecoration(
+                    border: Border.all(
+                      color: const Color(0x00FFFFFF),
+                      width: 2,
                     ),
-                  ],
+                    borderRadius: const BorderRadius.all(Radius.circular(5)),
+                  ),
+                  child: Row(
+                    children: [
+                      _getFileTypeImage(extension.substring(1) ?? ""),
+                      const SizedBox(width: 10),
+                      Flexible(
+                        child: Text(
+                          fileName,
+                          overflow: TextOverflow.ellipsis,
+                          style: const TextStyle(
+                            color: Colors.black,
+                          ),
+                        ),
+                      ),
+                      Text(
+                        extension,
+                        style: const TextStyle(
+                          color: Colors.black,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-            ),
+              );
+            },
         );
       },
       onSelected: (int result) async {
@@ -1014,9 +1062,11 @@ class _PostViewPageState extends State<PostViewPage> {
         borderRadius: BorderRadius.all(Radius.circular(12.0)),
       ),
       padding: const EdgeInsets.all(2.0),
-      icon: SvgPicture.asset(
+      child: SvgPicture.asset(
         'assets/icons/menu_2.svg',
         color: Colors.grey,
+        width: 50,
+        height: 20,
       ),
       itemBuilder: (BuildContext context) => [
         PopupMenuItem<String>(
@@ -1189,11 +1239,11 @@ class _PostViewPageState extends State<PostViewPage> {
           side: BorderSide(color: Color.fromRGBO(217, 217, 217, 1), width: 0.5),
           borderRadius: BorderRadius.all(Radius.circular(12.0))),
       padding: const EdgeInsets.all(2.0),
-      icon: SvgPicture.asset(
+      child: SvgPicture.asset(
         'assets/icons/menu_2.svg',
         color: Colors.grey,
-        width: 25,
-        height: 25,
+        width: 50,
+        height: 20,
       ),
       itemBuilder: (BuildContext context) => [
         PopupMenuItem<String>(
