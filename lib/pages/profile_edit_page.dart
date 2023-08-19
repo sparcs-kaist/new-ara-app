@@ -70,24 +70,28 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
                   Stack(
                     children: [
                       Container(
-                        width: 200,
-                        height: 200,
-                        decoration: const BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: Colors.grey,
+                        decoration: BoxDecoration(
+                          border: Border.all(
+                            color: Colors.grey,
+                          ),
+                          borderRadius: BorderRadius.all(Radius.circular(100)),
                         ),
                         child: ClipRRect(
-                          borderRadius: const BorderRadius.all(Radius.circular(100)),
-                          child: userProvider.naUser?.picture == null
-                              ? Container()
-                              : Image.network(
-                              fit: BoxFit.cover,
-                              userProvider.naUser!.picture.toString()),
+                          borderRadius:
+                          const BorderRadius.all(Radius.circular(100)),
+                          child: SizedBox.fromSize(
+                            size: const Size.fromRadius(150),
+                            child: userProvider.naUser?.picture == null
+                                ? Container()
+                                : Image.network(
+                                fit: BoxFit.cover,
+                                userProvider.naUser!.picture.toString()),
+                          ),
                         ),
                       ),
                       Positioned(
                         bottom: 0,
-                        right: 10,
+                        right: 15,
                         child: InkWell(
                           onTap: () {},  // (2023.08.19)프로필 사진 수정 기능 추후 구현 예정
                           child: Container(
@@ -95,7 +99,7 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
                             height: 40,
                             decoration: const BoxDecoration(
                               shape: BoxShape.circle,
-                              color: Colors.black54,
+                              color: Color.fromRGBO(51, 51, 51, 1),
                             ),
                             child: SvgPicture.asset(
                               "assets/icons/camera.svg",
