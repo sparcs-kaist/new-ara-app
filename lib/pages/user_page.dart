@@ -466,13 +466,15 @@ class _UserPageState extends State<UserPage>
           }
           return InkWell(
               onTap: () async {
-                return;
                 await Navigator.of(context)
                     .push(slideRoute(PostViewPage(id: curPost.id)));
-                var fetchFunc = (tabIndex == 0 ? fetchCreatedArticles : (tabIndex == 1 ? fetchScrappedArticles : fetchRecentArticles));
+                int newMaxPage = 0;
                 for (int page = 1; page <= curPage[tabIndex]; page++) {
-                  await fetchFunc(userProvider, page);
+                  bool res = await selectFetchFunc(userProvider, tabIndex, page);
+                  if (!res) break;
+                  newMaxPage = page;
                 }
+                curPage[tabIndex] = newMaxPage;
                 setCurCount(tabIndex);
               },
               child: SizedBox(
