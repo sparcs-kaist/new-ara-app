@@ -62,12 +62,15 @@ class _UserPageState extends State<UserPage>
     scrollControllerList[1].addListener(_scrollListener1);
     scrollControllerList[2].addListener(_scrollListener2);
 
-    UserProvider userProvider = context.read<UserProvider>();
 
+    UserProvider userProvider = context.read<UserProvider>();
     fetchInitData(userProvider);
   }
 
   Future<void> fetchInitData(UserProvider userProvider) async {
+    bool userFetchRes = await userProvider.apiMeUserInfo();
+    //if (!userFetchRes) return;
+    debugPrint("fetch invoked!, $userFetchRes, ");
     isLoadedList[0] = await fetchCreatedArticles(userProvider, 1);
     setCurCount(0);
   }
