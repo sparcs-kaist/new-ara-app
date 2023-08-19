@@ -48,7 +48,7 @@ class SettingPageState extends State<SettingPage> {
         leading: IconButton(
           color: ColorsInfo.newara,
           icon: SvgPicture.asset('assets/icons/left_chevron.svg',
-              color: ColorsInfo.newara, width: 10.7, height: 18.99),
+              color: ColorsInfo.newara, width: 35, height: 35),
           onPressed: () {
             Navigator.pop(context);
           },

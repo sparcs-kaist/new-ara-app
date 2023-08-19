@@ -14,6 +14,9 @@ class UserProvider with ChangeNotifier {
   List<Cookie> _loginCookie = [];
   final Map<String, dynamic> _apiRes = {};
 
+  bool _isWebViewLoaded = false;
+  bool get isWebViewLoaded => _isWebViewLoaded;
+
   UserProfileModel? get naUser => _naUser;
   bool get hasData => _hasData;
   dynamic get apiRes => _apiRes;
@@ -21,6 +24,11 @@ class UserProvider with ChangeNotifier {
   void setHasData(bool tf) {
     _hasData = tf;
     notifyListeners();
+  }
+
+  void setIsWebViewLoaded(bool tf, {bool quiet=false}) {
+    _isWebViewLoaded = tf;
+    if (!quiet) notifyListeners();
   }
 
   void setCookieToList(String cookieString) {

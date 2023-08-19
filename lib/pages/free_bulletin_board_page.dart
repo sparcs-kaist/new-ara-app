@@ -11,6 +11,7 @@ import 'package:new_ara_app/widgetclasses/post_preview.dart';
 import 'package:new_ara_app/models/board_detail_action_model.dart';
 import 'package:new_ara_app/models/article_list_action_model.dart';
 import 'package:new_ara_app/pages/post_view_page.dart';
+import 'package:new_ara_app/utils/slide_routing.dart';
 
 class FreeBulletinBoardPage extends StatefulWidget {
   final BoardDetailActionModel? boardInfo;
@@ -123,35 +124,27 @@ class _FreeBulletinBoardPageState extends State<FreeBulletinBoardPage> {
       appBar: AppBar(
         centerTitle: true,
         leadingWidth: 100,
-        leading: Row(
-          children: [
-            SizedBox(
-              width: 35,
-              child: IconButton(
+        leading: InkWell(
+          onTap: () => Navigator.pop(context),
+          child: Row(
+            children: [
+              SvgPicture.asset(
+                'assets/icons/left_chevron.svg',
                 color: ColorsInfo.newara,
-                icon: SizedBox(
-                  width: 11.58,
-                  height: 21.87,
-                  child: SvgPicture.asset(
-                    'assets/icons/left_chevron.svg',
-                    color: ColorsInfo.newara,
-                    fit: BoxFit.fill,
-                  ),
+                fit: BoxFit.fill,
+                width: 35,
+                height: 35,
+              ),
+              const Text(
+                "게시판",
+                style: TextStyle(
+                  color: Color(0xFFED3A3A),
+                  fontSize: 17,
+                  fontWeight: FontWeight.w500,
                 ),
-                onPressed: () {
-                  Navigator.pop(context);
-                },
               ),
-            ),
-            const Text(
-              "게시판",
-              style: TextStyle(
-                color: Color(0xFFED3A3A),
-                fontSize: 17,
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-          ],
+            ],
+          ),
         ),
         title: SizedBox(
           child: Text(
@@ -198,6 +191,7 @@ class _FreeBulletinBoardPageState extends State<FreeBulletinBoardPage> {
               child: SvgPicture.asset(
                 'assets/icons/modify.svg',
                 fit: BoxFit.fill,
+                color: ColorsInfo.newara,
               ),
             ),
           ),
@@ -222,11 +216,8 @@ class _FreeBulletinBoardPageState extends State<FreeBulletinBoardPage> {
                           ? Container()
                           : InkWell(
                               onTap: () async {
-                                await Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (context) => PostViewPage(
-                                            id: postPreviewList[index].id)));
+                                await Navigator.of(context).push(slideRoute(PostViewPage(
+                                    id: postPreviewList[index].id)));
                                 updateAllBulletinList();
                               },
                               child: Column(

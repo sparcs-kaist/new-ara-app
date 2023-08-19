@@ -174,10 +174,10 @@ class _UserPageState extends State<UserPage>
             highlightColor: Colors.white,
             splashColor: Colors.white,
             icon: SvgPicture.asset(
-              'assets/icons/icon-setting.svg',
+              'assets/icons/setting.svg',
               color: ColorsInfo.newara,
-              width: 25,
-              height: 25,
+              width: 35,
+              height: 35,
             ),
             onPressed: () {
               Navigator.of(context).push(slideRoute(const SettingPage()));
@@ -512,23 +512,32 @@ class _UserPageState extends State<UserPage>
                             crossAxisAlignment: CrossAxisAlignment.center,
                             children: [
                               SvgPicture.asset(
-                                'assets/icons/image_post_preview.svg',
-                              ),
-                              const SizedBox(
-                                width: 9,
+                                'assets/icons/image.svg',
+                                color: Colors.grey,
+                                width: 30,
+                                height: 25,
                               ),
                               SvgPicture.asset(
-                                'assets/icons/clip_post_preview.svg',
+                                'assets/icons/clip.svg',
+                                color: Colors.grey,
+                                width: 15,
+                                height: 20,
                               ),
                             ],
                           )
                               : curPost.attachment_type.toString() == "IMAGE"
                               ? SvgPicture.asset(
-                            'assets/icons/image_post_preview.svg',
+                            'assets/icons/image.svg',
+                            color: Colors.grey,
+                            width: 30,
+                            height: 25,
                           )
                               : curPost.attachment_type.toString() == "NON_IMAGE"
                               ? SvgPicture.asset(
-                            'assets/icons/clip_post_preview.svg',
+                            'assets/icons/clip.svg',
+                            color: Colors.grey,
+                            width: 15,
+                            height: 20,
                           )
                               : Container()
                         ],
@@ -575,8 +584,8 @@ class _UserPageState extends State<UserPage>
                             children: [
                               SvgPicture.asset(
                                 'assets/icons/like.svg',
-                                width: 13,
-                                height: 15,
+                                width: 20,
+                                height: 20,
                                 color: ColorsInfo.newara,
                               ),
                               const SizedBox(width: 3),
@@ -588,8 +597,8 @@ class _UserPageState extends State<UserPage>
                               const SizedBox(width: 10),
                               SvgPicture.asset(
                                 'assets/icons/dislike.svg',
-                                width: 13,
-                                height: 15,
+                                width: 20,
+                                height: 20,
                                 color: const Color.fromRGBO(83, 141, 209, 1),
                               ),
                               const SizedBox(width: 3),
@@ -601,8 +610,8 @@ class _UserPageState extends State<UserPage>
                               const SizedBox(width: 10),
                               SvgPicture.asset(
                                 'assets/icons/comment.svg',
-                                width: 13,
-                                height: 15,
+                                width: 20,
+                                height: 20,
                                 color: const Color.fromRGBO(99, 99, 99, 1),
                               ),
                               const SizedBox(width: 3),

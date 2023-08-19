@@ -54,6 +54,7 @@ class _MainNavigationTabPageState extends State<MainNavigationTabPage> {
 
   BottomNavigationBar _buildBottomNavigationBar() {
     return BottomNavigationBar(
+      backgroundColor: Colors.white,
       currentIndex: _selectedIndex,
       showSelectedLabels: false,
       showUnselectedLabels: false,
@@ -63,7 +64,7 @@ class _MainNavigationTabPageState extends State<MainNavigationTabPage> {
       items: [
         BottomNavigationBarItem(
           icon: SvgPicture.asset(
-            'assets/icons/home-1.svg',
+            'assets/icons/home.svg',
             color: _selectedIndex == 0 ? Colors.black : Colors.grey,
             width: 36,
             height: 36,
@@ -74,8 +75,8 @@ class _MainNavigationTabPageState extends State<MainNavigationTabPage> {
           icon: SvgPicture.asset(
             'assets/icons/post_list.svg',
             color: _selectedIndex == 1 ? Colors.black : Colors.grey,
-            width: 23,
-            height: 20,
+            width: 36,
+            height: 36,
           ),
           label: 'Bulletin',
         ),
@@ -83,8 +84,8 @@ class _MainNavigationTabPageState extends State<MainNavigationTabPage> {
           icon: SvgPicture.asset(
             'assets/icons/chat.svg',
             color: _selectedIndex == 2 ? Colors.black : Colors.grey,
-            width: 25,
-            height: 23.33,
+            width: 36,
+            height: 36,
           ),
           label: 'Chatting',
         ),

@@ -47,23 +47,24 @@ class _PostPreviewState extends State<PostPreview> {
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
                         SvgPicture.asset(
-                          'assets/icons/image_post_preview.svg',
-                        ),
-                        SizedBox(
-                          width: 9,
+                          'assets/icons/image.svg',
+                          color: Colors.grey,
                         ),
                         SvgPicture.asset(
-                          'assets/icons/clip_post_preview.svg',
+                          'assets/icons/clip.svg',
+                          color: Colors.grey,
                         ),
                       ],
                     )
                   : widget.model.attachment_type.toString() == "IMAGE"
                       ? SvgPicture.asset(
-                          'assets/icons/image_post_preview.svg',
+                          'assets/icons/image.svg',
+                color: Colors.grey,
                         )
                       : widget.model.attachment_type.toString() == "NON_IMAGE"
                           ? SvgPicture.asset(
-                              'assets/icons/clip_post_preview.svg',
+                              color: Colors.grey,
+                              'assets/icons/clip.svg',
                             )
                           : Container()
             ],
