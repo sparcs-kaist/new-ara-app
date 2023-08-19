@@ -308,7 +308,7 @@ class _PostWritePageState extends State<PostWritePage> {
         _currentHtmlContent != '<p><br></p>' &&
         _isUploadingPost == false;
 
-  //  _getCurrentHtmlContent();
+    //  _getCurrentHtmlContent();
 
     String updateImgTagSrc(htmlString, uuid, fileUrl) {
       var document = parse(htmlString);
@@ -819,19 +819,18 @@ class _PostWritePageState extends State<PostWritePage> {
                   ),
                   Expanded(
                     child: Column(
-                      mainAxisAlignment: MainAxisAlignment.end,
+                      // mainAxisAlignment: MainAxisAlignment.end,
                       children: [
-                        
-                        
                         Expanded(
                           child: SingleChildScrollView(
+                            physics: NeverScrollableScrollPhysics(),
                             child: Column(
-                            
                               children: [
                                 HtmlEditor(
-                                  callbacks:
-                                      Callbacks(onChangeContent: (String? value) {
-                                    debugPrint("onChangeContent:R!!!!!!!!!!!!!!!!");
+                                  callbacks: Callbacks(
+                                      onChangeContent: (String? value) {
+                                    debugPrint(
+                                        "onChangeContent:R!!!!!!!!!!!!!!!!");
                                     setState(() {
                                       _currentHtmlContent = value!;
                                     });
@@ -839,34 +838,38 @@ class _PostWritePageState extends State<PostWritePage> {
                                   controller: _htmlController, //required
                                   htmlEditorOptions: HtmlEditorOptions(
                                       shouldEnsureVisible: true,
-                                    
+                                      autoAdjustHeight: true,
                                       hint: "내용을 입력해주세요.",
-                                      initialText: widget.previousArticle == null
+                                      initialText: widget.previousArticle ==
+                                              null
                                           ? null
                                           : widget.previousArticle!.content),
                                   htmlToolbarOptions: HtmlToolbarOptions(
                                       toolbarType: ToolbarType.nativeGrid,
-                                      mediaUploadInterceptor: (PlatformFile file,
-                                          InsertFileType type) async {
+                                      mediaUploadInterceptor:
+                                          (PlatformFile file,
+                                              InsertFileType type) async {
                                         if (type == InsertFileType.image) {
                                           // var uuid = Uuid();
                                           String uuid = const Uuid().v4();
                                           setState(() {
                                             _isFileMenuBarSelected = true;
-                                            _attachmentList.add(AttachmentsFormat(
+                                            _attachmentList
+                                                .add(AttachmentsFormat(
                                               fileType: FileType.Image,
                                               isNewFile: true,
                                               fileLocalPath: file.path,
                                               uuid: uuid,
                                             ));
                                           });
-                                          
+
                                           ///src랑 file.path랑 연결해줘야함.
                                           String base64Data =
                                               base64.encode(file.bytes!);
                                           String base64Image =
                                               """<img data-uuid=$uuid  src="data:image/${file.extension};base64,$base64Data" data-filename="${file.name}" width=100% />""";
-                                          _htmlController.insertHtml(base64Image);
+                                          _htmlController
+                                              .insertHtml(base64Image);
                                         }
                                         return false;
                                       },
@@ -880,7 +883,7 @@ class _PostWritePageState extends State<PostWritePage> {
                                           strikethrough: true,
                                           superscript: false,
                                           subscript: false,
-                                          
+
                                           // StyleButtons(
                                         ),
                                         const InsertButtons(
@@ -894,23 +897,23 @@ class _PostWritePageState extends State<PostWritePage> {
                                         )
                                         // ColorButtons(),
                                       ]),
-                                          
+
                                   otherOptions: OtherOptions(
-                                    height: 350,
+                                    height: 450,
                                   ),
                                 ),
-                                Container(
-                                  color: Colors.blue,
-                                  height: 10,
-                                )
+                                // Container(
+                                //   color: Colors.blue,
+                                //   height: 10,
+                                // )
                               ],
                             ),
                           ),
                         ),
-                        Container(
-                          height: 5,
-                          color: Colors.yellow,
-                        )
+                        // Container(
+                        //   height: 5,
+                        //   color: Colors.yellow,
+                        // )
                       ],
                     ),
                   ),
