@@ -68,8 +68,6 @@ class _UserPageState extends State<UserPage>
 
   Future<void> fetchInitData(UserProvider userProvider) async {
     isLoadedList[0] = await fetchCreatedArticles(userProvider, 1);
-    isLoadedList[1] = await fetchScrappedArticles(userProvider, 1);
-    isLoadedList[2] = await fetchRecentArticles(userProvider, 1);
     setCurCount(0);
   }
 
@@ -91,18 +89,30 @@ class _UserPageState extends State<UserPage>
     if (mounted) setState(() {});
   }
 
+  Future<void> fetchNewTab(UserProvider userProvider, int newTabIndex) async {
+    setIsLoaded(false, 0);
+    setIsLoaded(false, 1);
+    setIsLoaded(false, 2);
+    bool res = await selectFetchFunc(userProvider, newTabIndex, 1);
+    if (!res) return;
+    curPage[newTabIndex] = 1;
+    setCurCount(newTabIndex);
+    setIsLoaded(true, newTabIndex);
+  }
+
   void _handleTabChange() {
-    int tabIndex = _tabController.index;
+    int newTabIndex = _tabController.index;
     UserProvider userProvider = context.read<UserProvider>();
     if (!_tabController.indexIsChanging) {
       if (_tabController.animation!.isCompleted) {
         return;
       } else {  // Swipe
-        // swipe method
+        fetchNewTab(userProvider, newTabIndex);
       }
     }
     else {  // Tab
       // fetch method
+      fetchNewTab(userProvider, newTabIndex);
     }
   }
 
