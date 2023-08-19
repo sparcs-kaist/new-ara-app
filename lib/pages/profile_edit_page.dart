@@ -18,10 +18,17 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
   String _changedNick = "";
 
   @override
+  void initState() {
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    MediaQueryData mediaQueryData = MediaQuery.of(context);
     UserProvider userProvider = context.read<UserProvider>();
     UserProfileModel userProfileModel = userProvider.naUser!;
+
+    MediaQueryData mediaQueryData = MediaQuery.of(context);
+    double profileDiameter = mediaQueryData.size.width - 70;
 
     return Scaffold(
       appBar: AppBar(
@@ -71,27 +78,24 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
                     children: [
                       Container(
                         decoration: BoxDecoration(
+                          shape: BoxShape.circle,
                           border: Border.all(
                             color: Colors.grey,
                           ),
-                          borderRadius: BorderRadius.all(Radius.circular(100)),
                         ),
-                        child: ClipRRect(
-                          borderRadius:
-                          const BorderRadius.all(Radius.circular(100)),
-                          child: SizedBox.fromSize(
-                            size: const Size.fromRadius(150),
-                            child: userProvider.naUser?.picture == null
-                                ? Container()
-                                : Image.network(
-                                fit: BoxFit.cover,
-                                userProvider.naUser!.picture.toString()),
-                          ),
+                        width: profileDiameter,
+                        height: profileDiameter,
+                        child: ClipOval(
+                          child: userProvider.naUser?.picture == null
+                              ? Container()
+                              : Image.network(
+                              fit: BoxFit.cover,
+                              userProvider.naUser!.picture.toString()),
                         ),
                       ),
                       Positioned(
                         bottom: 0,
-                        right: 15,
+                        right: 50,
                         child: InkWell(
                           onTap: () {},  // (2023.08.19)프로필 사진 수정 기능 추후 구현 예정
                           child: Container(
