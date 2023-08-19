@@ -315,6 +315,8 @@ class _PostWritePageState extends State<PostWritePage> {
       // debugPrint(document.body?.innerHtml ?? '');
       List<html.Element> imgTags = document.getElementsByTagName('img');
 
+      if (uuid == null) return document.body?.innerHtml ?? '';
+
       for (var imgTag in imgTags) {
         if (imgTag.attributes['data-uuid'] == uuid) {
           if (fileUrl != null) {
