@@ -160,6 +160,7 @@ class UserProvider with ChangeNotifier {
       response = await dio.post(totUrl, data: payload);
     } catch (error) {
       debugPrint("POST /api/$apiUrl failed with error: $error");
+      return null;
     }
     return response;
   }
@@ -177,6 +178,7 @@ class UserProvider with ChangeNotifier {
       response = await dio.delete(totUrl, data: payload);
     } catch (error) {
       debugPrint("DELETE /api/$apiUrl failed with error: $error");
+      return null;
     }
     return response;
   }
@@ -194,6 +196,7 @@ class UserProvider with ChangeNotifier {
       response = await dio.patch(totUrl, data: payload);
     } catch (error) {
       debugPrint("PATCH /api/$apiUrl failed with error: $error");
+      return null;
     }
     return response;
   }
