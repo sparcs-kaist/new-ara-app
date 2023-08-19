@@ -69,8 +69,9 @@ class _UserPageState extends State<UserPage>
 
   Future<void> fetchInitData(UserProvider userProvider) async {
     bool userFetchRes = await userProvider.apiMeUserInfo();
-    //if (!userFetchRes) return;
-    debugPrint("fetch invoked!, $userFetchRes, ");
+    if (!userFetchRes) {
+      debugPrint("최신 유저정보 조회 실패!");
+    }
     isLoadedList[0] = await fetchCreatedArticles(userProvider, 1);
     setCurCount(0);
   }
