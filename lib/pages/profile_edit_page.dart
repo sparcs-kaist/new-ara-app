@@ -5,6 +5,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:new_ara_app/providers/user_provider.dart';
 import 'package:new_ara_app/constants/colors_info.dart';
 import 'package:new_ara_app/models/user_profile_model.dart';
+import 'package:new_ara_app/widgetclasses/loading_indicator.dart';
 
 class ProfileEditPage extends StatefulWidget {
   const ProfileEditPage({super.key});
@@ -14,23 +15,63 @@ class ProfileEditPage extends StatefulWidget {
 }
 
 class _ProfileEditPageState extends State<ProfileEditPage> {
-  final GlobalKey _formKey = GlobalKey();
-  String _changedNick = "";
+  final _formKey = GlobalKey<FormState>();
+  String? _changedNick;
+  bool isImageChanged = false;
+  bool isLoading = false;
 
   @override
   void initState() {
     super.initState();
   }
 
+  void setIsLoading(bool tf) {
+    if (mounted) setState(() => isLoading = tf);
+  }
+
+  Future<bool> updateProfile(UserProvider userProvider) async {
+    UserProfileModel userProfileModel = userProvider.naUser!;
+    FormState? formState = _formKey.currentState;
+
+    if (formState == null || !(formState.validate())) return false;
+
+    debugPrint("_changedNick: $_changedNick");
+    // (2023.08.20) 기준 payload. 바뀔 수 있으니 이상하면 브라우저 network에서 직접 보기.
+    // swagger, redoc 정보와 다름.
+    dynamic payload = {
+      "nickname": _changedNick ?? userProfileModel.nickname,
+      "see_sexual": userProfileModel.see_sexual,
+      "see_social": userProfileModel.see_social,
+    };
+    debugPrint("payload info: ${payload.toString()}");
+    if (isImageChanged) {
+      payload.addAll({
+        "picture": null,  // (2023.08.20) 나중에 사진 넣을 예정
+      });
+    }
+    try {
+      var response = await userProvider.patchApiRes(
+        "user_profiles/${userProfileModel.user}/",
+        payload: payload,
+      );
+      if (response == null) return false;
+      if (response.statusCode != 200) return false;
+    } catch (error) {
+      debugPrint("Error: $error");
+      return false;
+    }
+    return true;
+  }
+
   @override
   Widget build(BuildContext context) {
     UserProvider userProvider = context.read<UserProvider>();
-    UserProfileModel userProfileModel = userProvider.naUser!;
+    UserProvider userProviderData = context.watch<UserProvider>();
 
     MediaQueryData mediaQueryData = MediaQuery.of(context);
     double profileDiameter = mediaQueryData.size.width - 70;
 
-    return Scaffold(
+    return isLoading ? const LoadingIndicator() : Scaffold(
       appBar: AppBar(
         centerTitle: true,
         leading: IconButton(
@@ -50,8 +91,18 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
         ),
         actions: [
           IconButton(
-            onPressed: () {
-              // 추후 구현 예정
+            onPressed: () async {
+              setIsLoading(true);
+              bool updateRes = await updateProfile(userProvider);
+              debugPrint("updateRes: $updateRes");
+              _changedNick = null;
+              if (updateRes) {
+                await userProvider.apiMeUserInfo().then((getRes) {
+                  if (getRes) Navigator.pop(context);
+                });
+              } else {
+                setIsLoading(false);
+              }
             },
             icon: const Text(
               '완료',
@@ -86,11 +137,11 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
                         width: profileDiameter,
                         height: profileDiameter,
                         child: ClipOval(
-                          child: userProvider.naUser?.picture == null
+                          child: userProviderData.naUser?.picture == null
                               ? Container()
                               : Image.network(
                               fit: BoxFit.cover,
-                              userProvider.naUser!.picture.toString()),
+                              userProviderData.naUser!.picture.toString()),
                         ),
                       ),
                       Positioned(
@@ -116,7 +167,7 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
                   ),
                   const SizedBox(height: 40),
                   SizedBox(
-                    width: mediaQueryData.size.width - 80,
+                    width: mediaQueryData.size.width - 60,
                     child: Row(
                       children: [
                         const Text(
@@ -135,7 +186,7 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
                               borderRadius:
                               BorderRadius.all(Radius.circular(10)),
                             ),
-                            child: _buildForm(userProfileModel.nickname),
+                            child: _buildForm(userProviderData.naUser!.nickname),
                           ),
                         ),
                       ],
@@ -143,7 +194,7 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
                   ),
                   const SizedBox(height: 30),
                   SizedBox(
-                    width: mediaQueryData.size.width - 80,
+                    width: mediaQueryData.size.width - 60,
                     child: Row(
                       children: [
                         const Text(
@@ -157,7 +208,7 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
                         const SizedBox(width: 45),
                         Expanded(
                           child: Text(
-                            userProfileModel.email,
+                            userProviderData.naUser!.email,
                             style: const TextStyle(
                               fontWeight: FontWeight.w500,
                               fontSize: 15,
@@ -192,10 +243,9 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
               hintText: '변경하실 닉네임을 입력해주세요.',
             ),
             validator: (value) {
+              // (2023.08.19) 나중에 글자 수 확인도 추가해야 함
               if (value == null || value.isEmpty) {
-                return '댓글이 작성되지 않았습니다!';
-              } else if (value == initialNick) {
-                return '닉네임이 변경되지 않았습니다!';
+                return '닉네임이 작성되지 않았습니다!';
               }
               return null;
             },
