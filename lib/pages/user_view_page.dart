@@ -39,6 +39,7 @@ class _UserViewPageState extends State<UserViewPage> {
   }
 
   void _listViewListener() async {
+    // 페이지네이션 기능 수정해야함.
     if (isLoaded &&
         _listViewController.position.pixels ==
             _listViewController.position.maxScrollExtent) {

@@ -13,6 +13,7 @@ import 'package:new_ara_app/models/scrap_model.dart';
 import 'package:new_ara_app/pages/post_view_page.dart';
 import 'package:new_ara_app/utils/time_utils.dart';
 import 'package:new_ara_app/utils/slide_routing.dart';
+import 'package:new_ara_app/pages/profile_edit_page.dart';
 
 class UserPage extends StatefulWidget {
   const UserPage({Key? key}) : super(key: key);
@@ -256,7 +257,14 @@ class _UserPageState extends State<UserPage>
                       width: 26,
                       height: 21,
                       child: GestureDetector(
-                        onTap: () {}, // 추후에 프로필 수정 기능 구현 예정
+                        onTap: () async {
+                          await Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => ProfileEditPage(),
+                            ),
+                          );
+                        }, // 추후에 프로필 수정 기능 구현 예정
                         child: Text(
                           'myPage.change'.tr(),
                           style: const TextStyle(
