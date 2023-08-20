@@ -179,21 +179,16 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
                         ),
                         width: profileDiameter,
                         height: profileDiameter,
-                        child: !(Platform.isAndroid) ? _clippedImage(userProviderData) :
+                        child: !(Platform.isAndroid) ? _buildClippedImage(userProviderData) :
                             FutureBuilder<void>(
                               future: _retrieveLostData(),
                               builder: (context, snapshot) {
                                 switch (snapshot.connectionState) {
                                   case ConnectionState.none:
                                   case ConnectionState.waiting:
-                                    return const Center(
-                                      child: Text(
-                                        'You have not yet picked an image.',
-                                        textAlign: TextAlign.center,
-                                      )
-                                    );
+                                    return const LoadingIndicator();
                                   case ConnectionState.done:
-                                    return _clippedImage(userProviderData);
+                                    return _buildClippedImage(userProviderData);
                                   case ConnectionState.active:
                                     if (snapshot.hasError) {
                                       return Center(
@@ -203,12 +198,7 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
                                         )
                                       );
                                     } else {
-                                      return const Center(
-                                        child: Text(
-                                          'You have not yet picked an image.',
-                                          textAlign: TextAlign.center,
-                                        )
-                                      );
+                                      return const LoadingIndicator();
                                     }
                                 }
                               }
@@ -300,7 +290,7 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
     );
   }
 
-  ClipOval _clippedImage(UserProvider userProviderData) {
+  ClipOval _buildClippedImage(UserProvider userProviderData) {
     return ClipOval(
       child: _selectedImage != null ? Image.file(
         fit: BoxFit.cover,
