@@ -204,6 +204,7 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
                           absorbing: _isCamClicked,
                           child: InkWell(
                             onTap: () async {
+                              if (_isCamClicked) return;
                               setIsCamClicked(true);
                               await _pickImage(context);
                               setIsCamClicked(false);
