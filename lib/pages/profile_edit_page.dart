@@ -1,6 +1,12 @@
+import 'dart:io';
+import 'package:http_parser/http_parser.dart';
 import 'package:flutter/material.dart';
+import 'package:new_ara_app/constants/url_info.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:dio/dio.dart';
+import 'package:mime/mime.dart';
 
 import 'package:new_ara_app/providers/user_provider.dart';
 import 'package:new_ara_app/constants/colors_info.dart';
@@ -16,20 +22,51 @@ class ProfileEditPage extends StatefulWidget {
 
 class _ProfileEditPageState extends State<ProfileEditPage> {
   final _formKey = GlobalKey<FormState>();
-  String? _changedNick;
-  bool isImageChanged = false;
-  bool isLoading = false;
+  final ImagePicker _imagePicker = ImagePicker();
+  bool _isLoading = false;
+  XFile? _selectedImage;
+  String? _changedNick, _retrieveDataError;
 
   @override
   void initState() {
     super.initState();
   }
 
-  void setIsLoading(bool tf) {
-    if (mounted) setState(() => isLoading = tf);
+  void _setIsLoading(bool tf) {
+    if (mounted) setState(() => _isLoading = tf);
   }
 
-  Future<bool> updateProfile(UserProvider userProvider) async {
+  Future<void> _retrieveLostData() async {
+    final LostDataResponse response = await _imagePicker.retrieveLostData();
+    if (response.isEmpty) {
+      return;
+    }
+    if (response.file != null) {
+      setState(() {
+        if (response.files == null) {
+          _selectedImage = response.file;
+        }
+      });
+    } else {
+      _retrieveDataError = response.exception!.code;
+    }
+  }
+
+  Future<void> _pickImage(BuildContext context) async {
+    if (!(context.mounted)) return;
+    double diameter = MediaQuery.of(context).size.width - 70;
+    final XFile? tmpImage = await _imagePicker.pickImage(
+      source: ImageSource.gallery,
+      maxWidth: diameter,
+      maxHeight: diameter,
+      imageQuality: 100,  // (2023.08.21) default 값으로 설정함. 추후 논의 필요
+    );
+    if (tmpImage != null) {
+      setState(() => _selectedImage = tmpImage);
+    }
+  }
+
+  Future<bool> _updateProfile(UserProvider userProvider) async {
     UserProfileModel userProfileModel = userProvider.naUser!;
     FormState? formState = _formKey.currentState;
 
@@ -38,23 +75,28 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
     debugPrint("_changedNick: $_changedNick");
     // (2023.08.20) 기준 payload. 바뀔 수 있으니 이상하면 브라우저 network에서 직접 보기.
     // swagger, redoc 정보와 다름.
-    dynamic payload = {
+    Map<String, dynamic> payload = {
       "nickname": _changedNick ?? userProfileModel.nickname,
       "see_sexual": userProfileModel.see_sexual,
       "see_social": userProfileModel.see_social,
     };
-    debugPrint("payload info: ${payload.toString()}");
-    if (isImageChanged) {
-      payload.addAll({
-        "picture": null,  // (2023.08.20) 나중에 사진 넣을 예정
-      });
-    }
-    try {
-      var response = await userProvider.patchApiRes(
-        "user_profiles/${userProfileModel.user}/",
-        payload: payload,
+    if (_selectedImage != null) {
+      final String imagePath = _selectedImage!.path;
+      final String? mime = lookupMimeType(imagePath);
+      debugPrint("mime: $mime");
+      payload["picture"] = await MultipartFile.fromFile(
+        imagePath,
+        contentType: MediaType("image", mime!.split('/')[1]),
       );
-      if (response == null) return false;
+    }
+    var formData = FormData.fromMap(payload);
+    var dio = Dio();
+    dio.options.headers['Cookie'] = userProvider.getCookiesToString();
+    try {
+      var response = await dio.patch(
+        "$newAraDefaultUrl/api/user_profiles/${userProfileModel.user}/",
+        data: formData,
+      );
       if (response.statusCode != 200) return false;
     } catch (error) {
       debugPrint("Error: $error");
@@ -71,7 +113,7 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
     MediaQueryData mediaQueryData = MediaQuery.of(context);
     double profileDiameter = mediaQueryData.size.width - 70;
 
-    return isLoading ? const LoadingIndicator() : Scaffold(
+    return _isLoading ? const LoadingIndicator() : Scaffold(
       appBar: AppBar(
         centerTitle: true,
         leading: IconButton(
@@ -92,16 +134,17 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
         actions: [
           IconButton(
             onPressed: () async {
-              setIsLoading(true);
-              bool updateRes = await updateProfile(userProvider);
+              _setIsLoading(true);
+              bool updateRes = await _updateProfile(userProvider);
               debugPrint("updateRes: $updateRes");
               _changedNick = null;
+              _selectedImage = null;
               if (updateRes) {
                 await userProvider.apiMeUserInfo().then((getRes) {
                   if (getRes) Navigator.pop(context);
                 });
               } else {
-                setIsLoading(false);
+                _setIsLoading(false);
               }
             },
             icon: const Text(
@@ -136,19 +179,48 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
                         ),
                         width: profileDiameter,
                         height: profileDiameter,
-                        child: ClipOval(
-                          child: userProviderData.naUser?.picture == null
-                              ? Container()
-                              : Image.network(
-                              fit: BoxFit.cover,
-                              userProviderData.naUser!.picture.toString()),
-                        ),
+                        child: !(Platform.isAndroid) ? _clippedImage(userProviderData) :
+                            FutureBuilder<void>(
+                              future: _retrieveLostData(),
+                              builder: (context, snapshot) {
+                                switch (snapshot.connectionState) {
+                                  case ConnectionState.none:
+                                  case ConnectionState.waiting:
+                                    return const Center(
+                                      child: Text(
+                                        'You have not yet picked an image.',
+                                        textAlign: TextAlign.center,
+                                      )
+                                    );
+                                  case ConnectionState.done:
+                                    return _clippedImage(userProviderData);
+                                  case ConnectionState.active:
+                                    if (snapshot.hasError) {
+                                      return Center(
+                                        child: Text(
+                                          'Pick image error: ${snapshot.error}}',
+                                          textAlign: TextAlign.center,
+                                        )
+                                      );
+                                    } else {
+                                      return const Center(
+                                        child: Text(
+                                          'You have not yet picked an image.',
+                                          textAlign: TextAlign.center,
+                                        )
+                                      );
+                                    }
+                                }
+                              }
+                            ),
                       ),
                       Positioned(
                         bottom: 0,
                         right: 50,
                         child: InkWell(
-                          onTap: () {},  // (2023.08.19)프로필 사진 수정 기능 추후 구현 예정
+                          onTap: () async {
+                            await _pickImage(context);
+                          },  // (2023.08.19)프로필 사진 수정 기능 추후 구현 예정
                           child: Container(
                             width: 40,
                             height: 40,
@@ -224,6 +296,32 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
             ),
           ),
         ),
+      ),
+    );
+  }
+
+  ClipOval _clippedImage(UserProvider userProviderData) {
+    return ClipOval(
+      child: _selectedImage != null ? Image.file(
+        fit: BoxFit.cover,
+        File(_selectedImage!.path),
+        errorBuilder: (BuildContext context, Object error,
+            StackTrace? stackTrace) {
+          return const Center(
+              child:
+              Text('This image type is not supported'));
+        },
+      ) : userProviderData.naUser?.picture == null
+          ? Container()
+          : Image.network(
+        fit: BoxFit.cover,
+        userProviderData.naUser!.picture.toString(),
+        errorBuilder: (BuildContext context, Object error,
+            StackTrace? stackTrace) {
+          return const Center(
+              child:
+              Text('Fail to load image'));
+        },
       ),
     );
   }

@@ -44,7 +44,7 @@ dependencies:
   webview_flutter: ^4.0.7
   webview_cookie_manager: ^2.0.6
   dio: ^5.1.2
-  image_picker: ^0.8.7+5
+  image_picker: ^1.0.2
   file_picker: ^5.3.1
   path: ^1.8.3
   path_provider: ^2.0.15
@@ -55,6 +55,8 @@ dependencies:
   html: ^0.15.4
   sanitize_html: ^2.0.0
   flutter_keyboard_visibility: ^5.4.1
+  mime: ^1.0.4
+  http_parser: ^4.0.2
 
 dev_dependencies:
   flutter_test:
