@@ -23,13 +23,17 @@ class ProfileEditPage extends StatefulWidget {
 class _ProfileEditPageState extends State<ProfileEditPage> {
   final _formKey = GlobalKey<FormState>();
   final ImagePicker _imagePicker = ImagePicker();
-  bool _isLoading = false;
+  bool _isLoading = false, _isCamClicked = false;
   XFile? _selectedImage;
   String? _changedNick, _retrieveDataError;
 
   @override
   void initState() {
     super.initState();
+  }
+
+  void setIsCamClicked(bool tf) {
+    if (mounted) setState(() => _isCamClicked = tf);
   }
 
   void _setIsLoading(bool tf) {
@@ -196,20 +200,25 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
                       Positioned(
                         bottom: 0,
                         right: 50,
-                        child: InkWell(
-                          onTap: () async {
-                            await _pickImage(context);
-                          },  // (2023.08.19)프로필 사진 수정 기능 추후 구현 예정
-                          child: Container(
-                            width: 40,
-                            height: 40,
-                            decoration: const BoxDecoration(
-                              shape: BoxShape.circle,
-                              color: Color.fromRGBO(51, 51, 51, 1),
-                            ),
-                            child: SvgPicture.asset(
-                              "assets/icons/camera.svg",
-                              color: Colors.white,
+                        child: AbsorbPointer(
+                          absorbing: _isCamClicked,
+                          child: InkWell(
+                            onTap: () async {
+                              setIsCamClicked(true);
+                              await _pickImage(context);
+                              setIsCamClicked(false);
+                            },  // (2023.08.19)프로필 사진 수정 기능 추후 구현 예정
+                            child: Container(
+                              width: 40,
+                              height: 40,
+                              decoration: const BoxDecoration(
+                                shape: BoxShape.circle,
+                                color: Color.fromRGBO(51, 51, 51, 1),
+                              ),
+                              child: SvgPicture.asset(
+                                "assets/icons/camera.svg",
+                                color: Colors.white,
+                              ),
                             ),
                           ),
                         ),
