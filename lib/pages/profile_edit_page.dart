@@ -186,20 +186,9 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
                                 switch (snapshot.connectionState) {
                                   case ConnectionState.none:
                                   case ConnectionState.waiting:
-                                    return const LoadingIndicator();
+                                  case ConnectionState.active:
                                   case ConnectionState.done:
                                     return _buildClippedImage(userProviderData);
-                                  case ConnectionState.active:
-                                    if (snapshot.hasError) {
-                                      return Center(
-                                        child: Text(
-                                          'Pick image error: ${snapshot.error}}',
-                                          textAlign: TextAlign.center,
-                                        )
-                                      );
-                                    } else {
-                                      return const LoadingIndicator();
-                                    }
                                 }
                               }
                             ),
