@@ -57,6 +57,7 @@ dependencies:
   flutter_keyboard_visibility: ^5.4.1
   mime: ^1.0.4
   http_parser: ^4.0.2
+  flutter_local_notifications: ^15.1.0+1
 
 dev_dependencies:
   flutter_test:
