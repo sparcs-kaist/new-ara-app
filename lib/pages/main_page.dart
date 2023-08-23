@@ -46,7 +46,7 @@ class _MainPageState extends State<MainPage> {
   void refreshDailyBest(UserProvider userProvider) async {
     // api 호출과 Provider 정보 동기화.
     List<dynamic> recentJson =
-        (await userProvider.getApiRes("articles/recent/"))['results'];
+        (await userProvider.getApiRes("articles/top/"))['results'];
     if (mounted) {
       setState(() {
         for (Map<String, dynamic> json in recentJson) {
@@ -305,7 +305,7 @@ class _MainPageState extends State<MainPage> {
                           //잠시 free_bulletin_board 들 테스트 하기 위한
                           Navigator.of(context).push(
                             slideRoute(const FreeBulletinBoardPage(
-                              boardType: BoardType.recent,
+                              boardType: BoardType.top,
                               boardInfo: null,
                             ))
                           );
