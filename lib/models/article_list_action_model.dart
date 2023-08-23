@@ -11,8 +11,8 @@ class ArticleListActionModel {
   final BoardModel parent_board;
   final String? title;
   final PublicUserModel created_by;
-  final String read_status;
-  final String attachment_type;
+  final String? read_status;
+  final String? attachment_type;
   final dynamic communication_article_status; // 변수의 용도 정확하게 모르겠음, string 또는 int
   final dynamic days_left; // 변수의 타입 및 용도 정확하게 모르겠음, string 또는 int
   final String created_at; // $date-time

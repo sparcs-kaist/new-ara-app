@@ -28,19 +28,43 @@ class _FreeBulletinBoardPageState extends State<FreeBulletinBoardPage> {
   int currentPage = 1;
   bool isLoading = true;
   String apiUrl = "";
+  String _boardName = "";
   final ScrollController _scrollController = ScrollController();
 
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
-    if (widget.boardType == BoardType.free) {
-      apiUrl = "articles/?parent_board=${widget.boardInfo!.id.toInt()}&page=";
-    } else if (widget.boardType == BoardType.recent) {
-      apiUrl = "articles/recent/?page=";
-    }
 
     var userProvider = context.read<UserProvider>();
+
+    switch (widget.boardType) {
+      case BoardType.free:
+        apiUrl = "articles/?parent_board=${widget.boardInfo!.id.toInt()}&page=";
+        _boardName = widget.boardInfo!.ko_name;
+        break;
+      case BoardType.recent:
+        apiUrl = "articles/recent/?page=";
+        _boardName = "최근 본 글";
+        break;
+      case BoardType.top:
+        apiUrl = "articles/top/?page=";
+        _boardName = "실시간 인기글";
+        break;
+      case BoardType.all:
+        apiUrl = "articles/?page=";
+        _boardName = "전체보기";
+        break;
+      case BoardType.scraps:
+        apiUrl = "scraps/?page=";
+        _boardName = "담아둔 글";
+        break;
+      default:
+        apiUrl = "articles/?page=";
+        _boardName = "테스트 게시판";
+        break;
+    }
+
     _scrollController.addListener(_scrollListener);
     refreshPostList(userProvider);
   }
@@ -54,13 +78,21 @@ class _FreeBulletinBoardPageState extends State<FreeBulletinBoardPage> {
 
   void refreshPostList(UserProvider userProvider) async {
     Map<String, dynamic>? myMap = await userProvider.getApiRes("${apiUrl}1");
+    debugPrint(myMap?["results"].toString());
     if (mounted) {
       setState(() {
         postPreviewList.clear();
         for (int i = 0; i < (myMap?["results"].length ?? 0); i++) {
           try {
-            postPreviewList
-                .add(ArticleListActionModel.fromJson(myMap!["results"][i]));
+            if (widget.boardType != BoardType.scraps &&
+                myMap!["results"][i]["created_by"]["profile"] != null) {
+                  
+              postPreviewList
+                  .add(ArticleListActionModel.fromJson(myMap!["results"][i]));
+            } else if (widget.boardType == BoardType.scraps) {
+              postPreviewList.add(ArticleListActionModel.fromJson(
+                  myMap!["results"][i]["parent_article"]));
+            }
           } catch (error) {
             debugPrint(
                 "refreshPostList error at $i : $error"); // invalid json 걸러내기
@@ -87,6 +119,10 @@ class _FreeBulletinBoardPageState extends State<FreeBulletinBoardPage> {
             if (myMap["results"][i]["created_by"]["profile"] != null) {
               postPreviewList.add(
                   ArticleListActionModel.fromJson(myMap["results"][i] ?? {}));
+            } else if (widget.boardType == BoardType.scraps) {
+              // 스크랩 게시물이면
+              postPreviewList.add(ArticleListActionModel.fromJson(
+                  myMap["results"][i]["parent_article"] ?? {}));
             }
           }
           isLoading = false;
@@ -105,9 +141,14 @@ class _FreeBulletinBoardPageState extends State<FreeBulletinBoardPage> {
 
         for (int i = 0; i < (json!["results"].length ?? 0); i++) {
           //???/
-          if (json["results"][i]["created_by"]["profile"] != null) {
+          if (widget.boardType != BoardType.scraps &&
+              json["results"][i]["created_by"]["profile"] != null) {
             _newList
                 .add(ArticleListActionModel.fromJson(json["results"][i] ?? {}));
+          } else if (widget.boardType == BoardType.scraps) {
+            // 스크랩 게시물이면
+            _newList.add(ArticleListActionModel.fromJson(
+                json["results"][i]["parent_article"] ?? {}));
           }
         }
       }
@@ -148,7 +189,7 @@ class _FreeBulletinBoardPageState extends State<FreeBulletinBoardPage> {
         ),
         title: SizedBox(
           child: Text(
-            widget.boardInfo?.ko_name ?? "실시간 인기글",
+            _boardName,
             style: const TextStyle(
               color: ColorsInfo.newara,
               fontSize: 18,
@@ -216,8 +257,9 @@ class _FreeBulletinBoardPageState extends State<FreeBulletinBoardPage> {
                           ? Container()
                           : InkWell(
                               onTap: () async {
-                                await Navigator.of(context).push(slideRoute(PostViewPage(
-                                    id: postPreviewList[index].id)));
+                                await Navigator.of(context).push(slideRoute(
+                                    PostViewPage(
+                                        id: postPreviewList[index].id)));
                                 updateAllBulletinList();
                               },
                               child: Column(

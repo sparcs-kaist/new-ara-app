@@ -148,94 +148,118 @@ class _BulletinListPageState extends State<BulletinListPage> {
                         const SizedBox(
                           height: 21,
                         ),
-                        SizedBox(
-                          height: 32,
-                          child: Row(
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              const SizedBox(
-                                width: 3,
-                              ),
-                              SvgPicture.asset(
-                                'assets/icons/menu_1.svg',
-                                height: 32,
-                                width: 32,
-                                color: const Color(0xFFED3A3A),
-                              ),
-                              const SizedBox(
-                                width: 5,
-                              ),
-                              const Text(
-                                '전체보기',
-                                style: TextStyle(
-                                  color: Color(0xFF333333),
-                                  fontSize: 17,
-                                  fontWeight: FontWeight.w700,
+                        InkWell(
+                          onTap: () {
+                            Navigator.of(context).push(slideRoute(
+                                FreeBulletinBoardPage(
+                                    boardType: BoardType.all,
+                                    boardInfo: null)));
+                          },
+                          child: SizedBox(
+                            height: 32,
+                            child: Row(
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                const SizedBox(
+                                  width: 3,
                                 ),
-                              ),
-                            ],
+                                SvgPicture.asset(
+                                  'assets/icons/menu_1.svg',
+                                  height: 32,
+                                  width: 32,
+                                  color: const Color(0xFFED3A3A),
+                                ),
+                                const SizedBox(
+                                  width: 5,
+                                ),
+                                const Text(
+                                  '전체보기',
+                                  style: TextStyle(
+                                    color: Color(0xFF333333),
+                                    fontSize: 17,
+                                    fontWeight: FontWeight.w700,
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
                         ),
                         const SizedBox(
                           height: 10,
                         ),
-                        SizedBox(
-                          height: 32,
-                          child: Row(
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              const SizedBox(
-                                width: 3,
-                              ),
-                              SvgPicture.asset(
-                                'assets/icons/star.svg',
-                                height: 32,
-                                width: 32,
-                                color: const Color(0xFFED3A3A),
-                              ),
-                              const SizedBox(
-                                width: 5,
-                              ),
-                              const Text(
-                                '인기글',
-                                style: TextStyle(
-                                  color: Color(0xFF333333),
-                                  fontSize: 17,
-                                  fontWeight: FontWeight.w700,
+                        InkWell(
+                          onTap: () {
+                            Navigator.of(context).push(slideRoute(
+                                FreeBulletinBoardPage(
+                                    boardType: BoardType.top,
+                                    boardInfo: null)));
+                          },
+                          child: SizedBox(
+                            height: 32,
+                            child: Row(
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                const SizedBox(
+                                  width: 3,
                                 ),
-                              ),
-                            ],
+                                SvgPicture.asset(
+                                  'assets/icons/star.svg',
+                                  height: 32,
+                                  width: 32,
+                                  color: const Color(0xFFED3A3A),
+                                ),
+                                const SizedBox(
+                                  width: 5,
+                                ),
+                                const Text(
+                                  '인기글',
+                                  style: TextStyle(
+                                    color: Color(0xFF333333),
+                                    fontSize: 17,
+                                    fontWeight: FontWeight.w700,
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
                         ),
                         const SizedBox(
                           height: 10,
                         ),
-                        SizedBox(
-                          height: 32,
-                          child: Row(
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              const SizedBox(
-                                width: 3,
-                              ),
-                              SvgPicture.asset(
-                                'assets/icons/download_2.svg',
-                                height: 32,
-                                width: 32,
-                                color: const Color(0xFFED3A3A),
-                              ),
-                              const SizedBox(
-                                width: 5,
-                              ),
-                              const Text(
-                                '담아놓은 글',
-                                style: TextStyle(
-                                  color: Color(0xFF333333),
-                                  fontSize: 17,
-                                  fontWeight: FontWeight.w700,
+                        InkWell(
+                          onTap: () {
+                            Navigator.of(context).push(slideRoute(
+                                FreeBulletinBoardPage(
+                                    boardType: BoardType.scraps,
+                                    boardInfo: null)));
+                          },
+                          child: SizedBox(
+                            height: 32,
+                            child: Row(
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                const SizedBox(
+                                  width: 3,
                                 ),
-                              ),
-                            ],
+                                SvgPicture.asset(
+                                  'assets/icons/download_2.svg',
+                                  height: 32,
+                                  width: 32,
+                                  color: const Color(0xFFED3A3A),
+                                ),
+                                const SizedBox(
+                                  width: 5,
+                                ),
+                                const Text(
+                                  '담아놓은 글',
+                                  style: TextStyle(
+                                    color: Color(0xFF333333),
+                                    fontSize: 17,
+                                    fontWeight: FontWeight.w700,
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
                         ),
                         const SizedBox(
@@ -253,9 +277,10 @@ class _BulletinListPageState extends State<BulletinListPage> {
                         BoardExpansionTile(5, "소통", boardsByGroup[5]),
                         InkWell(
                             onTap: () {
-                              Navigator.of(context).push(slideRoute(FreeBulletinBoardPage(
-                                  boardType: BoardType.free,
-                                  boardInfo: boardsByGroup[2][0])));
+                              Navigator.of(context).push(slideRoute(
+                                  FreeBulletinBoardPage(
+                                      boardType: BoardType.free,
+                                      boardInfo: boardsByGroup[2][0])));
                             },
                             child: SizedBox(
                               height: 48,
@@ -354,8 +379,9 @@ class BoardExpansionTile extends StatelessWidget {
                   ),
                   InkWell(
                     onTap: () {
-                      Navigator.of(context).push(slideRoute(FreeBulletinBoardPage(
-                          boardType: BoardType.free, boardInfo: model)));
+                      Navigator.of(context).push(slideRoute(
+                          FreeBulletinBoardPage(
+                              boardType: BoardType.free, boardInfo: model)));
                     },
                     child: Text(
                       model.ko_name,
