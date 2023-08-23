@@ -110,9 +110,32 @@ class _NotificationPageState extends State<NotificationPage> {
     );
   }
 
-  ListView _buildNotificationListView(UserProvider userProvider,
+  Widget _buildDateInfo(String strDate1, String strDate2) {
+    DateTime now = DateTime.now();
+    DateTime prevDate = DateTime.parse(strDate1).toLocal();
+    DateTime curDate = DateTime.parse(strDate2).toLocal();
+    if (prevDate.year == curDate.year && prevDate.month == curDate.month &&
+        prevDate.day == curDate.day) return Container();
+    String dateText = "${(curDate.year != now.year ? "${curDate.year}년 " : "")}${curDate.month}월 ${curDate.day}일";
+    return SizedBox(
+      height: 60,
+      child: Center(
+        child: Text(
+          dateText,
+          style: const TextStyle(
+            fontSize: 14,
+            fontWeight: FontWeight.w500,
+            color: Color.fromRGBO(177, 177, 177, 1),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildNotificationListView(UserProvider userProvider,
       NotificationProvider notificationProvider,
       List<NotificationModel> targetList) {
+    if (targetList.isEmpty) return Container();
     return ListView.separated(
       controller: _listViewController,
       physics: const AlwaysScrollableScrollPhysics(),
@@ -126,87 +149,103 @@ class _NotificationPageState extends State<NotificationPage> {
           );
         }
         NotificationModel targetNoti = targetList[idx];
-        return InkWell(
-            onTap: () async {
-              await Navigator.of(context).push(
-                  slideRoute(PostViewPage(id: targetNoti.related_article.id))
-              );
-              setState(() => targetList[idx].is_read = true);
-              await _readNotification(userProvider, targetNoti.id);
-              await notificationProvider.instantNotificationFetch();
-            },
-            child: Container(
-              height: 90,
-              padding: const EdgeInsets.symmetric(horizontal: 10),
-              decoration: BoxDecoration(
-                border: Border.all(
-                  width: 1,
-                  color: const Color.fromRGBO(230, 230, 230, 1),
-                ),
-                borderRadius: const BorderRadius.all(
-                  Radius.circular(15),
+        return Column(
+          children: [
+            idx != 0 ? _buildDateInfo(targetList[idx - 1].created_at,
+                targetList[idx].created_at) : const SizedBox(
+              height: 40,
+              child: Text(
+                '오늘',
+                style: TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w500,
+                  color: Color.fromRGBO(177, 177, 177, 1),
                 ),
               ),
-              child: Row(
-                //mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Container(
-                    width: 40,
-                    height: 40,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: (targetNoti.is_read ?? false) ? Colors.grey
-                          : ColorsInfo.newara,
+            ),
+            InkWell(
+                onTap: () async {
+                  await Navigator.of(context).push(
+                      slideRoute(PostViewPage(id: targetNoti.related_article.id))
+                  );
+                  setState(() => targetList[idx].is_read = true);
+                  await _readNotification(userProvider, targetNoti.id);
+                  await notificationProvider.instantNotificationFetch();
+                },
+                child: Container(
+                  height: 90,
+                  padding: const EdgeInsets.symmetric(horizontal: 10),
+                  decoration: BoxDecoration(
+                    border: Border.all(
+                      width: 1,
+                      color: const Color.fromRGBO(230, 230, 230, 1),
                     ),
-                    child: SvgPicture.asset(
-                      targetNoti.type == "default" ? "assets/icons/notification.svg"
-                          : "assets/icons/comment.svg",
-                      color: Colors.white,
-                    ),
-                  ),
-                  const SizedBox(width: 10),
-                  Flexible(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(
-                          targetNoti.title,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w700,
-                            color: (targetNoti.is_read ?? false) ? Colors.grey
-                                : Colors.black,
-                          ),
-                        ),
-                        const SizedBox(height: 5),
-                        Text(
-                          targetNoti.content,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: const TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                        const SizedBox(height: 5),
-                        Text(
-                          "| 게시글: ${targetNoti.related_article.title}",
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: const TextStyle(
-                            fontSize: 12,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                      ],
+                    borderRadius: const BorderRadius.all(
+                      Radius.circular(15),
                     ),
                   ),
-                ],
-              ),
-            )
+                  child: Row(
+                    //mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Container(
+                        width: 40,
+                        height: 40,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: (targetNoti.is_read ?? false) ? Colors.grey
+                              : ColorsInfo.newara,
+                        ),
+                        child: SvgPicture.asset(
+                          targetNoti.type == "default" ? "assets/icons/notification.svg"
+                              : "assets/icons/comment.svg",
+                          color: Colors.white,
+                        ),
+                      ),
+                      const SizedBox(width: 10),
+                      Flexible(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text(
+                              targetNoti.title,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w700,
+                                color: (targetNoti.is_read ?? false) ? Colors.grey
+                                    : Colors.black,
+                              ),
+                            ),
+                            const SizedBox(height: 5),
+                            Text(
+                              targetNoti.content,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: const TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                            const SizedBox(height: 5),
+                            Text(
+                              "| 게시글: ${targetNoti.related_article.title}",
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: const TextStyle(
+                                fontSize: 12,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                )
+            ),
+          ],
         );
       },
       separatorBuilder: (context, idx) {
