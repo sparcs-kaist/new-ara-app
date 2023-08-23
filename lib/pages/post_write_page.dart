@@ -98,7 +98,6 @@ class _PostWritePageState extends State<PostWritePage> {
 
   List<bool?> _selectedCheckboxes = [true, false, false];
   bool _isFileMenuBarSelected = false; // 첨부파일 메뉴바가 펼쳐져 있는가?
-  bool _isBottomShow = false; // 아래가 보이는 가?
 
   BoardDetailActionModel? _chosenBoardValue;
   TopicModel? _chosenTopicValue;
@@ -336,6 +335,23 @@ class _PostWritePageState extends State<PostWritePage> {
       }
       //  debugPrint(document.body?.innerHtml ?? '');
       return document.body?.innerHtml ?? '';
+    }
+
+    String updateImgTagWidth(String htmlString) {
+      var document = parse(htmlString);
+      // debugPrint(document.body?.innerHtml ?? '');
+      List<html.Element> imgTags = document.getElementsByTagName('img');
+
+      for (var imgTag in imgTags) {
+        imgTag.attributes['width'] = '100%';
+      }
+      //  debugPrint(document.body?.innerHtml ?? '');
+      return document.body?.innerHtml ?? '';
+    }
+
+    String preventHangleError(String htmlString) {
+      return htmlString;
+      //   return htmlString.replaceAll('<p><br></p>', '<p><br></p><p></p>');
     }
 
     Future<void> filePick() async {
@@ -718,6 +734,10 @@ class _PostWritePageState extends State<PostWritePage> {
 
                           onTap: () {
                             debugPrint("d");
+                            // setState(() {
+                            //   _htmlController.resetHeight();
+                            //   _htmlController.recalculateHeight();
+                            // });
                           },
                           //isExpanded: true,
                           value: _chosenTopicValue,
@@ -824,21 +844,21 @@ class _PostWritePageState extends State<PostWritePage> {
                                 HtmlEditor(
                                   callbacks: Callbacks(
                                       onChangeContent: (String? value) {
-                                    debugPrint(
-                                        "onChangeContent:R!!!!!!!!!!!!!!!!");
+                                    debugPrint("onChangeContent: $value");
                                     setState(() {
                                       _currentHtmlContent = value!;
                                     });
                                   }),
                                   controller: _htmlController, //required
                                   htmlEditorOptions: HtmlEditorOptions(
-                                      shouldEnsureVisible: true,
-                                      autoAdjustHeight: false,
-                                      hint: "내용을 입력해주세요.",
-                                      initialText: widget.previousArticle ==
-                                              null
-                                          ? null
-                                          : widget.previousArticle!.content),
+                                    shouldEnsureVisible: true,
+                                    autoAdjustHeight: false,
+                                    hint: "<p>내용을 입력해주세요.</p>",
+                                    initialText: widget.previousArticle == null
+                                        ? null
+                                        : updateImgTagWidth(
+                                            widget.previousArticle!.content!),
+                                  ),
                                   htmlToolbarOptions: HtmlToolbarOptions(
                                       toolbarType: ToolbarType.nativeGrid,
                                       mediaUploadInterceptor:
@@ -893,9 +913,12 @@ class _PostWritePageState extends State<PostWritePage> {
                                         // ColorButtons(),
                                       ]),
 
-                                  // otherOptions: OtherOptions(
-                                  //   height: 250,
-                                  // ),
+                                  otherOptions: OtherOptions(
+                                    height: 450,
+                                    // decoration: BoxDecoration(
+                                    //   border: Border.None,
+                                    // )
+                                  ),
                                 ),
                                 // Container(
                                 //   color: Colors.blue,
