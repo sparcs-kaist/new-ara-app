@@ -21,23 +21,18 @@ class NotificationPage extends StatefulWidget {
 
 class _NotificationPageState extends State<NotificationPage> {
   final ScrollController _listViewController = ScrollController();
+  bool isLoading = false;
 
   @override
   void initState() {
     super.initState();
-    _listViewController.addListener(_listViewListener);
+    //_listViewController.addListener(_listViewListener);
     NotificationProvider notificationProvider = context.read<NotificationProvider>();
-    notificationProvider.resetPage();
     notificationProvider.instantNotificationFetch();
   }
 
-  void _listViewListener() async {
-    if (_listViewController.position.pixels == _listViewController.position.maxScrollExtent) {
-      debugPrint("maxDetected");
-      NotificationProvider notificationProvider = context.read<NotificationProvider>();
-      notificationProvider.nextPage();
-      notificationProvider.instantNotificationFetch();
-    }
+  void setIsLoading(bool value) {
+    if (mounted) setState(() => isLoading = value);
   }
 
   Future<bool> _readNotification(UserProvider userProvider, int id) async {
@@ -94,7 +89,6 @@ class _NotificationPageState extends State<NotificationPage> {
                   child: RefreshIndicator(
                     color: ColorsInfo.newara,
                     onRefresh: () async {
-                      notificationProvider.resetPage();
                       await notificationProvider.instantNotificationFetch();
                     },
                     child: _buildNotificationListView(userProvider,

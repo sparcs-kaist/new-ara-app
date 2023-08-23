@@ -71,7 +71,6 @@ class _MyAppState extends State<MyApp> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    context.read<NotificationProvider>().periodicNotificationFetch();
     autoLoginByGetCookie(Provider.of<UserProvider>(context, listen: false));
   }
 
