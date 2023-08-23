@@ -14,6 +14,7 @@ import 'package:new_ara_app/pages/post_view_page.dart';
 import 'package:new_ara_app/utils/time_utils.dart';
 import 'package:new_ara_app/utils/slide_routing.dart';
 import 'package:new_ara_app/pages/profile_edit_page.dart';
+import 'package:new_ara_app/providers/notification_provider.dart';
 
 class UserPage extends StatefulWidget {
   const UserPage({Key? key}) : super(key: key);
@@ -173,7 +174,7 @@ class _UserPageState extends State<UserPage>
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          userProvider.hasData == true ? userProvider.naUser!.nickname : "",
+            (userProvider.hasData == true ? userProvider.naUser!.nickname : ""),
           style: const TextStyle(
             fontSize: 28,
             fontWeight: FontWeight.w700,
