@@ -251,7 +251,7 @@ class _BulletinListPageState extends State<BulletinListPage> {
                                   width: 5,
                                 ),
                                 const Text(
-                                  '담아놓은 글',
+                                  '담아둔 글',
                                   style: TextStyle(
                                     color: Color(0xFF333333),
                                     fontSize: 17,

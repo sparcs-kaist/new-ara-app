@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:new_ara_app/pages/bulletin_search_page.dart';
+import 'package:new_ara_app/pages/post_write_page.dart';
 import 'package:provider/provider.dart';
 
 import 'package:new_ara_app/constants/board_type.dart';
@@ -221,7 +222,10 @@ class _FreeBulletinBoardPageState extends State<FreeBulletinBoardPage> {
         mainAxisAlignment: MainAxisAlignment.end,
         children: [
           FloatingActionButton(
-            onPressed: () {
+            onPressed: () async{
+              await Navigator.of(context).push(
+                slideRoute(PostWritePage())
+              );
               updateAllBulletinList();
               debugPrint('FloatingActionButton pressed');
             },
