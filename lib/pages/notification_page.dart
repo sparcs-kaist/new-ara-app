@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
+import 'package:dio/dio.dart';
 
 import 'package:new_ara_app/constants/url_info.dart';
 import 'package:new_ara_app/widgetclasses/loading_indicator.dart';
@@ -20,19 +21,101 @@ class NotificationPage extends StatefulWidget {
 }
 
 class _NotificationPageState extends State<NotificationPage> {
-  final ScrollController _listViewController = ScrollController();
-  bool isLoading = false;
+  late final ScrollController _listViewController;
+  bool _isLoadingTotal = true, _isLoadingNewPage = false;
+  int _curPage = 1;
+  List<NotificationModel> _modelList = [];
 
   @override
   void initState() {
     super.initState();
-    //_listViewController.addListener(_listViewListener);
-    NotificationProvider notificationProvider = context.read<NotificationProvider>();
-    notificationProvider.instantNotificationFetch();
+    _listViewController = ScrollController()
+      ..addListener(_listViewListener);
+    UserProvider userProvider = context.read<UserProvider>();
+    _initNotificationPage(userProvider);
   }
 
-  void setIsLoading(bool value) {
-    if (mounted) setState(() => isLoading = value);
+  Future<void> _initNotificationPage(UserProvider userProvider) async {
+    _modelList = await _fetchEachPage(userProvider, 1);
+    _curPage = 1;
+    _setIsLoadingTotal(false);
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+  }
+
+  Future<List<NotificationModel>> _fetchEachPage(UserProvider userProvider, int targetPage) async {
+    var dio = Dio()
+        ..options.headers["Cookie"] = userProvider.getCookiesToString();
+    List<NotificationModel> resList = [];
+    try {
+      var response = await dio.get(
+        "$newAraDefaultUrl/api/notifications/?page=$targetPage"
+      );
+      List<dynamic> resultsList = response.data["results"];
+      for (var json in resultsList) {
+        try {
+          resList.add(NotificationModel.fromJson(json));
+        } catch (error) {
+          debugPrint("$error");
+          continue;
+        }
+      }
+    } catch (error) {
+      return [];
+    }
+    return resList;
+  }
+
+  void _listViewListener() async {
+    if (_isLoadingNewPage) return;
+    if (_listViewController.position.pixels == _listViewController.position.maxScrollExtent) {
+      _setIsLoadingNewPage(true);
+      bool hasNext = true;
+      UserProvider userProvider = context.read<UserProvider>();
+      List<NotificationModel> resList = [];
+      var dio = Dio()
+        ..options.headers["Cookie"] = userProvider.getCookiesToString();
+      int page = 1;
+      for (page = 1; hasNext; page++) {
+        if (page > _curPage + 1) break;
+        try {
+          var response = await dio.get(
+            "$newAraDefaultUrl/api/notifications/?page=$page"
+          );
+          hasNext = response.data["next"] == null ? false : true;
+          List<dynamic> resultsList = response.data["results"];
+          for (var json in resultsList) {
+            try {
+              resList.add(NotificationModel.fromJson(json));
+            } catch (error) {
+              debugPrint("$error");
+              continue;
+            }
+          }
+        } catch (error) {
+          debugPrint("$error");
+          return;
+        }
+      }
+      _curPage = page;
+      _modelList = resList;
+      _setIsLoadingNewPage(false);
+    }
+  }
+
+  void update() {
+    if (mounted) setState(() {});
+  }
+
+  void _setIsLoadingTotal(bool value) {
+    if (mounted) setState(() => _isLoadingTotal = value);
+  }
+
+  void _setIsLoadingNewPage(bool value) {
+    if (mounted) setState(() => _isLoadingNewPage = value);
   }
 
   Future<bool> _readNotification(UserProvider userProvider, int id) async {
@@ -50,8 +133,6 @@ class _NotificationPageState extends State<NotificationPage> {
   @override
   Widget build(BuildContext context) {
     UserProvider userProvider = context.read<UserProvider>();
-    NotificationProvider notificationProvider = context.read<NotificationProvider>();
-    NotificationProvider notificationProviderData = context.watch<NotificationProvider>();
     return Scaffold(
       appBar: AppBar(
         title: Text(
@@ -89,10 +170,140 @@ class _NotificationPageState extends State<NotificationPage> {
                   child: RefreshIndicator(
                     color: ColorsInfo.newara,
                     onRefresh: () async {
-                      await notificationProvider.instantNotificationFetch();
+                      await _initNotificationPage(userProvider);
+                      update();
                     },
-                    child: _buildNotificationListView(userProvider,
-                        notificationProvider, notificationProviderData.notificationList),
+                    child: _isLoadingTotal ? const LoadingIndicator()
+                        : ListView.separated(
+                      controller: _listViewController,
+                      itemCount: _modelList.length + 1,
+                      itemBuilder: (context, idx) {
+                        if (idx == _modelList.length) {
+                          return Visibility(
+                            visible: _isLoadingNewPage,
+                            child: const SizedBox(
+                              height: 45,
+                              child: LoadingIndicator(),
+                            ),
+                          );
+                        }
+                        NotificationModel targetNoti = _modelList[idx];
+                        return Column(
+                          children: [
+                            idx != 0 ? _buildDateInfo(_modelList[idx - 1].created_at,
+                                _modelList[idx].created_at) : const SizedBox(
+                              height: 40,
+                              child: Text(
+                                '오늘',
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w500,
+                                  color: Color.fromRGBO(177, 177, 177, 1),
+                                ),
+                              ),
+                            ),
+                            InkWell(
+                                onTap: () async {
+                                  await Navigator.of(context).push(
+                                    slideRoute(PostViewPage(
+                                      id: targetNoti.related_article.id,
+                                    ))
+                                  );
+                                  if (mounted) {
+                                    setState(() => targetNoti.is_read = true);
+                                  }
+                                  bool res = await _readNotification(userProvider, targetNoti.id);
+                                  if (!res && mounted) {
+                                    setState(() => targetNoti.is_read = false);
+                                  }
+                                  List<NotificationModel> newList = [];
+                                  for (int page = 1; page <= _curPage; page++) {
+                                    newList += await _fetchEachPage(userProvider, page);
+                                  }
+                                  if (mounted) {
+                                    setState(() => _modelList = newList);
+                                  }
+                                },
+                                child: Container(
+                                  height: 90,
+                                  padding: const EdgeInsets.symmetric(horizontal: 10),
+                                  decoration: BoxDecoration(
+                                    border: Border.all(
+                                      width: 1,
+                                      color: const Color.fromRGBO(230, 230, 230, 1),
+                                    ),
+                                    borderRadius: const BorderRadius.all(
+                                      Radius.circular(15),
+                                    ),
+                                  ),
+                                  child: Row(
+                                    //mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Container(
+                                        width: 40,
+                                        height: 40,
+                                        decoration: BoxDecoration(
+                                          shape: BoxShape.circle,
+                                          color: (targetNoti.is_read ?? false) ? Colors.grey
+                                              : ColorsInfo.newara,
+                                        ),
+                                        child: SvgPicture.asset(
+                                          targetNoti.type == "default" ? "assets/icons/notification.svg"
+                                              : "assets/icons/comment.svg",
+                                          color: Colors.white,
+                                        ),
+                                      ),
+                                      const SizedBox(width: 10),
+                                      Flexible(
+                                        child: Column(
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          mainAxisAlignment: MainAxisAlignment.center,
+                                          children: [
+                                            Text(
+                                              targetNoti.title,
+                                              maxLines: 1,
+                                              overflow: TextOverflow.ellipsis,
+                                              style: TextStyle(
+                                                fontSize: 16,
+                                                fontWeight: FontWeight.w700,
+                                                color: (targetNoti.is_read ?? false) ? Colors.grey
+                                                    : Colors.black,
+                                              ),
+                                            ),
+                                            const SizedBox(height: 5),
+                                            Text(
+                                              targetNoti.content,
+                                              maxLines: 1,
+                                              overflow: TextOverflow.ellipsis,
+                                              style: const TextStyle(
+                                                fontSize: 14,
+                                                fontWeight: FontWeight.w500,
+                                              ),
+                                            ),
+                                            const SizedBox(height: 5),
+                                            Text(
+                                              "| 게시글: ${targetNoti.related_article.title}",
+                                              maxLines: 1,
+                                              overflow: TextOverflow.ellipsis,
+                                              style: const TextStyle(
+                                                fontSize: 12,
+                                                fontWeight: FontWeight.w500,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                )
+                            ),
+                          ],
+                        );
+                      },
+                      separatorBuilder: (context, idx) {
+                        return const SizedBox(height: 10);
+                      },
+                    ),
                   ),
                 ),
               ),
@@ -123,128 +334,6 @@ class _NotificationPageState extends State<NotificationPage> {
           ),
         ),
       ),
-    );
-  }
-
-  Widget _buildNotificationListView(UserProvider userProvider,
-      NotificationProvider notificationProvider,
-      List<NotificationModel> targetList) {
-    if (targetList.isEmpty) return Container();
-    return ListView.separated(
-      controller: _listViewController,
-      physics: const AlwaysScrollableScrollPhysics(),
-      itemCount: targetList.length + 1,
-      itemBuilder: (context, idx) {
-        if (idx == targetList.length) {
-          // 나중에 visibility 등등 설정해줘야 함
-          return const SizedBox(
-            height: 45,
-            child: LoadingIndicator(),
-          );
-        }
-        NotificationModel targetNoti = targetList[idx];
-        return Column(
-          children: [
-            idx != 0 ? _buildDateInfo(targetList[idx - 1].created_at,
-                targetList[idx].created_at) : const SizedBox(
-              height: 40,
-              child: Text(
-                '오늘',
-                style: TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w500,
-                  color: Color.fromRGBO(177, 177, 177, 1),
-                ),
-              ),
-            ),
-            InkWell(
-                onTap: () async {
-                  await Navigator.of(context).push(
-                      slideRoute(PostViewPage(id: targetNoti.related_article.id))
-                  );
-                  setState(() => targetList[idx].is_read = true);
-                  await _readNotification(userProvider, targetNoti.id);
-                  await notificationProvider.instantNotificationFetch();
-                },
-                child: Container(
-                  height: 90,
-                  padding: const EdgeInsets.symmetric(horizontal: 10),
-                  decoration: BoxDecoration(
-                    border: Border.all(
-                      width: 1,
-                      color: const Color.fromRGBO(230, 230, 230, 1),
-                    ),
-                    borderRadius: const BorderRadius.all(
-                      Radius.circular(15),
-                    ),
-                  ),
-                  child: Row(
-                    //mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Container(
-                        width: 40,
-                        height: 40,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: (targetNoti.is_read ?? false) ? Colors.grey
-                              : ColorsInfo.newara,
-                        ),
-                        child: SvgPicture.asset(
-                          targetNoti.type == "default" ? "assets/icons/notification.svg"
-                              : "assets/icons/comment.svg",
-                          color: Colors.white,
-                        ),
-                      ),
-                      const SizedBox(width: 10),
-                      Flexible(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Text(
-                              targetNoti.title,
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w700,
-                                color: (targetNoti.is_read ?? false) ? Colors.grey
-                                    : Colors.black,
-                              ),
-                            ),
-                            const SizedBox(height: 5),
-                            Text(
-                              targetNoti.content,
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                              style: const TextStyle(
-                                fontSize: 14,
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
-                            const SizedBox(height: 5),
-                            Text(
-                              "| 게시글: ${targetNoti.related_article.title}",
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                              style: const TextStyle(
-                                fontSize: 12,
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                )
-            ),
-          ],
-        );
-      },
-      separatorBuilder: (context, idx) {
-        return const SizedBox(height: 10);
-      },
     );
   }
 }

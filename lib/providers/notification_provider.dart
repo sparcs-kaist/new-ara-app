@@ -3,15 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
 
 import 'package:new_ara_app/constants/url_info.dart';
-import 'package:new_ara_app/models/notification_model.dart';
 
 class NotificationProvider with ChangeNotifier {
-  List<NotificationModel> _notificationList = [];
-  List<NotificationModel> get notificationList => _notificationList;
-
-  List<NotificationModel> _newNotiList = [];
-
-  bool _isFetching = false;
+  bool _isNotReadExist = false;
+  bool get isNotReadExist => _isNotReadExist;
 
   String _cookieString = "";
 
@@ -19,40 +14,37 @@ class NotificationProvider with ChangeNotifier {
     _cookieString = newCookieString;
   }
 
-  Future<bool> _fetchNotifications() async {
-    if (_cookieString == "") return false;
-    _newNotiList.clear();
-    var dio = Dio();
-    dio.options.headers['Cookie'] = _cookieString;
-    try {
-      var response = await dio.get("$newAraDefaultUrl/api/notifications/?page=1");
-      Map<String, dynamic> rawJson = response.data;
-      List<dynamic> notificationsJson = rawJson['results'];
-      for (Map<String, dynamic> json in notificationsJson) {
-        try {
-          var newNoti = NotificationModel.fromJson(json);
-          _newNotiList.add(newNoti);
-        } catch (error) {
-          debugPrint("NotificationModel.fromJson failed id: ${json['id']}");
-        }
-      }
-    } catch (error) {
-      debugPrint("GET /api/notifications failed: $error");
-      return false;
-    }
-    return true;
-  }
+  Future<void> checkIsNotReadExist() async {
+    bool res = false;
 
-  Future<void> instantNotificationFetch() async {
-    if (_isFetching) return;
-    _isFetching = true;
-    bool fetchRes = await _fetchNotifications();
-    if (!fetchRes) {
-      _isFetching = false;
-      return;
-    }
-    _notificationList = _newNotiList;
+    var dio = Dio()
+        ..options.headers["Cookie"] = _cookieString;
+
+    // 알림이 몇 페이지 인지 확인
+    int curPage = 1;
+    bool hasNext = false;
+    do {
+      try {
+        var response = await dio.get(
+          "$newAraDefaultUrl/api/notifications/?page=$curPage"
+        );
+        hasNext = response.data["next"] == null ? false : true;
+        List<dynamic> resultsJson = response.data["results"];
+        for (var json in resultsJson) {
+          if (json['is_read'] ?? false) {
+            res = true;
+            break;
+          }
+        }
+      } catch (error) {
+        debugPrint("$error");
+        res = true;
+        break;
+      }
+      curPage += 1;
+    } while (hasNext);
+
+    _isNotReadExist = res;
     notifyListeners();
-    _isFetching = false;
   }
 }
