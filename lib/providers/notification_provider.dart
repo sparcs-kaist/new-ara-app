@@ -31,7 +31,7 @@ class NotificationProvider with ChangeNotifier {
         hasNext = response.data["next"] == null ? false : true;
         List<dynamic> resultsJson = response.data["results"];
         for (var json in resultsJson) {
-          if (json['is_read'] ?? false) {
+          if (!(json['is_read'] ?? true)) {
             res = true;
             break;
           }

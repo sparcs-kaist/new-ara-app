@@ -11,6 +11,7 @@ import 'package:new_ara_app/constants/url_info.dart';
 import 'package:new_ara_app/utils/time_utils.dart';
 import 'package:new_ara_app/pages/post_view_page.dart';
 import 'package:new_ara_app/utils/slide_routing.dart';
+import 'package:new_ara_app/providers/notification_provider.dart';
 
 class UserViewPage extends StatefulWidget {
   final int userID;
@@ -35,6 +36,7 @@ class _UserViewPageState extends State<UserViewPage> {
     super.initState();
     UserProvider userProvider = context.read<UserProvider>();
     _listViewController.addListener(_listViewListener);
+    context.read<NotificationProvider>().checkIsNotReadExist();
     loadAll(userProvider, 1);
   }
 

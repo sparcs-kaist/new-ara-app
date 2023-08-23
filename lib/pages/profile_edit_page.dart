@@ -12,6 +12,7 @@ import 'package:new_ara_app/providers/user_provider.dart';
 import 'package:new_ara_app/constants/colors_info.dart';
 import 'package:new_ara_app/models/user_profile_model.dart';
 import 'package:new_ara_app/widgetclasses/loading_indicator.dart';
+import 'package:new_ara_app/providers/notification_provider.dart';
 
 class ProfileEditPage extends StatefulWidget {
   const ProfileEditPage({super.key});
@@ -30,6 +31,7 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
   @override
   void initState() {
     super.initState();
+    context.read<NotificationProvider>().checkIsNotReadExist();
   }
 
   void setIsCamClicked(bool tf) {

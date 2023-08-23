@@ -13,6 +13,7 @@ import 'package:new_ara_app/widgetclasses/text_info.dart';
 import 'package:new_ara_app/widgetclasses/border_boxes.dart';
 import 'package:new_ara_app/widgetclasses/text_and_switch.dart';
 import 'package:webview_cookie_manager/webview_cookie_manager.dart';
+import 'package:new_ara_app/providers/notification_provider.dart';
 
 class SettingPage extends StatefulWidget {
   const SettingPage({Key? key}) : super(key: key);
@@ -33,6 +34,7 @@ class SettingPageState extends State<SettingPage> {
         true; // 웹과 동일하게 하기 위해 snake_case 변수명 사용
     see_social =
         userProvider.naUser?.see_social ?? true; // 위와 같은 이유로 snake_case
+    context.read<NotificationProvider>().checkIsNotReadExist();
   }
 
   @override

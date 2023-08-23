@@ -63,6 +63,7 @@ class _UserPageState extends State<UserPage>
     scrollControllerList[1].addListener(_scrollListener1);
     scrollControllerList[2].addListener(_scrollListener2);
 
+    context.read<NotificationProvider>().checkIsNotReadExist();
 
     UserProvider userProvider = context.read<UserProvider>();
     fetchInitData(userProvider);

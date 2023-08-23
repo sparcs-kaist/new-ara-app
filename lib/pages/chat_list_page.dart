@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:provider/provider.dart';
 
 import 'package:new_ara_app/constants/colors_info.dart';
 import 'package:new_ara_app/pages/chat_window_page.dart';
+import 'package:new_ara_app/providers/notification_provider.dart';
 
 class ChatListPage extends StatefulWidget {
   const ChatListPage({Key? key}) : super(key: key);
@@ -18,6 +20,7 @@ class _ChatListPageState extends State<ChatListPage> {
   void initState() {
     // TODO: implement initState
     super.initState();
+    context.read<NotificationProvider>().checkIsNotReadExist();
 
     //totest: 채팅창 하나는 미리 추가해놓은 로직
     chatPreviewList.add(

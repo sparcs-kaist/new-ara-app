@@ -9,10 +9,10 @@ import 'package:new_ara_app/constants/url_info.dart';
 import 'package:new_ara_app/widgetclasses/loading_indicator.dart';
 import 'package:new_ara_app/constants/colors_info.dart';
 import 'package:new_ara_app/providers/user_provider.dart';
-import 'package:new_ara_app/providers/notification_provider.dart';
 import 'package:new_ara_app/models/notification_model.dart';
 import 'package:new_ara_app/pages/post_view_page.dart';
 import 'package:new_ara_app/utils/slide_routing.dart';
+import 'package:new_ara_app/providers/notification_provider.dart';
 
 class NotificationPage extends StatefulWidget {
   const NotificationPage({Key? key}) : super(key: key);
@@ -43,6 +43,7 @@ class _NotificationPageState extends State<NotificationPage> {
 
   @override
   void dispose() {
+    _listViewController.dispose();
     super.dispose();
   }
 
@@ -133,6 +134,7 @@ class _NotificationPageState extends State<NotificationPage> {
   @override
   Widget build(BuildContext context) {
     UserProvider userProvider = context.read<UserProvider>();
+    NotificationProvider notificationProvider = context.read<NotificationProvider>();
     return Scaffold(
       appBar: AppBar(
         title: Text(
@@ -164,6 +166,7 @@ class _NotificationPageState extends State<NotificationPage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
+              const SizedBox(height: 15),
               Expanded(
                 child: SizedBox(
                   width: MediaQuery.of(context).size.width - 40,
@@ -171,6 +174,7 @@ class _NotificationPageState extends State<NotificationPage> {
                     color: ColorsInfo.newara,
                     onRefresh: () async {
                       await _initNotificationPage(userProvider);
+                      await notificationProvider.checkIsNotReadExist();
                       update();
                     },
                     child: _isLoadingTotal ? const LoadingIndicator()
@@ -216,6 +220,7 @@ class _NotificationPageState extends State<NotificationPage> {
                                   if (!res && mounted) {
                                     setState(() => targetNoti.is_read = false);
                                   }
+                                  await notificationProvider.checkIsNotReadExist();
                                   List<NotificationModel> newList = [];
                                   for (int page = 1; page <= _curPage; page++) {
                                     newList += await _fetchEachPage(userProvider, page);
