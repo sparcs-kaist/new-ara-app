@@ -131,6 +131,18 @@ class _NotificationPageState extends State<NotificationPage> {
     return true;
   }
 
+  Future<bool> _readAllNotification(UserProvider userProvider) async {
+    try {
+      await userProvider.myDio().post(
+        "$newAraDefaultUrl/api/notifications/read_all/"
+      );
+    } catch (error) {
+      debugPrint("POST /api/notifications/read_all failed: $error");
+      return false;
+    }
+    return true;
+  }
+
   @override
   Widget build(BuildContext context) {
     UserProvider userProvider = context.read<UserProvider>();
@@ -145,19 +157,6 @@ class _NotificationPageState extends State<NotificationPage> {
             color: ColorsInfo.newara,
           ),
         ),
-        actions: [
-          IconButton(
-            highlightColor: Colors.white,
-            splashColor: Colors.white,
-            icon: SvgPicture.asset(
-              'assets/icons/search.svg', color: ColorsInfo.newara,
-              width: 45,
-              height: 45,
-            ),
-            onPressed: () {},
-          ),
-          const SizedBox(width: 20),
-        ],
       ),
       body: SafeArea(
         child: SizedBox(
@@ -314,6 +313,35 @@ class _NotificationPageState extends State<NotificationPage> {
               ),
               const SizedBox(height: 15),
             ],
+          ),
+        ),
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () async {
+          if (!notificationProvider.isNotReadExist) return;
+          _setIsLoadingTotal(true);
+          bool res = await _readAllNotification(userProvider);
+          if (!res) {
+            debugPrint("모두 읽기 요청 실패");
+            _setIsLoadingTotal(false);
+            return;
+          }
+          await notificationProvider.checkIsNotReadExist();
+          List<NotificationModel> newList = [];
+          for (int page = 1; page <= _curPage; page++) {
+            newList += await _fetchEachPage(userProvider, page);
+          }
+          _modelList = newList;
+          _setIsLoadingTotal(false);
+        },
+        backgroundColor: Colors.white,
+        child: Center(
+          child: SvgPicture.asset(
+            'assets/icons/verified.svg',
+            fit: BoxFit.cover,
+            color: ColorsInfo.newara,
+            width: 40,
+            height: 40,
           ),
         ),
       ),
