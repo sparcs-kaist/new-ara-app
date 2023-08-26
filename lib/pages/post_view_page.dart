@@ -22,6 +22,7 @@ import 'package:new_ara_app/utils/post_view_utils.dart';
 import 'package:new_ara_app/constants/url_info.dart';
 import 'package:new_ara_app/utils/slide_routing.dart';
 import 'package:new_ara_app/constants/file_type.dart';
+import 'package:new_ara_app/providers/notification_provider.dart';
 
 
 class PostViewPage extends StatefulWidget {
@@ -62,6 +63,7 @@ class _PostViewPageState extends State<PostViewPage> {
       isReportable = value ? !article.is_mine : false;
       _setIsValid(value);
     });
+    context.read<NotificationProvider>().checkIsNotReadExist();
   }
 
   @override

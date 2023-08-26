@@ -25,6 +25,7 @@ import 'package:provider/provider.dart';
 import 'package:uuid/uuid.dart';
 
 import '../providers/user_provider.dart';
+import 'package:new_ara_app/providers/notification_provider.dart';
 import 'package:path/path.dart' as path;
 import 'package:path_provider/path_provider.dart';
 
@@ -128,6 +129,8 @@ class _PostWritePageState extends State<PostWritePage> {
   void initState() {
     // TODO: implement initState
     super.initState();
+
+    context.read<NotificationProvider>().checkIsNotReadExist();
 
     if (widget.previousArticle != null)
       _isEditingPost = true;

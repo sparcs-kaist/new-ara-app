@@ -119,10 +119,10 @@ class UserProvider with ChangeNotifier {
 
   // 아래의 getApiRes 와는 다른 함수
   // apiUrl을 받고 요청을 보낸 후 결과를 리턴해줌
-  Future<dynamic> getApiRes(String apiUrl, {String? initCookieString, bool isNewAra = true}) async {
+  Future<dynamic> getApiRes(String apiUrl, {String? initCookieString}) async {
     String cookieString = "";
 
-    var totUrl = isNewAra ? "$newAraDefaultUrl/api/$apiUrl" : apiUrl;
+    var totUrl = "$newAraDefaultUrl/api/$apiUrl";
     if (initCookieString == null) {
       cookieString = getCookiesToString();
     } else {

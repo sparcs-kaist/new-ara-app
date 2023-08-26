@@ -1,10 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:provider/provider.dart';
+
 import 'package:new_ara_app/pages/main_page.dart';
 import 'package:new_ara_app/pages/bulletin_list_page.dart';
 import 'package:new_ara_app/pages/chat_list_page.dart';
 import 'package:new_ara_app/pages/notification_page.dart';
 import 'package:new_ara_app/pages/user_page.dart';
+import 'package:new_ara_app/providers/notification_provider.dart';
+import 'package:new_ara_app/constants/colors_info.dart';
 
 class MainNavigationTabPage extends StatefulWidget {
   const MainNavigationTabPage({Key? key}) : super(key: key);
@@ -90,11 +94,30 @@ class _MainNavigationTabPageState extends State<MainNavigationTabPage> {
           label: 'Chatting',
         ),
         BottomNavigationBarItem(
-          icon: SvgPicture.asset(
-            'assets/icons/notification.svg',
-            color: _selectedIndex == 3 ? Colors.black : Colors.grey,
-            width: 36,
-            height: 36,
+          icon: Stack(
+            children: [
+              SvgPicture.asset(
+                'assets/icons/notification.svg',
+                color: _selectedIndex == 3 ? Colors.black : Colors.grey,
+                width: 36,
+                height: 36,
+              ),
+              Visibility(
+                visible: context.watch<NotificationProvider>().isNotReadExist,
+                child: Positioned(
+                  top: 0,
+                  right: 5,
+                  child: Container(
+                    width: 7,
+                    height: 7,
+                    decoration: const BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: ColorsInfo.newara,
+                    ),
+                  ),
+                ),
+              ),
+            ],
           ),
           label: 'Notification',
         ),

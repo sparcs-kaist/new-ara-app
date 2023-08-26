@@ -7,6 +7,7 @@ import 'package:provider/provider.dart';
 import 'package:new_ara_app/pages/main_navigation_tab_page.dart';
 import 'package:new_ara_app/pages/login_page.dart';
 import 'package:new_ara_app/providers/user_provider.dart';
+import 'package:new_ara_app/providers/notification_provider.dart';
 
 final supportedLocales = [
   const Locale('en'),
@@ -25,6 +26,14 @@ void main() async {
       child: MultiProvider(
         providers: [
           ChangeNotifierProvider(create: (_) => UserProvider()),
+          ChangeNotifierProxyProvider<UserProvider, NotificationProvider>(
+            create: (_) => NotificationProvider(),
+            update: (_, userProvider, notificationProvider) {
+              return notificationProvider!..updateCookie(
+                userProvider.getCookiesToString()
+              );
+            }
+          ),
         ],
         child: const MyApp(),
       ),

@@ -11,6 +11,7 @@ import 'package:new_ara_app/constants/url_info.dart';
 import 'package:new_ara_app/utils/time_utils.dart';
 import 'package:new_ara_app/pages/post_view_page.dart';
 import 'package:new_ara_app/utils/slide_routing.dart';
+import 'package:new_ara_app/providers/notification_provider.dart';
 
 class UserViewPage extends StatefulWidget {
   final int userID;
@@ -35,10 +36,12 @@ class _UserViewPageState extends State<UserViewPage> {
     super.initState();
     UserProvider userProvider = context.read<UserProvider>();
     _listViewController.addListener(_listViewListener);
+    context.read<NotificationProvider>().checkIsNotReadExist();
     loadAll(userProvider, 1);
   }
 
   void _listViewListener() async {
+    // 페이지네이션 기능 수정해야함.
     if (isLoaded &&
         _listViewController.position.pixels ==
             _listViewController.position.maxScrollExtent) {

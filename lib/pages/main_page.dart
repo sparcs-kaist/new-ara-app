@@ -15,6 +15,7 @@ import 'package:new_ara_app/widgetclasses/post_preview.dart';
 import 'package:new_ara_app/models/article_list_action_model.dart';
 import 'package:new_ara_app/pages/post_view_page.dart';
 import 'package:new_ara_app/utils/slide_routing.dart';
+import 'package:new_ara_app/providers/notification_provider.dart';
 
 class MainPage extends StatefulWidget {
   const MainPage({Key? key}) : super(key: key);
@@ -41,6 +42,7 @@ class _MainPageState extends State<MainPage> {
 
     refreshDailyBest(userProvider);
     refreshBoardList(userProvider);
+    context.read<NotificationProvider>().checkIsNotReadExist();
   }
 
   void refreshDailyBest(UserProvider userProvider) async {
