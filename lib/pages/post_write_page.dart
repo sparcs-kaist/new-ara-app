@@ -424,6 +424,7 @@ class _PostWritePageState extends State<PostWritePage> {
       }
       setState(() {
         _isUploadingPost = true;
+        _isLoading = true;
       });
       try {
         Dio dio = Dio();
@@ -480,9 +481,12 @@ class _PostWritePageState extends State<PostWritePage> {
       } on DioException catch (error) {
         debugPrint('post Error: ${error.response!.data}');
       }
-      setState(() {
-        _isUploadingPost = false;
-      });
+      if (mounted) {
+        setState(() {
+          _isUploadingPost = false;
+          _isLoading = false;
+        });
+      }
     }
 
     void updatePost() async {
@@ -500,6 +504,7 @@ class _PostWritePageState extends State<PostWritePage> {
       }
       setState(() {
         _isUploadingPost = true;
+        _isLoading = true;
       });
 
       try {
@@ -558,6 +563,12 @@ class _PostWritePageState extends State<PostWritePage> {
         Navigator.pop(context);
       } on DioException catch (error) {
         debugPrint('post Error: ${error.response!.data}');
+      }
+      if (mounted) {
+        setState(() {
+          _isUploadingPost = false;
+          _isLoading = false;
+        });
       }
     }
 
