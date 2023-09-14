@@ -1,3 +1,11 @@
+/// 'notification_provider.dart'
+/// [NotificationProvider]를 정의함.
+/// [NotificationProvider] 속 [checkIsNotReadExist] 메서드를 이용하여 새로운 알림을 감지하고
+/// Listener에게 알려줌.
+/// 
+/// Author: 김상오(alvin)
+/// 
+
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
