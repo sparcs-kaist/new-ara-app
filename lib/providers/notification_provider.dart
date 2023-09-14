@@ -27,6 +27,7 @@ class NotificationProvider with ChangeNotifier {
   /// NewAra API로 요청을 보내 알림을 받음.
   /// 받은 알림 별로 읽음 여부를 확인하여 isNotReadExist 변수를 설정함.
   /// 구독 중인 리스너에게 isNotReadExist 결과를 알려줌.
+  /// 페이지가 전환될 때마다 전환되는 페이지의 initState에서 호출됨.
   Future<void> checkIsNotReadExist() async {
     bool res = false;
 
