@@ -1,36 +1,38 @@
 import 'dart:convert';
 import 'dart:io';
-import 'package:http/http.dart' as http; // 추후에 dio 로 완전히 전환할 예정
+import 'package:http/http.dart' as http;
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:new_ara_app/constants/url_info.dart';
 import 'package:new_ara_app/models/user_profile_model.dart';
 import 'package:webview_cookie_manager/webview_cookie_manager.dart';
 
-//Provider.of<UserProvider>(context, listen: false).increment()
+/// `UserProvider`는 사용자 정보 및 연관된 API 로직을 관리하는 클래스입니다.
 class UserProvider with ChangeNotifier {
-  UserProfileModel? _naUser; // api/me 했을 때 받는 유저의 정보
-  bool _hasData = false; // api/me 했을 때 유저의 정보가 있는가?
-  List<Cookie> _loginCookie = [];
-  final Map<String, dynamic> _apiRes = {};
-
+  UserProfileModel? _naUser; // 사용자 정보 모델
+  bool _hasData = false; // 사용자 정보 유무 플래그
+  List<Cookie> _loginCookie = []; // 로그인 시 사용되는 쿠키
+  // TODO: _apiRes가 필요한 이유 알아내기
+  final Map<String, dynamic> _apiRes = {}; // API 응답 저장 맵
   bool _isWebViewLoaded = false;
-  bool get isWebViewLoaded => _isWebViewLoaded;
 
+  bool get isWebViewLoaded => _isWebViewLoaded;
   UserProfileModel? get naUser => _naUser;
   bool get hasData => _hasData;
   dynamic get apiRes => _apiRes;
 
+  /// `_hasData`의 값을 설정하고 UI를 업데이트합니다.
   void setHasData(bool tf) {
     _hasData = tf;
     notifyListeners();
   }
 
-  void setIsWebViewLoaded(bool tf, {bool quiet=false}) {
+  void setIsWebViewLoaded(bool tf, {bool quiet = false}) {
     _isWebViewLoaded = tf;
     if (!quiet) notifyListeners();
   }
 
+  /// 문자열 쿠키를 Cookie 객체 리스트로 변환합니다.
   void setCookieToList(String cookieString) {
     _loginCookie.clear();
     List<String> tempCookieList = cookieString.split('; ');
@@ -42,6 +44,7 @@ class UserProvider with ChangeNotifier {
     }
   }
 
+  /// 현재 저장된 쿠키 리스트를 문자열로 반환합니다.
   String getCookiesToString() {
     String cookieString = _loginCookie
         .map((cookie) => '${cookie.name}=${cookie.value}')
@@ -49,67 +52,53 @@ class UserProvider with ChangeNotifier {
     return cookieString;
   }
 
+  /// 지정된 URL의 웹뷰에서 쿠키를 가져와 저장합니다.
   Future<void> setCookiesFromUrl(url) async {
-    //웹뷰에서 쿠키 가져와서 프로바이더에 저장하는 메소드.
     _loginCookie = await WebviewCookieManager().getCookies(url);
     return;
   }
 
+  /// /api/me 엔드포인트를 호출하여 사용자 정보를 갱신합니다.
+  /// 실패 시 false, 성공 시 true 반환합니다.
   Future<bool> apiMeUserInfo(
       {String initCookieString = "", String message = ""}) async {
-    //쿠키를 기반으로 api/me 해서 namodel 갱신하는 메소드
-    //initCookieString 이 없으면 현재 프로바이더의 쿠키로 한다.
-
     dynamic cookieString = "ㅁ";
     String apiUrl = '$newAraDefaultUrl/api/me';
 
     if (initCookieString == "") {
-      // 쿠키를 문자열로 변환하여 HTTP 요청의 헤더에 추가
       cookieString = _loginCookie
           .map((cookie) => '${cookie.name}=${cookie.value}')
           .join('; ');
-      // API 요청을 보낼 URL
     } else {
       cookieString = initCookieString;
     }
-    // HTTP 요청을 위한 헤더 및 쿠키 추가
+
     Map<String, String> headers = {
-      'Cookie': cookieString, // 쿠키 추가
+      'Cookie': cookieString,
     };
 
-    // HTTP GET 요청 보내기
     http.Response response = await http.get(
       Uri.parse(apiUrl),
       headers: headers,
     );
     if (response.statusCode == 200) {
-      // 요청이 성공적으로 처리됨
-      //_naUser 모델에 요청값 입력.
       Map<String, dynamic> responseData =
           jsonDecode(utf8.decode(response.bodyBytes));
 
       _naUser = UserProfileModel.fromJson(responseData);
-      // 유저 정보 출력
       debugPrint("user_provider.dart($message) : $responseData");
-      //유저 정보를 사용하는 곳에서 재 실행!
       notifyListeners();
       return true;
     } else {
-      //401 Unauthorized
-      // 요청이 실패함 -> 유저가 로그아웃 된 상태 또는 인터넷 오류.
       debugPrint(
           'api/me request failed with status code: ${response.statusCode}');
       return false;
     }
   }
 
+  /// 주어진 쿠키 설정으로 Dio 객체를 초기화하고 반환합니다.
   Dio myDio({String? initCookieString}) {
-    String cookieString = "";
-    if (initCookieString == null) {
-      cookieString = getCookiesToString();
-    } else {
-      cookieString = initCookieString;
-    }
+    String cookieString = initCookieString ?? getCookiesToString();
 
     var dio = Dio();
     dio.options.headers['Cookie'] = cookieString;
@@ -117,17 +106,11 @@ class UserProvider with ChangeNotifier {
     return dio;
   }
 
-  // 아래의 getApiRes 와는 다른 함수
-  // apiUrl을 받고 요청을 보낸 후 결과를 리턴해줌
+  /// 지정된 API URL로 GET 요청을 전송하고 응답을 반환합니다.
+  /// 실패 시 null을 반환합니다.
   Future<dynamic> getApiRes(String apiUrl, {String? initCookieString}) async {
-    String cookieString = "";
-
+    String cookieString = initCookieString ?? getCookiesToString();
     var totUrl = "$newAraDefaultUrl/api/$apiUrl";
-    if (initCookieString == null) {
-      cookieString = getCookiesToString();
-    } else {
-      cookieString = initCookieString;
-    }
 
     var dio = Dio();
     dio.options.headers['Cookie'] = cookieString;
