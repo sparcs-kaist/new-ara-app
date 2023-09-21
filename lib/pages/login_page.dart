@@ -12,15 +12,13 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
-
-  bool showSSOPage =false;
+  bool showSSOPage = false;
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
       body: SafeArea(
-        child: showSSOPage == false ?
-              Center(
+        child: showSSOPage == false
+            ? Center(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -62,8 +60,7 @@ class _LoginPageState extends State<LoginPage> {
                   ],
                 ),
               )
-            :
-            const SparcsSSOPage(),
+            : const SparcsSSOPage(),
       ),
     );
   }
