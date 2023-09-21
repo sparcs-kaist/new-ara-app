@@ -27,7 +27,10 @@ class SettingPage extends StatefulWidget {
 
 class SettingPageState extends State<SettingPage> {
   // 백엔드 모델과 동일한 변수명을 사용하기 위해 snake case 사용함.
+
+  /// 성인글 보기 설정. true이면 성인글을 보여줌.
   late bool see_sexual;
+  /// 정치글 보기 설정. true이면 정치글을 보여줌.
   late bool see_social;
 
   @override
