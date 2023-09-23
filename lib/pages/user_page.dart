@@ -33,6 +33,8 @@ class _UserPageState extends State<UserPage>
     ScrollController() // 최근 본 글 ListView
   ];
 
+  // TODO: magic number enum 대체 고려하기
+
   /// 작성한 글, 담아둔 글, 최근 본 글 ListView에 대해
   /// 스크롤의 가장 하단에 도달하여 새로운 페이지를 불러오는지 여부를 표시함.
   List<bool> isLoadingNewPage = [ false, false, false ];

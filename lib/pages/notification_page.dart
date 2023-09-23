@@ -1,3 +1,4 @@
+/// 사용자에 대한 이때까지의 알림을 보여주는 페이지 관리 파일
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:easy_localization/easy_localization.dart';
@@ -14,6 +15,7 @@ import 'package:new_ara_app/pages/post_view_page.dart';
 import 'package:new_ara_app/utils/slide_routing.dart';
 import 'package:new_ara_app/providers/notification_provider.dart';
 
+/// 알림페이지의 빌드 및 이벤트 처리를 담당하는 위젯.
 class NotificationPage extends StatefulWidget {
   const NotificationPage({Key? key}) : super(key: key);
   @override
@@ -21,9 +23,19 @@ class NotificationPage extends StatefulWidget {
 }
 
 class _NotificationPageState extends State<NotificationPage> {
+  /// 알림 ListView를 제어하는 컨트롤러
   late final ScrollController _listViewController;
-  bool _isLoadingTotal = true, _isLoadingNewPage = false;
+
+  /// 알림 리스트 자체를 새로고침 중인지 나타내는 변수.
+  bool _isLoadingTotal = true;
+
+  /// 사용자의 스크롤에 따라 다음 페이지의 알림을 불러오는 중인지 나타내는 변수.
+  bool _isLoadingNewPage = false;
+
+  /// 현재까지 불러온 가장 마지막 알림 페이지를 나타냄.
   int _curPage = 1;
+
+  /// 알림 ListView에 표시되는 알림 모델의 리스트.
   List<NotificationModel> _modelList = [];
 
   @override
@@ -35,6 +47,8 @@ class _NotificationPageState extends State<NotificationPage> {
     _initNotificationPage(userProvider);
   }
 
+  /// 사용자가 페이지에 처음 진입할 때, 화면 새로고침 시에 사용됨.
+  /// API 통신을 위해 [userProvider]를 전달받음.
   Future<void> _initNotificationPage(UserProvider userProvider) async {
     _modelList = await _fetchEachPage(userProvider, 1);
     _curPage = 1;
@@ -47,6 +61,8 @@ class _NotificationPageState extends State<NotificationPage> {
     super.dispose();
   }
 
+  /// [targetPage]를 통해 지정한 페이지의 알림을 불러와 모델로 변환 후,
+  /// 결과 리스트를 반환함.
   Future<List<NotificationModel>> _fetchEachPage(UserProvider userProvider, int targetPage) async {
     var dio = Dio()
         ..options.headers["Cookie"] = userProvider.getCookiesToString();
@@ -70,6 +86,9 @@ class _NotificationPageState extends State<NotificationPage> {
     return resList;
   }
 
+  /// 알림 ListView를 구독 중인 리스너이며
+  /// 사용자가 ListView의 끝에 도달하였을 때 이를 감지하여
+  /// 새로운 페이지를 로딩함.
   void _listViewListener() async {
     if (_isLoadingNewPage) return;
     if (_listViewController.position.pixels == _listViewController.position.maxScrollExtent) {
@@ -119,6 +138,9 @@ class _NotificationPageState extends State<NotificationPage> {
     if (mounted) setState(() => _isLoadingNewPage = value);
   }
 
+  /// id에 해당하는 알림을 읽음 처리해주는 함수.
+  /// API 통신에 필요한 [userProvider], 알림 식별에 필요한 [id]를 전달받음.
+  /// 읽음 처리가 성공하면 true, 그렇지 않으면 false 리턴.
   Future<bool> _readNotification(UserProvider userProvider, int id) async {
     try {
       await userProvider.myDio().post(
@@ -131,6 +153,9 @@ class _NotificationPageState extends State<NotificationPage> {
     return true;
   }
 
+  /// 알림 모두 읽기 기능에 사용됨.
+  /// API 통신을 위해 [userProvider]를 이용함.
+  /// 모두 읽음 처리 성공 시에 true, 아니면 false를 반환함.
   Future<bool> _readAllNotification(UserProvider userProvider) async {
     try {
       await userProvider.myDio().post(
@@ -172,6 +197,7 @@ class _NotificationPageState extends State<NotificationPage> {
                   child: RefreshIndicator(
                     color: ColorsInfo.newara,
                     onRefresh: () async {
+                      // 새로고침 시 첫 페이지만 다시 불러옴.
                       await _initNotificationPage(userProvider);
                       await notificationProvider.checkIsNotReadExist();
                       update();
@@ -191,6 +217,7 @@ class _NotificationPageState extends State<NotificationPage> {
                           );
                         }
                         NotificationModel targetNoti = _modelList[idx];
+                        // 개별 알림을 리턴함.
                         return Column(
                           children: [
                             idx != 0 ? _buildDateInfo(_modelList[idx - 1].created_at,
@@ -207,6 +234,7 @@ class _NotificationPageState extends State<NotificationPage> {
                             ),
                             InkWell(
                                 onTap: () async {
+                                  // 알림 클릭 시에 해당하는 글로 이동.
                                   await Navigator.of(context).push(
                                     slideRoute(PostViewPage(
                                       id: targetNoti.related_article.id,
@@ -316,6 +344,8 @@ class _NotificationPageState extends State<NotificationPage> {
           ),
         ),
       ),
+      // 모두 읽음 처리를 위한 버튼.
+      // (2023.09.23) 추후 디자이너와 조율해야함.
       floatingActionButton: FloatingActionButton(
         onPressed: () async {
           if (!notificationProvider.isNotReadExist) return;
@@ -348,6 +378,7 @@ class _NotificationPageState extends State<NotificationPage> {
     );
   }
 
+  // 현재 date와 알림 생성 date의 차이를 계산하여 문자열로 변경해줌.
   Widget _buildDateInfo(String strDate1, String strDate2) {
     DateTime now = DateTime.now();
     DateTime prevDate = DateTime.parse(strDate1).toLocal();
