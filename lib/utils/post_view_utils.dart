@@ -1,3 +1,7 @@
+/// PostViewPage 내부에서 사용되는 메서드가 많아 별도의 파일로 분류함.
+
+// TODO: 다시 PostViewPage 내부로 합칠 지 고민해보기
+
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -24,6 +28,8 @@ class ArticleController {
     required this.userProvider,
   });
 
+  /// 글에 대한 좋아요 및 좋아요 취소를 해주는 메서드.
+  /// 요청이 성공하면 true, 아닌 경우 false를 리턴함.
   Future<bool> posVote() async {
     if (model.is_mine) return false;
     int id = model.id;
@@ -42,6 +48,8 @@ class ArticleController {
     return true;
   }
 
+  /// 글에 대한 싫어요, 싫어요 취소를 해주는 메서드
+  /// 요청이 성공하면 true, 실패하면 false를 리턴.
   Future<bool> negVote() async {
     if (model.is_mine == true) return false;
     int id = model.id;
@@ -60,6 +68,7 @@ class ArticleController {
     return true;
   }
 
+  /// 멤버 변수 model 내부의 좋아요, 싫어요 상태를 [value]에 맞게 변형.
   void _setVote(bool value) {
     model.positive_vote_count ??= 0;
     model.positive_vote_count = model.positive_vote_count! +
@@ -71,6 +80,8 @@ class ArticleController {
         : value;
   }
 
+  /// 글에 대한 스크랩, 스크랩 취소 기능을 담당하는 메서드.
+  /// 스크랩 관련 API 요청이 성공하면 true, 실패하면 false를 반환.
   Future<bool> scrap() async {
     if (model.my_scrap == null) {
       var postRes = await userProvider.postApiRes(
@@ -88,6 +99,8 @@ class ArticleController {
     return true;
   }
 
+  /// 글에 대한 공유 기능을 담당하는 메서드.
+  /// 클립보드에 글의 링크를 복사해줌.
   Future<void> share() async {
     String url = "$newAraDefaultUrl/post/${model.id}";
     await Clipboard.setData(ClipboardData(text: url));
@@ -103,6 +116,8 @@ class FileController {
     required this.userProvider,
   });
 
+  /// 첨부파일 다운로드과정을 전체적으로 관리하는 메서드.
+  /// 다운로드가 성공하면 true, 그렇지 않으면 false 리턴.
   Future<bool> download() async {
     String initFileName = Uri.parse(model.file).path.substring(7);
     late String targetDir;
@@ -117,6 +132,7 @@ class FileController {
     return res;
   }
 
+  /// 첨부파일이 다운로드될 경로를 플랫폼에 따라 리턴함.
   Future<String> _getDownloadPath() async {
     late Directory directory;
     if (Platform.isIOS) {
@@ -130,6 +146,9 @@ class FileController {
     return directory.path;
   }
 
+  /// (2023.09.24)현재 뉴아라앱은 첨부파일 다운로드 시
+  /// 파일명 뒤에 타임스탬프를 추가하여 같은 파일이 여러번 다운로드될 수 있도록 함.
+  /// 이를 위해 타임스탬프가 추가된 파일명을 리턴하는 메서드.
   String _addTimestampToFileName(String fileName) {
     String timestamp = DateTime.now().millisecondsSinceEpoch.toString();
     int dotIndex = fileName.lastIndexOf('.');
@@ -141,6 +160,8 @@ class FileController {
     return '$fileName-$timestamp';
   }
 
+  /// 웹 상에서 [uri]에 위치한 파일을 [totalPath]로 다운로드해주는 함수.
+  /// 다운로드가 성공하면 true, 그렇지 않으면 false 리턴.
   Future<bool> _downloadFile(String uri, String totalPath) async {
     try {
       await userProvider.myDio().download(uri, totalPath);
@@ -160,6 +181,7 @@ class CommentController {
     required this.userProvider,
   });
 
+  /// 댓글에 대한 좋아요, 좋아요 취소 기능을 담당.
   Future<bool> posVote() async {
     if (model.is_mine) return false;
     int id = model.id;
@@ -178,6 +200,7 @@ class CommentController {
     return true;
   }
 
+  /// 댓글에 대한 싫어요, 싫어요 취소 기능을 담당.
   Future<bool> negVote() async {
     if (model.is_mine == true) return false;
     int id = model.id;
@@ -196,6 +219,8 @@ class CommentController {
     return true;
   }
 
+  /// API 요청을 통해 값이 변경될 때 모델의 값도 [value]에 맞게 설정하기
+  /// 위해 만들어짐.
   void setVote(bool value) {
     model.positive_vote_count ??= 0;
     model.positive_vote_count = model.positive_vote_count! +
@@ -208,8 +233,13 @@ class CommentController {
   }
 }
 
+/// 신고 기능이 글, 댓글 모두에게 필요하여 만든 위젯.
 class ReportDialogWidget extends StatefulWidget {
-  final int? articleID, commentID;
+  /// 글에 대한 신고일 경우 null이 아님.
+  final int? articleID;
+
+  /// 댓글에 대한 신고일 경우 null이 아님.
+  final int? commentID;
   const ReportDialogWidget({super.key, this.articleID, this.commentID});
 
   @override
@@ -217,6 +247,7 @@ class ReportDialogWidget extends StatefulWidget {
 }
 
 class _ReportDialogWidgetState extends State<ReportDialogWidget> {
+  /// 신고 사유 내역을 나타냄.
   List<String> reportContents = [
     "hate_speech",
     "unauthorized_sales_articles",
@@ -225,6 +256,8 @@ class _ReportDialogWidgetState extends State<ReportDialogWidget> {
     "defamation",
     "other"
   ];
+
+  /// 신고 사유 내역을 한국어로 나타냄.
   List<String> reportContentKor = [
     "혐오 발언",
     "허가되지 않은 판매글",
@@ -233,6 +266,8 @@ class _ReportDialogWidgetState extends State<ReportDialogWidget> {
     "명예훼손",
     "기타"
   ];
+
+  /// 각각의 신고 내역에 대해 선택되었는지 여부를 나타냄.
   late List<bool> isChosen;
 
   @override
@@ -353,6 +388,7 @@ class _ReportDialogWidgetState extends State<ReportDialogWidget> {
     );
   }
 
+  /// 신고 내역을 API 요청을 통해 서버에 보내는 역할.
   Future<bool> postReport() async {
     if (!isChosen[0] &&
         !isChosen[1] &&
@@ -421,7 +457,3 @@ class _ReportDialogWidgetState extends State<ReportDialogWidget> {
     );
   }
 }
-
-// PostViewPage 내에 삽입되는 WebViewWidget
-// article.content or curComment.content 렌더링을 위한 WebViewWidget
-// WebViewWidget 과의 차이점은 JS를 이용한 자동 높이 조정
