@@ -1,3 +1,5 @@
+/// post의 내용을 보여주는 페이지 전체를 관리하는 파일.
+/// 뷰, 이벤트 처리 모두를 관리하고 있음.
 import 'dart:core';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -24,8 +26,9 @@ import 'package:new_ara_app/utils/slide_routing.dart';
 import 'package:new_ara_app/constants/file_type.dart';
 import 'package:new_ara_app/providers/notification_provider.dart';
 
-
+/// 하나의 post에 대한 내용 뷰, 이벤트 처리를 모두 담당하는 StatefulWidget.
 class PostViewPage extends StatefulWidget {
+  /// 보여주고 싶은 대상 post의 id.
   final int articleID;
   const PostViewPage({super.key, required int id}) : articleID = id;
 
@@ -34,35 +37,85 @@ class PostViewPage extends StatefulWidget {
 }
 
 class _PostViewPageState extends State<PostViewPage> {
+  /// 각각의 댓글 컨테이너에 대한 GlobalKey를 저장하는 리스트.
+  /// 해당 댓글에 다른 사용자가 답글을 작성하거나, 댓글 작성자가 수정하는 경우에
+  /// 해당 댓글 컨테이너의를 키보드 바로 위로 위치 시키는 기능에서 사용됨.
   final List<GlobalKey> _commentKeys = [];
+
+  /// 댓글 입력 TextField에 대한 GlobalKey.
   final GlobalKey _textFieldKey = GlobalKey();
 
-  late ArticleModel article;
-  late bool isReportable, isValid, isModify, isNestedComment, isSending;
-  late List<CommentNestedCommentListActionModel> commentList;
+  /// PostViewPage에서 표시할 글.
+  late ArticleModel _article;
 
+  /// 현재 사용자가 글을 신고할 수 있는 지 여부.
+  /// initState에서 자신의 글일 경우 true, 아닐 경우 false로 설정됨.
+  late bool _isReportable;
+  
+  /// 페이지 전체에 대한 로드 완료 여부를 나타냄.
+  /// 현재 글 정보 및 웹뷰의 로드가 모두 완료되었을 경우 true.
+  /// 아닌 경우 false로 설정됨.
+  late bool _isValid;
+
+  /// 사용자가 댓글을 수정 중인 지에 대한 여부를 나타냄.
+  /// 댓글을 수정 중이라면 true. 아닌 경우 false.
+  late bool _isModify;
+
+  /// 사용자가 대댓글을 작성하고 있는 지에 대한 여부를 나타냄.
+  /// 대댓글을 작성 중이라면 true. 아닌 경우 false.
+  late bool _isNestedComment;
+
+  /// 현재 댓글 전송 중인지 여부를 나타냄.
+  /// 댓글 전송 버튼 중복 클릭 방지를 위해 사용하는 변수.
+  /// 현재 댓글을 전송 중이라면 true. 아닌 경우 false.
+  late bool _isSending;
+
+  /// 현재 페이지의 글에 달려있는 모든 댓글, 답글이 저장됨.
+  late List<CommentNestedCommentListActionModel> _commentList;
+
+  /// 댓글 입력 TextField에 입력되어있는 텍스트.
+  /// 댓글 전송 시에 사용됨.
   String _commentContent = "";
+
+  /// 댓글 입력 TextField에 대한 FocusNode.
+  /// 답글 쓰기, 수정 버튼 클릭 시에 TextField에 자동으로 Focus를 주기 위해 사용됨.
   FocusNode textFocusNode = FocusNode();
-  CommentNestedCommentListActionModel? targetComment; // 수정 or 대댓글이 달릴 댓글
+
+  /// 댓글 수정 혹은 대댓글을 전송할 경우 해당 댓글 모델을 의미.
+  /// 새로운 댓글 작성의 경우 null로 설정됨.
+  CommentNestedCommentListActionModel? targetComment;
+
+  /// 댓글 입력 TextField에 대한 GlobalKey
   final _formKey = GlobalKey<FormState>();
+
+  /// SingleChildScrollView에 대한 ScrollController.
+  /// 대댓글, 댓글 수정 시 해당 댓글 컨테이너의 스크롤 위치 조정에 사용됨.
   final ScrollController _scrollController = ScrollController();
+
+  /// 댓글 입력 TextField에 대한 TextEditingController
+  /// TextField의 텍스트 조정에 사용됨.
+  /// 댓글 수정의 경우 수정할 댓글을 초기 텍스트로 설정하고
+  /// 전송 버튼 클릭 시에는 TextField의 내용을 지워줌.
   final TextEditingController _textEditingController = TextEditingController();
 
+  /// 본문 내용을 표시할 웹뷰.
   late InArticleWebView inArticleWebView;
 
   @override
   void initState() {
     super.initState();
-    isValid = false;
-    isModify = isNestedComment = false;
-    isSending = false;
-    commentList = [];
+    _isValid = false;
+    _isModify = _isNestedComment = false;
+    _isSending = false;
+    _commentList = [];
     UserProvider userProvider = context.read<UserProvider>();
     userProvider.setIsWebViewLoaded(false, quiet: true);
     _fetchArticle(userProvider).then((value) {
-      isReportable = value ? !article.is_mine : false;
+      _isReportable = value ? !_article.is_mine : false;
       _setIsValid(value);
     });
+    
+    // 페이지가 로드될 때 새로운 알림이 있는지 조회.
     context.read<NotificationProvider>().checkIsNotReadExist();
   }
 
@@ -80,19 +133,18 @@ class _PostViewPageState extends State<PostViewPage> {
 
     return Stack(
       children: [
-        !isValid ? Container() : Scaffold(
+        !_isValid ? Container() : Scaffold(
           appBar: AppBar(
             leading: IconButton(
               color: ColorsInfo.newara,
               icon: SvgPicture.asset('assets/icons/left_chevron.svg',
                   color: ColorsInfo.newara, width: 35, height: 35),
-              onPressed: () {
-                Navigator.pop(context);
-              },
+              onPressed: () => Navigator.pop(context),
             ),
           ),
           body: SafeArea(
             child: GestureDetector(
+              // 화면을 탭하면 키보드가 내려가도록 하기 위해 사용함.
               onTap: () => FocusScope.of(context).unfocus(),
               child: Container(
                 margin: const EdgeInsets.symmetric(horizontal: 20),
@@ -112,8 +164,9 @@ class _PostViewPageState extends State<PostViewPage> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
+                            // 글 제목 텍스트 표시.
                             Text(
-                              article.title.toString(),
+                              _article.title.toString(),
                               style: const TextStyle(
                                 fontSize: 18,
                                 fontWeight: FontWeight.w700,
@@ -129,7 +182,7 @@ class _PostViewPageState extends State<PostViewPage> {
                                 Row(
                                   children: [
                                     Text(
-                                      getTime(article.created_at),
+                                      getTime(_article.created_at),
                                       style: const TextStyle(
                                         fontSize: 12,
                                         fontWeight: FontWeight.w500,
@@ -139,7 +192,7 @@ class _PostViewPageState extends State<PostViewPage> {
                                     ),
                                     const SizedBox(width: 10),
                                     Text(
-                                      '조회 ${article.hit_count}',
+                                      '조회 ${_article.hit_count}',
                                       style: const TextStyle(
                                         fontSize: 12,
                                         fontWeight: FontWeight.w500,
@@ -156,16 +209,16 @@ class _PostViewPageState extends State<PostViewPage> {
                                       'assets/icons/like.svg',
                                       width: 13,
                                       height: 15,
-                                      color: article.my_vote == false
+                                      color: _article.my_vote == false
                                           ? ColorsInfo.noneVote
                                           : ColorsInfo.newara,
                                     ),
                                     const SizedBox(width: 3),
-                                    Text('${article.positive_vote_count}',
+                                    Text('${_article.positive_vote_count}',
                                         style: TextStyle(
                                             fontSize: 14,
                                             fontWeight: FontWeight.w500,
-                                            color: article.my_vote == false
+                                            color: _article.my_vote == false
                                                 ? ColorsInfo.noneVote
                                                 : ColorsInfo.newara)),
                                     const SizedBox(width: 10),
@@ -173,16 +226,16 @@ class _PostViewPageState extends State<PostViewPage> {
                                       'assets/icons/dislike.svg',
                                       width: 13,
                                       height: 15,
-                                      color: article.my_vote == true
+                                      color: _article.my_vote == true
                                           ? ColorsInfo.noneVote
                                           : ColorsInfo.negVote,
                                     ),
                                     const SizedBox(width: 3),
-                                    Text('${article.negative_vote_count}',
+                                    Text('${_article.negative_vote_count}',
                                         style: TextStyle(
                                           fontSize: 14,
                                           fontWeight: FontWeight.w500,
-                                          color: article.my_vote == true
+                                          color: _article.my_vote == true
                                               ? ColorsInfo.noneVote
                                               : ColorsInfo.negVote,
                                         )),
@@ -195,7 +248,7 @@ class _PostViewPageState extends State<PostViewPage> {
                                       const Color.fromRGBO(99, 99, 99, 1),
                                     ),
                                     const SizedBox(width: 3),
-                                    Text('${article.comment_count}',
+                                    Text('${_article.comment_count}',
                                         style: const TextStyle(
                                             fontSize: 14,
                                             fontWeight: FontWeight.w500,
@@ -208,12 +261,15 @@ class _PostViewPageState extends State<PostViewPage> {
                             const SizedBox(height: 10),
                             // 유저 정보 (프로필 이미지, 닉네임)
                             InkWell(
-                              onTap: article.name_type == 2 ? null : () async {
-                                await Navigator.of(context).push(slideRoute(UserViewPage(userID: article.created_by.id)));
+                              // 익명일 경우 작성자 정보확인이 불가하도록 함.
+                              onTap: _article.name_type == 2 ? null : () async {
+                                await Navigator.of(context).push(slideRoute(UserViewPage(userID: _article.created_by.id)));
+                                // 유저 정보 페이지에서 돌아올 때 페이지를 업데이트함.
                                 _setIsValid(await _fetchArticle(userProvider));
                               },
                               child: Row(
                                 children: [
+                                  // 사용자 프로필 사진.
                                   Container(
                                     width: 30,
                                     height: 30,
@@ -224,12 +280,13 @@ class _PostViewPageState extends State<PostViewPage> {
                                     child: ClipRRect(
                                       borderRadius: const BorderRadius.all(
                                           Radius.circular(100)),
-                                      child: Image.network(article
+                                      child: Image.network(_article
                                           .created_by.profile.picture
                                           .toString()),
                                     ),
                                   ),
                                   const SizedBox(width: 10),
+                                  // 사용자 닉네임 텍스트 표시.
                                   Container(
                                       constraints: BoxConstraints(
                                           maxWidth: MediaQuery.of(context)
@@ -237,7 +294,7 @@ class _PostViewPageState extends State<PostViewPage> {
                                               .width -
                                               150),
                                       child: Text(
-                                        article.created_by.profile.nickname
+                                        _article.created_by.profile.nickname
                                             .toString(),
                                         style: const TextStyle(
                                           fontSize: 14,
@@ -247,8 +304,9 @@ class _PostViewPageState extends State<PostViewPage> {
                                         overflow: TextOverflow.ellipsis,
                                       )),
                                   const SizedBox(width: 10),
+                                  // 익명일 경우 작성자 정보 확인을 불가하도록 함.
                                   Visibility(
-                                    visible: article.created_by.profile.nickname != "익명",
+                                    visible: _article.created_by.profile.nickname != "익명",
                                     child: SvgPicture.asset(
                                       'assets/icons/right_chevron.svg',
                                       color: Colors.black,
@@ -262,34 +320,35 @@ class _PostViewPageState extends State<PostViewPage> {
                             const Divider(thickness: 1,),
                             // (2023.08.09)첨부파일 리스트뷰 프로토타입. 추후 디자이너와 조율 예정
                             Visibility(
-                              visible: article.attachments.isNotEmpty,
+                              visible: _article.attachments.isNotEmpty,
                               child: Row(
                                 mainAxisAlignment: MainAxisAlignment.end,
                                 children: [
-                                  _buildAttachMenuButton(article.attachments.length),
+                                  _buildAttachMenuButton(_article.attachments.length),
                                 ],
                               ),
                             ),
                             const SizedBox(height: 5),
                             InArticleWebView(
-                              content: article.content ?? "내용이 없습니다.",
+                              content: _article.content ?? "내용이 없습니다.",
                               initialHeight: 150,
                             ),
                             const SizedBox(height: 10),
+                            // 좋아요, 싫어요 버튼 Row
                             Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
                                 InkWell(
                                   onTap: () async {
                                     bool res = await ArticleController(
-                                      model: article,
+                                      model: _article,
                                       userProvider: userProvider,
                                     ).posVote();
                                     if (res) update();
                                   },
                                   child: SvgPicture.asset(
                                     'assets/icons/like.svg',
-                                    color: article.my_vote == false
+                                    color: _article.my_vote == false
                                         ? ColorsInfo.noneVote
                                         : ColorsInfo.newara,
                                     width: 35,
@@ -297,11 +356,11 @@ class _PostViewPageState extends State<PostViewPage> {
                                   ),
                                 ),
                                 const SizedBox(width: 3),
-                                Text('${article.positive_vote_count}',
+                                Text('${_article.positive_vote_count}',
                                     style: TextStyle(
                                       fontSize: 20,
                                       fontWeight: FontWeight.w500,
-                                      color: article.my_vote == false
+                                      color: _article.my_vote == false
                                           ? ColorsInfo.noneVote
                                           : ColorsInfo.posVote,
                                     )),
@@ -309,7 +368,7 @@ class _PostViewPageState extends State<PostViewPage> {
                                 InkWell(
                                     onTap: () {
                                       ArticleController(
-                                        model: article,
+                                        model: _article,
                                         userProvider: userProvider,
                                       ).negVote().then((result) {
                                         if (result) update();
@@ -317,7 +376,7 @@ class _PostViewPageState extends State<PostViewPage> {
                                     },
                                     child: SvgPicture.asset(
                                       'assets/icons/dislike.svg',
-                                      color: article.my_vote == true
+                                      color: _article.my_vote == true
                                           ? ColorsInfo.noneVote
                                           : ColorsInfo.negVote,
                                       width: 35,
@@ -325,11 +384,11 @@ class _PostViewPageState extends State<PostViewPage> {
                                     ),
                                 ),
                                 const SizedBox(width: 3),
-                                Text('${article.negative_vote_count}',
+                                Text('${_article.negative_vote_count}',
                                     style: TextStyle(
                                       fontSize: 20,
                                       fontWeight: FontWeight.w500,
-                                      color: article.my_vote == true
+                                      color: _article.my_vote == true
                                           ? ColorsInfo.noneVote
                                           : ColorsInfo.negVote,
                                     )),
@@ -346,7 +405,7 @@ class _PostViewPageState extends State<PostViewPage> {
                                     InkWell(
                                       onTap: () {
                                         ArticleController(
-                                          model: article,
+                                          model: _article,
                                           userProvider: userProvider,
                                         ).scrap().then((result) {
                                           if (result) update();
@@ -360,7 +419,7 @@ class _PostViewPageState extends State<PostViewPage> {
                                           borderRadius:
                                           BorderRadius.circular(8),
                                           border: Border.all(
-                                            color: article.my_scrap == null
+                                            color: _article.my_scrap == null
                                                 ? const Color.fromRGBO(
                                                 230, 230, 230, 1)
                                                 : ColorsInfo.newara,
@@ -376,7 +435,7 @@ class _PostViewPageState extends State<PostViewPage> {
                                                 'assets/icons/bookmark.svg',
                                                 width: 25,
                                                 height: 25,
-                                                color: article.my_scrap ==
+                                                color: _article.my_scrap ==
                                                     null
                                                     ? const Color.fromRGBO(
                                                     100, 100, 100, 1)
@@ -384,12 +443,12 @@ class _PostViewPageState extends State<PostViewPage> {
                                               ),
                                               const SizedBox(width: 5),
                                               Text(
-                                                article.my_scrap == null
+                                                _article.my_scrap == null
                                                     ? '담아두기'
                                                     : '담아둔 글',
                                                 style: TextStyle(
                                                   color:
-                                                  article.my_scrap == null
+                                                  _article.my_scrap == null
                                                       ? Colors.black
                                                       : ColorsInfo.newara,
                                                   fontSize: 15,
@@ -405,7 +464,7 @@ class _PostViewPageState extends State<PostViewPage> {
                                     InkWell(
                                       onTap: () async {
                                         await ArticleController(
-                                          model: article,
+                                          model: _article,
                                           userProvider: userProvider,
                                         ).share();
                                       },
@@ -448,14 +507,14 @@ class _PostViewPageState extends State<PostViewPage> {
                                     ),
                                   ],
                                 ),
-                                // 신고버튼 Row
-                                isReportable ? InkWell(
+                                // 자신의 글일 경우 수정 버튼, 타인의 글일 경우 신고 버튼
+                                _isReportable ? InkWell(
                                   onTap: () {
                                     showDialog(
                                         context: context,
                                         builder: (context) {
                                           return ReportDialogWidget(
-                                              articleID: article.id);
+                                              articleID: _article.id);
                                         });
                                   },
                                   child: Container(
@@ -499,7 +558,7 @@ class _PostViewPageState extends State<PostViewPage> {
                                     await Navigator.push(
                                         context,
                                         MaterialPageRoute(
-                                            builder: (context) => PostWritePage(previousArticle: article)
+                                            builder: (context) => PostWritePage(previousArticle: _article)
                                         )
                                     );
                                     bool result = await _fetchArticle(userProvider);
@@ -547,7 +606,7 @@ class _PostViewPageState extends State<PostViewPage> {
                             SizedBox(
                               width: MediaQuery.of(context).size.width - 40,
                               child: Text(
-                                '${article.comment_count}개의 댓글',
+                                '${_article.comment_count}개의 댓글',
                                 style: const TextStyle(
                                   fontSize: 16,
                                   fontWeight: FontWeight.w700,
@@ -555,14 +614,17 @@ class _PostViewPageState extends State<PostViewPage> {
                               ),
                             ),
                             const SizedBox(height: 15),
+                            // 댓글을 보여주는 ListView.
                             ListView.separated(
                               padding: const EdgeInsets.only(bottom: 15),
-                              shrinkWrap: true,
+                              shrinkWrap: true,  // 모든 댓글을 보여주는 선에서 크기를 최소화
+                              // SingleChildScrollView와의 충돌을 방지하기 위해서
                               physics: const NeverScrollableScrollPhysics(),
-                              itemCount: commentList.length,
+                              itemCount: _commentList.length,
                               itemBuilder: (BuildContext context, int idx) {
                                 CommentNestedCommentListActionModel
-                                curComment = commentList[idx];
+                                curComment = _commentList[idx];
+                                // 각각의 댓글에 대한 컨테이너
                                 return Container(
                                   key: _commentKeys[idx],
                                   margin: EdgeInsets.only(
@@ -579,6 +641,7 @@ class _PostViewPageState extends State<PostViewPage> {
                                         MainAxisAlignment.spaceBetween,
                                         children: [
                                           InkWell(
+                                            // 익명일 경우 댓글 작성자 정보 확인이 불가능하도록 함.
                                             onTap: curComment.name_type == 2 ? null : () {
                                               Navigator.push(
                                                 context,
@@ -840,7 +903,7 @@ class _PostViewPageState extends State<PostViewPage> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Visibility(
-                          visible: isNestedComment,
+                          visible: _isNestedComment,
                           child: Column(
                             children: [
                               Text(
@@ -857,7 +920,7 @@ class _PostViewPageState extends State<PostViewPage> {
                           ),
                         ),
                         Visibility(
-                          visible: isModify,
+                          visible: _isModify,
                           child: Column(
                             children: [
                               Text(
@@ -877,7 +940,7 @@ class _PostViewPageState extends State<PostViewPage> {
                           children: [
                             // Close button
                             Visibility(
-                              visible: (isModify || isNestedComment),
+                              visible: (_isModify || _isNestedComment),
                               child: Row(
                                 children: [
                                   Column(
@@ -920,7 +983,7 @@ class _PostViewPageState extends State<PostViewPage> {
                             const SizedBox(width: 5),
                             // send button
                             AbsorbPointer(
-                              absorbing: isSending,
+                              absorbing: _isSending,
                               child: InkWell(
                                 onTap: () async {
                                   setIsSending(true);
@@ -960,6 +1023,8 @@ class _PostViewPageState extends State<PostViewPage> {
     );
   }
 
+  /// 첨부파일명과 함께 파일 타입 사진을 보여주기 위해 사용.
+  /// 파일 확장자를 ext를 통해 받은 후 해당하는 svg 이미지를 리턴.
   SvgPicture _getFileTypeImage(String ext) {
     late String assetPath;
     if (AttachFileType.imageExt.contains(ext)) {
@@ -982,6 +1047,8 @@ class _PostViewPageState extends State<PostViewPage> {
     );
   }
 
+  /// 첨부파일 모아보기를 클릭하였을 때 나오는 PopupMenuButton.
+  /// 파일의 갯수를 전달받고 클래스 멤버변수 _article의 attachments 속성에서 정보를 가져옴.
   PopupMenuButton<int> _buildAttachMenuButton(int fileNum) {
     return PopupMenuButton<int>(
       shadowColor: const Color.fromRGBO(0, 0, 0, 0.2),
@@ -999,7 +1066,7 @@ class _PostViewPageState extends State<PostViewPage> {
         ),
       ),
       itemBuilder: (BuildContext context) {
-        List<AttachmentModel> files = article.attachments;
+        List<AttachmentModel> files = _article.attachments;
         return List.generate(
             files.length,
             (idx) {
@@ -1045,7 +1112,7 @@ class _PostViewPageState extends State<PostViewPage> {
         );
       },
       onSelected: (int result) async {
-        AttachmentModel model = article.attachments[result];
+        AttachmentModel model = _article.attachments[result];
         UserProvider userProvider = context.read<UserProvider>();
         bool res = await FileController(model: model, userProvider: userProvider).download();
         debugPrint(res ? "파일 다운로드 성공" : "파일 다운로드 실패");
@@ -1053,7 +1120,9 @@ class _PostViewPageState extends State<PostViewPage> {
     );
   }
 
-  // 자신의 댓글
+  /// 자신의 댓글에 대한 수정, 삭제 버튼이 있는 PopupMenuButton
+  /// 댓글 식별을 위한 [id], API 통신을 위한 [userProvider],
+  /// 해당 댓글의 _commentList 내에서의 위치인 [idx]를 전달받음.
   PopupMenuButton<String> _buildMyPopupMenuButton(
       int id, UserProvider userProvider, int idx) {
     return PopupMenuButton<String>(
@@ -1118,8 +1187,8 @@ class _PostViewPageState extends State<PostViewPage> {
       onSelected: (String result) async {
         switch (result) {
           case 'Modify':
-            _textEditingController.text = commentList[idx].content.toString();
-            targetComment = commentList[idx];
+            _textEditingController.text = _commentList[idx].content.toString();
+            targetComment = _commentList[idx];
             _setCommentMode(false, true);
             textFocusNode.requestFocus();
             moveCommentContainer(idx);
@@ -1232,7 +1301,8 @@ class _PostViewPageState extends State<PostViewPage> {
     );
   }
 
-  // 다른 유저의 댓글
+  /// 다른 유저의 댓글에 대해 채팅, 신고를 나타내는 PopupMenuButton
+  /// 댓글의 id인 commentID를 전달받음.
   PopupMenuButton<String> _buildOthersPopupMenuButton(int commentID) {
     return PopupMenuButton<String>(
       shadowColor: const Color.fromRGBO(0, 0, 0, 0.2),
@@ -1309,7 +1379,7 @@ class _PostViewPageState extends State<PostViewPage> {
     );
   }
 
-  // 댓글 입력 Form
+  /// 댓글 입력을 위한 Form을 생성하여 리턴함.
   Form _buildForm() {
     return Form(
       key: _formKey,
@@ -1338,10 +1408,12 @@ class _PostViewPageState extends State<PostViewPage> {
     );
   }
 
-  // curComment.content 를 Text() or InArticleWebView() 로 렌더링할 지 결정
+  /// 현재 댓글은 이미지, 링크가 있는 경우 HTML로 저장되어 있음.
+  /// 그러나 텍스트만 있는 댓글도 다수 존재하여 HTML 태그를 감지하고 필요한 것들만
+  /// 웹뷰로 로드, 나머지는 텍스트로 댓글을 로드하도록 함.
   Widget _buildCommentContent(String content) {
     RegExp pattern = RegExp(r'<[^>]+>');
-    // HTML 태그가 존재하는지 검사 (완벽한 방법은 아님)
+    // 정규식을 이용하여 HTML 태그가 존재하는지 검사 (완벽한 방법은 아님)
     if (!content.contains(pattern)) {
       return Text(
         content,
@@ -1358,6 +1430,9 @@ class _PostViewPageState extends State<PostViewPage> {
     );
   }
 
+  /// 대댓글, 수정 기능 사용 시 대상이 되는 댓글 컨테이너를
+  /// 키보드 바로 위로 이동시키는 메서드.
+  /// 댓글 식별을 위해 _commentKeys의 인덱스를 [idx]로 전달받음.
   void moveCommentContainer(int idx) {
     Future.delayed(
       const Duration(milliseconds: 500), () {
@@ -1383,7 +1458,7 @@ class _PostViewPageState extends State<PostViewPage> {
 
   void setIsSending(bool value) {
     if (!mounted) return;
-    setState(() => isSending = value);
+    setState(() => _isSending = value);
   }
 
   void update() {
@@ -1394,18 +1469,21 @@ class _PostViewPageState extends State<PostViewPage> {
   // isValid: article 에 적절한 정보가 있는지 나타냄
   void _setIsValid(bool value) {
     if (!mounted) return;
-    setState(() => isValid = value);
+    setState(() => _isValid = value);
   }
 
   // 둘 다 false 면 일반적인 댓글
   void _setCommentMode(bool isNestedVal, bool isModifyVal) {
     if (!mounted) return;
     setState(() {
-      isNestedComment = isNestedVal;
-      isModify = isModifyVal;
+      _isNestedComment = isNestedVal;
+      _isModify = isModifyVal;
     });
   }
 
+  /// 댓글 삭제 기능을 위해 만들어진 메서드.
+  /// 댓글 식별을 위한 [id], API 통신을 위한 [userProvider]를 전달받음.
+  /// 댓글 삭제 API 요청이 성공하면 true, 그 외에는 false를 반환함.
   Future<bool> _delComment(int id, UserProvider userProvider) async {
     late dynamic delRes;
     try {
@@ -1421,7 +1499,9 @@ class _PostViewPageState extends State<PostViewPage> {
     return true;
   }
 
-  // Article 모델에 필요한 정보
+  /// 클래스 멤버변수 _article, _commentList, _commentKeys의 값을 설정하는 메서드.
+  /// API 통신을 위해 [userProvider]를 전달받음.
+  /// _article, _commentList, _commentKeys의 값이 모두 설정되면 true, 아닌 경우 false 반환.
   Future<bool> _fetchArticle(UserProvider userProvider) async {
     dynamic articleJson, commentJson;
 
@@ -1431,16 +1511,16 @@ class _PostViewPageState extends State<PostViewPage> {
       return false;
     }
     try {
-      article = ArticleModel.fromJson(articleJson);
+      _article = ArticleModel.fromJson(articleJson);
     } catch (error) {
       debugPrint(
           "ArticleModel.fromJson failed at articleID = ${widget.articleID}: $error");
       return false;
     }
 
-    commentList.clear();
+    _commentList.clear();
     _commentKeys.clear();
-    for (ArticleNestedCommentListAction anc in article.comments) {
+    for (ArticleNestedCommentListAction anc in _article.comments) {
       commentJson = await userProvider.getApiRes("comments/${anc.id}");
       if (commentJson == null) continue;
       late CommentNestedCommentListActionModel tmpModel;
@@ -1451,7 +1531,7 @@ class _PostViewPageState extends State<PostViewPage> {
         // 따라서 원래 댓글은 ArticleNestedCommentListActionModel 에 저장되고,
         // 대댓글을 CommentNestedCommentListActionModel 에 저장되지만 댓글도 CommentNestedCommentListActionModel 에 저장하여 더 편하게 함.
         tmpModel = CommentNestedCommentListActionModel.fromJson(commentJson);
-        commentList.add(tmpModel);
+        _commentList.add(tmpModel);
         _commentKeys.add(GlobalKey());
       } catch (error) {
         debugPrint(
@@ -1462,7 +1542,7 @@ class _PostViewPageState extends State<PostViewPage> {
       // 대댓글을 추가하는 과정
       for (CommentNestedCommentListActionModel cnc in anc.comments) {
         try {
-          commentList.add(cnc);
+          _commentList.add(cnc);
           _commentKeys.add(GlobalKey());
         } catch (error) {
           debugPrint(
@@ -1474,20 +1554,23 @@ class _PostViewPageState extends State<PostViewPage> {
     return true;
   }
 
+  /// 댓글을 POST 요청을 통해 작성하는 메서드.
+  /// API 요청을 위해 [userProvider]를 이용.
+  /// 댓글이 성공적으로 보내지면 true, 그렇지 않으면 false 반환.
   Future<bool> _sendComment(UserProvider userProvider) async {
     if (_formKey.currentState == null || !(_formKey.currentState!.validate())) {
       return false;
     }
     _formKey.currentState!.save();
-    if (!isModify) {
+    if (!_isModify) {
       dynamic defaultPayload = {
         "content": _commentContent,
-        "name_type": article.name_type,
+        "name_type": _article.name_type,
         "attachment": null,
       };
       defaultPayload.addAll(targetComment != null
           ? {"parent_comment": targetComment!.id}
-          : {"parent_article": article.id});
+          : {"parent_article": _article.id});
       var postRes = await userProvider.postApiRes(
         'comments/',
         payload: defaultPayload,
@@ -1504,7 +1587,7 @@ class _PostViewPageState extends State<PostViewPage> {
       dynamic defaultPayload = {
         "content": _commentContent,
         "is_mine": true,
-        "name_type": article.name_type,
+        "name_type": _article.name_type,
       };
       var patchRes = await userProvider.patchApiRes(
         "comments/${targetComment!.id}/",
@@ -1522,9 +1605,17 @@ class _PostViewPageState extends State<PostViewPage> {
   }
 }
 
+// TODO: 웹뷰 구조 수정 및 최적화(계속 별도의 클래스로 유지할 지 여부)
+
+/// PostViewPage에서는 article 및 comment의 content를 HTML 렌더링으로 보여줘야 함.
+/// 따라서 웹뷰가 사용되는 경우가 자주 있어 따로 클래스로 분리함.
 class InArticleWebView extends StatefulWidget {
+  /// 웹뷰에서 렌더링하는 HTML. 웹뷰 내에서 자체적으로 sanitize 하도록 함.
   final String content;
+
+  /// 초기 웹뷰 위젯의 높이.
   final double initialHeight;
+
   const InArticleWebView({
     super.key,
     required this.content,
@@ -1537,9 +1628,24 @@ class InArticleWebView extends StatefulWidget {
 
 class _InArticleWebViewState extends State<InArticleWebView> {
   WebViewController _webViewController = WebViewController();
+
+  /// 웹뷰에서 렌더링하는 content의 높이에 맞춰 조정된 height.
   late double webViewHeight;
+
+  /// 높이 조절이 완료되었는지 여부.
   late bool isFitted;
 
+  /// content에 뉴아라 게시물에 대한 링크가 있을 경우 게시물 번호를 추출해줌.
+  /// launchInBrower 메서드에서 사용함.
+  /// ```
+  /// if (targetUrl.authority == newAraAuthority) {
+  /// int postNum = getPostNum(targetUrl.path);
+  /// if (postNum != -1) {
+  ///   launchArticle(postNum);
+  ///   return;
+  ///  }
+  /// }
+  /// ```
   int getPostNum(String path) {
     final RegExp pattern = RegExp(r'/post/\d+');
     RegExpMatch? match = pattern.firstMatch(path);
@@ -1547,6 +1653,7 @@ class _InArticleWebViewState extends State<InArticleWebView> {
     return int.parse(path.substring(6));
   }
 
+  /// 뉴아라 내부 게시물 번호인 [postNum]을 전달받아 PostViewPage를 호출함.
   void launchArticle(int postNum) {
     Navigator.push(
         context,
@@ -1554,6 +1661,9 @@ class _InArticleWebViewState extends State<InArticleWebView> {
     );
   }
 
+  /// 웹뷰에서 링크가 클릭되었을 때 링크 분석, 리다이렉트를 담당해줌.
+  /// 링크를 [url]로 전달받은 후
+  /// 뉴아라 내부 게시물일 경우 PostViewPage, 아닐 경우 기본 브라우저로 리다이렉트.
   Future<void> launchInBrowser(String url) async {
     final Uri targetUrl = Uri.parse(url);
     if (!await canLaunchUrl(targetUrl)) {
@@ -1575,6 +1685,7 @@ class _InArticleWebViewState extends State<InArticleWebView> {
     }
   }
 
+  /// 웹뷰에서 content를 표시하기 위해 어느 정도 높이가 필요한지 구함.
   Future<double> getPageHeight() async {
     final String pageHeightStr =
     (await _webViewController.runJavaScriptReturningResult('''
@@ -1597,6 +1708,7 @@ class _InArticleWebViewState extends State<InArticleWebView> {
     return pageHeight;
   }
 
+  /// getPageHeight를 호출하고 리턴값을 받아 직접 state를 변경함.
   Future<void> setPageHeight() async {
     getPageHeight().then((height) {
       if (!mounted) return;
