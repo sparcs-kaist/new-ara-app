@@ -23,8 +23,11 @@ class MainPage extends StatefulWidget {
   State<StatefulWidget> createState() => _MainPageState();
 }
 
+/// 네이게이션 페이지에서 제일 먼저 보이는 메인 페이지.
 class _MainPageState extends State<MainPage> {
+  //각 컨텐츠 로딩을 확인하기 위한 변수
   List<bool> isLoading = [true, true, true, true, true, true, true, true];
+  //각 컨텐츠 별 데이터 리스트
   List<BoardDetailActionModel> boardList = [];
   List<ArticleListActionModel> dailyBestContentList = [];
   List<ArticleListActionModel> portalContentList = [];
@@ -40,11 +43,13 @@ class _MainPageState extends State<MainPage> {
     super.initState();
     var userProvider = Provider.of<UserProvider>(context, listen: false);
 
+    //TODO: 현재 api 요청 속도가 너무 느림. 병렬 처리 방식과, api 요청 속도 개선 필요. Future.wait([])로 바꾸면 개선되지 않을까 고민. 반복되는 코드 구조 개선 필요.
     refreshDailyBest(userProvider);
     refreshBoardList(userProvider);
     context.read<NotificationProvider>().checkIsNotReadExist();
   }
 
+  /// 일일 베스트 컨텐츠 데이터를 새로고침
   void refreshDailyBest(UserProvider userProvider) async {
     // api 호출과 Provider 정보 동기화.
     List<dynamic> recentJson =
@@ -65,8 +70,8 @@ class _MainPageState extends State<MainPage> {
     }
   }
 
+  /// 게시판 목록 안의 게시물들을 새로 고침
   void refreshBoardList(UserProvider userProvider) async {
-    //Provider 에  api res 주입
     List<dynamic> boardJson = await userProvider.getApiRes("boards/");
     if (mounted) {
       setState(() {
@@ -81,7 +86,7 @@ class _MainPageState extends State<MainPage> {
         isLoading[7] = false;
       });
     }
-
+    // 게시판 목록 로드 후 각 게시판의 공지사항들을 새로고침
     refreshPortalNotice(userProvider);
     refreshFacilityNotice(userProvider);
     refreshNewAraNotice(userProvider);
@@ -90,9 +95,8 @@ class _MainPageState extends State<MainPage> {
     refreshFreshmanCouncil(userProvider);
   }
 
+  /// 주어진 slug 값을 통해 게시판과 토픽의 ID를 찾음. topic 이 없는 경우 slug2로 ""을 넘겨주면 된다.
   List<int> findBoardID(String slug1, String slug2) {
-    //topic 이 없는 경우 slug2로 ""을 넘겨준다.
-
     List<int> returnValue = [-1, -1];
     for (int i = 0; i < boardList.length; i++) {
       if (boardList[i].slug == slug1) {
@@ -109,6 +113,7 @@ class _MainPageState extends State<MainPage> {
     return returnValue;
   }
 
+  ///포탈 게시물 글 불러오기.
   void refreshPortalNotice(UserProvider userProvider) async {
     //포탈 공지
     //  articles/?parent_board=1
@@ -131,6 +136,7 @@ class _MainPageState extends State<MainPage> {
     }
   }
 
+  ///입주 업체 게시물 글 불러오기.
   void refreshFacilityNotice(UserProvider userProvider) async {
     //articles/?parent_board=11
     //입주 업체
