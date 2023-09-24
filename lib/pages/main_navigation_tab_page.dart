@@ -10,6 +10,8 @@ import 'package:new_ara_app/pages/user_page.dart';
 import 'package:new_ara_app/providers/notification_provider.dart';
 import 'package:new_ara_app/constants/colors_info.dart';
 
+/// MainNavigationTabPage
+/// 메인 화면 하단에 위치하는 탭바를 포함한 메인 페이지입니다.
 class MainNavigationTabPage extends StatefulWidget {
   const MainNavigationTabPage({Key? key}) : super(key: key);
   @override
@@ -17,8 +19,9 @@ class MainNavigationTabPage extends StatefulWidget {
 }
 
 class _MainNavigationTabPageState extends State<MainNavigationTabPage> {
-  int _selectedIndex = 0;
+  int _selectedIndex = 0; // 현재 선택된 탭의 인덱스
 
+  // 탭별로 연결될 페이지 목록
   final List<Widget> _widgetOptions = <Widget>[
     const MainPage(),
     const BulletinListPage(),
@@ -27,6 +30,7 @@ class _MainNavigationTabPageState extends State<MainNavigationTabPage> {
     const UserPage(),
   ];
 
+  // 탭을 클릭할 때 실행될 함수
   void _onItemTapped(int index) {
     setState(() {
       _selectedIndex = index;
@@ -35,35 +39,29 @@ class _MainNavigationTabPageState extends State<MainNavigationTabPage> {
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
   }
-  // void downloadUserInfo(initStateContext) async {
-  //
-  //   await Provider.of<UserProvider>(initStateContext, listen: false)
-  //        .setCookiesFromUrl("https://newara.dev.sparcs.org/");
-  //   await Provider.of<UserProvider>(initStateContext, listen: false)
-  //       .apiMeUserInfo(message: "new-ara-home-page");
-  // }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: SafeArea(
+        // 현재 선택된 탭에 맞는 페이지 출력
         child: _widgetOptions.elementAt(_selectedIndex),
       ),
       bottomNavigationBar: _buildBottomNavigationBar(),
     );
   }
 
+  /// 하단의 네비게이션 바를 구성하는 함수입니다.
   BottomNavigationBar _buildBottomNavigationBar() {
     return BottomNavigationBar(
-      backgroundColor: Colors.white,
-      currentIndex: _selectedIndex,
-      showSelectedLabels: false,
-      showUnselectedLabels: false,
-      type: BottomNavigationBarType.fixed,
-      onTap: _onItemTapped,
+      backgroundColor: Colors.white, // 바탕색을 하얀색으로 설정합니다.
+      currentIndex: _selectedIndex, // 현재 선택된 탭의 인덱스를 나타냅니다.
+      showSelectedLabels: false, // 선택된 탭의 라벨(텍스트)를 보이지 않게 합니다.
+      showUnselectedLabels: false, // 선택되지 않은 탭의 라벨(텍스트)를 보이지 않게 합니다.
+      type: BottomNavigationBarType.fixed, // 탭바의 타입을 고정된 것으로 설정합니다.
+      onTap: _onItemTapped, // 탭을 클릭하면 _onItemTapped 함수를 실행합니다.
       elevation: 10,
       items: [
         BottomNavigationBarItem(
