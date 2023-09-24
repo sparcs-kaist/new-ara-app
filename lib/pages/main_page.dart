@@ -263,9 +263,7 @@ class _MainPageState extends State<MainPage> {
               height: 35,
             ),
             onPressed: () async {
-              await Navigator.of(context).push(
-                slideRoute(PostWritePage())
-              );
+              await Navigator.of(context).push(slideRoute(PostWritePage()));
             },
           ),
           IconButton(
@@ -277,10 +275,8 @@ class _MainPageState extends State<MainPage> {
             ),
             onPressed: () async {
               debugPrint("BulletinSearch");
-              await Navigator.of(context).push(
-                slideRoute(BulletinSearchPage(
-                    boardType: BoardType.all, boardInfo: null))
-              );
+              await Navigator.of(context).push(slideRoute(BulletinSearchPage(
+                  boardType: BoardType.all, boardInfo: null)));
             },
           ),
         ],
@@ -305,12 +301,11 @@ class _MainPageState extends State<MainPage> {
                         'main_page.realtime',
                         () {
                           //잠시 free_bulletin_board 들 테스트 하기 위한
-                          Navigator.of(context).push(
-                            slideRoute(const FreeBulletinBoardPage(
-                              boardType: BoardType.top,
-                              boardInfo: null,
-                            ))
-                          );
+                          Navigator.of(context)
+                              .push(slideRoute(const FreeBulletinBoardPage(
+                            boardType: BoardType.top,
+                            boardInfo: null,
+                          )));
                         },
                       ),
                       const SizedBox(height: 5),
@@ -390,12 +385,11 @@ class _MainPageState extends State<MainPage> {
                           children: [
                             InkWell(
                               onTap: () {
-                                Navigator.of(context).push(
-                                  slideRoute(FreeBulletinBoardPage(
-                                    boardType: BoardType.free,
-                                    boardInfo: boardList[0],
-                                  ))
-                                );
+                                Navigator.of(context)
+                                    .push(slideRoute(FreeBulletinBoardPage(
+                                  boardType: BoardType.free,
+                                  boardInfo: boardList[0],
+                                )));
                               },
                               child: Row(
                                 children: [
@@ -436,10 +430,8 @@ class _MainPageState extends State<MainPage> {
                             ),
                             InkWell(
                               onTap: () {
-                                Navigator.of(context).push(
-                                  slideRoute(PostViewPage(
-                                      id: portalContentList[0].id))
-                                );
+                                Navigator.of(context).push(slideRoute(
+                                    PostViewPage(id: portalContentList[0].id)));
                               },
                               child: Text(
                                 portalContentList[0].title.toString(),
@@ -454,10 +446,9 @@ class _MainPageState extends State<MainPage> {
                             ),
                             InkWell(
                                 onTap: () {
-                                  Navigator.of(context).push(
-                                      slideRoute(PostViewPage(
-                                          id: portalContentList[1].id))
-                                  );
+                                  Navigator.of(context).push(slideRoute(
+                                      PostViewPage(
+                                          id: portalContentList[1].id)));
                                 },
                                 child: Text(
                                   portalContentList[1].title.toString(),
@@ -472,10 +463,9 @@ class _MainPageState extends State<MainPage> {
                             ),
                             InkWell(
                                 onTap: () {
-                                  Navigator.of(context).push(
-                                      slideRoute(PostViewPage(
-                                          id: portalContentList[2].id))
-                                  );
+                                  Navigator.of(context).push(slideRoute(
+                                      PostViewPage(
+                                          id: portalContentList[2].id)));
                                 },
                                 child: Text(
                                   portalContentList[2].title.toString(),
@@ -497,12 +487,11 @@ class _MainPageState extends State<MainPage> {
                             ),
                             InkWell(
                               onTap: () {
-                                Navigator.of(context).push(
-                                  slideRoute(FreeBulletinBoardPage(
-                                    boardType: BoardType.free,
-                                    boardInfo: boardList[7],
-                                  ))
-                                );
+                                Navigator.of(context)
+                                    .push(slideRoute(FreeBulletinBoardPage(
+                                  boardType: BoardType.free,
+                                  boardInfo: boardList[7],
+                                )));
                               },
                               child: Row(
                                 children: [
@@ -530,10 +519,10 @@ class _MainPageState extends State<MainPage> {
                                   Expanded(
                                     child: InkWell(
                                         onTap: () {
-                                          Navigator.of(context).push(
-                                            slideRoute(PostViewPage(
-                                                id: facilityContentList[0].id))
-                                          );
+                                          Navigator.of(context).push(slideRoute(
+                                              PostViewPage(
+                                                  id: facilityContentList[0]
+                                                      .id)));
                                         },
                                         child: Text(
                                           facilityContentList[0]
@@ -554,12 +543,11 @@ class _MainPageState extends State<MainPage> {
                             ),
                             InkWell(
                               onTap: () {
-                                Navigator.of(context).push(
-                                  slideRoute(FreeBulletinBoardPage(
-                                    boardType: BoardType.free,
-                                    boardInfo: boardList[11],
-                                  ))
-                                );
+                                Navigator.of(context)
+                                    .push(slideRoute(FreeBulletinBoardPage(
+                                  boardType: BoardType.free,
+                                  boardInfo: boardList[11],
+                                )));
                               },
                               child: Row(
                                 children: [
@@ -587,12 +575,10 @@ class _MainPageState extends State<MainPage> {
                                   Expanded(
                                     child: InkWell(
                                         onTap: () {
-                                          Navigator.of(context).push(
-                                            slideRoute(PostViewPage(
-                                                id: newAraContentList[
-                                                0]
-                                                    .id))
-                                          );
+                                          Navigator.of(context).push(slideRoute(
+                                              PostViewPage(
+                                                  id: newAraContentList[0]
+                                                      .id)));
                                         },
                                         child: Text(
                                           newAraContentList[0].title.toString(),
@@ -611,12 +597,11 @@ class _MainPageState extends State<MainPage> {
                       ),
                       const SizedBox(height: 10),
                       MainPageTextButton('main_page.stu_community', () {
-                        Navigator.of(context).push(
-                          slideRoute(FreeBulletinBoardPage(
-                            boardType: BoardType.free,
-                            boardInfo: boardList[1],
-                          ))
-                        );
+                        Navigator.of(context)
+                            .push(slideRoute(FreeBulletinBoardPage(
+                          boardType: BoardType.free,
+                          boardInfo: boardList[1],
+                        )));
                       }),
                       const SizedBox(height: 5),
                       Container(
@@ -653,11 +638,9 @@ class _MainPageState extends State<MainPage> {
                                   Expanded(
                                     child: InkWell(
                                         onTap: () {
-                                          Navigator.of(context).push(
-                                            slideRoute(PostViewPage(
-                                                id: gradContentList[0]
-                                                    .id))
-                                          );
+                                          Navigator.of(context).push(slideRoute(
+                                              PostViewPage(
+                                                  id: gradContentList[0].id)));
                                         },
                                         child: Text(
                                           gradContentList[0].title.toString(),
@@ -689,12 +672,10 @@ class _MainPageState extends State<MainPage> {
                                   Expanded(
                                     child: InkWell(
                                         onTap: () {
-                                          Navigator.of(context).push(
-                                            slideRoute(PostViewPage(
-                                                id: underGradContentList[
-                                                0]
-                                                    .id))
-                                          );
+                                          Navigator.of(context).push(slideRoute(
+                                              PostViewPage(
+                                                  id: underGradContentList[0]
+                                                      .id)));
                                         },
                                         child: Text(
                                           underGradContentList[0]
@@ -728,12 +709,10 @@ class _MainPageState extends State<MainPage> {
                                   Expanded(
                                     child: InkWell(
                                         onTap: () {
-                                          Navigator.of(context).push(
-                                            slideRoute(PostViewPage(
-                                                id: freshmanContentList[
-                                                0]
-                                                    .id))
-                                          );
+                                          Navigator.of(context).push(slideRoute(
+                                              PostViewPage(
+                                                  id: freshmanContentList[0]
+                                                      .id)));
                                         },
                                         child: Text(
                                           freshmanContentList[0]
@@ -775,9 +754,7 @@ class PopularBoard extends StatelessWidget {
   Widget build(BuildContext context) {
     return InkWell(
         onTap: () {
-          Navigator.of(context).push(
-            slideRoute(PostViewPage(id: model.id))
-          );
+          Navigator.of(context).push(slideRoute(PostViewPage(id: model.id)));
         },
         child: Container(
           // height: 100,
