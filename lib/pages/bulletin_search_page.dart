@@ -115,16 +115,10 @@ ${_apiUrl}1&main_search__contains=${_searchWord}
     if (_scrollController.position.pixels ==
         _scrollController.position.maxScrollExtent) {
       _currentPage = _currentPage + 1;
-      // api 호출과 Provider 정보 동기화.
-      // await Future.delayed(Duration(seconds: 1));
       Map<String, dynamic>? myMap = await userProvider.getApiRes(
           "$_apiUrl$_currentPage&main_search__contains=$_searchWord");
       if (mounted) {
         setState(() {
-          // "is_hidden": true,
-          // "why_hidden": [
-          // "REPORTED_CONTENT"
-          // ]
           for (int i = 0; i < (myMap!["results"].length ?? 0); i++) {
             //???/
             if (myMap["results"][i]["created_by"]["profile"] != null) {

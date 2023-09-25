@@ -16,7 +16,7 @@ import 'package:new_ara_app/utils/slide_routing.dart';
 import 'package:new_ara_app/providers/notification_provider.dart';
 
 /// FreeBulletinBoardPage는 게시판 목록를 나타내는 위젯.
-/// boardType에 따라 게시판의 종류를 판별하고, 특성화 된 위젯들을 활성화 비활성화 되독록 설계.
+/// boardType에 따라 게시판의 종류를 판별하고, 특성화 된 위젯들을 활성화 비활성화 되도록 설계.
 /// 모든 게시물 목록 형태가 유사하기에 최대한 코드를 재할용.
 class FreeBulletinBoardPage extends StatefulWidget {
   final BoardDetailActionModel? boardInfo;
@@ -141,7 +141,7 @@ class _FreeBulletinBoardPageState extends State<FreeBulletinBoardPage> {
 
   @override
   Widget build(BuildContext context) {
-    //TODO: void refreshPostList(UserProvider userProvider) async 메소드와 통합하기.
+    // TODO: void refreshPostList(UserProvider userProvider) async 메소드와 통합하기.
     /// 게시물 클릭하고 다시 돌아올 때 게시물 목록 업데이트 해주는 함수.
     Future<void> updateAllBulletinList() async {
       List<ArticleListActionModel> _newList = [];

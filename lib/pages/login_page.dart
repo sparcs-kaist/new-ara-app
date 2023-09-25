@@ -5,7 +5,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:new_ara_app/constants/colors_info.dart';
 import 'package:new_ara_app/pages/sparcs_sso_page.dart';
 
-/// `LoginPage` 위젯은 사용자에게 로그인 페이지를 표시합니다.
+/// `LoginPage` 위젯은 사용자에게 로그인 페이지를 표시.
 class LoginPage extends StatefulWidget {
   /// 기본 생성자입니다.
   const LoginPage({Key? key}) : super(key: key);
@@ -14,9 +14,9 @@ class LoginPage extends StatefulWidget {
   State<LoginPage> createState() => _LoginPageState();
 }
 
-/// `_LoginPageState` 클래스는 `LoginPage` 위젯의 상태를 관리합니다.
+/// `_LoginPageState` 클래스는 `LoginPage` 위젯의 상태를 관리.
 class _LoginPageState extends State<LoginPage> {
-  /// SSO 페이지를 표시할지 여부를 결정하는 변수입니다.
+  /// SSO 페이지를 표시할지 여부를 결정하는 변수.
   bool showSSOPage = false;
 
   @override

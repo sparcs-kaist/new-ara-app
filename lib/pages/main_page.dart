@@ -394,6 +394,7 @@ class _MainPageState extends State<MainPage> {
                                 Navigator.of(context)
                                     .push(slideRoute(FreeBulletinBoardPage(
                                   boardType: BoardType.free,
+                                  //TODO: 포탈 공지가 boardList[0]가 아닐 수도 있다. slug로 확인해야 한다.
                                   boardInfo: boardList[0],
                                 )));
                               },
@@ -496,6 +497,7 @@ class _MainPageState extends State<MainPage> {
                                 Navigator.of(context)
                                     .push(slideRoute(FreeBulletinBoardPage(
                                   boardType: BoardType.free,
+                                  //TODO: 입주 업체가 boardList[7]가 아닐 수도 있다. slug로 확인해야 한다.
                                   boardInfo: boardList[7],
                                 )));
                               },
@@ -552,6 +554,7 @@ class _MainPageState extends State<MainPage> {
                                 Navigator.of(context)
                                     .push(slideRoute(FreeBulletinBoardPage(
                                   boardType: BoardType.free,
+                                  //TODO: 뉴아라가 boardList[11]가 아닐 수도 있다. slug로 확인해야 한다.
                                   boardInfo: boardList[11],
                                 )));
                               },
@@ -606,6 +609,7 @@ class _MainPageState extends State<MainPage> {
                         Navigator.of(context)
                             .push(slideRoute(FreeBulletinBoardPage(
                           boardType: BoardType.free,
+                          //TODO: 원총이 boardList[1]가 아닐 수도 있다. slug로 확인해야 한다.
                           boardInfo: boardList[1],
                         )));
                       }),

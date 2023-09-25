@@ -11,7 +11,7 @@ import 'package:new_ara_app/providers/notification_provider.dart';
 import 'package:new_ara_app/constants/colors_info.dart';
 
 /// MainNavigationTabPage
-/// 메인 화면 하단에 위치하는 탭바를 포함한 메인 페이지입니다.
+/// 메인 화면 하단에 위치하는 탭바를 포함한 메인 페이지.
 class MainNavigationTabPage extends StatefulWidget {
   const MainNavigationTabPage({Key? key}) : super(key: key);
   @override
@@ -53,15 +53,15 @@ class _MainNavigationTabPageState extends State<MainNavigationTabPage> {
     );
   }
 
-  /// 하단의 네비게이션 바를 구성하는 함수입니다.
+  /// 하단의 네비게이션 바를 구성하는 함수.
   BottomNavigationBar _buildBottomNavigationBar() {
     return BottomNavigationBar(
-      backgroundColor: Colors.white, // 바탕색을 하얀색으로 설정합니다.
-      currentIndex: _selectedIndex, // 현재 선택된 탭의 인덱스를 나타냅니다.
-      showSelectedLabels: false, // 선택된 탭의 라벨(텍스트)를 보이지 않게 합니다.
-      showUnselectedLabels: false, // 선택되지 않은 탭의 라벨(텍스트)를 보이지 않게 합니다.
-      type: BottomNavigationBarType.fixed, // 탭바의 타입을 고정된 것으로 설정합니다.
-      onTap: _onItemTapped, // 탭을 클릭하면 _onItemTapped 함수를 실행합니다.
+      backgroundColor: Colors.white, // 바탕색을 하얀색으로 설정 함.
+      currentIndex: _selectedIndex, // 현재 선택된 탭의 인덱스를 나타냄.
+      showSelectedLabels: false, // 선택된 탭의 라벨(텍스트)를 보이지 않게 함.
+      showUnselectedLabels: false, // 선택되지 않은 탭의 라벨(텍스트)를 보이지 않게 함.
+      type: BottomNavigationBarType.fixed, // 탭바의 타입을 고정된 것으로 설정 함.
+      onTap: _onItemTapped, // 탭을 클릭하면 _onItemTapped 함수를 실행 함.
       elevation: 10,
       items: [
         BottomNavigationBarItem(
