@@ -32,28 +32,40 @@ import 'package:path_provider/path_provider.dart';
 import 'package:html/parser.dart' show parse;
 import 'package:html/dom.dart' as html;
 
+/// 사용자가 게시물을 작성하거나 편집할 수 있는 페이지를 나타내는 StatefulWidget입니다.
 class PostWritePage extends StatefulWidget {
+  /// 사용자가 기존 게시물을 편집하는 경우 이 변수에 이전 게시물의 데이터가 저장됩니다.
   final ArticleModel? previousArticle;
+
+  /// 생성자에서 이전 게시물의 데이터를 선택적으로 받을 수 있습니다.
   const PostWritePage({Key? key, this.previousArticle}) : super(key: key);
 
   @override
   State<PostWritePage> createState() => _PostWritePageState();
 }
 
+/// 첨부 파일의 유형을 나타내는 열거형입니다.
+/// TODO: pdf, doc 같은 파일 유형 추가하기.
 enum FileType {
   Image,
   Other,
 }
 
+/// 첨부 파일의 형식 및 속성을 나타내는 클래스입니다.
+///
 class AttachmentsFormat {
   FileType fileType;
-  bool isNewFile; // 수정 시에 추가한 파일인가?
 
-  // 로컬 파일
+  /// 수정 시에 추가한 파일인지 판별해서, 새로 추가한 파일만 api 요청으로 업로드하기 위해 설계.
+  bool isNewFile;
+
+  /// 로컬에 있는 파일 경로
   String? fileLocalPath;
+
+  /// 파일마다 고유한 uuid를 할당해서, 파일을 지우거나 편집할 때 인식할 수 있도록함.
   String? uuid;
 
-  /// 온라인 파일
+  /// 업로드 되어있는 온라인 파일에 대한 정보
   int? id;
   String? fileUrlPath;
   String fileUrlName;
@@ -72,14 +84,20 @@ class AttachmentsFormat {
 }
 
 class _PostWritePageState extends State<PostWritePage> {
+  /// 현재 이 페이지가 수정페이지인지 처음 작성하는 게시물인지 판단
   bool _isEditingPost = false;
 
+  /// 기본 게시판 및 주제 모델.
+  /// 사용자에게 선택 옵션을 제공하기 전의 초기 상태를 나타냄.
   final _defaultTopicModel = TopicModel(
     id: -1,
     slug: "",
     ko_name: "말머리 없음",
     en_name: "No Topic",
   );
+
+  // 기본 게시판 및 주제 모델.
+  // 게시물 주제 선택 후 초기 상태를 나타낸다.
   final _defaultTopicModel2 = TopicModel(
     id: -1,
     slug: "",
@@ -97,22 +115,33 @@ class _PostWritePageState extends State<PostWritePage> {
     group: SimpleBoardModel(id: -1, slug: '', ko_name: '', en_name: ''),
   );
 
+  /// 익명, 성인, 정치 체크 박스가 선택되어 있는지 판별을 위한 리스트
   List<bool?> _selectedCheckboxes = [true, false, false];
-  bool _isFileMenuBarSelected = false; // 첨부파일 메뉴바가 펼쳐져 있는가?
 
+  /// 첨부파일 메뉴바가 펼쳐져 있는 지 판별을 위한 변수
+  bool _isFileMenuBarSelected = false;
+
+  /// 사용자가 선택한 게시판 모델
   BoardDetailActionModel? _chosenBoardValue;
+
+  /// 사용자가 선택한 토픽 모델
   TopicModel? _chosenTopicValue;
 
+  /// 사용자에게 보여줄 게시판 메뉴 목록
   List<BoardDetailActionModel> _boardList = [];
+
+  /// 사용자에게 보여줄 토픽 메뉴 목록
   List<TopicModel> _specTopicList = [];
 
-  File? imagePickerFile;
-  File? filePickerFile;
+  // 페이지 로딩 시 대기 화면을 띄우기 위한 변수
   bool _isLoading = true;
-  bool _isUploadingPost = false; // 지금 api 통신으로 포스트 업로드 중이냐
-  var imagePickerResult;
+  // 지금 포스트 업로드 중이냐
+  bool _isUploadingPost = false;
+
+  //TODO: 함수 안에 지역 변수로 넣는거 고려하기.
   FilePickerResult? filePickerResult;
 
+  /// 사용자에게 보여주는 첨부파일 목록
   final List<AttachmentsFormat> _attachmentList = [];
 
   late TargetPlatform? platform;
@@ -159,34 +188,36 @@ class _PostWritePageState extends State<PostWritePage> {
     _initPostWritePost();
   }
 
+  /// 게시판 목록을 가져오고, 이전 게시물의 데이터를 가져옵니다.
   Future<void> _initPostWritePost() async {
     await _getBoardList();
     await _getPostContent();
   }
 
+  /// 사용자가 선택 가능한 게시판 목록을 가져오는 함수.
+  /// API에서 게시판 목록을 가져와 `_boardList`에 저장.
   Future<void> _getBoardList() async {
+    // 사용자 정보 제공자로부터 쿠키 정보 가져오기.
     var userProvider = context.read<UserProvider>();
     try {
       Dio dio = Dio();
       dio.options.headers['Cookie'] = userProvider.getCookiesToString();
       var response = await dio.get('$newAraDefaultUrl/api/boards/');
-      debugPrint(response.data.toString());
 
+      // 기본 게시판 정보를 `_boardList`에 초기화.
       _boardList = [_defaultBoardDetailActionModel];
+
+      // API 응답으로부터 게시판 목록 파싱 후 `_boardList`에 추가.
       for (Map<String, dynamic> json in response.data) {
         try {
           BoardDetailActionModel boardDetail =
               BoardDetailActionModel.fromJson(json);
-
-          if (boardDetail.user_writable == true) {
+          if (boardDetail.user_writable) {
             _boardList.add(boardDetail);
-          } else {
-            // Optionally, you can do something with entries where user_writable is false
-            // For example, you can skip them or perform any other action
           }
         } catch (error) {
           debugPrint(
-              "refreshBoardList BoardDetailActionModel.fromJson failed: $error");
+              "refreshBoardList BoardDetailActionModel.fromJson 실패: $error");
           return;
         }
       }
@@ -194,29 +225,29 @@ class _PostWritePageState extends State<PostWritePage> {
       return;
     }
 
+    // 상태 업데이트.
     setState(() {
       _specTopicList.add(_defaultTopicModel);
-
       _chosenTopicValue = _specTopicList[0];
       _chosenBoardValue = _boardList[0];
       _isLoading = false;
     });
-    return;
   }
 
+  /// 기존 게시물의 내용과 첨부 파일 가져오기.
   Future<void> _getPostContent() async {
     if (!_isEditingPost) return;
+
     setState(() {
       _isLoading = true;
     });
+
     String? title = widget.previousArticle!.title;
     _titleController.text = title ?? '';
 
+    // 첨부 파일 정보 파싱 후 `_attachmentList`에 추가.
     for (int i = 0; i < widget.previousArticle!.attachments.length; i++) {
-      // _attachmentList
-      //     .add(AttachmentsFormat(fileType: FileType.Image, isNewFile: false));
       AttachmentModel attachment = widget.previousArticle!.attachments[i];
-
       int id = attachment.id;
       String? fileUrlPath = attachment.file;
       String fileUrlName = _extractAndDecodeFileNameFromUrl(attachment.file);
@@ -230,24 +261,22 @@ class _PostWritePageState extends State<PostWritePage> {
           fileUrlSize: fileUrlSize));
     }
 
+    // 상태 업데이트.
     setState(() {
-      _isFileMenuBarSelected = _attachmentList.length > 0 ? true : false;
-
+      _isFileMenuBarSelected = _attachmentList.isNotEmpty;
       _selectedCheckboxes[1] =
           widget.previousArticle?.is_content_sexual ?? false;
       _selectedCheckboxes[2] =
           widget.previousArticle?.is_content_social ?? false;
-
       _isLoading = false;
     });
+
+    // 게시판 및 주제 정보 업데이트.
     setState(() {
       BoardDetailActionModel boardDetailActionModel =
           _findBoardListValue(widget.previousArticle!.parent_board.slug);
-      _specTopicList = [];
-      _specTopicList.add(_defaultTopicModel);
-      for (TopicModel topic in boardDetailActionModel.topics) {
-        _specTopicList.add(topic);
-      }
+      _specTopicList = [_defaultTopicModel];
+      _specTopicList.addAll(boardDetailActionModel.topics);
       _chosenTopicValue = widget.previousArticle!.parent_topic == null
           ? _specTopicList[0]
           : _findSpecTopicListValue(widget.previousArticle!.parent_topic!.slug);
@@ -255,6 +284,7 @@ class _PostWritePageState extends State<PostWritePage> {
     });
   }
 
+  /// 주어진 slug 값을 사용하여 게시판 목록에서 해당 게시판을 찾는 함수.
   BoardDetailActionModel _findBoardListValue(String slug) {
     for (BoardDetailActionModel board in _boardList) {
       if (board.slug == slug) {
@@ -264,6 +294,7 @@ class _PostWritePageState extends State<PostWritePage> {
     return _defaultBoardDetailActionModel;
   }
 
+  /// 주어진 slug 값을 사용하여 토픽 목록에서 해당 주제를 찾는 함수.
   TopicModel _findSpecTopicListValue(String slug) {
     for (TopicModel topic in _specTopicList) {
       if (topic.slug == slug) {
@@ -297,6 +328,7 @@ class _PostWritePageState extends State<PostWritePage> {
 
     var userProvider = context.watch<UserProvider>();
 
+    /// 게시물 업로드 가능한지 확인
     bool canIupload = _titleController.text != '' &&
         _chosenBoardValue!.id != -1 &&
         _currentHtmlContent != '' &&
@@ -305,6 +337,7 @@ class _PostWritePageState extends State<PostWritePage> {
 
     //  _getCurrentHtmlContent();
 
+    /// HTML 문자열 내의 이미지 태그의 uuid를 판별해 src 속성에 url 을 추가.
     String updateImgTagSrc(htmlString, uuid, fileUrl) {
       var document = parse(htmlString);
       // debugPrint(document.body?.innerHtml ?? '');
@@ -326,6 +359,7 @@ class _PostWritePageState extends State<PostWritePage> {
       return document.body?.innerHtml ?? '';
     }
 
+    ///  HTML 문자열 내의 이미지 태그의 src 속성의 값을 판별해 삭제
     String deleteImgTagSrc(htmlString, fileUrl) {
       var document = parse(htmlString);
       // debugPrint(document.body?.innerHtml ?? '');
@@ -340,6 +374,7 @@ class _PostWritePageState extends State<PostWritePage> {
       return document.body?.innerHtml ?? '';
     }
 
+    /// HTML 문자열 내의 이미지 태그의 너비를 100%로 설정
     String updateImgTagWidth(String htmlString) {
       var document = parse(htmlString);
       // debugPrint(document.body?.innerHtml ?? '');
@@ -352,11 +387,14 @@ class _PostWritePageState extends State<PostWritePage> {
       return document.body?.innerHtml ?? '';
     }
 
+    /// 한글 오류 방지 (현재는 그대로 반환)
+    /// TODO: iOS 한글 오류 방지 코드 추가
     String preventHangleError(String htmlString) {
       return htmlString;
       //   return htmlString.replaceAll('<p><br></p>', '<p><br></p><p></p>');
     }
 
+    /// 파일 선택 및 `_attachmentList`에 추가
     Future<void> filePick() async {
       filePickerResult = await FilePicker.platform.pickFiles();
       if (filePickerResult != null) {
@@ -393,6 +431,8 @@ class _PostWritePageState extends State<PostWritePage> {
     //   }
     // }
 
+    /// 바이트를 적절한 단위로 변환하여 문자열로 반환
+    /// TODO: 이 함수는 다른 파일로 분리하는 것이 좋을 것 같음.
     String formatBytes(int bytes) {
       if (bytes < 1024) {
         return '$bytes B'; // 바이트 단위로 표시
@@ -572,6 +612,7 @@ class _PostWritePageState extends State<PostWritePage> {
       }
     }
 
+    /// 첨부 파일 삭제 및 관련 HTML 내용 업데이트
     void onAttachmentDelete(int index) async {
       String text = await _htmlController.getText();
 
@@ -593,6 +634,7 @@ class _PostWritePageState extends State<PostWritePage> {
       });
     }
 
+    /// 게시판 주제 선택 이후 토픽 목록 변경
     void setSpecTopicList(BoardDetailActionModel? value) {
       setState(() {
         _specTopicList = [];
@@ -643,6 +685,8 @@ class _PostWritePageState extends State<PostWritePage> {
         ),
         actions: [
           MaterialButton(
+            /// 포스트 업로드하는 기능
+            ///TODO: 함수 따로 빼기
             onPressed:
                 canIupload ? (_isEditingPost ? updatePost : uploadPost) : null,
             // 버튼이 클릭되었을 때 수행할 동작
@@ -727,6 +771,9 @@ class _PostWritePageState extends State<PostWritePage> {
                               ),
                             );
                           }).toList(),
+
+                          /// 게시판 선택 이후 토픽 목록 변경하는 기능
+                          ///TODO: 함수 따로 빼기
                           onChanged: _isEditingPost ? null : setSpecTopicList,
                         ),
                       ),
@@ -776,6 +823,9 @@ class _PostWritePageState extends State<PostWritePage> {
                               ),
                             );
                           }).toList(),
+
+                          /// 토픽 선택하는 기능
+                          ///TODO: 함수 따로 빼기
                           onChanged: _isEditingPost
                               ? null
                               : (TopicModel? value) {
@@ -875,6 +925,9 @@ class _PostWritePageState extends State<PostWritePage> {
                                   ),
                                   htmlToolbarOptions: HtmlToolbarOptions(
                                       toolbarType: ToolbarType.nativeGrid,
+
+                                      /// 사진 추가 시 base64 인코딩하여 태그로 추가. (이미지 첨부 기능)
+                                      /// uuid를 할당하여 각각 태그가 구분 가능하게하고, 추후 태그를 수정 가능하도록 함.
                                       mediaUploadInterceptor:
                                           (PlatformFile file,
                                               InsertFileType type) async {
@@ -892,7 +945,6 @@ class _PostWritePageState extends State<PostWritePage> {
                                             ));
                                           });
 
-                                          ///src랑 file.path랑 연결해줘야함.
                                           String base64Data =
                                               base64.encode(file.bytes!);
                                           String base64Image =
@@ -1057,6 +1109,7 @@ class _PostWritePageState extends State<PostWritePage> {
                                             horizontal: 15),
                                         child: SizedBox(
                                           //최대 4개까지 첨부파일 보여주고 그 이후로는 스크롤.
+                                          //피그마 디자인 기준으로 필요한 높이를 계산함.
                                           height: 10 +
                                               math.min(3,
                                                       _attachmentList.length) *
