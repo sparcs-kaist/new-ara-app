@@ -10,6 +10,8 @@ import 'package:new_ara_app/widgetclasses/loading_indicator.dart';
 import 'package:new_ara_app/widgetclasses/post_preview.dart';
 import 'package:provider/provider.dart';
 
+/// `BulletinSearchPage`는 게시판 게시물에 대한 검색 인터페이스를 표시하는 위젯
+/// 상단에 검색 바를 제공하고 검색 결과에 따른 게시물 목록을 표시
 class BulletinSearchPage extends StatefulWidget {
   final BoardDetailActionModel? boardInfo;
   final BoardType boardType;
@@ -35,6 +37,8 @@ class _BulletinSearchPageState extends State<BulletinSearchPage> {
     // TODO: implement initState
     super.initState();
 
+    // 게시판 유형에 따라 API URL 및 힌트 텍스트를 다르게 설정
+    // 현재는 전체 게시물에서 검색을 하는 것과, 특정 게시판에서 검색을 하는 것만 지원
     switch (widget.boardType) {
       case BoardType.free:
         _apiUrl =
@@ -62,6 +66,7 @@ class _BulletinSearchPageState extends State<BulletinSearchPage> {
     super.dispose();
   }
 
+  /// 사용자가 입력한 검색어를 기반으로 게시물 새로 고침.
   void refreshPostList(UserProvider userProvider) async {
     if (_searchWord == "") {
       if (mounted) {
@@ -94,6 +99,7 @@ ${_apiUrl}1&main_search__contains=${_searchWord}
     }
   }
 
+  /// 사용자가 스크롤을 내렸을 때 추가 게시물을 불러옴
   void _scrollListener() async {
     if (_searchWord == "") {
       if (mounted) {
