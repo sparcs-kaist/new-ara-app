@@ -65,7 +65,8 @@ class AttachmentsFormat {
   /// 파일마다 고유한 uuid를 할당해서, 파일을 지우거나 편집할 때 인식할 수 있도록함.
   String? uuid;
 
-  /// 업로드 되어있는 온라인 파일에 대한 정보
+  /// 클라우드에 업로드 되어있는 파일에 대한 정보.
+  /// 게시물 수정 시 기존 첨부파일 정보를 저장하기 위해 필요.
   int? id;
   String? fileUrlPath;
   String fileUrlName;
@@ -88,7 +89,7 @@ class _PostWritePageState extends State<PostWritePage> {
   bool _isEditingPost = false;
 
   /// 기본 게시판 및 주제 모델.
-  /// 사용자에게 선택 옵션을 제공하기 전의 초기 상태를 나타냄.
+  /// 아무 것도 선택하기 전 초기 상태를 나타냄.
   final _defaultTopicModel = TopicModel(
     id: -1,
     slug: "",
@@ -97,7 +98,7 @@ class _PostWritePageState extends State<PostWritePage> {
   );
 
   // 기본 게시판 및 주제 모델.
-  // 게시물 주제 선택 후 초기 상태를 나타낸다.
+  // 메뉴바에서 게시물 주제 선택 후 토픽 메뉴 초기 상태를 나타낸다.
   final _defaultTopicModel2 = TopicModel(
     id: -1,
     slug: "",
@@ -188,7 +189,8 @@ class _PostWritePageState extends State<PostWritePage> {
     _initPostWritePost();
   }
 
-  /// 게시판 목록을 가져오고, 이전 게시물의 데이터를 가져옵니다.
+  /// 게시판 목록을 가져온다.
+  /// 이전 게시물의 데이터를 가져온다.
   Future<void> _initPostWritePost() async {
     await _getBoardList();
     await _getPostContent();
@@ -304,6 +306,7 @@ class _PostWritePageState extends State<PostWritePage> {
     return _defaultTopicModel;
   }
 
+  /// 주어진 url에서 파일 이름을 추출하는 함수.
   String _extractAndDecodeFileNameFromUrl(String url) {
     String encodedFilename = url.split('/').last;
     return Uri.decodeFull(encodedFilename);
@@ -337,7 +340,8 @@ class _PostWritePageState extends State<PostWritePage> {
 
     //  _getCurrentHtmlContent();
 
-    /// HTML 문자열 내의 이미지 태그의 uuid를 판별해 src 속성에 url 을 추가.
+    /// HTML 문자열 내의 이미지 태그의 uuid를 판별해 src 속성에 url 을 추
+    /// 로컬에 있는 첨부파일을 게시물에 추가, 삭제하는 데 쓰임.
     String updateImgTagSrc(htmlString, uuid, fileUrl) {
       var document = parse(htmlString);
       // debugPrint(document.body?.innerHtml ?? '');
@@ -360,6 +364,7 @@ class _PostWritePageState extends State<PostWritePage> {
     }
 
     /// HTML 문자열 내의 이미지 태그의 src 속성의 값을 판별해 삭제
+    /// 이미 클라우드에 올라가 있는 첨부 파일을 html 본문에서 제거하는 데 쓰임.
     String deleteImgTagSrc(htmlString, fileUrl) {
       var document = parse(htmlString);
       // debugPrint(document.body?.innerHtml ?? '');
@@ -374,7 +379,7 @@ class _PostWritePageState extends State<PostWritePage> {
       return document.body?.innerHtml ?? '';
     }
 
-    /// HTML 문자열 내의 이미지 태그의 너비를 100%로 설정
+    /// HTML 문자열 내의 이미지 태그의 너비를 100%로 설정하여 리턴
     String updateImgTagWidth(String htmlString) {
       var document = parse(htmlString);
       // debugPrint(document.body?.innerHtml ?? '');
@@ -401,7 +406,7 @@ class _PostWritePageState extends State<PostWritePage> {
         debugPrint(filePickerResult!.files.single.path!);
         File file = File(filePickerResult!.files.single.path!);
         if (Platform.isIOS) {
-          // iOS에서는 파일을 복사해서 사용해야 함. 캐쉬로 날라가는 문제 발생.
+          // iOS에서는 파일을 복사해서 사용했음. 캐쉬로 날라가는 문제 발생해서.
           final documentPath = (await getApplicationDocumentsDirectory()).path;
           file = await file.copy('$documentPath/${path.basename(file.path)}');
           debugPrint("IOS run");
@@ -448,6 +453,13 @@ class _PostWritePageState extends State<PostWritePage> {
       }
     }
 
+    /// 새로운 포스트를 서버에 업로드하는 함수이다.
+    /// 
+    /// 사용자가 입력한 제목, 내용 및 첨부 파일을 서버에 전송하여 새로운 포스트를 생성한다.
+    /// 이 함수는 다음의 단계를 거친다:
+    /// 1. 사용자 입력 값을 가져온다.
+    /// 2. 첨부 파일이 있으면 서버에 업로드하고, 해당 파일의 ID를 가져온다.
+    /// 3. 제목, 내용 및 첨부 파일 ID를 함께 서버에 전송하여 포스트를 생성한다.
     void uploadPost() async {
       // 포스트 업로드;
       String titleValue;
@@ -529,6 +541,9 @@ class _PostWritePageState extends State<PostWritePage> {
       }
     }
 
+    /// 기존 포스트 업데이트하는 함수
+    /// uploadPost 함수와 유사하나 새로 추가된 파일만 서버에 새로 업로드 한다.
+    /// TODO: upladPost와 updatePost는 유사한 점이 많아 함수를 하나로 합치는 것이 좋을 것 같다.
     void updatePost() async {
       String titleValue;
       String contentValue;
@@ -553,8 +568,6 @@ class _PostWritePageState extends State<PostWritePage> {
         for (int i = 0; i < _attachmentList.length; i++) {
           if (_attachmentList[i].isNewFile) {
             var attachFile = File(_attachmentList[i].fileLocalPath!);
-            //이 파일 uuid 에 해당하는 img 태그가 html 안에 있다면 변경해야한다.
-
             // 파일이 존재하는지 확인
             if (attachFile.existsSync()) {
               var dio = Dio();
@@ -613,6 +626,8 @@ class _PostWritePageState extends State<PostWritePage> {
     }
 
     /// 첨부 파일 삭제 및 관련 HTML 내용 업데이트
+    /// 기존에 업로드된 파일인 경우 API 요청으로 삭제
+    /// 새로 추가한 파일인 경우 HTML 내용에서 해당 이미지 태그 삭제
     void onAttachmentDelete(int index) async {
       String text = await _htmlController.getText();
 
@@ -772,7 +787,7 @@ class _PostWritePageState extends State<PostWritePage> {
                             );
                           }).toList(),
 
-                          /// 게시판 선택 이후 토픽 목록 변경하는 기능
+                          /// 게시판 선택 이후 토픽 목록이 변해야 하므로 변경하는 기능 추가
                           ///TODO: 함수 따로 빼기
                           onChanged: _isEditingPost ? null : setSpecTopicList,
                         ),
@@ -795,10 +810,6 @@ class _PostWritePageState extends State<PostWritePage> {
 
                           onTap: () {
                             debugPrint("d");
-                            // setState(() {
-                            //   _htmlController.resetHeight();
-                            //   _htmlController.recalculateHeight();
-                            // });
                           },
                           //isExpanded: true,
                           value: _chosenTopicValue,
