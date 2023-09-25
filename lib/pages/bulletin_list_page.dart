@@ -15,6 +15,9 @@ import 'package:new_ara_app/providers/notification_provider.dart';
 
 const boardsByGroupLength = 5;
 
+/// `BulletinListPage`는 게시판 목록을 표시하는 페이지.
+///
+/// 사용자는 이 페이지에서 다양한 게시판을 탐색하고 선택 가능.
 class BulletinListPage extends StatefulWidget {
   const BulletinListPage({Key? key}) : super(key: key);
   @override
@@ -22,8 +25,10 @@ class BulletinListPage extends StatefulWidget {
 }
 
 class _BulletinListPageState extends State<BulletinListPage> {
+  /// 데이터 로딩 상태
   bool isLoading = true;
 
+  /// 게시판 그룹 별로 게시판 목록 저장하는 변수. 게시판 그룹은 1부터 시작하도록 초기화.
   List<List<BoardDetailActionModel>> boardsByGroup =
       List.generate(boardsByGroupLength + 1, (_) => []);
   List<Map<String, dynamic>> textContent = [];
@@ -37,10 +42,9 @@ class _BulletinListPageState extends State<BulletinListPage> {
     refreshBoardList(userProvider);
     context.read<NotificationProvider>().checkIsNotReadExist();
   }
-
+  /// 게시판 목록을 새로고침하는 함수
+  /// API를 호출하여 게시판 데이터를 가져온 후, 상태를 업데이트.
   void refreshBoardList(UserProvider userProvider) async {
-    //var boardsByGroup = List<dynamic>.filled(6, List< dynamic >.filled(0, null, growable: true) , growable: true);
-
     List<dynamic> jsonBoards = await userProvider.getApiRes("boards/") ?? [];
     List<BoardDetailActionModel> boardModels = [];
     for (dynamic jsonBoard in jsonBoards) {
@@ -86,7 +90,7 @@ class _BulletinListPageState extends State<BulletinListPage> {
                           maxLines: 1,
                           focusNode: _focusNode,
                           onTap: () async {
-                            debugPrint("onTap");
+                            // TODO: 검색 창 누를 때 실행되는 함수로 나중에 별로도 빼기
                             Navigator.push(
                               context,
                               MaterialPageRoute(
@@ -145,12 +149,11 @@ class _BulletinListPageState extends State<BulletinListPage> {
                           ),
                           cursorColor: Colors.transparent,
                         ),
-
-                        /// ----------- TextField 아래
                         const SizedBox(
                           height: 21,
                         ),
                         InkWell(
+                          /// 전체 보기 클릭 시
                           onTap: () {
                             Navigator.of(context).push(slideRoute(
                                 FreeBulletinBoardPage(
@@ -190,6 +193,7 @@ class _BulletinListPageState extends State<BulletinListPage> {
                           height: 10,
                         ),
                         InkWell(
+                          /// 인기글 클릭 시
                           onTap: () {
                             Navigator.of(context).push(slideRoute(
                                 FreeBulletinBoardPage(
@@ -229,6 +233,7 @@ class _BulletinListPageState extends State<BulletinListPage> {
                           height: 10,
                         ),
                         InkWell(
+                          /// 스크랩 클릭 시
                           onTap: () {
                             Navigator.of(context).push(slideRoute(
                                 FreeBulletinBoardPage(
@@ -277,6 +282,8 @@ class _BulletinListPageState extends State<BulletinListPage> {
 
                         BoardExpansionTile(1, "공지", boardsByGroup[1]),
                         BoardExpansionTile(5, "소통", boardsByGroup[5]),
+
+                        /// 자유 게시판은 별도의 하위 목록이 없기에 따로 처리
                         InkWell(
                             onTap: () {
                               Navigator.of(context).push(slideRoute(
@@ -324,10 +331,18 @@ class _BulletinListPageState extends State<BulletinListPage> {
   }
 }
 
+/// `BoardExpansionTile`는 게시판 그룹을 나타내는 확장 가능한 타일 위젯.
+///
+/// 이 위젯은 주어진 게시판 그룹의 제목과 해당 그룹에 속한 게시판 목록을 표시.
+/// 사용자는 이 타일을 통해 원하는 게시판으로 이동 가능.
 class BoardExpansionTile extends StatelessWidget {
+  //TODO: titleNum이 필요한 이유 알기
   final int titleNum;
   final String title;
   final List<BoardDetailActionModel> boardsByGroup;
+
+  /// [titleNum]은 게시판 그룹의 번호, [title]은 게시판 그룹의 제목,
+  /// [boardsByGroup]은 해당 그룹에 속한 게시판 목록.
   const BoardExpansionTile(this.titleNum, this.title, this.boardsByGroup,
       {super.key});
 

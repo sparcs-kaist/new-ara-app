@@ -359,7 +359,7 @@ class _PostWritePageState extends State<PostWritePage> {
       return document.body?.innerHtml ?? '';
     }
 
-    ///  HTML 문자열 내의 이미지 태그의 src 속성의 값을 판별해 삭제
+    /// HTML 문자열 내의 이미지 태그의 src 속성의 값을 판별해 삭제
     String deleteImgTagSrc(htmlString, fileUrl) {
       var document = parse(htmlString);
       // debugPrint(document.body?.innerHtml ?? '');
