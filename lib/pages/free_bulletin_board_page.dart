@@ -15,6 +15,9 @@ import 'package:new_ara_app/pages/post_view_page.dart';
 import 'package:new_ara_app/utils/slide_routing.dart';
 import 'package:new_ara_app/providers/notification_provider.dart';
 
+/// FreeBulletinBoardPage는 게시판 목록를 나타내는 위젯.
+/// boardType에 따라 게시판의 종류를 판별하고, 특성화 된 위젯들을 활성화 비활성화 되독록 설계.
+/// 모든 게시물 목록 형태가 유사하기에 최대한 코드를 재할용.
 class FreeBulletinBoardPage extends StatefulWidget {
   final BoardDetailActionModel? boardInfo;
   final BoardType boardType;
@@ -40,6 +43,7 @@ class _FreeBulletinBoardPageState extends State<FreeBulletinBoardPage> {
 
     var userProvider = context.read<UserProvider>();
 
+    // 게시판 타입에 따라 API URL과 게시판 이름을 설정
     switch (widget.boardType) {
       case BoardType.free:
         apiUrl = "articles/?parent_board=${widget.boardInfo!.id.toInt()}&page=";
@@ -79,6 +83,7 @@ class _FreeBulletinBoardPageState extends State<FreeBulletinBoardPage> {
     super.dispose();
   }
 
+  // 게시글 목록을 새로고침하는 함수
   void refreshPostList(UserProvider userProvider) async {
     Map<String, dynamic>? myMap = await userProvider.getApiRes("${apiUrl}1");
     debugPrint(myMap?["results"].toString());
@@ -89,7 +94,6 @@ class _FreeBulletinBoardPageState extends State<FreeBulletinBoardPage> {
           try {
             if (widget.boardType != BoardType.scraps &&
                 myMap!["results"][i]["created_by"]["profile"] != null) {
-                  
               postPreviewList
                   .add(ArticleListActionModel.fromJson(myMap!["results"][i]));
             } else if (widget.boardType == BoardType.scraps) {
@@ -106,6 +110,7 @@ class _FreeBulletinBoardPageState extends State<FreeBulletinBoardPage> {
     }
   }
 
+  // 스크롤 리스너 함수. 스크롤이 끝에 도달하면 추가 데이터를 로드
   void _scrollListener() async {
     var userProvider = context.read<UserProvider>();
     if (_scrollController.position.pixels ==
@@ -136,6 +141,8 @@ class _FreeBulletinBoardPageState extends State<FreeBulletinBoardPage> {
 
   @override
   Widget build(BuildContext context) {
+    //TODO: void refreshPostList(UserProvider userProvider) async 메소드와 통합하기.
+    /// 게시물 클릭하고 다시 돌아올 때 게시물 목록 업데이트 해주는 함수.
     Future<void> updateAllBulletinList() async {
       List<ArticleListActionModel> _newList = [];
       UserProvider userProvider = context.read<UserProvider>();
@@ -224,10 +231,8 @@ class _FreeBulletinBoardPageState extends State<FreeBulletinBoardPage> {
         mainAxisAlignment: MainAxisAlignment.end,
         children: [
           FloatingActionButton(
-            onPressed: () async{
-              await Navigator.of(context).push(
-                slideRoute(PostWritePage())
-              );
+            onPressed: () async {
+              await Navigator.of(context).push(slideRoute(PostWritePage()));
               updateAllBulletinList();
               debugPrint('FloatingActionButton pressed');
             },

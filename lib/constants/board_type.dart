@@ -1,3 +1,4 @@
+///게시물의 타입을 나타내는 enum
 enum BoardType{
   free, // 일반 자유 게시판
   recent, // 최근에 본글
