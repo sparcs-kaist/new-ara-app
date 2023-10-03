@@ -336,7 +336,7 @@ class _BulletinListPageState extends State<BulletinListPage> {
 /// 이 위젯은 주어진 게시판 그룹의 제목과 해당 그룹에 속한 게시판 목록을 표시.
 /// 사용자는 이 타일을 통해 원하는 게시판으로 이동 가능.
 class BoardExpansionTile extends StatelessWidget {
-  //TODO: titleNum이 필요한 이유 알기
+  // TODO: titleNum이 필요한 이유 알기
   final int titleNum;
   final String title;
   final List<BoardDetailActionModel> boardsByGroup;

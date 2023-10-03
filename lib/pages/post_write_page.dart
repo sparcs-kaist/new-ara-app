@@ -139,7 +139,7 @@ class _PostWritePageState extends State<PostWritePage> {
   // 지금 포스트 업로드 중이냐
   bool _isUploadingPost = false;
 
-  //TODO: 함수 안에 지역 변수로 넣는거 고려하기.
+  // TODO: 함수 안에 지역 변수로 넣는거 고려하기.
   FilePickerResult? filePickerResult;
 
   /// 사용자에게 보여주는 첨부파일 목록
@@ -157,7 +157,6 @@ class _PostWritePageState extends State<PostWritePage> {
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
 
     context.read<NotificationProvider>().checkIsNotReadExist();
@@ -172,20 +171,6 @@ class _PostWritePageState extends State<PostWritePage> {
     } else {
       platform = TargetPlatform.iOS;
     }
-
-    // Subscribe
-    // keyboardSubscription =
-    //     keyboardVisibilityController.onChange.listen((bool visible) {
-    //   print('Keyboard visibility update. Is visible: $visible');
-    //   setState(() {
-    //     if (visible) {
-    //       _isBottomShow = false;
-    //     } else {
-    //       _isBottomShow = true;
-    //     }
-    //   });
-    // });
-
     _initPostWritePost();
   }
 
@@ -312,19 +297,6 @@ class _PostWritePageState extends State<PostWritePage> {
     return Uri.decodeFull(encodedFilename);
   }
 
-  // void _getCurrentHtmlContent() async {
-  //   try {
-  //     String tmp = await _htmlController.getText();
-  //     setState(() {
-  //       _currentHtmlContent = tmp;
-  //     });
-  //   } catch (error) {
-  //     debugPrint(
-  //         "refreshBoardList BoardDetailActionModel.fromJson failed: $error");
-  //     return;
-  //   }
-  // }
-
   @override
   Widget build(BuildContext context) {
     if (_isLoading) return const LoadingIndicator();
@@ -340,11 +312,10 @@ class _PostWritePageState extends State<PostWritePage> {
 
     //  _getCurrentHtmlContent();
 
-    /// HTML 문자열 내의 이미지 태그의 uuid를 판별해 src 속성에 url 을 추
+    /// HTML 문자열 내의 이미지 태그의 uuid를 판별해 src 속성에 url 을 추가
     /// 로컬에 있는 첨부파일을 게시물에 추가, 삭제하는 데 쓰임.
     String updateImgTagSrc(htmlString, uuid, fileUrl) {
       var document = parse(htmlString);
-      // debugPrint(document.body?.innerHtml ?? '');
       List<html.Element> imgTags = document.getElementsByTagName('img');
 
       if (uuid == null) return document.body?.innerHtml ?? '';
@@ -359,7 +330,6 @@ class _PostWritePageState extends State<PostWritePage> {
           }
         }
       }
-      //  debugPrint(document.body?.innerHtml ?? '');
       return document.body?.innerHtml ?? '';
     }
 
@@ -375,20 +345,17 @@ class _PostWritePageState extends State<PostWritePage> {
           imgTag.remove();
         }
       }
-      //  debugPrint(document.body?.innerHtml ?? '');
       return document.body?.innerHtml ?? '';
     }
 
     /// HTML 문자열 내의 이미지 태그의 너비를 100%로 설정하여 리턴
     String updateImgTagWidth(String htmlString) {
       var document = parse(htmlString);
-      // debugPrint(document.body?.innerHtml ?? '');
       List<html.Element> imgTags = document.getElementsByTagName('img');
 
       for (var imgTag in imgTags) {
         imgTag.attributes['width'] = '100%';
       }
-      //  debugPrint(document.body?.innerHtml ?? '');
       return document.body?.innerHtml ?? '';
     }
 
@@ -396,7 +363,6 @@ class _PostWritePageState extends State<PostWritePage> {
     /// TODO: iOS 한글 오류 방지 코드 추가
     String preventHangleError(String htmlString) {
       return htmlString;
-      //   return htmlString.replaceAll('<p><br></p>', '<p><br></p><p></p>');
     }
 
     /// 파일 선택 및 `_attachmentList`에 추가
@@ -425,17 +391,6 @@ class _PostWritePageState extends State<PostWritePage> {
       }
     }
 
-    // Future<void> _imagePick() async {
-    //   imagePickerResult =
-    //       await ImagePicker().pickImage(source: ImageSource.gallery);
-    //   if (imagePickerResult != null) {
-    //     debugPrint(imagePickerResult.path);
-    //     setState(() {
-    //       imagePickerFile = File(imagePickerResult.path);
-    //     });
-    //   }
-    // }
-
     /// 바이트를 적절한 단위로 변환하여 문자열로 반환
     /// TODO: 이 함수는 다른 파일로 분리하는 것이 좋을 것 같음.
     String formatBytes(int bytes) {
@@ -454,14 +409,13 @@ class _PostWritePageState extends State<PostWritePage> {
     }
 
     /// 새로운 포스트를 서버에 업로드하는 함수이다.
-    /// 
+    ///
     /// 사용자가 입력한 제목, 내용 및 첨부 파일을 서버에 전송하여 새로운 포스트를 생성한다.
     /// 이 함수는 다음의 단계를 거친다:
     /// 1. 사용자 입력 값을 가져온다.
     /// 2. 첨부 파일이 있으면 서버에 업로드하고, 해당 파일의 ID를 가져온다.
     /// 3. 제목, 내용 및 첨부 파일 ID를 함께 서버에 전송하여 포스트를 생성한다.
     void uploadPost() async {
-      // 포스트 업로드;
       String titleValue;
       String contentValue;
       List<int> attachmentIds = [];
@@ -484,17 +438,14 @@ class _PostWritePageState extends State<PostWritePage> {
         for (int i = 0; i < _attachmentList.length; i++) {
           if (_attachmentList[i].isNewFile) {
             var attachFile = File(_attachmentList[i].fileLocalPath!);
-            //이 파일 uuid 에 해당하는 img 태그가 html 안에 있다면 변경해야한다.
-
+            // 이 파일 uuid 에 해당하는 img 태그가 html 안에 있다면 변경한다.
             // 파일이 존재하는지 확인
             if (attachFile.existsSync()) {
               var dio = Dio();
               dio.options.headers['Cookie'] = userProvider.getCookiesToString();
               var formData = FormData.fromMap({
                 "file": await MultipartFile.fromFile(attachFile.path,
-                    filename: attachFile.path
-                        .split('/')
-                        .last), // You may need to replace '/' with '\\' if you're using Windows.
+                    filename: attachFile.path.split('/').last),
               });
               try {
                 var response = await dio
@@ -568,15 +519,13 @@ class _PostWritePageState extends State<PostWritePage> {
         for (int i = 0; i < _attachmentList.length; i++) {
           if (_attachmentList[i].isNewFile) {
             var attachFile = File(_attachmentList[i].fileLocalPath!);
-            // 파일이 존재하는지 확인
+            // 파일이 존재하는지 확인하는 코드
             if (attachFile.existsSync()) {
               var dio = Dio();
               dio.options.headers['Cookie'] = userProvider.getCookiesToString();
               var formData = FormData.fromMap({
                 "file": await MultipartFile.fromFile(attachFile.path,
-                    filename: attachFile.path
-                        .split('/')
-                        .last), // You may need to replace '/' with '\\' if you're using Windows.
+                    filename: attachFile.path.split('/').last),
               });
               try {
                 var response = await dio
@@ -603,11 +552,8 @@ class _PostWritePageState extends State<PostWritePage> {
             'title': titleValue,
             'content': contentValue,
             'attachments': attachmentIds,
-            // 'parent_topic':
-            //     _chosenTopicValue!.id == -1 ? '' : _chosenTopicValue!.id,
             'is_content_sexual': _selectedCheckboxes[1],
             'is_content_social': _selectedCheckboxes[2],
-            // 'parent_board': _chosenBoardValue!.id,
             'name_type': 'REGULAR'
           },
         );
@@ -701,7 +647,7 @@ class _PostWritePageState extends State<PostWritePage> {
         actions: [
           MaterialButton(
             /// 포스트 업로드하는 기능
-            ///TODO: 함수 따로 빼기
+            /// TODO: 함수 따로 빼기
             onPressed:
                 canIupload ? (_isEditingPost ? updatePost : uploadPost) : null,
             // 버튼이 클릭되었을 때 수행할 동작
@@ -759,10 +705,10 @@ class _PostWritePageState extends State<PostWritePage> {
                       ),
                       child: DropdownButtonHideUnderline(
                         child: DropdownButton<BoardDetailActionModel>(
-                          //  isDense: true,
-                          //isExpanded: true,
+                          // TODO: 원하는 메뉴 모양 만들기 위해 속성 테스트 할 것
+                          // isDense: true,
+                          // isExpanded: true,
 
-                          //isExpanded: true,
                           value: _chosenBoardValue,
                           style: TextStyle(color: Colors.red),
                           items: _boardList
@@ -788,7 +734,7 @@ class _PostWritePageState extends State<PostWritePage> {
                           }).toList(),
 
                           /// 게시판 선택 이후 토픽 목록이 변해야 하므로 변경하는 기능 추가
-                          ///TODO: 함수 따로 빼기
+                          /// TODO: 함수 따로 빼기
                           onChanged: _isEditingPost ? null : setSpecTopicList,
                         ),
                       ),
@@ -805,13 +751,6 @@ class _PostWritePageState extends State<PostWritePage> {
                       ),
                       child: DropdownButtonHideUnderline(
                         child: DropdownButton<TopicModel>(
-                          //  isDense: true,
-                          //isExpanded: true,
-
-                          onTap: () {
-                            debugPrint("d");
-                          },
-                          //isExpanded: true,
                           value: _chosenTopicValue,
                           style: TextStyle(color: Colors.red),
                           items: _specTopicList
@@ -836,7 +775,7 @@ class _PostWritePageState extends State<PostWritePage> {
                           }).toList(),
 
                           /// 토픽 선택하는 기능
-                          ///TODO: 함수 따로 빼기
+                          /// TODO: 함수 따로 빼기
                           onChanged: _isEditingPost
                               ? null
                               : (TopicModel? value) {
@@ -848,10 +787,6 @@ class _PostWritePageState extends State<PostWritePage> {
                       ),
                     ),
                   ),
-
-                  // Expanded(
-                  //   child: Placeholder(),
-                  // )
                 ],
               ),
             ),
@@ -884,18 +819,15 @@ class _PostWritePageState extends State<PostWritePage> {
                       counterText: "",
                       filled: true,
                       fillColor: Colors.white,
-
                       isDense: true,
-                      // contentPadding: const EdgeInsets.fromLTRB(
-                      //     10.0, 10.0, 10.0, 10.0), // 모서리를 둥글게 설정
                       enabledBorder: OutlineInputBorder(
-                        // borderRadius: BorderRadius.circular(10.0),
+                    
                         borderSide: BorderSide(
                           color: Colors.transparent, // 테두리 색상 설정
                         ), // 모서리를 둥글게 설정
                       ),
                       focusedBorder: OutlineInputBorder(
-                        //  borderRadius: BorderRadius.circular(10.0),
+                    
                         borderSide: BorderSide(
                           color: Colors.transparent, // 테두리 색상 설정
                         ), // 모서리를 둥글게 설정
@@ -909,7 +841,7 @@ class _PostWritePageState extends State<PostWritePage> {
                   ),
                   Expanded(
                     child: Column(
-                      // mainAxisAlignment: MainAxisAlignment.end,
+  
                       children: [
                         Expanded(
                           child: SingleChildScrollView(
@@ -924,7 +856,7 @@ class _PostWritePageState extends State<PostWritePage> {
                                       _currentHtmlContent = value!;
                                     });
                                   }),
-                                  controller: _htmlController, //required
+                                  controller: _htmlController,
                                   htmlEditorOptions: HtmlEditorOptions(
                                     shouldEnsureVisible: true,
                                     autoAdjustHeight: false,
@@ -943,7 +875,6 @@ class _PostWritePageState extends State<PostWritePage> {
                                           (PlatformFile file,
                                               InsertFileType type) async {
                                         if (type == InsertFileType.image) {
-                                          // var uuid = Uuid();
                                           String uuid = const Uuid().v4();
                                           setState(() {
                                             _isFileMenuBarSelected = true;
@@ -966,7 +897,6 @@ class _PostWritePageState extends State<PostWritePage> {
                                         return false;
                                       },
                                       defaultToolbarButtons: [
-                                        // FontSettingButtons(),
                                         const FontButtons(
                                           bold: true,
                                           italic: true,
@@ -975,8 +905,6 @@ class _PostWritePageState extends State<PostWritePage> {
                                           strikethrough: true,
                                           superscript: false,
                                           subscript: false,
-
-                                          // StyleButtons(
                                         ),
                                         const InsertButtons(
                                           link: true,
@@ -987,28 +915,16 @@ class _PostWritePageState extends State<PostWritePage> {
                                           table: false,
                                           hr: true,
                                         )
-                                        // ColorButtons(),
+                               
                                       ]),
-
                                   otherOptions: OtherOptions(
                                     height: 450,
-                                    // decoration: BoxDecoration(
-                                    //   border: Border.None,
-                                    // )
                                   ),
                                 ),
-                                // Container(
-                                //   color: Colors.blue,
-                                //   height: 10,
-                                // )
                               ],
                             ),
                           ),
                         ),
-                        // Container(
-                        //   height: 5,
-                        //   color: Colors.yellow,
-                        // )
                       ],
                     ),
                   ),
@@ -1266,6 +1182,7 @@ class _PostWritePageState extends State<PostWritePage> {
                                 SizedBox(
                                   width: 20,
                                 ),
+                                // TODO: 익명 선택하는 기능 추가하고 익명 보여주는 기능 추가하기
                                 // GestureDetector(
                                 //   onTap: () {
                                 //     setState(() {

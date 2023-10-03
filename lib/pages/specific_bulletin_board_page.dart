@@ -8,7 +8,7 @@ import 'package:provider/provider.dart';
 
 import 'package:new_ara_app/models/article_list_action_model.dart';
 
-//TODO: free_bulletin_board_page.dart와 통합 필요.
+// TODO: free_bulletin_board_page.dart와 통합 필요.
 class SpecificBulletinBoardPage extends StatefulWidget {
   const SpecificBulletinBoardPage({Key? key}) : super(key: key);
 

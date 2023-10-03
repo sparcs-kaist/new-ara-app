@@ -100,7 +100,7 @@ class _MyAppState extends State<MyApp> {
         supportedLocales: context.supportedLocales,
         locale: context.locale,
         theme: _setThemeData(),
-        //TODO: CustionScrollBehavior의 역할은?
+        // TODO: CustionScrollBehavior의 역할은?
         builder: (context, child) {
           return ScrollConfiguration(
             behavior: CustomScrollBehavior(),

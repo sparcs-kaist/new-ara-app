@@ -23,9 +23,9 @@ class _SparcsSSOPageState extends State<SparcsSSOPage> {
   // WebView의 로딩 상태를 표시하는 플래그
   bool isVisible = false;
 
-  //TODO: 이 쿠키가 왜 쓰이는 지, 왜 남겨두었는지 알아보기
+  // TODO: 이 쿠키가 왜 쓰이는 지, 왜 남겨두었는지 알아보기
   List<Cookie> cookies = [];
-  //TODO: 이 userID가 왜 쓰이는 지, 왜 남겨두었는지 알아보기
+  // TODO: 이 userID가 왜 쓰이는 지, 왜 남겨두었는지 알아보기
   int userID = 0;
 
   @override
@@ -33,7 +33,7 @@ class _SparcsSSOPageState extends State<SparcsSSOPage> {
     super.initState();
 
     // 쿠키 초기화
-    //TODO: 여기 웹뷰에서 쿠키 초기화하면 모든 웹뷰에서 쿠키가 초기화 되는 것인지 알기
+    // TODO: 여기 웹뷰에서 쿠키 초기화하면 모든 웹뷰에서 쿠키가 초기화 되는 것인지 알기
     WebViewCookieManager().clearCookies();
 
     _controller = WebViewController()

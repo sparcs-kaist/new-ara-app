@@ -43,7 +43,7 @@ class _MainPageState extends State<MainPage> {
     super.initState();
     var userProvider = Provider.of<UserProvider>(context, listen: false);
 
-    //TODO: 현재 api 요청 속도가 너무 느림. 병렬 처리 방식과, api 요청 속도 개선 필요. Future.wait([])로 바꾸면 개선되지 않을까 고민. 반복되는 코드 구조 개선 필요.
+    // TODO: 현재 api 요청 속도가 너무 느림. 병렬 처리 방식과, api 요청 속도 개선 필요. Future.wait([])로 바꾸면 개선되지 않을까 고민. 반복되는 코드 구조 개선 필요.
     refreshDailyBest(userProvider);
     refreshBoardList(userProvider);
     context.read<NotificationProvider>().checkIsNotReadExist();
@@ -394,7 +394,7 @@ class _MainPageState extends State<MainPage> {
                                 Navigator.of(context)
                                     .push(slideRoute(FreeBulletinBoardPage(
                                   boardType: BoardType.free,
-                                  //TODO: 포탈 공지가 boardList[0]가 아닐 수도 있다. slug로 확인해야 한다.
+                                  // TODO: 포탈 공지가 boardList[0]가 아닐 수도 있다. slug로 확인해야 한다.
                                   boardInfo: boardList[0],
                                 )));
                               },
@@ -497,7 +497,7 @@ class _MainPageState extends State<MainPage> {
                                 Navigator.of(context)
                                     .push(slideRoute(FreeBulletinBoardPage(
                                   boardType: BoardType.free,
-                                  //TODO: 입주 업체가 boardList[7]가 아닐 수도 있다. slug로 확인해야 한다.
+                                  // TODO: 입주 업체가 boardList[7]가 아닐 수도 있다. slug로 확인해야 한다.
                                   boardInfo: boardList[7],
                                 )));
                               },
@@ -554,7 +554,7 @@ class _MainPageState extends State<MainPage> {
                                 Navigator.of(context)
                                     .push(slideRoute(FreeBulletinBoardPage(
                                   boardType: BoardType.free,
-                                  //TODO: 뉴아라가 boardList[11]가 아닐 수도 있다. slug로 확인해야 한다.
+                                  // TODO: 뉴아라가 boardList[11]가 아닐 수도 있다. slug로 확인해야 한다.
                                   boardInfo: boardList[11],
                                 )));
                               },
@@ -609,7 +609,7 @@ class _MainPageState extends State<MainPage> {
                         Navigator.of(context)
                             .push(slideRoute(FreeBulletinBoardPage(
                           boardType: BoardType.free,
-                          //TODO: 원총이 boardList[1]가 아닐 수도 있다. slug로 확인해야 한다.
+                          // TODO: 원총이 boardList[1]가 아닐 수도 있다. slug로 확인해야 한다.
                           boardInfo: boardList[1],
                         )));
                       }),
