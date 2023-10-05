@@ -1,13 +1,13 @@
 class PublicUserProfileModel {
   String? picture;
   String? nickname;
-  int? user;
+  dynamic user;
   bool? is_official;
   bool? is_school_admin;
 
   PublicUserProfileModel({
-    required this.picture,
-    required this.nickname,
+    this.picture,
+    this.nickname,
     required this.user,
     required this.is_official,
     required this.is_school_admin,

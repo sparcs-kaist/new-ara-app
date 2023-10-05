@@ -1,5 +1,12 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.new_ara_app">
+   <queries>
+       <!-- If your app opens https URLs -->
+       <intent>
+           <action android:name="android.intent.action.VIEW" />
+           <data android:scheme="https" />
+       </intent>
+   </queries>
    <application
         android:label="new_ara_app"
         android:name="${applicationName}"

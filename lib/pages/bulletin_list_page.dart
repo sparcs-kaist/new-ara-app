@@ -1,15 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:new_ara_app/pages/bulletin_search_page.dart';
+import 'package:provider/provider.dart';
+
 import 'package:new_ara_app/constants/board_type.dart';
 import 'package:new_ara_app/constants/colors_info.dart';
 import 'package:new_ara_app/pages/free_bulletin_board_page.dart';
 import 'package:new_ara_app/providers/user_provider.dart';
 import 'package:new_ara_app/widgetclasses/loading_indicator.dart';
-import 'package:provider/provider.dart';
+import 'package:new_ara_app/models/board_detail_action_model.dart';
+import 'package:new_ara_app/utils/slide_routing.dart';
+import 'package:new_ara_app/providers/notification_provider.dart';
 
 const boardsByGroupLength = 5;
 
+/// `BulletinListPage`는 게시판 목록을 표시하는 페이지.
+///
+/// 사용자는 이 페이지에서 다양한 게시판을 탐색하고 선택 가능.
 class BulletinListPage extends StatefulWidget {
   const BulletinListPage({Key? key}) : super(key: key);
   @override
@@ -17,37 +25,36 @@ class BulletinListPage extends StatefulWidget {
 }
 
 class _BulletinListPageState extends State<BulletinListPage> {
+  /// 데이터 로딩 상태
   bool isLoading = true;
 
-  var boardsByGroup = List.generate(boardsByGroupLength + 1, (row) {
-    return <dynamic>[];
-  });
+  /// 게시판 그룹 별로 게시판 목록 저장하는 변수. 게시판 그룹은 1부터 시작하도록 초기화.
+  List<List<BoardDetailActionModel>> boardsByGroup =
+      List.generate(boardsByGroupLength + 1, (_) => []);
   List<Map<String, dynamic>> textContent = [];
+  FocusNode _focusNode = FocusNode();
+
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
     var userProvider = Provider.of<UserProvider>(context, listen: false);
     refreshBoardList(userProvider);
+    context.read<NotificationProvider>().checkIsNotReadExist();
   }
-
+  /// 게시판 목록을 새로고침하는 함수
+  /// API를 호출하여 게시판 데이터를 가져온 후, 상태를 업데이트.
   void refreshBoardList(UserProvider userProvider) async {
-    //Provider에  api res 주입
-    await userProvider.synApiRes("boards/");
-    //Provider에 api res 정보 사용
-    //var boardsByGroup = List<dynamic>.filled(6, List< dynamic >.filled(0, null, growable: true) , growable: true);
+    List<dynamic> jsonBoards = await userProvider.getApiRes("boards/") ?? [];
+    List<BoardDetailActionModel> boardModels = [];
+    for (dynamic jsonBoard in jsonBoards) {
+      boardModels.add(BoardDetailActionModel.fromJson(jsonBoard));
+    }
 
-    var apiResBoards = userProvider.getApiRes("boards/");
     if (mounted) {
       setState(() {
-        for (var element in apiResBoards) {
-          // debugPrint("${element["ko_name"]}, group_id: ${element["group_id"]}, id: ${element["id"]}, lenght: ${element["topics"]}");
-          // debugPrint("-------------------------");
-          boardsByGroup[element["group_id"]].add(element);
-          // for(var topic in element["topics"]){
-          //   debugPrint("${topic["ko_name"]} ,id: ${topic["id"]}");
-          // }
-          // debugPrint("=========================");
+        for (BoardDetailActionModel model in boardModels) {
+          boardsByGroup[model.group.id].add(model);
         }
         isLoading = false;
       });
@@ -81,6 +88,19 @@ class _BulletinListPageState extends State<BulletinListPage> {
                         TextField(
                           minLines: 1,
                           maxLines: 1,
+                          focusNode: _focusNode,
+                          onTap: () async {
+                            // TODO: 검색 창 누를 때 실행되는 함수로 나중에 별로도 빼기
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => BulletinSearchPage(
+                                      boardType: BoardType.all,
+                                      boardInfo: null)),
+                            );
+
+                            FocusScope.of(context).requestFocus(FocusNode());
+                          },
                           textInputAction: TextInputAction.search,
                           onSubmitted: (String text) {},
                           style: const TextStyle(
@@ -129,99 +149,124 @@ class _BulletinListPageState extends State<BulletinListPage> {
                           ),
                           cursorColor: Colors.transparent,
                         ),
-
-                        /// ----------- TextField 아래
                         const SizedBox(
                           height: 21,
                         ),
-                        SizedBox(
-                          height: 32,
-                          child: Row(
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              const SizedBox(
-                                width: 3,
-                              ),
-                              SvgPicture.asset(
-                                'assets/icons/menu_1.svg',
-                                height: 32,
-                                width: 32,
-                                color: const Color(0xFFED3A3A),
-                              ),
-                              const SizedBox(
-                                width: 5,
-                              ),
-                              const Text(
-                                '전체보기',
-                                style: TextStyle(
-                                  color: Color(0xFF333333),
-                                  fontSize: 17,
-                                  fontWeight: FontWeight.w700,
+                        InkWell(
+                          /// 전체 보기 클릭 시
+                          onTap: () {
+                            Navigator.of(context).push(slideRoute(
+                                FreeBulletinBoardPage(
+                                    boardType: BoardType.all,
+                                    boardInfo: null)));
+                          },
+                          child: SizedBox(
+                            height: 32,
+                            child: Row(
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                const SizedBox(
+                                  width: 3,
                                 ),
-                              ),
-                            ],
+                                SvgPicture.asset(
+                                  'assets/icons/menu_1.svg',
+                                  height: 32,
+                                  width: 32,
+                                  color: const Color(0xFFED3A3A),
+                                ),
+                                const SizedBox(
+                                  width: 5,
+                                ),
+                                const Text(
+                                  '전체보기',
+                                  style: TextStyle(
+                                    color: Color(0xFF333333),
+                                    fontSize: 17,
+                                    fontWeight: FontWeight.w700,
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
                         ),
                         const SizedBox(
                           height: 10,
                         ),
-                        SizedBox(
-                          height: 32,
-                          child: Row(
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              const SizedBox(
-                                width: 3,
-                              ),
-                              SvgPicture.asset(
-                                'assets/icons/star.svg',
-                                height: 32,
-                                width: 32,
-                                color: const Color(0xFFED3A3A),
-                              ),
-                              const SizedBox(
-                                width: 5,
-                              ),
-                              const Text(
-                                '인기글',
-                                style: TextStyle(
-                                  color: Color(0xFF333333),
-                                  fontSize: 17,
-                                  fontWeight: FontWeight.w700,
+                        InkWell(
+                          /// 인기글 클릭 시
+                          onTap: () {
+                            Navigator.of(context).push(slideRoute(
+                                FreeBulletinBoardPage(
+                                    boardType: BoardType.top,
+                                    boardInfo: null)));
+                          },
+                          child: SizedBox(
+                            height: 32,
+                            child: Row(
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                const SizedBox(
+                                  width: 3,
                                 ),
-                              ),
-                            ],
+                                SvgPicture.asset(
+                                  'assets/icons/star.svg',
+                                  height: 32,
+                                  width: 32,
+                                  color: const Color(0xFFED3A3A),
+                                ),
+                                const SizedBox(
+                                  width: 5,
+                                ),
+                                const Text(
+                                  '인기글',
+                                  style: TextStyle(
+                                    color: Color(0xFF333333),
+                                    fontSize: 17,
+                                    fontWeight: FontWeight.w700,
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
                         ),
                         const SizedBox(
                           height: 10,
                         ),
-                        SizedBox(
-                          height: 32,
-                          child: Row(
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              const SizedBox(
-                                width: 3,
-                              ),
-                              SvgPicture.asset(
-                                'assets/icons/download_2.svg',
-                                height: 32,
-                                width: 32,
-                                color: const Color(0xFFED3A3A),
-                              ),
-                              const SizedBox(
-                                width: 5,
-                              ),
-                              const Text(
-                                '담아놓은 글',
-                                style: TextStyle(
-                                  color: Color(0xFF333333),
-                                  fontSize: 17,
-                                  fontWeight: FontWeight.w700,
+                        InkWell(
+                          /// 스크랩 클릭 시
+                          onTap: () {
+                            Navigator.of(context).push(slideRoute(
+                                FreeBulletinBoardPage(
+                                    boardType: BoardType.scraps,
+                                    boardInfo: null)));
+                          },
+                          child: SizedBox(
+                            height: 32,
+                            child: Row(
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                const SizedBox(
+                                  width: 3,
                                 ),
-                              ),
-                            ],
+                                SvgPicture.asset(
+                                  'assets/icons/download_2.svg',
+                                  height: 32,
+                                  width: 32,
+                                  color: const Color(0xFFED3A3A),
+                                ),
+                                const SizedBox(
+                                  width: 5,
+                                ),
+                                const Text(
+                                  '담아둔 글',
+                                  style: TextStyle(
+                                    color: Color(0xFF333333),
+                                    fontSize: 17,
+                                    fontWeight: FontWeight.w700,
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
                         ),
                         const SizedBox(
@@ -236,10 +281,46 @@ class _BulletinListPageState extends State<BulletinListPage> {
                         ),
 
                         BoardExpansionTile(1, "공지", boardsByGroup[1]),
-                        BoardExpansionTile(2, "잡담", boardsByGroup[2]),
+                        BoardExpansionTile(5, "소통", boardsByGroup[5]),
+
+                        /// 자유 게시판은 별도의 하위 목록이 없기에 따로 처리
+                        InkWell(
+                            onTap: () {
+                              Navigator.of(context).push(slideRoute(
+                                  FreeBulletinBoardPage(
+                                      boardType: BoardType.free,
+                                      boardInfo: boardsByGroup[2][0])));
+                            },
+                            child: SizedBox(
+                              height: 48,
+                              child: Row(
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  const SizedBox(
+                                    width: 3,
+                                  ),
+                                  SvgPicture.asset(
+                                    'assets/icons/notify.svg',
+                                    height: 32,
+                                    width: 32,
+                                    color: const Color(0xFF333333),
+                                  ),
+                                  const SizedBox(
+                                    width: 5,
+                                  ),
+                                  Text(
+                                    boardsByGroup[2][0].ko_name,
+                                    style: const TextStyle(
+                                      color: Color(0xFF333333),
+                                      fontSize: 20,
+                                      fontWeight: FontWeight.w700,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            )),
                         BoardExpansionTile(3, "학생 단체 및 동아리", boardsByGroup[3]),
                         BoardExpansionTile(4, "거래", boardsByGroup[4]),
-                        BoardExpansionTile(5, "소통", boardsByGroup[5]),
                       ],
                     ),
                   ),
@@ -250,10 +331,18 @@ class _BulletinListPageState extends State<BulletinListPage> {
   }
 }
 
+/// `BoardExpansionTile`는 게시판 그룹을 나타내는 확장 가능한 타일 위젯.
+///
+/// 이 위젯은 주어진 게시판 그룹의 제목과 해당 그룹에 속한 게시판 목록을 표시.
+/// 사용자는 이 타일을 통해 원하는 게시판으로 이동 가능.
 class BoardExpansionTile extends StatelessWidget {
+  // TODO: titleNum이 필요한 이유 알기
   final int titleNum;
   final String title;
-  final dynamic boardsByGroup;
+  final List<BoardDetailActionModel> boardsByGroup;
+
+  /// [titleNum]은 게시판 그룹의 번호, [title]은 게시판 그룹의 제목,
+  /// [boardsByGroup]은 해당 그룹에 속한 게시판 목록.
   const BoardExpansionTile(this.titleNum, this.title, this.boardsByGroup,
       {super.key});
 
@@ -262,6 +351,7 @@ class BoardExpansionTile extends StatelessWidget {
     return Theme(
       data: ThemeData(
         dividerColor: Colors.transparent, // 액센트 색상을 투명으로 설정
+        splashColor: Colors.transparent,
       ),
       child: ListTileTheme(
         contentPadding: const EdgeInsets.all(0),
@@ -296,7 +386,7 @@ class BoardExpansionTile extends StatelessWidget {
               ],
             ),
           ),
-          children: boardsByGroup.map<Widget>((subMenu) {
+          children: boardsByGroup.map<Widget>((model) {
             return SizedBox(
               height: 39,
               child: Row(
@@ -306,15 +396,12 @@ class BoardExpansionTile extends StatelessWidget {
                   ),
                   InkWell(
                     onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => FreeBulletinBoardPage(
-                                boardType: BoardType.free, boardInfo: subMenu)),
-                      );
+                      Navigator.of(context).push(slideRoute(
+                          FreeBulletinBoardPage(
+                              boardType: BoardType.free, boardInfo: model)));
                     },
                     child: Text(
-                      subMenu["ko_name"],
+                      model.ko_name,
                       style: const TextStyle(
                         color: Color(0xFF333333),
                         fontSize: 16,
