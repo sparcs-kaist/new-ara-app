@@ -41,8 +41,7 @@ class _NotificationPageState extends State<NotificationPage> {
   @override
   void initState() {
     super.initState();
-    _listViewController = ScrollController()
-      ..addListener(_listViewListener);
+    _listViewController = ScrollController()..addListener(_listViewListener);
     UserProvider userProvider = context.read<UserProvider>();
     _initNotificationPage(userProvider);
   }
@@ -63,14 +62,14 @@ class _NotificationPageState extends State<NotificationPage> {
 
   /// [targetPage]를 통해 지정한 페이지의 알림을 불러와 모델로 변환 후,
   /// 결과 리스트를 반환함.
-  Future<List<NotificationModel>> _fetchEachPage(UserProvider userProvider, int targetPage) async {
+  Future<List<NotificationModel>> _fetchEachPage(
+      UserProvider userProvider, int targetPage) async {
     var dio = Dio()
-        ..options.headers["Cookie"] = userProvider.getCookiesToString();
+      ..options.headers["Cookie"] = userProvider.getCookiesToString();
     List<NotificationModel> resList = [];
     try {
-      var response = await dio.get(
-        "$newAraDefaultUrl/api/notifications/?page=$targetPage"
-      );
+      var response = await dio
+          .get("$newAraDefaultUrl/api/notifications/?page=$targetPage");
       List<dynamic> resultsList = response.data["results"];
       for (var json in resultsList) {
         try {
@@ -89,9 +88,11 @@ class _NotificationPageState extends State<NotificationPage> {
   /// 알림 ListView를 구독 중인 리스너이며
   /// 사용자가 ListView의 끝에 도달하였을 때 이를 감지하여
   /// 새로운 페이지를 로딩함.
-  void _listViewListener() async {  // TODO: Future<void>로 변경.
+  void _listViewListener() async {
+    // TODO: Future<void>로 변경.
     if (_isLoadingNewPage) return;
-    if (_listViewController.position.pixels == _listViewController.position.maxScrollExtent) {
+    if (_listViewController.position.pixels ==
+        _listViewController.position.maxScrollExtent) {
       _setIsLoadingNewPage(true);
       bool hasNext = true;
       UserProvider userProvider = context.read<UserProvider>();
@@ -102,9 +103,8 @@ class _NotificationPageState extends State<NotificationPage> {
       for (page = 1; hasNext; page++) {
         if (page > _curPage + 1) break;
         try {
-          var response = await dio.get(
-            "$newAraDefaultUrl/api/notifications/?page=$page"
-          );
+          var response =
+              await dio.get("$newAraDefaultUrl/api/notifications/?page=$page");
           hasNext = response.data["next"] == null ? false : true;
           List<dynamic> resultsList = response.data["results"];
           for (var json in resultsList) {
@@ -144,9 +144,9 @@ class _NotificationPageState extends State<NotificationPage> {
   /// 읽음 처리가 성공하면 true, 그렇지 않으면 false 리턴.
   Future<bool> _readNotification(UserProvider userProvider, int id) async {
     try {
-      await userProvider.myDio().post(
-        "$newAraDefaultUrl/api/notifications/$id/read/"
-      );
+      await userProvider
+          .myDio()
+          .post("$newAraDefaultUrl/api/notifications/$id/read/");
     } catch (error) {
       debugPrint("POST /api/notifications/$id/read/ failed: $error");
       return false;
@@ -159,9 +159,9 @@ class _NotificationPageState extends State<NotificationPage> {
   /// 모두 읽음 처리 성공 시에 true, 아니면 false를 반환함.
   Future<bool> _readAllNotification(UserProvider userProvider) async {
     try {
-      await userProvider.myDio().post(
-        "$newAraDefaultUrl/api/notifications/read_all/"
-      );
+      await userProvider
+          .myDio()
+          .post("$newAraDefaultUrl/api/notifications/read_all/");
     } catch (error) {
       debugPrint("POST /api/notifications/read_all failed: $error");
       return false;
@@ -172,7 +172,8 @@ class _NotificationPageState extends State<NotificationPage> {
   @override
   Widget build(BuildContext context) {
     UserProvider userProvider = context.read<UserProvider>();
-    NotificationProvider notificationProvider = context.read<NotificationProvider>();
+    NotificationProvider notificationProvider =
+        context.read<NotificationProvider>();
     return Scaffold(
       appBar: AppBar(
         title: Text(
@@ -203,140 +204,166 @@ class _NotificationPageState extends State<NotificationPage> {
                       await notificationProvider.checkIsNotReadExist();
                       update();
                     },
-                    child: _isLoadingTotal ? const LoadingIndicator()
+                    child: _isLoadingTotal
+                        ? const LoadingIndicator()
                         : ListView.separated(
-                      controller: _listViewController,
-                      itemCount: _modelList.length + 1,
-                      itemBuilder: (context, idx) {
-                        if (idx == _modelList.length) {
-                          return Visibility(
-                            visible: _isLoadingNewPage,
-                            child: const SizedBox(
-                              height: 45,
-                              child: LoadingIndicator(),
-                            ),
-                          );
-                        }
-                        NotificationModel targetNoti = _modelList[idx];
-                        // 개별 알림을 리턴함.
-                        return Column(
-                          children: [
-                            idx != 0 ? _buildDateInfo(_modelList[idx - 1].created_at,
-                                _modelList[idx].created_at) : const SizedBox(
-                              height: 40,
-                              child: Text(
-                                '오늘',
-                                style: TextStyle(
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w500,
-                                  color: Color.fromRGBO(177, 177, 177, 1),
-                                ),
-                              ),
-                            ),
-                            InkWell(
-                                onTap: () async {
-                                  // 알림 클릭 시에 해당하는 글로 이동.
-                                  await Navigator.of(context).push(
-                                    slideRoute(PostViewPage(
-                                      id: targetNoti.related_article.id,
-                                    ))
-                                  );
-                                  if (mounted) {
-                                    setState(() => targetNoti.is_read = true);
-                                  }
-                                  bool res = await _readNotification(userProvider, targetNoti.id);
-                                  if (!res && mounted) {
-                                    setState(() => targetNoti.is_read = false);
-                                  }
-                                  await notificationProvider.checkIsNotReadExist();
-                                  List<NotificationModel> newList = [];
-                                  for (int page = 1; page <= _curPage; page++) {
-                                    newList += await _fetchEachPage(userProvider, page);
-                                  }
-                                  if (mounted) {
-                                    setState(() => _modelList = newList);
-                                  }
-                                },
-                                child: Container(
-                                  height: 90,
-                                  padding: const EdgeInsets.symmetric(horizontal: 10),
-                                  decoration: BoxDecoration(
-                                    border: Border.all(
-                                      width: 1,
-                                      color: const Color.fromRGBO(230, 230, 230, 1),
-                                    ),
-                                    borderRadius: const BorderRadius.all(
-                                      Radius.circular(15),
-                                    ),
+                            controller: _listViewController,
+                            itemCount: _modelList.length + 1,
+                            itemBuilder: (context, idx) {
+                              if (idx == _modelList.length) {
+                                return Visibility(
+                                  visible: _isLoadingNewPage,
+                                  child: const SizedBox(
+                                    height: 45,
+                                    child: LoadingIndicator(),
                                   ),
-                                  child: Row(
-                                    //mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      Container(
-                                        width: 40,
-                                        height: 40,
+                                );
+                              }
+                              NotificationModel targetNoti = _modelList[idx];
+                              // 개별 알림을 리턴함.
+                              return Column(
+                                children: [
+                                  idx != 0
+                                      ? _buildDateInfo(
+                                          _modelList[idx - 1].created_at,
+                                          _modelList[idx].created_at)
+                                      : const SizedBox(
+                                          height: 40,
+                                          child: Text(
+                                            '오늘',
+                                            style: TextStyle(
+                                              fontSize: 14,
+                                              fontWeight: FontWeight.w500,
+                                              color: Color.fromRGBO(
+                                                  177, 177, 177, 1),
+                                            ),
+                                          ),
+                                        ),
+                                  InkWell(
+                                      onTap: () async {
+                                        // 알림 클릭 시에 해당하는 글로 이동.
+                                        await Navigator.of(context)
+                                            .push(slideRoute(PostViewPage(
+                                          id: targetNoti.related_article.id,
+                                        )));
+                                        if (mounted) {
+                                          setState(
+                                              () => targetNoti.is_read = true);
+                                        }
+                                        bool res = await _readNotification(
+                                            userProvider, targetNoti.id);
+                                        if (!res && mounted) {
+                                          setState(
+                                              () => targetNoti.is_read = false);
+                                        }
+                                        await notificationProvider
+                                            .checkIsNotReadExist();
+                                        List<NotificationModel> newList = [];
+                                        for (int page = 1;
+                                            page <= _curPage;
+                                            page++) {
+                                          newList += await _fetchEachPage(
+                                              userProvider, page);
+                                        }
+                                        if (mounted) {
+                                          setState(() => _modelList = newList);
+                                        }
+                                      },
+                                      child: Container(
+                                        height: 90,
+                                        padding: const EdgeInsets.symmetric(
+                                            horizontal: 10),
                                         decoration: BoxDecoration(
-                                          shape: BoxShape.circle,
-                                          color: (targetNoti.is_read ?? false) ? Colors.grey
-                                              : ColorsInfo.newara,
+                                          border: Border.all(
+                                            width: 1,
+                                            color: const Color.fromRGBO(
+                                                230, 230, 230, 1),
+                                          ),
+                                          borderRadius: const BorderRadius.all(
+                                            Radius.circular(15),
+                                          ),
                                         ),
-                                        child: SvgPicture.asset(
-                                          targetNoti.type == "default" ? "assets/icons/notification.svg"
-                                              : "assets/icons/comment.svg",
-                                          color: Colors.white,
-                                        ),
-                                      ),
-                                      const SizedBox(width: 10),
-                                      Flexible(
-                                        child: Column(
-                                          crossAxisAlignment: CrossAxisAlignment.start,
-                                          mainAxisAlignment: MainAxisAlignment.center,
+                                        child: Row(
+                                          //mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                           children: [
-                                            Text(
-                                              targetNoti.title,
-                                              maxLines: 1,
-                                              overflow: TextOverflow.ellipsis,
-                                              style: TextStyle(
-                                                fontSize: 16,
-                                                fontWeight: FontWeight.w700,
-                                                color: (targetNoti.is_read ?? false) ? Colors.grey
-                                                    : Colors.black,
+                                            Container(
+                                              width: 40,
+                                              height: 40,
+                                              decoration: BoxDecoration(
+                                                shape: BoxShape.circle,
+                                                color: (targetNoti.is_read ??
+                                                        false)
+                                                    ? Colors.grey
+                                                    : ColorsInfo.newara,
+                                              ),
+                                              child: SvgPicture.asset(
+                                                targetNoti.type == "default"
+                                                    ? "assets/icons/notification.svg"
+                                                    : "assets/icons/comment.svg",
+                                                color: Colors.white,
                                               ),
                                             ),
-                                            const SizedBox(height: 5),
-                                            Text(
-                                              targetNoti.content,
-                                              maxLines: 1,
-                                              overflow: TextOverflow.ellipsis,
-                                              style: const TextStyle(
-                                                fontSize: 14,
-                                                fontWeight: FontWeight.w500,
-                                              ),
-                                            ),
-                                            const SizedBox(height: 5),
-                                            Text(
-                                              "| 게시글: ${targetNoti.related_article.title}",
-                                              maxLines: 1,
-                                              overflow: TextOverflow.ellipsis,
-                                              style: const TextStyle(
-                                                fontSize: 12,
-                                                fontWeight: FontWeight.w500,
+                                            const SizedBox(width: 10),
+                                            Flexible(
+                                              child: Column(
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment.center,
+                                                children: [
+                                                  Text(
+                                                    targetNoti.title,
+                                                    maxLines: 1,
+                                                    overflow:
+                                                        TextOverflow.ellipsis,
+                                                    style: TextStyle(
+                                                      fontSize: 16,
+                                                      fontWeight:
+                                                          FontWeight.w700,
+                                                      color:
+                                                          (targetNoti.is_read ??
+                                                                  false)
+                                                              ? Colors.grey
+                                                              : Colors.black,
+                                                    ),
+                                                  ),
+                                                  const SizedBox(height: 5),
+                                                  Text(
+                                                    targetNoti.content,
+                                                    maxLines: 1,
+                                                    overflow:
+                                                        TextOverflow.ellipsis,
+                                                    style: const TextStyle(
+                                                      fontSize: 14,
+                                                      fontWeight:
+                                                          FontWeight.w500,
+                                                    ),
+                                                  ),
+                                                  const SizedBox(height: 5),
+                                                  Text(
+                                                    "| 게시글: ${targetNoti.related_article.title}",
+                                                    maxLines: 1,
+                                                    overflow:
+                                                        TextOverflow.ellipsis,
+                                                    style: const TextStyle(
+                                                      fontSize: 12,
+                                                      fontWeight:
+                                                          FontWeight.w500,
+                                                    ),
+                                                  ),
+                                                ],
                                               ),
                                             ),
                                           ],
                                         ),
-                                      ),
-                                    ],
-                                  ),
-                                )
-                            ),
-                          ],
-                        );
-                      },
-                      separatorBuilder: (context, idx) {
-                        return const SizedBox(height: 10);
-                      },
-                    ),
+                                      )),
+                                ],
+                              );
+                            },
+                            separatorBuilder: (context, idx) {
+                              return const SizedBox(height: 10);
+                            },
+                          ),
                   ),
                 ),
               ),
@@ -349,6 +376,7 @@ class _NotificationPageState extends State<NotificationPage> {
       // TODO: 디자이너와 모두 읽기 기능 위치, 위젯 조정해야함.
       floatingActionButton: FloatingActionButton(
         onPressed: () async {
+          // TODO: return 하나로 바꾸기
           if (!notificationProvider.isNotReadExist) return;
           _setIsLoadingTotal(true);
           bool res = await _readAllNotification(userProvider);
@@ -387,9 +415,11 @@ class _NotificationPageState extends State<NotificationPage> {
     DateTime now = DateTime.now();
     DateTime prevDate = DateTime.parse(strDate1).toLocal();
     DateTime curDate = DateTime.parse(strDate2).toLocal();
-    if (prevDate.year == curDate.year && prevDate.month == curDate.month &&
+    if (prevDate.year == curDate.year &&
+        prevDate.month == curDate.month &&
         prevDate.day == curDate.day) return Container();
-    String dateText = "${(curDate.year != now.year ? "${curDate.year}년 " : "")}${curDate.month}월 ${curDate.day}일";
+    String dateText =
+        "${(curDate.year != now.year ? "${curDate.year}년 " : "")}${curDate.month}월 ${curDate.day}일";
     return SizedBox(
       height: 60,
       child: Center(

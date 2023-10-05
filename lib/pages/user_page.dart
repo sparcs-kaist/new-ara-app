@@ -37,7 +37,7 @@ class _UserPageState extends State<UserPage>
 
   /// 작성한 글, 담아둔 글, 최근 본 글 ListView에 대해
   /// 스크롤의 가장 하단에 도달하여 새로운 페이지를 불러오는지 여부를 표시함.
-  List<bool> isLoadingNewPage = [ false, false, false ];
+  List<bool> isLoadingNewPage = [false, false, false];
 
   /// 작성한 글 ListView에 들어가는 모델 리스트
   List<ArticleListActionModel> createdArticleList = [];
@@ -98,12 +98,12 @@ class _UserPageState extends State<UserPage>
   /// API 통신을 위해 userProvider를 전달받으며
   /// 별도의 리턴값 없이 작업 완료 후 state를 바로 업데이트함.
   Future<void> fetchInitData(UserProvider userProvider) async {
-    bool userFetchRes = await userProvider.apiMeUserInfo();  // 유저 정보 조회
+    bool userFetchRes = await userProvider.apiMeUserInfo(); // 유저 정보 조회
     if (!userFetchRes) {
       debugPrint("최신 유저정보 조회 실패!");
     }
-    isLoadedList[0] = await fetchCreatedArticles(userProvider, 1);  // 작성한 글 조회
-    setCurCount(0);  // state 업데이트
+    isLoadedList[0] = await fetchCreatedArticles(userProvider, 1); // 작성한 글 조회
+    setCurCount(0); // state 업데이트
   }
 
   void setIsLoadingNewPage(int index, bool value) {
@@ -115,7 +115,8 @@ class _UserPageState extends State<UserPage>
   /// 실행 후 성공 여부를 bool 타입으로 반환.
   /// UserPage에서 경우에 따라 다른 fetching 메서드를 사용해야 하는 경우가 많아
   /// 이를 편리하게 하기 위해 생성함.
-  Future<bool> selectFetchFunc(UserProvider userProvider, int funcNum, int page) async {
+  Future<bool> selectFetchFunc(
+      UserProvider userProvider, int funcNum, int page) async {
     if (funcNum == 0) {
       return await fetchCreatedArticles(userProvider, page);
     } else if (funcNum == 1) {
@@ -156,15 +157,17 @@ class _UserPageState extends State<UserPage>
     if (!_tabController.indexIsChanging) {
       if (_tabController.animation!.isCompleted) {
         return;
-      } else {  // Swipe
+      } else {
+        // Swipe
         fetchNewTab(userProvider, newTabIndex);
       }
-    }
-    else {  // Tap
+    } else {
+      // Tap
       fetchNewTab(userProvider, newTabIndex);
     }
   }
 
+  // TODO: 리스너별로 겹치는 로직 메서드화하기
   void _scrollListener0() async {
     // 새로운 페이지를 로드 중인 경우 스크롤의 끝에 도달하여도 무시함.
     if (isLoadingNewPage[0]) return;
@@ -173,7 +176,8 @@ class _UserPageState extends State<UserPage>
         scrollControllerList[0].position.pixels ==
             scrollControllerList[0].position.maxScrollExtent) {
       setIsLoadingNewPage(0, true);
-      bool res = await fetchCreatedArticles(context.read<UserProvider>(), curPage[0] + 1);
+      bool res = await fetchCreatedArticles(
+          context.read<UserProvider>(), curPage[0] + 1);
       if (res) curPage[0] += 1;
       setIsLoadingNewPage(0, false);
     }
@@ -186,7 +190,8 @@ class _UserPageState extends State<UserPage>
         scrollControllerList[1].position.pixels ==
             scrollControllerList[1].position.maxScrollExtent) {
       setIsLoadingNewPage(1, true);
-      bool res = await fetchScrappedArticles(context.read<UserProvider>(), curPage[1] + 1);
+      bool res = await fetchScrappedArticles(
+          context.read<UserProvider>(), curPage[1] + 1);
       if (res) curPage[1] += 1;
       setIsLoadingNewPage(1, false);
     }
@@ -199,7 +204,8 @@ class _UserPageState extends State<UserPage>
         scrollControllerList[2].position.pixels ==
             scrollControllerList[2].position.maxScrollExtent) {
       setIsLoadingNewPage(2, true);
-      bool res = await fetchRecentArticles(context.read<UserProvider>(), curPage[2] + 1);
+      bool res = await fetchRecentArticles(
+          context.read<UserProvider>(), curPage[2] + 1);
       if (res) curPage[2] += 1;
       setIsLoadingNewPage(2, false);
     }
@@ -221,7 +227,7 @@ class _UserPageState extends State<UserPage>
     return Scaffold(
       appBar: AppBar(
         title: Text(
-            (userProvider.hasData == true ? userProvider.naUser!.nickname : ""),
+          (userProvider.hasData == true ? userProvider.naUser!.nickname : ""),
           style: const TextStyle(
             fontSize: 28,
             fontWeight: FontWeight.w700,
@@ -264,14 +270,14 @@ class _UserPageState extends State<UserPage>
                       ),
                       child: ClipRRect(
                         borderRadius:
-                        const BorderRadius.all(Radius.circular(100)),
+                            const BorderRadius.all(Radius.circular(100)),
                         child: SizedBox.fromSize(
                           size: const Size.fromRadius(48),
                           child: userProvider.naUser?.picture == null
                               ? Container()
                               : Image.network(
-                              fit: BoxFit.cover,
-                              userProvider.naUser!.picture.toString()),
+                                  fit: BoxFit.cover,
+                                  userProvider.naUser!.picture.toString()),
                         ),
                       ),
                     ),
@@ -429,7 +435,8 @@ class _UserPageState extends State<UserPage>
   /// 담아둔 글의 해당 페이지를 불러와 모델로 변환 후 scrappedArticleList에 저장.
   /// API 통신을 위해 userProvider, 페이지 지정을 위해 page 전달받음.
   /// 리스트 저장까지 성공 시에 true, 아니면 false 반환.
-  Future<bool> fetchScrappedArticles(UserProvider userProvider, int page) async {
+  Future<bool> fetchScrappedArticles(
+      UserProvider userProvider, int page) async {
     int user = userProvider.naUser!.user;
     String apiUrl = "/api/scraps/?page=$page&created_by=$user";
     if (page == 1) {
@@ -438,7 +445,8 @@ class _UserPageState extends State<UserPage>
     try {
       var response = await userProvider.myDio().get('$newAraDefaultUrl$apiUrl');
       if (response.statusCode != 200) return false;
-      debugPrint("fetchScrappedArticles() GET request (page: $page): ${response.statusCode}");
+      debugPrint(
+          "fetchScrappedArticles() GET request (page: $page): ${response.statusCode}");
       List<dynamic> rawPostList = response.data['results'];
       for (int i = 0; i < rawPostList.length; i++) {
         Map<String, dynamic>? rawPost = rawPostList[i];
@@ -514,15 +522,18 @@ class _UserPageState extends State<UserPage>
   /// 각각의 ListView 구현에 동일한 부분이 많아 메서드화하게 됨.
   Widget _buildPostList(int tabIndex, UserProvider userProvider) {
     // isLoadedList[tabIndex]는 true임이 보장됨.
-    int itemCount = (tabIndex == 0 ? createdArticleList.length : (tabIndex == 1
-        ? scrappedArticleList.length
-        : recentArticleList.length));
+    int itemCount = (tabIndex == 0
+        ? createdArticleList.length
+        : (tabIndex == 1
+            ? scrappedArticleList.length
+            : recentArticleList.length));
     return RefreshIndicator(
       color: ColorsInfo.newara,
       onRefresh: () async {
         setIsLoaded(false, tabIndex);
         UserProvider userProvider = context.read<UserProvider>();
-        isLoadedList[tabIndex] = await selectFetchFunc(userProvider, tabIndex, 1);
+        isLoadedList[tabIndex] =
+            await selectFetchFunc(userProvider, tabIndex, 1);
         if (!isLoadedList[tabIndex]) return;
         curPage[tabIndex] = 1;
         setCurCount(tabIndex);
@@ -559,7 +570,8 @@ class _UserPageState extends State<UserPage>
                     .push(slideRoute(PostViewPage(id: curPost.id)));
                 int newMaxPage = 0;
                 for (int page = 1; page <= curPage[tabIndex]; page++) {
-                  bool res = await selectFetchFunc(userProvider, tabIndex, page);
+                  bool res =
+                      await selectFetchFunc(userProvider, tabIndex, page);
                   if (!res) break;
                   newMaxPage = page;
                 }
@@ -583,40 +595,43 @@ class _UserPageState extends State<UserPage>
                             maxLines: 1,
                           ),
                         ),
-                        curPost.attachment_type.toString() == "NONE" ? Container() : const SizedBox(width: 5),
+                        curPost.attachment_type.toString() == "NONE"
+                            ? Container()
+                            : const SizedBox(width: 5),
                         curPost.attachment_type.toString() == "BOTH"
                             ? Row(
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-                            SvgPicture.asset(
-                              'assets/icons/image.svg',
-                              color: Colors.grey,
-                              width: 30,
-                              height: 25,
-                            ),
-                            SvgPicture.asset(
-                              'assets/icons/clip.svg',
-                              color: Colors.grey,
-                              width: 15,
-                              height: 20,
-                            ),
-                          ],
-                        )
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  SvgPicture.asset(
+                                    'assets/icons/image.svg',
+                                    color: Colors.grey,
+                                    width: 30,
+                                    height: 25,
+                                  ),
+                                  SvgPicture.asset(
+                                    'assets/icons/clip.svg',
+                                    color: Colors.grey,
+                                    width: 15,
+                                    height: 20,
+                                  ),
+                                ],
+                              )
                             : curPost.attachment_type.toString() == "IMAGE"
-                            ? SvgPicture.asset(
-                          'assets/icons/image.svg',
-                          color: Colors.grey,
-                          width: 30,
-                          height: 25,
-                        )
-                            : curPost.attachment_type.toString() == "NON_IMAGE"
-                            ? SvgPicture.asset(
-                          'assets/icons/clip.svg',
-                          color: Colors.grey,
-                          width: 15,
-                          height: 20,
-                        )
-                            : Container()
+                                ? SvgPicture.asset(
+                                    'assets/icons/image.svg',
+                                    color: Colors.grey,
+                                    width: 30,
+                                    height: 25,
+                                  )
+                                : curPost.attachment_type.toString() ==
+                                        "NON_IMAGE"
+                                    ? SvgPicture.asset(
+                                        'assets/icons/clip.svg',
+                                        color: Colors.grey,
+                                        width: 15,
+                                        height: 20,
+                                      )
+                                    : Container()
                       ],
                     ),
                     const SizedBox(height: 5),
@@ -712,4 +727,3 @@ class _UserPageState extends State<UserPage>
     );
   }
 }
-

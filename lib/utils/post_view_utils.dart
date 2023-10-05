@@ -68,7 +68,7 @@ class ArticleController {
     return true;
   }
 
-  /// 멤버 변수 model 내부의 
+  /// 멤버 변수 model 내부의
   /// 좋아요, 싫어요 상태를 [value]에 맞게 한번에 업데이트.
   /// value: true = 좋아요, false = 싫어요
   void _setVote(bool value) {
@@ -88,9 +88,7 @@ class ArticleController {
         (model.my_vote == false ? -1 : (value ? 0 : 1));
 
     /* 현재 사용자의 상태(true, false, null)를 업데이트함. */
-    model.my_vote = (model.my_vote == value)
-        ? null
-        : value;
+    model.my_vote = (model.my_vote == value) ? null : value;
   }
 
   /// 글에 대한 스크랩, 스크랩 취소 기능을 담당하는 메서드.
@@ -99,13 +97,15 @@ class ArticleController {
     if (model.my_scrap == null) {
       var postRes = await userProvider.postApiRes(
         "scraps/",
-        payload: {"parent_article": model.id,},
+        payload: {
+          "parent_article": model.id,
+        },
       );
       if (postRes.statusCode != 201) return false;
       model.my_scrap = ScrapCreateActionModel.fromJson(postRes.data);
     } else {
-      var delRes = await userProvider.delApiRes(
-          "scraps/${model.my_scrap!.id}/");
+      var delRes =
+          await userProvider.delApiRes("scraps/${model.my_scrap!.id}/");
       if (delRes.statusCode != 204) return false;
       model.my_scrap = null;
     }
@@ -141,7 +141,8 @@ class FileController {
       return false;
     }
     String fileName = _addTimestampToFileName(initFileName);
-    bool res = await _downloadFile(model.file, "$targetDir${Platform.pathSeparator}$fileName");
+    bool res = await _downloadFile(
+        model.file, "$targetDir${Platform.pathSeparator}$fileName");
     return res;
   }
 
@@ -153,7 +154,8 @@ class FileController {
     } else {
       directory = Directory('/storage/emulated/0/Download');
       if (!await directory.exists()) {
-        directory = (await getExternalStorageDirectory())!;  // Android 에서는 존재가 보장됨
+        directory =
+            (await getExternalStorageDirectory())!; // Android 에서는 존재가 보장됨
       }
     }
     return directory.path;
@@ -241,9 +243,7 @@ class CommentController {
     model.negative_vote_count = model.negative_vote_count! +
         (model.my_vote == false ? -1 : (value ? 0 : 1));
 
-    model.my_vote = (model.my_vote == value)
-        ? null
-        : value;
+    model.my_vote = (model.my_vote == value) ? null : value;
   }
 }
 
@@ -372,11 +372,11 @@ class _ReportDialogWidgetState extends State<ReportDialogWidget> {
                     decoration: BoxDecoration(
                       borderRadius: const BorderRadius.all(Radius.circular(20)),
                       color: ColorsInfo.newara.withOpacity((isChosen[0] ||
-                          isChosen[1] ||
-                          isChosen[2] ||
-                          isChosen[3] ||
-                          isChosen[4] ||
-                          isChosen[5])
+                              isChosen[1] ||
+                              isChosen[2] ||
+                              isChosen[3] ||
+                              isChosen[4] ||
+                              isChosen[5])
                           ? 1
                           : 0.5),
                     ),
