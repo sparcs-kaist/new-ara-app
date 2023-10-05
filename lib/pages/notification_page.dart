@@ -89,7 +89,7 @@ class _NotificationPageState extends State<NotificationPage> {
   /// 알림 ListView를 구독 중인 리스너이며
   /// 사용자가 ListView의 끝에 도달하였을 때 이를 감지하여
   /// 새로운 페이지를 로딩함.
-  void _listViewListener() async {
+  void _listViewListener() async {  // TODO: Future<void>로 변경.
     if (_isLoadingNewPage) return;
     if (_listViewController.position.pixels == _listViewController.position.maxScrollExtent) {
       _setIsLoadingNewPage(true);
@@ -126,6 +126,7 @@ class _NotificationPageState extends State<NotificationPage> {
     }
   }
 
+  // TODO: 메서드명을 updateState로 변경
   void update() {
     if (mounted) setState(() {});
   }
@@ -345,7 +346,7 @@ class _NotificationPageState extends State<NotificationPage> {
         ),
       ),
       // 모두 읽음 처리를 위한 버튼.
-      // (2023.09.23) 추후 디자이너와 조율해야함.
+      // TODO: 디자이너와 모두 읽기 기능 위치, 위젯 조정해야함.
       floatingActionButton: FloatingActionButton(
         onPressed: () async {
           if (!notificationProvider.isNotReadExist) return;
@@ -354,8 +355,11 @@ class _NotificationPageState extends State<NotificationPage> {
           if (!res) {
             debugPrint("모두 읽기 요청 실패");
             _setIsLoadingTotal(false);
+            // TODO: return을 마지막에 한번만 하도록 변경(다른 파일에서도 확인)
             return;
           }
+          // TODO: NotificationProvider에 isNotReadExist 변수 변경 메서드 추가하여
+          // checkIsNotReadExist를 호출하는 대신 변수만 변경하는 것으로 코드 수정하기
           await notificationProvider.checkIsNotReadExist();
           List<NotificationModel> newList = [];
           for (int page = 1; page <= _curPage; page++) {
