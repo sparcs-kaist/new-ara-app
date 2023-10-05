@@ -535,14 +535,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.5.1"
-  html_unescape:
-    dependency: transitive
-    description:
-      name: html_unescape
-      sha256: "15362d7a18f19d7b742ef8dcb811f5fd2a2df98db9f80ea393c075189e0b61e3"
-      url: "https://pub.dev"
-    source: hosted
-    version: "2.0.0"
   http:
     dependency: "direct main"
     description:
@@ -1364,14 +1356,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "11.7.1"
-  vsc_quill_delta_to_html:
-    dependency: "direct main"
-    description:
-      name: vsc_quill_delta_to_html
-      sha256: "76dd00ecfa83cc2c32b4bd965e52569b689bb7fec26ae1739f9b2d9cd6e5d883"
-      url: "https://pub.dev"
-    source: hosted
-    version: "1.0.3"
   watcher:
     dependency: transitive
     description:

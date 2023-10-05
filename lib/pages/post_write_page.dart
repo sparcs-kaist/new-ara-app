@@ -303,24 +303,6 @@ class _PostWritePageState extends State<PostWritePage> {
     return Uri.decodeFull(encodedFilename);
   }
 
-  Future<void> _pickImage() async {
-    final ImagePicker _picker = ImagePicker();
-    final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
-
-    if (image != null) {
-      final String imageUrl = image.path;
-      final int length = _quillController.document.length;
-      final TextSelection selection = _quillController.selection;
-      setState(() {
-        _quillController.document.insert(
-          selection.baseOffset,
-          quill.BlockEmbed('image', imageUrl),
-        );
-      });
-      onAttachmentAdd(image.path);
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     if (_isLoading) return const LoadingIndicator();
@@ -497,7 +479,7 @@ class _PostWritePageState extends State<PostWritePage> {
                             width: 10,
                           ),
                           InkWell(
-                            onTap: filePick,
+                            onTap: _pickFile,
                             child: Row(
                               children: [
                                 SvgPicture.asset(
@@ -568,7 +550,7 @@ class _PostWritePageState extends State<PostWritePage> {
                             ),
                             Spacer(),
                             InkWell(
-                              onTap: () => filePick(),
+                              onTap: () => _pickFile(),
                               child: SvgPicture.asset(
                                 'assets/icons/add.svg',
                                 width: 34,
@@ -1148,29 +1130,6 @@ class _PostWritePageState extends State<PostWritePage> {
   }
 
   /// 파일 선택 및 `_attachmentList`에 추가
-  Future<void> filePick() async {
-    filePickerResult = await FilePicker.platform.pickFiles();
-    if (filePickerResult != null) {
-      debugPrint(filePickerResult!.files.single.path!);
-      File file = File(filePickerResult!.files.single.path!);
-      if (Platform.isIOS) {
-        // iOS에서는 파일을 복사해서 사용했음. 캐쉬로 날라가는 문제 발생해서.
-        final documentPath = (await getApplicationDocumentsDirectory()).path;
-        file = await file.copy('$documentPath/${path.basename(file.path)}');
-        debugPrint("IOS run");
-        debugPrint(file.path);
-        debugPrint(filePickerResult!.files.single.path);
-      }
-      setState(() {
-        _isFileMenuBarSelected = true;
-        _attachmentList.add(AttachmentsFormat(
-          fileType: FileType.Other,
-          isNewFile: true,
-          fileLocalPath: file.path,
-        ));
-      });
-    }
-  }
 
   /// 바이트를 적절한 단위로 변환하여 문자열로 반환
   /// TODO: 이 함수는 다른 파일로 분리하는 것이 좋을 것 같음.
@@ -1232,6 +1191,7 @@ class _PostWritePageState extends State<PostWritePage> {
             attachmentIds.add(attachmentModel.id);
             contentValue = manageImgTagSrcWithNewFile(contentValue,
                 _attachmentList[i].fileLocalPath!, attachmentModel.file);
+            debugPrint("next : $contentValue");
           } catch (error) {
             debugPrint("$error");
           }
@@ -1283,17 +1243,64 @@ class _PostWritePageState extends State<PostWritePage> {
     };
   }
 
-  void onAttachmentAdd(String filePath) {
-    String uuid = const Uuid().v4();
-    setState(() {
-      _isFileMenuBarSelected = true;
-      _attachmentList.add(AttachmentsFormat(
-        fileType: FileType.Image,
-        isNewFile: true,
-        fileLocalPath: filePath,
-        uuid: uuid,
-      ));
-    });
+  /// 사진 추가 시 실행되는 함수
+  Future<void> _pickImage() async {
+    final ImagePicker _picker = ImagePicker();
+    final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
+
+    if (image != null) {
+      final String imageUrl = image.path;
+      final int length = _quillController.document.length;
+      final TextSelection selection = _quillController.selection;
+      setState(() {
+        _quillController.document.insert(
+          selection.baseOffset,
+          quill.BlockEmbed('image', imageUrl),
+        );
+      });
+      // Insert a blank line (new paragraph) after the image
+      _quillController.document.insert(
+        selection.baseOffset + 1,
+        "\n\n", // Assume ParagraphBlock is a valid Quill block for creating paragraphs
+      );
+
+      /// TODO: 사진 첨부 시 첨부파일에도 같이 올라갈 것인지 결정하기.
+      String uuid = const Uuid().v4();
+      setState(() {
+        _isFileMenuBarSelected = true;
+        _attachmentList.add(AttachmentsFormat(
+          fileType: FileType.Image,
+          isNewFile: true,
+          fileLocalPath: imageUrl,
+          uuid: uuid,
+        ));
+      });
+    }
+  }
+
+  /// 첨부파일 추가 시 실행되는 함수
+  Future<void> _pickFile() async {
+    filePickerResult = await FilePicker.platform.pickFiles();
+    if (filePickerResult != null) {
+      debugPrint(filePickerResult!.files.single.path!);
+      File file = File(filePickerResult!.files.single.path!);
+      if (Platform.isIOS) {
+        // iOS에서는 파일을 복사해서 사용했음. 캐쉬로 날라가는 문제 발생해서.
+        final documentPath = (await getApplicationDocumentsDirectory()).path;
+        file = await file.copy('$documentPath/${path.basename(file.path)}');
+        debugPrint("IOS run");
+        debugPrint(file.path);
+        debugPrint(filePickerResult!.files.single.path);
+      }
+      setState(() {
+        _isFileMenuBarSelected = true;
+        _attachmentList.add(AttachmentsFormat(
+          fileType: FileType.Other,
+          isNewFile: true,
+          fileLocalPath: file.path,
+        ));
+      });
+    }
   }
 
   /// 첨부 파일 삭제 및 관련 HTML 내용 업데이트
