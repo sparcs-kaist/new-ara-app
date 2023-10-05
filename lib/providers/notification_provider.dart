@@ -1,7 +1,7 @@
 /// 'notification_provider.dart'
 /// [NotificationProvider]를 정의함.
 /// 새로운 알림이 생성되었는지 확인하고 구독 중인 리스너에게 알려주는 기능.
-/// 
+///
 /// Author: 김상오(alvin)
 
 import 'dart:async';
@@ -31,18 +31,18 @@ class NotificationProvider with ChangeNotifier {
   Future<void> checkIsNotReadExist() async {
     bool res = false;
 
-    var dio = Dio()
-        ..options.headers["Cookie"] = _cookieString;
+    var dio = Dio()..options.headers["Cookie"] = _cookieString;
 
     int curPage = 1;
+
     /// 다음 페이지가 존재하는 지 나타냄.
     bool hasNext = false;
+    // TODO: res = true일 때 do while 문에도 break 걸기
     do {
       try {
-        var response = await dio.get(
-          "$newAraDefaultUrl/api/notifications/?page=$curPage"
-        );
-        hasNext = response.data["next"] == null ? false : true;  // 다음 페이지 존재 확인.
+        var response =
+            await dio.get("$newAraDefaultUrl/api/notifications/?page=$curPage");
+        hasNext = response.data["next"] == null ? false : true; // 다음 페이지 존재 확인.
         List<dynamic> resultsJson = response.data["results"];
         for (var json in resultsJson) {
           if (!(json['is_read'] ?? true)) {

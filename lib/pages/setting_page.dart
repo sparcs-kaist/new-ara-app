@@ -30,6 +30,7 @@ class SettingPageState extends State<SettingPage> {
 
   /// 성인글 보기 설정. true이면 성인글을 보여줌.
   late bool see_sexual;
+
   /// 정치글 보기 설정. true이면 정치글을 보여줌.
   late bool see_social;
 
@@ -37,10 +38,8 @@ class SettingPageState extends State<SettingPage> {
   void initState() {
     super.initState();
     var userProvider = context.read<UserProvider>();
-    see_sexual = userProvider.naUser?.see_sexual ??
-        true;
-    see_social =
-        userProvider.naUser?.see_social ?? true;
+    see_sexual = userProvider.naUser?.see_sexual ?? true;
+    see_social = userProvider.naUser?.see_social ?? true;
     // 페이지 전환 과정에서 새로운 알림을 확인하기 위한 호출.
     context.read<NotificationProvider>().checkIsNotReadExist();
   }
@@ -323,8 +322,7 @@ class SettingPageState extends State<SettingPage> {
   /// 로그아웃 관련된 모든 로직을 처리하는 함수.
   /// UserProvider, FlutterSecureStorage에서 유저 정보를 삭제함.
   Future<void> _logout() async {
-    Provider.of<UserProvider>(context, listen: false)
-      .setHasData(false);
+    Provider.of<UserProvider>(context, listen: false).setHasData(false);
     Navigator.of(context).popUntil((route) => route.isFirst);
 
     // FlutterSecureStorage에서 세션 정보를 삭제함.
