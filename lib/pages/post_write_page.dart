@@ -1044,16 +1044,30 @@ class _PostWritePageState extends State<PostWritePage> {
               height: 1,
               color: Color(0xFFF0F0F0),
             ),
-            InkWell(
-              onTap: _pickImage,
-              child: Container(
-                height: 10,
-                color: Colors.yellow,
-              ),
-            ),
             quill.QuillToolbar.basic(
               controller: _quillController,
-              embedButtons: FlutterQuillEmbeds.buttons(),
+              multiRowsDisplay: true,
+              showUndo: false,
+              showRedo: false,
+              showColorButton: false,
+              showBackgroundColorButton: false,
+              showFontFamily: false,
+              showFontSize: false,
+              showDividers: false,
+              showListCheck: false,
+              showSearchButton: false,
+              showSubscript: false,
+              showSuperscript: false,
+          
+              toolbarIconAlignment: WrapAlignment.start,
+              toolbarIconCrossAlignment: WrapCrossAlignment.start,
+              customButtons: [
+                quill.QuillCustomButton(
+                  icon: Icons.camera_alt,
+                  onTap: _pickImage,
+                ),
+              ],
+              // embedButtons: FlutterQuillEmbeds.buttons(),
             ),
             Expanded(
                 child: quill.QuillEditor.basic(
