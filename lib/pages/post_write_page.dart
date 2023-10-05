@@ -1,8 +1,10 @@
 import 'dart:async';
 import 'dart:math' as math;
 import 'dart:convert';
+import 'package:delta_to_html/delta_to_html.dart';
 import 'package:dio/dio.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 import 'package:html_editor_enhanced/html_editor.dart';
 import 'package:new_ara_app/constants/url_info.dart';
@@ -152,7 +154,6 @@ class _PostWritePageState extends State<PostWritePage> {
 
   final TextEditingController _titleController = TextEditingController();
   final HtmlEditorController _htmlController = HtmlEditorController();
-  String _currentHtmlContent = "";
 
   final ScrollController _listScrollController = ScrollController();
 
@@ -316,6 +317,7 @@ class _PostWritePageState extends State<PostWritePage> {
           quill.BlockEmbed('image', imageUrl),
         );
       });
+      onAttachmentAdd(image.path);
     }
   }
 
@@ -326,10 +328,12 @@ class _PostWritePageState extends State<PostWritePage> {
     var userProvider = context.watch<UserProvider>();
 
     /// 게시물 업로드 가능한지 확인
+    String _currentHtmlContent =
+        DeltaToHTML.encodeJson(_quillController.document.toDelta().toJson());
     bool canIupload = _titleController.text != '' &&
         _chosenBoardValue!.id != -1 &&
         _currentHtmlContent != '' &&
-        _currentHtmlContent != '<p><br></p>' &&
+        _currentHtmlContent != '<br>' &&
         _isUploadingPost == false;
 
     Widget _buildMenubar() {
@@ -593,8 +597,9 @@ class _PostWritePageState extends State<PostWritePage> {
                                     height: 10,
                                   ),
                                   Expanded(
-                                    child: Scrollbar(
+                                    child: CupertinoScrollbar(
                                       thumbVisibility: true,
+                                      controller: _listScrollController,
                                       child: ListView.builder(
                                         controller: _listScrollController,
                                         shrinkWrap: true,
@@ -875,7 +880,7 @@ class _PostWritePageState extends State<PostWritePage> {
                                 Callbacks(onChangeContent: (String? value) {
                               debugPrint("onChangeContent: $value");
                               setState(() {
-                                _currentHtmlContent = value!;
+                                // _currentHtmlContent = value!;
                               });
                             }),
                             controller: _htmlController,
@@ -993,8 +998,10 @@ class _PostWritePageState extends State<PostWritePage> {
             /// TODO: 함수 따로 빼기
             onPressed: canIupload
                 ? (_isEditingPost
-                    ? updatePost(userProvider)
-                    : uploadPost(userProvider))
+                    ? managePost(userProvider,
+                        isUpdate: true,
+                        previousArticleId: widget.previousArticle!.id)
+                    : managePost(userProvider))
                 : null,
             // 버튼이 클릭되었을 때 수행할 동작
             padding: EdgeInsets.zero, // 패딩 제거
@@ -1058,13 +1065,20 @@ class _PostWritePageState extends State<PostWritePage> {
               showSearchButton: false,
               showSubscript: false,
               showSuperscript: false,
-          
+
               toolbarIconAlignment: WrapAlignment.start,
               toolbarIconCrossAlignment: WrapCrossAlignment.start,
               customButtons: [
                 quill.QuillCustomButton(
                   icon: Icons.camera_alt,
                   onTap: _pickImage,
+                ),
+                quill.QuillCustomButton(
+                  icon: Icons.settings,
+                  onTap: () {
+                    debugPrint(DeltaToHTML.encodeJson(
+                        _quillController.document.toDelta().toJson()));
+                  },
                 ),
               ],
               // embedButtons: FlutterQuillEmbeds.buttons(),
@@ -1084,19 +1098,17 @@ class _PostWritePageState extends State<PostWritePage> {
 
   /// HTML 문자열 내의 이미지 태그의 uuid를 판별해 src 속성에 url 을 추가
   /// 로컬에 있는 첨부파일을 게시물에 추가, 삭제하는 데 쓰임.
-  String updateImgTagSrc(htmlString, uuid, fileUrl) {
+  String manageImgTagSrcWithNewFile(
+      String htmlString, String curUrl, String? nexUrl) {
     var document = parse(htmlString);
     List<html.Element> imgTags = document.getElementsByTagName('img');
 
-    if (uuid == null) return document.body?.innerHtml ?? '';
-
     for (var imgTag in imgTags) {
-      if (imgTag.attributes['data-uuid'] == uuid) {
-        if (fileUrl != null) {
-          imgTag.attributes['src'] = fileUrl;
-        } else {
-          // fileUrl이 null인 경우 이미지 태그를 삭제
+      if (imgTag.attributes['src'] == curUrl) {
+        if (nexUrl == null) {
           imgTag.remove();
+        } else {
+          imgTag.attributes['src'] = nexUrl;
         }
       }
     }
@@ -1177,23 +1189,22 @@ class _PostWritePageState extends State<PostWritePage> {
     }
   }
 
-  /// 새로운 포스트를 서버에 업로드하는 함수이다.
-  ///
+  /// 포스트를 서버에 업로드하는 함수이다.
   /// 사용자가 입력한 제목, 내용 및 첨부 파일을 서버에 전송하여 새로운 포스트를 생성한다.
   /// 이 함수는 다음의 단계를 거친다:
-  /// 1. 사용자 입력 값을 가져온다.
+  /// 1. 포스트 입력 값을 가져온다..
   /// 2. 첨부 파일이 있으면 서버에 업로드하고, 해당 파일의 ID를 가져온다.
   /// 3. 제목, 내용 및 첨부 파일 ID를 함께 서버에 전송하여 포스트를 생성한다.
-  void Function() uploadPost(UserProvider userProvider) {
+  void Function() managePost(UserProvider userProvider,
+      {bool isUpdate = false, int? previousArticleId}) {
     return () async {
       String titleValue;
       String contentValue;
       List<int> attachmentIds = [];
       try {
         titleValue = _titleController.text;
-        contentValue = await _htmlController.getText();
-        debugPrint("title: $titleValue");
-        debugPrint("content: $contentValue");
+        contentValue = DeltaToHTML.encodeJson(
+            _quillController.document.toDelta().toJson());
       } catch (error) {
         debugPrint(error.toString());
         return;
@@ -1202,58 +1213,67 @@ class _PostWritePageState extends State<PostWritePage> {
         _isUploadingPost = true;
         _isLoading = true;
       });
-      try {
-        Dio dio = Dio();
-        dio.options.headers['Cookie'] = userProvider.getCookiesToString();
-        for (int i = 0; i < _attachmentList.length; i++) {
-          if (_attachmentList[i].isNewFile) {
-            var attachFile = File(_attachmentList[i].fileLocalPath!);
-            // 이 파일 uuid 에 해당하는 img 태그가 html 안에 있다면 변경한다.
-            // 파일이 존재하는지 확인
-            if (attachFile.existsSync()) {
-              var dio = Dio();
-              dio.options.headers['Cookie'] = userProvider.getCookiesToString();
-              var formData = FormData.fromMap({
-                "file": await MultipartFile.fromFile(attachFile.path,
-                    filename: attachFile.path.split('/').last),
-              });
-              try {
-                var response = await dio
-                    .post("$newAraDefaultUrl/api/attachments/", data: formData);
-                debugPrint("Response: ${response.data}");
-                final attachmentModel = AttachmentModel.fromJson(response.data);
-                attachmentIds.add(attachmentModel.id);
-                contentValue = updateImgTagSrc(contentValue,
-                    _attachmentList[i].uuid, attachmentModel.file);
-              } catch (error) {
-                debugPrint("$error");
-              }
-            } else {
-              debugPrint("File does not exist: ${attachFile.path}");
-            }
-          }
-        }
 
-        var response = await dio.post(
-          '$newAraDefaultUrl/api/articles/',
-          data: {
-            'title': titleValue,
-            'content': contentValue,
-            'attachments': attachmentIds,
-            'parent_topic':
-                _chosenTopicValue!.id == -1 ? '' : _chosenTopicValue!.id,
-            'is_content_sexual': _selectedCheckboxes[1],
-            'is_content_social': _selectedCheckboxes[2],
-            'parent_board': _chosenBoardValue!.id,
-            'name_type': 'REGULAR'
-          },
-        );
+      Dio dio = Dio();
+      dio.options.headers['Cookie'] = userProvider.getCookiesToString();
+
+      for (int i = 0; i < _attachmentList.length; i++) {
+        var attachFile = File(_attachmentList[i].fileLocalPath!);
+        if (attachFile.existsSync() || _attachmentList[i].isNewFile) {
+          var formData = FormData.fromMap({
+            "file": await MultipartFile.fromFile(attachFile.path,
+                filename: attachFile.path.split('/').last),
+          });
+          try {
+            var response = await dio.post("$newAraDefaultUrl/api/attachments/",
+                data: formData);
+            debugPrint("Response: ${response.data}");
+            final attachmentModel = AttachmentModel.fromJson(response.data);
+            attachmentIds.add(attachmentModel.id);
+            contentValue = manageImgTagSrcWithNewFile(contentValue,
+                _attachmentList[i].fileLocalPath!, attachmentModel.file);
+          } catch (error) {
+            debugPrint("$error");
+          }
+        } else if (!isUpdate) {
+          debugPrint("File does not exist: ${attachFile.path}");
+        } else {
+          attachmentIds.add(_attachmentList[i].id!);
+        }
+      }
+
+      try {
+        var response;
+        var data = {
+          'title': titleValue,
+          'content': contentValue,
+          'attachments': attachmentIds,
+          'is_content_sexual': _selectedCheckboxes[1],
+          'is_content_social': _selectedCheckboxes[2],
+          'name_type': 'REGULAR'
+        };
+
+        if (isUpdate) {
+          response = await dio.put(
+            '$newAraDefaultUrl/api/articles/${previousArticleId}/',
+            data: data,
+          );
+        } else {
+          data['parent_topic'] =
+              _chosenTopicValue!.id == -1 ? '' : _chosenTopicValue!.id;
+          data['parent_board'] = _chosenBoardValue!.id;
+          response = await dio.post(
+            '$newAraDefaultUrl/api/articles/',
+            data: data,
+          );
+        }
 
         debugPrint('Response data: ${response.data}');
         Navigator.pop(context);
       } on DioException catch (error) {
         debugPrint('post Error: ${error.response!.data}');
       }
+
       if (mounted) {
         setState(() {
           _isUploadingPost = false;
@@ -1263,103 +1283,37 @@ class _PostWritePageState extends State<PostWritePage> {
     };
   }
 
-  /// 기존 포스트 업데이트하는 함수
-  /// uploadPost 함수와 유사하나 새로 추가된 파일만 서버에 새로 업로드 한다.
-  /// TODO: upladPost와 updatePost는 유사한 점이 많아 함수를 하나로 합치는 것이 좋을 것 같다.
-  void Function() updatePost(UserProvider userProvider) {
-    return () async {
-      String titleValue;
-      String contentValue;
-      List<int> attachmentIds = [];
-      try {
-        titleValue = _titleController.text;
-        contentValue = await _htmlController.getText();
-        debugPrint("title: $titleValue");
-        debugPrint("content: $contentValue");
-      } catch (error) {
-        debugPrint(error.toString());
-        return;
-      }
-      setState(() {
-        _isUploadingPost = true;
-        _isLoading = true;
-      });
-
-      try {
-        Dio dio = Dio();
-        dio.options.headers['Cookie'] = userProvider.getCookiesToString();
-        for (int i = 0; i < _attachmentList.length; i++) {
-          if (_attachmentList[i].isNewFile) {
-            var attachFile = File(_attachmentList[i].fileLocalPath!);
-            // 파일이 존재하는지 확인하는 코드
-            if (attachFile.existsSync()) {
-              var dio = Dio();
-              dio.options.headers['Cookie'] = userProvider.getCookiesToString();
-              var formData = FormData.fromMap({
-                "file": await MultipartFile.fromFile(attachFile.path,
-                    filename: attachFile.path.split('/').last),
-              });
-              try {
-                var response = await dio
-                    .post("$newAraDefaultUrl/api/attachments/", data: formData);
-                debugPrint("Response: ${response.data}");
-                final attachmentModel = AttachmentModel.fromJson(response.data);
-                attachmentIds.add(attachmentModel.id);
-                contentValue = updateImgTagSrc(contentValue,
-                    _attachmentList[i].uuid, attachmentModel.file);
-              } catch (error) {
-                debugPrint("$error");
-              }
-            } else {
-              debugPrint("File does not exist: ${attachFile.path}");
-            }
-          } else {
-            attachmentIds.add(_attachmentList[i].id!);
-          }
-        }
-
-        var response = await dio.put(
-          '$newAraDefaultUrl/api/articles/${widget.previousArticle!.id}/',
-          data: {
-            'title': titleValue,
-            'content': contentValue,
-            'attachments': attachmentIds,
-            'is_content_sexual': _selectedCheckboxes[1],
-            'is_content_social': _selectedCheckboxes[2],
-            'name_type': 'REGULAR'
-          },
-        );
-
-        debugPrint('Response data: ${response.data}');
-        Navigator.pop(context);
-      } on DioException catch (error) {
-        debugPrint('post Error: ${error.response!.data}');
-      }
-      if (mounted) {
-        setState(() {
-          _isUploadingPost = false;
-          _isLoading = false;
-        });
-      }
-    };
+  void onAttachmentAdd(String filePath) {
+    String uuid = const Uuid().v4();
+    setState(() {
+      _isFileMenuBarSelected = true;
+      _attachmentList.add(AttachmentsFormat(
+        fileType: FileType.Image,
+        isNewFile: true,
+        fileLocalPath: filePath,
+        uuid: uuid,
+      ));
+    });
   }
 
   /// 첨부 파일 삭제 및 관련 HTML 내용 업데이트
   /// 기존에 업로드된 파일인 경우 API 요청으로 삭제
   /// 새로 추가한 파일인 경우 HTML 내용에서 해당 이미지 태그 삭제
   void onAttachmentDelete(int index) async {
-    String text = await _htmlController.getText();
+    String crnText =
+        DeltaToHTML.encodeJson(_quillController.document.toDelta().toJson());
 
     if (_attachmentList[index].isNewFile) {
-      String nextText =
-          updateImgTagSrc(text, _attachmentList[index].uuid, null);
-      debugPrint("next : $nextText");
-      _htmlController.setText(nextText);
+      String nxtText = manageImgTagSrcWithNewFile(
+          crnText, _attachmentList[index].fileLocalPath!, null);
+      debugPrint("next : $nxtText");
+
+      _htmlController.setText(nxtText);
     } else {
-      String nextText =
-          deleteImgTagSrc(text, _attachmentList[index].fileUrlPath);
-      debugPrint("next : $nextText");
-      _htmlController.setText(nextText);
+      String nxtText =
+          deleteImgTagSrc(crnText, _attachmentList[index].fileUrlPath);
+      debugPrint("next : $nxtText");
+      _htmlController.setText(nxtText);
     }
 
     setState(() {
