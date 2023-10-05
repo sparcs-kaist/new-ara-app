@@ -316,7 +316,7 @@ class _UserPageState extends State<UserPage>
                               builder: (context) => ProfileEditPage(),
                             ),
                           );
-                        }, // 추후에 프로필 수정 기능 구현 예정
+                        },
                         child: Text(
                           'myPage.change'.tr(),
                           style: const TextStyle(
@@ -385,6 +385,9 @@ class _UserPageState extends State<UserPage>
       ),
     );
   }
+
+  // TODO: 아래 3가지 fetch함수 generic type 이용해서 하나로 통합하기
+  // PR #8 코드 참고.
 
   /// 해당 페이지의 글을 불러와 모델로 변환 후 createdArtielcList에 추가.
   /// API 통신을 위해 userProvider, fetch 대상 페이지를 나타내는 page.
@@ -490,14 +493,19 @@ class _UserPageState extends State<UserPage>
     }
   }
 
+  /// 탭별 컨텐츠 로드 완료 여부를 설정하고 state를 업데이트하는 메서드.
+  /// ListView refresh, 탭 전환 시에 사용됨.
   void setIsLoaded(bool value, int tabIndex) =>
       setState(() => isLoadedList[tabIndex] = value);
 
+  // TODO: 더이상 사용하지 않는 메서드. 제거하기.
   void setMyCount(int value, int tabIndex) {
     setState(() => tabCount[tabIndex] = value);
     setState(() => curCount = tabCount[tabIndex]);
   }
 
+  /// "총 $curCount개의 글" 문구에 표시되는 curCount 변수를 설정하고
+  /// State를 업데이트하는 메서드. 탭이 전환될 때마다 사용됨.
   void setCurCount(int tabIndex) {
     if (mounted) setState(() => curCount = tabCount[tabIndex]);
   }
