@@ -507,6 +507,7 @@ class _PostViewPageState extends State<PostViewPage> {
                                     ),
                                   ],
                                 ),
+                                // TODO: collection if로 삼항연산자 대체하기
                                 // 자신의 글일 경우 수정 버튼, 타인의 글일 경우 신고 버튼
                                 _isReportable ? InkWell(
                                   onTap: () {
@@ -745,6 +746,7 @@ class _PostViewPageState extends State<PostViewPage> {
                                             left: 30),
                                         child: Row(
                                           children: [
+                                            // 삭제된 댓글의 경우 좋아요, 싫어요 버튼이 안보이게함.
                                             Visibility(
                                               visible: curComment.is_hidden == false,
                                               child: Row(
@@ -840,6 +842,7 @@ class _PostViewPageState extends State<PostViewPage> {
                                                 ],
                                               ),
                                             ),
+                                            // 대댓글인 경우 답글쓰기 버튼이 안보이게함.
                                             Visibility(
                                               visible: curComment.parent_comment == null,
                                               child: InkWell(
@@ -1461,6 +1464,7 @@ class _PostViewPageState extends State<PostViewPage> {
     setState(() => _isSending = value);
   }
 
+  // TODO: 메서드명 updateState로 변경하여 의미를 더 명확히하기.
   void update() {
     if (!mounted) return;
     setState(() {});
@@ -1627,6 +1631,7 @@ class InArticleWebView extends StatefulWidget {
 }
 
 class _InArticleWebViewState extends State<InArticleWebView> {
+  // TODO: late 선언으로 변경.
   WebViewController _webViewController = WebViewController();
 
   /// 웹뷰에서 렌더링하는 content의 높이에 맞춰 조정된 height.
@@ -1749,6 +1754,7 @@ class _InArticleWebViewState extends State<InArticleWebView> {
           await setPageHeight();
           isFitted = true;
           debugPrint("height fitted!!");
+          // TODO: 500ms 대기가 필요한 지 확인 후 최적화하기
           Future.delayed(
             const Duration(milliseconds: 500), ()
               => userProvider.setIsWebViewLoaded(true)
