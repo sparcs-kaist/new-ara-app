@@ -32,6 +32,9 @@ import 'package:path_provider/path_provider.dart';
 import 'package:html/parser.dart' show parse;
 import 'package:html/dom.dart' as html;
 
+import 'package:flutter_quill/flutter_quill.dart' as quill;
+import 'package:flutter_quill_extensions/flutter_quill_extensions.dart';
+
 /// 사용자가 게시물을 작성하거나 편집할 수 있는 페이지를 나타내는 StatefulWidget입니다.
 class PostWritePage extends StatefulWidget {
   /// 사용자가 기존 게시물을 편집하는 경우 이 변수에 이전 게시물의 데이터가 저장됩니다.
@@ -154,6 +157,8 @@ class _PostWritePageState extends State<PostWritePage> {
   final ScrollController _listScrollController = ScrollController();
 
   late StreamSubscription<bool> keyboardSubscription;
+
+  final quill.QuillController _quillController = quill.QuillController.basic();
 
   @override
   void initState() {
@@ -295,6 +300,24 @@ class _PostWritePageState extends State<PostWritePage> {
   String _extractAndDecodeFileNameFromUrl(String url) {
     String encodedFilename = url.split('/').last;
     return Uri.decodeFull(encodedFilename);
+  }
+
+  Future<void> _pickImage() async {
+    final ImagePicker _picker = ImagePicker();
+    final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
+
+    if (image != null) {
+      final String imageUrl = image.path;
+      final int length = _quillController.document.length;
+      final TextSelection selection =
+          _quillController.selection;
+      setState(() {
+        _quillController.document.insert(
+          selection.baseOffset,
+          quill.BlockEmbed('image', imageUrl),
+        );
+      });
+    }
   }
 
   @override
@@ -790,7 +813,21 @@ class _PostWritePageState extends State<PostWritePage> {
                 ],
               ),
             ),
+            InkWell(
+              onTap: _pickImage,
+              child: Container(
+                height: 10,
+                color: Colors.yellow,
+              ),
+            ),
+            quill.QuillToolbar.basic(controller: _quillController, embedButtons: FlutterQuillEmbeds.buttons(),),
             Expanded(
+                child: quill.QuillEditor.basic(
+              controller: _quillController,
+              embedBuilders: FlutterQuillEmbeds.builders(),
+              readOnly: false, // The editor is editable
+            )),
+            Expanded( 
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -821,13 +858,11 @@ class _PostWritePageState extends State<PostWritePage> {
                       fillColor: Colors.white,
                       isDense: true,
                       enabledBorder: OutlineInputBorder(
-                    
                         borderSide: BorderSide(
                           color: Colors.transparent, // 테두리 색상 설정
                         ), // 모서리를 둥글게 설정
                       ),
                       focusedBorder: OutlineInputBorder(
-                    
                         borderSide: BorderSide(
                           color: Colors.transparent, // 테두리 색상 설정
                         ), // 모서리를 둥글게 설정
@@ -841,7 +876,6 @@ class _PostWritePageState extends State<PostWritePage> {
                   ),
                   Expanded(
                     child: Column(
-  
                       children: [
                         Expanded(
                           child: SingleChildScrollView(
@@ -915,7 +949,6 @@ class _PostWritePageState extends State<PostWritePage> {
                                           table: false,
                                           hr: true,
                                         )
-                               
                                       ]),
                                   otherOptions: OtherOptions(
                                     height: 450,
