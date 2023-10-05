@@ -37,6 +37,7 @@ class NotificationProvider with ChangeNotifier {
     int curPage = 1;
     /// 다음 페이지가 존재하는 지 나타냄.
     bool hasNext = false;
+    // TODO: res = true일 때 do while 문에도 break 걸기
     do {
       try {
         var response = await dio.get(
