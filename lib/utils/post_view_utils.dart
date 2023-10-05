@@ -68,13 +68,26 @@ class ArticleController {
     return true;
   }
 
-  /// 멤버 변수 model 내부의 좋아요, 싫어요 상태를 [value]에 맞게 변형.
+  /// 멤버 변수 model 내부의 
+  /// 좋아요, 싫어요 상태를 [value]에 맞게 한번에 업데이트.
+  /// value: true = 좋아요, false = 싫어요
   void _setVote(bool value) {
+    /* positive_vote_count, negative_vote_count 모두 int?
+       타입이므로 null일 경우 0으로 초기화함. */
     model.positive_vote_count ??= 0;
+    model.negative_vote_count ??= 0;
+
+    /* 이미 좋아요한 경우 좋아요 취소,
+       아닌 경우 value에 따라 좋아요 추가 혹은 현상태 유지. */
     model.positive_vote_count = model.positive_vote_count! +
         (model.my_vote == true ? -1 : (value ? 1 : 0));
+
+    /* 이미 싫어요한 경우 싫어요 취소,
+       아닌 경우 value에 따라 싫어요 추가 혹은 현상태 유지. */
     model.negative_vote_count = model.negative_vote_count! +
         (model.my_vote == false ? -1 : (value ? 0 : 1));
+
+    /* 현재 사용자의 상태(true, false, null)를 업데이트함. */
     model.my_vote = (model.my_vote == value)
         ? null
         : value;
@@ -227,6 +240,7 @@ class CommentController {
         (model.my_vote == true ? -1 : (value ? 1 : 0));
     model.negative_vote_count = model.negative_vote_count! +
         (model.my_vote == false ? -1 : (value ? 0 : 1));
+
     model.my_vote = (model.my_vote == value)
         ? null
         : value;
