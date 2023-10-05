@@ -506,12 +506,6 @@ class _UserPageState extends State<UserPage>
   void setIsLoaded(bool value, int tabIndex) =>
       setState(() => isLoadedList[tabIndex] = value);
 
-  // TODO: 더이상 사용하지 않는 메서드. 제거하기.
-  void setMyCount(int value, int tabIndex) {
-    setState(() => tabCount[tabIndex] = value);
-    setState(() => curCount = tabCount[tabIndex]);
-  }
-
   /// "총 $curCount개의 글" 문구에 표시되는 curCount 변수를 설정하고
   /// State를 업데이트하는 메서드. 탭이 전환될 때마다 사용됨.
   void setCurCount(int tabIndex) {
