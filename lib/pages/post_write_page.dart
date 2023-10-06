@@ -159,7 +159,7 @@ class _PostWritePageState extends State<PostWritePage> {
 
   late StreamSubscription<bool> keyboardSubscription;
 
-  final quill.QuillController _quillController = quill.QuillController.basic();
+  quill.QuillController _quillController = quill.QuillController.basic();
 
   @override
   void initState() {
@@ -463,7 +463,7 @@ class _PostWritePageState extends State<PostWritePage> {
     Widget _buildAttachmentShow() {
       return KeyboardVisibilityBuilder(
         builder: (context, isKeyboardVisible) {
-          if (isKeyboardVisible) {
+          if (isKeyboardVisible && false) {
             _isFileMenuBarSelected = false;
 
             return Container();
@@ -659,7 +659,7 @@ class _PostWritePageState extends State<PostWritePage> {
                                                     ),
                                                     InkWell(
                                                       onTap: () {
-                                                        onAttachmentDelete(
+                                                        _onAttachmentDelete(
                                                             index);
                                                       },
                                                       child: SvgPicture.asset(
@@ -980,10 +980,10 @@ class _PostWritePageState extends State<PostWritePage> {
             /// TODO: 함수 따로 빼기
             onPressed: canIupload
                 ? (_isEditingPost
-                    ? managePost(userProvider,
+                    ? _managePost(userProvider,
                         isUpdate: true,
                         previousArticleId: widget.previousArticle!.id)
-                    : managePost(userProvider))
+                    : _managePost(userProvider))
                 : null,
             // 버튼이 클릭되었을 때 수행할 동작
             padding: EdgeInsets.zero, // 패딩 제거
@@ -1060,6 +1060,36 @@ class _PostWritePageState extends State<PostWritePage> {
                   onTap: () {
                     debugPrint(DeltaToHTML.encodeJson(
                         _quillController.document.toDelta().toJson()));
+
+                    var json = jsonEncode(_quillController.document.toDelta());
+                    List<dynamic> delta = jsonDecode(json);
+                    List<dynamic> nwDelta = [];
+
+                    // Delta 리스트를 순회하면서 'insert' 키를 찾습니다.
+                    for (Map<String, dynamic> line in delta) {
+                      var value = line["insert"];
+                      bool flag = true;
+
+                      // 'insert' 키의 값이 맵인 경우, 이 맵을 순회하여 'image' 키를 찾습니다.
+                      if (value is Map<String, dynamic>) {
+                        for (var newKey in value.keys) {
+                          if (newKey == "image") {
+                            flag = false;
+                            // 'image' 키의 값이 "abc"인 경우, 해당 라인을 삭제합니다.
+                          }
+                        }
+                      }
+                      if (flag) nwDelta.add(line);
+                    }
+
+                    // 수정된 Delta를 다시 JSON으로 인코딩하고 Document로 변환합니다.
+                    String newJson = jsonEncode(nwDelta);
+                    quill.Delta newDelta =
+                        quill.Delta.fromJson(jsonDecode(newJson));
+                    setState(() {
+                      _quillController.document =
+                          quill.Document.fromJson(newDelta.toJson());
+                    });
                   },
                 ),
               ],
@@ -1076,40 +1106,6 @@ class _PostWritePageState extends State<PostWritePage> {
         ),
       ),
     );
-  }
-
-  /// HTML 문자열 내의 이미지 태그의 uuid를 판별해 src 속성에 url 을 추가
-  /// 로컬에 있는 첨부파일을 게시물에 추가, 삭제하는 데 쓰임.
-  String manageImgTagSrcWithNewFile(
-      String htmlString, String curUrl, String? nexUrl) {
-    var document = parse(htmlString);
-    List<html.Element> imgTags = document.getElementsByTagName('img');
-
-    for (var imgTag in imgTags) {
-      if (imgTag.attributes['src'] == curUrl) {
-        if (nexUrl == null) {
-          imgTag.remove();
-        } else {
-          imgTag.attributes['src'] = nexUrl;
-        }
-      }
-    }
-    return document.body?.innerHtml ?? '';
-  }
-
-  /// HTML 문자열 내의 이미지 태그의 src 속성의 값을 판별해 삭제
-  /// 이미 클라우드에 올라가 있는 첨부 파일을 html 본문에서 제거하는 데 쓰임.
-  String deleteImgTagSrc(htmlString, fileUrl) {
-    var document = parse(htmlString);
-    // debugPrint(document.body?.innerHtml ?? '');
-    List<html.Element> imgTags = document.getElementsByTagName('img');
-
-    for (var imgTag in imgTags) {
-      if (imgTag.attributes['src'] == fileUrl) {
-        imgTag.remove();
-      }
-    }
-    return document.body?.innerHtml ?? '';
   }
 
   /// HTML 문자열 내의 이미지 태그의 너비를 100%로 설정하여 리턴
@@ -1129,8 +1125,6 @@ class _PostWritePageState extends State<PostWritePage> {
     return htmlString;
   }
 
-  /// 파일 선택 및 `_attachmentList`에 추가
-
   /// 바이트를 적절한 단위로 변환하여 문자열로 반환
   /// TODO: 이 함수는 다른 파일로 분리하는 것이 좋을 것 같음.
   String formatBytes(int bytes) {
@@ -1148,13 +1142,29 @@ class _PostWritePageState extends State<PostWritePage> {
     }
   }
 
+  String _manageImgTagSrc(String htmlString, String curUrl, String? nexUrl) {
+    var document = parse(htmlString);
+    List<html.Element> imgTags = document.getElementsByTagName('img');
+
+    for (var imgTag in imgTags) {
+      if (imgTag.attributes['src'] == curUrl) {
+        if (nexUrl == null) {
+          imgTag.remove();
+        } else {
+          imgTag.attributes['src'] = nexUrl;
+        }
+      }
+    }
+    return document.body?.innerHtml ?? '';
+  }
+
   /// 포스트를 서버에 업로드하는 함수이다.
   /// 사용자가 입력한 제목, 내용 및 첨부 파일을 서버에 전송하여 새로운 포스트를 생성한다.
   /// 이 함수는 다음의 단계를 거친다:
   /// 1. 포스트 입력 값을 가져온다..
   /// 2. 첨부 파일이 있으면 서버에 업로드하고, 해당 파일의 ID를 가져온다.
   /// 3. 제목, 내용 및 첨부 파일 ID를 함께 서버에 전송하여 포스트를 생성한다.
-  void Function() managePost(UserProvider userProvider,
+  void Function() _managePost(UserProvider userProvider,
       {bool isUpdate = false, int? previousArticleId}) {
     return () async {
       String titleValue;
@@ -1186,12 +1196,10 @@ class _PostWritePageState extends State<PostWritePage> {
           try {
             var response = await dio.post("$newAraDefaultUrl/api/attachments/",
                 data: formData);
-            debugPrint("Response: ${response.data}");
             final attachmentModel = AttachmentModel.fromJson(response.data);
             attachmentIds.add(attachmentModel.id);
-            contentValue = manageImgTagSrcWithNewFile(contentValue,
+            contentValue = _manageImgTagSrc(contentValue,
                 _attachmentList[i].fileLocalPath!, attachmentModel.file);
-            debugPrint("next : $contentValue");
           } catch (error) {
             debugPrint("$error");
           }
@@ -1282,15 +1290,11 @@ class _PostWritePageState extends State<PostWritePage> {
   Future<void> _pickFile() async {
     filePickerResult = await FilePicker.platform.pickFiles();
     if (filePickerResult != null) {
-      debugPrint(filePickerResult!.files.single.path!);
       File file = File(filePickerResult!.files.single.path!);
       if (Platform.isIOS) {
         // iOS에서는 파일을 복사해서 사용했음. 캐쉬로 날라가는 문제 발생해서.
         final documentPath = (await getApplicationDocumentsDirectory()).path;
         file = await file.copy('$documentPath/${path.basename(file.path)}');
-        debugPrint("IOS run");
-        debugPrint(file.path);
-        debugPrint(filePickerResult!.files.single.path);
       }
       setState(() {
         _isFileMenuBarSelected = true;
@@ -1303,25 +1307,72 @@ class _PostWritePageState extends State<PostWritePage> {
     }
   }
 
+  void _deleteImageWithSrc(String src, quill.QuillController controller) {
+    final length = controller.document.length;
+    int i = 0;
+    debugPrint(controller.document.toPlainText());
+    return;
+
+    // while (i < length) {
+    //   final node = controller.document.toPlainText();
+
+    //   if (node.contains('<img src="abc"')) {
+    //     final startIndex = node.indexOf('<img src="abc"');
+    //     final endIndex = node.indexOf('>', startIndex);
+    //     if (endIndex != -1) {
+    //       controller.replaceText(
+    //         startIndex,
+    //         endIndex - startIndex + 1,
+    //         '',
+    //       );
+    //       i = startIndex;
+    //     } else {
+    //       i += 1;
+    //     }
+    //   } else {
+    //     i += 1;
+    //   }
+    // }
+  }
+
   /// 첨부 파일 삭제 및 관련 HTML 내용 업데이트
   /// 기존에 업로드된 파일인 경우 API 요청으로 삭제
   /// 새로 추가한 파일인 경우 HTML 내용에서 해당 이미지 태그 삭제
-  void onAttachmentDelete(int index) async {
-    String crnText =
-        DeltaToHTML.encodeJson(_quillController.document.toDelta().toJson());
+  void _onAttachmentDelete(int index) async {
+    String toFind;
 
     if (_attachmentList[index].isNewFile) {
-      String nxtText = manageImgTagSrcWithNewFile(
-          crnText, _attachmentList[index].fileLocalPath!, null);
-      debugPrint("next : $nxtText");
-
-      _htmlController.setText(nxtText);
+      toFind = _attachmentList[index].fileLocalPath!;
     } else {
-      String nxtText =
-          deleteImgTagSrc(crnText, _attachmentList[index].fileUrlPath);
-      debugPrint("next : $nxtText");
-      _htmlController.setText(nxtText);
+      toFind = _attachmentList[index].fileUrlPath!;
     }
+    var json = jsonEncode(_quillController.document.toDelta());
+    List<dynamic> delta = jsonDecode(json);
+    List<dynamic> nwDelta = [];
+
+    // Delta 리스트를 순회하면서 'insert' 키를 찾습니다.
+    for (Map<String, dynamic> line in delta) {
+      var value = line["insert"];
+      bool flag = true;
+
+      // 'insert' 키의 값이 맵인 경우, 이 맵을 순회하여 'image' 키를 찾습니다.
+      if (value is Map<String, dynamic>) {
+        for (var newKey in value.keys) {
+          if (newKey == "image" && value[newKey] == toFind) {
+            flag = false;
+            // 'image' 키의 값이 "abc"인 경우, 해당 라인을 삭제합니다.
+          }
+        }
+      }
+      if (flag) nwDelta.add(line);
+    }
+
+    // 수정된 Delta를 다시 JSON으로 인코딩하고 Document로 변환합니다.
+    String newJson = jsonEncode(nwDelta);
+    quill.Delta newDelta = quill.Delta.fromJson(jsonDecode(newJson));
+    setState(() {
+      _quillController.document = quill.Document.fromJson(newDelta.toJson());
+    });
 
     setState(() {
       _attachmentList.removeAt(index);
