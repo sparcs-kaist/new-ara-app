@@ -36,6 +36,11 @@ import 'package:html/dom.dart' as html;
 
 import 'package:flutter_quill/flutter_quill.dart' as quill;
 import 'package:flutter_quill_extensions/flutter_quill_extensions.dart';
+import 'package:html2md/html2md.dart' as html2md;
+import 'package:quill_markdown/quill_markdown.dart';
+
+import 'package:markdown_quill/markdown_quill.dart';
+import 'package:markdown/markdown.dart' as md;
 
 /// 사용자가 게시물을 작성하거나 편집할 수 있는 페이지를 나타내는 StatefulWidget입니다.
 class PostWritePage extends StatefulWidget {
@@ -90,7 +95,7 @@ class AttachmentsFormat {
 }
 
 class _PostWritePageState extends State<PostWritePage> {
-  /// 현재 이 페이지가 수정페이지인지 처음 작성하는 게시물인지 판단
+  /// 현재 이 페이지가 수정페이지이면 true, 처음 작성하는 게시물이면 false
   bool _isEditingPost = false;
 
   /// 기본 게시판 및 주제 모델.
@@ -245,6 +250,8 @@ class _PostWritePageState extends State<PostWritePage> {
       String? fileUrlPath = attachment.file;
       String fileUrlName = _extractAndDecodeFileNameFromUrl(attachment.file);
       int? fileUrlSize = attachment.size ?? 0;
+
+      // TODO: fileType이 이미지인지 아닌지 판단해서 넣기.
       _attachmentList.add(AttachmentsFormat(
           fileType: FileType.Image,
           isNewFile: false,
@@ -254,8 +261,10 @@ class _PostWritePageState extends State<PostWritePage> {
           fileUrlSize: fileUrlSize));
     }
 
-    // 상태 업데이트.
+    // 수정 게시물의 기존 상태 반영.
     setState(() {
+      _quillController.document = quill.Document.fromDelta(
+          _htmlToQuillDelta(widget.previousArticle!.content!));
       _isFileMenuBarSelected = _attachmentList.isNotEmpty;
       _selectedCheckboxes[1] =
           widget.previousArticle?.is_content_sexual ?? false;
@@ -1106,6 +1115,45 @@ class _PostWritePageState extends State<PostWritePage> {
         ),
       ),
     );
+  }
+
+//   quill.Delta convertHtmlToDelta(String html) {
+//   final document = quill.Document();
+//   final DeltaHtmlConverter converter = DeltaHtmlConverter();
+
+//   document.insert(0, converter.convert(html));
+//   return document.toDelta();
+// }
+
+  quill.Delta _htmlToQuillDelta(String html) {
+    debugPrint("1 : " + html);
+    // HTML을 마크다운으로 변환
+    var markdown = html2md.convert(
+      html,
+      styleOptions: {
+        'headingStyle': 'atx',
+      
+      },
+    );
+    debugPrint("2 : " + markdown);
+
+    // 마크다운을 Delta로 변환
+    var deltaJson = markdownToQuill(markdown);
+    debugPrint("3 : " + deltaJson!);
+
+    final mdDocument = md.Document(encodeHtml: false);
+
+    final mdToDelta = MarkdownToDelta(markdownDocument: mdDocument);
+
+    final deltaToMd = DeltaToMarkdown();
+
+    var deltaJson2 = mdToDelta.convert(markdown);
+    debugPrint("4 : " + deltaJson2.toString());
+
+    // Delta를 JSON으로 변환
+    //var delta = quill.Delta.fromJson(jsonDecode(deltaJson!));
+
+    return deltaJson2;
   }
 
   /// HTML 문자열 내의 이미지 태그의 너비를 100%로 설정하여 리턴

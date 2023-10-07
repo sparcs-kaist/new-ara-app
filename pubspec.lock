@@ -527,6 +527,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.15.4"
+  html2md:
+    dependency: "direct main"
+    description:
+      name: html2md
+      sha256: "6f50cec926b0a09816aadb66a59e4cda45c91fd00551e5a8298870069729b508"
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.3.1"
   html_editor_enhanced:
     dependency: "direct main"
     description:
@@ -679,6 +687,22 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.2.0"
+  markdown:
+    dependency: transitive
+    description:
+      name: markdown
+      sha256: acf35edccc0463a9d7384e437c015a3535772e09714cf60e07eeef3a15870dcd
+      url: "https://pub.dev"
+    source: hosted
+    version: "7.1.1"
+  markdown_quill:
+    dependency: "direct main"
+    description:
+      name: markdown_quill
+      sha256: "1d9d75d160e50304ab3270f36bd257536a2233228b92992d4a30a3ee2b43ff68"
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.0.0"
   matcher:
     dependency: transitive
     description:
@@ -951,6 +975,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.1.4"
+  quill_markdown:
+    dependency: "direct main"
+    description:
+      name: quill_markdown
+      sha256: "209831b93e3ec7b003d2d783743dd6b7e9700c92d55d69a10347c03a39cf1915"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.1.0"
   quiver:
     dependency: transitive
     description:
