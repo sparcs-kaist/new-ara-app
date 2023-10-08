@@ -1132,7 +1132,6 @@ class _PostWritePageState extends State<PostWritePage> {
       html,
       styleOptions: {
         'headingStyle': 'atx',
-      
       },
     );
     debugPrint("2 : " + markdown);
@@ -1235,25 +1234,28 @@ class _PostWritePageState extends State<PostWritePage> {
       dio.options.headers['Cookie'] = userProvider.getCookiesToString();
 
       for (int i = 0; i < _attachmentList.length; i++) {
-        var attachFile = File(_attachmentList[i].fileLocalPath!);
-        if (attachFile.existsSync() || _attachmentList[i].isNewFile) {
-          var formData = FormData.fromMap({
-            "file": await MultipartFile.fromFile(attachFile.path,
-                filename: attachFile.path.split('/').last),
-          });
-          try {
-            var response = await dio.post("$newAraDefaultUrl/api/attachments/",
-                data: formData);
-            final attachmentModel = AttachmentModel.fromJson(response.data);
-            attachmentIds.add(attachmentModel.id);
-            contentValue = _manageImgTagSrc(contentValue,
-                _attachmentList[i].fileLocalPath!, attachmentModel.file);
-          } catch (error) {
-            debugPrint("$error");
+        //새로 올리는 파일이면 새로운 id 할당 받기.
+        if (_attachmentList[i].isNewFile) {
+          File attachFile = File(_attachmentList[i].fileLocalPath!);
+          bool fileExists = await attachFile.exists();
+          if (fileExists) {
+            FormData formData = FormData.fromMap({
+              "file": await MultipartFile.fromFile(attachFile.path,
+                  filename: attachFile.path.split('/').last),
+            });
+            try {
+              Response response = await dio
+                  .post("$newAraDefaultUrl/api/attachments/", data: formData);
+              final attachmentModel = AttachmentModel.fromJson(response.data);
+              attachmentIds.add(attachmentModel.id);
+              contentValue = _manageImgTagSrc(contentValue,
+                  _attachmentList[i].fileLocalPath!, attachmentModel.file);
+            } catch (error) {
+              debugPrint("$error");
+            }
           }
-        } else if (!isUpdate) {
-          debugPrint("File does not exist: ${attachFile.path}");
         } else {
+          // 기존에 올라간 파일이면 기존 id만 추가.
           attachmentIds.add(_attachmentList[i].id!);
         }
       }
