@@ -1105,25 +1105,21 @@ class _PostWritePageState extends State<PostWritePage> {
               // embedButtons: FlutterQuillEmbeds.buttons(),
             ),
             Expanded(
-                child: quill.QuillEditor.basic(
-              controller: _quillController,
-              embedBuilders: FlutterQuillEmbeds.builders(),
-              readOnly: false, // The editor is editable
-            )),
+                child: Padding(
+                  padding: const EdgeInsets.all(12.0),
+                 
+                  child: quill.QuillEditor.basic(
+                              controller: _quillController,
+                              embedBuilders: FlutterQuillEmbeds.builders(),
+                              readOnly: false, // The editor is editable
+                            ),
+                )),
             _buildAttachmentShow()
           ],
         ),
       ),
     );
   }
-
-//   quill.Delta convertHtmlToDelta(String html) {
-//   final document = quill.Document();
-//   final DeltaHtmlConverter converter = DeltaHtmlConverter();
-
-//   document.insert(0, converter.convert(html));
-//   return document.toDelta();
-// }
 
   quill.Delta _htmlToQuillDelta(String html) {
     debugPrint("1 : " + html);
