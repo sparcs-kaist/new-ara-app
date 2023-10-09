@@ -853,6 +853,78 @@ class _PostWritePageState extends State<PostWritePage> {
       );
     }
 
+    Widget _buildToolbar() {
+      return quill.QuillToolbar.basic(
+        controller: _quillController,
+        multiRowsDisplay: true,
+        showUndo: false,
+        showRedo: false,
+        showColorButton: false,
+        showBackgroundColorButton: false,
+        showFontFamily: false,
+        showFontSize: false,
+        showDividers: false,
+        showListCheck: false,
+        showSearchButton: false,
+        showSubscript: false,
+        showSuperscript: false,
+
+        toolbarIconAlignment: WrapAlignment.start,
+        toolbarIconCrossAlignment: WrapCrossAlignment.start,
+        customButtons: [
+          quill.QuillCustomButton(
+            icon: Icons.camera_alt,
+            onTap: _pickImage,
+          ),
+          quill.QuillCustomButton(
+            icon: Icons.settings,
+            onTap: () {
+              debugPrint(DeltaToHTML.encodeJson(
+                  _quillController.document.toDelta().toJson()));
+
+              var json = jsonEncode(_quillController.document.toDelta());
+              List<dynamic> delta = jsonDecode(json);
+              List<dynamic> nwDelta = [];
+
+              // Delta 리스트를 순회하면서 'insert' 키를 찾습니다.
+              for (Map<String, dynamic> line in delta) {
+                var value = line["insert"];
+                bool flag = true;
+
+                // 'insert' 키의 값이 맵인 경우, 이 맵을 순회하여 'image' 키를 찾습니다.
+                if (value is Map<String, dynamic>) {
+                  for (var newKey in value.keys) {
+                    if (newKey == "image") {
+                      flag = false;
+                      // 'image' 키의 값이 "abc"인 경우, 해당 라인을 삭제합니다.
+                    }
+                  }
+                }
+                if (flag) nwDelta.add(line);
+              }
+
+              // 수정된 Delta를 다시 JSON으로 인코딩하고 Document로 변환합니다.
+              String newJson = jsonEncode(nwDelta);
+              quill.Delta newDelta = quill.Delta.fromJson(jsonDecode(newJson));
+              setState(() {
+                _quillController.document =
+                    quill.Document.fromJson(newDelta.toJson());
+              });
+            },
+          ),
+        ],
+        // embedButtons: FlutterQuillEmbeds.buttons(),
+      );
+    }
+
+    Widget _buildEditor() {
+      return quill.QuillEditor.basic(
+        controller: _quillController,
+        embedBuilders: FlutterQuillEmbeds.builders(),
+        readOnly: false, // The editor is editable
+      );
+    }
+
     Widget _buildRegacy() {
       return Expanded(
         child: Column(
@@ -1042,78 +1114,13 @@ class _PostWritePageState extends State<PostWritePage> {
               height: 1,
               color: Color(0xFFF0F0F0),
             ),
-            quill.QuillToolbar.basic(
-              controller: _quillController,
-              multiRowsDisplay: true,
-              showUndo: false,
-              showRedo: false,
-              showColorButton: false,
-              showBackgroundColorButton: false,
-              showFontFamily: false,
-              showFontSize: false,
-              showDividers: false,
-              showListCheck: false,
-              showSearchButton: false,
-              showSubscript: false,
-              showSuperscript: false,
-
-              toolbarIconAlignment: WrapAlignment.start,
-              toolbarIconCrossAlignment: WrapCrossAlignment.start,
-              customButtons: [
-                quill.QuillCustomButton(
-                  icon: Icons.camera_alt,
-                  onTap: _pickImage,
-                ),
-                quill.QuillCustomButton(
-                  icon: Icons.settings,
-                  onTap: () {
-                    debugPrint(DeltaToHTML.encodeJson(
-                        _quillController.document.toDelta().toJson()));
-
-                    var json = jsonEncode(_quillController.document.toDelta());
-                    List<dynamic> delta = jsonDecode(json);
-                    List<dynamic> nwDelta = [];
-
-                    // Delta 리스트를 순회하면서 'insert' 키를 찾습니다.
-                    for (Map<String, dynamic> line in delta) {
-                      var value = line["insert"];
-                      bool flag = true;
-
-                      // 'insert' 키의 값이 맵인 경우, 이 맵을 순회하여 'image' 키를 찾습니다.
-                      if (value is Map<String, dynamic>) {
-                        for (var newKey in value.keys) {
-                          if (newKey == "image") {
-                            flag = false;
-                            // 'image' 키의 값이 "abc"인 경우, 해당 라인을 삭제합니다.
-                          }
-                        }
-                      }
-                      if (flag) nwDelta.add(line);
-                    }
-
-                    // 수정된 Delta를 다시 JSON으로 인코딩하고 Document로 변환합니다.
-                    String newJson = jsonEncode(nwDelta);
-                    quill.Delta newDelta =
-                        quill.Delta.fromJson(jsonDecode(newJson));
-                    setState(() {
-                      _quillController.document =
-                          quill.Document.fromJson(newDelta.toJson());
-                    });
-                  },
-                ),
-              ],
-              // embedButtons: FlutterQuillEmbeds.buttons(),
-            ),
+            _buildToolbar(),
+            _buildEditor(),
             Expanded(
                 child: Padding(
-                  padding: const EdgeInsets.all(12.0),
-                 
-                  child: quill.QuillEditor.basic(
-                              controller: _quillController,
-                              embedBuilders: FlutterQuillEmbeds.builders(),
-                              readOnly: false, // The editor is editable
-                            ),
-                )),
+              padding: const EdgeInsets.all(12.0),
+              child: _buildEditor(),
+            )),
             _buildAttachmentShow()
           ],
         ),
@@ -1139,8 +1146,6 @@ class _PostWritePageState extends State<PostWritePage> {
     final mdDocument = md.Document(encodeHtml: false);
 
     final mdToDelta = MarkdownToDelta(markdownDocument: mdDocument);
-
-    final deltaToMd = DeltaToMarkdown();
 
     var deltaJson2 = mdToDelta.convert(markdown);
     debugPrint("4 : " + deltaJson2.toString());
