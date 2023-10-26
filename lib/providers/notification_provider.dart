@@ -24,6 +24,11 @@ class NotificationProvider with ChangeNotifier {
     _cookieString = newCookieString;
   }
 
+  void setIsNotReadExist(bool value) {
+    _isNotReadExist = value;
+    notifyListeners();
+  }
+
   /// NewAra API로 요청을 보내 알림을 받음.
   /// 받은 알림 별로 읽음 여부를 확인하여 isNotReadExist 변수를 설정함.
   /// 구독 중인 리스너에게 isNotReadExist 결과를 알려줌.
@@ -50,6 +55,7 @@ class NotificationProvider with ChangeNotifier {
             break;
           }
         }
+        if (res) break;
       } catch (error) {
         /* dio.get 과정에서 발생한 에러에 대한 예외처리.
            해당 경우에 새로운 알림이 존재하는 것으로 가정. */
