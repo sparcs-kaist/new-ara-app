@@ -1115,7 +1115,6 @@ class _PostWritePageState extends State<PostWritePage> {
               color: Color(0xFFF0F0F0),
             ),
             _buildToolbar(),
-            _buildEditor(),
             Expanded(
                 child: Padding(
               padding: const EdgeInsets.all(12.0),
