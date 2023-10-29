@@ -751,6 +751,7 @@ class _PostWritePageState extends State<PostWritePage> {
               GestureDetector(
                 onTap: () {
                   setState(() {
+                    //성인 체크 박스 
                     _selectedCheckboxes[1] = !_selectedCheckboxes[1]!;
                   });
                 },
@@ -792,6 +793,7 @@ class _PostWritePageState extends State<PostWritePage> {
               GestureDetector(
                 onTap: () {
                   setState(() {
+                    //정치 체크 박스
                     _selectedCheckboxes[2] = !_selectedCheckboxes[2]!;
                   });
                 },
