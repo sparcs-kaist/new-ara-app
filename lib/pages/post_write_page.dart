@@ -918,7 +918,7 @@ class _PostWritePageState extends State<PostWritePage> {
       );
     }
 
-    Widget buildEdior() {
+    Widget buildEditor() {
       return quill.QuillEditor.basic(
         controller: _quillController,
         embedBuilders: FlutterQuillEmbeds.builders(),
@@ -1015,7 +1015,7 @@ class _PostWritePageState extends State<PostWritePage> {
             Expanded(
                 child: Padding(
               padding: const EdgeInsets.all(12.0),
-              child: buildEdior(),
+              child: buildEditor(),
             )),
             buildAttachmentShow()
           ],
