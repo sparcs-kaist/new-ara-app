@@ -489,7 +489,10 @@ class _PostWritePageState extends State<PostWritePage> {
                         children: [
                           SvgPicture.asset(
                             'assets/icons/clip.svg',
-                            color: Color(0xFF636363),
+                            colorFilter: ColorFilter.mode(
+                              Color(0xFF636363),
+                              BlendMode.srcIn,
+                            ),
                             width: 34,
                             height: 34,
                           ),
@@ -549,7 +552,10 @@ class _PostWritePageState extends State<PostWritePage> {
                           'assets/icons/chevron_down.svg',
                           width: 20,
                           height: 20,
-                          color: Colors.red,
+                          colorFilter: ColorFilter.mode(
+                            Colors.red,
+                            BlendMode.srcIn,
+                          ),
                         ),
                       ),
                       Spacer(),
@@ -559,7 +565,10 @@ class _PostWritePageState extends State<PostWritePage> {
                           'assets/icons/add.svg',
                           width: 34,
                           height: 34,
-                          color: Color(0xFFED3A3A),
+                          colorFilter: ColorFilter.mode(
+                            Color(0xFFED3A3A),
+                            BlendMode.srcIn,
+                          ),
                         ),
                       ),
                       SizedBox(
@@ -617,7 +626,9 @@ class _PostWritePageState extends State<PostWritePage> {
                                                 'assets/icons/pdf.svg',
                                                 width: 30,
                                                 height: 30,
-                                                color: Colors.black,
+                                                colorFilter: ColorFilter.mode(
+                                                    Colors.black,
+                                                    BlendMode.srcIn),
                                               ),
                                               SizedBox(
                                                 width: 3,
@@ -662,7 +673,9 @@ class _PostWritePageState extends State<PostWritePage> {
                                                   'assets/icons/close.svg',
                                                   width: 30,
                                                   height: 30,
-                                                  color: Color(0xFFBBBBBB),
+                                                  colorFilter: ColorFilter.mode(
+                                                      Color(0xFFBBBBBB),
+                                                      BlendMode.srcIn),
                                                 ),
                                               ),
                                               SizedBox(
@@ -755,7 +768,8 @@ class _PostWritePageState extends State<PostWritePage> {
                     'assets/icons/check.svg',
                     width: 16,
                     height: 16,
-                    color: Colors.white,
+                    colorFilter: ColorFilter.mode(
+                        Colors.white, BlendMode.srcIn), // #FFFFFF 색상
                   ),
                 ),
               ),
@@ -795,7 +809,8 @@ class _PostWritePageState extends State<PostWritePage> {
                     'assets/icons/check.svg',
                     width: 16,
                     height: 16,
-                    color: Colors.white,
+                    colorFilter: ColorFilter.mode(
+                        Colors.white, BlendMode.srcIn), // #FFFFFF 색상
                   ),
                 ),
               ),
@@ -1005,28 +1020,15 @@ class _PostWritePageState extends State<PostWritePage> {
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
-        leadingWidth: 100,
-        leading: Row(
-          children: [
-            SizedBox(
-              width: 35,
-              child: IconButton(
-                color: ColorsInfo.newara,
-                icon: SizedBox(
-                  width: 35,
-                  height: 35,
-                  child: SvgPicture.asset(
-                    'assets/icons/left_chevron.svg',
-                    color: ColorsInfo.newara,
-                    fit: BoxFit.fill,
-                  ),
-                ),
-                onPressed: () {
-                  Navigator.pop(context);
-                },
+        leading: IconButton(
+          icon: SvgPicture.asset('assets/icons/left_chevron.svg',
+              colorFilter: ColorFilter.mode(
+                Colors.red,
+                BlendMode.srcIn,
               ),
-            ),
-          ],
+              width: 35,
+              height: 35),
+          onPressed: () => Navigator.pop(context),
         ),
         title: SizedBox(
           child: Text(
