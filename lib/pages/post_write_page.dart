@@ -328,101 +328,104 @@ class _PostWritePageState extends State<PostWritePage> {
         _isUploadingPost == false;
 
     Widget _buildMenubar() {
-      return Container(
-        width: double.infinity,
-        height: 34,
-        child: Row(
-          children: [
-            Flexible(
-              child: Container(
-                decoration: BoxDecoration(
-                  color: Color(0xFFF8F8F8),
-                  borderRadius: BorderRadius.circular(20.0),
-                ),
-                child: DropdownButtonHideUnderline(
-                  child: DropdownButton<BoardDetailActionModel>(
-                    // TODO: 원하는 메뉴 모양 만들기 위해 속성 테스트 할 것
-                    // isDense: true,
-                    // isExpanded: true,
+      return Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 15),
+        child: Container(
+          width: double.infinity,
+          height: 34,
+          child: Row(
+            children: [
+              Flexible(
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: Color(0xFFF8F8F8),
+                    borderRadius: BorderRadius.circular(20.0),
+                  ),
+                  child: DropdownButtonHideUnderline(
+                    child: DropdownButton<BoardDetailActionModel>(
+                      // TODO: 원하는 메뉴 모양 만들기 위해 속성 테스트 할 것
+                      // isDense: true,
+                      // isExpanded: true,
 
-                    value: _chosenBoardValue,
-                    style: TextStyle(color: Colors.red),
-                    items: _boardList
-                        .map<DropdownMenuItem<BoardDetailActionModel>>(
-                            (BoardDetailActionModel value) {
-                      return DropdownMenuItem<BoardDetailActionModel>(
-                        enabled: value.id != -1,
-                        value: value,
-                        child: Padding(
-                          padding: const EdgeInsets.only(left: 12.0),
-                          child: Text(
-                            value.ko_name,
-                            style: TextStyle(
-                              color: value.id == -1 || _isEditingPost
-                                  ? Color(0xFFBBBBBB)
-                                  : ColorsInfo.newara,
-                              fontWeight: FontWeight.w500,
-                              fontSize: 16,
+                      value: _chosenBoardValue,
+                      style: TextStyle(color: Colors.red),
+                      items: _boardList
+                          .map<DropdownMenuItem<BoardDetailActionModel>>(
+                              (BoardDetailActionModel value) {
+                        return DropdownMenuItem<BoardDetailActionModel>(
+                          enabled: value.id != -1,
+                          value: value,
+                          child: Padding(
+                            padding: const EdgeInsets.only(left: 12.0),
+                            child: Text(
+                              value.ko_name,
+                              style: TextStyle(
+                                color: value.id == -1 || _isEditingPost
+                                    ? Color(0xFFBBBBBB)
+                                    : ColorsInfo.newara,
+                                fontWeight: FontWeight.w500,
+                                fontSize: 16,
+                              ),
                             ),
                           ),
-                        ),
-                      );
-                    }).toList(),
+                        );
+                      }).toList(),
 
-                    /// 게시판 선택 이후 토픽 목록이 변해야 하므로 변경하는 기능 추가
-                    /// TODO: 함수 따로 빼기
-                    onChanged: _isEditingPost ? null : setSpecTopicList,
+                      /// 게시판 선택 이후 토픽 목록이 변해야 하므로 변경하는 기능 추가
+                      /// TODO: 함수 따로 빼기
+                      onChanged: _isEditingPost ? null : setSpecTopicList,
+                    ),
                   ),
                 ),
               ),
-            ),
-            SizedBox(
-              width: 10,
-            ),
-            Flexible(
-              child: Container(
-                decoration: BoxDecoration(
-                  color: Color(0xFFF8F8F8),
-                  borderRadius: BorderRadius.circular(20.0),
-                ),
-                child: DropdownButtonHideUnderline(
-                  child: DropdownButton<TopicModel>(
-                    value: _chosenTopicValue,
-                    style: TextStyle(color: Colors.red),
-                    items: _specTopicList
-                        .map<DropdownMenuItem<TopicModel>>((TopicModel value) {
-                      return DropdownMenuItem<TopicModel>(
-                        value: value,
-                        child: Padding(
-                          padding: const EdgeInsets.only(left: 12.0),
-                          child: Text(
-                            value.ko_name,
-                            style: TextStyle(
-                              color: value.id == -1 || _isEditingPost
-                                  ? Color(0xFFBBBBBB)
-                                  : Colors.black,
-                              fontWeight: FontWeight.w500,
-                              fontSize: 16,
+              SizedBox(
+                width: 10,
+              ),
+              Flexible(
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: Color(0xFFF8F8F8),
+                    borderRadius: BorderRadius.circular(20.0),
+                  ),
+                  child: DropdownButtonHideUnderline(
+                    child: DropdownButton<TopicModel>(
+                      value: _chosenTopicValue,
+                      style: TextStyle(color: Colors.red),
+                      items: _specTopicList.map<DropdownMenuItem<TopicModel>>(
+                          (TopicModel value) {
+                        return DropdownMenuItem<TopicModel>(
+                          value: value,
+                          child: Padding(
+                            padding: const EdgeInsets.only(left: 12.0),
+                            child: Text(
+                              value.ko_name,
+                              style: TextStyle(
+                                color: value.id == -1 || _isEditingPost
+                                    ? Color(0xFFBBBBBB)
+                                    : Colors.black,
+                                fontWeight: FontWeight.w500,
+                                fontSize: 16,
+                              ),
                             ),
                           ),
-                        ),
-                      );
-                    }).toList(),
+                        );
+                      }).toList(),
 
-                    /// 토픽 선택하는 기능
-                    /// TODO: 함수 따로 빼기
-                    onChanged: _isEditingPost
-                        ? null
-                        : (TopicModel? value) {
-                            setState(() {
-                              _chosenTopicValue = value;
-                            });
-                          },
+                      /// 토픽 선택하는 기능
+                      /// TODO: 함수 따로 빼기
+                      onChanged: _isEditingPost
+                          ? null
+                          : (TopicModel? value) {
+                              setState(() {
+                                _chosenTopicValue = value;
+                              });
+                            },
+                    ),
                   ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       );
     }
