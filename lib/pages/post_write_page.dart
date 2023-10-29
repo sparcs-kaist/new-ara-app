@@ -1017,6 +1017,9 @@ class _PostWritePageState extends State<PostWritePage> {
       );
     }
 
+    //빌드 전 첨부파일의 유효성 확인
+    _checkAttachmentsValid();
+
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
@@ -1110,6 +1113,19 @@ class _PostWritePageState extends State<PostWritePage> {
         ),
       ),
     );
+  }
+
+  /// _attachmentList 의 첨부파일이 존재하는 파일인지 유효성 확인하는 함수
+  void _checkAttachmentsValid() {
+    // _attachmentList에서 원소를 직접 삭제하기
+    for (int i = _attachmentList.length - 1; i >= 0; i--) {
+      if (_attachmentList[i].isNewFile) {
+        File file = File(_attachmentList[i].fileLocalPath!);
+        if (!file.existsSync()) {
+          _attachmentList.removeAt(i);
+        }
+      }
+    }
   }
 
   quill.Delta _htmlToQuillDelta(String html) {
