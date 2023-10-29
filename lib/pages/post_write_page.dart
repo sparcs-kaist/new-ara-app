@@ -751,7 +751,7 @@ class _PostWritePageState extends State<PostWritePage> {
               GestureDetector(
                 onTap: () {
                   setState(() {
-                    //성인 체크 박스 
+                    //성인 체크 박스
                     _selectedCheckboxes[1] = !_selectedCheckboxes[1]!;
                   });
                 },
@@ -922,100 +922,6 @@ class _PostWritePageState extends State<PostWritePage> {
         controller: _quillController,
         embedBuilders: FlutterQuillEmbeds.builders(),
         readOnly: false, // The editor is editable
-      );
-    }
-
-    Widget _buildRegacy() {
-      return Expanded(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Expanded(
-              child: Column(
-                children: [
-                  Expanded(
-                    child: SingleChildScrollView(
-                      physics: NeverScrollableScrollPhysics(),
-                      child: Column(
-                        children: [
-                          HtmlEditor(
-                            callbacks:
-                                Callbacks(onChangeContent: (String? value) {
-                              debugPrint("onChangeContent: $value");
-                              setState(() {
-                                // _currentHtmlContent = value!;
-                              });
-                            }),
-                            controller: _htmlController,
-                            htmlEditorOptions: HtmlEditorOptions(
-                              shouldEnsureVisible: true,
-                              autoAdjustHeight: false,
-                              hint: "<p>내용을 입력해주세요.</p>",
-                              initialText: widget.previousArticle == null
-                                  ? null
-                                  : updateImgTagWidth(
-                                      widget.previousArticle!.content!),
-                            ),
-                            htmlToolbarOptions: HtmlToolbarOptions(
-                                toolbarType: ToolbarType.nativeGrid,
-
-                                /// 사진 추가 시 base64 인코딩하여 태그로 추가. (이미지 첨부 기능)
-                                /// uuid를 할당하여 각각 태그가 구분 가능하게하고, 추후 태그를 수정 가능하도록 함.
-                                mediaUploadInterceptor: (PlatformFile file,
-                                    InsertFileType type) async {
-                                  if (type == InsertFileType.image) {
-                                    String uuid = const Uuid().v4();
-                                    setState(() {
-                                      _isFileMenuBarSelected = true;
-                                      _attachmentList.add(AttachmentsFormat(
-                                        fileType: FileType.Image,
-                                        isNewFile: true,
-                                        fileLocalPath: file.path,
-                                        uuid: uuid,
-                                      ));
-                                    });
-
-                                    String base64Data =
-                                        base64.encode(file.bytes!);
-                                    String base64Image =
-                                        """<img data-uuid=$uuid  src="data:image/${file.extension};base64,$base64Data" data-filename="${file.name}" width=100% />""";
-                                    _htmlController.insertHtml(base64Image);
-                                  }
-                                  return false;
-                                },
-                                defaultToolbarButtons: [
-                                  const FontButtons(
-                                    bold: true,
-                                    italic: true,
-                                    underline: true,
-                                    clearAll: true,
-                                    strikethrough: true,
-                                    superscript: false,
-                                    subscript: false,
-                                  ),
-                                  const InsertButtons(
-                                    link: true,
-                                    picture: true,
-                                    audio: false,
-                                    video: false,
-                                    otherFile: false,
-                                    table: false,
-                                    hr: true,
-                                  )
-                                ]),
-                            otherOptions: OtherOptions(
-                              height: 450,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
       );
     }
 
