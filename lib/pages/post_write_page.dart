@@ -1266,34 +1266,6 @@ class _PostWritePageState extends State<PostWritePage> {
     }
   }
 
-  void _deleteImageWithSrc(String src, quill.QuillController controller) {
-    final length = controller.document.length;
-    int i = 0;
-    debugPrint(controller.document.toPlainText());
-    return;
-
-    // while (i < length) {
-    //   final node = controller.document.toPlainText();
-
-    //   if (node.contains('<img src="abc"')) {
-    //     final startIndex = node.indexOf('<img src="abc"');
-    //     final endIndex = node.indexOf('>', startIndex);
-    //     if (endIndex != -1) {
-    //       controller.replaceText(
-    //         startIndex,
-    //         endIndex - startIndex + 1,
-    //         '',
-    //       );
-    //       i = startIndex;
-    //     } else {
-    //       i += 1;
-    //     }
-    //   } else {
-    //     i += 1;
-    //   }
-    // }
-  }
-
   /// 첨부 파일 삭제 및 관련 HTML 내용 업데이트
   /// 기존에 업로드된 파일인 경우 API 요청으로 삭제
   /// 새로 추가한 파일인 경우 HTML 내용에서 해당 이미지 태그 삭제
