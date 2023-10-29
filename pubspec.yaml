@@ -64,6 +64,7 @@ dependencies:
   html2md: ^1.3.1
   quill_markdown: ^0.1.0
   markdown_quill: ^2.0.0
+  markdown: ^7.1.1
 
 dev_dependencies:
   flutter_test:

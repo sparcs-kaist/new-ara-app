@@ -5,11 +5,8 @@ import 'package:delta_to_html/delta_to_html.dart';
 import 'package:dio/dio.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
-import 'package:html_editor_enhanced/html_editor.dart';
 import 'package:new_ara_app/constants/url_info.dart';
 import 'dart:io';
-import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:image_picker/image_picker.dart';
@@ -17,28 +14,21 @@ import 'package:new_ara_app/constants/colors_info.dart';
 import 'package:new_ara_app/models/article_model.dart';
 import 'package:new_ara_app/models/attachment_model.dart';
 import 'package:new_ara_app/models/board_detail_action_model.dart';
-import 'package:new_ara_app/models/board_group_model.dart';
-import 'package:new_ara_app/models/board_model.dart';
 import 'package:new_ara_app/models/simple_board_model.dart';
 import 'package:new_ara_app/models/topic_model.dart';
+import 'package:new_ara_app/providers/user_provider.dart';
 import 'package:new_ara_app/widgetclasses/loading_indicator.dart';
-import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
 import 'package:uuid/uuid.dart';
-
-import '../providers/user_provider.dart';
 import 'package:new_ara_app/providers/notification_provider.dart';
 import 'package:path/path.dart' as path;
 import 'package:path_provider/path_provider.dart';
-
 import 'package:html/parser.dart' show parse;
 import 'package:html/dom.dart' as html;
-
 import 'package:flutter_quill/flutter_quill.dart' as quill;
 import 'package:flutter_quill_extensions/flutter_quill_extensions.dart';
 import 'package:html2md/html2md.dart' as html2md;
 import 'package:quill_markdown/quill_markdown.dart';
-
 import 'package:markdown_quill/markdown_quill.dart';
 import 'package:markdown/markdown.dart' as md;
 
@@ -57,8 +47,8 @@ class PostWritePage extends StatefulWidget {
 /// 첨부 파일의 유형을 나타내는 열거형입니다.
 /// TODO: pdf, doc 같은 파일 유형 추가하기.
 enum FileType {
-  Image,
-  Other,
+  image,
+  other,
 }
 
 /// 첨부 파일의 형식 및 속성을 나타내는 클래스입니다.
@@ -127,7 +117,7 @@ class _PostWritePageState extends State<PostWritePage> {
   );
 
   /// 익명, 성인, 정치 체크 박스가 선택되어 있는지 판별을 위한 리스트
-  List<bool?> _selectedCheckboxes = [true, false, false];
+  final List<bool?> _selectedCheckboxes = [true, false, false];
 
   /// 첨부파일 메뉴바가 펼쳐져 있는 지 판별을 위한 변수
   bool _isFileMenuBarSelected = false;
@@ -158,13 +148,12 @@ class _PostWritePageState extends State<PostWritePage> {
   late TargetPlatform? platform;
 
   final TextEditingController _titleController = TextEditingController();
-  final HtmlEditorController _htmlController = HtmlEditorController();
 
   final ScrollController _listScrollController = ScrollController();
 
   late StreamSubscription<bool> keyboardSubscription;
 
-  quill.QuillController _quillController = quill.QuillController.basic();
+  final quill.QuillController _quillController = quill.QuillController.basic();
 
   @override
   void initState() {
@@ -172,10 +161,11 @@ class _PostWritePageState extends State<PostWritePage> {
 
     context.read<NotificationProvider>().checkIsNotReadExist();
 
-    if (widget.previousArticle != null)
+    if (widget.previousArticle != null) {
       _isEditingPost = true;
-    else
+    } else {
       _isEditingPost = false;
+    }
 
     if (Platform.isAndroid) {
       platform = TargetPlatform.android;
@@ -253,7 +243,7 @@ class _PostWritePageState extends State<PostWritePage> {
 
       // TODO: fileType이 이미지인지 아닌지 판단해서 넣기.
       _attachmentList.add(AttachmentsFormat(
-          fileType: FileType.Image,
+          fileType: FileType.image,
           isNewFile: false,
           id: id,
           fileUrlPath: fileUrlPath,
@@ -319,18 +309,18 @@ class _PostWritePageState extends State<PostWritePage> {
     var userProvider = context.watch<UserProvider>();
 
     /// 게시물 업로드 가능한지 확인
-    String _currentHtmlContent =
+    String currentHtmlContent =
         DeltaToHTML.encodeJson(_quillController.document.toDelta().toJson());
     bool canIupload = _titleController.text != '' &&
         _chosenBoardValue!.id != -1 &&
-        _currentHtmlContent != '' &&
-        _currentHtmlContent != '<br>' &&
+        currentHtmlContent != '' &&
+        currentHtmlContent != '<br>' &&
         _isUploadingPost == false;
 
-    Widget _buildMenubar() {
+    Widget buildMenubar() {
       return Padding(
         padding: const EdgeInsets.symmetric(horizontal: 15),
-        child: Container(
+        child: SizedBox(
           width: double.infinity,
           height: 34,
           child: Row(
@@ -338,7 +328,7 @@ class _PostWritePageState extends State<PostWritePage> {
               Flexible(
                 child: Container(
                   decoration: BoxDecoration(
-                    color: Color(0xFFF8F8F8),
+                    color: const Color(0xFFF8F8F8),
                     borderRadius: BorderRadius.circular(20.0),
                   ),
                   child: DropdownButtonHideUnderline(
@@ -348,7 +338,7 @@ class _PostWritePageState extends State<PostWritePage> {
                       // isExpanded: true,
 
                       value: _chosenBoardValue,
-                      style: TextStyle(color: Colors.red),
+                      style: const TextStyle(color: Colors.red),
                       items: _boardList
                           .map<DropdownMenuItem<BoardDetailActionModel>>(
                               (BoardDetailActionModel value) {
@@ -361,7 +351,7 @@ class _PostWritePageState extends State<PostWritePage> {
                               value.ko_name,
                               style: TextStyle(
                                 color: value.id == -1 || _isEditingPost
-                                    ? Color(0xFFBBBBBB)
+                                    ? const Color(0xFFBBBBBB)
                                     : ColorsInfo.newara,
                                 fontWeight: FontWeight.w500,
                                 fontSize: 16,
@@ -378,19 +368,19 @@ class _PostWritePageState extends State<PostWritePage> {
                   ),
                 ),
               ),
-              SizedBox(
+              const SizedBox(
                 width: 10,
               ),
               Flexible(
                 child: Container(
                   decoration: BoxDecoration(
-                    color: Color(0xFFF8F8F8),
+                    color: const Color(0xFFF8F8F8),
                     borderRadius: BorderRadius.circular(20.0),
                   ),
                   child: DropdownButtonHideUnderline(
                     child: DropdownButton<TopicModel>(
                       value: _chosenTopicValue,
-                      style: TextStyle(color: Colors.red),
+                      style: const TextStyle(color: Colors.red),
                       items: _specTopicList.map<DropdownMenuItem<TopicModel>>(
                           (TopicModel value) {
                         return DropdownMenuItem<TopicModel>(
@@ -401,7 +391,7 @@ class _PostWritePageState extends State<PostWritePage> {
                               value.ko_name,
                               style: TextStyle(
                                 color: value.id == -1 || _isEditingPost
-                                    ? Color(0xFFBBBBBB)
+                                    ? const Color(0xFFBBBBBB)
                                     : Colors.black,
                                 fontWeight: FontWeight.w500,
                                 fontSize: 16,
@@ -430,21 +420,18 @@ class _PostWritePageState extends State<PostWritePage> {
       );
     }
 
-    Widget _buildTitle() {
+    Widget buildTitle() {
       return TextField(
-        onChanged: (value) {
-          setState(() {});
-        },
         controller: _titleController,
         minLines: 1,
         maxLines: 1,
         maxLength: 255,
-        style: TextStyle(
+        style: const TextStyle(
           height: 1,
           fontSize: 22,
           fontWeight: FontWeight.w700,
         ),
-        decoration: InputDecoration(
+        decoration: const InputDecoration(
           hintText: "제목을 입력해주세요.",
           hintStyle: TextStyle(
               fontSize: 22,
@@ -472,15 +459,15 @@ class _PostWritePageState extends State<PostWritePage> {
       );
     }
 
-    Widget _buildAttachmentShow() {
+    Widget buildAttachmentShow() {
       return Column(
         children: [
-          if (_attachmentList.length == 0)
+          if (_attachmentList.isEmpty)
             Row(
               children: [
                 Row(
                   children: [
-                    SizedBox(
+                    const SizedBox(
                       width: 10,
                     ),
                     InkWell(
@@ -489,14 +476,14 @@ class _PostWritePageState extends State<PostWritePage> {
                         children: [
                           SvgPicture.asset(
                             'assets/icons/clip.svg',
-                            colorFilter: ColorFilter.mode(
+                            colorFilter: const ColorFilter.mode(
                               Color(0xFF636363),
                               BlendMode.srcIn,
                             ),
                             width: 34,
                             height: 34,
                           ),
-                          Text(
+                          const Text(
                             "첨부파일 추가",
                             style: TextStyle(
                                 fontWeight: FontWeight.w500,
@@ -512,34 +499,34 @@ class _PostWritePageState extends State<PostWritePage> {
             )
           else
             AnimatedSize(
-              duration: Duration(milliseconds: 100),
+              duration: const Duration(milliseconds: 100),
               alignment: AlignmentDirectional.topCenter,
               child: Column(
                 children: [
                   Row(
                     children: [
-                      SizedBox(
+                      const SizedBox(
                         width: 20,
                       ),
-                      Text(
+                      const Text(
                         "첨부파일",
                         style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w500,
                         ),
                       ),
-                      SizedBox(
+                      const SizedBox(
                         width: 8,
                       ),
                       Text(
                         _attachmentList.length.toString(),
-                        style: TextStyle(
+                        style: const TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w500,
                           color: ColorsInfo.newara,
                         ),
                       ),
-                      SizedBox(
+                      const SizedBox(
                         width: 5,
                       ),
                       InkWell(
@@ -552,26 +539,26 @@ class _PostWritePageState extends State<PostWritePage> {
                           'assets/icons/chevron_down.svg',
                           width: 20,
                           height: 20,
-                          colorFilter: ColorFilter.mode(
+                          colorFilter: const ColorFilter.mode(
                             Colors.red,
                             BlendMode.srcIn,
                           ),
                         ),
                       ),
-                      Spacer(),
+                      const Spacer(),
                       InkWell(
                         onTap: () => _pickFile(),
                         child: SvgPicture.asset(
                           'assets/icons/add.svg',
                           width: 34,
                           height: 34,
-                          colorFilter: ColorFilter.mode(
+                          colorFilter: const ColorFilter.mode(
                             Color(0xFFED3A3A),
                             BlendMode.srcIn,
                           ),
                         ),
                       ),
-                      SizedBox(
+                      const SizedBox(
                         width: 14,
                       ),
                     ],
@@ -588,7 +575,7 @@ class _PostWritePageState extends State<PostWritePage> {
 
                         child: Column(
                           children: [
-                            SizedBox(
+                            const SizedBox(
                               height: 10,
                             ),
                             Expanded(
@@ -603,14 +590,14 @@ class _PostWritePageState extends State<PostWritePage> {
                                     return Column(
                                       children: [
                                         if (index != 0)
-                                          SizedBox(
+                                          const SizedBox(
                                             height: 5,
                                           ),
                                         Container(
                                           height: 44,
                                           decoration: BoxDecoration(
                                             border: Border.all(
-                                              color: Color(
+                                              color: const Color(
                                                   0xFFF0F0F0), // #F0F0F0 색상
                                               width: 1, // 테두리 두께 1픽셀
                                             ),
@@ -619,18 +606,19 @@ class _PostWritePageState extends State<PostWritePage> {
                                           ),
                                           child: Row(
                                             children: [
-                                              SizedBox(
+                                              const SizedBox(
                                                 width: 6,
                                               ),
                                               SvgPicture.asset(
                                                 'assets/icons/pdf.svg',
                                                 width: 30,
                                                 height: 30,
-                                                colorFilter: ColorFilter.mode(
-                                                    Colors.black,
-                                                    BlendMode.srcIn),
+                                                colorFilter:
+                                                    const ColorFilter.mode(
+                                                        Colors.black,
+                                                        BlendMode.srcIn),
                                               ),
-                                              SizedBox(
+                                              const SizedBox(
                                                 width: 3,
                                               ),
                                               Expanded(
@@ -647,7 +635,7 @@ class _PostWritePageState extends State<PostWritePage> {
                                                       TextOverflow.ellipsis,
                                                 ),
                                               ),
-                                              SizedBox(
+                                              const SizedBox(
                                                 width: 3,
                                               ),
                                               Text(
@@ -660,7 +648,7 @@ class _PostWritePageState extends State<PostWritePage> {
                                                     : formatBytes(
                                                         _attachmentList[index]
                                                             .fileUrlSize),
-                                                style: TextStyle(
+                                                style: const TextStyle(
                                                     fontSize: 14,
                                                     fontWeight: FontWeight.w500,
                                                     color: Color(0xFFBBBBBB)),
@@ -673,12 +661,13 @@ class _PostWritePageState extends State<PostWritePage> {
                                                   'assets/icons/close.svg',
                                                   width: 30,
                                                   height: 30,
-                                                  colorFilter: ColorFilter.mode(
-                                                      Color(0xFFBBBBBB),
-                                                      BlendMode.srcIn),
+                                                  colorFilter:
+                                                      const ColorFilter.mode(
+                                                          Color(0xFFBBBBBB),
+                                                          BlendMode.srcIn),
                                                 ),
                                               ),
-                                              SizedBox(
+                                              const SizedBox(
                                                 width: 8.52,
                                               ),
                                             ],
@@ -698,13 +687,13 @@ class _PostWritePageState extends State<PostWritePage> {
                 ],
               ),
             ),
-          SizedBox(
+          const SizedBox(
             height: 15,
           ),
           Row(
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
-              SizedBox(
+              const SizedBox(
                 width: 20,
               ),
               // TODO: 익명 선택하는 기능 추가하고 익명 보여주는 기능 추가하기
@@ -748,6 +737,8 @@ class _PostWritePageState extends State<PostWritePage> {
               // SizedBox(
               //   width: 15,
               // ),
+
+              //TODO: 터치 부분이 너무 작아서 불편함.
               GestureDetector(
                 onTap: () {
                   setState(() {
@@ -755,39 +746,44 @@ class _PostWritePageState extends State<PostWritePage> {
                     _selectedCheckboxes[1] = !_selectedCheckboxes[1]!;
                   });
                 },
-                child: Container(
-                  width: 20,
-                  height: 20,
-                  decoration: BoxDecoration(
-                    color: _selectedCheckboxes[1]!
-                        ? ColorsInfo.newara
-                        : Color(0xFFF0F0F0),
-                    borderRadius: BorderRadius.circular(5.0),
-                  ),
-                  alignment: Alignment.center,
-                  child: SvgPicture.asset(
-                    'assets/icons/check.svg',
-                    width: 16,
-                    height: 16,
-                    colorFilter: ColorFilter.mode(
-                        Colors.white, BlendMode.srcIn), // #FFFFFF 색상
-                  ),
+                child: Row(
+                  children: [
+                    Container(
+                      width: 20,
+                      height: 20,
+                      decoration: BoxDecoration(
+                        color: _selectedCheckboxes[1]!
+                            ? ColorsInfo.newara
+                            : const Color(0xFFF0F0F0),
+                        borderRadius: BorderRadius.circular(5.0),
+                      ),
+                      alignment: Alignment.center,
+                      child: SvgPicture.asset(
+                        'assets/icons/check.svg',
+                        width: 16,
+                        height: 16,
+                        colorFilter: const ColorFilter.mode(
+                            Colors.white, BlendMode.srcIn), // #FFFFFF 색상
+                      ),
+                    ),
+                    const SizedBox(
+                      width: 6,
+                    ),
+                    Text(
+                      "성인",
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w500,
+                        color: _selectedCheckboxes[1]!
+                            ? ColorsInfo.newara
+                            : const Color(0xFFBBBBBB),
+                      ),
+                    ),
+                  ],
                 ),
               ),
-              SizedBox(
-                width: 6,
-              ),
-              Text(
-                "성인",
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w500,
-                  color: _selectedCheckboxes[1]!
-                      ? ColorsInfo.newara
-                      : Color(0xFFBBBBBB),
-                ),
-              ),
-              SizedBox(
+
+              const SizedBox(
                 width: 15,
               ),
               GestureDetector(
@@ -797,41 +793,46 @@ class _PostWritePageState extends State<PostWritePage> {
                     _selectedCheckboxes[2] = !_selectedCheckboxes[2]!;
                   });
                 },
-                child: Container(
-                  width: 20,
-                  height: 20,
-                  decoration: BoxDecoration(
-                    color: _selectedCheckboxes[2]!
-                        ? ColorsInfo.newara
-                        : Color(0xFFF0F0F0),
-                    borderRadius: BorderRadius.circular(5.0),
-                  ),
-                  alignment: Alignment.center,
-                  child: SvgPicture.asset(
-                    'assets/icons/check.svg',
-                    width: 16,
-                    height: 16,
-                    colorFilter: ColorFilter.mode(
-                        Colors.white, BlendMode.srcIn), // #FFFFFF 색상
-                  ),
+                child: Row(
+                  children: [
+                    Container(
+                      width: 20,
+                      height: 20,
+                      decoration: BoxDecoration(
+                        color: _selectedCheckboxes[2]!
+                            ? ColorsInfo.newara
+                            : const Color(0xFFF0F0F0),
+                        borderRadius: BorderRadius.circular(5.0),
+                      ),
+                      alignment: Alignment.center,
+                      child: SvgPicture.asset(
+                        'assets/icons/check.svg',
+                        width: 16,
+                        height: 16,
+                        colorFilter: const ColorFilter.mode(
+                            Colors.white, BlendMode.srcIn), // #FFFFFF 색상
+                      ),
+                    ),
+                    const SizedBox(
+                      width: 6,
+                    ),
+                    Text(
+                      "정치",
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w500,
+                        color: _selectedCheckboxes[2]!
+                            ? ColorsInfo.newara
+                            : const Color(0xFFBBBBBB),
+                      ),
+                    ),
+                  ],
                 ),
               ),
-              SizedBox(
-                width: 6,
-              ),
-              Text(
-                "정치",
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w500,
-                  color: _selectedCheckboxes[2]!
-                      ? ColorsInfo.newara
-                      : Color(0xFFBBBBBB),
-                ),
-              ),
-              Spacer(),
+
+              const Spacer(),
               GestureDetector(
-                child: Text(
+                child: const Text(
                   "이용약관",
                   style: TextStyle(
                     decoration: TextDecoration.underline,
@@ -841,19 +842,19 @@ class _PostWritePageState extends State<PostWritePage> {
                   ),
                 ),
               ),
-              SizedBox(
+              const SizedBox(
                 width: 20,
               ),
             ],
           ),
-          SizedBox(
+          const SizedBox(
             height: 20,
           )
         ],
       );
     }
 
-    Widget _buildToolbar() {
+    Widget buildToolbar() {
       return quill.QuillToolbar.basic(
         controller: _quillController,
         multiRowsDisplay: true,
@@ -917,7 +918,7 @@ class _PostWritePageState extends State<PostWritePage> {
       );
     }
 
-    Widget _buildEditor() {
+    Widget buildEdior() {
       return quill.QuillEditor.basic(
         controller: _quillController,
         embedBuilders: FlutterQuillEmbeds.builders(),
@@ -933,7 +934,7 @@ class _PostWritePageState extends State<PostWritePage> {
         centerTitle: true,
         leading: IconButton(
           icon: SvgPicture.asset('assets/icons/left_chevron.svg',
-              colorFilter: ColorFilter.mode(
+              colorFilter: const ColorFilter.mode(
                 Colors.red,
                 BlendMode.srcIn,
               ),
@@ -941,10 +942,10 @@ class _PostWritePageState extends State<PostWritePage> {
               height: 35),
           onPressed: () => Navigator.pop(context),
         ),
-        title: SizedBox(
+        title: const SizedBox(
           child: Text(
             "글 쓰기",
-            style: const TextStyle(
+            style: TextStyle(
               color: ColorsInfo.newara,
               fontSize: 18,
               fontWeight: FontWeight.w700,
@@ -972,9 +973,9 @@ class _PostWritePageState extends State<PostWritePage> {
                     ),
                     child: Container(
                       constraints:
-                          BoxConstraints(maxWidth: 65.0, maxHeight: 35.0),
+                          const BoxConstraints(maxWidth: 65.0, maxHeight: 35.0),
                       alignment: Alignment.center,
-                      child: Text(
+                      child: const Text(
                         '올리기',
                         style: TextStyle(color: Colors.white),
                       ),
@@ -985,14 +986,14 @@ class _PostWritePageState extends State<PostWritePage> {
                         borderRadius: BorderRadius.circular(10.0),
                         color: Colors.transparent,
                         border: Border.all(
-                          color: Color(0xFFF0F0F0), // #F0F0F0 색상
+                          color: const Color(0xFFF0F0F0), // #F0F0F0 색상
                           width: 1, // 테두리 두께 1픽셀
                         )),
                     child: Container(
                       constraints:
-                          BoxConstraints(maxWidth: 65.0, maxHeight: 35.0),
+                          const BoxConstraints(maxWidth: 65.0, maxHeight: 35.0),
                       alignment: Alignment.center,
-                      child: Text(
+                      child: const Text(
                         '올리기',
                         style: TextStyle(color: Color(0xFFBBBBBB)),
                       ),
@@ -1004,19 +1005,19 @@ class _PostWritePageState extends State<PostWritePage> {
       body: SafeArea(
         child: Column(
           children: [
-            _buildMenubar(),
-            _buildTitle(),
+            buildMenubar(),
+            buildTitle(),
             Container(
               height: 1,
-              color: Color(0xFFF0F0F0),
+              color: const Color(0xFFF0F0F0),
             ),
-            _buildToolbar(),
+            buildToolbar(),
             Expanded(
                 child: Padding(
               padding: const EdgeInsets.all(12.0),
-              child: _buildEditor(),
+              child: buildEdior(),
             )),
-            _buildAttachmentShow()
+            buildAttachmentShow()
           ],
         ),
       ),
@@ -1037,7 +1038,7 @@ class _PostWritePageState extends State<PostWritePage> {
   }
 
   quill.Delta _htmlToQuillDelta(String html) {
-    debugPrint("1 : " + html);
+    debugPrint("1 : $html");
     // HTML을 마크다운으로 변환
     var markdown = html2md.convert(
       html,
@@ -1045,18 +1046,18 @@ class _PostWritePageState extends State<PostWritePage> {
         'headingStyle': 'atx',
       },
     );
-    debugPrint("2 : " + markdown);
+    debugPrint("2 : $markdown");
 
     // 마크다운을 Delta로 변환
     var deltaJson = markdownToQuill(markdown);
-    debugPrint("3 : " + deltaJson!);
+    debugPrint("3 : ${deltaJson!}");
 
     final mdDocument = md.Document(encodeHtml: false);
 
     final mdToDelta = MarkdownToDelta(markdownDocument: mdDocument);
 
     var deltaJson2 = mdToDelta.convert(markdown);
-    debugPrint("4 : " + deltaJson2.toString());
+    debugPrint("4 : $deltaJson2");
 
     // Delta를 JSON으로 변환
     //var delta = quill.Delta.fromJson(jsonDecode(deltaJson!));
@@ -1170,7 +1171,7 @@ class _PostWritePageState extends State<PostWritePage> {
       }
 
       try {
-        var response;
+        Response response;
         var data = {
           'title': titleValue,
           'content': contentValue,
@@ -1182,7 +1183,7 @@ class _PostWritePageState extends State<PostWritePage> {
 
         if (isUpdate) {
           response = await dio.put(
-            '$newAraDefaultUrl/api/articles/${previousArticleId}/',
+            '$newAraDefaultUrl/api/articles/$previousArticleId/',
             data: data,
           );
         } else {
@@ -1196,7 +1197,9 @@ class _PostWritePageState extends State<PostWritePage> {
         }
 
         debugPrint('Response data: ${response.data}');
-        Navigator.pop(context);
+        if (mounted) {
+          Navigator.pop(context);
+        }
       } on DioException catch (error) {
         debugPrint('post Error: ${error.response!.data}');
       }
@@ -1212,12 +1215,12 @@ class _PostWritePageState extends State<PostWritePage> {
 
   /// 사진 추가 시 실행되는 함수
   Future<void> _pickImage() async {
-    final ImagePicker _picker = ImagePicker();
-    final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
+    final ImagePicker imagePicker = ImagePicker();
+    final XFile? image =
+        await imagePicker.pickImage(source: ImageSource.gallery);
 
     if (image != null) {
       final String imageUrl = image.path;
-      final int length = _quillController.document.length;
       final TextSelection selection = _quillController.selection;
       setState(() {
         _quillController.document.insert(
@@ -1236,7 +1239,7 @@ class _PostWritePageState extends State<PostWritePage> {
       setState(() {
         _isFileMenuBarSelected = true;
         _attachmentList.add(AttachmentsFormat(
-          fileType: FileType.Image,
+          fileType: FileType.image,
           isNewFile: true,
           fileLocalPath: imageUrl,
           uuid: uuid,
@@ -1258,7 +1261,8 @@ class _PostWritePageState extends State<PostWritePage> {
       setState(() {
         _isFileMenuBarSelected = true;
         _attachmentList.add(AttachmentsFormat(
-          fileType: FileType.Other,
+          //TODO: 파일 타입 결정해서 FileType에 추가하기, svg파일도 추가하기.
+          fileType: FileType.other,
           isNewFile: true,
           fileLocalPath: file.path,
         ));
