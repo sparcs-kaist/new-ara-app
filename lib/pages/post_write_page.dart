@@ -1,13 +1,12 @@
 import 'dart:async';
 import 'dart:math' as math;
 import 'dart:convert';
+import 'package:delta_to_html/delta_to_html.dart';
 import 'package:dio/dio.dart';
 import 'package:file_picker/file_picker.dart';
-import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
-import 'package:html_editor_enhanced/html_editor.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:new_ara_app/constants/url_info.dart';
 import 'dart:io';
-import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:image_picker/image_picker.dart';
@@ -15,22 +14,23 @@ import 'package:new_ara_app/constants/colors_info.dart';
 import 'package:new_ara_app/models/article_model.dart';
 import 'package:new_ara_app/models/attachment_model.dart';
 import 'package:new_ara_app/models/board_detail_action_model.dart';
-import 'package:new_ara_app/models/board_group_model.dart';
-import 'package:new_ara_app/models/board_model.dart';
 import 'package:new_ara_app/models/simple_board_model.dart';
 import 'package:new_ara_app/models/topic_model.dart';
+import 'package:new_ara_app/providers/user_provider.dart';
 import 'package:new_ara_app/widgetclasses/loading_indicator.dart';
-import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
 import 'package:uuid/uuid.dart';
-
-import '../providers/user_provider.dart';
 import 'package:new_ara_app/providers/notification_provider.dart';
 import 'package:path/path.dart' as path;
 import 'package:path_provider/path_provider.dart';
-
 import 'package:html/parser.dart' show parse;
 import 'package:html/dom.dart' as html;
+import 'package:flutter_quill/flutter_quill.dart' as quill;
+import 'package:flutter_quill_extensions/flutter_quill_extensions.dart';
+import 'package:html2md/html2md.dart' as html2md;
+import 'package:quill_markdown/quill_markdown.dart';
+import 'package:markdown_quill/markdown_quill.dart';
+import 'package:markdown/markdown.dart' as md;
 
 /// 사용자가 게시물을 작성하거나 편집할 수 있는 페이지를 나타내는 StatefulWidget입니다.
 class PostWritePage extends StatefulWidget {
@@ -47,8 +47,8 @@ class PostWritePage extends StatefulWidget {
 /// 첨부 파일의 유형을 나타내는 열거형입니다.
 /// TODO: pdf, doc 같은 파일 유형 추가하기.
 enum FileType {
-  Image,
-  Other,
+  image,
+  other,
 }
 
 /// 첨부 파일의 형식 및 속성을 나타내는 클래스입니다.
@@ -85,7 +85,7 @@ class AttachmentsFormat {
 }
 
 class _PostWritePageState extends State<PostWritePage> {
-  /// 현재 이 페이지가 수정페이지인지 처음 작성하는 게시물인지 판단
+  /// 현재 이 페이지가 수정페이지이면 true, 처음 작성하는 게시물이면 false
   bool _isEditingPost = false;
 
   /// 기본 게시판 및 주제 모델.
@@ -117,7 +117,7 @@ class _PostWritePageState extends State<PostWritePage> {
   );
 
   /// 익명, 성인, 정치 체크 박스가 선택되어 있는지 판별을 위한 리스트
-  List<bool?> _selectedCheckboxes = [true, false, false];
+  final List<bool?> _selectedCheckboxes = [true, false, false];
 
   /// 첨부파일 메뉴바가 펼쳐져 있는 지 판별을 위한 변수
   bool _isFileMenuBarSelected = false;
@@ -148,12 +148,12 @@ class _PostWritePageState extends State<PostWritePage> {
   late TargetPlatform? platform;
 
   final TextEditingController _titleController = TextEditingController();
-  final HtmlEditorController _htmlController = HtmlEditorController();
-  String _currentHtmlContent = "";
 
   final ScrollController _listScrollController = ScrollController();
 
   late StreamSubscription<bool> keyboardSubscription;
+
+  final quill.QuillController _quillController = quill.QuillController.basic();
 
   @override
   void initState() {
@@ -161,10 +161,11 @@ class _PostWritePageState extends State<PostWritePage> {
 
     context.read<NotificationProvider>().checkIsNotReadExist();
 
-    if (widget.previousArticle != null)
+    if (widget.previousArticle != null) {
       _isEditingPost = true;
-    else
+    } else {
       _isEditingPost = false;
+    }
 
     if (Platform.isAndroid) {
       platform = TargetPlatform.android;
@@ -239,8 +240,10 @@ class _PostWritePageState extends State<PostWritePage> {
       String? fileUrlPath = attachment.file;
       String fileUrlName = _extractAndDecodeFileNameFromUrl(attachment.file);
       int? fileUrlSize = attachment.size ?? 0;
+
+      // TODO: fileType이 이미지인지 아닌지 판단해서 넣기.
       _attachmentList.add(AttachmentsFormat(
-          fileType: FileType.Image,
+          fileType: FileType.image,
           isNewFile: false,
           id: id,
           fileUrlPath: fileUrlPath,
@@ -248,8 +251,10 @@ class _PostWritePageState extends State<PostWritePage> {
           fileUrlSize: fileUrlSize));
     }
 
-    // 상태 업데이트.
+    // 수정 게시물의 기존 상태 반영.
     setState(() {
+      _quillController.document = quill.Document.fromDelta(
+          _htmlToQuillDelta(widget.previousArticle!.content!));
       _isFileMenuBarSelected = _attachmentList.isNotEmpty;
       _selectedCheckboxes[1] =
           widget.previousArticle?.is_content_sexual ?? false;
@@ -304,340 +309,643 @@ class _PostWritePageState extends State<PostWritePage> {
     var userProvider = context.watch<UserProvider>();
 
     /// 게시물 업로드 가능한지 확인
+    String currentHtmlContent =
+        DeltaToHTML.encodeJson(_quillController.document.toDelta().toJson());
     bool canIupload = _titleController.text != '' &&
         _chosenBoardValue!.id != -1 &&
-        _currentHtmlContent != '' &&
-        _currentHtmlContent != '<p><br></p>' &&
+        currentHtmlContent != '' &&
+        currentHtmlContent != '<br>' &&
         _isUploadingPost == false;
 
-    //  _getCurrentHtmlContent();
+    Widget buildMenubar() {
+      return Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 15),
+        child: SizedBox(
+          width: double.infinity,
+          height: 34,
+          child: Row(
+            children: [
+              Flexible(
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFF8F8F8),
+                    borderRadius: BorderRadius.circular(20.0),
+                  ),
+                  child: DropdownButtonHideUnderline(
+                    child: DropdownButton<BoardDetailActionModel>(
+                      // TODO: 원하는 메뉴 모양 만들기 위해 속성 테스트 할 것
+                      // isDense: true,
+                      // isExpanded: true,
 
-    /// HTML 문자열 내의 이미지 태그의 uuid를 판별해 src 속성에 url 을 추가
-    /// 로컬에 있는 첨부파일을 게시물에 추가, 삭제하는 데 쓰임.
-    String updateImgTagSrc(htmlString, uuid, fileUrl) {
-      var document = parse(htmlString);
-      List<html.Element> imgTags = document.getElementsByTagName('img');
+                      value: _chosenBoardValue,
+                      style: const TextStyle(color: Colors.red),
+                      items: _boardList
+                          .map<DropdownMenuItem<BoardDetailActionModel>>(
+                              (BoardDetailActionModel value) {
+                        return DropdownMenuItem<BoardDetailActionModel>(
+                          enabled: value.id != -1,
+                          value: value,
+                          child: Padding(
+                            padding: const EdgeInsets.only(left: 12.0),
+                            child: Text(
+                              value.ko_name,
+                              style: TextStyle(
+                                color: value.id == -1 || _isEditingPost
+                                    ? const Color(0xFFBBBBBB)
+                                    : ColorsInfo.newara,
+                                fontWeight: FontWeight.w500,
+                                fontSize: 16,
+                              ),
+                            ),
+                          ),
+                        );
+                      }).toList(),
 
-      if (uuid == null) return document.body?.innerHtml ?? '';
+                      /// 게시판 선택 이후 토픽 목록이 변해야 하므로 변경하는 기능 추가
+                      /// TODO: 함수 따로 빼기
+                      onChanged: _isEditingPost ? null : setSpecTopicList,
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(
+                width: 10,
+              ),
+              Flexible(
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFF8F8F8),
+                    borderRadius: BorderRadius.circular(20.0),
+                  ),
+                  child: DropdownButtonHideUnderline(
+                    child: DropdownButton<TopicModel>(
+                      value: _chosenTopicValue,
+                      style: const TextStyle(color: Colors.red),
+                      items: _specTopicList.map<DropdownMenuItem<TopicModel>>(
+                          (TopicModel value) {
+                        return DropdownMenuItem<TopicModel>(
+                          value: value,
+                          child: Padding(
+                            padding: const EdgeInsets.only(left: 12.0),
+                            child: Text(
+                              value.ko_name,
+                              style: TextStyle(
+                                color: value.id == -1 || _isEditingPost
+                                    ? const Color(0xFFBBBBBB)
+                                    : Colors.black,
+                                fontWeight: FontWeight.w500,
+                                fontSize: 16,
+                              ),
+                            ),
+                          ),
+                        );
+                      }).toList(),
 
-      for (var imgTag in imgTags) {
-        if (imgTag.attributes['data-uuid'] == uuid) {
-          if (fileUrl != null) {
-            imgTag.attributes['src'] = fileUrl;
-          } else {
-            // fileUrl이 null인 경우 이미지 태그를 삭제
-            imgTag.remove();
-          }
-        }
-      }
-      return document.body?.innerHtml ?? '';
+                      /// 토픽 선택하는 기능
+                      /// TODO: 함수 따로 빼기
+                      onChanged: _isEditingPost
+                          ? null
+                          : (TopicModel? value) {
+                              setState(() {
+                                _chosenTopicValue = value;
+                              });
+                            },
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
     }
 
-    /// HTML 문자열 내의 이미지 태그의 src 속성의 값을 판별해 삭제
-    /// 이미 클라우드에 올라가 있는 첨부 파일을 html 본문에서 제거하는 데 쓰임.
-    String deleteImgTagSrc(htmlString, fileUrl) {
-      var document = parse(htmlString);
-      // debugPrint(document.body?.innerHtml ?? '');
-      List<html.Element> imgTags = document.getElementsByTagName('img');
-
-      for (var imgTag in imgTags) {
-        if (imgTag.attributes['src'] == fileUrl) {
-          imgTag.remove();
-        }
-      }
-      return document.body?.innerHtml ?? '';
+    Widget buildTitle() {
+      return TextField(
+        controller: _titleController,
+        minLines: 1,
+        maxLines: 1,
+        maxLength: 255,
+        style: const TextStyle(
+          height: 1,
+          fontSize: 22,
+          fontWeight: FontWeight.w700,
+        ),
+        decoration: const InputDecoration(
+          hintText: "제목을 입력해주세요.",
+          hintStyle: TextStyle(
+              fontSize: 22,
+              color: Color(0xFFBBBBBB),
+              fontWeight: FontWeight.w700),
+          counterStyle: TextStyle(
+            height: double.minPositive,
+          ),
+          counterText: "",
+          filled: true,
+          fillColor: Colors.white,
+          isDense: true,
+          enabledBorder: OutlineInputBorder(
+            borderSide: BorderSide(
+              color: Colors.transparent, // 테두리 색상 설정
+            ), // 모서리를 둥글게 설정
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderSide: BorderSide(
+              color: Colors.transparent, // 테두리 색상 설정
+            ), // 모서리를 둥글게 설정
+          ),
+        ),
+        cursorColor: Colors.transparent,
+      );
     }
 
-    /// HTML 문자열 내의 이미지 태그의 너비를 100%로 설정하여 리턴
-    String updateImgTagWidth(String htmlString) {
-      var document = parse(htmlString);
-      List<html.Element> imgTags = document.getElementsByTagName('img');
+    Widget buildAttachmentShow() {
+      return Column(
+        children: [
+          if (_attachmentList.isEmpty)
+            Row(
+              children: [
+                Row(
+                  children: [
+                    const SizedBox(
+                      width: 10,
+                    ),
+                    InkWell(
+                      onTap: _pickFile,
+                      child: Row(
+                        children: [
+                          SvgPicture.asset(
+                            'assets/icons/clip.svg',
+                            colorFilter: const ColorFilter.mode(
+                              Color(0xFF636363),
+                              BlendMode.srcIn,
+                            ),
+                            width: 34,
+                            height: 34,
+                          ),
+                          const Text(
+                            "첨부파일 추가",
+                            style: TextStyle(
+                                fontWeight: FontWeight.w500,
+                                fontSize: 16,
+                                color: Color(0xFF636363)),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            )
+          else
+            AnimatedSize(
+              duration: const Duration(milliseconds: 100),
+              alignment: AlignmentDirectional.topCenter,
+              child: Column(
+                children: [
+                  Row(
+                    children: [
+                      const SizedBox(
+                        width: 20,
+                      ),
+                      const Text(
+                        "첨부파일",
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                      const SizedBox(
+                        width: 8,
+                      ),
+                      Text(
+                        _attachmentList.length.toString(),
+                        style: const TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w500,
+                          color: ColorsInfo.newara,
+                        ),
+                      ),
+                      const SizedBox(
+                        width: 5,
+                      ),
+                      InkWell(
+                        onTap: () {
+                          setState(() {
+                            _isFileMenuBarSelected = !_isFileMenuBarSelected;
+                          });
+                        },
+                        child: SvgPicture.asset(
+                          'assets/icons/chevron_down.svg',
+                          width: 20,
+                          height: 20,
+                          colorFilter: const ColorFilter.mode(
+                            Colors.red,
+                            BlendMode.srcIn,
+                          ),
+                        ),
+                      ),
+                      const Spacer(),
+                      InkWell(
+                        onTap: () => _pickFile(),
+                        child: SvgPicture.asset(
+                          'assets/icons/add.svg',
+                          width: 34,
+                          height: 34,
+                          colorFilter: const ColorFilter.mode(
+                            Color(0xFFED3A3A),
+                            BlendMode.srcIn,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(
+                        width: 14,
+                      ),
+                    ],
+                  ),
+                  if (_isFileMenuBarSelected) ...[
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 15),
+                      child: SizedBox(
+                        //최대 4개까지 첨부파일 보여주고 그 이후로는 스크롤.
+                        //피그마 디자인 기준으로 필요한 높이를 계산함.
+                        height: 10 +
+                            math.min(3, _attachmentList.length) * 44 +
+                            5 * (math.min(3, _attachmentList.length) - 1),
 
-      for (var imgTag in imgTags) {
-        imgTag.attributes['width'] = '100%';
-      }
-      return document.body?.innerHtml ?? '';
+                        child: Column(
+                          children: [
+                            const SizedBox(
+                              height: 10,
+                            ),
+                            Expanded(
+                              child: CupertinoScrollbar(
+                                thumbVisibility: true,
+                                controller: _listScrollController,
+                                child: ListView.builder(
+                                  controller: _listScrollController,
+                                  shrinkWrap: true,
+                                  itemCount: _attachmentList.length,
+                                  itemBuilder: (context, index) {
+                                    return Column(
+                                      children: [
+                                        if (index != 0)
+                                          const SizedBox(
+                                            height: 5,
+                                          ),
+                                        Container(
+                                          height: 44,
+                                          decoration: BoxDecoration(
+                                            border: Border.all(
+                                              color: const Color(
+                                                  0xFFF0F0F0), // #F0F0F0 색상
+                                              width: 1, // 테두리 두께 1픽셀
+                                            ),
+                                            borderRadius: BorderRadius.circular(
+                                                15), // 반지름 15
+                                          ),
+                                          child: Row(
+                                            children: [
+                                              const SizedBox(
+                                                width: 6,
+                                              ),
+                                              SvgPicture.asset(
+                                                'assets/icons/pdf.svg',
+                                                width: 30,
+                                                height: 30,
+                                                colorFilter:
+                                                    const ColorFilter.mode(
+                                                        Colors.black,
+                                                        BlendMode.srcIn),
+                                              ),
+                                              const SizedBox(
+                                                width: 3,
+                                              ),
+                                              Expanded(
+                                                child: Text(
+                                                  _attachmentList[index]
+                                                          .isNewFile
+                                                      ? path.basename(
+                                                          _attachmentList[index]
+                                                              .fileLocalPath!)
+                                                      : _attachmentList[index]
+                                                          .fileUrlName,
+                                                  maxLines: 1,
+                                                  overflow:
+                                                      TextOverflow.ellipsis,
+                                                ),
+                                              ),
+                                              const SizedBox(
+                                                width: 3,
+                                              ),
+                                              Text(
+                                                _attachmentList[index].isNewFile
+                                                    ? formatBytes(File(
+                                                            _attachmentList[
+                                                                    index]
+                                                                .fileLocalPath!)
+                                                        .lengthSync())
+                                                    : formatBytes(
+                                                        _attachmentList[index]
+                                                            .fileUrlSize),
+                                                style: const TextStyle(
+                                                    fontSize: 14,
+                                                    fontWeight: FontWeight.w500,
+                                                    color: Color(0xFFBBBBBB)),
+                                              ),
+                                              InkWell(
+                                                onTap: () {
+                                                  _onAttachmentDelete(index);
+                                                },
+                                                child: SvgPicture.asset(
+                                                  'assets/icons/close.svg',
+                                                  width: 30,
+                                                  height: 30,
+                                                  colorFilter:
+                                                      const ColorFilter.mode(
+                                                          Color(0xFFBBBBBB),
+                                                          BlendMode.srcIn),
+                                                ),
+                                              ),
+                                              const SizedBox(
+                                                width: 8.52,
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ],
+                                    );
+                                  },
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
+                ],
+              ),
+            ),
+          const SizedBox(
+            height: 15,
+          ),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              const SizedBox(
+                width: 20,
+              ),
+              // TODO: 익명 선택하는 기능 추가하고 익명 보여주는 기능 추가하기
+              // GestureDetector(
+              //   onTap: () {
+              //     setState(() {
+              //       _selectedCheckboxes[0] = !_selectedCheckboxes[0]!;
+              //     });
+              //   },
+              //   child: Container(
+              //     width: 20,
+              //     height: 20,
+              //     decoration: BoxDecoration(
+              //       color: _selectedCheckboxes[0]!
+              //           ? ColorsInfo.newara
+              //           : Color(0xFFF0F0F0),
+              //       borderRadius: BorderRadius.circular(5.0),
+              //     ),
+              //     alignment: Alignment.center,
+              //     child: SvgPicture.asset(
+              //       'assets/icons/check.svg',
+              //       width: 16,
+              //       height: 16,
+              //       color: Colors.white,
+              //     ),
+              //   ),
+              // ),
+              // SizedBox(
+              //   width: 6,
+              // ),
+              // Text(
+              //   "익명",
+              //   style: TextStyle(
+              //     fontSize: 16,
+              //     fontWeight: FontWeight.w500,
+              //     color: _selectedCheckboxes[0]!
+              //         ? ColorsInfo.newara
+              //         : Color(0xFFBBBBBB),
+              //   ),
+              // ),
+              // SizedBox(
+              //   width: 15,
+              // ),
+
+              //TODO: 터치 부분이 너무 작아서 불편함.
+              GestureDetector(
+                onTap: () {
+                  setState(() {
+                    //성인 체크 박스
+                    _selectedCheckboxes[1] = !_selectedCheckboxes[1]!;
+                  });
+                },
+                child: Row(
+                  children: [
+                    Container(
+                      width: 20,
+                      height: 20,
+                      decoration: BoxDecoration(
+                        color: _selectedCheckboxes[1]!
+                            ? ColorsInfo.newara
+                            : const Color(0xFFF0F0F0),
+                        borderRadius: BorderRadius.circular(5.0),
+                      ),
+                      alignment: Alignment.center,
+                      child: SvgPicture.asset(
+                        'assets/icons/check.svg',
+                        width: 16,
+                        height: 16,
+                        colorFilter: const ColorFilter.mode(
+                            Colors.white, BlendMode.srcIn), // #FFFFFF 색상
+                      ),
+                    ),
+                    const SizedBox(
+                      width: 6,
+                    ),
+                    Text(
+                      "성인",
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w500,
+                        color: _selectedCheckboxes[1]!
+                            ? ColorsInfo.newara
+                            : const Color(0xFFBBBBBB),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+
+              const SizedBox(
+                width: 15,
+              ),
+              GestureDetector(
+                onTap: () {
+                  setState(() {
+                    //정치 체크 박스
+                    _selectedCheckboxes[2] = !_selectedCheckboxes[2]!;
+                  });
+                },
+                child: Row(
+                  children: [
+                    Container(
+                      width: 20,
+                      height: 20,
+                      decoration: BoxDecoration(
+                        color: _selectedCheckboxes[2]!
+                            ? ColorsInfo.newara
+                            : const Color(0xFFF0F0F0),
+                        borderRadius: BorderRadius.circular(5.0),
+                      ),
+                      alignment: Alignment.center,
+                      child: SvgPicture.asset(
+                        'assets/icons/check.svg',
+                        width: 16,
+                        height: 16,
+                        colorFilter: const ColorFilter.mode(
+                            Colors.white, BlendMode.srcIn), // #FFFFFF 색상
+                      ),
+                    ),
+                    const SizedBox(
+                      width: 6,
+                    ),
+                    Text(
+                      "정치",
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w500,
+                        color: _selectedCheckboxes[2]!
+                            ? ColorsInfo.newara
+                            : const Color(0xFFBBBBBB),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+
+              const Spacer(),
+              GestureDetector(
+                child: const Text(
+                  "이용약관",
+                  style: TextStyle(
+                    decoration: TextDecoration.underline,
+                    fontSize: 16,
+                    fontWeight: FontWeight.w500,
+                    color: Color(0xFFBBBBBB),
+                  ),
+                ),
+              ),
+              const SizedBox(
+                width: 20,
+              ),
+            ],
+          ),
+          const SizedBox(
+            height: 20,
+          )
+        ],
+      );
     }
 
-    /// 한글 오류 방지 (현재는 그대로 반환)
-    /// TODO: iOS 한글 오류 방지 코드 추가
-    String preventHangleError(String htmlString) {
-      return htmlString;
-    }
+    Widget buildToolbar() {
+      return quill.QuillToolbar.basic(
+        controller: _quillController,
+        multiRowsDisplay: true,
+        showUndo: false,
+        showRedo: false,
+        showColorButton: false,
+        showBackgroundColorButton: false,
+        showFontFamily: false,
+        showFontSize: false,
+        showDividers: false,
+        showListCheck: false,
+        showSearchButton: false,
+        showSubscript: false,
+        showSuperscript: false,
 
-    /// 파일 선택 및 `_attachmentList`에 추가
-    Future<void> filePick() async {
-      filePickerResult = await FilePicker.platform.pickFiles();
-      if (filePickerResult != null) {
-        debugPrint(filePickerResult!.files.single.path!);
-        File file = File(filePickerResult!.files.single.path!);
-        if (Platform.isIOS) {
-          // iOS에서는 파일을 복사해서 사용했음. 캐쉬로 날라가는 문제 발생해서.
-          final documentPath = (await getApplicationDocumentsDirectory()).path;
-          file = await file.copy('$documentPath/${path.basename(file.path)}');
-          debugPrint("IOS run");
-          debugPrint(file.path);
-          debugPrint(filePickerResult!.files.single.path);
-        }
+        toolbarIconAlignment: WrapAlignment.start,
+        toolbarIconCrossAlignment: WrapCrossAlignment.start,
+        customButtons: [
+          quill.QuillCustomButton(
+            icon: Icons.camera_alt,
+            onTap: _pickImage,
+          ),
+          quill.QuillCustomButton(
+            icon: Icons.settings,
+            onTap: () {
+              debugPrint(DeltaToHTML.encodeJson(
+                  _quillController.document.toDelta().toJson()));
 
-        setState(() {
-          _isFileMenuBarSelected = true;
-          _attachmentList.add(AttachmentsFormat(
-            fileType: FileType.Other,
-            isNewFile: true,
-            fileLocalPath: file.path,
-          ));
-        });
-      }
-    }
+              var json = jsonEncode(_quillController.document.toDelta());
+              List<dynamic> delta = jsonDecode(json);
+              List<dynamic> nwDelta = [];
 
-    /// 바이트를 적절한 단위로 변환하여 문자열로 반환
-    /// TODO: 이 함수는 다른 파일로 분리하는 것이 좋을 것 같음.
-    String formatBytes(int bytes) {
-      if (bytes < 1024) {
-        return '$bytes B'; // 바이트 단위로 표시
-      } else if (bytes < 1024 * 1024) {
-        double kb = bytes / 1024;
-        return '${kb.toStringAsFixed(2)} KB'; // 킬로바이트(KB) 단위로 표시
-      } else if (bytes < 1024 * 1024 * 1024) {
-        double mb = bytes / (1024 * 1024);
-        return '${mb.toStringAsFixed(2)} MB'; // 메가바이트(MB) 단위로 표시
-      } else {
-        double gb = bytes / (1024 * 1024 * 1024);
-        return '${gb.toStringAsFixed(2)} GB'; // 기가바이트(GB) 단위로 표시
-      }
-    }
+              // Delta 리스트를 순회하면서 'insert' 키를 찾습니다.
+              for (Map<String, dynamic> line in delta) {
+                var value = line["insert"];
+                bool flag = true;
 
-    /// 새로운 포스트를 서버에 업로드하는 함수이다.
-    ///
-    /// 사용자가 입력한 제목, 내용 및 첨부 파일을 서버에 전송하여 새로운 포스트를 생성한다.
-    /// 이 함수는 다음의 단계를 거친다:
-    /// 1. 사용자 입력 값을 가져온다.
-    /// 2. 첨부 파일이 있으면 서버에 업로드하고, 해당 파일의 ID를 가져온다.
-    /// 3. 제목, 내용 및 첨부 파일 ID를 함께 서버에 전송하여 포스트를 생성한다.
-    void uploadPost() async {
-      String titleValue;
-      String contentValue;
-      List<int> attachmentIds = [];
-      try {
-        titleValue = _titleController.text;
-        contentValue = await _htmlController.getText();
-        debugPrint("title: $titleValue");
-        debugPrint("content: $contentValue");
-      } catch (error) {
-        debugPrint(error.toString());
-        return;
-      }
-      setState(() {
-        _isUploadingPost = true;
-        _isLoading = true;
-      });
-      try {
-        Dio dio = Dio();
-        dio.options.headers['Cookie'] = userProvider.getCookiesToString();
-        for (int i = 0; i < _attachmentList.length; i++) {
-          if (_attachmentList[i].isNewFile) {
-            var attachFile = File(_attachmentList[i].fileLocalPath!);
-            // 이 파일 uuid 에 해당하는 img 태그가 html 안에 있다면 변경한다.
-            // 파일이 존재하는지 확인
-            if (attachFile.existsSync()) {
-              var dio = Dio();
-              dio.options.headers['Cookie'] = userProvider.getCookiesToString();
-              var formData = FormData.fromMap({
-                "file": await MultipartFile.fromFile(attachFile.path,
-                    filename: attachFile.path.split('/').last),
-              });
-              try {
-                var response = await dio
-                    .post("$newAraDefaultUrl/api/attachments/", data: formData);
-                debugPrint("Response: ${response.data}");
-                final attachmentModel = AttachmentModel.fromJson(response.data);
-                attachmentIds.add(attachmentModel.id);
-                contentValue = updateImgTagSrc(contentValue,
-                    _attachmentList[i].uuid, attachmentModel.file);
-              } catch (error) {
-                debugPrint("$error");
+                // 'insert' 키의 값이 맵인 경우, 이 맵을 순회하여 'image' 키를 찾습니다.
+                if (value is Map<String, dynamic>) {
+                  for (var newKey in value.keys) {
+                    if (newKey == "image") {
+                      flag = false;
+                      // 'image' 키의 값이 "abc"인 경우, 해당 라인을 삭제합니다.
+                    }
+                  }
+                }
+                if (flag) nwDelta.add(line);
               }
-            } else {
-              debugPrint("File does not exist: ${attachFile.path}");
-            }
-          }
-        }
 
-        var response = await dio.post(
-          '$newAraDefaultUrl/api/articles/',
-          data: {
-            'title': titleValue,
-            'content': contentValue,
-            'attachments': attachmentIds,
-            'parent_topic':
-                _chosenTopicValue!.id == -1 ? '' : _chosenTopicValue!.id,
-            'is_content_sexual': _selectedCheckboxes[1],
-            'is_content_social': _selectedCheckboxes[2],
-            'parent_board': _chosenBoardValue!.id,
-            'name_type': 'REGULAR'
-          },
-        );
-
-        debugPrint('Response data: ${response.data}');
-        Navigator.pop(context);
-      } on DioException catch (error) {
-        debugPrint('post Error: ${error.response!.data}');
-      }
-      if (mounted) {
-        setState(() {
-          _isUploadingPost = false;
-          _isLoading = false;
-        });
-      }
-    }
-
-    /// 기존 포스트 업데이트하는 함수
-    /// uploadPost 함수와 유사하나 새로 추가된 파일만 서버에 새로 업로드 한다.
-    /// TODO: upladPost와 updatePost는 유사한 점이 많아 함수를 하나로 합치는 것이 좋을 것 같다.
-    void updatePost() async {
-      String titleValue;
-      String contentValue;
-      List<int> attachmentIds = [];
-      try {
-        titleValue = _titleController.text;
-        contentValue = await _htmlController.getText();
-        debugPrint("title: $titleValue");
-        debugPrint("content: $contentValue");
-      } catch (error) {
-        debugPrint(error.toString());
-        return;
-      }
-      setState(() {
-        _isUploadingPost = true;
-        _isLoading = true;
-      });
-
-      try {
-        Dio dio = Dio();
-        dio.options.headers['Cookie'] = userProvider.getCookiesToString();
-        for (int i = 0; i < _attachmentList.length; i++) {
-          if (_attachmentList[i].isNewFile) {
-            var attachFile = File(_attachmentList[i].fileLocalPath!);
-            // 파일이 존재하는지 확인하는 코드
-            if (attachFile.existsSync()) {
-              var dio = Dio();
-              dio.options.headers['Cookie'] = userProvider.getCookiesToString();
-              var formData = FormData.fromMap({
-                "file": await MultipartFile.fromFile(attachFile.path,
-                    filename: attachFile.path.split('/').last),
+              // 수정된 Delta를 다시 JSON으로 인코딩하고 Document로 변환합니다.
+              String newJson = jsonEncode(nwDelta);
+              quill.Delta newDelta = quill.Delta.fromJson(jsonDecode(newJson));
+              setState(() {
+                _quillController.document =
+                    quill.Document.fromJson(newDelta.toJson());
               });
-              try {
-                var response = await dio
-                    .post("$newAraDefaultUrl/api/attachments/", data: formData);
-                debugPrint("Response: ${response.data}");
-                final attachmentModel = AttachmentModel.fromJson(response.data);
-                attachmentIds.add(attachmentModel.id);
-                contentValue = updateImgTagSrc(contentValue,
-                    _attachmentList[i].uuid, attachmentModel.file);
-              } catch (error) {
-                debugPrint("$error");
-              }
-            } else {
-              debugPrint("File does not exist: ${attachFile.path}");
-            }
-          } else {
-            attachmentIds.add(_attachmentList[i].id!);
-          }
-        }
-
-        var response = await dio.put(
-          '$newAraDefaultUrl/api/articles/${widget.previousArticle!.id}/',
-          data: {
-            'title': titleValue,
-            'content': contentValue,
-            'attachments': attachmentIds,
-            'is_content_sexual': _selectedCheckboxes[1],
-            'is_content_social': _selectedCheckboxes[2],
-            'name_type': 'REGULAR'
-          },
-        );
-
-        debugPrint('Response data: ${response.data}');
-        Navigator.pop(context);
-      } on DioException catch (error) {
-        debugPrint('post Error: ${error.response!.data}');
-      }
-      if (mounted) {
-        setState(() {
-          _isUploadingPost = false;
-          _isLoading = false;
-        });
-      }
+            },
+          ),
+        ],
+        // embedButtons: FlutterQuillEmbeds.buttons(),
+      );
     }
 
-    /// 첨부 파일 삭제 및 관련 HTML 내용 업데이트
-    /// 기존에 업로드된 파일인 경우 API 요청으로 삭제
-    /// 새로 추가한 파일인 경우 HTML 내용에서 해당 이미지 태그 삭제
-    void onAttachmentDelete(int index) async {
-      String text = await _htmlController.getText();
-
-      if (_attachmentList[index].isNewFile) {
-        String nextText =
-            updateImgTagSrc(text, _attachmentList[index].uuid, null);
-        debugPrint("next : $nextText");
-        _htmlController.setText(nextText);
-      } else {
-        String nextText =
-            deleteImgTagSrc(text, _attachmentList[index].fileUrlPath);
-        debugPrint("next : $nextText");
-        _htmlController.setText(nextText);
-      }
-
-      setState(() {
-        _attachmentList.removeAt(index);
-        _isLoading = false;
-      });
+    Widget buildEditor() {
+      return quill.QuillEditor.basic(
+        controller: _quillController,
+        embedBuilders: FlutterQuillEmbeds.builders(),
+        readOnly: false, // The editor is editable
+      );
     }
 
-    /// 게시판 주제 선택 이후 토픽 목록 변경
-    void setSpecTopicList(BoardDetailActionModel? value) {
-      setState(() {
-        _specTopicList = [];
-        _specTopicList.add(_defaultTopicModel2);
-        for (TopicModel topic in value!.topics) {
-          _specTopicList.add(topic);
-        }
-        _chosenTopicValue = _specTopicList[0];
-        _chosenBoardValue = value;
-      });
-    }
+    //빌드 전 첨부파일의 유효성 확인
+    _checkAttachmentsValid();
 
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
-        leadingWidth: 100,
-        leading: Row(
-          children: [
-            SizedBox(
-              width: 35,
-              child: IconButton(
-                color: ColorsInfo.newara,
-                icon: SizedBox(
-                  width: 35,
-                  height: 35,
-                  child: SvgPicture.asset(
-                    'assets/icons/left_chevron.svg',
-                    color: ColorsInfo.newara,
-                    fit: BoxFit.fill,
-                  ),
-                ),
-                onPressed: () {
-                  Navigator.pop(context);
-                },
+        leading: IconButton(
+          icon: SvgPicture.asset('assets/icons/left_chevron.svg',
+              colorFilter: const ColorFilter.mode(
+                Colors.red,
+                BlendMode.srcIn,
               ),
-            ),
-          ],
+              width: 35,
+              height: 35),
+          onPressed: () => Navigator.pop(context),
         ),
-        title: SizedBox(
+        title: const SizedBox(
           child: Text(
             "글 쓰기",
-            style: const TextStyle(
+            style: TextStyle(
               color: ColorsInfo.newara,
               fontSize: 18,
               fontWeight: FontWeight.w700,
@@ -648,8 +956,13 @@ class _PostWritePageState extends State<PostWritePage> {
           MaterialButton(
             /// 포스트 업로드하는 기능
             /// TODO: 함수 따로 빼기
-            onPressed:
-                canIupload ? (_isEditingPost ? updatePost : uploadPost) : null,
+            onPressed: canIupload
+                ? (_isEditingPost
+                    ? _managePost(userProvider,
+                        isUpdate: true,
+                        previousArticleId: widget.previousArticle!.id)
+                    : _managePost(userProvider))
+                : null,
             // 버튼이 클릭되었을 때 수행할 동작
             padding: EdgeInsets.zero, // 패딩 제거
             child: canIupload
@@ -660,9 +973,9 @@ class _PostWritePageState extends State<PostWritePage> {
                     ),
                     child: Container(
                       constraints:
-                          BoxConstraints(maxWidth: 65.0, maxHeight: 35.0),
+                          const BoxConstraints(maxWidth: 65.0, maxHeight: 35.0),
                       alignment: Alignment.center,
-                      child: Text(
+                      child: const Text(
                         '올리기',
                         style: TextStyle(color: Colors.white),
                       ),
@@ -673,14 +986,14 @@ class _PostWritePageState extends State<PostWritePage> {
                         borderRadius: BorderRadius.circular(10.0),
                         color: Colors.transparent,
                         border: Border.all(
-                          color: Color(0xFFF0F0F0), // #F0F0F0 색상
+                          color: const Color(0xFFF0F0F0), // #F0F0F0 색상
                           width: 1, // 테두리 두께 1픽셀
                         )),
                     child: Container(
                       constraints:
-                          BoxConstraints(maxWidth: 65.0, maxHeight: 35.0),
+                          const BoxConstraints(maxWidth: 65.0, maxHeight: 35.0),
                       alignment: Alignment.center,
-                      child: Text(
+                      child: const Text(
                         '올리기',
                         style: TextStyle(color: Color(0xFFBBBBBB)),
                       ),
@@ -692,647 +1005,326 @@ class _PostWritePageState extends State<PostWritePage> {
       body: SafeArea(
         child: Column(
           children: [
+            buildMenubar(),
+            buildTitle(),
             Container(
-              width: double.infinity,
-              height: 34,
-              child: Row(
-                children: [
-                  Flexible(
-                    child: Container(
-                      decoration: BoxDecoration(
-                        color: Color(0xFFF8F8F8),
-                        borderRadius: BorderRadius.circular(20.0),
-                      ),
-                      child: DropdownButtonHideUnderline(
-                        child: DropdownButton<BoardDetailActionModel>(
-                          // TODO: 원하는 메뉴 모양 만들기 위해 속성 테스트 할 것
-                          // isDense: true,
-                          // isExpanded: true,
-
-                          value: _chosenBoardValue,
-                          style: TextStyle(color: Colors.red),
-                          items: _boardList
-                              .map<DropdownMenuItem<BoardDetailActionModel>>(
-                                  (BoardDetailActionModel value) {
-                            return DropdownMenuItem<BoardDetailActionModel>(
-                              enabled: value.id != -1,
-                              value: value,
-                              child: Padding(
-                                padding: const EdgeInsets.only(left: 12.0),
-                                child: Text(
-                                  value.ko_name,
-                                  style: TextStyle(
-                                    color: value.id == -1 || _isEditingPost
-                                        ? Color(0xFFBBBBBB)
-                                        : ColorsInfo.newara,
-                                    fontWeight: FontWeight.w500,
-                                    fontSize: 16,
-                                  ),
-                                ),
-                              ),
-                            );
-                          }).toList(),
-
-                          /// 게시판 선택 이후 토픽 목록이 변해야 하므로 변경하는 기능 추가
-                          /// TODO: 함수 따로 빼기
-                          onChanged: _isEditingPost ? null : setSpecTopicList,
-                        ),
-                      ),
-                    ),
-                  ),
-                  SizedBox(
-                    width: 10,
-                  ),
-                  Flexible(
-                    child: Container(
-                      decoration: BoxDecoration(
-                        color: Color(0xFFF8F8F8),
-                        borderRadius: BorderRadius.circular(20.0),
-                      ),
-                      child: DropdownButtonHideUnderline(
-                        child: DropdownButton<TopicModel>(
-                          value: _chosenTopicValue,
-                          style: TextStyle(color: Colors.red),
-                          items: _specTopicList
-                              .map<DropdownMenuItem<TopicModel>>(
-                                  (TopicModel value) {
-                            return DropdownMenuItem<TopicModel>(
-                              value: value,
-                              child: Padding(
-                                padding: const EdgeInsets.only(left: 12.0),
-                                child: Text(
-                                  value.ko_name,
-                                  style: TextStyle(
-                                    color: value.id == -1 || _isEditingPost
-                                        ? Color(0xFFBBBBBB)
-                                        : Colors.black,
-                                    fontWeight: FontWeight.w500,
-                                    fontSize: 16,
-                                  ),
-                                ),
-                              ),
-                            );
-                          }).toList(),
-
-                          /// 토픽 선택하는 기능
-                          /// TODO: 함수 따로 빼기
-                          onChanged: _isEditingPost
-                              ? null
-                              : (TopicModel? value) {
-                                  setState(() {
-                                    _chosenTopicValue = value;
-                                  });
-                                },
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
+              height: 1,
+              color: const Color(0xFFF0F0F0),
             ),
+            buildToolbar(),
             Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  TextField(
-                    onChanged: (value) {
-                      setState(() {});
-                    },
-                    controller: _titleController,
-                    minLines: 1,
-                    maxLines: 1,
-                    maxLength: 255,
-                    style: TextStyle(
-                      height: 1,
-                      fontSize: 22,
-                      fontWeight: FontWeight.w700,
-                    ),
-                    decoration: InputDecoration(
-                      hintText: "제목을 입력해주세요.",
-                      hintStyle: TextStyle(
-                          fontSize: 22,
-                          color: Color(0xFFBBBBBB),
-                          fontWeight: FontWeight.w700),
-                      counterStyle: TextStyle(
-                        height: double.minPositive,
-                      ),
-                      counterText: "",
-                      filled: true,
-                      fillColor: Colors.white,
-                      isDense: true,
-                      enabledBorder: OutlineInputBorder(
-                    
-                        borderSide: BorderSide(
-                          color: Colors.transparent, // 테두리 색상 설정
-                        ), // 모서리를 둥글게 설정
-                      ),
-                      focusedBorder: OutlineInputBorder(
-                    
-                        borderSide: BorderSide(
-                          color: Colors.transparent, // 테두리 색상 설정
-                        ), // 모서리를 둥글게 설정
-                      ),
-                    ),
-                    cursorColor: Colors.transparent,
-                  ),
-                  Container(
-                    height: 1,
-                    color: Color(0xFFF0F0F0),
-                  ),
-                  Expanded(
-                    child: Column(
-  
-                      children: [
-                        Expanded(
-                          child: SingleChildScrollView(
-                            physics: NeverScrollableScrollPhysics(),
-                            child: Column(
-                              children: [
-                                HtmlEditor(
-                                  callbacks: Callbacks(
-                                      onChangeContent: (String? value) {
-                                    debugPrint("onChangeContent: $value");
-                                    setState(() {
-                                      _currentHtmlContent = value!;
-                                    });
-                                  }),
-                                  controller: _htmlController,
-                                  htmlEditorOptions: HtmlEditorOptions(
-                                    shouldEnsureVisible: true,
-                                    autoAdjustHeight: false,
-                                    hint: "<p>내용을 입력해주세요.</p>",
-                                    initialText: widget.previousArticle == null
-                                        ? null
-                                        : updateImgTagWidth(
-                                            widget.previousArticle!.content!),
-                                  ),
-                                  htmlToolbarOptions: HtmlToolbarOptions(
-                                      toolbarType: ToolbarType.nativeGrid,
-
-                                      /// 사진 추가 시 base64 인코딩하여 태그로 추가. (이미지 첨부 기능)
-                                      /// uuid를 할당하여 각각 태그가 구분 가능하게하고, 추후 태그를 수정 가능하도록 함.
-                                      mediaUploadInterceptor:
-                                          (PlatformFile file,
-                                              InsertFileType type) async {
-                                        if (type == InsertFileType.image) {
-                                          String uuid = const Uuid().v4();
-                                          setState(() {
-                                            _isFileMenuBarSelected = true;
-                                            _attachmentList
-                                                .add(AttachmentsFormat(
-                                              fileType: FileType.Image,
-                                              isNewFile: true,
-                                              fileLocalPath: file.path,
-                                              uuid: uuid,
-                                            ));
-                                          });
-
-                                          String base64Data =
-                                              base64.encode(file.bytes!);
-                                          String base64Image =
-                                              """<img data-uuid=$uuid  src="data:image/${file.extension};base64,$base64Data" data-filename="${file.name}" width=100% />""";
-                                          _htmlController
-                                              .insertHtml(base64Image);
-                                        }
-                                        return false;
-                                      },
-                                      defaultToolbarButtons: [
-                                        const FontButtons(
-                                          bold: true,
-                                          italic: true,
-                                          underline: true,
-                                          clearAll: true,
-                                          strikethrough: true,
-                                          superscript: false,
-                                          subscript: false,
-                                        ),
-                                        const InsertButtons(
-                                          link: true,
-                                          picture: true,
-                                          audio: false,
-                                          video: false,
-                                          otherFile: false,
-                                          table: false,
-                                          hr: true,
-                                        )
-                               
-                                      ]),
-                                  otherOptions: OtherOptions(
-                                    height: 450,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  KeyboardVisibilityBuilder(
-                    builder: (context, isKeyboardVisible) {
-                      if (isKeyboardVisible) {
-                        _isFileMenuBarSelected = false;
-
-                        return Container();
-                      } else {
-                        return Column(
-                          children: [
-                            if (_attachmentList.length == 0)
-                              Row(
-                                children: [
-                                  Row(
-                                    children: [
-                                      SizedBox(
-                                        width: 10,
-                                      ),
-                                      InkWell(
-                                        onTap: filePick,
-                                        child: Row(
-                                          children: [
-                                            SvgPicture.asset(
-                                              'assets/icons/clip.svg',
-                                              color: Color(0xFF636363),
-                                              width: 34,
-                                              height: 34,
-                                            ),
-                                            Text(
-                                              "첨부파일 추가",
-                                              style: TextStyle(
-                                                  fontWeight: FontWeight.w500,
-                                                  fontSize: 16,
-                                                  color: Color(0xFF636363)),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ],
-                              )
-                            else
-                              AnimatedSize(
-                                duration: Duration(milliseconds: 100),
-                                alignment: AlignmentDirectional.topCenter,
-                                child: Column(
-                                  children: [
-                                    Row(
-                                      children: [
-                                        SizedBox(
-                                          width: 20,
-                                        ),
-                                        Text(
-                                          "첨부파일",
-                                          style: TextStyle(
-                                            fontSize: 16,
-                                            fontWeight: FontWeight.w500,
-                                          ),
-                                        ),
-                                        SizedBox(
-                                          width: 8,
-                                        ),
-                                        Text(
-                                          _attachmentList.length.toString(),
-                                          style: TextStyle(
-                                            fontSize: 16,
-                                            fontWeight: FontWeight.w500,
-                                            color: ColorsInfo.newara,
-                                          ),
-                                        ),
-                                        SizedBox(
-                                          width: 5,
-                                        ),
-                                        InkWell(
-                                          onTap: () {
-                                            setState(() {
-                                              _isFileMenuBarSelected =
-                                                  !_isFileMenuBarSelected;
-                                            });
-                                          },
-                                          child: SvgPicture.asset(
-                                            'assets/icons/chevron_down.svg',
-                                            width: 20,
-                                            height: 20,
-                                            color: Colors.red,
-                                          ),
-                                        ),
-                                        Spacer(),
-                                        InkWell(
-                                          onTap: () => filePick(),
-                                          child: SvgPicture.asset(
-                                            'assets/icons/add.svg',
-                                            width: 34,
-                                            height: 34,
-                                            color: Color(0xFFED3A3A),
-                                          ),
-                                        ),
-                                        SizedBox(
-                                          width: 14,
-                                        ),
-                                      ],
-                                    ),
-                                    if (_isFileMenuBarSelected) ...[
-                                      Padding(
-                                        padding: const EdgeInsets.symmetric(
-                                            horizontal: 15),
-                                        child: SizedBox(
-                                          //최대 4개까지 첨부파일 보여주고 그 이후로는 스크롤.
-                                          //피그마 디자인 기준으로 필요한 높이를 계산함.
-                                          height: 10 +
-                                              math.min(3,
-                                                      _attachmentList.length) *
-                                                  44 +
-                                              5 *
-                                                  (math.min(
-                                                          3,
-                                                          _attachmentList
-                                                              .length) -
-                                                      1),
-
-                                          child: Column(
-                                            children: [
-                                              SizedBox(
-                                                height: 10,
-                                              ),
-                                              Expanded(
-                                                child: Scrollbar(
-                                                  thumbVisibility: true,
-                                                  child: ListView.builder(
-                                                    controller:
-                                                        _listScrollController,
-                                                    shrinkWrap: true,
-                                                    itemCount:
-                                                        _attachmentList.length,
-                                                    itemBuilder:
-                                                        (context, index) {
-                                                      return Column(
-                                                        children: [
-                                                          if (index != 0)
-                                                            SizedBox(
-                                                              height: 5,
-                                                            ),
-                                                          Container(
-                                                            height: 44,
-                                                            decoration:
-                                                                BoxDecoration(
-                                                              border:
-                                                                  Border.all(
-                                                                color: Color(
-                                                                    0xFFF0F0F0), // #F0F0F0 색상
-                                                                width:
-                                                                    1, // 테두리 두께 1픽셀
-                                                              ),
-                                                              borderRadius:
-                                                                  BorderRadius
-                                                                      .circular(
-                                                                          15), // 반지름 15
-                                                            ),
-                                                            child: Row(
-                                                              children: [
-                                                                SizedBox(
-                                                                  width: 6,
-                                                                ),
-                                                                SvgPicture
-                                                                    .asset(
-                                                                  'assets/icons/pdf.svg',
-                                                                  width: 30,
-                                                                  height: 30,
-                                                                  color: Colors
-                                                                      .black,
-                                                                ),
-                                                                SizedBox(
-                                                                  width: 3,
-                                                                ),
-                                                                Expanded(
-                                                                  child: Text(
-                                                                    _attachmentList[index]
-                                                                            .isNewFile
-                                                                        ? path.basename(_attachmentList[index]
-                                                                            .fileLocalPath!)
-                                                                        : _attachmentList[index]
-                                                                            .fileUrlName,
-                                                                    maxLines: 1,
-                                                                    overflow:
-                                                                        TextOverflow
-                                                                            .ellipsis,
-                                                                  ),
-                                                                ),
-                                                                SizedBox(
-                                                                  width: 3,
-                                                                ),
-                                                                Text(
-                                                                  _attachmentList[
-                                                                              index]
-                                                                          .isNewFile
-                                                                      ? formatBytes(
-                                                                          File(_attachmentList[index].fileLocalPath!)
-                                                                              .lengthSync())
-                                                                      : formatBytes(
-                                                                          _attachmentList[index]
-                                                                              .fileUrlSize),
-                                                                  style: TextStyle(
-                                                                      fontSize:
-                                                                          14,
-                                                                      fontWeight:
-                                                                          FontWeight
-                                                                              .w500,
-                                                                      color: Color(
-                                                                          0xFFBBBBBB)),
-                                                                ),
-                                                                InkWell(
-                                                                  onTap: () {
-                                                                    onAttachmentDelete(
-                                                                        index);
-                                                                  },
-                                                                  child:
-                                                                      SvgPicture
-                                                                          .asset(
-                                                                    'assets/icons/close.svg',
-                                                                    width: 30,
-                                                                    height: 30,
-                                                                    color: Color(
-                                                                        0xFFBBBBBB),
-                                                                  ),
-                                                                ),
-                                                                SizedBox(
-                                                                  width: 8.52,
-                                                                ),
-                                                              ],
-                                                            ),
-                                                          ),
-                                                        ],
-                                                      );
-                                                    },
-                                                  ),
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                      ),
-                                    ],
-                                  ],
-                                ),
-                              ),
-                            SizedBox(
-                              height: 15,
-                            ),
-                            Row(
-                              crossAxisAlignment: CrossAxisAlignment.end,
-                              children: [
-                                SizedBox(
-                                  width: 20,
-                                ),
-                                // TODO: 익명 선택하는 기능 추가하고 익명 보여주는 기능 추가하기
-                                // GestureDetector(
-                                //   onTap: () {
-                                //     setState(() {
-                                //       _selectedCheckboxes[0] = !_selectedCheckboxes[0]!;
-                                //     });
-                                //   },
-                                //   child: Container(
-                                //     width: 20,
-                                //     height: 20,
-                                //     decoration: BoxDecoration(
-                                //       color: _selectedCheckboxes[0]!
-                                //           ? ColorsInfo.newara
-                                //           : Color(0xFFF0F0F0),
-                                //       borderRadius: BorderRadius.circular(5.0),
-                                //     ),
-                                //     alignment: Alignment.center,
-                                //     child: SvgPicture.asset(
-                                //       'assets/icons/check.svg',
-                                //       width: 16,
-                                //       height: 16,
-                                //       color: Colors.white,
-                                //     ),
-                                //   ),
-                                // ),
-                                // SizedBox(
-                                //   width: 6,
-                                // ),
-                                // Text(
-                                //   "익명",
-                                //   style: TextStyle(
-                                //     fontSize: 16,
-                                //     fontWeight: FontWeight.w500,
-                                //     color: _selectedCheckboxes[0]!
-                                //         ? ColorsInfo.newara
-                                //         : Color(0xFFBBBBBB),
-                                //   ),
-                                // ),
-                                // SizedBox(
-                                //   width: 15,
-                                // ),
-                                GestureDetector(
-                                  onTap: () {
-                                    setState(() {
-                                      _selectedCheckboxes[1] =
-                                          !_selectedCheckboxes[1]!;
-                                    });
-                                  },
-                                  child: Container(
-                                    width: 20,
-                                    height: 20,
-                                    decoration: BoxDecoration(
-                                      color: _selectedCheckboxes[1]!
-                                          ? ColorsInfo.newara
-                                          : Color(0xFFF0F0F0),
-                                      borderRadius: BorderRadius.circular(5.0),
-                                    ),
-                                    alignment: Alignment.center,
-                                    child: SvgPicture.asset(
-                                      'assets/icons/check.svg',
-                                      width: 16,
-                                      height: 16,
-                                      color: Colors.white,
-                                    ),
-                                  ),
-                                ),
-                                SizedBox(
-                                  width: 6,
-                                ),
-                                Text(
-                                  "성인",
-                                  style: TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.w500,
-                                    color: _selectedCheckboxes[1]!
-                                        ? ColorsInfo.newara
-                                        : Color(0xFFBBBBBB),
-                                  ),
-                                ),
-                                SizedBox(
-                                  width: 15,
-                                ),
-                                GestureDetector(
-                                  onTap: () {
-                                    setState(() {
-                                      _selectedCheckboxes[2] =
-                                          !_selectedCheckboxes[2]!;
-                                    });
-                                  },
-                                  child: Container(
-                                    width: 20,
-                                    height: 20,
-                                    decoration: BoxDecoration(
-                                      color: _selectedCheckboxes[2]!
-                                          ? ColorsInfo.newara
-                                          : Color(0xFFF0F0F0),
-                                      borderRadius: BorderRadius.circular(5.0),
-                                    ),
-                                    alignment: Alignment.center,
-                                    child: SvgPicture.asset(
-                                      'assets/icons/check.svg',
-                                      width: 16,
-                                      height: 16,
-                                      color: Colors.white,
-                                    ),
-                                  ),
-                                ),
-                                SizedBox(
-                                  width: 6,
-                                ),
-                                Text(
-                                  "정치",
-                                  style: TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.w500,
-                                    color: _selectedCheckboxes[2]!
-                                        ? ColorsInfo.newara
-                                        : Color(0xFFBBBBBB),
-                                  ),
-                                ),
-                                Spacer(),
-                                GestureDetector(
-                                  child: Text(
-                                    "이용약관",
-                                    style: TextStyle(
-                                      decoration: TextDecoration.underline,
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.w500,
-                                      color: Color(0xFFBBBBBB),
-                                    ),
-                                  ),
-                                ),
-                                SizedBox(
-                                  width: 20,
-                                ),
-                              ],
-                            ),
-                            SizedBox(
-                              height: 20,
-                            )
-                          ],
-                        );
-                      }
-                    },
-                  ),
-                ],
-              ),
-            ),
+                child: Padding(
+              padding: const EdgeInsets.all(12.0),
+              child: buildEditor(),
+            )),
+            buildAttachmentShow()
           ],
         ),
       ),
     );
+  }
+
+  /// _attachmentList 의 첨부파일이 존재하는 파일인지 유효성 확인하는 함수
+  void _checkAttachmentsValid() {
+    // _attachmentList에서 원소를 직접 삭제하기
+    for (int i = _attachmentList.length - 1; i >= 0; i--) {
+      if (_attachmentList[i].isNewFile) {
+        File file = File(_attachmentList[i].fileLocalPath!);
+        if (!file.existsSync()) {
+          _attachmentList.removeAt(i);
+        }
+      }
+    }
+  }
+
+  quill.Delta _htmlToQuillDelta(String html) {
+    debugPrint("1 : $html");
+    // HTML을 마크다운으로 변환
+    var markdown = html2md.convert(
+      html,
+      styleOptions: {
+        'headingStyle': 'atx',
+      },
+    );
+    debugPrint("2 : $markdown");
+
+    // 마크다운을 Delta로 변환
+    var deltaJson = markdownToQuill(markdown);
+    debugPrint("3 : ${deltaJson!}");
+
+    final mdDocument = md.Document(encodeHtml: false);
+
+    final mdToDelta = MarkdownToDelta(markdownDocument: mdDocument);
+
+    var deltaJson2 = mdToDelta.convert(markdown);
+    debugPrint("4 : $deltaJson2");
+
+    // Delta를 JSON으로 변환
+    //var delta = quill.Delta.fromJson(jsonDecode(deltaJson!));
+
+    return deltaJson2;
+  }
+
+  /// HTML 문자열 내의 이미지 태그의 너비를 100%로 설정하여 리턴
+  String updateImgTagWidth(String htmlString) {
+    var document = parse(htmlString);
+    List<html.Element> imgTags = document.getElementsByTagName('img');
+
+    for (var imgTag in imgTags) {
+      imgTag.attributes['width'] = '100%';
+    }
+    return document.body?.innerHtml ?? '';
+  }
+
+  /// 한글 오류 방지 (현재는 그대로 반환)
+  /// TODO: iOS 한글 오류 방지 코드 추가
+  String preventHangleError(String htmlString) {
+    return htmlString;
+  }
+
+  /// 바이트를 적절한 단위로 변환하여 문자열로 반환
+  /// TODO: 이 함수는 다른 파일로 분리하는 것이 좋을 것 같음.
+  String formatBytes(int bytes) {
+    if (bytes < 1024) {
+      return '$bytes B'; // 바이트 단위로 표시
+    } else if (bytes < 1024 * 1024) {
+      double kb = bytes / 1024;
+      return '${kb.toStringAsFixed(2)} KB'; // 킬로바이트(KB) 단위로 표시
+    } else if (bytes < 1024 * 1024 * 1024) {
+      double mb = bytes / (1024 * 1024);
+      return '${mb.toStringAsFixed(2)} MB'; // 메가바이트(MB) 단위로 표시
+    } else {
+      double gb = bytes / (1024 * 1024 * 1024);
+      return '${gb.toStringAsFixed(2)} GB'; // 기가바이트(GB) 단위로 표시
+    }
+  }
+
+  String _manageImgTagSrc(String htmlString, String curUrl, String? nexUrl) {
+    var document = parse(htmlString);
+    List<html.Element> imgTags = document.getElementsByTagName('img');
+
+    for (var imgTag in imgTags) {
+      if (imgTag.attributes['src'] == curUrl) {
+        if (nexUrl == null) {
+          imgTag.remove();
+        } else {
+          imgTag.attributes['src'] = nexUrl;
+        }
+      }
+    }
+    return document.body?.innerHtml ?? '';
+  }
+
+  /// 포스트를 서버에 업로드하는 함수이다.
+  /// 사용자가 입력한 제목, 내용 및 첨부 파일을 서버에 전송하여 새로운 포스트를 생성한다.
+  /// 이 함수는 다음의 단계를 거친다:
+  /// 1. 포스트 입력 값을 가져온다..
+  /// 2. 첨부 파일이 있으면 서버에 업로드하고, 해당 파일의 ID를 가져온다.
+  /// 3. 제목, 내용 및 첨부 파일 ID를 함께 서버에 전송하여 포스트를 생성한다.
+  void Function() _managePost(UserProvider userProvider,
+      {bool isUpdate = false, int? previousArticleId}) {
+    return () async {
+      String titleValue;
+      String contentValue;
+      List<int> attachmentIds = [];
+      try {
+        titleValue = _titleController.text;
+        contentValue = DeltaToHTML.encodeJson(
+            _quillController.document.toDelta().toJson());
+      } catch (error) {
+        debugPrint(error.toString());
+        return;
+      }
+      setState(() {
+        _isUploadingPost = true;
+        _isLoading = true;
+      });
+
+      Dio dio = Dio();
+      dio.options.headers['Cookie'] = userProvider.getCookiesToString();
+
+      for (int i = 0; i < _attachmentList.length; i++) {
+        //새로 올리는 파일이면 새로운 id 할당 받기.
+        if (_attachmentList[i].isNewFile) {
+          File attachFile = File(_attachmentList[i].fileLocalPath!);
+          bool fileExists = await attachFile.exists();
+          if (fileExists) {
+            FormData formData = FormData.fromMap({
+              "file": await MultipartFile.fromFile(attachFile.path,
+                  filename: attachFile.path.split('/').last),
+            });
+            try {
+              Response response = await dio
+                  .post("$newAraDefaultUrl/api/attachments/", data: formData);
+              final attachmentModel = AttachmentModel.fromJson(response.data);
+              attachmentIds.add(attachmentModel.id);
+              contentValue = _manageImgTagSrc(contentValue,
+                  _attachmentList[i].fileLocalPath!, attachmentModel.file);
+            } catch (error) {
+              debugPrint("$error");
+            }
+          }
+        } else {
+          // 기존에 올라간 파일이면 기존 id만 추가.
+          attachmentIds.add(_attachmentList[i].id!);
+        }
+      }
+
+      try {
+        Response response;
+        var data = {
+          'title': titleValue,
+          'content': contentValue,
+          'attachments': attachmentIds,
+          'is_content_sexual': _selectedCheckboxes[1],
+          'is_content_social': _selectedCheckboxes[2],
+          'name_type': 'REGULAR'
+        };
+
+        if (isUpdate) {
+          response = await dio.put(
+            '$newAraDefaultUrl/api/articles/$previousArticleId/',
+            data: data,
+          );
+        } else {
+          data['parent_topic'] =
+              _chosenTopicValue!.id == -1 ? '' : _chosenTopicValue!.id;
+          data['parent_board'] = _chosenBoardValue!.id;
+          response = await dio.post(
+            '$newAraDefaultUrl/api/articles/',
+            data: data,
+          );
+        }
+
+        debugPrint('Response data: ${response.data}');
+        if (mounted) {
+          Navigator.pop(context);
+        }
+      } on DioException catch (error) {
+        debugPrint('post Error: ${error.response!.data}');
+      }
+
+      if (mounted) {
+        setState(() {
+          _isUploadingPost = false;
+          _isLoading = false;
+        });
+      }
+    };
+  }
+
+  /// 사진 추가 시 실행되는 함수
+  Future<void> _pickImage() async {
+    final ImagePicker imagePicker = ImagePicker();
+    final XFile? image =
+        await imagePicker.pickImage(source: ImageSource.gallery);
+
+    if (image != null) {
+      final String imageUrl = image.path;
+      final TextSelection selection = _quillController.selection;
+      setState(() {
+        _quillController.document.insert(
+          selection.baseOffset,
+          quill.BlockEmbed('image', imageUrl),
+        );
+      });
+      // Insert a blank line (new paragraph) after the image
+      _quillController.document.insert(
+        selection.baseOffset + 1,
+        "\n\n", // Assume ParagraphBlock is a valid Quill block for creating paragraphs
+      );
+
+      /// TODO: 사진 첨부 시 첨부파일에도 같이 올라갈 것인지 결정하기.
+      String uuid = const Uuid().v4();
+      setState(() {
+        _isFileMenuBarSelected = true;
+        _attachmentList.add(AttachmentsFormat(
+          fileType: FileType.image,
+          isNewFile: true,
+          fileLocalPath: imageUrl,
+          uuid: uuid,
+        ));
+      });
+    }
+  }
+
+  /// 첨부파일 추가 시 실행되는 함수
+  Future<void> _pickFile() async {
+    filePickerResult = await FilePicker.platform.pickFiles();
+    if (filePickerResult != null) {
+      File file = File(filePickerResult!.files.single.path!);
+      if (Platform.isIOS) {
+        // iOS에서는 파일을 복사해서 사용했음. 캐쉬로 날라가는 문제 발생해서.
+        final documentPath = (await getApplicationDocumentsDirectory()).path;
+        file = await file.copy('$documentPath/${path.basename(file.path)}');
+      }
+      setState(() {
+        _isFileMenuBarSelected = true;
+        _attachmentList.add(AttachmentsFormat(
+          //TODO: 파일 타입 결정해서 FileType에 추가하기, svg파일도 추가하기.
+          fileType: FileType.other,
+          isNewFile: true,
+          fileLocalPath: file.path,
+        ));
+      });
+    }
+  }
+
+  /// 첨부 파일 삭제 및 관련 HTML 내용 업데이트
+  /// 기존에 업로드된 파일인 경우 API 요청으로 삭제
+  /// 새로 추가한 파일인 경우 HTML 내용에서 해당 이미지 태그 삭제
+  void _onAttachmentDelete(int index) async {
+    String toFind;
+
+    if (_attachmentList[index].isNewFile) {
+      toFind = _attachmentList[index].fileLocalPath!;
+    } else {
+      toFind = _attachmentList[index].fileUrlPath!;
+    }
+    var json = jsonEncode(_quillController.document.toDelta());
+    List<dynamic> delta = jsonDecode(json);
+    List<dynamic> nwDelta = [];
+
+    // Delta 리스트를 순회하면서 'insert' 키를 찾습니다.
+    for (Map<String, dynamic> line in delta) {
+      var value = line["insert"];
+      bool flag = true;
+
+      // 'insert' 키의 값이 맵인 경우, 이 맵을 순회하여 'image' 키를 찾습니다.
+      if (value is Map<String, dynamic>) {
+        for (var newKey in value.keys) {
+          if (newKey == "image" && value[newKey] == toFind) {
+            flag = false;
+            // 'image' 키의 값이 "abc"인 경우, 해당 라인을 삭제합니다.
+          }
+        }
+      }
+      if (flag) nwDelta.add(line);
+    }
+
+    // 수정된 Delta를 다시 JSON으로 인코딩하고 Document로 변환합니다.
+    String newJson = jsonEncode(nwDelta);
+    quill.Delta newDelta = quill.Delta.fromJson(jsonDecode(newJson));
+    setState(() {
+      _quillController.document = quill.Document.fromJson(newDelta.toJson());
+    });
+
+    setState(() {
+      _attachmentList.removeAt(index);
+      _isLoading = false;
+    });
+  }
+
+  /// 게시판 주제 선택 이후 토픽 목록 변경
+  void setSpecTopicList(BoardDetailActionModel? value) {
+    setState(() {
+      _specTopicList = [];
+      _specTopicList.add(_defaultTopicModel2);
+      for (TopicModel topic in value!.topics) {
+        _specTopicList.add(topic);
+      }
+      _chosenTopicValue = _specTopicList[0];
+      _chosenBoardValue = value;
+    });
   }
 }
