@@ -125,6 +125,7 @@ class _PostViewPageState extends State<PostViewPage> {
     // _fetchArticle이 진행중일 때는 Stack을 이용해 가림.
     // _fetchArticle이 끝났지만 웹뷰 로드가 끝나지 않았을 때는 조건문으로 가림.
     // 웹뷰 로드까지 완료되었을 때는 빌드된 Scaffold를 보여줌.
+    // TODO: Stack 리팩토링
     return Stack(
       children: [
         if (_isPageLoaded)
@@ -161,6 +162,7 @@ class _PostViewPageState extends State<PostViewPage> {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
+                              // TODO: 위젯 구역별로 메서드화 (Resolved)
                               _buildTitle(),
                               const SizedBox(height: 10),
                               // 유저 정보 (프로필 이미지, 닉네임)
