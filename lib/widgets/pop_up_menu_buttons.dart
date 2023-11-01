@@ -226,10 +226,17 @@ class OthersPopupMenuButton extends StatelessWidget {
   }
 }
 
+/// PostViewPage에서 자신의 댓글에 쓰이는 PopupMenuButton(수정, 삭제)
 class MyPopupMenuButton extends StatelessWidget {
+  /// 대상이 되는 댓글의 id
   final int commentID;
   final UserProvider userProvider;
+  /// 대상이 되는 댓글의 _commentList에서의 인덱스
+  /// _commentList: PostViewPage에서 사용되는 댓글 리스트
   final int commentIdx;
+  /// PopupMenuButton에서 유저가 특정 항목을 선택했을 때 적용
+  /// PostViewPage와 밀접하게 연관되는 부분이 있어 클래스에서
+  /// 직접 구현하지 않고 전달받음.
   final void Function(String)? onSelected;
 
   const MyPopupMenuButton({
@@ -239,7 +246,8 @@ class MyPopupMenuButton extends StatelessWidget {
     required this.commentIdx,
     required this.onSelected,
   });
-
+ 
+  @override
   Widget build(BuildContext context) {
     return PopupMenuButton<String>(
       shadowColor: const Color.fromRGBO(0, 0, 0, 0.2),
