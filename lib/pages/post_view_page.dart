@@ -735,8 +735,49 @@ class _PostViewPageState extends State<PostViewPage> {
                         child: Visibility(
                             visible: !(curComment.is_hidden),
                             child: (curComment.is_mine == true
-                                ? _buildMyPopupMenuButton(
-                                    curComment.id, userProvider, idx)
+                                ? MyPopupMenuButton(
+                                    commentID: curComment.id,
+                                    userProvider: userProvider,
+                                    commentIdx: idx,
+                                    onSelected: (String result) async {
+                                      switch (result) {
+                                        case 'Modify':
+                                          _textEditingController.text =
+                                              _commentList[idx]
+                                                  .content
+                                                  .toString();
+                                          targetComment = _commentList[idx];
+                                          _setCommentMode(false, true);
+                                          textFocusNode.requestFocus();
+                                          moveCommentContainer(idx);
+                                          break;
+                                        case 'Delete':
+                                          showDialog(
+                                            context: context,
+                                            builder: (context) {
+                                              return DeleteDialog(
+                                                targetID: curComment.id,
+                                                userProvider: userProvider,
+                                                targetContext: context,
+                                                onTap: () {
+                                                  _delComment(curComment.id,
+                                                          userProvider)
+                                                      .then((res) async {
+                                                    if (res) {
+                                                      bool res =
+                                                          await _fetchArticle(
+                                                              userProvider);
+                                                      _setIsPageLoaded(res);
+                                                    }
+                                                  });
+                                                  Navigator.pop(context);
+                                                },
+                                              );
+                                            },
+                                          );
+                                          break;
+                                      }
+                                    })
                                 : OthersPopupMenuButton(
                                     commentID: curComment.id))),
                       ),
@@ -1076,9 +1117,7 @@ class _PostViewPageState extends State<PostViewPage> {
                   targetContext: context,
                   onTap: () {
                     _delComment(id, userProvider).then((res) async {
-                      if (res == false) {
-                        return;
-                      } else {
+                      if (res) {
                         bool res = await _fetchArticle(userProvider);
                         _setIsPageLoaded(res);
                       }

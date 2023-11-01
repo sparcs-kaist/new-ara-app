@@ -226,3 +226,82 @@ class OthersPopupMenuButton extends StatelessWidget {
   }
 }
 
+class MyPopupMenuButton extends StatelessWidget {
+  final int commentID;
+  final UserProvider userProvider;
+  final int commentIdx;
+  final void Function(String)? onSelected;
+
+  const MyPopupMenuButton({
+    super.key,
+    required this.commentID,
+    required this.userProvider,
+    required this.commentIdx,
+    required this.onSelected,
+  });
+
+  Widget build(BuildContext context) {
+    return PopupMenuButton<String>(
+      shadowColor: const Color.fromRGBO(0, 0, 0, 0.2),
+      splashRadius: 5,
+      shape: const RoundedRectangleBorder(
+        side: BorderSide(color: Color.fromRGBO(217, 217, 217, 1), width: 0.5),
+        borderRadius: BorderRadius.all(Radius.circular(12.0)),
+      ),
+      padding: const EdgeInsets.all(2.0),
+      itemBuilder: (BuildContext context) => [
+        PopupMenuItem<String>(
+          value: 'Modify',
+          child: Row(
+            children: [
+              SvgPicture.asset(
+                'assets/icons/modify.svg',
+                width: 25,
+                height: 25,
+                color: const Color.fromRGBO(51, 51, 51, 1),
+              ),
+              const SizedBox(width: 10),
+              const Text(
+                '수정',
+                style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w700,
+                    color: Color.fromRGBO(51, 51, 51, 1)),
+              ),
+            ],
+          ),
+        ),
+        PopupMenuItem<String>(
+          value: 'Delete',
+          child: Row(
+            children: [
+              SvgPicture.asset(
+                'assets/icons/delete.svg',
+                width: 25,
+                height: 25,
+                color: ColorsInfo.newara,
+              ),
+              const SizedBox(width: 10),
+              const Text(
+                '삭제',
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w700,
+                  color: ColorsInfo.newara,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
+      onSelected: onSelected,
+      child: SvgPicture.asset(
+        'assets/icons/menu_2.svg',
+        color: Colors.grey,
+        width: 50,
+        height: 20,
+      ),
+    );
+  
+  }
+}
