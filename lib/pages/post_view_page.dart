@@ -71,6 +71,8 @@ class _PostViewPageState extends State<PostViewPage> {
   /// 현재 페이지의 글에 달려있는 모든 댓글, 답글이 저장됨.
   late List<CommentNestedCommentListActionModel> _commentList;
 
+  late InArticleWebView inArticleWebView;
+
   /// 댓글 입력 TextField에 입력되어있는 텍스트.
   /// 댓글 전송 시에 사용됨.
   String _commentContent = "";
@@ -104,14 +106,15 @@ class _PostViewPageState extends State<PostViewPage> {
     _isSending = false;
     _commentList = [];
     UserProvider userProvider = context.read<UserProvider>();
-    userProvider.setIsWebViewLoaded(false, quiet: true);
+    userProvider.setIsContentLoaded(false, quiet: true);
     _fetchArticle(userProvider).then((value) {
       _isReportable = value ? !_article.is_mine : false;
       _setIsPageLoaded(value);
     });
 
     // 페이지가 로드될 때 새로운 알림이 있는지 조회.
-    context.read<NotificationProvider>().checkIsNotReadExist();
+    // 페이지 로드 속도 향상을 위해 주석 처리.
+    //context.read<NotificationProvider>().checkIsNotReadExist();
   }
 
   @override
@@ -153,7 +156,7 @@ class _PostViewPageState extends State<PostViewPage> {
                       child: RefreshIndicator(
                         color: ColorsInfo.newara,
                         onRefresh: () async {
-                          userProvider.setIsWebViewLoaded(false);
+                          userProvider.setIsContentLoaded(false);
                           _setIsPageLoaded(false);
                           _setIsPageLoaded(await _fetchArticle(userProvider));
                         },
@@ -184,9 +187,11 @@ class _PostViewPageState extends State<PostViewPage> {
                                 ),
                               ),
                               const SizedBox(height: 5),
+                              //_buildArticleContent(userProvider),
                               InArticleWebView(
-                                content: _article.content ?? "내용이 없습니다.",
-                                initialHeight: 150,
+                                content: _article.content ?? "",
+                                initialHeight: 150.0,
+                                isComment: false,
                               ),
                               const SizedBox(height: 10),
                               // 좋아요, 싫어요 버튼 Row
@@ -226,13 +231,47 @@ class _PostViewPageState extends State<PostViewPage> {
             ),
           )
         else
-          Container(),
+          const LoadingIndicator(),
         Visibility(
-          visible: !(context.watch<UserProvider>().isWebViewLoaded),
+          visible: !(context.watch<UserProvider>().isContentLoaded),
           child: const LoadingIndicator(),
         ),
       ],
     );
+  }
+
+  /// 글의 내용을 빌드하는 위젯
+  /// Text 또는 InArticleWebView 위젯을 리턴.
+  Widget _buildArticleContent(UserProvider userProvider) {
+    if (_article.content == null) {
+      return const Text(
+        '내용이 없습니다.',
+        style: TextStyle(
+          fontSize: 14,
+          fontWeight: FontWeight.w400,
+          color: Colors.black,
+        ),
+      );
+    } else {
+      String content = _article.content!;
+      if (content.contains('<')) {
+        return InArticleWebView(
+          content: content,
+          initialHeight: 150.0,
+          isComment: false,
+        );
+      } else {
+        userProvider.setIsContentLoaded(true);
+        return Text(
+          content,
+          style: const TextStyle(
+            fontSize: 14,
+            fontWeight: FontWeight.w400,
+            color: Colors.black,
+          ),
+        );
+      }
+    }
   }
 
   /// 제목, 날짜, 조회수, 좋아요, 싫어요, 댓글 표시
@@ -1000,7 +1039,7 @@ class _PostViewPageState extends State<PostViewPage> {
     } else {
       assetPath = "assets/icons/clip.svg";
     }
-    debugPrint("$ext");
+    debugPrint(ext);
     return SvgPicture.asset(
       assetPath,
       color: Colors.black,
@@ -1053,7 +1092,7 @@ class _PostViewPageState extends State<PostViewPage> {
                   ),
                   child: Row(
                     children: [
-                      _getFileTypeImage(extension.substring(1) ?? ""),
+                      _getFileTypeImage(extension.substring(1)),
                       const SizedBox(width: 10),
                       Flexible(
                         child: Text(
@@ -1380,9 +1419,8 @@ class _PostViewPageState extends State<PostViewPage> {
   /// 그러나 텍스트만 있는 댓글도 다수 존재하여 HTML 태그를 감지하고 필요한 것들만
   /// 웹뷰로 로드, 나머지는 텍스트로 댓글을 로드하도록 함.
   Widget _buildCommentContent(String content) {
-    RegExp pattern = RegExp(r'<[^>]+>');
-    // 정규식을 이용하여 HTML 태그가 존재하는지 검사 (완벽한 방법은 아님)
-    if (!content.contains(pattern)) {
+    // HTML 태그가 존재하는지 검사 (완벽한 방법은 아님)
+    if (!content.contains('<')) {
       return Text(
         content,
         style: const TextStyle(
@@ -1395,6 +1433,7 @@ class _PostViewPageState extends State<PostViewPage> {
     return InArticleWebView(
       content: getContentHtml(content),
       initialHeight: 10,
+      isComment: false,
     );
   }
 
@@ -1579,16 +1618,27 @@ class _PostViewPageState extends State<PostViewPage> {
 /// PostViewPage에서는 article 및 comment의 content를 HTML 렌더링으로 보여줘야 함.
 /// 따라서 웹뷰가 사용되는 경우가 자주 있어 따로 클래스로 분리함.
 class InArticleWebView extends StatefulWidget {
-  /// 웹뷰에서 렌더링하는 HTML. 웹뷰 내에서 자체적으로 sanitize 하도록 함.
+  /// 웹뷰에서 렌더링하는 HTML. 추후 sanitize함.
   final String content;
 
   /// 초기 웹뷰 위젯의 높이.
   final double initialHeight;
 
+  /// 웹뷰로 표시하려는 content가 댓글인지 여부.
+  /// 아래와 같이 사용.
+  /// ```
+  /// if (!(widget.isComment)) {
+  ///   Future.delayed(const Duration(milliseconds: 500),
+  ///      () => userProvider.setIsWebViewLoaded(true));
+  /// }
+  /// ```
+  final bool isComment;
+
   const InArticleWebView({
     super.key,
     required this.content,
     required this.initialHeight,
+    required this.isComment,
   });
 
   @override
@@ -1678,7 +1728,7 @@ class _InArticleWebViewState extends State<InArticleWebView> {
   }
 
   /// getPageHeight를 호출하고 리턴값을 받아 직접 state를 변경함.
-  Future<void> setPageHeight() async {
+  Future<void> updatePageHeight() async {
     getPageHeight().then((height) {
       if (!mounted) return;
       setState(() => webViewHeight = height);
@@ -1714,14 +1764,18 @@ class _InArticleWebViewState extends State<InArticleWebView> {
         },
         onPageStarted: (String url) async {},
         onPageFinished: (String url) async {
-          if (isFitted) return;
-          await setPageHeight();
-          isFitted = true;
-          debugPrint("height fitted!!");
-          // TODO: 500ms 대기가 필요한 지 확인 후 최적화하기
-          // TODO: setIsWebViewLoaded 구현 수정하기
-          Future.delayed(const Duration(milliseconds: 500),
-              () => userProvider.setIsWebViewLoaded(true));
+          if (!isFitted) {
+            await updatePageHeight();
+            isFitted = true;
+            debugPrint("height fitted!!");
+            // // TODO: 500ms 대기가 필요한 지 확인 후 최적화하기
+            //   // TODO: setIsWebViewLoaded 구현 수정하기
+            //   Future.delayed(const Duration(milliseconds: 500),
+            //       () => userProvider.setIsContentLoaded(true));
+            if (!(widget.isComment)) {
+              userProvider.setIsContentLoaded(true);
+            }
+          }
         },
         onWebResourceError: (WebResourceError error) async {
           debugPrint(
