@@ -8,7 +8,6 @@ import 'package:flutter/services.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
-import 'package:flutter/foundation.dart';
 
 import 'package:new_ara_app/models/article_model.dart';
 import 'package:new_ara_app/models/comment_nested_comment_list_action_model.dart';
@@ -244,6 +243,19 @@ class CommentController {
         (model.my_vote == false ? -1 : (value ? 0 : 1));
 
     model.my_vote = (model.my_vote == value) ? null : value;
+  }
+
+  /// 댓글 삭제 기능을 위해 만들어진 메서드.
+  /// 댓글 식별을 위한 [id], API 통신을 위한 [userProvider]를 전달받음.
+  /// 댓글 삭제 API 요청이 성공하면 true, 그 외에는 false를 반환함.
+  Future<bool> delComment(int id, UserProvider userProvider) async {
+    try {
+      await userProvider.delApiRes("comments/$id/");
+      return true;
+    } catch (error) {
+      debugPrint("DELETE /api/comments/$id failed: $error");
+      return false;
+    }
   }
 }
 

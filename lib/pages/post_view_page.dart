@@ -182,7 +182,6 @@ class _PostViewPageState extends State<PostViewPage> {
                                 ),
                               ),
                               const SizedBox(height: 5),
-                              //_buildArticleContent(userProvider),
                               InArticleWebView(
                                 content: _article.content ?? "",
                                 initialHeight: 150,
@@ -219,7 +218,7 @@ class _PostViewPageState extends State<PostViewPage> {
                     ),
                     const SizedBox(height: 15),
                     // 댓글 입력 부분
-                    _buildCommentTextField(userProvider),
+                    _buildCommentTextFormField(userProvider),
                   ]),
                 ),
               ),
@@ -399,8 +398,8 @@ class _PostViewPageState extends State<PostViewPage> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
+        // 좋아요 버튼
         InkWell(
-          // TODO: 따로 빼서 메서드화하여 가독성 향상하기
           onTap: () async {
             bool res = await ArticleController(
               model: _article,
@@ -427,6 +426,7 @@ class _PostViewPageState extends State<PostViewPage> {
                   : ColorsInfo.posVote,
             )),
         const SizedBox(width: 20),
+        // 싫어요 버튼
         InkWell(
           onTap: () {
             ArticleController(
@@ -760,7 +760,11 @@ class _PostViewPageState extends State<PostViewPage> {
                                                 userProvider: userProvider,
                                                 targetContext: context,
                                                 onTap: () {
-                                                  _delComment(curComment.id,
+                                                  CommentController(
+                                                          model: curComment,
+                                                          userProvider:
+                                                              userProvider)
+                                                      .delComment(curComment.id,
                                                           userProvider)
                                                       .then((res) async {
                                                     if (res) {
@@ -913,7 +917,7 @@ class _PostViewPageState extends State<PostViewPage> {
 
   /// 댓글 입력창 빌드를 담당하며 빌드된 위젯을 리턴.
   /// targetComment, _isNestedComment, _isModify, _textEditingController 클래스 전역변수 사용.
-  Widget _buildCommentTextField(UserProvider userProvider) {
+  Widget _buildCommentTextFormField(UserProvider userProvider) {
     return Container(
       decoration: const BoxDecoration(
         border: Border(
@@ -1089,11 +1093,14 @@ class _PostViewPageState extends State<PostViewPage> {
   /// 키보드 바로 위로 이동시키는 메서드.
   /// 댓글 식별을 위해 _commentKeys의 인덱스를 [idx]로 전달받음.
   void moveCommentContainer(int idx) {
+    // 키보드가 화면에 나타나기까지 대기(0.5초로 설정함)
     Future.delayed(const Duration(milliseconds: 500), () {
       if (_commentKeys[idx].currentContext == null ||
           _textFieldKey.currentContext == null) return;
+      // 댓글 컨테이너가 있는 위치
       RenderBox commentBox =
           _commentKeys[idx].currentContext!.findRenderObject() as RenderBox;
+      // 댓글 입력창이 있는 위치
       RenderBox textFieldBox =
           _textFieldKey.currentContext!.findRenderObject() as RenderBox;
 
@@ -1102,6 +1109,7 @@ class _PostViewPageState extends State<PostViewPage> {
       double diff = commentHeight - textFieldHeight;
 
       debugPrint("diff: $diff");
+      // 댓글이 키보드로 가려지는 경우 이동.
       if (diff > -15) {
         _scrollController.animateTo(
           _scrollController.position.pixels + diff + textFieldBox.size.height,
@@ -1135,24 +1143,6 @@ class _PostViewPageState extends State<PostViewPage> {
       _isNestedComment = isNestedVal;
       _isModify = isModifyVal;
     });
-  }
-
-  /// 댓글 삭제 기능을 위해 만들어진 메서드.
-  /// 댓글 식별을 위한 [id], API 통신을 위한 [userProvider]를 전달받음.
-  /// 댓글 삭제 API 요청이 성공하면 true, 그 외에는 false를 반환함.
-  Future<bool> _delComment(int id, UserProvider userProvider) async {
-    late dynamic delRes;
-    try {
-      delRes = await userProvider.delApiRes("comments/$id/");
-    } catch (error) {
-      debugPrint("DELETE /api/comments/$id failed: $error");
-      return false;
-    }
-    if (delRes.statusCode != 204) {
-      debugPrint("DELETE /api/comments/$id ${delRes.statusCode}");
-      return false;
-    }
-    return true;
   }
 
   /// 클래스 멤버변수 _article, _commentList, _commentKeys의 값을 설정하는 메서드.
