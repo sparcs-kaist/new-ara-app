@@ -7,7 +7,7 @@ import 'package:provider/provider.dart';
 import 'package:dio/dio.dart';
 
 import 'package:new_ara_app/constants/url_info.dart';
-import 'package:new_ara_app/widgetclasses/loading_indicator.dart';
+import 'package:new_ara_app/widgets/loading_indicator.dart';
 import 'package:new_ara_app/constants/colors_info.dart';
 import 'package:new_ara_app/providers/user_provider.dart';
 import 'package:new_ara_app/models/notification_model.dart';

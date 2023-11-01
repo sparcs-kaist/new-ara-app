@@ -9,18 +9,18 @@ import 'package:new_ara_app/constants/colors_info.dart';
 import 'package:new_ara_app/models/article_model.dart';
 import 'package:new_ara_app/models/article_nested_comment_list_action_model.dart';
 import 'package:new_ara_app/models/comment_nested_comment_list_action_model.dart';
-import 'package:new_ara_app/models/attachment_model.dart';
+import 'package:new_ara_app/widgets/dialogs.dart';
 import 'package:new_ara_app/providers/user_provider.dart';
-import 'package:new_ara_app/widgetclasses/loading_indicator.dart';
-import 'package:new_ara_app/utils/time_utils.dart';
+import 'package:new_ara_app/widgets/loading_indicator.dart';
 import 'package:new_ara_app/utils/html_info.dart';
+import 'package:new_ara_app/utils/time_utils.dart';
 import 'package:new_ara_app/pages/user_view_page.dart';
 import 'package:new_ara_app/pages/post_write_page.dart';
 import 'package:new_ara_app/utils/post_view_utils.dart';
 import 'package:new_ara_app/utils/slide_routing.dart';
-import 'package:new_ara_app/constants/file_type.dart';
-import 'package:new_ara_app/widgetclasses/in_article_web_view.dart';
+import 'package:new_ara_app/widgets/in_article_web_view.dart';
 import 'package:new_ara_app/providers/notification_provider.dart';
+import 'package:new_ara_app/widgets/pop_up_menu_buttons.dart';
 
 /// 하나의 post에 대한 내용 뷰, 이벤트 처리를 모두 담당하는 StatefulWidget.
 class PostViewPage extends StatefulWidget {
@@ -67,8 +67,6 @@ class _PostViewPageState extends State<PostViewPage> {
   /// 현재 페이지의 글에 달려있는 모든 댓글, 답글이 저장됨.
   late List<CommentNestedCommentListActionModel> _commentList;
 
-  late InArticleWebView inArticleWebView;
-
   /// 댓글 입력 TextField에 입력되어있는 텍스트.
   /// 댓글 전송 시에 사용됨.
   String _commentContent = "";
@@ -109,8 +107,7 @@ class _PostViewPageState extends State<PostViewPage> {
     });
 
     // 페이지가 로드될 때 새로운 알림이 있는지 조회.
-    // 페이지 로드 속도 향상을 위해 주석 처리.
-    //context.read<NotificationProvider>().checkIsNotReadExist();
+    context.read<NotificationProvider>().checkIsNotReadExist();
   }
 
   @override
@@ -125,9 +122,9 @@ class _PostViewPageState extends State<PostViewPage> {
   Widget build(BuildContext context) {
     UserProvider userProvider = context.read<UserProvider>();
 
-    // 웹뷰 로드는 다른 위젯이 로드되는 것보다 시간이 더 걸림.
-    // 따라서 다른 위젯 로드를 완료할 때까지 LoadingIndicator를 보여줌.
-    // 웹뷰를 로드하는 동안에는 Container를 보여줌.
+    // _fetchArticle이 진행중일 때는 Stack을 이용해 가림.
+    // _fetchArticle이 끝났지만 웹뷰 로드가 끝나지 않았을 때는 조건문으로 가림.
+    // 웹뷰 로드까지 완료되었을 때는 빌드된 Scaffold를 보여줌.
     return Stack(
       children: [
         if (_isPageLoaded)
@@ -177,8 +174,10 @@ class _PostViewPageState extends State<PostViewPage> {
                                 child: Row(
                                   mainAxisAlignment: MainAxisAlignment.end,
                                   children: [
-                                    _buildAttachMenuButton(
-                                        _article.attachments.length),
+                                    AttachPopupMenuButton(
+                                      fileNum: _article.attachments.length,
+                                      attachments: _article.attachments,
+                                    ),
                                   ],
                                 ),
                               ),
@@ -227,47 +226,13 @@ class _PostViewPageState extends State<PostViewPage> {
             ),
           )
         else
-          const LoadingIndicator(),
+          Container(color: Colors.white),
         Visibility(
           visible: !(context.watch<UserProvider>().isContentLoaded),
-          child: const LoadingIndicator(),
+          child: Container(color: Colors.white),
         ),
       ],
     );
-  }
-
-  /// 글의 내용을 빌드하는 위젯
-  /// Text 또는 InArticleWebView 위젯을 리턴.
-  Widget _buildArticleContent(UserProvider userProvider) {
-    if (_article.content == null) {
-      return const Text(
-        '내용이 없습니다.',
-        style: TextStyle(
-          fontSize: 14,
-          fontWeight: FontWeight.w400,
-          color: Colors.black,
-        ),
-      );
-    } else {
-      String content = _article.content!;
-      if (content.contains('<')) {
-        return InArticleWebView(
-          content: content,
-          initialHeight: 150.0,
-          isComment: false,
-        );
-      } else {
-        userProvider.setIsContentLoaded(true);
-        return Text(
-          content,
-          style: const TextStyle(
-            fontSize: 14,
-            fontWeight: FontWeight.w400,
-            color: Colors.black,
-          ),
-        );
-      }
-    }
   }
 
   /// 제목, 날짜, 조회수, 좋아요, 싫어요, 댓글 표시
@@ -595,91 +560,91 @@ class _PostViewPageState extends State<PostViewPage> {
             ),
           ],
         ),
-        // TODO: collection if로 삼항연산자 대체하기
         // 자신의 글일 경우 수정 버튼, 타인의 글일 경우 신고 버튼
-        _isReportable
-            ? InkWell(
-                onTap: () {
-                  showDialog(
-                      context: context,
-                      builder: (context) {
-                        return ReportDialogWidget(articleID: _article.id);
-                      });
-                },
-                child: Container(
-                  width: 90,
-                  height: 40,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(8),
-                    border: Border.all(
-                      color: const Color.fromRGBO(230, 230, 230, 1),
-                    ),
-                  ),
-                  child: Center(
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        const SizedBox(width: 2),
-                        SvgPicture.asset(
-                          'assets/icons/warning.svg',
-                          width: 25,
-                          height: 25,
-                          color: const Color.fromRGBO(100, 100, 100, 1),
-                        ),
-                        const SizedBox(width: 10),
-                        const Text(
-                          '신고',
-                          style: TextStyle(
-                            fontSize: 15,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              )
-            : InkWell(
-                onTap: () async {
-                  await Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) =>
-                              PostWritePage(previousArticle: _article)));
-                  userProvider.setIsContentLoaded(false);
-                  _setIsPageLoaded(false);
-                  _setIsPageLoaded(await _fetchArticle(userProvider));
-                },
-                child: Container(
-                  width: 95,
-                  height: 40,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(8),
-                    border: Border.all(
-                      color: const Color.fromRGBO(230, 230, 230, 1),
-                    ),
-                  ),
-                  child: Center(
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        SvgPicture.asset(
-                          'assets/icons/modify.svg',
-                          width: 30,
-                          height: 30,
-                        ),
-                        const Text(
-                          '수정하기',
-                          style: TextStyle(
-                            fontSize: 15,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
+        if (_isReportable) // 타인의 글(신고가 가능한 글)
+          InkWell(
+            onTap: () {
+              showDialog(
+                  context: context,
+                  builder: (context) {
+                    return ReportDialogWidget(articleID: _article.id);
+                  });
+            },
+            child: Container(
+              width: 90,
+              height: 40,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(
+                  color: const Color.fromRGBO(230, 230, 230, 1),
                 ),
               ),
+              child: Center(
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const SizedBox(width: 2),
+                    SvgPicture.asset(
+                      'assets/icons/warning.svg',
+                      width: 25,
+                      height: 25,
+                      color: const Color.fromRGBO(100, 100, 100, 1),
+                    ),
+                    const SizedBox(width: 10),
+                    const Text(
+                      '신고',
+                      style: TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          )
+        else // 자신의 글
+          InkWell(
+            onTap: () async {
+              await Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) =>
+                          PostWritePage(previousArticle: _article)));
+              userProvider.setIsContentLoaded(false);
+              _setIsPageLoaded(false);
+              _setIsPageLoaded(await _fetchArticle(userProvider));
+            },
+            child: Container(
+              width: 95,
+              height: 40,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(
+                  color: const Color.fromRGBO(230, 230, 230, 1),
+                ),
+              ),
+              child: Center(
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    SvgPicture.asset(
+                      'assets/icons/modify.svg',
+                      width: 30,
+                      height: 30,
+                    ),
+                    const Text(
+                      '수정하기',
+                      style: TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
       ],
     );
   }
@@ -687,7 +652,7 @@ class _PostViewPageState extends State<PostViewPage> {
   /// 댓글 리스트 빌드를 담당하며 빌드된 위젯을 리턴.
   /// _commentList 클래스 전역변수를 사용함.
   Widget _buildCommentListView(UserProvider userProvider) {
-    return ListView.separated(
+    return ListView.builder(
       padding: const EdgeInsets.only(bottom: 15),
       shrinkWrap: true, // 모든 댓글을 보여주는 선에서 크기를 최소화
       // SingleChildScrollView와의 충돌을 방지하기 위해서
@@ -696,205 +661,212 @@ class _PostViewPageState extends State<PostViewPage> {
       itemBuilder: (BuildContext context, int idx) {
         CommentNestedCommentListActionModel curComment = _commentList[idx];
         // 각각의 댓글에 대한 컨테이너
-        return Container(
-          key: _commentKeys[idx],
-          margin: EdgeInsets.only(
-              left: (curComment.parent_comment == null ? 0 : 30)),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        return Column(
+          children: [
+            Container(
+              key: _commentKeys[idx],
+              margin: EdgeInsets.only(
+                  left: (curComment.parent_comment == null ? 0 : 30)),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  InkWell(
-                    // 익명일 경우 댓글 작성자 정보 확인이 불가능하도록 함.
-                    onTap: curComment.name_type == 2
-                        ? null
-                        : () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => UserViewPage(
-                                      userID: curComment.created_by.id)),
-                            );
-                          },
-                    child: Row(
-                      children: [
-                        Container(
-                          width: 25,
-                          height: 25,
-                          decoration: const BoxDecoration(
-                            shape: BoxShape.circle,
-                            color: Colors.grey,
-                          ),
-                          child: ClipRRect(
-                            borderRadius:
-                                const BorderRadius.all(Radius.circular(100)),
-                            child: Image.network(curComment
-                                .created_by.profile.picture
-                                .toString()),
-                          ),
-                        ),
-                        const SizedBox(width: 5),
-                        Container(
-                            constraints: BoxConstraints(
-                              maxWidth: MediaQuery.of(context).size.width - 200,
-                            ),
-                            child: Text(
-                              curComment.created_by.profile.nickname.toString(),
-                              style: const TextStyle(
-                                fontSize: 14,
-                                fontWeight: FontWeight.w500,
-                              ),
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                            )),
-                        const SizedBox(width: 7),
-                        Text(
-                          getTime(curComment.created_at),
-                          style: const TextStyle(
-                              fontSize: 14,
-                              fontWeight: FontWeight.w400,
-                              color: Color.fromRGBO(51, 51, 51, 1)),
-                        ),
-                      ],
-                    ),
-                  ),
-                  SizedBox(
-                    width: 50,
-                    height: 25,
-                    child: Visibility(
-                        visible: !(curComment.is_hidden),
-                        child: (curComment.is_mine == true
-                            ? _buildMyPopupMenuButton(
-                                curComment.id, userProvider, idx)
-                            : _buildOthersPopupMenuButton(curComment.id))),
-                  ),
-                ],
-              ),
-              Container(
-                margin: const EdgeInsets.only(left: 30, right: 0),
-                child: curComment.is_hidden == false
-                    ? _buildCommentContent(curComment.content ?? "")
-                    : const Text(
-                        '삭제된 댓글 입니다.',
-                        style: TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w400,
-                          color: Colors.grey,
-                        ),
-                      ),
-              ),
-              const SizedBox(height: 8),
-              Container(
-                margin: const EdgeInsets.only(left: 30),
-                child: Row(
-                  children: [
-                    // 삭제된 댓글의 경우 좋아요, 싫어요 버튼이 안보이게함.
-                    Visibility(
-                      visible: curComment.is_hidden == false,
-                      child: Row(
-                        children: [
-                          InkWell(
-                            onTap: () {
-                              CommentController(
-                                model: curComment,
-                                userProvider: userProvider,
-                              ).posVote().then((result) {
-                                if (result) updateState();
-                              });
-                            },
-                            child: SvgPicture.asset(
-                              'assets/icons/like.svg',
-                              width: 25,
-                              height: 25,
-                              color: curComment.my_vote == false
-                                  ? ColorsInfo.noneVote
-                                  : ColorsInfo.newara,
-                            ),
-                          ),
-                          const SizedBox(width: 3),
-                          Text(
-                            curComment.positive_vote_count.toString(),
-                            style: TextStyle(
-                              fontSize: 13,
-                              fontWeight: FontWeight.w500,
-                              color: curComment.my_vote == false
-                                  ? ColorsInfo.noneVote
-                                  : ColorsInfo.posVote,
-                            ),
-                          ),
-                          const SizedBox(width: 6),
-                          InkWell(
-                            onTap: () async {
-                              CommentController(
-                                model: curComment,
-                                userProvider: userProvider,
-                              ).negVote().then((result) {
-                                if (result) updateState();
-                              });
-                            },
-                            child: SvgPicture.asset(
-                              'assets/icons/dislike.svg',
-                              width: 25,
-                              height: 25,
-                              color: curComment.my_vote == true
-                                  ? ColorsInfo.noneVote
-                                  : ColorsInfo.negVote,
-                            ),
-                          ),
-                          const SizedBox(width: 3),
-                          Text(
-                            curComment.negative_vote_count.toString(),
-                            style: TextStyle(
-                              fontSize: 13,
-                              fontWeight: FontWeight.w500,
-                              color: curComment.my_vote == true
-                                  ? ColorsInfo.noneVote
-                                  : ColorsInfo.negVote,
-                            ),
-                          ),
-                          const SizedBox(width: 6),
-                        ],
-                      ),
-                    ),
-                    // 대댓글인 경우 답글쓰기 버튼이 안보이게함.
-                    Visibility(
-                      visible: curComment.parent_comment == null,
-                      child: InkWell(
-                        onTap: () {
-                          targetComment = curComment;
-                          _setCommentMode(true, false);
-                          textFocusNode.requestFocus();
-                          moveCommentContainer(idx);
-                        },
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      InkWell(
+                        // 익명일 경우 댓글 작성자 정보 확인이 불가능하도록 함.
+                        onTap: curComment.name_type == 2
+                            ? null
+                            : () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => UserViewPage(
+                                          userID: curComment.created_by.id)),
+                                );
+                              },
                         child: Row(
                           children: [
-                            SvgPicture.asset(
-                              'assets/icons/right_arrow_2.svg',
-                              width: 11,
-                              height: 12,
+                            Container(
+                              width: 25,
+                              height: 25,
+                              decoration: const BoxDecoration(
+                                shape: BoxShape.circle,
+                                color: Colors.grey,
+                              ),
+                              child: ClipRRect(
+                                borderRadius: const BorderRadius.all(
+                                    Radius.circular(100)),
+                                child: Image.network(curComment
+                                    .created_by.profile.picture
+                                    .toString()),
+                              ),
                             ),
                             const SizedBox(width: 5),
-                            const Text(
-                              '답글 쓰기',
-                              style: TextStyle(
-                                fontSize: 13,
-                                fontWeight: FontWeight.w500,
-                              ),
+                            Container(
+                                constraints: BoxConstraints(
+                                  maxWidth:
+                                      MediaQuery.of(context).size.width - 200,
+                                ),
+                                child: Text(
+                                  curComment.created_by.profile.nickname
+                                      .toString(),
+                                  style: const TextStyle(
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                )),
+                            const SizedBox(width: 7),
+                            Text(
+                              getTime(curComment.created_at),
+                              style: const TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w400,
+                                  color: Color.fromRGBO(51, 51, 51, 1)),
                             ),
                           ],
                         ),
                       ),
+                      SizedBox(
+                        width: 50,
+                        height: 25,
+                        child: Visibility(
+                            visible: !(curComment.is_hidden),
+                            child: (curComment.is_mine == true
+                                ? _buildMyPopupMenuButton(
+                                    curComment.id, userProvider, idx)
+                                : OthersPopupMenuButton(
+                                    commentID: curComment.id))),
+                      ),
+                    ],
+                  ),
+                  Container(
+                    margin: const EdgeInsets.only(left: 30, right: 0),
+                    child: curComment.is_hidden == false
+                        ? _buildCommentContent(curComment.content ?? "")
+                        : const Text(
+                            '삭제된 댓글 입니다.',
+                            style: TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w400,
+                              color: Colors.grey,
+                            ),
+                          ),
+                  ),
+                  const SizedBox(height: 8),
+                  Container(
+                    margin: const EdgeInsets.only(left: 30),
+                    child: Row(
+                      children: [
+                        // 삭제된 댓글의 경우 좋아요, 싫어요 버튼이 안보이게함.
+                        Visibility(
+                          visible: curComment.is_hidden == false,
+                          child: Row(
+                            children: [
+                              InkWell(
+                                onTap: () {
+                                  CommentController(
+                                    model: curComment,
+                                    userProvider: userProvider,
+                                  ).posVote().then((result) {
+                                    if (result) updateState();
+                                  });
+                                },
+                                child: SvgPicture.asset(
+                                  'assets/icons/like.svg',
+                                  width: 25,
+                                  height: 25,
+                                  color: curComment.my_vote == false
+                                      ? ColorsInfo.noneVote
+                                      : ColorsInfo.newara,
+                                ),
+                              ),
+                              const SizedBox(width: 3),
+                              Text(
+                                curComment.positive_vote_count.toString(),
+                                style: TextStyle(
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.w500,
+                                  color: curComment.my_vote == false
+                                      ? ColorsInfo.noneVote
+                                      : ColorsInfo.posVote,
+                                ),
+                              ),
+                              const SizedBox(width: 6),
+                              InkWell(
+                                onTap: () async {
+                                  CommentController(
+                                    model: curComment,
+                                    userProvider: userProvider,
+                                  ).negVote().then((result) {
+                                    if (result) updateState();
+                                  });
+                                },
+                                child: SvgPicture.asset(
+                                  'assets/icons/dislike.svg',
+                                  width: 25,
+                                  height: 25,
+                                  color: curComment.my_vote == true
+                                      ? ColorsInfo.noneVote
+                                      : ColorsInfo.negVote,
+                                ),
+                              ),
+                              const SizedBox(width: 3),
+                              Text(
+                                curComment.negative_vote_count.toString(),
+                                style: TextStyle(
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.w500,
+                                  color: curComment.my_vote == true
+                                      ? ColorsInfo.noneVote
+                                      : ColorsInfo.negVote,
+                                ),
+                              ),
+                              const SizedBox(width: 6),
+                            ],
+                          ),
+                        ),
+                        // 대댓글인 경우 답글쓰기 버튼이 안보이게함.
+                        Visibility(
+                          visible: curComment.parent_comment == null,
+                          child: InkWell(
+                            onTap: () {
+                              targetComment = curComment;
+                              _setCommentMode(true, false);
+                              textFocusNode.requestFocus();
+                              moveCommentContainer(idx);
+                            },
+                            child: Row(
+                              children: [
+                                SvgPicture.asset(
+                                  'assets/icons/right_arrow_2.svg',
+                                  width: 11,
+                                  height: 12,
+                                ),
+                                const SizedBox(width: 5),
+                                const Text(
+                                  '답글 쓰기',
+                                  style: TextStyle(
+                                    fontSize: 13,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
-            ],
-          ),
+            ),
+            const Divider(),
+          ],
         );
       },
-      separatorBuilder: (BuildContext context, int idx) => const Divider(),
     );
   }
 
@@ -1021,108 +993,6 @@ class _PostViewPageState extends State<PostViewPage> {
     );
   }
 
-  /// 첨부파일명과 함께 파일 타입 사진을 보여주기 위해 사용.
-  /// 파일 확장자를 ext를 통해 받은 후 해당하는 svg 이미지를 리턴.
-  SvgPicture _getFileTypeImage(String ext) {
-    late String assetPath;
-    if (AttachFileType.imageExt.contains(ext)) {
-      assetPath = "assets/icons/image.svg";
-    } else if (AttachFileType.videoExt.contains(ext)) {
-      assetPath = "assets/icons/video.svg";
-    } else if (AttachFileType.docx == ext) {
-      assetPath = "assets/icons/docx.svg";
-    } else if (AttachFileType.pdf == ext) {
-      assetPath = "assets/icons/pdf.svg";
-    } else {
-      assetPath = "assets/icons/clip.svg";
-    }
-    debugPrint(ext);
-    return SvgPicture.asset(
-      assetPath,
-      color: Colors.black,
-      width: 30,
-      height: 30,
-    );
-  }
-
-  /// 첨부파일 모아보기를 클릭하였을 때 나오는 PopupMenuButton.
-  /// 파일의 갯수를 전달받고 클래스 멤버변수 _article의 attachments 속성에서 정보를 가져옴.
-  PopupMenuButton<int> _buildAttachMenuButton(int fileNum) {
-    return PopupMenuButton<int>(
-        shadowColor: const Color.fromRGBO(0, 0, 0, 0.2),
-        splashRadius: 5,
-        shape: const RoundedRectangleBorder(
-          side: BorderSide(color: Color.fromRGBO(217, 217, 217, 1), width: 0.5),
-          borderRadius: BorderRadius.all(Radius.circular(12.0)),
-        ),
-        padding: const EdgeInsets.all(2.0),
-        child: Text(
-          '첨부파일 모아보기 $fileNum',
-          style: const TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.w500,
-          ),
-        ),
-        itemBuilder: (BuildContext context) {
-          List<AttachmentModel> files = _article.attachments;
-          return List.generate(
-            files.length,
-            (idx) {
-              String fullFileName =
-                  Uri.parse(files[idx].file).path.substring(7);
-              int dotIndex = fullFileName.lastIndexOf(".");
-              String fileName = dotIndex == -1
-                  ? fullFileName
-                  : fullFileName.substring(0, dotIndex - 1);
-              String extension =
-                  dotIndex == -1 ? "" : fullFileName.substring(dotIndex);
-              return PopupMenuItem<int>(
-                value: idx,
-                child: Container(
-                  padding: const EdgeInsets.only(left: 3),
-                  decoration: BoxDecoration(
-                    border: Border.all(
-                      color: const Color(0x00FFFFFF),
-                      width: 2,
-                    ),
-                    borderRadius: const BorderRadius.all(Radius.circular(5)),
-                  ),
-                  child: Row(
-                    children: [
-                      _getFileTypeImage(extension.substring(1)),
-                      const SizedBox(width: 10),
-                      Flexible(
-                        child: Text(
-                          fileName,
-                          overflow: TextOverflow.ellipsis,
-                          style: const TextStyle(
-                            color: Colors.black,
-                          ),
-                        ),
-                      ),
-                      Text(
-                        extension,
-                        style: const TextStyle(
-                          color: Colors.black,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              );
-            },
-          );
-        },
-        onSelected: (int result) async {
-          AttachmentModel model = _article.attachments[result];
-          UserProvider userProvider = context.read<UserProvider>();
-          bool res =
-              await FileController(model: model, userProvider: userProvider)
-                  .download();
-          debugPrint(res ? "파일 다운로드 성공" : "파일 다운로드 실패");
-        });
-  }
-
   /// 자신의 댓글에 대한 수정, 삭제 버튼이 있는 PopupMenuButton
   /// 댓글 식별을 위한 [id], API 통신을 위한 [userProvider],
   /// 해당 댓글의 _commentList 내에서의 위치인 [idx]를 전달받음.
@@ -1200,183 +1070,24 @@ class _PostViewPageState extends State<PostViewPage> {
             showDialog(
               context: context,
               builder: (context) {
-                return Dialog(
-                  child: Container(
-                    decoration: const BoxDecoration(
-                      borderRadius: BorderRadius.all(Radius.circular(15)),
-                    ),
-                    width: 350,
-                    height: 200,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        SvgPicture.asset(
-                          'assets/icons/information.svg',
-                          width: 55,
-                          height: 55,
-                          color: ColorsInfo.newara,
-                        ),
-                        const Text(
-                          '정말로 이 댓글을 삭제하시겠습니까?',
-                          style: TextStyle(
-                            fontSize: 17,
-                            fontWeight: FontWeight.w700,
-                            color: Colors.black,
-                          ),
-                        ),
-                        const SizedBox(height: 20),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            InkWell(
-                              onTap: () {
-                                Navigator.pop(context);
-                              },
-                              child: Container(
-                                decoration: BoxDecoration(
-                                  border: Border.all(
-                                    color: Colors.grey, // 테두리 색상을 빨간색으로 지정
-                                    width: 1, // 테두리의 두께를 2로 지정
-                                  ),
-                                  borderRadius: const BorderRadius.all(
-                                      Radius.circular(20)),
-                                  color: Colors.white,
-                                ),
-                                width: 60,
-                                height: 40,
-                                child: const Center(
-                                  child: Text(
-                                    '취소',
-                                    style: TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.w500,
-                                      color: Colors.black,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ),
-                            const SizedBox(width: 10),
-                            InkWell(
-                              onTap: () {
-                                _delComment(id, userProvider).then((res) async {
-                                  if (res == false) {
-                                    return;
-                                  } else {
-                                    bool res =
-                                        await _fetchArticle(userProvider);
-                                    _setIsPageLoaded(res);
-                                  }
-                                });
-                                Navigator.pop(context);
-                              },
-                              child: Container(
-                                decoration: const BoxDecoration(
-                                  borderRadius:
-                                      BorderRadius.all(Radius.circular(20)),
-                                  color: ColorsInfo.newara,
-                                ),
-                                width: 60,
-                                height: 40,
-                                child: const Center(
-                                  child: Text(
-                                    '확인',
-                                    style: TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.w500,
-                                      color: Colors.white,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ],
-                        )
-                      ],
-                    ),
-                  ),
+                return DeleteDialog(
+                  targetID: id,
+                  userProvider: userProvider,
+                  targetContext: context,
+                  onTap: () {
+                    _delComment(id, userProvider).then((res) async {
+                      if (res == false) {
+                        return;
+                      } else {
+                        bool res = await _fetchArticle(userProvider);
+                        _setIsPageLoaded(res);
+                      }
+                    });
+                    Navigator.pop(context);
+                  },
                 );
               },
             );
-            break;
-        }
-      },
-    );
-  }
-
-  /// 다른 유저의 댓글에 대해 채팅, 신고를 나타내는 PopupMenuButton
-  /// 댓글의 id인 commentID를 전달받음.
-  PopupMenuButton<String> _buildOthersPopupMenuButton(int commentID) {
-    return PopupMenuButton<String>(
-      shadowColor: const Color.fromRGBO(0, 0, 0, 0.2),
-      splashRadius: 5,
-      shape: const RoundedRectangleBorder(
-          side: BorderSide(color: Color.fromRGBO(217, 217, 217, 1), width: 0.5),
-          borderRadius: BorderRadius.all(Radius.circular(12.0))),
-      padding: const EdgeInsets.all(2.0),
-      child: SvgPicture.asset(
-        'assets/icons/menu_2.svg',
-        color: Colors.grey,
-        width: 50,
-        height: 20,
-      ),
-      itemBuilder: (BuildContext context) => [
-        PopupMenuItem<String>(
-          value: 'Chat',
-          child: Row(
-            children: [
-              SvgPicture.asset(
-                'assets/icons/chat.svg',
-                width: 20,
-                height: 20,
-                color: const Color.fromRGBO(51, 51, 51, 1),
-              ),
-              const SizedBox(width: 10),
-              const Text(
-                '채팅',
-                style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w700,
-                    color: Color.fromRGBO(51, 51, 51, 1)),
-              ),
-            ],
-          ),
-        ),
-        PopupMenuItem<String>(
-          value: 'Report',
-          child: Row(
-            children: [
-              SvgPicture.asset(
-                'assets/icons/warning.svg',
-                width: 20,
-                height: 20,
-                color: ColorsInfo.newara,
-              ),
-              const SizedBox(width: 10),
-              const Text(
-                '신고',
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w700,
-                  color: ColorsInfo.newara,
-                ),
-              ),
-            ],
-          ),
-        ),
-      ],
-      onSelected: (String result) {
-        switch (result) {
-          case 'Chat':
-            // (2023.08.01) 채팅 기능은 추후에 구현 예정이기 때문에 아직은 Placeholder
-            break;
-          case 'Report':
-            showDialog(
-                context: context,
-                builder: (context) {
-                  return ReportDialogWidget(commentID: commentID);
-                });
             break;
         }
       },
@@ -1430,7 +1141,7 @@ class _PostViewPageState extends State<PostViewPage> {
     return InArticleWebView(
       content: getContentHtml(content),
       initialHeight: 10,
-      isComment: false,
+      isComment: true,
     );
   }
 
@@ -1471,7 +1182,7 @@ class _PostViewPageState extends State<PostViewPage> {
     setState(() {});
   }
 
-  // isValid: article 에 적절한 정보가 있는지 나타냄
+  // _isPageLoaded: article 에 적절한 정보가 있는지 나타냄
   void _setIsPageLoaded(bool value) {
     if (!mounted) return;
     setState(() => _isPageLoaded = value);

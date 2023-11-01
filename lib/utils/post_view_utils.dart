@@ -471,3 +471,4 @@ class _ReportDialogWidgetState extends State<ReportDialogWidget> {
     );
   }
 }
+
