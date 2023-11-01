@@ -10,13 +10,11 @@ import 'package:new_ara_app/constants/url_info.dart';
 import 'package:new_ara_app/providers/user_provider.dart';
 import 'package:new_ara_app/utils/html_info.dart';
 
-
-// TODO: 웹뷰 구조 수정 및 최적화(계속 별도의 클래스로 유지할 지 여부)
-
 /// PostViewPage에서는 article 및 comment의 content를 HTML 렌더링으로 보여줘야 함.
 /// 따라서 웹뷰가 사용되는 경우가 자주 있어 따로 클래스로 분리함.
 class InArticleWebView extends StatefulWidget {
-  /// 웹뷰에서 렌더링하는 HTML. 추후 sanitize함.
+  /// 웹뷰에서 렌더링하는 HTML.
+  /// 웹뷰에서 로딩하기 전에 sanitize함.
   final String content;
 
   /// 초기 웹뷰 위젯의 높이.
@@ -24,12 +22,6 @@ class InArticleWebView extends StatefulWidget {
 
   /// 웹뷰로 표시하려는 content가 댓글인지 여부.
   /// 아래와 같이 사용.
-  /// ```
-  /// if (!(widget.isComment)) {
-  ///   Future.delayed(const Duration(milliseconds: 500),
-  ///      () => userProvider.setIsWebViewLoaded(true));
-  /// }
-  /// ```
   final bool isComment;
 
   const InArticleWebView({
@@ -46,10 +38,10 @@ class InArticleWebView extends StatefulWidget {
 class _InArticleWebViewState extends State<InArticleWebView> {
   late WebViewController _webViewController;
 
-  /// 웹뷰에서 렌더링하는 content의 높이에 맞춰 조정된 height.
+  /// WebView 위젯의 height.(initialHeight에서 조정됨)
   late double webViewHeight;
 
-  /// 높이 조절이 완료되었는지 여부.
+  /// webViewHeight 조정 완료 여부.
   late bool isFitted;
 
   /// content에 뉴아라 게시물에 대한 링크가 있을 경우 게시물 번호를 추출해줌.
@@ -164,15 +156,15 @@ class _InArticleWebViewState extends State<InArticleWebView> {
         onPageFinished: (String url) async {
           if (!isFitted) {
             await updatePageHeight();
-            isFitted = true;
-            debugPrint("height fitted!!");
-            // // TODO: 500ms 대기가 필요한 지 확인 후 최적화하기
-            //   // TODO: setIsWebViewLoaded 구현 수정하기
-            //   Future.delayed(const Duration(milliseconds: 500),
-            //       () => userProvider.setIsContentLoaded(true));
-            if (!(widget.isComment)) {
-              userProvider.setIsContentLoaded(true);
-            }
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              isFitted = true;
+              debugPrint("height fitted!!");
+              // 댓글은 웹뷰 로드가 빠름(대부분 content가 많지 않기 때문)
+              // 따라서 댓글이 아닌 경우에만 isContentLoaded로 로드여부 관리.
+              if (!(widget.isComment)) {
+                userProvider.setIsContentLoaded(true);
+              }
+            });
           }
         },
         onWebResourceError: (WebResourceError error) async {
@@ -189,6 +181,7 @@ class _InArticleWebViewState extends State<InArticleWebView> {
       height: webViewHeight,
       child: WebViewWidget(
         controller: _webViewController,
+        // 웹뷰를 클릭하였을 때 키보드를 비활성화.
         gestureRecognizers: {
           Factory<OneSequenceGestureRecognizer>(() {
             TapGestureRecognizer tabGestureRecognizer = TapGestureRecognizer();
