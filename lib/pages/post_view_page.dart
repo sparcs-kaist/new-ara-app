@@ -1203,6 +1203,7 @@ class _PostViewPageState extends State<PostViewPage> {
   /// 댓글을 POST 요청을 통해 작성하는 메서드.
   /// API 요청을 위해 [userProvider]를 이용.
   /// 댓글이 성공적으로 보내지면 true, 그렇지 않으면 false 반환.
+  /// PostViewPage와 크게 연관되어 있어 CommentController로 이동시키지 않고 남김.
   Future<bool> _sendComment(UserProvider userProvider) async {
     if (_formKey.currentState == null || !(_formKey.currentState!.validate())) {
       return false;

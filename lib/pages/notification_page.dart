@@ -88,8 +88,8 @@ class _NotificationPageState extends State<NotificationPage> {
   /// 알림 ListView를 구독 중인 리스너이며
   /// 사용자가 ListView의 끝에 도달하였을 때 이를 감지하여
   /// 새로운 페이지를 로딩함.
+  // TODO: Future<void>로 변경 (Resolved)
   Future<void> _listViewListener() async {
-    // TODO: Future<void>로 변경 (Resolved)
     if (_isLoadingNewPage) return;
     if (_listViewController.position.pixels ==
         _listViewController.position.maxScrollExtent) {
@@ -375,8 +375,8 @@ class _NotificationPageState extends State<NotificationPage> {
       // 모두 읽음 처리를 위한 버튼.
       // TODO: 디자이너와 모두 읽기 기능 위치, 위젯 조정해야함
       floatingActionButton: FloatingActionButton(
+        // TODO: 산재되어있는 return 하나로 통일하기 (Resolved)
         onPressed: () async {
-          // TODO: 산재되어있는 return 하나로 통일하기 (Resolved)
           if (notificationProvider.isNotReadExist) {
             _setIsLoadingTotal(true);
             bool res = await _readAllNotification(userProvider);
@@ -409,7 +409,7 @@ class _NotificationPageState extends State<NotificationPage> {
     );
   }
 
-  // 현재 date와 알림 생성 date의 차이를 계산하여 문자열로 변경해줌.
+  /// 현재 date와 알림 생성 date의 차이를 계산하여 문자열로 변경해줌.
   Widget _buildDateInfo(String strDate1, String strDate2) {
     DateTime now = DateTime.now();
     DateTime prevDate = DateTime.parse(strDate1).toLocal();
