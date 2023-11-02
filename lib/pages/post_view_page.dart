@@ -228,7 +228,7 @@ class _PostViewPageState extends State<PostViewPage> {
           )
         else
           const LoadingIndicator(),
-        // TODO: 굳이 웹뷰가 다 로드될때까지 기다려야 할까??
+        // TODO: 아래 기능에 대해 디자이너와 논의 필요 (2023.11.03)
         // Visibility(
         //   visible: !(context.watch<UserProvider>().isContentLoaded),
         //   child: Container(color: Colors.white),
