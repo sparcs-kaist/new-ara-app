@@ -316,12 +316,8 @@ class _UserPageState extends State<UserPage>
                       height: 21,
                       child: GestureDetector(
                         onTap: () async {
-                          await Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => ProfileEditPage(),
-                            ),
-                          );
+                          await Navigator.of(context)
+                              .push(slideRoute(const ProfileEditPage()));
                         },
                         child: Text(
                           'myPage.change'.tr(),

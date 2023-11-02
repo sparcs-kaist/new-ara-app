@@ -216,13 +216,10 @@ class _FreeBulletinBoardPageState extends State<FreeBulletinBoardPage> {
               height: 35,
             ),
             onPressed: () async {
-              await Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => BulletinSearchPage(
-                            boardType: widget.boardType,
-                            boardInfo: widget.boardInfo,
-                          )));
+              await Navigator.of(context).push(slideRoute(BulletinSearchPage(
+                boardType: widget.boardType,
+                boardInfo: widget.boardInfo,
+              )));
             },
           ),
         ],

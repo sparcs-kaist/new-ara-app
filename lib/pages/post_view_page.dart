@@ -461,7 +461,7 @@ class _PostViewPageState extends State<PostViewPage> {
                                                                   .my_scrap ==
                                                               null
                                                           ? const Color
-                                                                  .fromRGBO(
+                                                              .fromRGBO(
                                                               100, 100, 100, 1)
                                                           : ColorsInfo.newara,
                                                     ),
@@ -571,7 +571,7 @@ class _PostViewPageState extends State<PostViewPage> {
                                                         width: 25,
                                                         height: 25,
                                                         color: const Color
-                                                                .fromRGBO(
+                                                            .fromRGBO(
                                                             100, 100, 100, 1),
                                                       ),
                                                       const SizedBox(width: 10),
@@ -590,13 +590,11 @@ class _PostViewPageState extends State<PostViewPage> {
                                             )
                                           : InkWell(
                                               onTap: () async {
-                                                await Navigator.push(
-                                                    context,
-                                                    MaterialPageRoute(
-                                                        builder: (context) =>
-                                                            PostWritePage(
-                                                                previousArticle:
-                                                                    _article)));
+                                                await Navigator.of(context)
+                                                    .push(slideRoute(
+                                                        PostWritePage(
+                                                            previousArticle:
+                                                                _article)));
                                                 bool result =
                                                     await _fetchArticle(
                                                         userProvider);
@@ -687,19 +685,17 @@ class _PostViewPageState extends State<PostViewPage> {
                                               children: [
                                                 InkWell(
                                                   // 익명일 경우 댓글 작성자 정보 확인이 불가능하도록 함.
-                                                  onTap:
-                                                      curComment.name_type == 2
-                                                          ? null
-                                                          : () {
-                                                              Navigator.push(
-                                                                context,
-                                                                MaterialPageRoute(
-                                                                    builder: (context) => UserViewPage(
-                                                                        userID: curComment
-                                                                            .created_by
-                                                                            .id)),
-                                                              );
-                                                            },
+                                                  onTap: curComment.name_type ==
+                                                          2
+                                                      ? null
+                                                      : () {
+                                                          Navigator.of(context)
+                                                              .push(slideRoute(
+                                                                  UserViewPage(
+                                                                      userID: curComment
+                                                                          .created_by
+                                                                          .id)));
+                                                        },
                                                   child: Row(
                                                     children: [
                                                       Container(
@@ -714,8 +710,7 @@ class _PostViewPageState extends State<PostViewPage> {
                                                         child: ClipRRect(
                                                           borderRadius:
                                                               const BorderRadius
-                                                                      .all(
-                                                                  Radius
+                                                                  .all(Radius
                                                                       .circular(
                                                                           100)),
                                                           child: Image.network(
@@ -1753,8 +1748,7 @@ class _InArticleWebViewState extends State<InArticleWebView> {
 
   /// 뉴아라 내부 게시물 번호인 [postNum]을 전달받아 PostViewPage를 호출함.
   void launchArticle(int postNum) {
-    Navigator.push(context,
-        MaterialPageRoute(builder: (context) => PostViewPage(id: postNum)));
+    Navigator.of(context).push(slideRoute(PostViewPage(id: postNum)));
   }
 
   /// 웹뷰에서 링크가 클릭되었을 때 링크 분석, 리다이렉트를 담당해줌.
