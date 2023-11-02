@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:new_ara_app/constants/url_info.dart';
 import 'package:new_ara_app/providers/user_provider.dart';
 import 'package:webview_flutter/webview_flutter.dart';
-import 'package:new_ara_app/widgetclasses/loading_indicator.dart';
+import 'package:new_ara_app/widgets/loading_indicator.dart';
 import 'package:provider/provider.dart';
 
 /// SparcsSSOPage

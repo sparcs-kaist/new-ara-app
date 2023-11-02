@@ -7,7 +7,7 @@ import 'package:provider/provider.dart';
 import 'package:dio/dio.dart';
 
 import 'package:new_ara_app/constants/url_info.dart';
-import 'package:new_ara_app/widgetclasses/loading_indicator.dart';
+import 'package:new_ara_app/widgets/loading_indicator.dart';
 import 'package:new_ara_app/constants/colors_info.dart';
 import 'package:new_ara_app/providers/user_provider.dart';
 import 'package:new_ara_app/models/notification_model.dart';
@@ -88,8 +88,8 @@ class _NotificationPageState extends State<NotificationPage> {
   /// 알림 ListView를 구독 중인 리스너이며
   /// 사용자가 ListView의 끝에 도달하였을 때 이를 감지하여
   /// 새로운 페이지를 로딩함.
-  void _listViewListener() async {
-    // TODO: Future<void>로 변경.
+  // TODO: Future<void>로 변경 (Resolved)
+  Future<void> _listViewListener() async {
     if (_isLoadingNewPage) return;
     if (_listViewController.position.pixels ==
         _listViewController.position.maxScrollExtent) {
@@ -126,8 +126,8 @@ class _NotificationPageState extends State<NotificationPage> {
     }
   }
 
-  // TODO: 메서드명을 updateState로 변경
-  void update() {
+  // TODO: 메서드명을 updateState로 변경 (Resolved)
+  void updateState() {
     if (mounted) setState(() {});
   }
 
@@ -202,7 +202,7 @@ class _NotificationPageState extends State<NotificationPage> {
                       // 새로고침 시 첫 페이지만 다시 불러옴.
                       await _initNotificationPage(userProvider);
                       await notificationProvider.checkIsNotReadExist();
-                      update();
+                      updateState();
                     },
                     child: _isLoadingTotal
                         ? const LoadingIndicator()
@@ -373,28 +373,27 @@ class _NotificationPageState extends State<NotificationPage> {
         ),
       ),
       // 모두 읽음 처리를 위한 버튼.
-      // TODO: 디자이너와 모두 읽기 기능 위치, 위젯 조정해야함.
+      // TODO: 디자이너와 모두 읽기 기능 위치, 위젯 조정해야함
       floatingActionButton: FloatingActionButton(
+        // TODO: 산재되어있는 return 하나로 통일하기 (Resolved)
         onPressed: () async {
-          // TODO: return 하나로 바꾸기
-          if (!notificationProvider.isNotReadExist) return;
-          _setIsLoadingTotal(true);
-          bool res = await _readAllNotification(userProvider);
-          if (!res) {
-            debugPrint("모두 읽기 요청 실패");
-            _setIsLoadingTotal(false);
-            // TODO: return을 마지막에 한번만 하도록 변경(다른 파일에서도 확인)
-            return;
+          if (notificationProvider.isNotReadExist) {
+            _setIsLoadingTotal(true);
+            bool res = await _readAllNotification(userProvider);
+            if (res) {
+              // TODO: checkIsNotReadExist 호출하지 않고 처리 (resolved)
+              notificationProvider.setIsNotReadExist(false);
+              List<NotificationModel> newList = [];
+              for (int page = 1; page <= _curPage; page++) {
+                newList += await _fetchEachPage(userProvider, page);
+              }
+              _modelList = newList;
+              _setIsLoadingTotal(false);
+            } else {
+              debugPrint("모두 읽기 요청 실패");
+              _setIsLoadingTotal(false);
+            }
           }
-          // TODO: NotificationProvider에 isNotReadExist 변수 변경 메서드 추가하여
-          // checkIsNotReadExist를 호출하는 대신 변수만 변경하는 것으로 코드 수정하기
-          await notificationProvider.checkIsNotReadExist();
-          List<NotificationModel> newList = [];
-          for (int page = 1; page <= _curPage; page++) {
-            newList += await _fetchEachPage(userProvider, page);
-          }
-          _modelList = newList;
-          _setIsLoadingTotal(false);
         },
         backgroundColor: Colors.white,
         child: Center(
@@ -410,7 +409,7 @@ class _NotificationPageState extends State<NotificationPage> {
     );
   }
 
-  // 현재 date와 알림 생성 date의 차이를 계산하여 문자열로 변경해줌.
+  /// 현재 date와 알림 생성 date의 차이를 계산하여 문자열로 변경해줌.
   Widget _buildDateInfo(String strDate1, String strDate2) {
     DateTime now = DateTime.now();
     DateTime prevDate = DateTime.parse(strDate1).toLocal();
