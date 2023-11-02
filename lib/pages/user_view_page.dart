@@ -225,6 +225,7 @@ class _UserViewPageState extends State<UserViewPage> {
               onTap: () async {
                 await Navigator.of(context)
                     .push(slideRoute(PostViewPage(id: curPost.id)));
+                // 사용자가 글을 보고 돌아왔을 때 리스트를 업데이트.
                 for (int i = 1; i <= _nextPage; i++) {
                   await _fetchCreatedArticles(userProvider, i);
                 }
@@ -251,46 +252,7 @@ class _UserViewPageState extends State<UserViewPage> {
                           ),
                         ),
                         // 첨부파일 이미지
-                        curPost.attachment_type.toString() == "NONE"
-                            ? Container()
-                            : const SizedBox(width: 5),
-                        curPost.attachment_type.toString() == "BOTH"
-                            ? Row(
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                children: [
-                                  SvgPicture.asset(
-                                    'assets/icons/image.svg',
-                                    color: Colors.grey,
-                                    width: 30,
-                                    height: 25,
-                                  ),
-                                  const SizedBox(
-                                    width: 9,
-                                  ),
-                                  SvgPicture.asset(
-                                    'assets/icons/clip.svg',
-                                    color: Colors.grey,
-                                    width: 15,
-                                    height: 20,
-                                  ),
-                                ],
-                              )
-                            : curPost.attachment_type.toString() == "IMAGE"
-                                ? SvgPicture.asset(
-                                    'assets/icons/image.svg',
-                                    color: Colors.grey,
-                                    width: 30,
-                                    height: 25,
-                                  )
-                                : curPost.attachment_type.toString() ==
-                                        "NON_IMAGE"
-                                    ? SvgPicture.asset(
-                                        'assets/icons/clip.svg',
-                                        color: Colors.grey,
-                                        width: 15,
-                                        height: 20,
-                                      )
-                                    : Container()
+                        _buildAttachImage(curPost.attachment_type.toString())
                       ],
                     ),
                     const SizedBox(height: 5),
@@ -338,7 +300,10 @@ class _UserViewPageState extends State<UserViewPage> {
                               'assets/icons/like.svg',
                               width: 13,
                               height: 15,
-                              color: ColorsInfo.newara,
+                              colorFilter: const ColorFilter.mode(
+                                ColorsInfo.newara,
+                                BlendMode.srcIn,
+                              ),
                             ),
                             const SizedBox(width: 3),
                             Text('${curPost.positive_vote_count}',
@@ -351,7 +316,10 @@ class _UserViewPageState extends State<UserViewPage> {
                               'assets/icons/dislike.svg',
                               width: 13,
                               height: 15,
-                              color: const Color.fromRGBO(83, 141, 209, 1),
+                              colorFilter: const ColorFilter.mode(
+                                Color.fromRGBO(83, 141, 209, 1),
+                                BlendMode.srcIn,
+                              ),
                             ),
                             const SizedBox(width: 3),
                             Text('${curPost.negative_vote_count}',
@@ -364,7 +332,10 @@ class _UserViewPageState extends State<UserViewPage> {
                               'assets/icons/comment.svg',
                               width: 13,
                               height: 15,
-                              color: const Color.fromRGBO(99, 99, 99, 1),
+                              colorFilter: const ColorFilter.mode(
+                                Color.fromRGBO(99, 99, 99, 1),
+                                BlendMode.srcIn,
+                              ),
                             ),
                             const SizedBox(width: 3),
                             Text('${curPost.comment_count}',
@@ -386,6 +357,64 @@ class _UserViewPageState extends State<UserViewPage> {
           },
         ),
       ),
+    );
+  }
+
+  /// 글에 첨부된 파일의 타입에 따른 위젯을 리턴하는 함수.
+  Widget _buildAttachImage(String attachmentType) {
+    return Row(
+      children: [
+        if (attachmentType == "NONE") Container() else const SizedBox(width: 5),
+        if (attachmentType == "BOTH")
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              SvgPicture.asset(
+                'assets/icons/image.svg',
+                colorFilter: const ColorFilter.mode(
+                  Colors.grey,
+                  BlendMode.srcIn,
+                ),
+                width: 30,
+                height: 25,
+              ),
+              const SizedBox(
+                width: 5,
+              ),
+              SvgPicture.asset(
+                'assets/icons/clip.svg',
+                colorFilter: const ColorFilter.mode(
+                  Colors.grey,
+                  BlendMode.srcIn,
+                ),
+                width: 15,
+                height: 20,
+              ),
+            ],
+          )
+        else if (attachmentType == "IMAGE")
+          SvgPicture.asset(
+            'assets/icons/image.svg',
+            colorFilter: const ColorFilter.mode(
+              Colors.grey,
+              BlendMode.srcIn,
+            ),
+            width: 30,
+            height: 25,
+          )
+        else if (attachmentType == "NON_IMAGE")
+          SvgPicture.asset(
+            'assets/icons/clip.svg',
+            colorFilter: const ColorFilter.mode(
+              Colors.grey,
+              BlendMode.srcIn,
+            ),
+            width: 15,
+            height: 20,
+          )
+        else
+          Container()
+      ],
     );
   }
 
