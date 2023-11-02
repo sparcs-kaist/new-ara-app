@@ -18,6 +18,7 @@ import 'package:new_ara_app/providers/notification_provider.dart';
 
 /// 유저 관련 정보 페이지 뷰, 이벤트 처리를 모두 관리하는 StatefulWidget
 class UserViewPage extends StatefulWidget {
+  /// 정보 조회의 대상이되는 user의 ID.
   final int userID;
 
   const UserViewPage({super.key, required this.userID});
