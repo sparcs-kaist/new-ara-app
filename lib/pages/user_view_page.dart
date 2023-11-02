@@ -4,6 +4,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
+import 'package:dio/dio.dart';
 
 import 'package:new_ara_app/constants/colors_info.dart';
 import 'package:new_ara_app/models/public_user_profile_model.dart';
@@ -74,7 +75,6 @@ class _UserViewPageState extends State<UserViewPage> {
     if (_isLoaded &&
         _listViewController.position.pixels ==
             _listViewController.position.maxScrollExtent) {
-      //setIsLoaded(false);
       UserProvider userProvider = context.read<UserProvider>();
       bool userFetch = await _fetchUser(userProvider);
       bool listFetch = await _fetchCreatedArticles(userProvider, _nextPage);
@@ -409,16 +409,35 @@ class _UserViewPageState extends State<UserViewPage> {
   /// API 통신 및 userProfileModel에 정보 저장이 모두 성공적일 경우 true.
   /// 아닌 경우 false 반환.
   Future<bool> _fetchUser(UserProvider userProvider) async {
-    Map<String, dynamic>? userJson =
-        await userProvider.getApiRes("user_profiles/${widget.userID}");
-    if (userJson == null) return false;
+    String apiUrl = "/api/user_profiles/${widget.userID}";
     try {
-      _userProfileModel = PublicUserProfileModel.fromJson(userJson);
-    } catch (error) {
-      debugPrint("fetch user failed: ${widget.userID}");
-      return false;
+      var response = await userProvider.myDio().get(
+        "$newAraDefaultUrl$apiUrl"
+      );
+      dynamic json = response.data;
+      try {
+        _userProfileModel = PublicUserProfileModel.fromJson(json);
+        return true;
+      } catch (error) {
+        debugPrint("fetch user failed: ${widget.userID}");
+      }
+    } on DioException catch (e) {
+      // 서버에서 response를 보냈지만 invalid한 statusCode일 때
+      if (e.response != null) {
+        debugPrint("${e.response!.data}");
+        debugPrint("${e.response!.headers}");
+        debugPrint("${e.response!.requestOptions}");
+      }
+      // request의 setting, sending에서 문제 발생
+      // requestOption, message를 출력.
+      else {
+        debugPrint("${e.requestOptions}");
+        debugPrint("${e.message}");
+      }
+    } catch (e) {
+      debugPrint("_fetchUser failed with error: $e");
     }
-    return true;
+    return false;
   }
 
   /// 작성한 글 리스트를 불러와 멤버 변수 articleList에 저장하는 함수.
