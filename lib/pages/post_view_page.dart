@@ -118,6 +118,57 @@ class _PostViewPageState extends State<PostViewPage> {
     super.dispose();
   }
 
+  /// 클래스 멤버변수 _article, _commentList, _commentKeys의 값을 설정하는 메서드.
+  /// API 통신을 위해 [userProvider]를 전달받음.
+  /// _article, _commentList, _commentKeys의 값이 모두 설정되면 true, 아닌 경우 false 반환.
+  Future<bool> _fetchArticle(UserProvider userProvider) async {
+    dynamic articleJson;
+
+    articleJson = await userProvider.getApiRes("articles/${widget.articleID}");
+    if (articleJson == null) {
+      debugPrint("\nArticleJson is null\n");
+      return false;
+    }
+    try {
+      _article = ArticleModel.fromJson(articleJson);
+    } catch (error) {
+      debugPrint(
+          "ArticleModel.fromJson failed at articleID = ${widget.articleID}: $error");
+      return false;
+    }
+
+    _commentList.clear();
+    _commentKeys.clear();
+    for (ArticleNestedCommentListAction anc in _article.comments) {
+      // 댓글을 추가하는 과정
+      try {
+        // ArticleNestedCommentListActionModel 은 CommentNestedCommentListAction 의 모든 필드를 가지고 있음
+        // 따라서 원래 댓글은 ArticleNestedCommentListActionModel 에 저장되고,
+        // 대댓글을 CommentNestedCommentListActionModel 에 저장되지만 댓글도 CommentNestedCommentListActionModel 에 저장하여 더 편하게 함.
+        _commentList
+            .add(CommentNestedCommentListActionModel.fromJson(anc.toJson()));
+        _commentKeys.add(GlobalKey());
+      } catch (error) {
+        debugPrint(
+            "CommentNestedCommentListActionModel.fromJson failed at ID ${anc.id}: $error");
+        return false;
+      }
+
+      // 대댓글을 추가하는 과정
+      for (CommentNestedCommentListActionModel cnc in anc.comments) {
+        try {
+          _commentList.add(cnc);
+          _commentKeys.add(GlobalKey());
+        } catch (error) {
+          debugPrint(
+              "CommentNestedCommentListActionModel.fromJson failed at ID ${cnc.id}: $error\n");
+          return false;
+        }
+      }
+    }
+    return true;
+  }
+
   @override
   Widget build(BuildContext context) {
     UserProvider userProvider = context.read<UserProvider>();
@@ -408,7 +459,7 @@ class _PostViewPageState extends State<PostViewPage> {
               model: _article,
               userProvider: userProvider,
             ).posVote();
-            if (res) updateState();
+            if (res) _updateState();
           },
           child: SvgPicture.asset(
             'assets/icons/like.svg',
@@ -436,7 +487,7 @@ class _PostViewPageState extends State<PostViewPage> {
               model: _article,
               userProvider: userProvider,
             ).negVote().then((result) {
-              if (result) updateState();
+              if (result) _updateState();
             });
           },
           child: SvgPicture.asset(
@@ -476,7 +527,7 @@ class _PostViewPageState extends State<PostViewPage> {
                   model: _article,
                   userProvider: userProvider,
                 ).scrap().then((result) {
-                  if (result) updateState();
+                  if (result) _updateState();
                 });
               },
               child: Container(
@@ -752,7 +803,7 @@ class _PostViewPageState extends State<PostViewPage> {
                                           targetComment = _commentList[idx];
                                           _setCommentMode(false, true);
                                           textFocusNode.requestFocus();
-                                          moveCommentContainer(idx);
+                                          _moveCommentContainer(idx);
                                           break;
                                         case 'Delete':
                                           showDialog(
@@ -819,7 +870,7 @@ class _PostViewPageState extends State<PostViewPage> {
                                     model: curComment,
                                     userProvider: userProvider,
                                   ).posVote().then((result) {
-                                    if (result) updateState();
+                                    if (result) _updateState();
                                   });
                                 },
                                 child: SvgPicture.asset(
@@ -849,7 +900,7 @@ class _PostViewPageState extends State<PostViewPage> {
                                     model: curComment,
                                     userProvider: userProvider,
                                   ).negVote().then((result) {
-                                    if (result) updateState();
+                                    if (result) _updateState();
                                   });
                                 },
                                 child: SvgPicture.asset(
@@ -884,7 +935,7 @@ class _PostViewPageState extends State<PostViewPage> {
                               targetComment = curComment;
                               _setCommentMode(true, false);
                               textFocusNode.requestFocus();
-                              moveCommentContainer(idx);
+                              _moveCommentContainer(idx);
                             },
                             child: Row(
                               children: [
@@ -915,6 +966,29 @@ class _PostViewPageState extends State<PostViewPage> {
           ],
         );
       },
+    );
+  }
+
+  /// 현재 댓글은 이미지, 링크가 있는 경우 HTML로 저장되어 있음.
+  /// 그러나 텍스트만 있는 댓글도 다수 존재하여 HTML 태그를 감지하고 필요한 것들만
+  /// 웹뷰로 로드, 나머지는 텍스트로 댓글을 로드하도록 함.
+  /// _buildCommentListView에서 사용함.
+  Widget _buildCommentContent(String content) {
+    // HTML 태그가 존재하는지 검사 (완벽한 방법은 아님)
+    if (!content.contains('<')) {
+      return Text(
+        content,
+        style: const TextStyle(
+          fontSize: 14,
+          fontWeight: FontWeight.w400,
+          color: Colors.black,
+        ),
+      );
+    }
+    return InArticleWebView(
+      content: getContentHtml(content),
+      initialHeight: 10,
+      isComment: true,
     );
   }
 
@@ -1015,7 +1089,7 @@ class _PostViewPageState extends State<PostViewPage> {
                 absorbing: _isSending,
                 child: InkWell(
                   onTap: () async {
-                    setIsSending(true);
+                    _setIsSending(true);
                     bool sendRes = await _sendComment(userProvider);
                     if (sendRes) {
                       _setIsPageLoaded(await _fetchArticle(userProvider));
@@ -1023,7 +1097,7 @@ class _PostViewPageState extends State<PostViewPage> {
                     } else {
                       debugPrint("Send Comment Failed");
                     }
-                    setIsSending(false);
+                    _setIsSending(false);
                   },
                   child: SvgPicture.asset(
                     'assets/icons/send.svg',
@@ -1042,6 +1116,7 @@ class _PostViewPageState extends State<PostViewPage> {
   }
 
   /// 댓글 입력을 위한 Form을 생성하여 리턴함.
+  /// _buildCommentTextFormField 함수에서 사용함.
   Form _buildForm() {
     return Form(
       key: _formKey,
@@ -1070,32 +1145,10 @@ class _PostViewPageState extends State<PostViewPage> {
     );
   }
 
-  /// 현재 댓글은 이미지, 링크가 있는 경우 HTML로 저장되어 있음.
-  /// 그러나 텍스트만 있는 댓글도 다수 존재하여 HTML 태그를 감지하고 필요한 것들만
-  /// 웹뷰로 로드, 나머지는 텍스트로 댓글을 로드하도록 함.
-  Widget _buildCommentContent(String content) {
-    // HTML 태그가 존재하는지 검사 (완벽한 방법은 아님)
-    if (!content.contains('<')) {
-      return Text(
-        content,
-        style: const TextStyle(
-          fontSize: 14,
-          fontWeight: FontWeight.w400,
-          color: Colors.black,
-        ),
-      );
-    }
-    return InArticleWebView(
-      content: getContentHtml(content),
-      initialHeight: 10,
-      isComment: true,
-    );
-  }
-
   /// 대댓글, 수정 기능 사용 시 대상이 되는 댓글 컨테이너를
   /// 키보드 바로 위로 이동시키는 메서드.
   /// 댓글 식별을 위해 _commentKeys의 인덱스를 [idx]로 전달받음.
-  void moveCommentContainer(int idx) {
+  void _moveCommentContainer(int idx) {
     // 키보드가 화면에 나타나기까지 대기(0.5초로 설정함)
     Future.delayed(const Duration(milliseconds: 500), () {
       if (_commentKeys[idx].currentContext == null ||
@@ -1123,20 +1176,21 @@ class _PostViewPageState extends State<PostViewPage> {
     });
   }
 
-  void setIsSending(bool value) {
+  /// _isSending의 값을 수정하고 state를 업데이트함.
+  void _setIsSending(bool value) {
     if (!mounted) return;
     setState(() => _isSending = value);
   }
 
-  void updateState() {
-    if (!mounted) return;
-    setState(() {});
-  }
-
-  // _isPageLoaded: article 에 적절한 정보가 있는지 나타냄
+ // _isPageLoaded: article 에 적절한 정보가 있는지 나타냄
   void _setIsPageLoaded(bool value) {
     if (!mounted) return;
     setState(() => _isPageLoaded = value);
+  }
+
+  void _updateState() {
+    if (!mounted) return;
+    setState(() {});
   }
 
   // 둘 다 false 면 일반적인 댓글
@@ -1146,58 +1200,6 @@ class _PostViewPageState extends State<PostViewPage> {
       _isNestedComment = isNestedVal;
       _isModify = isModifyVal;
     });
-  }
-
-  /// 클래스 멤버변수 _article, _commentList, _commentKeys의 값을 설정하는 메서드.
-  /// API 통신을 위해 [userProvider]를 전달받음.
-  /// _article, _commentList, _commentKeys의 값이 모두 설정되면 true, 아닌 경우 false 반환.
-  Future<bool> _fetchArticle(UserProvider userProvider) async {
-    dynamic articleJson, commentJson;
-
-    articleJson = await userProvider.getApiRes("articles/${widget.articleID}");
-    if (articleJson == null) {
-      debugPrint("\nArticleJson is null\n");
-      return false;
-    }
-    try {
-      _article = ArticleModel.fromJson(articleJson);
-    } catch (error) {
-      debugPrint(
-          "ArticleModel.fromJson failed at articleID = ${widget.articleID}: $error");
-      return false;
-    }
-
-    _commentList.clear();
-    _commentKeys.clear();
-    for (ArticleNestedCommentListAction anc in _article.comments) {
-      // 댓글을 추가하는 과정
-      try {
-        // ArticleNestedCommentListActionModel 은 CommentNestedCommentListAction 의 모든 필드를 가지고 있음
-        // 따라서 원래 댓글은 ArticleNestedCommentListActionModel 에 저장되고,
-        // 대댓글을 CommentNestedCommentListActionModel 에 저장되지만 댓글도 CommentNestedCommentListActionModel 에 저장하여 더 편하게 함.
-        _commentList.add(
-          CommentNestedCommentListActionModel.fromJson(anc.toJson())
-        );
-        _commentKeys.add(GlobalKey());
-      } catch (error) {
-        debugPrint(
-            "CommentNestedCommentListActionModel.fromJson failed at ID ${anc.id}: $error");
-        return false;
-      }
-
-      // 대댓글을 추가하는 과정
-      for (CommentNestedCommentListActionModel cnc in anc.comments) {
-        try {
-          _commentList.add(cnc);
-          _commentKeys.add(GlobalKey());
-        } catch (error) {
-          debugPrint(
-              "CommentNestedCommentListActionModel.fromJson failed at ID ${cnc.id}: $error\n");
-          return false;
-        }
-      }
-    }
-    return true;
   }
 
   /// 댓글을 POST 요청을 통해 작성하는 메서드.
