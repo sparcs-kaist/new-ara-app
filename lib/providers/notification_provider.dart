@@ -24,6 +24,13 @@ class NotificationProvider with ChangeNotifier {
     _cookieString = newCookieString;
   }
 
+  /// _isNotReadExist를 변경하고 구독중인 위젯에 알림.
+  /// NotificationPage의 알림 모두 읽기 기능에 사용됨.
+  void setIsNotReadExist(bool value) {
+    _isNotReadExist = value;
+    notifyListeners();
+  }
+
   /// NewAra API로 요청을 보내 알림을 받음.
   /// 받은 알림 별로 읽음 여부를 확인하여 isNotReadExist 변수를 설정함.
   /// 구독 중인 리스너에게 isNotReadExist 결과를 알려줌.
@@ -37,7 +44,7 @@ class NotificationProvider with ChangeNotifier {
 
     /// 다음 페이지가 존재하는 지 나타냄.
     bool hasNext = false;
-    // TODO: res = true일 때 do while 문에도 break 걸기
+    // TODO: res = true일 때 do while 문에도 break 걸기 (Resolved)
     do {
       try {
         var response =
@@ -50,6 +57,7 @@ class NotificationProvider with ChangeNotifier {
             break;
           }
         }
+        if (res) break;
       } catch (error) {
         /* dio.get 과정에서 발생한 에러에 대한 예외처리.
            해당 경우에 새로운 알림이 존재하는 것으로 가정. */

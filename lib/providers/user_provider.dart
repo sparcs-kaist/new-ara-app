@@ -16,7 +16,7 @@ class UserProvider with ChangeNotifier {
   final Map<String, dynamic> _apiRes = {}; // API 응답 저장 맵
   bool _isWebViewLoaded = false;
 
-  bool get isWebViewLoaded => _isWebViewLoaded;
+  bool get isContentLoaded => _isWebViewLoaded;
   UserProfileModel? get naUser => _naUser;
   bool get hasData => _hasData;
   dynamic get apiRes => _apiRes;
@@ -27,7 +27,7 @@ class UserProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  void setIsWebViewLoaded(bool tf, {bool quiet = false}) {
+  void setIsContentLoaded(bool tf, {bool quiet = false}) {
     _isWebViewLoaded = tf;
     if (!quiet) notifyListeners();
   }

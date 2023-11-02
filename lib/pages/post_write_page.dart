@@ -17,7 +17,7 @@ import 'package:new_ara_app/models/board_detail_action_model.dart';
 import 'package:new_ara_app/models/simple_board_model.dart';
 import 'package:new_ara_app/models/topic_model.dart';
 import 'package:new_ara_app/providers/user_provider.dart';
-import 'package:new_ara_app/widgetclasses/loading_indicator.dart';
+import 'package:new_ara_app/widgets/loading_indicator.dart';
 import 'package:provider/provider.dart';
 import 'package:uuid/uuid.dart';
 import 'package:new_ara_app/providers/notification_provider.dart';
