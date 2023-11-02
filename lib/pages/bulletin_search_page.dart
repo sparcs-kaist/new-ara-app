@@ -6,6 +6,7 @@ import 'package:new_ara_app/models/article_list_action_model.dart';
 import 'package:new_ara_app/models/board_detail_action_model.dart';
 import 'package:new_ara_app/pages/post_view_page.dart';
 import 'package:new_ara_app/providers/user_provider.dart';
+import 'package:new_ara_app/utils/slide_routing.dart';
 import 'package:new_ara_app/widgets/loading_indicator.dart';
 import 'package:new_ara_app/widgets/post_preview.dart';
 import 'package:provider/provider.dart';
@@ -245,11 +246,9 @@ ${_apiUrl}1&main_search__contains=${_searchWord}
                           ? Container()
                           : InkWell(
                               onTap: () {
-                                Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (context) => PostViewPage(
-                                            id: postPreviewList[index].id)));
+                                Navigator.of(context).push(slideRoute(
+                                    PostViewPage(
+                                        id: postPreviewList[index].id)));
                               },
                               child: Column(
                                 children: [

@@ -42,6 +42,7 @@ class _BulletinListPageState extends State<BulletinListPage> {
     refreshBoardList(userProvider);
     context.read<NotificationProvider>().checkIsNotReadExist();
   }
+
   /// 게시판 목록을 새로고침하는 함수
   /// API를 호출하여 게시판 데이터를 가져온 후, 상태를 업데이트.
   void refreshBoardList(UserProvider userProvider) async {
@@ -91,13 +92,10 @@ class _BulletinListPageState extends State<BulletinListPage> {
                           focusNode: _focusNode,
                           onTap: () async {
                             // TODO: 검색 창 누를 때 실행되는 함수로 나중에 별로도 빼기
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => BulletinSearchPage(
-                                      boardType: BoardType.all,
-                                      boardInfo: null)),
-                            );
+                            Navigator.of(context).push(slideRoute(
+                                BulletinSearchPage(
+                                    boardType: BoardType.all,
+                                    boardInfo: null)));
 
                             FocusScope.of(context).requestFocus(FocusNode());
                           },
