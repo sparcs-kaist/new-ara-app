@@ -89,6 +89,7 @@ class ArticleNestedCommentListAction {
         'created_by': created_by.toJson(),
         'comments': comments.map((comment) => comment.toJson()).toList(),
         'created_at': created_at,
+        'updated_at': updated_at,
         'deleted_at': deleted_at,
         'name_type': name_type,
         'report_count': report_count,

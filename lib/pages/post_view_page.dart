@@ -1169,17 +1169,14 @@ class _PostViewPageState extends State<PostViewPage> {
     _commentList.clear();
     _commentKeys.clear();
     for (ArticleNestedCommentListAction anc in _article.comments) {
-      commentJson = await userProvider.getApiRes("comments/${anc.id}");
-      if (commentJson == null) continue;
-      late CommentNestedCommentListActionModel tmpModel;
-
       // 댓글을 추가하는 과정
       try {
         // ArticleNestedCommentListActionModel 은 CommentNestedCommentListAction 의 모든 필드를 가지고 있음
         // 따라서 원래 댓글은 ArticleNestedCommentListActionModel 에 저장되고,
         // 대댓글을 CommentNestedCommentListActionModel 에 저장되지만 댓글도 CommentNestedCommentListActionModel 에 저장하여 더 편하게 함.
-        tmpModel = CommentNestedCommentListActionModel.fromJson(commentJson);
-        _commentList.add(tmpModel);
+        _commentList.add(
+          CommentNestedCommentListActionModel.fromJson(anc.toJson())
+        );
         _commentKeys.add(GlobalKey());
       } catch (error) {
         debugPrint(
