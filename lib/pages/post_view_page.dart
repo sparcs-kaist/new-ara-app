@@ -213,7 +213,6 @@ class _PostViewPageState extends State<PostViewPage> {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              // TODO: 위젯 구역별로 메서드화 (Resolved)
                               _buildTitle(),
                               const SizedBox(height: 10),
                               // 유저 정보 (프로필 이미지, 닉네임)
