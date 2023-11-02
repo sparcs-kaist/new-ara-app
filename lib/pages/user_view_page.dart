@@ -32,6 +32,10 @@ class _UserViewPageState extends State<UserViewPage> {
   /// 페이지 로딩이 완료되었는지 여부를 나타냄.
   bool _isLoaded = false;
 
+  /// 스크롤 최하단에 도달하여 다음 페이지를 로딩중일 경우 true.
+  /// 아니면 false.
+  bool _isLoadingNewPage = false;
+
   /// 작성한 글 호출에 사용.
   /// 다음에 불러와야 하는 글 페이지를 나타냄.
   int _nextPage = 1;
@@ -65,20 +69,25 @@ class _UserViewPageState extends State<UserViewPage> {
   Future<void> loadAll(UserProvider userProvider, int page) async {
     bool userFetch = await _fetchUser(userProvider);
     bool listFetch = await _fetchCreatedArticles(userProvider, page);
-    setIsLoaded(userFetch && listFetch);
+    _setIsLoaded(userFetch && listFetch);
   }
 
   /// 작성한 글 리스트뷰를 listen함.
   /// 스크롤의 끝에 도달하였는지 확인 및 새로운 페이지 호출에 사용됨.
   void _listViewListener() async {
-    // 페이지네이션 기능 수정해야함.(2023.09.21)
-    if (_isLoaded &&
-        _listViewController.position.pixels ==
-            _listViewController.position.maxScrollExtent) {
-      UserProvider userProvider = context.read<UserProvider>();
-      bool userFetch = await _fetchUser(userProvider);
-      bool listFetch = await _fetchCreatedArticles(userProvider, _nextPage);
-      if (listFetch) setIsLoaded(userFetch && listFetch);
+    // 이미 다음 페이지를 호출하는 경우는 제외
+    if (!_isLoadingNewPage) {
+      // 사용자가 최대로 스크롤한 경우
+      if (_isLoaded &&
+          _listViewController.position.pixels ==
+              _listViewController.position.maxScrollExtent) {
+        _setIsLoadingNewPage(true);
+        UserProvider userProvider = context.read<UserProvider>();
+        bool userFetch = await _fetchUser(userProvider);
+        bool listFetch = await _fetchCreatedArticles(userProvider, _nextPage);
+        if (listFetch) _setIsLoaded(userFetch && listFetch);
+        _setIsLoadingNewPage(false);
+      }
     }
   }
 
@@ -92,8 +101,8 @@ class _UserViewPageState extends State<UserViewPage> {
               leading: IconButton(
                 color: ColorsInfo.newara,
                 icon: SvgPicture.asset('assets/icons/left_chevron.svg',
-                    colorFilter:
-                        const ColorFilter.mode(ColorsInfo.newara, BlendMode.srcIn),
+                    colorFilter: const ColorFilter.mode(
+                        ColorsInfo.newara, BlendMode.srcIn),
                     width: 35,
                     height: 35),
                 onPressed: () {
@@ -107,7 +116,7 @@ class _UserViewPageState extends State<UserViewPage> {
                 child: RefreshIndicator(
                   color: ColorsInfo.newara,
                   onRefresh: () async {
-                    setIsLoaded(false);
+                    _setIsLoaded(false);
                     await loadAll(userProvider, 1);
                   },
                   child: Column(
@@ -205,9 +214,9 @@ class _UserViewPageState extends State<UserViewPage> {
             // 스크롤의 최하단에 왔을 때 로딩 인디케이터가 보이도록 설정
             if (idx == _articleList.length) {
               return Visibility(
-                  visible: !_isLoaded,
+                  visible: _isLoadingNewPage,
                   child: const SizedBox(
-                    height: 30,
+                    height: 40,
                     child: LoadingIndicator(),
                   ));
             }
@@ -219,7 +228,7 @@ class _UserViewPageState extends State<UserViewPage> {
                 for (int i = 1; i <= _nextPage; i++) {
                   await _fetchCreatedArticles(userProvider, i);
                 }
-                setIsLoaded(true);
+                _setIsLoaded(true);
               },
               // 각각의 작성한 글
               child: SizedBox(
@@ -382,8 +391,12 @@ class _UserViewPageState extends State<UserViewPage> {
 
   /// isLoaded 변수의 값을 설정. 설정된 값에 따라 state를 변경해주는 함수.
   /// API 통신 및 fetch 작업 이후 state 업데이트가 자주 시행됨에 따라 함수로 작성함.
-  void setIsLoaded(bool tf) {
+  void _setIsLoaded(bool tf) {
     if (mounted) setState(() => _isLoaded = tf);
+  }
+
+  void _setIsLoadingNewPage(bool tf) {
+    if (mounted) setState(() => _isLoadingNewPage = tf);
   }
 
   /// 유저 정보를 조회하여 멤버 변수 userProfileModel을 설정하는 함수.
