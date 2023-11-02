@@ -12,9 +12,9 @@ import 'package:flutter/cupertino.dart';
 import 'package:dio/dio.dart';
 
 import 'package:new_ara_app/constants/colors_info.dart';
-import 'package:new_ara_app/widgetclasses/text_info.dart';
-import 'package:new_ara_app/widgetclasses/border_boxes.dart';
-import 'package:new_ara_app/widgetclasses/text_and_switch.dart';
+import 'package:new_ara_app/widgets/text_info.dart';
+import 'package:new_ara_app/widgets/border_boxes.dart';
+import 'package:new_ara_app/widgets/text_and_switch.dart';
 import 'package:webview_cookie_manager/webview_cookie_manager.dart';
 import 'package:new_ara_app/providers/notification_provider.dart';
 

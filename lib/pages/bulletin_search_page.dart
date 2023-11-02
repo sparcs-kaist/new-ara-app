@@ -6,8 +6,8 @@ import 'package:new_ara_app/models/article_list_action_model.dart';
 import 'package:new_ara_app/models/board_detail_action_model.dart';
 import 'package:new_ara_app/pages/post_view_page.dart';
 import 'package:new_ara_app/providers/user_provider.dart';
-import 'package:new_ara_app/widgetclasses/loading_indicator.dart';
-import 'package:new_ara_app/widgetclasses/post_preview.dart';
+import 'package:new_ara_app/widgets/loading_indicator.dart';
+import 'package:new_ara_app/widgets/post_preview.dart';
 import 'package:provider/provider.dart';
 
 /// `BulletinSearchPage`는 게시판 게시물에 대한 검색 인터페이스를 표시하는 위젯

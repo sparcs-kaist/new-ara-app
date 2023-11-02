@@ -11,7 +11,7 @@ import 'package:mime/mime.dart';
 import 'package:new_ara_app/providers/user_provider.dart';
 import 'package:new_ara_app/constants/colors_info.dart';
 import 'package:new_ara_app/models/user_profile_model.dart';
-import 'package:new_ara_app/widgetclasses/loading_indicator.dart';
+import 'package:new_ara_app/widgets/loading_indicator.dart';
 import 'package:new_ara_app/providers/notification_provider.dart';
 
 class ProfileEditPage extends StatefulWidget {
