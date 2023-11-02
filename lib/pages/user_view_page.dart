@@ -39,7 +39,9 @@ class _UserViewPageState extends State<UserViewPage> {
   /// 페이지에 표시되는 글의 개수와 무관함.
   int _articleCount = 0;
 
+  /// 유저 정보를 저장하는 모델
   late PublicUserProfileModel _userProfileModel;
+
   final ScrollController _listViewController = ScrollController();
 
   /// 사용자가 작성한 글 모델을 저장하는 리스트.
