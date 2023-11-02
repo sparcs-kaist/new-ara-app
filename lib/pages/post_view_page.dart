@@ -227,11 +227,12 @@ class _PostViewPageState extends State<PostViewPage> {
             ),
           )
         else
-          Container(color: Colors.white),
-        Visibility(
-          visible: !(context.watch<UserProvider>().isContentLoaded),
-          child: Container(color: Colors.white),
-        ),
+          const LoadingIndicator(),
+        // TODO: 굳이 웹뷰가 다 로드될때까지 기다려야 할까??
+        // Visibility(
+        //   visible: !(context.watch<UserProvider>().isContentLoaded),
+        //   child: Container(color: Colors.white),
+        // ),
       ],
     );
   }
