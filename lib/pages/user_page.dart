@@ -111,46 +111,6 @@ class _UserPageState extends State<UserPage>
     setCurCount(tabType); // state 업데이트
   }
 
-  void setIsLoadingNewPage(TabType tabType, bool value) {
-    if (mounted) setState(() => isLoadingNextPage[tabType.index] = value);
-  }
-
-  /// 유저가 탭 전환을 하였을 때 전환된 탭의 새로고침을 위해 사용됨.
-  /// API 통신을 위해 userProvider, 전환된 탭을 나타내는 newTabIndex를 전달받음.
-  /// 별도의 리턴값없이 전환되는 탭의 새로고침 완료 후 state를 변경함.
-  /// 실패하는 경우 로딩 상태로 남게됨.
-  Future<void> fetchNewTab(UserProvider userProvider, TabType tabType) async {
-    setIsLoaded(false, TabType.created);
-    setIsLoaded(false, TabType.scrap);
-    setIsLoaded(false, TabType.recent);
-    bool res = await fetchArticles(userProvider, 1, tabType);
-    if (!res) return;
-    curPage[tabType.index] = 1;
-    setCurCount(tabType);
-    setIsLoaded(true, tabType);
-  }
-
-  /// TabController를 구독하며 탭 간 전환을 제어하기 위해 만들어짐.
-  void _handleTabChange() {
-    int newTabIndex = _tabController.index;
-    UserProvider userProvider = context.read<UserProvider>();
-    // TabController에서 탭 전환이 이루어지는 경우는 두 가지로
-    // 1. Tap으로 전환, 2. Swipe로 전환
-    // TabController가 두 가지를 동시에 인식하지 못해
-    // 아래와 같이 경우에 따라 다르게 처리함.
-    if (!_tabController.indexIsChanging) {
-      if (_tabController.animation!.isCompleted) {
-        return;
-      } else {
-        // Swipe
-        fetchNewTab(userProvider, TabType.values[newTabIndex]);
-      }
-    } else {
-      // Tap
-      fetchNewTab(userProvider, TabType.values[newTabIndex]);
-    }
-  }
-
   /// 작성한 글, 담아둔 글, 최근 본 글 각각의 ListView에 대한
   /// 리스너의 공통된 로직을 함수화한 것
   /// pageT를 통해 작성한 글, 담아둔 글, 최근 본 글 인지 식별하고
@@ -194,88 +154,6 @@ class _UserPageState extends State<UserPage>
       scrollControllerList[i].dispose();
     }
     super.dispose();
-  }
-
-  /// UserPage에서 TabBar의 상단 부분인 유저 정보 위젯을 빌드.
-  Widget _buildUserInfo(UserProvider userProvider) {
-    return SizedBox(
-      width: MediaQuery.of(context).size.width - 40,
-      height: 60,
-      child: Row(
-        children: [
-          Container(
-            width: 50,
-            height: 50,
-            decoration: const BoxDecoration(
-              shape: BoxShape.circle,
-            ),
-            child: ClipRRect(
-              borderRadius: const BorderRadius.all(Radius.circular(100)),
-              child: SizedBox.fromSize(
-                size: const Size.fromRadius(48),
-                child: userProvider.naUser?.picture == null
-                    ? Container()
-                    : Image.network(
-                        fit: BoxFit.cover,
-                        userProvider.naUser!.picture.toString()),
-              ),
-            ),
-          ),
-          const SizedBox(width: 10),
-          Expanded(
-            child: SizedBox(
-              height: 50,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    "${userProvider.naUser!.sso_user_info['first_name']} ${userProvider.naUser!.sso_user_info['last_name']}",
-                    style: const TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.w700,
-                    ),
-                  ),
-                  Text(
-                    userProvider.naUser == null
-                        ? "이메일 정보가 없습니다."
-                        : "${userProvider.naUser?.email}",
-                    style: const TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w500,
-                      color: Color.fromRGBO(177, 177, 177, 1),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-          const SizedBox(width: 30),
-          SizedBox(
-            width: 26,
-            height: 21,
-            child: GestureDetector(
-              onTap: () async {
-                await Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => ProfileEditPage(),
-                  ),
-                );
-              },
-              child: Text(
-                'myPage.change'.tr(),
-                style: const TextStyle(
-                  color: Color.fromRGBO(100, 100, 100, 1),
-                  fontSize: 14,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
   }
 
   @override
@@ -374,121 +252,86 @@ class _UserPageState extends State<UserPage>
     );
   }
 
-  /// tabType의 값에 따라 그에 맞는 api url을 리턴하는 함수.
-  /// fetchArticles 함수에서 사용.
-  String getApiUrl(TabType tabType, int page, int user) {
-    switch (tabType) {
-      case TabType.created:
-        return "/api/articles/?page=$page&created_by=$user";
-      case TabType.scrap:
-        return "/api/scraps/?page=$page&created_by=$user";
-      case TabType.recent:
-        return "/api/articles/recent/?page=$page";
-    }
-  }
-
-  /// json을 Model로 전환하고 pageT의 값에 따라
-  /// 그에 맞는 list에 모델을 추가함.
-  /// json -> model, list에 추가 작업이 모두 성공하면 true,
-  /// 아니면 false 반환
-  bool addList(TabType tabType, Map<String, dynamic> json) {
-    try {
-      switch (tabType) {
-        case (TabType.created):
-          ArticleListActionModel model = ArticleListActionModel.fromJson(json);
-          createdArticleList.add(model);
-          break;
-        case (TabType.scrap):
-          ScrapModel model = ScrapModel.fromJson(json);
-          scrappedArticleList.add(model);
-          break;
-        case (TabType.recent):
-          ArticleListActionModel model = ArticleListActionModel.fromJson(json);
-          recentArticleList.add(model);
-      }
-    } catch (error) {
-      debugPrint("fromJson error: $error");
-      return false;
-    }
-    return true;
-  }
-
-  /// tabType에 해당하는 페이지의 articleList를 초기화함.
-  void clearList(TabType tabType) {
-    switch (tabType) {
-      case TabType.created:
-        createdArticleList.clear();
-        break;
-      case TabType.scrap:
-        scrappedArticleList.clear();
-        break;
-      case TabType.recent:
-        recentArticleList.clear();
-        break;
-    }
-  }
-
-  /// 주어진 page, pageT에 맞는 article을 불러오는 함수.
-  /// article fetching 후 각각을 model로 변환하여
-  /// pageT에 해당하는 리스트에 추가함.
-  /// 위 모든 과정이 성공하면 true, 아니면 false를 반환함.
-  Future<bool> fetchArticles(
-      UserProvider userProvider, int page, TabType tabType) async {
-    int user = userProvider.naUser!.user;
-    // pageT에 맞는 apiUrl 설정
-    String apiUrl = getApiUrl(tabType, page, user);
-
-    // 첫 페이지를 불러오는 경우 기존 리스트를 초기화
-    if (page == 1) clearList(tabType);
-
-    try {
-      var response = await userProvider.myDio().get('$newAraDefaultUrl$apiUrl');
-      if (response.statusCode == 200) {
-        List<dynamic> rawPostList = response.data['results'];
-        for (int i = 0; i < rawPostList.length; i++) {
-          Map<String, dynamic>? rawPost = rawPostList[i];
-          if (rawPost != null) {
-            bool addRes = addList(tabType, rawPost);
-            // articleList에 추가하지 못한 글의 경우
-            // 별도의 exception 없이 debugPrint한 후에 넘어감.
-            if (!addRes) {
-              debugPrint("addList failed at index $i: (id: ${rawPost['id']})");
-            }
-          }
-        }
-        // pageT에 해당하는 페이지의 글 개수를 업데이트함.
-        articleCount[tabType.index] = response.data['num_items'];
-        debugPrint("fetchArticles() succeeded for page: $page");
-        return true;
-      }
-    } catch (error) {
-      debugPrint("fetchArticles() failed with error: $error");
-    }
-    return false;
-  }
-
-  /// 탭별 컨텐츠 로드 완료 여부를 설정하고 state를 업데이트하는 메서드.
-  /// ListView refresh, 탭 전환 시에 사용됨.
-  void setIsLoaded(bool value, TabType tabType) =>
-      setState(() => isLoadedList[tabType.index] = value);
-
-  /// "총 $curCount개의 글" 문구에 표시되는 curCount 변수를 설정하고
-  /// State를 업데이트하는 메서드. 탭이 전환될 때마다 사용됨.
-  void setCurCount(TabType tabType) {
-    if (mounted) setState(() => curCount = articleCount[tabType.index]);
-  }
-
-  /// pageT에 해당하는 탭의 article 개수를 리턴함.
-  /// _buildPostList에서 itemCount 변수 설정을 위해 사용.
-  int getItemCount(TabType tabType) {
-    switch (tabType) {
-      case TabType.created:
-        return createdArticleList.length;
-      case TabType.scrap:
-        return scrappedArticleList.length;
-      case TabType.recent:
-        return recentArticleList.length;
-    }
+  /// UserPage에서 TabBar의 상단 부분인 유저 정보 위젯을 빌드.
+  Widget _buildUserInfo(UserProvider userProvider) {
+    return SizedBox(
+      width: MediaQuery.of(context).size.width - 40,
+      height: 60,
+      child: Row(
+        children: [
+          Container(
+            width: 50,
+            height: 50,
+            decoration: const BoxDecoration(
+              shape: BoxShape.circle,
+            ),
+            child: ClipRRect(
+              borderRadius: const BorderRadius.all(Radius.circular(100)),
+              child: SizedBox.fromSize(
+                size: const Size.fromRadius(48),
+                child: userProvider.naUser?.picture == null
+                    ? Container()
+                    : Image.network(
+                        fit: BoxFit.cover,
+                        userProvider.naUser!.picture.toString()),
+              ),
+            ),
+          ),
+          const SizedBox(width: 10),
+          Expanded(
+            child: SizedBox(
+              height: 50,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    "${userProvider.naUser!.sso_user_info['first_name']} ${userProvider.naUser!.sso_user_info['last_name']}",
+                    style: const TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                  Text(
+                    userProvider.naUser == null
+                        ? "이메일 정보가 없습니다."
+                        : "${userProvider.naUser?.email}",
+                    style: const TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w500,
+                      color: Color.fromRGBO(177, 177, 177, 1),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          const SizedBox(width: 30),
+          SizedBox(
+            width: 26,
+            height: 21,
+            child: GestureDetector(
+              onTap: () async {
+                await Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => ProfileEditPage(),
+                  ),
+                );
+              },
+              child: Text(
+                'myPage.change'.tr(),
+                style: const TextStyle(
+                  color: Color.fromRGBO(100, 100, 100, 1),
+                  fontSize: 14,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 
   /// tabIndex에 해당하는 ListView를 생성하여 리턴함.
@@ -706,5 +549,163 @@ class _UserPageState extends State<UserPage>
         },
       ),
     );
+  }
+
+  /// 유저가 탭 전환을 하였을 때 전환된 탭의 새로고침을 위해 사용됨.
+  /// API 통신을 위해 userProvider, 전환된 탭을 나타내는 newTabIndex를 전달받음.
+  /// 별도의 리턴값없이 전환되는 탭의 새로고침 완료 후 state를 변경함.
+  /// 실패하는 경우 로딩 상태로 남게됨.
+  Future<void> fetchNewTab(UserProvider userProvider, TabType tabType) async {
+    setIsLoaded(false, TabType.created);
+    setIsLoaded(false, TabType.scrap);
+    setIsLoaded(false, TabType.recent);
+    bool res = await fetchArticles(userProvider, 1, tabType);
+    if (!res) return;
+    curPage[tabType.index] = 1;
+    setCurCount(tabType);
+    setIsLoaded(true, tabType);
+  }
+
+  /// TabController를 구독하며 탭 간 전환을 제어하기 위해 만들어짐.
+  void _handleTabChange() {
+    int newTabIndex = _tabController.index;
+    UserProvider userProvider = context.read<UserProvider>();
+    // TabController에서 탭 전환이 이루어지는 경우는 두 가지로
+    // 1. Tap으로 전환, 2. Swipe로 전환
+    // TabController가 두 가지를 동시에 인식하지 못해
+    // 아래와 같이 경우에 따라 다르게 처리함.
+    if (!_tabController.indexIsChanging) {
+      if (_tabController.animation!.isCompleted) {
+        return;
+      } else {
+        // Swipe
+        fetchNewTab(userProvider, TabType.values[newTabIndex]);
+      }
+    } else {
+      // Tap
+      fetchNewTab(userProvider, TabType.values[newTabIndex]);
+    }
+  }
+
+  /// tabType의 값에 따라 그에 맞는 api url을 리턴하는 함수.
+  /// fetchArticles 함수에서 사용.
+  String getApiUrl(TabType tabType, int page, int user) {
+    switch (tabType) {
+      case TabType.created:
+        return "/api/articles/?page=$page&created_by=$user";
+      case TabType.scrap:
+        return "/api/scraps/?page=$page&created_by=$user";
+      case TabType.recent:
+        return "/api/articles/recent/?page=$page";
+    }
+  }
+
+  /// json을 Model로 전환하고 pageT의 값에 따라
+  /// 그에 맞는 list에 모델을 추가함.
+  /// json -> model, list에 추가 작업이 모두 성공하면 true,
+  /// 아니면 false 반환
+  bool addList(TabType tabType, Map<String, dynamic> json) {
+    try {
+      switch (tabType) {
+        case (TabType.created):
+          ArticleListActionModel model = ArticleListActionModel.fromJson(json);
+          createdArticleList.add(model);
+          break;
+        case (TabType.scrap):
+          ScrapModel model = ScrapModel.fromJson(json);
+          scrappedArticleList.add(model);
+          break;
+        case (TabType.recent):
+          ArticleListActionModel model = ArticleListActionModel.fromJson(json);
+          recentArticleList.add(model);
+      }
+    } catch (error) {
+      debugPrint("fromJson error: $error");
+      return false;
+    }
+    return true;
+  }
+
+  /// tabType에 해당하는 페이지의 articleList를 초기화함.
+  void clearList(TabType tabType) {
+    switch (tabType) {
+      case TabType.created:
+        createdArticleList.clear();
+        break;
+      case TabType.scrap:
+        scrappedArticleList.clear();
+        break;
+      case TabType.recent:
+        recentArticleList.clear();
+        break;
+    }
+  }
+
+  /// 주어진 page, pageT에 맞는 article을 불러오는 함수.
+  /// article fetching 후 각각을 model로 변환하여
+  /// pageT에 해당하는 리스트에 추가함.
+  /// 위 모든 과정이 성공하면 true, 아니면 false를 반환함.
+  Future<bool> fetchArticles(
+      UserProvider userProvider, int page, TabType tabType) async {
+    int user = userProvider.naUser!.user;
+    // pageT에 맞는 apiUrl 설정
+    String apiUrl = getApiUrl(tabType, page, user);
+
+    // 첫 페이지를 불러오는 경우 기존 리스트를 초기화
+    if (page == 1) clearList(tabType);
+
+    try {
+      var response = await userProvider.myDio().get('$newAraDefaultUrl$apiUrl');
+      if (response.statusCode == 200) {
+        List<dynamic> rawPostList = response.data['results'];
+        for (int i = 0; i < rawPostList.length; i++) {
+          Map<String, dynamic>? rawPost = rawPostList[i];
+          if (rawPost != null) {
+            bool addRes = addList(tabType, rawPost);
+            // articleList에 추가하지 못한 글의 경우
+            // 별도의 exception 없이 debugPrint한 후에 넘어감.
+            if (!addRes) {
+              debugPrint("addList failed at index $i: (id: ${rawPost['id']})");
+            }
+          }
+        }
+        // pageT에 해당하는 페이지의 글 개수를 업데이트함.
+        articleCount[tabType.index] = response.data['num_items'];
+        debugPrint("fetchArticles() succeeded for page: $page");
+        return true;
+      }
+    } catch (error) {
+      debugPrint("fetchArticles() failed with error: $error");
+    }
+    return false;
+  }
+
+  /// 탭별 컨텐츠 로드 완료 여부를 설정하고 state를 업데이트하는 메서드.
+  /// ListView refresh, 탭 전환 시에 사용됨.
+  void setIsLoaded(bool value, TabType tabType) =>
+      setState(() => isLoadedList[tabType.index] = value);
+
+  /// isLoadingNextPage를 갱신하는 함수.
+  void setIsLoadingNewPage(TabType tabType, bool value) {
+    if (mounted) setState(() => isLoadingNextPage[tabType.index] = value);
+  }
+
+  /// "총 $curCount개의 글" 문구에 표시되는 curCount 변수를 설정하고
+  /// State를 업데이트하는 메서드. 탭이 전환될 때마다 사용됨.
+  void setCurCount(TabType tabType) {
+    if (mounted) setState(() => curCount = articleCount[tabType.index]);
+  }
+
+  /// pageT에 해당하는 탭의 article 개수를 리턴함.
+  /// _buildPostList에서 itemCount 변수 설정을 위해 사용.
+  int getItemCount(TabType tabType) {
+    switch (tabType) {
+      case TabType.created:
+        return createdArticleList.length;
+      case TabType.scrap:
+        return scrappedArticleList.length;
+      case TabType.recent:
+        return recentArticleList.length;
+    }
   }
 }
