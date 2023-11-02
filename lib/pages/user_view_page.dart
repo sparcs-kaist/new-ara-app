@@ -58,6 +58,30 @@ class _UserViewPageState extends State<UserViewPage> {
     loadAll(userProvider, 1);
   }
 
+  /// 유저 정보, 작성한 글 모두를 fetch함.
+  /// API 통신을 위해 userProvider, 작성한 글 페이지 지정을 위해 page를 parameter로 받음.
+  /// 유저 정보, 작성한 글 fetch 후에 별도의 리턴값없이 state를 업데이트함.
+  Future<void> loadAll(UserProvider userProvider, int page) async {
+    bool userFetch = await _fetchUser(userProvider);
+    bool listFetch = await _fetchCreatedArticles(userProvider, page);
+    setIsLoaded(userFetch && listFetch);
+  }
+
+  /// 작성한 글 리스트뷰를 listen함.
+  /// 스크롤의 끝에 도달하였는지 확인 및 새로운 페이지 호출에 사용됨.
+  void _listViewListener() async {
+    // 페이지네이션 기능 수정해야함.(2023.09.21)
+    if (_isLoaded &&
+        _listViewController.position.pixels ==
+            _listViewController.position.maxScrollExtent) {
+      //setIsLoaded(false);
+      UserProvider userProvider = context.read<UserProvider>();
+      bool userFetch = await _fetchUser(userProvider);
+      bool listFetch = await _fetchCreatedArticles(userProvider, _nextPage);
+      if (listFetch) setIsLoaded(userFetch && listFetch);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     UserProvider userProvider = context.read<UserProvider>();
@@ -374,15 +398,6 @@ class _UserViewPageState extends State<UserViewPage> {
           );
   }
 
-  /// 유저 정보, 작성한 글 모두를 fetch함.
-  /// API 통신을 위해 userProvider, 작성한 글 페이지 지정을 위해 page를 parameter로 받음.
-  /// 유저 정보, 작성한 글 fetch 후에 별도의 리턴값없이 state를 업데이트함.
-  Future<void> loadAll(UserProvider userProvider, int page) async {
-    bool userFetch = await _fetchUser(userProvider);
-    bool listFetch = await _fetchCreatedArticles(userProvider, page);
-    setIsLoaded(userFetch && listFetch);
-  }
-
   /// isLoaded 변수의 값을 설정. 설정된 값에 따라 state를 변경해주는 함수.
   /// API 통신 및 fetch 작업 이후 state 업데이트가 자주 시행됨에 따라 함수로 작성함.
   void setIsLoaded(bool tf) {
@@ -443,21 +458,6 @@ class _UserViewPageState extends State<UserViewPage> {
     } catch (error) {
       debugPrint("fetchCreatedArticles() failed with error: $error");
       return false;
-    }
-  }
-
-  /// 작성한 글 리스트뷰를 listen함.
-  /// 스크롤의 끝에 도달하였는지 확인 및 새로운 페이지 호출에 사용됨.
-  void _listViewListener() async {
-    // 페이지네이션 기능 수정해야함.(2023.09.21)
-    if (_isLoaded &&
-        _listViewController.position.pixels ==
-            _listViewController.position.maxScrollExtent) {
-      //setIsLoaded(false);
-      UserProvider userProvider = context.read<UserProvider>();
-      bool userFetch = await _fetchUser(userProvider);
-      bool listFetch = await _fetchCreatedArticles(userProvider, _nextPage);
-      if (listFetch) setIsLoaded(userFetch && listFetch);
     }
   }
 }
