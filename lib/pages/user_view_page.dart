@@ -411,9 +411,7 @@ class _UserViewPageState extends State<UserViewPage> {
   Future<bool> _fetchUser(UserProvider userProvider) async {
     String apiUrl = "/api/user_profiles/${widget.userID}";
     try {
-      var response = await userProvider.myDio().get(
-        "$newAraDefaultUrl$apiUrl"
-      );
+      var response = await userProvider.myDio().get("$newAraDefaultUrl$apiUrl");
       dynamic json = response.data;
       try {
         _userProfileModel = PublicUserProfileModel.fromJson(json);
@@ -454,13 +452,11 @@ class _UserViewPageState extends State<UserViewPage> {
     }
     try {
       var response = await userProvider.myDio().get("$newAraDefaultUrl$apiUrl");
-      if (response.statusCode != 200) return false;
       List<dynamic> rawPostList = response.data['results'];
       for (int i = 0; i < rawPostList.length; i++) {
         Map<String, dynamic>? rawPost = rawPostList[i];
-        if (rawPost == null) {
-          continue; // 가끔 형식에 맞지 않은 데이터를 가진 글이 있어 추가함.(2023.05.26)
-        }
+        // 가끔 형식에 맞지 않은 데이터를 가진 글이 있어 추가함.(2023.05.26) 
+        if (rawPost == null) continue;
         try {
           _articleList.add(ArticleListActionModel.fromJson(rawPost));
         } catch (error) {
@@ -474,9 +470,22 @@ class _UserViewPageState extends State<UserViewPage> {
       _nextPage += 1;
       _articleCount = response.data['num_items'];
       return true;
-    } catch (error) {
-      debugPrint("fetchCreatedArticles() failed with error: $error");
-      return false;
+    } on DioException catch (e) {
+      // 서버에서 response를 보냈지만 invalid한 statusCode일 때
+      if (e.response != null) {
+        debugPrint("${e.response!.data}");
+        debugPrint("${e.response!.headers}");
+        debugPrint("${e.response!.requestOptions}");
+      }
+      // request의 setting, sending에서 문제 발생
+      // requestOption, message를 출력.
+      else {
+        debugPrint("${e.requestOptions}");
+        debugPrint("${e.message}");
+      }
+    } catch (e) {
+      debugPrint("_fetchCreatedArticles failed with error: $e");
     }
+    return false;
   }
 }
