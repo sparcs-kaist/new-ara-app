@@ -17,7 +17,6 @@ import 'package:new_ara_app/utils/slide_routing.dart';
 import 'package:new_ara_app/pages/profile_edit_page.dart';
 import 'package:new_ara_app/providers/notification_provider.dart';
 
-// TODO: magic number enum으로 대체하여 가독성 향상 (Resolved)
 /// 작성한 글, 담아둔 글, 최근 본 글을 나타내기 위해 사용
 enum TabType { created, scrap, recent }
 
@@ -157,7 +156,6 @@ class _UserPageState extends State<UserPage>
   /// pageT를 통해 작성한 글, 담아둔 글, 최근 본 글 인지 식별하고
   /// 스크롤이 최하단까지 간 경우 다음 페이지를 호출함.
   /// 별도의 리턴값없이 state를 업데이트함.
-  // TODO: 리스너별로 겹치는 로직 메서드화 (Resolved)
   Future<void> listener(TabType tabType) async {
     // 이미 다음 페이지를 로딩하는 경우를 제외
     if (!isLoadingNextPage[tabType.index]) {
@@ -434,7 +432,6 @@ class _UserPageState extends State<UserPage>
   /// article fetching 후 각각을 model로 변환하여
   /// pageT에 해당하는 리스트에 추가함.
   /// 위 모든 과정이 성공하면 true, 아니면 false를 반환함.
-  // TODO: fetch 함수 리팩토링 (Resolved)
   Future<bool> fetchArticles(
       UserProvider userProvider, int page, TabType tabType) async {
     int user = userProvider.naUser!.user;
