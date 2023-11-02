@@ -85,7 +85,6 @@ class _UserViewPageState extends State<UserViewPage> {
   @override
   Widget build(BuildContext context) {
     UserProvider userProvider = context.read<UserProvider>();
-
     return !_isLoaded
         ? const LoadingIndicator()
         : Scaffold(
@@ -93,7 +92,10 @@ class _UserViewPageState extends State<UserViewPage> {
               leading: IconButton(
                 color: ColorsInfo.newara,
                 icon: SvgPicture.asset('assets/icons/left_chevron.svg',
-                    color: ColorsInfo.newara, width: 35, height: 35),
+                    colorFilter:
+                        const ColorFilter.mode(ColorsInfo.newara, BlendMode.srcIn),
+                    width: 35,
+                    height: 35),
                 onPressed: () {
                   Navigator.pop(context);
                 },
@@ -112,54 +114,7 @@ class _UserViewPageState extends State<UserViewPage> {
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       // 사용자 프로필 이미지, 텍스트
-                      SizedBox(
-                        width: MediaQuery.of(context).size.width - 40,
-                        height: 60,
-                        child: Row(
-                          children: [
-                            // 사용자 프로필 이미지
-                            Container(
-                              width: 50,
-                              height: 50,
-                              decoration: const BoxDecoration(
-                                shape: BoxShape.circle,
-                              ),
-                              child: ClipRRect(
-                                borderRadius: const BorderRadius.all(
-                                    Radius.circular(100)),
-                                child: SizedBox.fromSize(
-                                  size: const Size.fromRadius(48),
-                                  child: _userProfileModel.picture == null
-                                      ? Container()
-                                      : Image.network(
-                                          fit: BoxFit.cover,
-                                          _userProfileModel.picture.toString()),
-                                ),
-                              ),
-                            ),
-                            const SizedBox(width: 10),
-                            // 사용자 닉네임 텍스트
-                            Expanded(
-                              child: SizedBox(
-                                height: 50,
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Text(
-                                      _userProfileModel.nickname.toString(),
-                                      style: const TextStyle(
-                                        fontSize: 18,
-                                        fontWeight: FontWeight.w700,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
+                      _buildUserInfo(),
                       const Divider(),
                       // 총 N개의 글
                       SizedBox(
@@ -175,220 +130,7 @@ class _UserViewPageState extends State<UserViewPage> {
                       ),
                       const SizedBox(height: 5),
                       // 작성한 글 목록 표시
-                      Expanded(
-                        child: SizedBox(
-                          width: MediaQuery.of(context).size.width - 40,
-                          child: ListView.separated(
-                            // PullToRefresh를 위해 아래 physics 추가 필요
-                            physics: const AlwaysScrollableScrollPhysics(),
-                            controller: _listViewController,
-                            itemCount: _articleList.length + 1,
-                            itemBuilder: (BuildContext context, int idx) {
-                              // 스크롤의 최하단에 왔을 때 로딩 인디케이터가 보이도록 설정
-                              if (idx == _articleList.length) {
-                                return Visibility(
-                                    visible: !_isLoaded,
-                                    child: const SizedBox(
-                                      height: 30,
-                                      child: LoadingIndicator(),
-                                    ));
-                              }
-                              var curPost = _articleList[idx];
-                              return InkWell(
-                                onTap: () async {
-                                  await Navigator.of(context).push(
-                                      slideRoute(PostViewPage(id: curPost.id)));
-                                  for (int i = 1; i <= _nextPage; i++) {
-                                    await _fetchCreatedArticles(
-                                        userProvider, i);
-                                  }
-                                  setIsLoaded(true);
-                                },
-                                // 각각의 작성한 글
-                                child: SizedBox(
-                                  height: 61,
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      // 글 제목 및 첨부파일 이미지 표시
-                                      Row(
-                                        children: [
-                                          // 글 제목 텍스트
-                                          Flexible(
-                                            child: Text(
-                                              curPost.title.toString(),
-                                              style: const TextStyle(
-                                                  fontSize: 16,
-                                                  fontWeight: FontWeight.w500),
-                                              overflow: TextOverflow.ellipsis,
-                                              maxLines: 1,
-                                            ),
-                                          ),
-                                          // 첨부파일 이미지
-                                          curPost.attachment_type.toString() ==
-                                                  "NONE"
-                                              ? Container()
-                                              : const SizedBox(width: 5),
-                                          curPost.attachment_type.toString() ==
-                                                  "BOTH"
-                                              ? Row(
-                                                  crossAxisAlignment:
-                                                      CrossAxisAlignment.center,
-                                                  children: [
-                                                    SvgPicture.asset(
-                                                      'assets/icons/image.svg',
-                                                      color: Colors.grey,
-                                                      width: 30,
-                                                      height: 25,
-                                                    ),
-                                                    const SizedBox(
-                                                      width: 9,
-                                                    ),
-                                                    SvgPicture.asset(
-                                                      'assets/icons/clip.svg',
-                                                      color: Colors.grey,
-                                                      width: 15,
-                                                      height: 20,
-                                                    ),
-                                                  ],
-                                                )
-                                              : curPost.attachment_type
-                                                          .toString() ==
-                                                      "IMAGE"
-                                                  ? SvgPicture.asset(
-                                                      'assets/icons/image.svg',
-                                                      color: Colors.grey,
-                                                      width: 30,
-                                                      height: 25,
-                                                    )
-                                                  : curPost.attachment_type
-                                                              .toString() ==
-                                                          "NON_IMAGE"
-                                                      ? SvgPicture.asset(
-                                                          'assets/icons/clip.svg',
-                                                          color: Colors.grey,
-                                                          width: 15,
-                                                          height: 20,
-                                                        )
-                                                      : Container()
-                                        ],
-                                      ),
-                                      const SizedBox(height: 5),
-                                      // 사용자 닉네임부터 댓글 개수까지 표시하는 Row
-                                      Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceBetween,
-                                        children: [
-                                          // 닉네임, 작성한 날짜, 조회수 표시 Row
-                                          Flexible(
-                                            child: Row(
-                                              children: [
-                                                Flexible(
-                                                  child: Text(
-                                                    curPost.created_by.profile
-                                                        .nickname
-                                                        .toString(),
-                                                    style: const TextStyle(
-                                                        fontSize: 14,
-                                                        fontWeight:
-                                                            FontWeight.w500,
-                                                        color: Color.fromRGBO(
-                                                            177, 177, 177, 1)),
-                                                    overflow:
-                                                        TextOverflow.ellipsis,
-                                                    maxLines: 1,
-                                                  ),
-                                                ),
-                                                const SizedBox(width: 10),
-                                                Text(
-                                                  getTime(curPost.created_at
-                                                      .toString()),
-                                                  style: const TextStyle(
-                                                      fontSize: 14,
-                                                      fontWeight:
-                                                          FontWeight.w500,
-                                                      color: Color.fromRGBO(
-                                                          177, 177, 177, 1)),
-                                                ),
-                                                const SizedBox(width: 10),
-                                                Text('조회 ${curPost.hit_count}',
-                                                    style: const TextStyle(
-                                                        fontSize: 14,
-                                                        fontWeight:
-                                                            FontWeight.w500,
-                                                        color: Color.fromRGBO(
-                                                            177, 177, 177, 1))),
-                                              ],
-                                            ),
-                                          ),
-                                          // 좋아요, 싫어요, 댓글 표시 Row
-                                          Row(
-                                            children: [
-                                              SvgPicture.asset(
-                                                'assets/icons/like.svg',
-                                                width: 13,
-                                                height: 15,
-                                                color: ColorsInfo.newara,
-                                              ),
-                                              const SizedBox(width: 3),
-                                              Text(
-                                                  '${curPost.positive_vote_count}',
-                                                  style: const TextStyle(
-                                                      fontSize: 14,
-                                                      fontWeight:
-                                                          FontWeight.w500,
-                                                      color:
-                                                          ColorsInfo.newara)),
-                                              const SizedBox(width: 10),
-                                              SvgPicture.asset(
-                                                'assets/icons/dislike.svg',
-                                                width: 13,
-                                                height: 15,
-                                                color: const Color.fromRGBO(
-                                                    83, 141, 209, 1),
-                                              ),
-                                              const SizedBox(width: 3),
-                                              Text(
-                                                  '${curPost.negative_vote_count}',
-                                                  style: const TextStyle(
-                                                      fontSize: 14,
-                                                      fontWeight:
-                                                          FontWeight.w500,
-                                                      color: Color.fromRGBO(
-                                                          83, 141, 209, 1))),
-                                              const SizedBox(width: 10),
-                                              SvgPicture.asset(
-                                                'assets/icons/comment.svg',
-                                                width: 13,
-                                                height: 15,
-                                                color: const Color.fromRGBO(
-                                                    99, 99, 99, 1),
-                                              ),
-                                              const SizedBox(width: 3),
-                                              Text('${curPost.comment_count}',
-                                                  style: const TextStyle(
-                                                      fontSize: 14,
-                                                      fontWeight:
-                                                          FontWeight.w500,
-                                                      color: Color.fromRGBO(
-                                                          99, 99, 99, 1))),
-                                            ],
-                                          ),
-                                        ],
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              );
-                            },
-                            separatorBuilder: (BuildContext context, int idx) {
-                              return const Divider();
-                            },
-                          ),
-                        ),
-                      ),
+                      _buildArticleList(userProvider),
                       const SizedBox(height: 20),
                     ],
                   ),
@@ -396,6 +138,246 @@ class _UserViewPageState extends State<UserViewPage> {
               ),
             ),
           );
+  }
+
+  /// 사용자 프로필 이미지, 닉네임을 빌드.
+  /// 빌드된 위젯을 리턴.
+  Widget _buildUserInfo() {
+    return SizedBox(
+      width: MediaQuery.of(context).size.width - 40,
+      height: 60,
+      child: Row(
+        children: [
+          // 사용자 프로필 이미지
+          Container(
+            width: 50,
+            height: 50,
+            decoration: const BoxDecoration(
+              shape: BoxShape.circle,
+            ),
+            child: ClipRRect(
+              borderRadius: const BorderRadius.all(Radius.circular(100)),
+              child: SizedBox.fromSize(
+                size: const Size.fromRadius(48),
+                child: _userProfileModel.picture == null
+                    ? Container()
+                    : Image.network(
+                        fit: BoxFit.cover,
+                        _userProfileModel.picture.toString()),
+              ),
+            ),
+          ),
+          const SizedBox(width: 10),
+          // 사용자 닉네임 텍스트
+          Expanded(
+            child: SizedBox(
+              height: 50,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    _userProfileModel.nickname.toString(),
+                    style: const TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildArticleList(UserProvider userProvider) {
+    return Expanded(
+      child: SizedBox(
+        width: MediaQuery.of(context).size.width - 40,
+        child: ListView.separated(
+          // PullToRefresh를 위해 아래 physics 추가 필요
+          physics: const AlwaysScrollableScrollPhysics(),
+          controller: _listViewController,
+          itemCount: _articleList.length + 1,
+          itemBuilder: (BuildContext context, int idx) {
+            // 스크롤의 최하단에 왔을 때 로딩 인디케이터가 보이도록 설정
+            if (idx == _articleList.length) {
+              return Visibility(
+                  visible: !_isLoaded,
+                  child: const SizedBox(
+                    height: 30,
+                    child: LoadingIndicator(),
+                  ));
+            }
+            var curPost = _articleList[idx];
+            return InkWell(
+              onTap: () async {
+                await Navigator.of(context)
+                    .push(slideRoute(PostViewPage(id: curPost.id)));
+                for (int i = 1; i <= _nextPage; i++) {
+                  await _fetchCreatedArticles(userProvider, i);
+                }
+                setIsLoaded(true);
+              },
+              // 각각의 작성한 글
+              child: SizedBox(
+                height: 61,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    // 글 제목 및 첨부파일 이미지 표시
+                    Row(
+                      children: [
+                        // 글 제목 텍스트
+                        Flexible(
+                          child: Text(
+                            curPost.title.toString(),
+                            style: const TextStyle(
+                                fontSize: 16, fontWeight: FontWeight.w500),
+                            overflow: TextOverflow.ellipsis,
+                            maxLines: 1,
+                          ),
+                        ),
+                        // 첨부파일 이미지
+                        curPost.attachment_type.toString() == "NONE"
+                            ? Container()
+                            : const SizedBox(width: 5),
+                        curPost.attachment_type.toString() == "BOTH"
+                            ? Row(
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  SvgPicture.asset(
+                                    'assets/icons/image.svg',
+                                    color: Colors.grey,
+                                    width: 30,
+                                    height: 25,
+                                  ),
+                                  const SizedBox(
+                                    width: 9,
+                                  ),
+                                  SvgPicture.asset(
+                                    'assets/icons/clip.svg',
+                                    color: Colors.grey,
+                                    width: 15,
+                                    height: 20,
+                                  ),
+                                ],
+                              )
+                            : curPost.attachment_type.toString() == "IMAGE"
+                                ? SvgPicture.asset(
+                                    'assets/icons/image.svg',
+                                    color: Colors.grey,
+                                    width: 30,
+                                    height: 25,
+                                  )
+                                : curPost.attachment_type.toString() ==
+                                        "NON_IMAGE"
+                                    ? SvgPicture.asset(
+                                        'assets/icons/clip.svg',
+                                        color: Colors.grey,
+                                        width: 15,
+                                        height: 20,
+                                      )
+                                    : Container()
+                      ],
+                    ),
+                    const SizedBox(height: 5),
+                    // 사용자 닉네임부터 댓글 개수까지 표시하는 Row
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        // 닉네임, 작성한 날짜, 조회수 표시 Row
+                        Flexible(
+                          child: Row(
+                            children: [
+                              Flexible(
+                                child: Text(
+                                  curPost.created_by.profile.nickname
+                                      .toString(),
+                                  style: const TextStyle(
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w500,
+                                      color: Color.fromRGBO(177, 177, 177, 1)),
+                                  overflow: TextOverflow.ellipsis,
+                                  maxLines: 1,
+                                ),
+                              ),
+                              const SizedBox(width: 10),
+                              Text(
+                                getTime(curPost.created_at.toString()),
+                                style: const TextStyle(
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w500,
+                                    color: Color.fromRGBO(177, 177, 177, 1)),
+                              ),
+                              const SizedBox(width: 10),
+                              Text('조회 ${curPost.hit_count}',
+                                  style: const TextStyle(
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w500,
+                                      color: Color.fromRGBO(177, 177, 177, 1))),
+                            ],
+                          ),
+                        ),
+                        // 좋아요, 싫어요, 댓글 표시 Row
+                        Row(
+                          children: [
+                            SvgPicture.asset(
+                              'assets/icons/like.svg',
+                              width: 13,
+                              height: 15,
+                              color: ColorsInfo.newara,
+                            ),
+                            const SizedBox(width: 3),
+                            Text('${curPost.positive_vote_count}',
+                                style: const TextStyle(
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w500,
+                                    color: ColorsInfo.newara)),
+                            const SizedBox(width: 10),
+                            SvgPicture.asset(
+                              'assets/icons/dislike.svg',
+                              width: 13,
+                              height: 15,
+                              color: const Color.fromRGBO(83, 141, 209, 1),
+                            ),
+                            const SizedBox(width: 3),
+                            Text('${curPost.negative_vote_count}',
+                                style: const TextStyle(
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w500,
+                                    color: Color.fromRGBO(83, 141, 209, 1))),
+                            const SizedBox(width: 10),
+                            SvgPicture.asset(
+                              'assets/icons/comment.svg',
+                              width: 13,
+                              height: 15,
+                              color: const Color.fromRGBO(99, 99, 99, 1),
+                            ),
+                            const SizedBox(width: 3),
+                            Text('${curPost.comment_count}',
+                                style: const TextStyle(
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w500,
+                                    color: Color.fromRGBO(99, 99, 99, 1))),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            );
+          },
+          separatorBuilder: (BuildContext context, int idx) {
+            return const Divider();
+          },
+        ),
+      ),
+    );
   }
 
   /// isLoaded 변수의 값을 설정. 설정된 값에 따라 state를 변경해주는 함수.
@@ -455,7 +437,7 @@ class _UserViewPageState extends State<UserViewPage> {
       List<dynamic> rawPostList = response.data['results'];
       for (int i = 0; i < rawPostList.length; i++) {
         Map<String, dynamic>? rawPost = rawPostList[i];
-        // 가끔 형식에 맞지 않은 데이터를 가진 글이 있어 추가함.(2023.05.26) 
+        // 가끔 형식에 맞지 않은 데이터를 가진 글이 있어 추가함.(2023.05.26)
         if (rawPost == null) continue;
         try {
           _articleList.add(ArticleListActionModel.fromJson(rawPost));
