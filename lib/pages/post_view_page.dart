@@ -660,11 +660,9 @@ class _PostViewPageState extends State<PostViewPage> {
         else // 자신의 글
           InkWell(
             onTap: () async {
-              await Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) =>
-                          PostWritePage(previousArticle: _article)));
+              await Navigator.of(context).push(slideRoute(
+                PostWritePage(previousArticle: _article)
+              ));
               userProvider.setIsContentLoaded(false);
               _setIsPageLoaded(false);
               _setIsPageLoaded(await _fetchArticle(userProvider));
