@@ -321,6 +321,81 @@ class _PostWritePageState extends State<PostWritePage> {
         currentHtmlContent != '<br>' &&
         _isUploadingPost == false;
 
+    Widget buildAppbar() {
+      return AppBar(
+        centerTitle: true,
+        leading: IconButton(
+          icon: SvgPicture.asset('assets/icons/left_chevron.svg',
+              colorFilter: const ColorFilter.mode(
+                Colors.red,
+                BlendMode.srcIn,
+              ),
+              width: 35,
+              height: 35),
+          onPressed: () => Navigator.pop(context),
+        ),
+        title: const SizedBox(
+          child: Text(
+            "글 쓰기",
+            style: TextStyle(
+              color: ColorsInfo.newara,
+              fontSize: 18,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+        ),
+        actions: [
+          MaterialButton(
+            /// 포스트 업로드하는 기능
+            /// TODO: 함수 따로 빼기
+            onPressed: canIupload
+                ? (_isEditingPost
+                    ? _managePost(userProvider,
+                        isUpdate: true,
+                        previousArticleId: widget.previousArticle!.id)
+                    : _managePost(userProvider))
+                : null,
+            // 버튼이 클릭되었을 때 수행할 동작
+            padding: EdgeInsets.zero, // 패딩 제거
+            child: canIupload
+                ? Ink(
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(10.0),
+                      color: ColorsInfo.newara,
+                    ),
+                    child: Container(
+                      constraints:
+                          const BoxConstraints(maxWidth: 65.0, maxHeight: 35.0),
+                      alignment: Alignment.center,
+                      child: const Text(
+                        '올리기',
+                        style: TextStyle(color: Colors.white),
+                      ),
+                    ),
+                  )
+                : Ink(
+                    decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(10.0),
+                        color: Colors.transparent,
+                        border: Border.all(
+                          color: const Color(0xFFF0F0F0), // #F0F0F0 색상
+                          width: 1, // 테두리 두께 1픽셀
+                        )),
+                    child: Container(
+                      constraints:
+                          const BoxConstraints(maxWidth: 65.0, maxHeight: 35.0),
+                      alignment: Alignment.center,
+                      child: const Text(
+                        '올리기',
+                        style: TextStyle(color: Color(0xFFBBBBBB)),
+                      ),
+                    ),
+                  ),
+          ),
+        ],
+      );
+    }
+
     Widget buildMenubar() {
       return Padding(
         padding: const EdgeInsets.symmetric(horizontal: 15),
@@ -946,78 +1021,7 @@ class _PostWritePageState extends State<PostWritePage> {
     _checkAttachmentsValid();
 
     return Scaffold(
-      appBar: AppBar(
-        centerTitle: true,
-        leading: IconButton(
-          icon: SvgPicture.asset('assets/icons/left_chevron.svg',
-              colorFilter: const ColorFilter.mode(
-                Colors.red,
-                BlendMode.srcIn,
-              ),
-              width: 35,
-              height: 35),
-          onPressed: () => Navigator.pop(context),
-        ),
-        title: const SizedBox(
-          child: Text(
-            "글 쓰기",
-            style: TextStyle(
-              color: ColorsInfo.newara,
-              fontSize: 18,
-              fontWeight: FontWeight.w700,
-            ),
-          ),
-        ),
-        actions: [
-          MaterialButton(
-            /// 포스트 업로드하는 기능
-            /// TODO: 함수 따로 빼기
-            onPressed: canIupload
-                ? (_isEditingPost
-                    ? _managePost(userProvider,
-                        isUpdate: true,
-                        previousArticleId: widget.previousArticle!.id)
-                    : _managePost(userProvider))
-                : null,
-            // 버튼이 클릭되었을 때 수행할 동작
-            padding: EdgeInsets.zero, // 패딩 제거
-            child: canIupload
-                ? Ink(
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(10.0),
-                      color: ColorsInfo.newara,
-                    ),
-                    child: Container(
-                      constraints:
-                          const BoxConstraints(maxWidth: 65.0, maxHeight: 35.0),
-                      alignment: Alignment.center,
-                      child: const Text(
-                        '올리기',
-                        style: TextStyle(color: Colors.white),
-                      ),
-                    ),
-                  )
-                : Ink(
-                    decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(10.0),
-                        color: Colors.transparent,
-                        border: Border.all(
-                          color: const Color(0xFFF0F0F0), // #F0F0F0 색상
-                          width: 1, // 테두리 두께 1픽셀
-                        )),
-                    child: Container(
-                      constraints:
-                          const BoxConstraints(maxWidth: 65.0, maxHeight: 35.0),
-                      alignment: Alignment.center,
-                      child: const Text(
-                        '올리기',
-                        style: TextStyle(color: Color(0xFFBBBBBB)),
-                      ),
-                    ),
-                  ),
-          ),
-        ],
-      ),
+      appBar: buildAppbar(),
       body: SafeArea(
         child: Column(
           children: [
