@@ -117,7 +117,7 @@ class _PostWritePageState extends State<PostWritePage> {
   );
 
   /// 익명, 성인, 정치 체크 박스가 선택되어 있는지 판별을 위한 리스트
-  final List<bool?> _selectedCheckboxes = [true, false, false];
+  final List<bool?> _selectedCheckboxes = [false, false, false];
 
   /// 첨부파일 메뉴바가 펼쳐져 있는 지 판별을 위한 변수
   bool _isFileMenuBarSelected = false;
@@ -224,6 +224,7 @@ class _PostWritePageState extends State<PostWritePage> {
 
   /// 기존 게시물의 내용과 첨부 파일 가져오기.
   Future<void> _getPostContent() async {
+    // 새로 작성하는 게시물의 경우 함수 종료.
     if (!_isEditingPost) return;
 
     setState(() {
@@ -256,6 +257,9 @@ class _PostWritePageState extends State<PostWritePage> {
       _quillController.document = quill.Document.fromDelta(
           _htmlToQuillDelta(widget.previousArticle!.content!));
       _isFileMenuBarSelected = _attachmentList.isNotEmpty;
+      //TODO: 명명 규칙 다름
+      _selectedCheckboxes[0] =
+          widget.previousArticle?.name_type == 2 ? true : false;
       _selectedCheckboxes[1] =
           widget.previousArticle?.is_content_sexual ?? false;
       _selectedCheckboxes[2] =
@@ -696,47 +700,59 @@ class _PostWritePageState extends State<PostWritePage> {
               const SizedBox(
                 width: 20,
               ),
-              // TODO: 익명 선택하는 기능 추가하고 익명 보여주는 기능 추가하기
-              GestureDetector(
-                onTap: () {
-                  setState(() {
-                    _selectedCheckboxes[0] = !_selectedCheckboxes[0]!;
-                  });
-                },
-                child: Container(
-                  width: 20,
-                  height: 20,
-                  decoration: BoxDecoration(
-                    color: _selectedCheckboxes[0]!
-                        ? ColorsInfo.newara
-                        : const Color(0xFFF0F0F0),
-                    borderRadius: BorderRadius.circular(5.0),
-                  ),
-                  alignment: Alignment.center,
-                  child: SvgPicture.asset(
-                    'assets/icons/check.svg',
-                    width: 16,
-                    height: 16,
-                    color: Colors.white,
-                  ),
+              // TODO: 익명 선택 범위 화면 영역 확대(resolved)
+              // 자유 게시판인 경우 && 수정 게시물이 아닌 경우
+              if (_chosenBoardValue != null &&
+                  _isEditingPost == false &&
+                  _chosenBoardValue!.slug == 'talk')
+                Row(
+                  children: [
+                    GestureDetector(
+                      onTap: () {
+                        setState(() {
+                          _selectedCheckboxes[0] = !_selectedCheckboxes[0]!;
+                        });
+                      },
+                      child: Row(
+                        children: [
+                          Container(
+                            width: 20,
+                            height: 20,
+                            decoration: BoxDecoration(
+                              color: _selectedCheckboxes[0]!
+                                  ? ColorsInfo.newara
+                                  : const Color(0xFFF0F0F0),
+                              borderRadius: BorderRadius.circular(5.0),
+                            ),
+                            alignment: Alignment.center,
+                            child: SvgPicture.asset(
+                              'assets/icons/check.svg',
+                              width: 16,
+                              height: 16,
+                              color: Colors.white,
+                            ),
+                          ),
+                          const SizedBox(
+                            width: 6,
+                          ),
+                          Text(
+                            "익명",
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w500,
+                              color: _selectedCheckboxes[0]!
+                                  ? ColorsInfo.newara
+                                  : const Color(0xFFBBBBBB),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(
+                      width: 15,
+                    ),
+                  ],
                 ),
-              ),
-              const SizedBox(
-                width: 6,
-              ),
-              Text(
-                "익명",
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w500,
-                  color: _selectedCheckboxes[0]!
-                      ? ColorsInfo.newara
-                      : const Color(0xFFBBBBBB),
-                ),
-              ),
-              const SizedBox(
-                width: 15,
-              ),
 
               //TODO: 터치 부분이 너무 작아서 불편함.
               GestureDetector(
@@ -1178,7 +1194,8 @@ class _PostWritePageState extends State<PostWritePage> {
           'attachments': attachmentIds,
           'is_content_sexual': _selectedCheckboxes[1],
           'is_content_social': _selectedCheckboxes[2],
-          'name_type': 'REGULAR'
+          // TODO: 명명 규칙 다름
+          'name_type': _selectedCheckboxes[0] == true ? 'ANONYMOUS' : 'REGULAR',
         };
 
         if (isUpdate) {

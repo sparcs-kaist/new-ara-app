@@ -30,6 +30,9 @@ class ArticleModel {
   String created_at;
   String updated_at;
   String deleted_at;
+  /// name_type이 1이면 기본 이름, 2이면 익명 이름
+  /// TODO: 현재 데브랑 본섭이랑 name_type 명명 규칙이 다름
+  /// https://sparcs.slack.com/archives/CV6H8N4EM/p1699094779620889
   int? name_type;
   bool? is_content_sexual;
   bool? is_content_social;
