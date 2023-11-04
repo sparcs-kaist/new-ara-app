@@ -134,11 +134,13 @@ class _PostWritePageState extends State<PostWritePage> {
   /// 사용자에게 보여줄 토픽 메뉴 목록
   List<TopicModel> _specTopicList = [];
 
-  // 페이지 로딩 시 대기 화면을 띄우기 위한 변수
+  /// 페이지 로딩 시 대기 화면을 띄우기 위한 변수
   bool _isLoading = true;
-  // 지금 포스트 업로드 중이냐
+
+  /// 지금 포스트 업로드 중이냐
   bool _isUploadingPost = false;
-  //
+
+  /// 에디터에 내용이 있냐?
   bool _hasEditorText = false;
 
   // TODO: 함수 안에 지역 변수로 넣는거 고려하기.
@@ -153,8 +155,6 @@ class _PostWritePageState extends State<PostWritePage> {
 
   // 첨부파일 스크롤 컨트롤러
   final ScrollController _listScrollController = ScrollController();
-
-  late StreamSubscription<bool> keyboardSubscription;
 
   final quill.QuillController _quillController = quill.QuillController.basic();
 
@@ -243,6 +243,18 @@ class _PostWritePageState extends State<PostWritePage> {
               "refreshBoardList BoardDetailActionModel.fromJson 실패: $error");
           return;
         }
+      }
+    } on DioException catch (e) {
+      if (e.response != null) {
+        // 응답이 있는 에러
+        print('Dio error!');
+        print('STATUS: ${e.response?.statusCode}');
+        print('DATA: ${e.response?.data}');
+        print('HEADERS: ${e.response?.headers}');
+      } else {
+        // 응답이 없는 에러
+        print('Error sending request!');
+        print(e.message);
       }
     } catch (error) {
       return;
@@ -343,7 +355,7 @@ class _PostWritePageState extends State<PostWritePage> {
 
   @override
   Widget build(BuildContext context) {
-    if (_isLoading) return const LoadingIndicator();
+    // if (_isLoading) return const LoadingIndicator();
 
     var userProvider = context.watch<UserProvider>();
 
@@ -838,12 +850,11 @@ class _PostWritePageState extends State<PostWritePage> {
                               borderRadius: BorderRadius.circular(5.0),
                             ),
                             alignment: Alignment.center,
-                            child: SvgPicture.asset(
-                              'assets/icons/check.svg',
-                              width: 16,
-                              height: 16,
-                              color: Colors.white,
-                            ),
+                            child: SvgPicture.asset('assets/icons/check.svg',
+                                width: 16,
+                                height: 16,
+                                colorFilter: ColorFilter.mode(
+                                    Colors.white, BlendMode.srcIn)),
                           ),
                           const SizedBox(
                             width: 6,
@@ -1024,28 +1035,30 @@ class _PostWritePageState extends State<PostWritePage> {
     //빌드 전 첨부파일의 유효성 확인
     _checkAttachmentsValid();
 
-    return Scaffold(
-      appBar: buildAppBar(),
-      body: SafeArea(
-        child: Column(
-          children: [
-            buildMenubar(),
-            buildTitle(),
-            Container(
-              height: 1,
-              color: const Color(0xFFF0F0F0),
+    return _isLoading
+        ? const LoadingIndicator()
+        : Scaffold(
+            appBar: buildAppBar(),
+            body: SafeArea(
+              child: Column(
+                children: [
+                  buildMenubar(),
+                  buildTitle(),
+                  Container(
+                    height: 1,
+                    color: const Color(0xFFF0F0F0),
+                  ),
+                  buildToolbar(),
+                  Expanded(
+                      child: Padding(
+                    padding: const EdgeInsets.all(12.0),
+                    child: buildEditor(),
+                  )),
+                  buildAttachmentShow()
+                ],
+              ),
             ),
-            buildToolbar(),
-            Expanded(
-                child: Padding(
-              padding: const EdgeInsets.all(12.0),
-              child: buildEditor(),
-            )),
-            buildAttachmentShow()
-          ],
-        ),
-      ),
-    );
+          );
   }
 
   /// _attachmentList 의 첨부파일이 존재하는 파일인지 유효성 확인하는 함수
