@@ -9,6 +9,7 @@ import 'package:new_ara_app/pages/post_view_page.dart';
 import 'package:new_ara_app/constants/url_info.dart';
 import 'package:new_ara_app/providers/user_provider.dart';
 import 'package:new_ara_app/utils/html_info.dart';
+import 'package:new_ara_app/utils/slide_routing.dart';
 
 /// PostViewPage에서는 article 및 comment의 content를 HTML 렌더링으로 보여줘야 함.
 /// 따라서 웹뷰가 사용되는 경우가 자주 있어 따로 클래스로 분리함.
@@ -65,8 +66,9 @@ class _InArticleWebViewState extends State<InArticleWebView> {
   /// 뉴아라 내부 게시물 번호인 [postNum]을 전달받아 PostViewPage를 호출함.
   /// 댓글로 뉴아라 게시물 링크가 공유되었을 때 사용.
   void launchArticle(int postNum) {
-    Navigator.push(context,
-        MaterialPageRoute(builder: (context) => PostViewPage(id: postNum)));
+    Navigator.of(context).push(slideRoute(
+      PostViewPage(id: postNum),
+    ));
   }
 
   /// 웹뷰에서 링크가 클릭되었을 때 링크 분석, 리다이렉트를 담당해줌.
