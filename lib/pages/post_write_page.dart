@@ -90,7 +90,7 @@ class _PostWritePageState extends State<PostWritePage> {
 
   /// 기본 게시판 및 주제 모델.
   /// 아무 것도 선택하기 전 초기 상태를 나타냄.
-  final _defaultTopicModel = TopicModel(
+  final _defaultTopicModelNone = TopicModel(
     id: -1,
     slug: "",
     ko_name: "말머리 없음",
@@ -99,7 +99,7 @@ class _PostWritePageState extends State<PostWritePage> {
 
   // 기본 게시판 및 주제 모델.
   // 메뉴바에서 게시물 주제 선택 후 토픽 메뉴 초기 상태를 나타낸다.
-  final _defaultTopicModel2 = TopicModel(
+  final _defaultTopicModelSelect = TopicModel(
     id: -1,
     slug: "",
     ko_name: "말머리를 선택하세요",
@@ -215,7 +215,7 @@ class _PostWritePageState extends State<PostWritePage> {
 
     // 상태 업데이트.
     setState(() {
-      _specTopicList.add(_defaultTopicModel);
+      _specTopicList.add(_defaultTopicModelSelect);
       _chosenTopicValue = _specTopicList[0];
       _chosenBoardValue = _boardList[0];
       _isLoading = false;
@@ -271,7 +271,7 @@ class _PostWritePageState extends State<PostWritePage> {
     setState(() {
       BoardDetailActionModel boardDetailActionModel =
           _findBoardListValue(widget.previousArticle!.parent_board.slug);
-      _specTopicList = [_defaultTopicModel];
+      _specTopicList = [_defaultTopicModelNone];
       _specTopicList.addAll(boardDetailActionModel.topics);
       _chosenTopicValue = widget.previousArticle!.parent_topic == null
           ? _specTopicList[0]
@@ -297,7 +297,7 @@ class _PostWritePageState extends State<PostWritePage> {
         return topic;
       }
     }
-    return _defaultTopicModel;
+    return _defaultTopicModelNone;
   }
 
   /// 주어진 url에서 파일 이름을 추출하는 함수.
@@ -1336,7 +1336,7 @@ class _PostWritePageState extends State<PostWritePage> {
   void setSpecTopicList(BoardDetailActionModel? value) {
     setState(() {
       _specTopicList = [];
-      _specTopicList.add(_defaultTopicModel2);
+      _specTopicList.add(_defaultTopicModelNone);
       for (TopicModel topic in value!.topics) {
         _specTopicList.add(topic);
       }
