@@ -697,46 +697,46 @@ class _PostWritePageState extends State<PostWritePage> {
                 width: 20,
               ),
               // TODO: 익명 선택하는 기능 추가하고 익명 보여주는 기능 추가하기
-              // GestureDetector(
-              //   onTap: () {
-              //     setState(() {
-              //       _selectedCheckboxes[0] = !_selectedCheckboxes[0]!;
-              //     });
-              //   },
-              //   child: Container(
-              //     width: 20,
-              //     height: 20,
-              //     decoration: BoxDecoration(
-              //       color: _selectedCheckboxes[0]!
-              //           ? ColorsInfo.newara
-              //           : Color(0xFFF0F0F0),
-              //       borderRadius: BorderRadius.circular(5.0),
-              //     ),
-              //     alignment: Alignment.center,
-              //     child: SvgPicture.asset(
-              //       'assets/icons/check.svg',
-              //       width: 16,
-              //       height: 16,
-              //       color: Colors.white,
-              //     ),
-              //   ),
-              // ),
-              // SizedBox(
-              //   width: 6,
-              // ),
-              // Text(
-              //   "익명",
-              //   style: TextStyle(
-              //     fontSize: 16,
-              //     fontWeight: FontWeight.w500,
-              //     color: _selectedCheckboxes[0]!
-              //         ? ColorsInfo.newara
-              //         : Color(0xFFBBBBBB),
-              //   ),
-              // ),
-              // SizedBox(
-              //   width: 15,
-              // ),
+              GestureDetector(
+                onTap: () {
+                  setState(() {
+                    _selectedCheckboxes[0] = !_selectedCheckboxes[0]!;
+                  });
+                },
+                child: Container(
+                  width: 20,
+                  height: 20,
+                  decoration: BoxDecoration(
+                    color: _selectedCheckboxes[0]!
+                        ? ColorsInfo.newara
+                        : const Color(0xFFF0F0F0),
+                    borderRadius: BorderRadius.circular(5.0),
+                  ),
+                  alignment: Alignment.center,
+                  child: SvgPicture.asset(
+                    'assets/icons/check.svg',
+                    width: 16,
+                    height: 16,
+                    color: Colors.white,
+                  ),
+                ),
+              ),
+              const SizedBox(
+                width: 6,
+              ),
+              Text(
+                "익명",
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w500,
+                  color: _selectedCheckboxes[0]!
+                      ? ColorsInfo.newara
+                      : const Color(0xFFBBBBBB),
+                ),
+              ),
+              const SizedBox(
+                width: 15,
+              ),
 
               //TODO: 터치 부분이 너무 작아서 불편함.
               GestureDetector(
