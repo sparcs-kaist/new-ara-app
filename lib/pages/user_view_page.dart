@@ -420,10 +420,13 @@ class _UserViewPageState extends State<UserViewPage> {
 
   /// isLoaded 변수의 값을 설정. 설정된 값에 따라 state를 변경해주는 함수.
   /// API 통신 및 fetch 작업 이후 state 업데이트가 자주 시행됨에 따라 함수로 작성함.
+  /// UserViewPage 전체의 내용을 로드할 때 사용.
   void _setIsLoaded(bool tf) {
     if (mounted) setState(() => _isLoaded = tf);
   }
 
+  /// _isLoadingNewPage의 값을 매개변수 tf로 변경 후 state를 업데이트함.
+  /// UserViewPage에서 스크롤을 통해 새로운 페이지를 로드할 때 사용.
   void _setIsLoadingNewPage(bool tf) {
     if (mounted) setState(() => _isLoadingNewPage = tf);
   }
