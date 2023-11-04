@@ -151,11 +151,16 @@ class _PostWritePageState extends State<PostWritePage> {
 
   final TextEditingController _titleController = TextEditingController();
 
+  // 첨부파일 스크롤 컨트롤러
   final ScrollController _listScrollController = ScrollController();
 
   late StreamSubscription<bool> keyboardSubscription;
 
   final quill.QuillController _quillController = quill.QuillController.basic();
+
+  late FocusNode _titleFocusNode;
+
+  late FocusNode _editorFocusNode;
 
   @override
   void initState() {
@@ -176,12 +181,20 @@ class _PostWritePageState extends State<PostWritePage> {
     }
 
     _quillController.addListener(_onTextChanged);
+    _titleFocusNode = FocusNode();
+    _editorFocusNode = FocusNode();
     _initPostWritePost();
+
+    //위젯 트리가 빌드된 직후에 포커스를 요청합니다.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      FocusScope.of(context).requestFocus(_titleFocusNode);
+    });
   }
 
   void _onTextChanged() {
     //build 함수 다시 실행해서 글 올릴 수 잇는지 유효성 검사.
     bool hasText = _quillController.document.length > 1;
+    debugPrint("hasText : $hasText");
     if (hasText != _hasEditorText) {
       setState(() {
         _hasEditorText = hasText;
@@ -192,6 +205,8 @@ class _PostWritePageState extends State<PostWritePage> {
   @override
   void dispose() {
     super.dispose();
+    _titleFocusNode.dispose();
+    _editorFocusNode.dispose();
     _quillController.removeListener(_onTextChanged);
   }
 
@@ -336,7 +351,8 @@ class _PostWritePageState extends State<PostWritePage> {
     /// TODO: 업로드 로딩 인디케이터 추가하기
     bool canIupload = _titleController.text != '' &&
         _chosenBoardValue!.id != -1 &&
-        _isUploadingPost == false;
+        _isUploadingPost == false &&
+        _hasEditorText;
 
     PreferredSizeWidget buildAppBar() {
       return AppBar(
@@ -519,6 +535,7 @@ class _PostWritePageState extends State<PostWritePage> {
     Widget buildTitle() {
       return TextField(
         controller: _titleController,
+        focusNode: _titleFocusNode,
         minLines: 1,
         maxLines: 1,
         maxLength: 255,
@@ -996,6 +1013,7 @@ class _PostWritePageState extends State<PostWritePage> {
 
     Widget buildEditor() {
       return quill.QuillEditor.basic(
+        focusNode: _editorFocusNode,
         controller: _quillController,
         embedBuilders: FlutterQuillEmbeds.builders(),
         readOnly: false, // The editor is editable
