@@ -1197,6 +1197,19 @@ class _PostWritePageState extends State<PostWritePage> {
               attachmentIds.add(attachmentModel.id);
               contentValue = _manageImgTagSrc(contentValue,
                   _attachmentList[i].fileLocalPath!, attachmentModel.file);
+            } on DioException catch (e) {
+              // Handle the DioError separately to handle only Dio related errors
+              if (e.response != null) {
+                // DioError contains response data
+                print('Dio error!');
+                print('STATUS: ${e.response?.statusCode}');
+                print('DATA: ${e.response?.data}');
+                print('HEADERS: ${e.response?.headers}');
+              } else {
+                // Error due to setting up or sending/receiving the request
+                print('Error sending request!');
+                print(e.message);
+              }
             } catch (error) {
               debugPrint("$error");
             }
