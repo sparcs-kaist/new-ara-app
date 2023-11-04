@@ -1015,6 +1015,7 @@ class _PostWritePageState extends State<PostWritePage> {
       return quill.QuillEditor.basic(
         focusNode: _editorFocusNode,
         controller: _quillController,
+        placeholder: '내용을 입력해주세요.',
         embedBuilders: FlutterQuillEmbeds.builders(),
         readOnly: false, // The editor is editable
       );
