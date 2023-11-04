@@ -519,6 +519,7 @@ class _PostViewPageState extends State<PostViewPage> {
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         // 담아두기,공유 버튼 Row
+        // TODO: 삭제 버튼 위치 디자이너와 협의하기
         Row(
           children: [
             InkWell(
