@@ -138,6 +138,8 @@ class _PostWritePageState extends State<PostWritePage> {
   bool _isLoading = true;
   // 지금 포스트 업로드 중이냐
   bool _isUploadingPost = false;
+  //
+  bool _hasEditorText = false;
 
   // TODO: 함수 안에 지역 변수로 넣는거 고려하기.
   FilePickerResult? filePickerResult;
@@ -172,7 +174,25 @@ class _PostWritePageState extends State<PostWritePage> {
     } else {
       platform = TargetPlatform.iOS;
     }
+
+    _quillController.addListener(_onTextChanged);
     _initPostWritePost();
+  }
+
+  void _onTextChanged() {
+    //build 함수 다시 실행해서 글 올릴 수 잇는지 유효성 검사.
+    bool hasText = _quillController.document.length > 1;
+    if (hasText != _hasEditorText) {
+      setState(() {
+        _hasEditorText = hasText;
+      });
+    }
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    _quillController.removeListener(_onTextChanged);
   }
 
   /// 게시판 목록을 가져온다.
@@ -313,15 +333,12 @@ class _PostWritePageState extends State<PostWritePage> {
     var userProvider = context.watch<UserProvider>();
 
     /// 게시물 업로드 가능한지 확인
-    String currentHtmlContent =
-        DeltaToHTML.encodeJson(_quillController.document.toDelta().toJson());
+    /// TODO: 업로드 로딩 인디케이터 추가하기
     bool canIupload = _titleController.text != '' &&
         _chosenBoardValue!.id != -1 &&
-        currentHtmlContent != '' &&
-        currentHtmlContent != '<br>' &&
         _isUploadingPost == false;
 
-    Widget buildAppbar() {
+    PreferredSizeWidget buildAppBar() {
       return AppBar(
         centerTitle: true,
         leading: IconButton(
@@ -510,6 +527,10 @@ class _PostWritePageState extends State<PostWritePage> {
           fontSize: 22,
           fontWeight: FontWeight.w700,
         ),
+        onChanged: (String s) {
+          // build 함수를 다시 실행하여 올릴 수 있는 게시물인지 유효성 검사
+          setState(() {});
+        },
         decoration: const InputDecoration(
           hintText: "제목을 입력해주세요.",
           hintStyle: TextStyle(
@@ -968,42 +989,6 @@ class _PostWritePageState extends State<PostWritePage> {
             icon: Icons.camera_alt,
             onTap: _pickImage,
           ),
-          quill.QuillCustomButton(
-            icon: Icons.settings,
-            onTap: () {
-              debugPrint(DeltaToHTML.encodeJson(
-                  _quillController.document.toDelta().toJson()));
-
-              var json = jsonEncode(_quillController.document.toDelta());
-              List<dynamic> delta = jsonDecode(json);
-              List<dynamic> nwDelta = [];
-
-              // Delta 리스트를 순회하면서 'insert' 키를 찾습니다.
-              for (Map<String, dynamic> line in delta) {
-                var value = line["insert"];
-                bool flag = true;
-
-                // 'insert' 키의 값이 맵인 경우, 이 맵을 순회하여 'image' 키를 찾습니다.
-                if (value is Map<String, dynamic>) {
-                  for (var newKey in value.keys) {
-                    if (newKey == "image") {
-                      flag = false;
-                      // 'image' 키의 값이 "abc"인 경우, 해당 라인을 삭제합니다.
-                    }
-                  }
-                }
-                if (flag) nwDelta.add(line);
-              }
-
-              // 수정된 Delta를 다시 JSON으로 인코딩하고 Document로 변환합니다.
-              String newJson = jsonEncode(nwDelta);
-              quill.Delta newDelta = quill.Delta.fromJson(jsonDecode(newJson));
-              setState(() {
-                _quillController.document =
-                    quill.Document.fromJson(newDelta.toJson());
-              });
-            },
-          ),
         ],
         // embedButtons: FlutterQuillEmbeds.buttons(),
       );
@@ -1021,7 +1006,7 @@ class _PostWritePageState extends State<PostWritePage> {
     _checkAttachmentsValid();
 
     return Scaffold(
-      appBar: buildAppbar(),
+      appBar: buildAppBar(),
       body: SafeArea(
         child: Column(
           children: [
