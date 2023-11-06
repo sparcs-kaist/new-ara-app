@@ -90,7 +90,7 @@ class _PostWritePageState extends State<PostWritePage> {
 
   /// 기본 게시판 및 주제 모델.
   /// 아무 것도 선택하기 전 초기 상태를 나타냄.
-  final _defaultTopicModel = TopicModel(
+  final _defaultTopicModelNone = TopicModel(
     id: -1,
     slug: "",
     ko_name: "말머리 없음",
@@ -99,7 +99,7 @@ class _PostWritePageState extends State<PostWritePage> {
 
   // 기본 게시판 및 주제 모델.
   // 메뉴바에서 게시물 주제 선택 후 토픽 메뉴 초기 상태를 나타낸다.
-  final _defaultTopicModel2 = TopicModel(
+  final _defaultTopicModelSelect = TopicModel(
     id: -1,
     slug: "",
     ko_name: "말머리를 선택하세요",
@@ -117,7 +117,7 @@ class _PostWritePageState extends State<PostWritePage> {
   );
 
   /// 익명, 성인, 정치 체크 박스가 선택되어 있는지 판별을 위한 리스트
-  final List<bool?> _selectedCheckboxes = [true, false, false];
+  final List<bool?> _selectedCheckboxes = [false, false, false];
 
   /// 첨부파일 메뉴바가 펼쳐져 있는 지 판별을 위한 변수
   bool _isFileMenuBarSelected = false;
@@ -134,10 +134,14 @@ class _PostWritePageState extends State<PostWritePage> {
   /// 사용자에게 보여줄 토픽 메뉴 목록
   List<TopicModel> _specTopicList = [];
 
-  // 페이지 로딩 시 대기 화면을 띄우기 위한 변수
+  /// 페이지 로딩 시 대기 화면을 띄우기 위한 변수
   bool _isLoading = true;
-  // 지금 포스트 업로드 중이냐
+
+  /// 지금 포스트 업로드 중이냐
   bool _isUploadingPost = false;
+
+  /// 에디터에 내용이 있냐?
+  bool _hasEditorText = false;
 
   // TODO: 함수 안에 지역 변수로 넣는거 고려하기.
   FilePickerResult? filePickerResult;
@@ -149,11 +153,14 @@ class _PostWritePageState extends State<PostWritePage> {
 
   final TextEditingController _titleController = TextEditingController();
 
+  // 첨부파일 스크롤 컨트롤러
   final ScrollController _listScrollController = ScrollController();
 
-  late StreamSubscription<bool> keyboardSubscription;
-
   final quill.QuillController _quillController = quill.QuillController.basic();
+
+  late FocusNode _titleFocusNode;
+
+  late FocusNode _editorFocusNode;
 
   @override
   void initState() {
@@ -172,7 +179,35 @@ class _PostWritePageState extends State<PostWritePage> {
     } else {
       platform = TargetPlatform.iOS;
     }
+
+    _quillController.addListener(_onTextChanged);
+    _titleFocusNode = FocusNode();
+    _editorFocusNode = FocusNode();
     _initPostWritePost();
+
+    //위젯 트리가 빌드된 직후에 포커스를 요청합니다.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      FocusScope.of(context).requestFocus(_titleFocusNode);
+    });
+  }
+
+  void _onTextChanged() {
+    //build 함수 다시 실행해서 글 올릴 수 잇는지 유효성 검사.
+    bool hasText = _quillController.document.length > 1;
+    debugPrint("hasText : $hasText");
+    if (hasText != _hasEditorText) {
+      setState(() {
+        _hasEditorText = hasText;
+      });
+    }
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    _titleFocusNode.dispose();
+    _editorFocusNode.dispose();
+    _quillController.removeListener(_onTextChanged);
   }
 
   /// 게시판 목록을 가져온다.
@@ -209,13 +244,25 @@ class _PostWritePageState extends State<PostWritePage> {
           return;
         }
       }
+    } on DioException catch (e) {
+      if (e.response != null) {
+        // 응답이 있는 에러
+        print('Dio error!');
+        print('STATUS: ${e.response?.statusCode}');
+        print('DATA: ${e.response?.data}');
+        print('HEADERS: ${e.response?.headers}');
+      } else {
+        // 응답이 없는 에러
+        print('Error sending request!');
+        print(e.message);
+      }
     } catch (error) {
       return;
     }
 
     // 상태 업데이트.
     setState(() {
-      _specTopicList.add(_defaultTopicModel);
+      _specTopicList.add(_defaultTopicModelSelect);
       _chosenTopicValue = _specTopicList[0];
       _chosenBoardValue = _boardList[0];
       _isLoading = false;
@@ -224,6 +271,7 @@ class _PostWritePageState extends State<PostWritePage> {
 
   /// 기존 게시물의 내용과 첨부 파일 가져오기.
   Future<void> _getPostContent() async {
+    // 새로 작성하는 게시물의 경우 함수 종료.
     if (!_isEditingPost) return;
 
     setState(() {
@@ -256,6 +304,9 @@ class _PostWritePageState extends State<PostWritePage> {
       _quillController.document = quill.Document.fromDelta(
           _htmlToQuillDelta(widget.previousArticle!.content!));
       _isFileMenuBarSelected = _attachmentList.isNotEmpty;
+      //TODO: 명명 규칙 다름
+      _selectedCheckboxes[0] =
+          widget.previousArticle?.name_type == 2 ? true : false;
       _selectedCheckboxes[1] =
           widget.previousArticle?.is_content_sexual ?? false;
       _selectedCheckboxes[2] =
@@ -267,7 +318,7 @@ class _PostWritePageState extends State<PostWritePage> {
     setState(() {
       BoardDetailActionModel boardDetailActionModel =
           _findBoardListValue(widget.previousArticle!.parent_board.slug);
-      _specTopicList = [_defaultTopicModel];
+      _specTopicList = [_defaultTopicModelNone];
       _specTopicList.addAll(boardDetailActionModel.topics);
       _chosenTopicValue = widget.previousArticle!.parent_topic == null
           ? _specTopicList[0]
@@ -293,7 +344,7 @@ class _PostWritePageState extends State<PostWritePage> {
         return topic;
       }
     }
-    return _defaultTopicModel;
+    return _defaultTopicModelNone;
   }
 
   /// 주어진 url에서 파일 이름을 추출하는 함수.
@@ -304,18 +355,91 @@ class _PostWritePageState extends State<PostWritePage> {
 
   @override
   Widget build(BuildContext context) {
-    if (_isLoading) return const LoadingIndicator();
+    // if (_isLoading) return const LoadingIndicator();
 
     var userProvider = context.watch<UserProvider>();
 
     /// 게시물 업로드 가능한지 확인
-    String currentHtmlContent =
-        DeltaToHTML.encodeJson(_quillController.document.toDelta().toJson());
+    /// TODO: 업로드 로딩 인디케이터 추가하기
     bool canIupload = _titleController.text != '' &&
         _chosenBoardValue!.id != -1 &&
-        currentHtmlContent != '' &&
-        currentHtmlContent != '<br>' &&
-        _isUploadingPost == false;
+        _isUploadingPost == false &&
+        _hasEditorText;
+
+    PreferredSizeWidget buildAppBar() {
+      return AppBar(
+        centerTitle: true,
+        leading: IconButton(
+          icon: SvgPicture.asset('assets/icons/left_chevron.svg',
+              colorFilter: const ColorFilter.mode(
+                Colors.red,
+                BlendMode.srcIn,
+              ),
+              width: 35,
+              height: 35),
+          onPressed: () => Navigator.pop(context),
+        ),
+        title: const SizedBox(
+          child: Text(
+            "글 쓰기",
+            style: TextStyle(
+              color: ColorsInfo.newara,
+              fontSize: 18,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+        ),
+        actions: [
+          MaterialButton(
+            /// 포스트 업로드하는 기능
+            /// TODO: 함수 따로 빼기
+            onPressed: canIupload
+                ? (_isEditingPost
+                    ? _managePost(userProvider,
+                        isUpdate: true,
+                        previousArticleId: widget.previousArticle!.id)
+                    : _managePost(userProvider))
+                : null,
+            // 버튼이 클릭되었을 때 수행할 동작
+            padding: EdgeInsets.zero, // 패딩 제거
+            child: canIupload
+                ? Ink(
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(10.0),
+                      color: ColorsInfo.newara,
+                    ),
+                    child: Container(
+                      constraints:
+                          const BoxConstraints(maxWidth: 65.0, maxHeight: 35.0),
+                      alignment: Alignment.center,
+                      child: const Text(
+                        '올리기',
+                        style: TextStyle(color: Colors.white),
+                      ),
+                    ),
+                  )
+                : Ink(
+                    decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(10.0),
+                        color: Colors.transparent,
+                        border: Border.all(
+                          color: const Color(0xFFF0F0F0), // #F0F0F0 색상
+                          width: 1, // 테두리 두께 1픽셀
+                        )),
+                    child: Container(
+                      constraints:
+                          const BoxConstraints(maxWidth: 65.0, maxHeight: 35.0),
+                      alignment: Alignment.center,
+                      child: const Text(
+                        '올리기',
+                        style: TextStyle(color: Color(0xFFBBBBBB)),
+                      ),
+                    ),
+                  ),
+          ),
+        ],
+      );
+    }
 
     Widget buildMenubar() {
       return Padding(
@@ -423,6 +547,7 @@ class _PostWritePageState extends State<PostWritePage> {
     Widget buildTitle() {
       return TextField(
         controller: _titleController,
+        focusNode: _titleFocusNode,
         minLines: 1,
         maxLines: 1,
         maxLength: 255,
@@ -431,6 +556,10 @@ class _PostWritePageState extends State<PostWritePage> {
           fontSize: 22,
           fontWeight: FontWeight.w700,
         ),
+        onChanged: (String s) {
+          // build 함수를 다시 실행하여 올릴 수 있는 게시물인지 유효성 검사
+          setState(() {});
+        },
         decoration: const InputDecoration(
           hintText: "제목을 입력해주세요.",
           hintStyle: TextStyle(
@@ -696,47 +825,58 @@ class _PostWritePageState extends State<PostWritePage> {
               const SizedBox(
                 width: 20,
               ),
-              // TODO: 익명 선택하는 기능 추가하고 익명 보여주는 기능 추가하기
-              // GestureDetector(
-              //   onTap: () {
-              //     setState(() {
-              //       _selectedCheckboxes[0] = !_selectedCheckboxes[0]!;
-              //     });
-              //   },
-              //   child: Container(
-              //     width: 20,
-              //     height: 20,
-              //     decoration: BoxDecoration(
-              //       color: _selectedCheckboxes[0]!
-              //           ? ColorsInfo.newara
-              //           : Color(0xFFF0F0F0),
-              //       borderRadius: BorderRadius.circular(5.0),
-              //     ),
-              //     alignment: Alignment.center,
-              //     child: SvgPicture.asset(
-              //       'assets/icons/check.svg',
-              //       width: 16,
-              //       height: 16,
-              //       color: Colors.white,
-              //     ),
-              //   ),
-              // ),
-              // SizedBox(
-              //   width: 6,
-              // ),
-              // Text(
-              //   "익명",
-              //   style: TextStyle(
-              //     fontSize: 16,
-              //     fontWeight: FontWeight.w500,
-              //     color: _selectedCheckboxes[0]!
-              //         ? ColorsInfo.newara
-              //         : Color(0xFFBBBBBB),
-              //   ),
-              // ),
-              // SizedBox(
-              //   width: 15,
-              // ),
+              // TODO: 익명 선택 범위 화면 영역 확대(resolved)
+              // 자유 게시판인 경우 && 수정 게시물이 아닌 경우
+              if (_chosenBoardValue != null &&
+                  _isEditingPost == false &&
+                  _chosenBoardValue!.slug == 'talk')
+                Row(
+                  children: [
+                    GestureDetector(
+                      onTap: () {
+                        setState(() {
+                          _selectedCheckboxes[0] = !_selectedCheckboxes[0]!;
+                        });
+                      },
+                      child: Row(
+                        children: [
+                          Container(
+                            width: 20,
+                            height: 20,
+                            decoration: BoxDecoration(
+                              color: _selectedCheckboxes[0]!
+                                  ? ColorsInfo.newara
+                                  : const Color(0xFFF0F0F0),
+                              borderRadius: BorderRadius.circular(5.0),
+                            ),
+                            alignment: Alignment.center,
+                            child: SvgPicture.asset('assets/icons/check.svg',
+                                width: 16,
+                                height: 16,
+                                colorFilter: ColorFilter.mode(
+                                    Colors.white, BlendMode.srcIn)),
+                          ),
+                          const SizedBox(
+                            width: 6,
+                          ),
+                          Text(
+                            "익명",
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w500,
+                              color: _selectedCheckboxes[0]!
+                                  ? ColorsInfo.newara
+                                  : const Color(0xFFBBBBBB),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(
+                      width: 15,
+                    ),
+                  ],
+                ),
 
               //TODO: 터치 부분이 너무 작아서 불편함.
               GestureDetector(
@@ -877,42 +1017,6 @@ class _PostWritePageState extends State<PostWritePage> {
             icon: Icons.camera_alt,
             onTap: _pickImage,
           ),
-          quill.QuillCustomButton(
-            icon: Icons.settings,
-            onTap: () {
-              debugPrint(DeltaToHTML.encodeJson(
-                  _quillController.document.toDelta().toJson()));
-
-              var json = jsonEncode(_quillController.document.toDelta());
-              List<dynamic> delta = jsonDecode(json);
-              List<dynamic> nwDelta = [];
-
-              // Delta 리스트를 순회하면서 'insert' 키를 찾습니다.
-              for (Map<String, dynamic> line in delta) {
-                var value = line["insert"];
-                bool flag = true;
-
-                // 'insert' 키의 값이 맵인 경우, 이 맵을 순회하여 'image' 키를 찾습니다.
-                if (value is Map<String, dynamic>) {
-                  for (var newKey in value.keys) {
-                    if (newKey == "image") {
-                      flag = false;
-                      // 'image' 키의 값이 "abc"인 경우, 해당 라인을 삭제합니다.
-                    }
-                  }
-                }
-                if (flag) nwDelta.add(line);
-              }
-
-              // 수정된 Delta를 다시 JSON으로 인코딩하고 Document로 변환합니다.
-              String newJson = jsonEncode(nwDelta);
-              quill.Delta newDelta = quill.Delta.fromJson(jsonDecode(newJson));
-              setState(() {
-                _quillController.document =
-                    quill.Document.fromJson(newDelta.toJson());
-              });
-            },
-          ),
         ],
         // embedButtons: FlutterQuillEmbeds.buttons(),
       );
@@ -920,7 +1024,9 @@ class _PostWritePageState extends State<PostWritePage> {
 
     Widget buildEditor() {
       return quill.QuillEditor.basic(
+        focusNode: _editorFocusNode,
         controller: _quillController,
+        placeholder: '내용을 입력해주세요.',
         embedBuilders: FlutterQuillEmbeds.builders(),
         readOnly: false, // The editor is editable
       );
@@ -929,99 +1035,30 @@ class _PostWritePageState extends State<PostWritePage> {
     //빌드 전 첨부파일의 유효성 확인
     _checkAttachmentsValid();
 
-    return Scaffold(
-      appBar: AppBar(
-        centerTitle: true,
-        leading: IconButton(
-          icon: SvgPicture.asset('assets/icons/left_chevron.svg',
-              colorFilter: const ColorFilter.mode(
-                Colors.red,
-                BlendMode.srcIn,
-              ),
-              width: 35,
-              height: 35),
-          onPressed: () => Navigator.pop(context),
-        ),
-        title: const SizedBox(
-          child: Text(
-            "글 쓰기",
-            style: TextStyle(
-              color: ColorsInfo.newara,
-              fontSize: 18,
-              fontWeight: FontWeight.w700,
-            ),
-          ),
-        ),
-        actions: [
-          MaterialButton(
-            /// 포스트 업로드하는 기능
-            /// TODO: 함수 따로 빼기
-            onPressed: canIupload
-                ? (_isEditingPost
-                    ? _managePost(userProvider,
-                        isUpdate: true,
-                        previousArticleId: widget.previousArticle!.id)
-                    : _managePost(userProvider))
-                : null,
-            // 버튼이 클릭되었을 때 수행할 동작
-            padding: EdgeInsets.zero, // 패딩 제거
-            child: canIupload
-                ? Ink(
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(10.0),
-                      color: ColorsInfo.newara,
-                    ),
-                    child: Container(
-                      constraints:
-                          const BoxConstraints(maxWidth: 65.0, maxHeight: 35.0),
-                      alignment: Alignment.center,
-                      child: const Text(
-                        '올리기',
-                        style: TextStyle(color: Colors.white),
-                      ),
-                    ),
-                  )
-                : Ink(
-                    decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(10.0),
-                        color: Colors.transparent,
-                        border: Border.all(
-                          color: const Color(0xFFF0F0F0), // #F0F0F0 색상
-                          width: 1, // 테두리 두께 1픽셀
-                        )),
-                    child: Container(
-                      constraints:
-                          const BoxConstraints(maxWidth: 65.0, maxHeight: 35.0),
-                      alignment: Alignment.center,
-                      child: const Text(
-                        '올리기',
-                        style: TextStyle(color: Color(0xFFBBBBBB)),
-                      ),
-                    ),
+    return _isLoading
+        ? const LoadingIndicator()
+        : Scaffold(
+            appBar: buildAppBar(),
+            body: SafeArea(
+              child: Column(
+                children: [
+                  buildMenubar(),
+                  buildTitle(),
+                  Container(
+                    height: 1,
+                    color: const Color(0xFFF0F0F0),
                   ),
-          ),
-        ],
-      ),
-      body: SafeArea(
-        child: Column(
-          children: [
-            buildMenubar(),
-            buildTitle(),
-            Container(
-              height: 1,
-              color: const Color(0xFFF0F0F0),
+                  buildToolbar(),
+                  Expanded(
+                      child: Padding(
+                    padding: const EdgeInsets.all(12.0),
+                    child: buildEditor(),
+                  )),
+                  buildAttachmentShow()
+                ],
+              ),
             ),
-            buildToolbar(),
-            Expanded(
-                child: Padding(
-              padding: const EdgeInsets.all(12.0),
-              child: buildEditor(),
-            )),
-            buildAttachmentShow()
-          ],
-        ),
-      ),
-    );
+          );
   }
 
   /// _attachmentList 의 첨부파일이 존재하는 파일인지 유효성 확인하는 함수
@@ -1160,6 +1197,19 @@ class _PostWritePageState extends State<PostWritePage> {
               attachmentIds.add(attachmentModel.id);
               contentValue = _manageImgTagSrc(contentValue,
                   _attachmentList[i].fileLocalPath!, attachmentModel.file);
+            } on DioException catch (e) {
+              // Handle the DioError separately to handle only Dio related errors
+              if (e.response != null) {
+                // DioError contains response data
+                print('Dio error!');
+                print('STATUS: ${e.response?.statusCode}');
+                print('DATA: ${e.response?.data}');
+                print('HEADERS: ${e.response?.headers}');
+              } else {
+                // Error due to setting up or sending/receiving the request
+                print('Error sending request!');
+                print(e.message);
+              }
             } catch (error) {
               debugPrint("$error");
             }
@@ -1178,7 +1228,8 @@ class _PostWritePageState extends State<PostWritePage> {
           'attachments': attachmentIds,
           'is_content_sexual': _selectedCheckboxes[1],
           'is_content_social': _selectedCheckboxes[2],
-          'name_type': 'REGULAR'
+          // TODO: 명명 규칙 다름
+          'name_type': _selectedCheckboxes[0] == true ? 'ANONYMOUS' : 'REGULAR',
         };
 
         if (isUpdate) {
@@ -1319,7 +1370,7 @@ class _PostWritePageState extends State<PostWritePage> {
   void setSpecTopicList(BoardDetailActionModel? value) {
     setState(() {
       _specTopicList = [];
-      _specTopicList.add(_defaultTopicModel2);
+      _specTopicList.add(_defaultTopicModelNone);
       for (TopicModel topic in value!.topics) {
         _specTopicList.add(topic);
       }
