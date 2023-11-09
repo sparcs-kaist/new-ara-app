@@ -69,6 +69,7 @@ class _UserViewPageState extends State<UserViewPage> {
     // 이미 다음 페이지를 호출하는 경우는 제외
     if (!_isLoadingNewPage) {
       // 사용자가 최대로 스크롤한 경우
+      // TODO: 마지막 페이지에 도달했을 때 스크롤 안되게 하기
       if (_isLoaded &&
           _listViewController.position.pixels >=
               _listViewController.position.maxScrollExtent) {

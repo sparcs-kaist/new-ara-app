@@ -89,6 +89,7 @@ class _NotificationPageState extends State<NotificationPage> {
   /// 사용자가 ListView의 끝에 도달하였을 때 이를 감지하여
   /// 새로운 페이지를 로딩함.
   // TODO: Future<void>로 변경 (Resolved)
+  // TODO: 마지막 페이지에 도달했을 때 스크롤 안되게 하기
   Future<void> _listViewListener() async {
     if (_isLoadingNewPage) return;
     if (_listViewController.position.pixels >=
