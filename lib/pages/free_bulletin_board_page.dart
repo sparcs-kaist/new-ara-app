@@ -34,6 +34,7 @@ class _FreeBulletinBoardPageState extends State<FreeBulletinBoardPage> {
   bool isLoading = true;
   String apiUrl = "";
   String _boardName = "";
+  bool _isLoadingNextPage = false;
   final ScrollController _scrollController = ScrollController();
 
   @override
@@ -113,11 +114,18 @@ class _FreeBulletinBoardPageState extends State<FreeBulletinBoardPage> {
   // 스크롤 리스너 함수. 스크롤이 끝에 도달하면 추가 데이터를 로드
   void _scrollListener() async {
     var userProvider = context.read<UserProvider>();
-    if (_scrollController.position.pixels ==
-        _scrollController.position.maxScrollExtent) {
+
+    if (_scrollController.position.pixels >=
+            _scrollController.position.maxScrollExtent &&
+        _isLoadingNextPage == false) {
+      setState(() {
+        _isLoadingNextPage = true;
+      });
+
       currentPage = currentPage + 1;
       // api 호출과 Provider 정보 동기화.
       // await Future.delayed(Duration(seconds: 1));
+      // TODO: try catch로 감싸기
       Map<String, dynamic>? myMap =
           await userProvider.getApiRes("$apiUrl$currentPage");
       if (mounted) {
@@ -134,6 +142,7 @@ class _FreeBulletinBoardPageState extends State<FreeBulletinBoardPage> {
             }
           }
           isLoading = false;
+          _isLoadingNextPage = false;
         });
       }
     }
@@ -255,34 +264,48 @@ class _FreeBulletinBoardPageState extends State<FreeBulletinBoardPage> {
               child: Center(
                 child: SizedBox(
                   width: MediaQuery.of(context).size.width - 18,
-                  child: ListView.builder(
+                  child: ListView.separated(
                     controller: _scrollController,
-                    itemCount: postPreviewList.length, // 아이템 개수
+                    itemCount: postPreviewList.length +
+                        (_isLoadingNextPage ? 1 : 0), // 아이템 개수
                     itemBuilder: (BuildContext context, int index) {
                       // 각 아이템을 위한 위젯 생성
-                      // 숨겨진 게시물이면 일단 표현 안하는 걸로 함.
-                      return postPreviewList[index].is_hidden
-                          ? Container()
-                          : InkWell(
-                              onTap: () async {
-                                await Navigator.of(context).push(slideRoute(
-                                    PostViewPage(
-                                        id: postPreviewList[index].id)));
-                                updateAllBulletinList();
-                              },
-                              child: Column(
-                                children: [
-                                  Padding(
-                                    padding: const EdgeInsets.all(11.0),
-                                    child: PostPreview(
-                                        model: postPreviewList[index]),
-                                  ),
-                                  Container(
-                                    height: 1,
-                                    color: const Color(0xFFF0F0F0),
-                                  ),
-                                ],
-                              ));
+                      if (_isLoadingNextPage &&
+                          index == postPreviewList.length) {
+                        return Container(
+                          height: 50,
+                          child: Center(
+                            child: LoadingIndicator(),
+                          ),
+                        );
+                      } else {
+                        // 숨겨진 게시물이면 일단 표현 안하는 걸로 함.
+                        return postPreviewList[index].is_hidden
+                            ? Container()
+                            : InkWell(
+                                onTap: () async {
+                                  await Navigator.of(context).push(slideRoute(
+                                      PostViewPage(
+                                          id: postPreviewList[index].id)));
+                                  updateAllBulletinList();
+                                },
+                                child: Column(
+                                  children: [
+                                    Padding(
+                                      padding: const EdgeInsets.all(11.0),
+                                      child: PostPreview(
+                                          model: postPreviewList[index]),
+                                    ),
+                                  ],
+                                ),
+                              );
+                      }
+                    },
+                    separatorBuilder: (BuildContext context, int index) {
+                      return Container(
+                        height: 1,
+                        color: const Color(0xFFF0F0F0),
+                      );
                     },
                   ),
                 ),
