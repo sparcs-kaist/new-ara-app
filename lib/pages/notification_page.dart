@@ -91,7 +91,7 @@ class _NotificationPageState extends State<NotificationPage> {
   // TODO: Future<void>로 변경 (Resolved)
   Future<void> _listViewListener() async {
     if (_isLoadingNewPage) return;
-    if (_listViewController.position.pixels ==
+    if (_listViewController.position.pixels >=
         _listViewController.position.maxScrollExtent) {
       _setIsLoadingNewPage(true);
       bool hasNext = true;

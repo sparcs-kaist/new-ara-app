@@ -70,7 +70,7 @@ class _UserViewPageState extends State<UserViewPage> {
     if (!_isLoadingNewPage) {
       // 사용자가 최대로 스크롤한 경우
       if (_isLoaded &&
-          _listViewController.position.pixels ==
+          _listViewController.position.pixels >=
               _listViewController.position.maxScrollExtent) {
         _setIsLoadingNewPage(true);
         UserProvider userProvider = context.read<UserProvider>();

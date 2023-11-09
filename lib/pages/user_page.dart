@@ -121,7 +121,7 @@ class _UserPageState extends State<UserPage>
     if (!isLoadingNextPage[tabType.index]) {
       // 사용자가 최대로 스크롤 한 경우
       if (isLoadedList[tabType.index] &&
-          scrollControllerList[tabType.index].position.pixels ==
+          scrollControllerList[tabType.index].position.pixels >=
               scrollControllerList[tabType.index].position.maxScrollExtent) {
         setIsLoadingNewPage(tabType, true);
         bool fetchRes = await fetchArticles(
