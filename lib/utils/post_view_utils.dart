@@ -121,8 +121,8 @@ class ArticleController {
 
   /// 전달받은 id에 해당하는 글을 삭제하는 메서드.
   /// 삭제가 정상적으로 완료되면 true, 아니면 false 반환.
-  Future<bool> delete(int id) async {
-    String apiUrl = "$newAraDefaultUrl/api/articles/$id/";
+  Future<bool> delete() async {
+    String apiUrl = "$newAraDefaultUrl/api/articles/${model.id}/";
     try {
       await userProvider.myDio().delete(apiUrl);
       return true;

@@ -513,7 +513,7 @@ class _PostViewPageState extends State<PostViewPage> {
   }
 
   // TODO: 버튼 세부적인 다지인(아이콘 종류, 크기 등등) 조정 필요
-  
+
   /// 담아두기, 공유, 신고 버튼 빌드를 담당하며 빌드된 위젯을 리턴.
   /// _article 클래스 전역변수를 사용함.
   Widget _buildUtilityButtons(UserProvider userProvider) {
@@ -652,7 +652,27 @@ class _PostViewPageState extends State<PostViewPage> {
               )
             else // 자신의 글
               InkWell(
-                onTap: null,
+                onTap: () {
+                  showDialog(
+                    context: context,
+                    builder: (context) =>
+                      DeleteDialog(
+                        targetID: -1,
+                        userProvider: userProvider,
+                        targetContext: context,
+                        onTap: () {
+                          ArticleController(model: _article, userProvider: userProvider).delete().then((res) {
+                            // Dialog의 context에서 pop
+                            Navigator.pop(context);
+                            // DELETE 성공 시 PostViewPage의 context에서 pop
+                            if (res == true) {
+                              Navigator.pop(context);
+                            }
+                          });
+                        },
+                      )
+                  );
+                },
                 child: Container(
                   width: 65,
                   height: 40,
