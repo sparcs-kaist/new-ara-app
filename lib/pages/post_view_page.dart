@@ -412,8 +412,12 @@ class _PostViewPageState extends State<PostViewPage> {
             ),
             child: ClipRRect(
               borderRadius: const BorderRadius.all(Radius.circular(100)),
-              child:
-                  Image.network(_article.created_by.profile.picture.toString()),
+              child: SizedBox.fromSize(
+                size: const Size.fromRadius(48),
+                child: Image.network(
+                    fit: BoxFit.cover,
+                    _article.created_by.profile.picture.toString()),
+              ),
             ),
           ),
           const SizedBox(width: 10),
@@ -654,23 +658,25 @@ class _PostViewPageState extends State<PostViewPage> {
               InkWell(
                 onTap: () {
                   showDialog(
-                    context: context,
-                    builder: (context) =>
-                      DeleteDialog(
-                        userProvider: userProvider,
-                        targetContext: context,
-                        onTap: () {
-                          ArticleController(model: _article, userProvider: userProvider).delete().then((res) {
-                            // Dialog의 context에서 pop
-                            Navigator.pop(context);
-                            // DELETE 성공 시 PostViewPage의 context에서 pop
-                            if (res == true) {
-                              Navigator.pop(context);
-                            }
-                          });
-                        },
-                      )
-                  );
+                      context: context,
+                      builder: (context) => DeleteDialog(
+                            userProvider: userProvider,
+                            targetContext: context,
+                            onTap: () {
+                              ArticleController(
+                                      model: _article,
+                                      userProvider: userProvider)
+                                  .delete()
+                                  .then((res) {
+                                // Dialog의 context에서 pop
+                                Navigator.pop(context);
+                                // DELETE 성공 시 PostViewPage의 context에서 pop
+                                if (res == true) {
+                                  Navigator.pop(context);
+                                }
+                              });
+                            },
+                          ));
                 },
                 child: Container(
                   width: 65,
@@ -837,9 +843,17 @@ class _PostViewPageState extends State<PostViewPage> {
                               child: ClipRRect(
                                 borderRadius: const BorderRadius.all(
                                     Radius.circular(100)),
-                                child: Image.network(curComment
-                                    .created_by.profile.picture
-                                    .toString()),
+                                child: ClipRRect(
+                                  borderRadius: const BorderRadius.all(
+                                      Radius.circular(100)),
+                                  child: SizedBox.fromSize(
+                                    size: const Size.fromRadius(48),
+                                    child: Image.network(
+                                        fit: BoxFit.cover,
+                                        curComment.created_by.profile.picture
+                                            .toString()),
+                                  ),
+                                ),
                               ),
                             ),
                             const SizedBox(width: 5),
