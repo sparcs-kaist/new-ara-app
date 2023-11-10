@@ -657,7 +657,6 @@ class _PostViewPageState extends State<PostViewPage> {
                     context: context,
                     builder: (context) =>
                       DeleteDialog(
-                        targetID: -1,
                         userProvider: userProvider,
                         targetContext: context,
                         onTap: () {
@@ -897,7 +896,6 @@ class _PostViewPageState extends State<PostViewPage> {
                                             context: context,
                                             builder: (context) {
                                               return DeleteDialog(
-                                                targetID: curComment.id,
                                                 userProvider: userProvider,
                                                 targetContext: context,
                                                 onTap: () {
