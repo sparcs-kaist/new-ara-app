@@ -120,8 +120,9 @@ class _UserPageState extends State<UserPage>
     // 이미 다음 페이지를 로딩하는 경우를 제외
     if (!isLoadingNextPage[tabType.index]) {
       // 사용자가 최대로 스크롤 한 경우
+      // TODO: 마지막 페이지에 도달했을 때 스크롤 안되게 하기
       if (isLoadedList[tabType.index] &&
-          scrollControllerList[tabType.index].position.pixels ==
+          scrollControllerList[tabType.index].position.pixels >=
               scrollControllerList[tabType.index].position.maxScrollExtent) {
         setIsLoadingNewPage(tabType, true);
         bool fetchRes = await fetchArticles(
