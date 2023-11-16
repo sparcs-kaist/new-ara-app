@@ -231,11 +231,8 @@ class _ReportDialogState extends State<ReportDialog> {
   }
 }
 
-// TODO: 글 삭제 지원
 /// PostViewPage의 댓글 삭제 기능에 사용되는 Dialog
 class DeleteDialog extends StatelessWidget {
-  /// 삭제되는 글/댓글의 id
-  final int targetID;
   final UserProvider userProvider;
   /// PostViewPage의 context. 
   final BuildContext targetContext;
@@ -244,7 +241,6 @@ class DeleteDialog extends StatelessWidget {
 
   const DeleteDialog({
     super.key,
-    required this.targetID,
     required this.userProvider,
     required this.targetContext,
     required this.onTap,
@@ -270,7 +266,7 @@ class DeleteDialog extends StatelessWidget {
               color: ColorsInfo.newara,
             ),
             const Text(
-              '정말로 이 댓글을 삭제하시겠습니까?',
+              '정말로 삭제하시겠습니까?',
               style: TextStyle(
                 fontSize: 17,
                 fontWeight: FontWeight.w700,
