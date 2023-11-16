@@ -138,29 +138,19 @@ ${_apiUrl}1&main_search__contains=${_searchWord}
     return Scaffold(
       appBar: AppBar(
         centerTitle: false,
-        leadingWidth: 100,
-        leading: Row(
-          children: [
-            SizedBox(
+        leading: Padding(
+          padding: const EdgeInsets.fromLTRB(1, 10.5, 4, 10.5),
+          child: Align(
+            alignment: Alignment.centerLeft,
+            child: SizedBox(
               width: 35,
-              child: IconButton(
+              height: 35,
+              child: SvgPicture.asset(
+                'assets/icons/left_chevron.svg',
                 color: ColorsInfo.newara,
-                icon: SizedBox(
-                  width: 11.58,
-                  height: 21.87,
-                  child: SvgPicture.asset(
-                    'assets/icons/left_chevron.svg',
-                    color: ColorsInfo.newara,
-                    fit: BoxFit.fill,
-                  ),
-                ),
-                onPressed: () {
-                  Navigator.pop(context);
-                },
               ),
             ),
-            // Expanded(child: TextField()),
-          ],
+          ),
         ),
         actions: [
           SizedBox(
