@@ -9,6 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
 
 import 'package:new_ara_app/constants/url_info.dart';
+import 'package:new_ara_app/utils/create_dio_with_config.dart';
 
 /// 새로운 알림 여부를 알려주는 ChangeNotifier.
 /// 알림 생성 여부가 필요한 다양한 위젯에 활용하기 위해 ChangeNotifier로 구현함.
@@ -38,7 +39,7 @@ class NotificationProvider with ChangeNotifier {
   Future<void> checkIsNotReadExist() async {
     bool res = false;
 
-    var dio = Dio()..options.headers["Cookie"] = _cookieString;
+    Dio dio = createDioWithConfig()..options.headers["Cookie"] = _cookieString;
 
     int curPage = 1;
 

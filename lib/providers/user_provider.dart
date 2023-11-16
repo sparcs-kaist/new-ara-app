@@ -5,6 +5,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:new_ara_app/constants/url_info.dart';
 import 'package:new_ara_app/models/user_profile_model.dart';
+import 'package:new_ara_app/utils/create_dio_with_config.dart';
 import 'package:webview_cookie_manager/webview_cookie_manager.dart';
 
 /// `UserProvider`는 사용자 정보 및 연관된 API 로직을 관리하는 클래스입니다.
@@ -100,7 +101,7 @@ class UserProvider with ChangeNotifier {
   Dio myDio({String? initCookieString}) {
     String cookieString = initCookieString ?? getCookiesToString();
 
-    var dio = Dio();
+    Dio dio = createDioWithConfig();
     dio.options.headers['Cookie'] = cookieString;
 
     return dio;
@@ -112,7 +113,7 @@ class UserProvider with ChangeNotifier {
     String cookieString = initCookieString ?? getCookiesToString();
     var totUrl = "$newAraDefaultUrl/api/$apiUrl";
 
-    var dio = Dio();
+    Dio dio = createDioWithConfig();
     dio.options.headers['Cookie'] = cookieString;
 
     late dynamic response;
@@ -135,7 +136,7 @@ class UserProvider with ChangeNotifier {
     String cookieString = initCookieString ?? getCookiesToString();
     String totUrl = "$newAraDefaultUrl/api/$apiUrl";
 
-    var dio = Dio();
+    Dio dio = createDioWithConfig();
     dio.options.headers['Cookie'] = cookieString;
 
     late dynamic response;
@@ -152,7 +153,7 @@ class UserProvider with ChangeNotifier {
     String cookieString = initCookieString ?? getCookiesToString();
     String totUrl = "$newAraDefaultUrl/api/$apiUrl";
 
-    var dio = Dio();
+    Dio dio = createDioWithConfig();
     dio.options.headers['Cookie'] = cookieString;
 
     late dynamic response;
@@ -169,7 +170,7 @@ class UserProvider with ChangeNotifier {
     String cookieString = initCookieString ?? getCookiesToString();
     String totUrl = "$newAraDefaultUrl/api/$apiUrl";
 
-    var dio = Dio();
+    Dio dio = createDioWithConfig();
     dio.options.headers['Cookie'] = cookieString;
 
     late dynamic response;

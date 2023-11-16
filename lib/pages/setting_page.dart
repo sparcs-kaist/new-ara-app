@@ -7,6 +7,7 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:new_ara_app/constants/url_info.dart';
 import 'package:new_ara_app/providers/user_provider.dart';
+import 'package:new_ara_app/utils/create_dio_with_config.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:dio/dio.dart';
@@ -48,7 +49,7 @@ class SettingPageState extends State<SettingPage> {
   Widget build(BuildContext context) {
     var userProvider = context.watch<UserProvider>();
 
-    var dio = Dio();
+    Dio dio = createDioWithConfig();
     dio.options.headers['Cookie'] = userProvider.getCookiesToString();
 
     return Scaffold(
