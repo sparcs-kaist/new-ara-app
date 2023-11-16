@@ -18,17 +18,17 @@ import 'package:new_ara_app/providers/notification_provider.dart';
 /// FreeBulletinBoardPage는 게시판 목록를 나타내는 위젯.
 /// boardType에 따라 게시판의 종류를 판별하고, 특성화 된 위젯들을 활성화 비활성화 되도록 설계.
 /// 모든 게시물 목록 형태가 유사하기에 최대한 코드를 재할용.
-class FreeBulletinBoardPage extends StatefulWidget {
+class PostListShowPage extends StatefulWidget {
   final BoardDetailActionModel? boardInfo;
   final BoardType boardType;
-  const FreeBulletinBoardPage(
+  const PostListShowPage(
       {super.key, required this.boardType, required this.boardInfo});
 
   @override
-  State<FreeBulletinBoardPage> createState() => _FreeBulletinBoardPageState();
+  State<PostListShowPage> createState() => _PostListShowPageState();
 }
 
-class _FreeBulletinBoardPageState extends State<FreeBulletinBoardPage> {
+class _PostListShowPageState extends State<PostListShowPage> {
   List<ArticleListActionModel> postPreviewList = [];
   int currentPage = 1;
   bool isLoading = true;
@@ -130,6 +130,7 @@ class _FreeBulletinBoardPageState extends State<FreeBulletinBoardPage> {
           await userProvider.getApiRes("$apiUrl$currentPage");
       if (mounted) {
         setState(() {
+          //TODO: 더 불러올 자료가 없으면 막기. 현재 에러남.
           for (int i = 0; i < (myMap!["results"].length ?? 0); i++) {
             //???/
             if (myMap["results"][i]["created_by"]["profile"] != null) {

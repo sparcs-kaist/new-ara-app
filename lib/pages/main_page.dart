@@ -7,7 +7,7 @@ import 'package:provider/provider.dart';
 import 'package:new_ara_app/constants/board_type.dart';
 import 'package:new_ara_app/constants/colors_info.dart';
 import 'package:new_ara_app/models/board_detail_action_model.dart';
-import 'package:new_ara_app/pages/free_bulletin_board_page.dart';
+import 'package:new_ara_app/pages/post_list_show_page.dart';
 import 'package:new_ara_app/pages/post_write_page.dart';
 import 'package:new_ara_app/providers/user_provider.dart';
 import 'package:new_ara_app/widgets/loading_indicator.dart';
@@ -308,7 +308,7 @@ class _MainPageState extends State<MainPage> {
                         () {
                           //잠시 free_bulletin_board 들 테스트 하기 위한
                           Navigator.of(context)
-                              .push(slideRoute(const FreeBulletinBoardPage(
+                              .push(slideRoute(const PostListShowPage(
                             boardType: BoardType.top,
                             boardInfo: null,
                           )));
@@ -392,7 +392,7 @@ class _MainPageState extends State<MainPage> {
                             InkWell(
                               onTap: () {
                                 Navigator.of(context)
-                                    .push(slideRoute(FreeBulletinBoardPage(
+                                    .push(slideRoute(PostListShowPage(
                                   boardType: BoardType.free,
                                   // TODO: 포탈 공지가 boardList[0]가 아닐 수도 있다. slug로 확인해야 한다.
                                   boardInfo: boardList[0],
@@ -495,7 +495,7 @@ class _MainPageState extends State<MainPage> {
                             InkWell(
                               onTap: () {
                                 Navigator.of(context)
-                                    .push(slideRoute(FreeBulletinBoardPage(
+                                    .push(slideRoute(PostListShowPage(
                                   boardType: BoardType.free,
                                   // TODO: 입주 업체가 boardList[7]가 아닐 수도 있다. slug로 확인해야 한다.
                                   boardInfo: boardList[7],
@@ -552,7 +552,7 @@ class _MainPageState extends State<MainPage> {
                             InkWell(
                               onTap: () {
                                 Navigator.of(context)
-                                    .push(slideRoute(FreeBulletinBoardPage(
+                                    .push(slideRoute(PostListShowPage(
                                   boardType: BoardType.free,
                                   // TODO: 뉴아라가 boardList[11]가 아닐 수도 있다. slug로 확인해야 한다.
                                   boardInfo: boardList[11],
@@ -606,8 +606,7 @@ class _MainPageState extends State<MainPage> {
                       ),
                       const SizedBox(height: 10),
                       MainPageTextButton('main_page.stu_community', () {
-                        Navigator.of(context)
-                            .push(slideRoute(FreeBulletinBoardPage(
+                        Navigator.of(context).push(slideRoute(PostListShowPage(
                           boardType: BoardType.free,
                           // TODO: 원총이 boardList[1]가 아닐 수도 있다. slug로 확인해야 한다.
                           boardInfo: boardList[1],

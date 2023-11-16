@@ -6,7 +6,7 @@ import 'package:provider/provider.dart';
 
 import 'package:new_ara_app/constants/board_type.dart';
 import 'package:new_ara_app/constants/colors_info.dart';
-import 'package:new_ara_app/pages/free_bulletin_board_page.dart';
+import 'package:new_ara_app/pages/post_list_show_page.dart';
 import 'package:new_ara_app/providers/user_provider.dart';
 import 'package:new_ara_app/widgets/loading_indicator.dart';
 import 'package:new_ara_app/models/board_detail_action_model.dart';
@@ -154,7 +154,7 @@ class _BulletinListPageState extends State<BulletinListPage> {
                           /// 전체 보기 클릭 시
                           onTap: () {
                             Navigator.of(context).push(slideRoute(
-                                FreeBulletinBoardPage(
+                                PostListShowPage(
                                     boardType: BoardType.all,
                                     boardInfo: null)));
                           },
@@ -194,7 +194,7 @@ class _BulletinListPageState extends State<BulletinListPage> {
                           /// 인기글 클릭 시
                           onTap: () {
                             Navigator.of(context).push(slideRoute(
-                                FreeBulletinBoardPage(
+                                PostListShowPage(
                                     boardType: BoardType.top,
                                     boardInfo: null)));
                           },
@@ -234,7 +234,7 @@ class _BulletinListPageState extends State<BulletinListPage> {
                           /// 스크랩 클릭 시
                           onTap: () {
                             Navigator.of(context).push(slideRoute(
-                                FreeBulletinBoardPage(
+                                PostListShowPage(
                                     boardType: BoardType.scraps,
                                     boardInfo: null)));
                           },
@@ -285,7 +285,7 @@ class _BulletinListPageState extends State<BulletinListPage> {
                         InkWell(
                             onTap: () {
                               Navigator.of(context).push(slideRoute(
-                                  FreeBulletinBoardPage(
+                                  PostListShowPage(
                                       boardType: BoardType.free,
                                       boardInfo: boardsByGroup[2][0])));
                             },
@@ -394,9 +394,8 @@ class BoardExpansionTile extends StatelessWidget {
                   ),
                   InkWell(
                     onTap: () {
-                      Navigator.of(context).push(slideRoute(
-                          FreeBulletinBoardPage(
-                              boardType: BoardType.free, boardInfo: model)));
+                      Navigator.of(context).push(slideRoute(PostListShowPage(
+                          boardType: BoardType.free, boardInfo: model)));
                     },
                     child: Text(
                       model.ko_name,
