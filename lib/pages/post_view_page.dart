@@ -656,8 +656,8 @@ class _PostViewPageState extends State<PostViewPage> {
               )
             else // 자신의 글
               InkWell(
-                onTap: () {
-                  showDialog(
+                onTap: () async {
+                  await showDialog(
                       context: context,
                       builder: (context) => DeleteDialog(
                             userProvider: userProvider,
@@ -668,11 +668,17 @@ class _PostViewPageState extends State<PostViewPage> {
                                       userProvider: userProvider)
                                   .delete()
                                   .then((res) {
-                                // Dialog의 context에서 pop
-                                Navigator.pop(context);
-                                // DELETE 성공 시 PostViewPage의 context에서 pop
-                                if (res == true) {
+                                // 사용자가 미리 뒤로가기 버튼을 누르는 경우 에러 방지를 위해
+                                // try-catch 문을 도입함.
+                                try {
+                                  // dialog pop
                                   Navigator.pop(context);
+                                  if (res == true) {
+                                    // PostViewPage pop
+                                    Navigator.pop(context);
+                                  }
+                                } catch (error) {
+                                  debugPrint("pop error: $error");
                                 }
                               });
                             },
