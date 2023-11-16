@@ -266,7 +266,7 @@ class SettingPageState extends State<SettingPage> {
                   SizedBox(
                     width: MediaQuery.of(context).size.width - 60,
                     child: GestureDetector(
-                      onTap: () {}, // (2023.09.15) 추후에 기능 구현 예정
+                      onTap: () {}, // TODO: (2023.09.15) 추후에 기능 구현 예정
                       child: Center(
                         child: Text(
                           'setting_page.blocked_users'.tr(),
