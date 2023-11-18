@@ -264,25 +264,29 @@ class _MainPageState extends State<MainPage> {
           IconButton(
             icon: SvgPicture.asset(
               'assets/icons/post.svg',
-              color: ColorsInfo.newara,
+              colorFilter:
+                  const ColorFilter.mode(ColorsInfo.newara, BlendMode.srcIn),
               width: 35,
               height: 35,
             ),
             onPressed: () async {
-              await Navigator.of(context).push(slideRoute(PostWritePage()));
+              await Navigator.of(context)
+                  .push(slideRoute(const PostWritePage()));
             },
           ),
           IconButton(
             icon: SvgPicture.asset(
               'assets/icons/search.svg',
-              color: ColorsInfo.newara,
+              colorFilter:
+                  const ColorFilter.mode(ColorsInfo.newara, BlendMode.srcIn),
               width: 35,
               height: 35,
             ),
             onPressed: () async {
               debugPrint("BulletinSearch");
-              await Navigator.of(context).push(slideRoute(BulletinSearchPage(
-                  boardType: BoardType.all, boardInfo: null)));
+              await Navigator.of(context).push(slideRoute(
+                  const BulletinSearchPage(
+                      boardType: BoardType.all, boardInfo: null)));
             },
           ),
         ],
@@ -424,7 +428,8 @@ class _MainPageState extends State<MainPage> {
                                   ),
                                   SvgPicture.asset(
                                     'assets/icons/right_chevron.svg',
-                                    color: const Color(0xFF1F4899),
+                                    colorFilter: const ColorFilter.mode(
+                                        Color(0xFF1F4899), BlendMode.srcIn),
                                     fit: BoxFit.fill,
                                     width: 17,
                                     height: 17,
@@ -516,7 +521,8 @@ class _MainPageState extends State<MainPage> {
                                   ),
                                   SvgPicture.asset(
                                     'assets/icons/right_chevron.svg',
-                                    color: const Color(0xFF646464),
+                                    colorFilter: const ColorFilter.mode(
+                                        Color(0xFF646464), BlendMode.srcIn),
                                     fit: BoxFit.fill,
                                     width: 17,
                                     height: 17,
@@ -573,7 +579,8 @@ class _MainPageState extends State<MainPage> {
                                   ),
                                   SvgPicture.asset(
                                     'assets/icons/right_chevron.svg',
-                                    color: const Color(0xFFED3A3A),
+                                    colorFilter: const ColorFilter.mode(
+                                        Color(0xFFED3A3A), BlendMode.srcIn),
                                     fit: BoxFit.fill,
                                     width: 17,
                                     height: 17,
@@ -757,10 +764,8 @@ class PopularBoard extends StatelessWidget {
   final ArticleListActionModel model;
   final int boardNum;
 
-  PopularBoard(
-      {super.key, required ArticleListActionModel model, int ingiNum = 1})
-      : model = model,
-        boardNum = ingiNum;
+  const PopularBoard({super.key, required this.model, int ingiNum = 1})
+      : boardNum = ingiNum;
 
   @override
   Widget build(BuildContext context) {
@@ -829,7 +834,8 @@ class MainPageTextButton extends StatelessWidget {
                 ),
                 SvgPicture.asset(
                   'assets/icons/right_chevron.svg',
-                  color: Colors.black,
+                  colorFilter:
+                      const ColorFilter.mode(Colors.black, BlendMode.srcIn),
                   width: 22,
                   height: 22,
                 ),
