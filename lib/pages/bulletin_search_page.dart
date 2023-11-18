@@ -160,6 +160,7 @@ ${_apiUrl}1&main_search__contains=${_searchWord}
               child: TextField(
                 minLines: 1,
                 maxLines: 1,
+                
                 focusNode: _focusNode,
                 textInputAction: TextInputAction.search,
                 onSubmitted: (String text) {
@@ -171,35 +172,37 @@ ${_apiUrl}1&main_search__contains=${_searchWord}
                 },
                 style: const TextStyle(
                   height: 1,
-                  fontSize: 16,
+                  fontSize: 14,
                   fontWeight: FontWeight.w500,
+
+
                 ),
                 decoration: InputDecoration(
                   prefixIconConstraints:
-                      const BoxConstraints(maxHeight: 28, maxWidth: 28),
-                  prefixIcon: SizedBox(
-                    // 원하는 세로 크기
-                    child: SvgPicture.asset(
-                      'assets/icons/search.svg',
-                      color: Colors.grey,
-                      fit: BoxFit.contain,
+                      const BoxConstraints(maxHeight: 28, minHeight: 28),
+                  prefixIcon: Padding(
+                    padding: const EdgeInsets.fromLTRB(6.0, 0, 0, 0),
+                    child: SizedBox(
+                      // 원하는 세로 크기
+                      width: 24,
+                      height: 24,
+                      child: SvgPicture.asset(
+                        'assets/icons/search.svg',
+                        color: Color(0xFFBBBBBB),
+                        fit: BoxFit.contain,
+                      ),
                     ),
                   ),
                   hintText: _hintText,
                   hintStyle: const TextStyle(
                     color: Color(0xFFBBBBBB),
-                    fontSize: 16,
+                    fontSize: 14,
                     fontWeight: FontWeight.w500,
                   ),
                   filled: true,
                   fillColor: const Color(0xFFF6F6F6),
-                  isDense: true,
-                  contentPadding: const EdgeInsets.fromLTRB(
-                    10.0,
-                    10.0,
-                    10.0,
-                    10.0,
-                  ), // 모서리를 둥글게 설정
+                  isDense: false,
+                   // 모서리를 둥글게 설정
                   enabledBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(10.0),
                     borderSide: const BorderSide(
