@@ -96,7 +96,7 @@ class _PostListShowPageState extends State<PostListShowPage> {
             if (widget.boardType != BoardType.scraps &&
                 myMap!["results"][i]["created_by"]["profile"] != null) {
               postPreviewList
-                  .add(ArticleListActionModel.fromJson(myMap!["results"][i]));
+                  .add(ArticleListActionModel.fromJson(myMap["results"][i]));
             } else if (widget.boardType == BoardType.scraps) {
               postPreviewList.add(ArticleListActionModel.fromJson(
                   myMap!["results"][i]["parent_article"]));
@@ -154,7 +154,7 @@ class _PostListShowPageState extends State<PostListShowPage> {
     // TODO: void refreshPostList(UserProvider userProvider) async 메소드와 통합하기.
     /// 게시물 클릭하고 다시 돌아올 때 게시물 목록 업데이트 해주는 함수.
     Future<void> updateAllBulletinList() async {
-      List<ArticleListActionModel> _newList = [];
+      List<ArticleListActionModel> newList = [];
       UserProvider userProvider = context.read<UserProvider>();
       for (int j = 1; j <= currentPage; j++) {
         Map<String, dynamic>? json = await userProvider.getApiRes("$apiUrl$j");
@@ -163,11 +163,11 @@ class _PostListShowPageState extends State<PostListShowPage> {
           //???/
           if (widget.boardType != BoardType.scraps &&
               json["results"][i]["created_by"]["profile"] != null) {
-            _newList
+            newList
                 .add(ArticleListActionModel.fromJson(json["results"][i] ?? {}));
           } else if (widget.boardType == BoardType.scraps) {
             // 스크랩 게시물이면
-            _newList.add(ArticleListActionModel.fromJson(
+            newList.add(ArticleListActionModel.fromJson(
                 json["results"][i]["parent_article"] ?? {}));
           }
         }
@@ -175,7 +175,7 @@ class _PostListShowPageState extends State<PostListShowPage> {
       if (mounted) {
         setState(() {
           postPreviewList.clear();
-          postPreviewList = [..._newList];
+          postPreviewList = [...newList];
         });
       }
       return Future.value();
@@ -191,7 +191,8 @@ class _PostListShowPageState extends State<PostListShowPage> {
             children: [
               SvgPicture.asset(
                 'assets/icons/left_chevron.svg',
-                color: ColorsInfo.newara,
+                colorFilter: const ColorFilter.mode(
+                    ColorsInfo.newara, BlendMode.srcATop),
                 fit: BoxFit.fill,
                 width: 35,
                 height: 35,
@@ -221,7 +222,8 @@ class _PostListShowPageState extends State<PostListShowPage> {
           IconButton(
             icon: SvgPicture.asset(
               'assets/icons/search.svg',
-              color: ColorsInfo.newara,
+              colorFilter:
+                  const ColorFilter.mode(ColorsInfo.newara, BlendMode.srcIn),
               width: 35,
               height: 35,
             ),
@@ -239,7 +241,8 @@ class _PostListShowPageState extends State<PostListShowPage> {
         children: [
           FloatingActionButton(
             onPressed: () async {
-              await Navigator.of(context).push(slideRoute(PostWritePage()));
+              await Navigator.of(context)
+                  .push(slideRoute(const PostWritePage()));
               updateAllBulletinList();
               debugPrint('FloatingActionButton pressed');
             },
@@ -250,7 +253,8 @@ class _PostListShowPageState extends State<PostListShowPage> {
               child: SvgPicture.asset(
                 'assets/icons/modify.svg',
                 fit: BoxFit.fill,
-                color: ColorsInfo.newara,
+                colorFilter: const ColorFilter.mode(
+                    ColorsInfo.newara, BlendMode.srcIn), // 글쓰기 아이콘 색상 변경
               ),
             ),
           ),
@@ -273,7 +277,7 @@ class _PostListShowPageState extends State<PostListShowPage> {
                       // 각 아이템을 위한 위젯 생성
                       if (_isLoadingNextPage &&
                           index == postPreviewList.length) {
-                        return Container(
+                        return const SizedBox(
                           height: 50,
                           child: Center(
                             child: LoadingIndicator(),
