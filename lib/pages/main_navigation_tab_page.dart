@@ -58,9 +58,11 @@ class _MainNavigationTabPageState extends State<MainNavigationTabPage> {
   }
 
   void _onItemTapped(int index) {
-    setState(() {
-      _selectedIndex = index;
-    });
+    if (mounted) {
+      setState(() {
+        _selectedIndex = index;
+      });
+    }
   }
 
   /// 하단의 네비게이션 바를 구성하는 함수.
