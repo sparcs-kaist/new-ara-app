@@ -15,9 +15,7 @@ import 'package:new_ara_app/providers/notification_provider.dart';
 
 const boardsByGroupLength = 5;
 
-/// `BulletinListPage`는 게시판 목록을 표시하는 페이지.
-///
-/// 사용자는 이 페이지에서 다양한 게시판을 탐색하고 선택 가능.
+/// `BulletinListPage`는 사용자가 이 페이지에서 다양한 게시판을 탐색하고 선택함..
 class BulletinListPage extends StatefulWidget {
   const BulletinListPage({Key? key}) : super(key: key);
   @override
@@ -32,7 +30,7 @@ class _BulletinListPageState extends State<BulletinListPage> {
   List<List<BoardDetailActionModel>> boardsByGroup =
       List.generate(boardsByGroupLength + 1, (_) => []);
   List<Map<String, dynamic>> textContent = [];
-  FocusNode _focusNode = FocusNode();
+  final FocusNode _focusNode = FocusNode();
 
   @override
   void initState() {
@@ -93,7 +91,7 @@ class _BulletinListPageState extends State<BulletinListPage> {
                           onTap: () async {
                             // TODO: 검색 창 누를 때 실행되는 함수로 나중에 별로도 빼기
                             Navigator.of(context).push(slideRoute(
-                                BulletinSearchPage(
+                                const BulletinSearchPage(
                                     boardType: BoardType.all,
                                     boardInfo: null)));
 
@@ -113,7 +111,8 @@ class _BulletinListPageState extends State<BulletinListPage> {
                               // 원하는 세로 크기
                               child: SvgPicture.asset(
                                 'assets/icons/search.svg',
-                                color: Colors.grey,
+                                colorFilter: const ColorFilter.mode(
+                                    Colors.grey, BlendMode.srcIn),
                                 fit: BoxFit.contain,
                               ),
                             ),
@@ -154,7 +153,7 @@ class _BulletinListPageState extends State<BulletinListPage> {
                           /// 전체 보기 클릭 시
                           onTap: () {
                             Navigator.of(context).push(slideRoute(
-                                PostListShowPage(
+                                const PostListShowPage(
                                     boardType: BoardType.all,
                                     boardInfo: null)));
                           },
@@ -170,7 +169,8 @@ class _BulletinListPageState extends State<BulletinListPage> {
                                   'assets/icons/menu_1.svg',
                                   height: 32,
                                   width: 32,
-                                  color: const Color(0xFFED3A3A),
+                                  colorFilter: const ColorFilter.mode(
+                                      Color(0xFFED3A3A), BlendMode.srcIn),
                                 ),
                                 const SizedBox(
                                   width: 5,
@@ -194,7 +194,7 @@ class _BulletinListPageState extends State<BulletinListPage> {
                           /// 인기글 클릭 시
                           onTap: () {
                             Navigator.of(context).push(slideRoute(
-                                PostListShowPage(
+                                const PostListShowPage(
                                     boardType: BoardType.top,
                                     boardInfo: null)));
                           },
@@ -210,7 +210,8 @@ class _BulletinListPageState extends State<BulletinListPage> {
                                   'assets/icons/star.svg',
                                   height: 32,
                                   width: 32,
-                                  color: const Color(0xFFED3A3A),
+                                  colorFilter: const ColorFilter.mode(
+                                      Color(0xFFED3A3A), BlendMode.srcIn),
                                 ),
                                 const SizedBox(
                                   width: 5,
@@ -234,7 +235,7 @@ class _BulletinListPageState extends State<BulletinListPage> {
                           /// 스크랩 클릭 시
                           onTap: () {
                             Navigator.of(context).push(slideRoute(
-                                PostListShowPage(
+                                const PostListShowPage(
                                     boardType: BoardType.scraps,
                                     boardInfo: null)));
                           },
@@ -250,7 +251,8 @@ class _BulletinListPageState extends State<BulletinListPage> {
                                   'assets/icons/download_2.svg',
                                   height: 32,
                                   width: 32,
-                                  color: const Color(0xFFED3A3A),
+                                  colorFilter: const ColorFilter.mode(
+                                      Color(0xFFED3A3A), BlendMode.srcIn),
                                 ),
                                 const SizedBox(
                                   width: 5,
@@ -301,7 +303,8 @@ class _BulletinListPageState extends State<BulletinListPage> {
                                     'assets/icons/notify.svg',
                                     height: 32,
                                     width: 32,
-                                    color: const Color(0xFF333333),
+                                    colorFilter: const ColorFilter.mode(
+                                        Color(0xFF333333), BlendMode.srcIn),
                                   ),
                                   const SizedBox(
                                     width: 5,
@@ -368,7 +371,8 @@ class BoardExpansionTile extends StatelessWidget {
                   'assets/icons/notify.svg',
                   height: 32,
                   width: 32,
-                  color: const Color(0xFF333333),
+                  colorFilter: const ColorFilter.mode(
+                      Color(0xFF333333), BlendMode.srcIn),
                 ),
                 const SizedBox(
                   width: 5,
