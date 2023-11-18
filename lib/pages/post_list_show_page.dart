@@ -15,7 +15,7 @@ import 'package:new_ara_app/pages/post_view_page.dart';
 import 'package:new_ara_app/utils/slide_routing.dart';
 import 'package:new_ara_app/providers/notification_provider.dart';
 
-/// FreeBulletinBoardPage는 게시판 목록를 나타내는 위젯.
+/// PostListShowPage는 게시판 목록를 나타내는 위젯.
 /// boardType에 따라 게시판의 종류를 판별하고, 특성화 된 위젯들을 활성화 비활성화 되도록 설계.
 /// 모든 게시물 목록 형태가 유사하기에 최대한 코드를 재할용.
 class PostListShowPage extends StatefulWidget {
