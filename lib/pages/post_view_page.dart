@@ -842,6 +842,8 @@ class _PostViewPageState extends State<PostViewPage> {
                               },
                         child: Row(
                           children: [
+                            // 댓글 작성자 프로필 이미지 표시
+                            // 이미지 링크가 null일 경우 회색 바탕으로 표시.
                             Container(
                               width: 25,
                               height: 25,
