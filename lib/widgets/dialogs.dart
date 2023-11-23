@@ -478,6 +478,9 @@ class _BlockedUserDialogState extends State<BlockedUserDialog> {
                                 onTap: () async {
                                   bool unblockRes =
                                       await unblockUser(blockedUser.id);
+                                  // 차단해제 요청이 성공하면 blockModelList에서 유저를 제거함.
+                                  // 차단 해제 중 새로운 차단된 유저가 추가되는 경우가 거의 없다고 판단함.
+                                  // 따라서 차단 유저 목록 refetch는 진행하지 않고 blockedUser만 제거함.
                                   if (unblockRes) {
                                     setState(() {
                                       blockModelList.remove(blockedUser);
