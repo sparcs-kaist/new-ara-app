@@ -433,7 +433,8 @@ class _BlockedUserDialogState extends State<BlockedUserDialog> {
                     child: ListView.separated(
                       itemCount: blockModelList.length,
                       itemBuilder: (context, idx) {
-                        BlockModel blockedUser = blockModelList[idx];
+                        // 변경을 방지하기 위해 final 선언함.
+                        final BlockModel blockedUser = blockModelList[idx];
                         return SizedBox(
                           width: MediaQuery.of(context).size.width - 50,
                           height: 50,
