@@ -403,6 +403,7 @@ class _PostViewPageState extends State<PostViewPage> {
       child: Row(
         children: [
           // 사용자 프로필 사진.
+          // 프로필 이미지 링크가 null일 경우 회색 바탕으로 표시함.
           Container(
             width: 30,
             height: 30,
@@ -410,15 +411,17 @@ class _PostViewPageState extends State<PostViewPage> {
               shape: BoxShape.circle,
               color: Colors.grey,
             ),
-            child: ClipRRect(
-              borderRadius: const BorderRadius.all(Radius.circular(100)),
-              child: SizedBox.fromSize(
-                size: const Size.fromRadius(48),
-                child: Image.network(
-                    fit: BoxFit.cover,
-                    _article.created_by.profile.picture.toString()),
-              ),
-            ),
+            child: _article.created_by.profile.picture == null
+                ? Container()
+                : ClipRRect(
+                    borderRadius: const BorderRadius.all(Radius.circular(100)),
+                    child: SizedBox.fromSize(
+                      size: const Size.fromRadius(30),
+                      child: Image.network(
+                          fit: BoxFit.cover,
+                          _article.created_by.profile.picture!),
+                    ),
+                  ),
           ),
           const SizedBox(width: 10),
           // 사용자 닉네임 텍스트 표시.
@@ -846,21 +849,20 @@ class _PostViewPageState extends State<PostViewPage> {
                                 shape: BoxShape.circle,
                                 color: Colors.grey,
                               ),
-                              child: ClipRRect(
-                                borderRadius: const BorderRadius.all(
-                                    Radius.circular(100)),
-                                child: ClipRRect(
-                                  borderRadius: const BorderRadius.all(
-                                      Radius.circular(100)),
-                                  child: SizedBox.fromSize(
-                                    size: const Size.fromRadius(48),
-                                    child: Image.network(
-                                        fit: BoxFit.cover,
-                                        curComment.created_by.profile.picture
-                                            .toString()),
-                                  ),
-                                ),
-                              ),
+                              child:
+                                  curComment.created_by.profile.picture == null
+                                      ? Container()
+                                      : ClipRRect(
+                                          borderRadius: const BorderRadius.all(
+                                              Radius.circular(100)),
+                                          child: SizedBox.fromSize(
+                                            size: const Size.fromRadius(25),
+                                            child: Image.network(
+                                                fit: BoxFit.cover,
+                                                curComment.created_by.profile
+                                                    .picture!),
+                                          ),
+                                        ),
                             ),
                             const SizedBox(width: 5),
                             Container(
