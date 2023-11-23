@@ -427,7 +427,8 @@ class _PostViewPageState extends State<PostViewPage> {
                       child: SvgPicture.asset(
                         "assets/icons/warning.svg",
                         colorFilter: const ColorFilter.mode(
-                          Colors.black, BlendMode.srcIn,
+                          Colors.black,
+                          BlendMode.srcIn,
                         ),
                         width: 25,
                         height: 25,
@@ -858,7 +859,7 @@ class _PostViewPageState extends State<PostViewPage> {
                         child: Row(
                           children: [
                             // 댓글 작성자 프로필 이미지 표시
-                            // 이미지 링크가 null일 경우 회색 바탕으로 표시.
+                            // 이미지 링크가 null일 경우 warning 아이콘 표시
                             Container(
                               width: 25,
                               height: 25,
@@ -866,20 +867,35 @@ class _PostViewPageState extends State<PostViewPage> {
                                 shape: BoxShape.circle,
                                 color: Colors.grey,
                               ),
-                              child:
-                                  curComment.created_by.profile.picture == null
-                                      ? Container()
-                                      : ClipRRect(
-                                          borderRadius: const BorderRadius.all(
-                                              Radius.circular(100)),
-                                          child: SizedBox.fromSize(
-                                            size: const Size.fromRadius(25),
-                                            child: Image.network(
-                                                fit: BoxFit.cover,
-                                                curComment.created_by.profile
-                                                    .picture!),
+                              child: ClipRRect(
+                                borderRadius: const BorderRadius.all(
+                                    Radius.circular(100)),
+                                child: SizedBox.fromSize(
+                                  size: const Size.fromRadius(25),
+                                  child: Image.network(
+                                    fit: BoxFit.cover,
+                                    curComment.created_by.profile.picture ??
+                                        "null",
+                                    // 정상적인 이미지 로드에 실패했을 경우
+                                    // warning 아이콘 표시하기
+                                    errorBuilder: (BuildContext context,
+                                        Object error, StackTrace? stackTrace) {
+                                      debugPrint("$error");
+                                      return SizedBox(
+                                        child: SvgPicture.asset(
+                                          "assets/icons/warning.svg",
+                                          colorFilter: const ColorFilter.mode(
+                                            Colors.black,
+                                            BlendMode.srcIn,
                                           ),
+                                          width: 20,
+                                          height: 20,
                                         ),
+                                      );
+                                    },
+                                  ),
+                                ),
+                              ),
                             ),
                             const SizedBox(width: 5),
                             Container(
