@@ -850,8 +850,8 @@ class _PostViewPageState extends State<PostViewPage> {
                             ? null
                             : () {
                                 Navigator.of(context).push(slideRoute(
-                                  UserViewPage(userID: curComment.created_by.id)
-                                ));
+                                    UserViewPage(
+                                        userID: curComment.created_by.id)));
                               },
                         child: Row(
                           children: [
