@@ -411,17 +411,32 @@ class _PostViewPageState extends State<PostViewPage> {
               shape: BoxShape.circle,
               color: Colors.grey,
             ),
-            child: _article.created_by.profile.picture == null
-                ? Container()
-                : ClipRRect(
-                    borderRadius: const BorderRadius.all(Radius.circular(100)),
-                    child: SizedBox.fromSize(
-                      size: const Size.fromRadius(30),
-                      child: Image.network(
-                          fit: BoxFit.cover,
-                          _article.created_by.profile.picture!),
-                    ),
-                  ),
+            child: ClipRRect(
+              borderRadius: const BorderRadius.all(Radius.circular(100)),
+              child: SizedBox.fromSize(
+                size: const Size.fromRadius(30),
+                child: Image.network(
+                  fit: BoxFit.cover,
+                  _article.created_by.profile.picture ?? "null",
+                  // 정상적인 이미지 로드에 실패했을 경우
+                  // warning 아이콘 표시하기
+                  errorBuilder: (BuildContext context, Object error,
+                      StackTrace? stackTrace) {
+                    debugPrint("$error");
+                    return SizedBox(
+                      child: SvgPicture.asset(
+                        "assets/icons/warning.svg",
+                        colorFilter: const ColorFilter.mode(
+                          Colors.black, BlendMode.srcIn,
+                        ),
+                        width: 25,
+                        height: 25,
+                      ),
+                    );
+                  },
+                ),
+              ),
+            ),
           ),
           const SizedBox(width: 10),
           // 사용자 닉네임 텍스트 표시.
