@@ -261,7 +261,7 @@ class _UserPageState extends State<UserPage>
       child: Row(
         children: [
           // 사용자 프로필 표시
-          // 사용자 프로필 링크가 null일 경우 회색바탕으로 표시
+          // 사용자 프로필 링크가 null일 경우 warning 아이콘 표시
           Container(
             width: 50,
             height: 50,
@@ -269,16 +269,33 @@ class _UserPageState extends State<UserPage>
               shape: BoxShape.circle,
               color: Colors.grey,
             ),
-            child: userProvider.naUser!.picture == null
-                ? Container()
-                : ClipRRect(
-                    borderRadius: const BorderRadius.all(Radius.circular(100)),
-                    child: SizedBox.fromSize(
-                      size: const Size.fromRadius(25),
-                      child: Image.network(
-                          fit: BoxFit.cover, userProvider.naUser!.picture!),
-                    ),
-                  ),
+            child: ClipRRect(
+              borderRadius: const BorderRadius.all(Radius.circular(100)),
+              child: SizedBox.fromSize(
+                size: const Size.fromRadius(50),
+                child: Image.network(
+                  fit: BoxFit.cover,
+                  userProvider.naUser!.picture ?? "null",
+                  // 정상적인 이미지 로드에 실패했을 경우
+                  // warning 아이콘 표시하기
+                  errorBuilder: (BuildContext context, Object error,
+                      StackTrace? stackTrace) {
+                    debugPrint("$error");
+                    return SizedBox(
+                      child: SvgPicture.asset(
+                        "assets/icons/warning.svg",
+                        colorFilter: const ColorFilter.mode(
+                          Colors.black,
+                          BlendMode.srcIn,
+                        ),
+                        width: 45,
+                        height: 45,
+                      ),
+                    );
+                  },
+                ),
+              ),
+            ),
           ),
           const SizedBox(width: 10),
           Expanded(
