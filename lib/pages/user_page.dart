@@ -272,7 +272,7 @@ class _UserPageState extends State<UserPage>
             child: ClipRRect(
               borderRadius: const BorderRadius.all(Radius.circular(100)),
               child: SizedBox.fromSize(
-                size: const Size.fromRadius(50),
+                size: const Size.fromRadius(25),
                 child: Image.network(
                   fit: BoxFit.cover,
                   userProvider.naUser!.picture ?? "null",

@@ -414,7 +414,7 @@ class _PostViewPageState extends State<PostViewPage> {
             child: ClipRRect(
               borderRadius: const BorderRadius.all(Radius.circular(100)),
               child: SizedBox.fromSize(
-                size: const Size.fromRadius(30),
+                size: const Size.fromRadius(15),
                 child: Image.network(
                   fit: BoxFit.cover,
                   _article.created_by.profile.picture ?? "null",
@@ -871,7 +871,7 @@ class _PostViewPageState extends State<PostViewPage> {
                                 borderRadius: const BorderRadius.all(
                                     Radius.circular(100)),
                                 child: SizedBox.fromSize(
-                                  size: const Size.fromRadius(25),
+                                  size: const Size.fromRadius(12.5),
                                   child: Image.network(
                                     fit: BoxFit.cover,
                                     curComment.created_by.profile.picture ??
