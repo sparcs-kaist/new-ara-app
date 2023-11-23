@@ -265,8 +265,10 @@ class SettingPageState extends State<SettingPage> {
                   // 차단한 유저 목록 버튼 구현
                   SizedBox(
                     width: MediaQuery.of(context).size.width - 60,
-                    child: GestureDetector(
-                      onTap: () {}, // TODO: (2023.09.15) 추후에 기능 구현 예정
+                    child: InkWell(
+                      onTap: () {
+
+                      },
                       child: Center(
                         child: Text(
                           'setting_page.blocked_users'.tr(),
