@@ -61,12 +61,14 @@ class UserProvider with ChangeNotifier {
 
   /// /api/me 엔드포인트를 호출하여 사용자 정보를 갱신합니다.
   /// 실패 시 false, 성공 시 true 반환합니다.
-  Future<bool> apiMeUserInfo(
-      {String initCookieString = "", String message = ""}) async {
-    dynamic cookieString = "ㅁ";
+  Future<bool> apiMeUserInfo({
+    String initCookieString = "",
+    String message = "",
+  }) async {
+    String cookieString = "ㅁ";
     String apiUrl = '$newAraDefaultUrl/api/me';
 
-    if (initCookieString == "") {
+    if (initCookieString.isEmpty) {
       cookieString = _loginCookie
           .map((cookie) => '${cookie.name}=${cookie.value}')
           .join('; ');
@@ -74,25 +76,28 @@ class UserProvider with ChangeNotifier {
       cookieString = initCookieString;
     }
 
-    Map<String, String> headers = {
-      'Cookie': cookieString,
-    };
+    var dio = Dio();
+    dio.options.headers['Cookie'] = cookieString;
 
-    http.Response response = await http.get(
-      Uri.parse(apiUrl),
-      headers: headers,
-    );
-    if (response.statusCode == 200) {
-      Map<String, dynamic> responseData =
-          jsonDecode(utf8.decode(response.bodyBytes));
+    try {
+      var response = await dio.get(apiUrl);
 
-      _naUser = UserProfileModel.fromJson(responseData);
-      debugPrint("user_provider.dart($message) : $responseData");
-      notifyListeners();
-      return true;
-    } else {
-      debugPrint(
-          'api/me request failed with status code: ${response.statusCode}');
+      if (response.statusCode == 200) {
+        Map<String, dynamic> responseData = response.data;
+        _naUser = UserProfileModel.fromJson(responseData);
+        debugPrint("user_provider.dart($message) : $responseData");
+        notifyListeners();
+        return true;
+      } else {
+        debugPrint(
+            'api/me request failed with status code: ${response.statusCode}');
+        return false;
+      }
+    } on DioException catch (e) {
+      debugPrint('DioError: ${e.message}');
+      return false;
+    } catch (e) {
+      debugPrint('Unknown error: $e');
       return false;
     }
   }
