@@ -10,13 +10,14 @@ import 'package:new_ara_app/providers/user_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:dio/dio.dart';
+import 'package:webview_cookie_manager/webview_cookie_manager.dart';
 
 import 'package:new_ara_app/constants/colors_info.dart';
 import 'package:new_ara_app/widgets/text_info.dart';
 import 'package:new_ara_app/widgets/border_boxes.dart';
 import 'package:new_ara_app/widgets/text_and_switch.dart';
-import 'package:webview_cookie_manager/webview_cookie_manager.dart';
 import 'package:new_ara_app/providers/notification_provider.dart';
+import 'package:new_ara_app/models/block_model.dart';
 
 /// 설정 페이지 빌드 및 이벤트 처리를 담당하는 StatefulWidget.
 class SettingPage extends StatefulWidget {
@@ -259,29 +260,44 @@ class SettingPageState extends State<SettingPage> {
                   ),
                 ),
                 const SizedBox(height: 7),
-                // 차단한 유저 목록 UI border
-                BorderBoxes(50, [
-                  const SizedBox(height: 13),
-                  // 차단한 유저 목록 버튼 구현
-                  SizedBox(
-                    width: MediaQuery.of(context).size.width - 60,
-                    child: InkWell(
-                      onTap: () {
-
-                      },
-                      child: Center(
-                        child: Text(
-                          'setting_page.blocked_users'.tr(),
-                          style: const TextStyle(
-                            color: ColorsInfo.newara,
-                            fontSize: 16,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                      ),
+                // 차단한 유저 목록 버튼
+                Container(
+                  width: MediaQuery.of(context).size.width - 40,
+                  height: 50,
+                  decoration: BoxDecoration(
+                    borderRadius: const BorderRadius.all(Radius.circular(10)),
+                    border: Border.all(
+                      color: const Color.fromRGBO(240, 240, 240, 1),
                     ),
                   ),
-                ]),
+                  child: InkWell(
+                    onTap: () {
+                      showDialog(
+                        context: context,
+                        builder: (context) => BlockedUserDialog()
+                      );
+                    },
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        const SizedBox(height: 13),
+                        SizedBox(
+                          width: MediaQuery.of(context).size.width - 60,
+                          child: Center(
+                            child: Text(
+                              'setting_page.blocked_users'.tr(),
+                              style: const TextStyle(
+                                color: ColorsInfo.newara,
+                                fontSize: 16,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
                 const SizedBox(height: 5),
                 // 유저 차단 기능 설명 문구
                 TextInfo('setting_page.block_howto'.tr()),
@@ -333,5 +349,19 @@ class SettingPageState extends State<SettingPage> {
     await WebviewCookieManager().clearCookies();
 
     debugPrint("log out success");
+  }
+}
+
+class BlockedUserDialog extends StatefulWidget {
+  const BlockedUserDialog({super.key});
+  @override
+  State<BlockedUserDialog> createState() => _BlockedUserDialogState();
+}
+
+class _BlockedUserDialogState extends State<BlockedUserDialog> {
+  Widget build(BuildContext context) {
+    return Dialog(
+      child: Placeholder(),
+    );
   }
 }
