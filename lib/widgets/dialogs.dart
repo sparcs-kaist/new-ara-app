@@ -237,8 +237,10 @@ class _ReportDialogState extends State<ReportDialog> {
 /// PostViewPage의 댓글 삭제 기능에 사용되는 Dialog
 class DeleteDialog extends StatelessWidget {
   final UserProvider userProvider;
-  /// PostViewPage의 context. 
+
+  /// PostViewPage의 context.
   final BuildContext targetContext;
+
   /// '확인' 버튼을 눌렀을 때 적용되는 onTap 메서드
   final void Function()? onTap;
 
@@ -338,7 +340,6 @@ class DeleteDialog extends StatelessWidget {
         ),
       ),
     );
-  
   }
 }
 
@@ -416,13 +417,13 @@ class _BlockedUserDialogState extends State<BlockedUserDialog> {
                         left: 15, right: 15, top: 5, bottom: 5),
                     child: const Center(
                       child: Text(
-                      "차단한 유저가 없습니다",
-                      style: TextStyle(
-                        color: Colors.black,
-                        fontSize: 15,
-                        fontWeight: FontWeight.w500,
+                        "차단한 유저가 없습니다",
+                        style: TextStyle(
+                          color: Colors.black,
+                          fontSize: 15,
+                          fontWeight: FontWeight.w500,
+                        ),
                       ),
-                    ),
                     ),
                   )
                 : Container(
@@ -440,7 +441,8 @@ class _BlockedUserDialogState extends State<BlockedUserDialog> {
                           height: 50,
                           child: Row(
                             children: [
-                              // 사용자 프로필 이미지 표시(null이 아닌 경우)
+                              // 사용자 프로필 이미지 표시
+                              // 이미지 링크가 null일 경우 warning 아이콘 표시
                               Container(
                                 width: 40,
                                 height: 40,
@@ -448,19 +450,36 @@ class _BlockedUserDialogState extends State<BlockedUserDialog> {
                                   shape: BoxShape.circle,
                                   color: Colors.grey,
                                 ),
-                                child: blockedUser.user.profile.picture == null
-                                    ? Container()
-                                    : ClipRRect(
-                                        borderRadius: const BorderRadius.all(
-                                            Radius.circular(100)),
-                                        child: SizedBox.fromSize(
-                                          size: const Size.fromRadius(40),
-                                          child: Image.network(
-                                              fit: BoxFit.cover,
-                                              blockedUser
-                                                  .user.profile.picture!),
-                                        ),
-                                      ),
+                                child: ClipRRect(
+                                  borderRadius: const BorderRadius.all(
+                                      Radius.circular(100)),
+                                  child: SizedBox.fromSize(
+                                    size: const Size.fromRadius(20),
+                                    child: Image.network(
+                                      fit: BoxFit.cover,
+                                      blockedUser.user.profile.nickname ??
+                                          "null",
+                                      // 정상적인 이미지 로드에 실패했을 경우
+                                      // warning 아이콘 표시하기
+                                      errorBuilder: (BuildContext context,
+                                          Object error,
+                                          StackTrace? stackTrace) {
+                                        debugPrint("$error");
+                                        return SizedBox(
+                                          child: SvgPicture.asset(
+                                            "assets/icons/warning.svg",
+                                            colorFilter: const ColorFilter.mode(
+                                              Colors.black,
+                                              BlendMode.srcIn,
+                                            ),
+                                            width: 35,
+                                            height: 35,
+                                          ),
+                                        );
+                                      },
+                                    ),
+                                  ),
+                                ),
                               ),
                               const SizedBox(width: 20),
                               Expanded(
