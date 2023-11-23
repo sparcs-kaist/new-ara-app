@@ -7,7 +7,7 @@ import 'package:provider/provider.dart';
 import 'package:new_ara_app/constants/board_type.dart';
 import 'package:new_ara_app/constants/colors_info.dart';
 import 'package:new_ara_app/models/board_detail_action_model.dart';
-import 'package:new_ara_app/pages/free_bulletin_board_page.dart';
+import 'package:new_ara_app/pages/post_list_show_page.dart';
 import 'package:new_ara_app/pages/post_write_page.dart';
 import 'package:new_ara_app/providers/user_provider.dart';
 import 'package:new_ara_app/widgets/loading_indicator.dart';
@@ -264,25 +264,29 @@ class _MainPageState extends State<MainPage> {
           IconButton(
             icon: SvgPicture.asset(
               'assets/icons/post.svg',
-              color: ColorsInfo.newara,
+              colorFilter:
+                  const ColorFilter.mode(ColorsInfo.newara, BlendMode.srcIn),
               width: 35,
               height: 35,
             ),
             onPressed: () async {
-              await Navigator.of(context).push(slideRoute(PostWritePage()));
+              await Navigator.of(context)
+                  .push(slideRoute(const PostWritePage()));
             },
           ),
           IconButton(
             icon: SvgPicture.asset(
               'assets/icons/search.svg',
-              color: ColorsInfo.newara,
+              colorFilter:
+                  const ColorFilter.mode(ColorsInfo.newara, BlendMode.srcIn),
               width: 35,
               height: 35,
             ),
             onPressed: () async {
               debugPrint("BulletinSearch");
-              await Navigator.of(context).push(slideRoute(BulletinSearchPage(
-                  boardType: BoardType.all, boardInfo: null)));
+              await Navigator.of(context).push(slideRoute(
+                  const BulletinSearchPage(
+                      boardType: BoardType.all, boardInfo: null)));
             },
           ),
         ],
@@ -308,7 +312,7 @@ class _MainPageState extends State<MainPage> {
                         () {
                           //잠시 free_bulletin_board 들 테스트 하기 위한
                           Navigator.of(context)
-                              .push(slideRoute(const FreeBulletinBoardPage(
+                              .push(slideRoute(const PostListShowPage(
                             boardType: BoardType.top,
                             boardInfo: null,
                           )));
@@ -392,7 +396,7 @@ class _MainPageState extends State<MainPage> {
                             InkWell(
                               onTap: () {
                                 Navigator.of(context)
-                                    .push(slideRoute(FreeBulletinBoardPage(
+                                    .push(slideRoute(PostListShowPage(
                                   boardType: BoardType.free,
                                   // TODO: 포탈 공지가 boardList[0]가 아닐 수도 있다. slug로 확인해야 한다.
                                   boardInfo: boardList[0],
@@ -424,7 +428,8 @@ class _MainPageState extends State<MainPage> {
                                   ),
                                   SvgPicture.asset(
                                     'assets/icons/right_chevron.svg',
-                                    color: const Color(0xFF1F4899),
+                                    colorFilter: const ColorFilter.mode(
+                                        Color(0xFF1F4899), BlendMode.srcIn),
                                     fit: BoxFit.fill,
                                     width: 17,
                                     height: 17,
@@ -495,7 +500,7 @@ class _MainPageState extends State<MainPage> {
                             InkWell(
                               onTap: () {
                                 Navigator.of(context)
-                                    .push(slideRoute(FreeBulletinBoardPage(
+                                    .push(slideRoute(PostListShowPage(
                                   boardType: BoardType.free,
                                   // TODO: 입주 업체가 boardList[7]가 아닐 수도 있다. slug로 확인해야 한다.
                                   boardInfo: boardList[7],
@@ -516,7 +521,8 @@ class _MainPageState extends State<MainPage> {
                                   ),
                                   SvgPicture.asset(
                                     'assets/icons/right_chevron.svg',
-                                    color: const Color(0xFF646464),
+                                    colorFilter: const ColorFilter.mode(
+                                        Color(0xFF646464), BlendMode.srcIn),
                                     fit: BoxFit.fill,
                                     width: 17,
                                     height: 17,
@@ -552,7 +558,7 @@ class _MainPageState extends State<MainPage> {
                             InkWell(
                               onTap: () {
                                 Navigator.of(context)
-                                    .push(slideRoute(FreeBulletinBoardPage(
+                                    .push(slideRoute(PostListShowPage(
                                   boardType: BoardType.free,
                                   // TODO: 뉴아라가 boardList[11]가 아닐 수도 있다. slug로 확인해야 한다.
                                   boardInfo: boardList[11],
@@ -573,7 +579,8 @@ class _MainPageState extends State<MainPage> {
                                   ),
                                   SvgPicture.asset(
                                     'assets/icons/right_chevron.svg',
-                                    color: const Color(0xFFED3A3A),
+                                    colorFilter: const ColorFilter.mode(
+                                        Color(0xFFED3A3A), BlendMode.srcIn),
                                     fit: BoxFit.fill,
                                     width: 17,
                                     height: 17,
@@ -606,8 +613,7 @@ class _MainPageState extends State<MainPage> {
                       ),
                       const SizedBox(height: 10),
                       MainPageTextButton('main_page.stu_community', () {
-                        Navigator.of(context)
-                            .push(slideRoute(FreeBulletinBoardPage(
+                        Navigator.of(context).push(slideRoute(PostListShowPage(
                           boardType: BoardType.free,
                           // TODO: 원총이 boardList[1]가 아닐 수도 있다. slug로 확인해야 한다.
                           boardInfo: boardList[1],
@@ -758,10 +764,8 @@ class PopularBoard extends StatelessWidget {
   final ArticleListActionModel model;
   final int boardNum;
 
-  PopularBoard(
-      {super.key, required ArticleListActionModel model, int ingiNum = 1})
-      : model = model,
-        boardNum = ingiNum;
+  const PopularBoard({super.key, required this.model, int ingiNum = 1})
+      : boardNum = ingiNum;
 
   @override
   Widget build(BuildContext context) {
@@ -830,7 +834,8 @@ class MainPageTextButton extends StatelessWidget {
                 ),
                 SvgPicture.asset(
                   'assets/icons/right_chevron.svg',
-                  color: Colors.black,
+                  colorFilter:
+                      const ColorFilter.mode(Colors.black, BlendMode.srcIn),
                   width: 22,
                   height: 22,
                 ),

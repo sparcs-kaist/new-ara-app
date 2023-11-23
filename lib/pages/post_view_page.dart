@@ -412,8 +412,12 @@ class _PostViewPageState extends State<PostViewPage> {
             ),
             child: ClipRRect(
               borderRadius: const BorderRadius.all(Radius.circular(100)),
-              child:
-                  Image.network(_article.created_by.profile.picture.toString()),
+              child: SizedBox.fromSize(
+                size: const Size.fromRadius(48),
+                child: Image.network(
+                    fit: BoxFit.cover,
+                    _article.created_by.profile.picture.toString()),
+              ),
             ),
           ),
           const SizedBox(width: 10),
@@ -512,6 +516,8 @@ class _PostViewPageState extends State<PostViewPage> {
     );
   }
 
+  // TODO: 버튼 세부적인 다지인(아이콘 종류, 크기 등등) 조정 필요
+
   /// 담아두기, 공유, 신고 버튼 빌드를 담당하며 빌드된 위젯을 리턴.
   /// _article 클래스 전역변수를 사용함.
   Widget _buildUtilityButtons(UserProvider userProvider) {
@@ -531,7 +537,7 @@ class _PostViewPageState extends State<PostViewPage> {
                 });
               },
               child: Container(
-                width: 100,
+                width: 88,
                 height: 40,
                 decoration: BoxDecoration(
                   color: Colors.white,
@@ -549,8 +555,8 @@ class _PostViewPageState extends State<PostViewPage> {
                       const SizedBox(width: 2),
                       SvgPicture.asset(
                         'assets/icons/bookmark.svg',
-                        width: 25,
-                        height: 25,
+                        width: 15,
+                        height: 15,
                         color: _article.my_scrap == null
                             ? const Color.fromRGBO(100, 100, 100, 1)
                             : ColorsInfo.newara,
@@ -562,7 +568,7 @@ class _PostViewPageState extends State<PostViewPage> {
                           color: _article.my_scrap == null
                               ? Colors.black
                               : ColorsInfo.newara,
-                          fontSize: 15,
+                          fontSize: 13,
                           fontWeight: FontWeight.w500,
                         ),
                       ),
@@ -571,7 +577,7 @@ class _PostViewPageState extends State<PostViewPage> {
                 ),
               ),
             ),
-            const SizedBox(width: 15),
+            const SizedBox(width: 10),
             InkWell(
               onTap: () async {
                 await ArticleController(
@@ -580,7 +586,7 @@ class _PostViewPageState extends State<PostViewPage> {
                 ).share();
               },
               child: Container(
-                width: 90,
+                width: 64,
                 height: 40,
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(8),
@@ -595,7 +601,7 @@ class _PostViewPageState extends State<PostViewPage> {
                       const SizedBox(width: 2),
                       SvgPicture.asset(
                         'assets/icons/share.svg',
-                        width: 25,
+                        width: 11,
                         height: 25,
                         color: const Color.fromRGBO(100, 100, 100, 1),
                       ),
@@ -603,7 +609,7 @@ class _PostViewPageState extends State<PostViewPage> {
                       const Text(
                         '공유',
                         style: TextStyle(
-                          fontSize: 15,
+                          fontSize: 13,
                           fontWeight: FontWeight.w500,
                         ),
                       ),
@@ -614,89 +620,183 @@ class _PostViewPageState extends State<PostViewPage> {
             ),
           ],
         ),
-        // 자신의 글일 경우 수정 버튼, 타인의 글일 경우 신고 버튼
-        if (_isReportable) // 타인의 글(신고가 가능한 글)
-          InkWell(
-            onTap: () {
-              showDialog(
-                  context: context,
-                  builder: (context) {
-                    return ReportDialogWidget(articleID: _article.id);
-                  });
-            },
-            child: Container(
-              width: 90,
-              height: 40,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(8),
-                border: Border.all(
-                  color: const Color.fromRGBO(230, 230, 230, 1),
-                ),
-              ),
-              child: Center(
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const SizedBox(width: 2),
-                    SvgPicture.asset(
-                      'assets/icons/warning.svg',
-                      width: 25,
-                      height: 25,
-                      color: const Color.fromRGBO(100, 100, 100, 1),
+        Row(
+          children: [
+            // 자신의 글일 경우 삭제 버튼, 타인의 글일 경우 차단 버튼
+            if (_isReportable) // 신고가 가능한 글(타인의 글)
+              InkWell(
+                onTap: null,
+                child: Container(
+                  width: 65,
+                  height: 40,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(
+                      color: const Color.fromRGBO(230, 230, 230, 1),
                     ),
-                    const SizedBox(width: 10),
-                    const Text(
-                      '신고',
-                      style: TextStyle(
-                        fontSize: 15,
-                        fontWeight: FontWeight.w500,
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      SvgPicture.asset("assets/icons/barrior.svg",
+                          width: 11,
+                          height: 13,
+                          colorFilter: const ColorFilter.mode(
+                              Colors.black, BlendMode.srcIn)),
+                      const Text(
+                        '차단',
+                        style: TextStyle(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w500,
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
-              ),
-            ),
-          )
-        else // 자신의 글
-          InkWell(
-            onTap: () async {
-              await Navigator.of(context).push(slideRoute(
-                PostWritePage(previousArticle: _article)
-              ));
-              userProvider.setIsContentLoaded(false);
-              _setIsPageLoaded(false);
-              _setIsPageLoaded(await _fetchArticle(userProvider));
-            },
-            child: Container(
-              width: 95,
-              height: 40,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(8),
-                border: Border.all(
-                  color: const Color.fromRGBO(230, 230, 230, 1),
-                ),
-              ),
-              child: Center(
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    SvgPicture.asset(
-                      'assets/icons/modify.svg',
-                      width: 30,
-                      height: 30,
+              )
+            else // 자신의 글
+              InkWell(
+                onTap: () async {
+                  await showDialog(
+                      context: context,
+                      builder: (context) => DeleteDialog(
+                            userProvider: userProvider,
+                            targetContext: context,
+                            onTap: () {
+                              ArticleController(
+                                      model: _article,
+                                      userProvider: userProvider)
+                                  .delete()
+                                  .then((res) {
+                                // 사용자가 미리 뒤로가기 버튼을 누르는 경우 에러 방지를 위해
+                                // try-catch 문을 도입함.
+                                try {
+                                  // dialog pop
+                                  Navigator.pop(context);
+                                  if (res == true) {
+                                    // PostViewPage pop
+                                    Navigator.pop(context);
+                                  }
+                                } catch (error) {
+                                  debugPrint("pop error: $error");
+                                }
+                              });
+                            },
+                          ));
+                },
+                child: Container(
+                  width: 65,
+                  height: 40,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(
+                      color: const Color.fromRGBO(230, 230, 230, 1),
                     ),
-                    const Text(
-                      '수정하기',
-                      style: TextStyle(
-                        fontSize: 15,
-                        fontWeight: FontWeight.w500,
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      SvgPicture.asset("assets/icons/delete.svg",
+                          width: 15,
+                          height: 15,
+                          colorFilter: const ColorFilter.mode(
+                              Colors.black, BlendMode.srcIn)),
+                      const Text(
+                        '삭제',
+                        style: TextStyle(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w500,
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
-            ),
-          ),
+            const SizedBox(width: 10),
+            // 자신의 글일 경우 수정 버튼, 타인의 글일 경우 신고 버튼
+            if (_isReportable) // 타인의 글(신고가 가능한 글)
+              InkWell(
+                onTap: () {
+                  showDialog(
+                      context: context,
+                      builder: (context) {
+                        return ReportDialogWidget(articleID: _article.id);
+                      });
+                },
+                child: Container(
+                  width: 90,
+                  height: 40,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(
+                      color: const Color.fromRGBO(230, 230, 230, 1),
+                    ),
+                  ),
+                  child: Center(
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const SizedBox(width: 2),
+                        SvgPicture.asset(
+                          'assets/icons/warning.svg',
+                          width: 25,
+                          height: 25,
+                          color: const Color.fromRGBO(100, 100, 100, 1),
+                        ),
+                        const SizedBox(width: 10),
+                        const Text(
+                          '신고',
+                          style: TextStyle(
+                            fontSize: 15,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              )
+            else // 자신의 글
+              InkWell(
+                onTap: () async {
+                  await Navigator.of(context).push(
+                      slideRoute(PostWritePage(previousArticle: _article)));
+                  userProvider.setIsContentLoaded(false);
+                  _setIsPageLoaded(false);
+                  _setIsPageLoaded(await _fetchArticle(userProvider));
+                },
+                child: Container(
+                  width: 65,
+                  height: 40,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(
+                      color: const Color.fromRGBO(230, 230, 230, 1),
+                    ),
+                  ),
+                  child: Center(
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        SvgPicture.asset(
+                          'assets/icons/modify.svg',
+                          width: 11,
+                          height: 13,
+                        ),
+                        const Text(
+                          '수정',
+                          style: TextStyle(
+                            fontSize: 15,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+          ],
+        ),
       ],
     );
   }
@@ -749,9 +849,17 @@ class _PostViewPageState extends State<PostViewPage> {
                               child: ClipRRect(
                                 borderRadius: const BorderRadius.all(
                                     Radius.circular(100)),
-                                child: Image.network(curComment
-                                    .created_by.profile.picture
-                                    .toString()),
+                                child: ClipRRect(
+                                  borderRadius: const BorderRadius.all(
+                                      Radius.circular(100)),
+                                  child: SizedBox.fromSize(
+                                    size: const Size.fromRadius(48),
+                                    child: Image.network(
+                                        fit: BoxFit.cover,
+                                        curComment.created_by.profile.picture
+                                            .toString()),
+                                  ),
+                                ),
                               ),
                             ),
                             const SizedBox(width: 5),
@@ -808,7 +916,6 @@ class _PostViewPageState extends State<PostViewPage> {
                                             context: context,
                                             builder: (context) {
                                               return DeleteDialog(
-                                                targetID: curComment.id,
                                                 userProvider: userProvider,
                                                 targetContext: context,
                                                 onTap: () {
@@ -1180,7 +1287,7 @@ class _PostViewPageState extends State<PostViewPage> {
     setState(() => _isSending = value);
   }
 
- // _isPageLoaded: article 에 적절한 정보가 있는지 나타냄
+  // _isPageLoaded: article 에 적절한 정보가 있는지 나타냄
   void _setIsPageLoaded(bool value) {
     if (!mounted) return;
     setState(() => _isPageLoaded = value);

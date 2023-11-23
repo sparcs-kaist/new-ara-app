@@ -1,13 +1,12 @@
 /// PostViewPage 내부에서 사용되는 메서드가 많아 별도의 파일로 분류함.
 
-// TODO: 다시 PostViewPage 내부로 합칠 지 고민해보기
-
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
+import 'package:dio/dio.dart';
 
 import 'package:new_ara_app/models/article_model.dart';
 import 'package:new_ara_app/models/comment_nested_comment_list_action_model.dart';
@@ -116,6 +115,34 @@ class ArticleController {
   Future<void> share() async {
     String url = "$newAraDefaultUrl/post/${model.id}";
     await Clipboard.setData(ClipboardData(text: url));
+  }
+
+  // TODO: dio 요청 방식 통일하기
+
+  /// 전달받은 id에 해당하는 글을 삭제하는 메서드.
+  /// 삭제가 정상적으로 완료되면 true, 아니면 false 반환.
+  Future<bool> delete() async {
+    String apiUrl = "$newAraDefaultUrl/api/articles/${model.id}/";
+    try {
+      await userProvider.myDio().delete(apiUrl);
+      return true;
+    } on DioException catch (e) {
+      debugPrint("DioException occurred");
+      if (e.response != null) {
+        debugPrint("${e.response!.data}");
+        debugPrint("${e.response!.headers}");
+        debugPrint("${e.response!.requestOptions}");
+      }
+      // request의 setting, sending에서 문제 발생
+      // requestOption, message를 출력.
+      else {
+        debugPrint("${e.requestOptions}");
+        debugPrint("${e.message}");
+      }
+    } catch (e) {
+      debugPrint("error at delete: $e");
+    }
+    return false;
   }
 }
 
@@ -483,4 +510,3 @@ class _ReportDialogWidgetState extends State<ReportDialogWidget> {
     );
   }
 }
-

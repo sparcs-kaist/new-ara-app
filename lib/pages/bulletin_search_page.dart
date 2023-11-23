@@ -44,7 +44,7 @@ class _BulletinSearchPageState extends State<BulletinSearchPage> {
       case BoardType.free:
         _apiUrl =
             "articles/?parent_board=${widget.boardInfo!.id.toInt()}&page=";
-        _hintText = widget.boardInfo!.ko_name + "에서 검색";
+        _hintText = "${widget.boardInfo!.ko_name}에서 검색";
         break;
       case BoardType.all:
         _apiUrl = "articles/?page=";
@@ -80,7 +80,7 @@ class _BulletinSearchPageState extends State<BulletinSearchPage> {
     }
 
     Map<String, dynamic>? myMap = await userProvider.getApiRes("""
-${_apiUrl}1&main_search__contains=${_searchWord}
+${_apiUrl}1&main_search__contains=$_searchWord
 """);
 
     if (mounted) {
@@ -138,94 +138,114 @@ ${_apiUrl}1&main_search__contains=${_searchWord}
     return Scaffold(
       appBar: AppBar(
         centerTitle: false,
-        leadingWidth: 100,
-        leading: Row(
-          children: [
-            SizedBox(
-              width: 35,
-              child: IconButton(
-                color: ColorsInfo.newara,
-                icon: SizedBox(
-                  width: 11.58,
-                  height: 21.87,
-                  child: SvgPicture.asset(
-                    'assets/icons/left_chevron.svg',
-                    color: ColorsInfo.newara,
-                    fit: BoxFit.fill,
-                  ),
+        leading: Padding(
+          padding: const EdgeInsets.fromLTRB(1, 10.5, 4, 10.5),
+          child: Align(
+            alignment: Alignment.centerLeft,
+            child: InkWell(
+              onTap: () {
+                Navigator.of(context).pop();
+              },
+              child: SizedBox(
+                width: 35,
+                height: 35,
+                child: SvgPicture.asset(
+                  'assets/icons/left_chevron.svg',
+                  colorFilter: const ColorFilter.mode(
+                      ColorsInfo.newara, BlendMode.srcIn),
                 ),
-                onPressed: () {
-                  Navigator.pop(context);
-                },
               ),
             ),
-            // Expanded(child: TextField()),
-          ],
+          ),
         ),
         actions: [
-          SizedBox(
-            width: MediaQuery.of(context).size.width - 40,
-            child: Padding(
-              padding: const EdgeInsets.fromLTRB(0, 10, 15, 10),
-              child: TextField(
-                minLines: 1,
-                maxLines: 1,
-                focusNode: _focusNode,
-                textInputAction: TextInputAction.search,
-                onSubmitted: (String text) {
-                  setState(() {
-                    _searchWord = text;
-                    _isLoading = true;
-                  });
-                  refreshPostList(context.read<UserProvider>());
-                },
-                style: const TextStyle(
-                  height: 1,
-                  fontSize: 16,
-                  fontWeight: FontWeight.w500,
-                ),
-                decoration: InputDecoration(
-                  prefixIconConstraints:
-                      const BoxConstraints(maxHeight: 28, maxWidth: 28),
-                  prefixIcon: SizedBox(
-                    // 원하는 세로 크기
-                    child: SvgPicture.asset(
-                      'assets/icons/search.svg',
-                      color: Colors.grey,
-                      fit: BoxFit.contain,
-                    ),
-                  ),
-                  hintText: _hintText,
-                  hintStyle: const TextStyle(
-                    color: Color(0xFFBBBBBB),
-                    fontSize: 16,
-                    fontWeight: FontWeight.w500,
-                  ),
-                  filled: true,
-                  fillColor: const Color(0xFFF6F6F6),
-                  isDense: true,
-                  contentPadding: const EdgeInsets.fromLTRB(
-                    10.0,
-                    10.0,
-                    10.0,
-                    10.0,
-                  ), // 모서리를 둥글게 설정
-                  enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10.0),
-                    borderSide: const BorderSide(
-                      color: Colors.transparent, // 테두리 색상 설정
-                    ), // 모서리를 둥글게 설정
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10.0),
-                    borderSide: const BorderSide(
-                      color: Colors.transparent, // 테두리 색상 설정
-                    ), // 모서리를 둥글게 설정
-                  ),
-                ),
-                cursorColor: Colors.transparent,
+          Column(
+            children: [
+              const SizedBox(
+                height: 10,
               ),
-            ),
+              Expanded(
+                child: SizedBox(
+                  width: MediaQuery.of(context).size.width - 40,
+                  height: 36,
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: TextField(
+                          minLines: 1,
+                          maxLines: 1,
+                          textAlignVertical: TextAlignVertical.bottom,
+                          focusNode: _focusNode,
+                          textInputAction: TextInputAction.search,
+                          onSubmitted: (String text) {
+                            setState(() {
+                              _searchWord = text;
+                              _isLoading = true;
+                            });
+                            refreshPostList(context.read<UserProvider>());
+                          },
+                          style: const TextStyle(
+                            //TODO: 커서 크기와 텍스트 베이스라인 교정하기.
+                            height: 1.5,
+                            fontSize: 14,
+                            fontWeight: FontWeight.w500,
+                          ),
+                          decoration: InputDecoration(
+                            contentPadding:
+                                const EdgeInsets.fromLTRB(0, 0, 0, 14),
+                            prefixIconConstraints: const BoxConstraints(
+                                maxHeight: 28, minHeight: 28),
+                            prefixIcon: Padding(
+                              padding: const EdgeInsets.fromLTRB(6.0, 0, 0, 0),
+                              child: SizedBox(
+                                // 원하는 세로 크기
+                                width: 24,
+                                height: 24,
+                                child: SvgPicture.asset(
+                                  'assets/icons/search.svg',
+                                  colorFilter: const ColorFilter.mode(
+                                      Color(0xFFBBBBBB), BlendMode.srcIn),
+                                  fit: BoxFit.contain,
+                                ),
+                              ),
+                            ),
+                            hintText: _hintText,
+                            hintStyle: const TextStyle(
+                              color: Color(0xFFBBBBBB),
+                              fontSize: 14,
+                              fontWeight: FontWeight.w500,
+                            ),
+                            filled: true,
+                            fillColor: const Color(0xFFF6F6F6),
+                            isDense: false,
+                            // 모서리를 둥글게 설정
+                            enabledBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(10.0),
+                              borderSide: const BorderSide(
+                                color: Colors.transparent, // 테두리 색상 설정
+                              ), // 모서리를 둥글게 설정
+                            ),
+                            focusedBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(10.0),
+                              borderSide: const BorderSide(
+                                color: Colors.transparent, // 테두리 색상 설정
+                              ), // 모서리를 둥글게 설정
+                            ),
+                          ),
+                          cursorColor: Colors.transparent,
+                        ),
+                      ),
+                      const SizedBox(
+                        width: 15,
+                      )
+                    ],
+                  ),
+                ),
+              ),
+              const SizedBox(
+                height: 10,
+              ),
+            ],
           ),
         ],
       ),

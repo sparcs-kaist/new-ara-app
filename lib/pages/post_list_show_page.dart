@@ -15,20 +15,20 @@ import 'package:new_ara_app/pages/post_view_page.dart';
 import 'package:new_ara_app/utils/slide_routing.dart';
 import 'package:new_ara_app/providers/notification_provider.dart';
 
-/// FreeBulletinBoardPage는 게시판 목록를 나타내는 위젯.
+/// PostListShowPage는 게시판 목록를 나타내는 위젯.
 /// boardType에 따라 게시판의 종류를 판별하고, 특성화 된 위젯들을 활성화 비활성화 되도록 설계.
 /// 모든 게시물 목록 형태가 유사하기에 최대한 코드를 재할용.
-class FreeBulletinBoardPage extends StatefulWidget {
+class PostListShowPage extends StatefulWidget {
   final BoardDetailActionModel? boardInfo;
   final BoardType boardType;
-  const FreeBulletinBoardPage(
+  const PostListShowPage(
       {super.key, required this.boardType, required this.boardInfo});
 
   @override
-  State<FreeBulletinBoardPage> createState() => _FreeBulletinBoardPageState();
+  State<PostListShowPage> createState() => _PostListShowPageState();
 }
 
-class _FreeBulletinBoardPageState extends State<FreeBulletinBoardPage> {
+class _PostListShowPageState extends State<PostListShowPage> {
   List<ArticleListActionModel> postPreviewList = [];
   int currentPage = 1;
   bool isLoading = true;
@@ -96,7 +96,7 @@ class _FreeBulletinBoardPageState extends State<FreeBulletinBoardPage> {
             if (widget.boardType != BoardType.scraps &&
                 myMap!["results"][i]["created_by"]["profile"] != null) {
               postPreviewList
-                  .add(ArticleListActionModel.fromJson(myMap!["results"][i]));
+                  .add(ArticleListActionModel.fromJson(myMap["results"][i]));
             } else if (widget.boardType == BoardType.scraps) {
               postPreviewList.add(ArticleListActionModel.fromJson(
                   myMap!["results"][i]["parent_article"]));
@@ -130,6 +130,7 @@ class _FreeBulletinBoardPageState extends State<FreeBulletinBoardPage> {
           await userProvider.getApiRes("$apiUrl$currentPage");
       if (mounted) {
         setState(() {
+          //TODO: 더 불러올 자료가 없으면 막기. 현재 에러남.
           for (int i = 0; i < (myMap!["results"].length ?? 0); i++) {
             //???/
             if (myMap["results"][i]["created_by"]["profile"] != null) {
@@ -153,7 +154,7 @@ class _FreeBulletinBoardPageState extends State<FreeBulletinBoardPage> {
     // TODO: void refreshPostList(UserProvider userProvider) async 메소드와 통합하기.
     /// 게시물 클릭하고 다시 돌아올 때 게시물 목록 업데이트 해주는 함수.
     Future<void> updateAllBulletinList() async {
-      List<ArticleListActionModel> _newList = [];
+      List<ArticleListActionModel> newList = [];
       UserProvider userProvider = context.read<UserProvider>();
       for (int j = 1; j <= currentPage; j++) {
         Map<String, dynamic>? json = await userProvider.getApiRes("$apiUrl$j");
@@ -162,11 +163,11 @@ class _FreeBulletinBoardPageState extends State<FreeBulletinBoardPage> {
           //???/
           if (widget.boardType != BoardType.scraps &&
               json["results"][i]["created_by"]["profile"] != null) {
-            _newList
+            newList
                 .add(ArticleListActionModel.fromJson(json["results"][i] ?? {}));
           } else if (widget.boardType == BoardType.scraps) {
             // 스크랩 게시물이면
-            _newList.add(ArticleListActionModel.fromJson(
+            newList.add(ArticleListActionModel.fromJson(
                 json["results"][i]["parent_article"] ?? {}));
           }
         }
@@ -174,7 +175,7 @@ class _FreeBulletinBoardPageState extends State<FreeBulletinBoardPage> {
       if (mounted) {
         setState(() {
           postPreviewList.clear();
-          postPreviewList = [..._newList];
+          postPreviewList = [...newList];
         });
       }
       return Future.value();
@@ -190,7 +191,8 @@ class _FreeBulletinBoardPageState extends State<FreeBulletinBoardPage> {
             children: [
               SvgPicture.asset(
                 'assets/icons/left_chevron.svg',
-                color: ColorsInfo.newara,
+                colorFilter: const ColorFilter.mode(
+                    ColorsInfo.newara, BlendMode.srcATop),
                 fit: BoxFit.fill,
                 width: 35,
                 height: 35,
@@ -220,7 +222,8 @@ class _FreeBulletinBoardPageState extends State<FreeBulletinBoardPage> {
           IconButton(
             icon: SvgPicture.asset(
               'assets/icons/search.svg',
-              color: ColorsInfo.newara,
+              colorFilter:
+                  const ColorFilter.mode(ColorsInfo.newara, BlendMode.srcIn),
               width: 35,
               height: 35,
             ),
@@ -238,7 +241,8 @@ class _FreeBulletinBoardPageState extends State<FreeBulletinBoardPage> {
         children: [
           FloatingActionButton(
             onPressed: () async {
-              await Navigator.of(context).push(slideRoute(PostWritePage()));
+              await Navigator.of(context)
+                  .push(slideRoute(const PostWritePage()));
               updateAllBulletinList();
               debugPrint('FloatingActionButton pressed');
             },
@@ -249,7 +253,8 @@ class _FreeBulletinBoardPageState extends State<FreeBulletinBoardPage> {
               child: SvgPicture.asset(
                 'assets/icons/modify.svg',
                 fit: BoxFit.fill,
-                color: ColorsInfo.newara,
+                colorFilter: const ColorFilter.mode(
+                    ColorsInfo.newara, BlendMode.srcIn), // 글쓰기 아이콘 색상 변경
               ),
             ),
           ),
@@ -272,7 +277,7 @@ class _FreeBulletinBoardPageState extends State<FreeBulletinBoardPage> {
                       // 각 아이템을 위한 위젯 생성
                       if (_isLoadingNextPage &&
                           index == postPreviewList.length) {
-                        return Container(
+                        return const SizedBox(
                           height: 50,
                           child: Center(
                             child: LoadingIndicator(),
