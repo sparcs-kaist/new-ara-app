@@ -6,8 +6,7 @@ import 'package:new_ara_app/utils/time_utils.dart';
 
 class PostPreview extends StatefulWidget {
   final ArticleListActionModel model;
-  PostPreview({super.key, required ArticleListActionModel model})
-      : model = model;
+  const PostPreview({super.key, required this.model});
 
   @override
   State<PostPreview> createState() => _PostPreviewState();
@@ -48,22 +47,26 @@ class _PostPreviewState extends State<PostPreview> {
                       children: [
                         SvgPicture.asset(
                           'assets/icons/image.svg',
-                          color: Colors.grey,
+                          colorFilter: const ColorFilter.mode(
+                              Colors.grey, BlendMode.srcIn),
                         ),
                         SvgPicture.asset(
                           'assets/icons/clip.svg',
-                          color: Colors.grey,
+                          colorFilter: const ColorFilter.mode(
+                              Colors.grey, BlendMode.srcIn),
                         ),
                       ],
                     )
                   : widget.model.attachment_type.toString() == "IMAGE"
                       ? SvgPicture.asset(
                           'assets/icons/image.svg',
-                color: Colors.grey,
+                          colorFilter: const ColorFilter.mode(
+                              Colors.grey, BlendMode.srcIn),
                         )
                       : widget.model.attachment_type.toString() == "NON_IMAGE"
                           ? SvgPicture.asset(
-                              color: Colors.grey,
+                              colorFilter: const ColorFilter.mode(
+                                  Colors.grey, BlendMode.srcIn),
                               'assets/icons/clip.svg',
                             )
                           : Container()
@@ -71,94 +74,124 @@ class _PostPreviewState extends State<PostPreview> {
             //attachment_type
           ),
         ),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: [
-            Expanded(
-              child: Row(
-                children: [
-                  Flexible(
-                    child: Text(
-                      widget.model.created_by.profile.nickname.toString(),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(
-                        fontSize: 12,
-                        color: Color(0xFFB1B1B1),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(
-                    width: 8,
-                  ),
-                  Text(
-                    time,
+        Row(mainAxisAlignment: MainAxisAlignment.start, children: [
+          Expanded(
+            child: Row(
+              children: [
+                Flexible(
+                  child: Text(
+                    widget.model.created_by.profile.nickname.toString(),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
-                    style:
-                        const TextStyle(fontSize: 12, color: Color(0xFFB1B1B1)),
-                  ),
-                  const SizedBox(
-                    width: 5,
-                  ),
-                ],
-              ),
-            ),
-            Row(
-              children: [
-                SvgPicture.asset(
-                  'assets/icons/like.svg',
-                  width: 20,
-                  height: 20,
-                  color: Color(0xFFED3A3A),
-                ),
-                Text(
-                  widget.model.positive_vote_count.toString(),
-                  style: const TextStyle(
-                    fontWeight: FontWeight.w500,
-                    fontSize: 12,
-                    color: Color(0xFFED3A3A),
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-                const SizedBox(
-                  width: 8,
-                ),
-                SvgPicture.asset(
-                  'assets/icons/dislike.svg',
-                  width: 20,
-                  height: 20,
-                  color: Color(0xFF538DD1),
-                ),
-                Text(
-                  widget.model.negative_vote_count.toString(),
-                  style: const TextStyle(
-                      fontWeight: FontWeight.w500,
+                    style: const TextStyle(
                       fontSize: 12,
-                      color: Color(0xFF538DD1)),
-                  textAlign: TextAlign.center,
+                      color: Color(0xFFB1B1B1),
+                    ),
+                  ),
                 ),
                 const SizedBox(
                   width: 8,
                 ),
-                SvgPicture.asset(
-                  'assets/icons/comment.svg',
-                  width: 20,
-                  height: 20,
-                  color: Color(0xFF636363),
-                ),
                 Text(
-                  widget.model.comment_count.toString(),
-                  style: const TextStyle(
-                    fontWeight: FontWeight.w500,
-                    fontSize: 12,
-                    color: Color(0xFF636363),
-                  ),
+                  time,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style:
+                      const TextStyle(fontSize: 12, color: Color(0xFFB1B1B1)),
+                ),
+                const SizedBox(
+                  width: 5,
                 ),
               ],
-            )
+            ),
+          ),
+          _buildIcons(),
+        ]),
+      ],
+    );
+  }
+
+  Widget _buildIcons() {
+    List widgets = [];
+    if (widget.model.positive_vote_count != 0) {
+      widgets.add(
+        Row(
+          children: [
+            SvgPicture.asset(
+              'assets/icons/like.svg',
+              width: 20,
+              height: 20,
+              colorFilter:
+                  const ColorFilter.mode(Color(0xFFED3A3A), BlendMode.srcIn),
+            ),
+            Text(
+              widget.model.positive_vote_count.toString(),
+              style: const TextStyle(
+                fontWeight: FontWeight.w500,
+                fontSize: 12,
+                color: Color(0xFFED3A3A),
+              ),
+              textAlign: TextAlign.center,
+            ),
           ],
         ),
+      );
+    }
+    if (widget.model.negative_vote_count != 0) {
+      if (widgets.isNotEmpty) {
+        widgets.add(const SizedBox(
+          width: 8,
+        ));
+      }
+      widgets.add(
+        Row(
+          children: [
+            SvgPicture.asset('assets/icons/dislike.svg',
+                width: 20,
+                height: 20,
+                colorFilter:
+                    const ColorFilter.mode(Color(0xFF538DD1), BlendMode.srcIn)),
+            Text(
+              widget.model.negative_vote_count.toString(),
+              style: const TextStyle(
+                  fontWeight: FontWeight.w500,
+                  fontSize: 12,
+                  color: Color(0xFF538DD1)),
+              textAlign: TextAlign.center,
+            ),
+          ],
+        ),
+      );
+    }
+    if (widget.model.comment_count != 0) {
+      if (widgets.isNotEmpty) {
+        widgets.add(const SizedBox(
+          width: 8,
+        ));
+      }
+      widgets.add(
+        Row(
+          children: [
+            SvgPicture.asset('assets/icons/comment.svg',
+                width: 20,
+                height: 20,
+                colorFilter:
+                    const ColorFilter.mode(Color(0xFF636363), BlendMode.srcIn)),
+            Text(
+              widget.model.comment_count.toString(),
+              style: const TextStyle(
+                fontWeight: FontWeight.w500,
+                fontSize: 12,
+                color: Color(0xFF636363),
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+    return Row(
+      children: [
+        ...widgets,
       ],
     );
   }
