@@ -849,12 +849,9 @@ class _PostViewPageState extends State<PostViewPage> {
                         onTap: curComment.name_type == 2
                             ? null
                             : () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) => UserViewPage(
-                                          userID: curComment.created_by.id)),
-                                );
+                                Navigator.of(context).push(slideRoute(
+                                  UserViewPage(userID: curComment.created_by.id)
+                                ));
                               },
                         child: Row(
                           children: [
