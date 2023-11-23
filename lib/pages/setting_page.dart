@@ -19,6 +19,7 @@ import 'package:new_ara_app/widgets/border_boxes.dart';
 import 'package:new_ara_app/widgets/text_and_switch.dart';
 import 'package:new_ara_app/providers/notification_provider.dart';
 import 'package:new_ara_app/models/block_model.dart';
+import 'package:new_ara_app/widgets/dialogs.dart';
 
 /// 설정 페이지 빌드 및 이벤트 처리를 담당하는 StatefulWidget.
 class SettingPage extends StatefulWidget {
@@ -275,7 +276,7 @@ class SettingPageState extends State<SettingPage> {
                     onTap: () {
                       showDialog(
                           context: context,
-                          builder: (context) => BlockedUserDialog());
+                          builder: (context) => const BlockedUserDialog());
                     },
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.center,
@@ -349,193 +350,5 @@ class SettingPageState extends State<SettingPage> {
     await WebviewCookieManager().clearCookies();
 
     debugPrint("log out success");
-  }
-}
-
-class BlockedUserDialog extends StatefulWidget {
-  const BlockedUserDialog({super.key});
-  @override
-  State<BlockedUserDialog> createState() => _BlockedUserDialogState();
-}
-
-class _BlockedUserDialogState extends State<BlockedUserDialog> {
-  /// 차단된 유저의 BlockModel을 저장하는 리스트
-  late List<BlockModel> blockModelList;
-
-  /// blockModelList의 초기화가 완료되었으면 true, 아니면 false
-  bool isLoaded = false;
-
-  @override
-  void initState() {
-    super.initState();
-    fetchBlockedUsers().then((resList) {
-      blockModelList = resList;
-      if (mounted) {
-        setState(() => isLoaded = true);
-      }
-    });
-  }
-
-  /// 차단된 유저 목록을 fetch한 후 BlockModel의 리스트로 변환.
-  /// 성공 시에 BlockModel의 리스트를 반환함. 실패할 시 empty list 반환.
-  Future<List<BlockModel>> fetchBlockedUsers() async {
-    UserProvider userProvider = context.read<UserProvider>();
-    String apiUrl = "/api/blocks/";
-    List<BlockModel> resList = [];
-    try {
-      var response = await userProvider.myDio().get("$newAraDefaultUrl$apiUrl");
-      List<dynamic> jsonUserList = response.data['results'];
-      for (Map<String, dynamic> json in jsonUserList) {
-        try {
-          resList.add(BlockModel.fromJson(json));
-        } catch (error) {
-          debugPrint(
-              "Model structure of BlockModel might have changed: $error");
-        }
-      }
-      return resList;
-    } on DioException catch (e) {
-      debugPrint("DioException occurred");
-      if (e.response != null) {
-        debugPrint("${e.response!.data}");
-        debugPrint("${e.response!.headers}");
-        debugPrint("${e.response!.requestOptions}");
-      }
-      // request의 setting, sending에서 문제 발생
-      // requestOption, message를 출력.
-      else {
-        debugPrint("${e.requestOptions}");
-        debugPrint("${e.message}");
-      }
-    } catch (e) {
-      debugPrint("fetchBlockedUsers GET error: $e");
-    }
-    return resList;
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return !isLoaded
-        ? Container()
-        : Dialog(
-            child: blockModelList.isEmpty
-                ? Container(
-                    width: MediaQuery.of(context).size.width - 40,
-                    height: 55,
-                    margin: const EdgeInsets.only(
-                        left: 15, right: 15, top: 5, bottom: 5),
-                    child: const Center(
-                      child: Text(
-                      "차단한 유저가 없습니다",
-                      style: TextStyle(
-                        color: Colors.black,
-                        fontSize: 15,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                    ),
-                  )
-                : Container(
-                    width: MediaQuery.of(context).size.width - 40,
-                    height: 55.0 * blockModelList.length,
-                    margin: const EdgeInsets.only(
-                        left: 15, right: 15, top: 5, bottom: 5),
-                    child: ListView.separated(
-                      itemCount: blockModelList.length,
-                      itemBuilder: (context, idx) {
-                        BlockModel blockedUser = blockModelList[idx];
-                        return SizedBox(
-                          width: MediaQuery.of(context).size.width - 50,
-                          height: 50,
-                          child: Row(
-                            children: [
-                              // 사용자 프로필 이미지 표시(null이 아닌 경우)
-                              Container(
-                                width: 40,
-                                height: 40,
-                                decoration: const BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  color: Colors.grey,
-                                ),
-                                child: blockedUser.user.profile.picture == null
-                                    ? Container()
-                                    : ClipRRect(
-                                        borderRadius: const BorderRadius.all(
-                                            Radius.circular(100)),
-                                        child: SizedBox.fromSize(
-                                          size: const Size.fromRadius(40),
-                                          child: Image.network(
-                                              fit: BoxFit.cover,
-                                              blockedUser
-                                                  .user.profile.picture!),
-                                        ),
-                                      ),
-                              ),
-                              const SizedBox(width: 20),
-                              Expanded(
-                                child: Text(
-                                  blockedUser.user.profile.nickname ??
-                                      "닉네임이 없음",
-                                  overflow: TextOverflow.ellipsis,
-                                  maxLines: 1,
-                                  style: const TextStyle(
-                                    fontSize: 15,
-                                    fontWeight: FontWeight.w500,
-                                  ),
-                                ),
-                              ),
-                              InkWell(
-                                onTap: () async {
-                                  bool unblockRes =
-                                      await unblockUser(blockedUser.id);
-                                  if (unblockRes) {
-                                    setState(() {
-                                      blockModelList.remove(blockedUser);
-                                    });
-                                  }
-                                },
-                                child: SvgPicture.asset(
-                                  "assets/icons/close-2.svg",
-                                  colorFilter: const ColorFilter.mode(
-                                      Colors.black, BlendMode.srcIn),
-                                  width: 25,
-                                  height: 25,
-                                ),
-                              ),
-                            ],
-                          ),
-                        );
-                      },
-                      separatorBuilder: (context, idx) {
-                        return const Divider();
-                      },
-                    ),
-                  ),
-          );
-  }
-
-  Future<bool> unblockUser(int userID) async {
-    UserProvider userProvider = context.read<UserProvider>();
-    String apiUrl = "/api/blocks/$userID/";
-    try {
-      await userProvider.myDio().delete("$newAraDefaultUrl$apiUrl");
-      return true;
-    } on DioException catch (e) {
-      debugPrint("DioException occurred");
-      if (e.response != null) {
-        debugPrint("${e.response!.data}");
-        debugPrint("${e.response!.headers}");
-        debugPrint("${e.response!.requestOptions}");
-      }
-      // request의 setting, sending에서 문제 발생
-      // requestOption, message를 출력.
-      else {
-        debugPrint("${e.requestOptions}");
-        debugPrint("${e.message}");
-      }
-    } catch (e) {
-      debugPrint("unblock error: $e");
-    }
-    return false;
   }
 }
