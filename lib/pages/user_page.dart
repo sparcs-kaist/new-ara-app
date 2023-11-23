@@ -260,23 +260,25 @@ class _UserPageState extends State<UserPage>
       height: 60,
       child: Row(
         children: [
+          // 사용자 프로필 표시
+          // 사용자 프로필 링크가 null일 경우 회색바탕으로 표시
           Container(
             width: 50,
             height: 50,
             decoration: const BoxDecoration(
               shape: BoxShape.circle,
+              color: Colors.grey,
             ),
-            child: ClipRRect(
-              borderRadius: const BorderRadius.all(Radius.circular(100)),
-              child: SizedBox.fromSize(
-                size: const Size.fromRadius(48),
-                child: userProvider.naUser?.picture == null
-                    ? Container()
-                    : Image.network(
-                        fit: BoxFit.cover,
-                        userProvider.naUser!.picture.toString()),
-              ),
-            ),
+            child: userProvider.naUser!.picture == null
+                ? Container()
+                : ClipRRect(
+                    borderRadius: const BorderRadius.all(Radius.circular(100)),
+                    child: SizedBox.fromSize(
+                      size: const Size.fromRadius(25),
+                      child: Image.network(
+                          fit: BoxFit.cover, userProvider.naUser!.picture!),
+                    ),
+                  ),
           ),
           const SizedBox(width: 10),
           Expanded(
