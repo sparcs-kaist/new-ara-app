@@ -403,7 +403,7 @@ class _PostViewPageState extends State<PostViewPage> {
       child: Row(
         children: [
           // 사용자 프로필 사진.
-          // 프로필 이미지 링크가 null일 경우 회색 바탕으로 표시함.
+          // 프로필 이미지 링크가 null일 경우 warning 아이콘 표시
           Container(
             width: 30,
             height: 30,
