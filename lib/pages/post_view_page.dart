@@ -421,8 +421,7 @@ class _PostViewPageState extends State<PostViewPage> {
               borderRadius: const BorderRadius.all(Radius.circular(100)),
               child: SizedBox.fromSize(
                 size: const Size.fromRadius(15),
-                // 이미지 프로필이 null인 경우 network 호출하지 않고
-                // warning 아이콘 빌드
+                // 이미지 링크를 확인한 후 null인 이미지는 warning.svg를 빌드
                 child: buildProfileImage(
                     _article.created_by.profile.picture, 25, 25),
               ),
@@ -858,8 +857,7 @@ class _PostViewPageState extends State<PostViewPage> {
                                     Radius.circular(100)),
                                 child: SizedBox.fromSize(
                                   size: const Size.fromRadius(12.5),
-                                  // 이미지 프로필이 null인 경우
-                                  // network를 호출하지 않고
+                                  // 이미지 링크를 확인한 후 null인 이미지는 warning.svg를 빌드
                                   child: buildProfileImage(
                                       curComment.created_by.profile.picture,
                                       20,

@@ -274,6 +274,7 @@ class _UserPageState extends State<UserPage>
               borderRadius: const BorderRadius.all(Radius.circular(100)),
               child: SizedBox.fromSize(
                 size: const Size.fromRadius(25),
+                // 이미지 링크를 확인한 후 null인 이미지는 warning.svg를 빌드
                 child: buildProfileImage(userProvider.naUser!.picture, 45, 45),
               ),
             ),

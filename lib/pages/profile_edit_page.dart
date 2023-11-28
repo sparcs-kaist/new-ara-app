@@ -312,6 +312,7 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
                       child: Text('This image type is not supported'));
                 },
               )
+            // 이미지 링크를 확인한 후 null인 이미지는 warning.svg를 빌드
             : buildProfileImage(userProviderData.naUser!.picture,
                 profileDiameter - 5, profileDiameter - 5));
   }
