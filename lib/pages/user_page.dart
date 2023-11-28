@@ -16,6 +16,7 @@ import 'package:new_ara_app/utils/time_utils.dart';
 import 'package:new_ara_app/utils/slide_routing.dart';
 import 'package:new_ara_app/pages/profile_edit_page.dart';
 import 'package:new_ara_app/providers/notification_provider.dart';
+import 'package:new_ara_app/utils/profile_image.dart';
 
 /// 작성한 글, 담아둔 글, 최근 본 글을 나타내기 위해 사용
 enum TabType { created, scrap, recent }
@@ -273,27 +274,7 @@ class _UserPageState extends State<UserPage>
               borderRadius: const BorderRadius.all(Radius.circular(100)),
               child: SizedBox.fromSize(
                 size: const Size.fromRadius(25),
-                child: Image.network(
-                  fit: BoxFit.cover,
-                  userProvider.naUser!.picture ?? "null",
-                  // 정상적인 이미지 로드에 실패했을 경우
-                  // warning 아이콘 표시하기
-                  errorBuilder: (BuildContext context, Object error,
-                      StackTrace? stackTrace) {
-                    debugPrint("$error");
-                    return SizedBox(
-                      child: SvgPicture.asset(
-                        "assets/icons/warning.svg",
-                        colorFilter: const ColorFilter.mode(
-                          Colors.black,
-                          BlendMode.srcIn,
-                        ),
-                        width: 45,
-                        height: 45,
-                      ),
-                    );
-                  },
-                ),
+                child: buildProfileImage(userProvider.naUser!.picture, 45, 45),
               ),
             ),
           ),
