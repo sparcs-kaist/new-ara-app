@@ -415,27 +415,39 @@ class _PostViewPageState extends State<PostViewPage> {
               borderRadius: const BorderRadius.all(Radius.circular(100)),
               child: SizedBox.fromSize(
                 size: const Size.fromRadius(15),
-                child: Image.network(
-                  fit: BoxFit.cover,
-                  _article.created_by.profile.picture ?? "null",
-                  // 정상적인 이미지 로드에 실패했을 경우
-                  // warning 아이콘 표시하기
-                  errorBuilder: (BuildContext context, Object error,
-                      StackTrace? stackTrace) {
-                    debugPrint("$error");
-                    return SizedBox(
-                      child: SvgPicture.asset(
-                        "assets/icons/warning.svg",
-                        colorFilter: const ColorFilter.mode(
-                          Colors.black,
-                          BlendMode.srcIn,
+                child: _article.created_by.profile.picture == null
+                    ? SizedBox(
+                        child: SvgPicture.asset(
+                          "assets/icons/warning.svg",
+                          colorFilter: const ColorFilter.mode(
+                            Colors.black,
+                            BlendMode.srcIn,
+                          ),
+                          width: 25,
+                          height: 25,
                         ),
-                        width: 25,
-                        height: 25,
+                      )
+                    : Image.network(
+                        fit: BoxFit.cover,
+                        _article.created_by.profile.picture.toString(),
+                        // 정상적인 이미지 로드에 실패했을 경우
+                        // warning 아이콘 표시하기
+                        errorBuilder: (BuildContext context, Object error,
+                            StackTrace? stackTrace) {
+                          debugPrint("PostViewPage creator: $error");
+                          return SizedBox(
+                            child: SvgPicture.asset(
+                              "assets/icons/warning.svg",
+                              colorFilter: const ColorFilter.mode(
+                                Colors.black,
+                                BlendMode.srcIn,
+                              ),
+                              width: 25,
+                              height: 25,
+                            ),
+                          );
+                        },
                       ),
-                    );
-                  },
-                ),
               ),
             ),
           ),
@@ -869,28 +881,45 @@ class _PostViewPageState extends State<PostViewPage> {
                                     Radius.circular(100)),
                                 child: SizedBox.fromSize(
                                   size: const Size.fromRadius(12.5),
-                                  child: Image.network(
-                                    fit: BoxFit.cover,
-                                    curComment.created_by.profile.picture ??
-                                        "null",
-                                    // 정상적인 이미지 로드에 실패했을 경우
-                                    // warning 아이콘 표시하기
-                                    errorBuilder: (BuildContext context,
-                                        Object error, StackTrace? stackTrace) {
-                                      debugPrint("$error");
-                                      return SizedBox(
-                                        child: SvgPicture.asset(
-                                          "assets/icons/warning.svg",
-                                          colorFilter: const ColorFilter.mode(
-                                            Colors.black,
-                                            BlendMode.srcIn,
+                                  child: curComment
+                                              .created_by.profile.picture ==
+                                          null
+                                      ? SizedBox(
+                                          child: SvgPicture.asset(
+                                            "assets/icons/warning.svg",
+                                            colorFilter: const ColorFilter.mode(
+                                              Colors.black,
+                                              BlendMode.srcIn,
+                                            ),
+                                            width: 20,
+                                            height: 20,
                                           ),
-                                          width: 20,
-                                          height: 20,
+                                        )
+                                      : Image.network(
+                                          fit: BoxFit.cover,
+                                          curComment
+                                                  .created_by.profile.picture ??
+                                              "null",
+                                          // 정상적인 이미지 로드에 실패했을 경우
+                                          // warning 아이콘 표시하기
+                                          errorBuilder: (BuildContext context,
+                                              Object error,
+                                              StackTrace? stackTrace) {
+                                            debugPrint("PostViewPage Comment: $error");
+                                            return SizedBox(
+                                              child: SvgPicture.asset(
+                                                "assets/icons/warning.svg",
+                                                colorFilter:
+                                                    const ColorFilter.mode(
+                                                  Colors.black,
+                                                  BlendMode.srcIn,
+                                                ),
+                                                width: 20,
+                                                height: 20,
+                                              ),
+                                            );
+                                          },
                                         ),
-                                      );
-                                    },
-                                  ),
                                 ),
                               ),
                             ),
