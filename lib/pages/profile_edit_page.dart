@@ -13,6 +13,7 @@ import 'package:new_ara_app/constants/colors_info.dart';
 import 'package:new_ara_app/models/user_profile_model.dart';
 import 'package:new_ara_app/widgets/loading_indicator.dart';
 import 'package:new_ara_app/providers/notification_provider.dart';
+import 'package:new_ara_app/utils/profile_image.dart';
 
 class ProfileEditPage extends StatefulWidget {
   const ProfileEditPage({super.key});
@@ -188,7 +189,8 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
                               width: profileDiameter,
                               height: profileDiameter,
                               child: !(Platform.isAndroid)
-                                  ? _buildClippedImage(userProviderData, profileDiameter)
+                                  ? _buildClippedImage(
+                                      userProviderData, profileDiameter)
                                   : FutureBuilder<void>(
                                       future: _retrieveLostData(),
                                       builder: (context, snapshot) {
@@ -198,7 +200,8 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
                                           case ConnectionState.active:
                                           case ConnectionState.done:
                                             return _buildClippedImage(
-                                                userProviderData, profileDiameter);
+                                                userProviderData,
+                                                profileDiameter);
                                         }
                                       }),
                             ),
@@ -296,37 +299,21 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
   }
 
   /// 선택된 이미지 또는 기존의 프로필 이미지 위젯을 빌드하는 함수
-  ClipOval _buildClippedImage(UserProvider userProviderData, double profileDiameter) {
+  ClipOval _buildClippedImage(
+      UserProvider userProviderData, double profileDiameter) {
     return ClipOval(
-      child: _selectedImage != null
-          ? Image.file(
-              fit: BoxFit.cover,
-              File(_selectedImage!.path),
-              errorBuilder:
-                  (BuildContext context, Object error, StackTrace? stackTrace) {
-                return const Center(
-                    child: Text('This image type is not supported'));
-              },
-            )
-          : Image.network(
-              fit: BoxFit.cover,
-              userProviderData.naUser!.picture ?? "null",
-              errorBuilder:
-                  (BuildContext context, Object error, StackTrace? stackTrace) {
-                return SizedBox(
-                  child: SvgPicture.asset(
-                    "assets/icons/warning.svg",
-                    colorFilter: const ColorFilter.mode(
-                      Colors.black,
-                      BlendMode.srcIn,
-                    ),
-                    width: profileDiameter - 5,
-                    height: profileDiameter - 5,
-                  ),
-                );
-              },
-            ),
-    );
+        child: _selectedImage != null
+            ? Image.file(
+                fit: BoxFit.cover,
+                File(_selectedImage!.path),
+                errorBuilder: (BuildContext context, Object error,
+                    StackTrace? stackTrace) {
+                  return const Center(
+                      child: Text('This image type is not supported'));
+                },
+              )
+            : buildProfileImage(userProviderData.naUser!.picture,
+                profileDiameter - 5, profileDiameter - 5));
   }
 
   /// 닉네임 변경 필드를 빌드하는 함수
