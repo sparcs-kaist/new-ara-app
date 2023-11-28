@@ -22,6 +22,9 @@ import 'package:flutter_svg/flutter_svg.dart';
 ///   ),
 /// );
 Widget buildProfileImage(String? profileUri, double width, double height) {
+  // Image.network의 errorBuilder가 작동하였음에도 exception이 발생하는 경우 발견
+  // 또한 null인 이미지는 호출 후 error를 처리하기보다 미리 감지하는 것이 낫다고 판단하여
+  // 아래 삼항연산자 조건문을 적용함.
   return profileUri == null
       ? SizedBox(
           child: SvgPicture.asset(
