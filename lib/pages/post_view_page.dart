@@ -21,7 +21,7 @@ import 'package:new_ara_app/utils/slide_routing.dart';
 import 'package:new_ara_app/widgets/in_article_web_view.dart';
 import 'package:new_ara_app/providers/notification_provider.dart';
 import 'package:new_ara_app/widgets/pop_up_menu_buttons.dart';
-import 'package:webview_flutter/webview_flutter.dart';
+import 'package:new_ara_app/utils/profile_image.dart';
 
 /// 하나의 post에 대한 내용 뷰, 이벤트 처리를 모두 담당하는 StatefulWidget.
 class PostViewPage extends StatefulWidget {
@@ -390,6 +390,9 @@ class _PostViewPageState extends State<PostViewPage> {
   /// 작성자 정보 빌드를 담당하며 빌드된 위젯을 리턴.
   /// _article 클래스 전역변수를 사용함.
   Widget _buildAuthorInfo(UserProvider userProvider) {
+    debugPrint("**********************************************");
+    debugPrint("BUILDAUTHORINFO INVOKED");
+    debugPrint("**********************************************");
     return InkWell(
       // 익명일 경우 작성자 정보확인이 불가하도록 함.
       onTap: _article.name_type == 2
@@ -397,6 +400,9 @@ class _PostViewPageState extends State<PostViewPage> {
           : () async {
               await Navigator.of(context).push(
                   slideRoute(UserViewPage(userID: _article.created_by.id)));
+              debugPrint("**********************************************");
+              debugPrint("RETURN TO POSTVIEWPAGE");
+              debugPrint("**********************************************");
               // 유저 정보 페이지에서 돌아올 때 페이지를 업데이트함.
               _setIsPageLoaded(await _fetchArticle(userProvider));
             },
@@ -415,39 +421,10 @@ class _PostViewPageState extends State<PostViewPage> {
               borderRadius: const BorderRadius.all(Radius.circular(100)),
               child: SizedBox.fromSize(
                 size: const Size.fromRadius(15),
-                child: _article.created_by.profile.picture == null
-                    ? SizedBox(
-                        child: SvgPicture.asset(
-                          "assets/icons/warning.svg",
-                          colorFilter: const ColorFilter.mode(
-                            Colors.black,
-                            BlendMode.srcIn,
-                          ),
-                          width: 25,
-                          height: 25,
-                        ),
-                      )
-                    : Image.network(
-                        fit: BoxFit.cover,
-                        _article.created_by.profile.picture.toString(),
-                        // 정상적인 이미지 로드에 실패했을 경우
-                        // warning 아이콘 표시하기
-                        errorBuilder: (BuildContext context, Object error,
-                            StackTrace? stackTrace) {
-                          debugPrint("PostViewPage creator: $error");
-                          return SizedBox(
-                            child: SvgPicture.asset(
-                              "assets/icons/warning.svg",
-                              colorFilter: const ColorFilter.mode(
-                                Colors.black,
-                                BlendMode.srcIn,
-                              ),
-                              width: 25,
-                              height: 25,
-                            ),
-                          );
-                        },
-                      ),
+                // 이미지 프로필이 null인 경우 network 호출하지 않고
+                // warning 아이콘 빌드
+                child: buildProfileImage(
+                    _article.created_by.profile.picture, 25, 25),
               ),
             ),
           ),
@@ -881,45 +858,12 @@ class _PostViewPageState extends State<PostViewPage> {
                                     Radius.circular(100)),
                                 child: SizedBox.fromSize(
                                   size: const Size.fromRadius(12.5),
-                                  child: curComment
-                                              .created_by.profile.picture ==
-                                          null
-                                      ? SizedBox(
-                                          child: SvgPicture.asset(
-                                            "assets/icons/warning.svg",
-                                            colorFilter: const ColorFilter.mode(
-                                              Colors.black,
-                                              BlendMode.srcIn,
-                                            ),
-                                            width: 20,
-                                            height: 20,
-                                          ),
-                                        )
-                                      : Image.network(
-                                          fit: BoxFit.cover,
-                                          curComment
-                                                  .created_by.profile.picture ??
-                                              "null",
-                                          // 정상적인 이미지 로드에 실패했을 경우
-                                          // warning 아이콘 표시하기
-                                          errorBuilder: (BuildContext context,
-                                              Object error,
-                                              StackTrace? stackTrace) {
-                                            debugPrint("PostViewPage Comment: $error");
-                                            return SizedBox(
-                                              child: SvgPicture.asset(
-                                                "assets/icons/warning.svg",
-                                                colorFilter:
-                                                    const ColorFilter.mode(
-                                                  Colors.black,
-                                                  BlendMode.srcIn,
-                                                ),
-                                                width: 20,
-                                                height: 20,
-                                              ),
-                                            );
-                                          },
-                                        ),
+                                  // 이미지 프로필이 null인 경우
+                                  // network를 호출하지 않고
+                                  child: buildProfileImage(
+                                      curComment.created_by.profile.picture,
+                                      20,
+                                      20),
                                 ),
                               ),
                             ),
