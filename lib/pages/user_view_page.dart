@@ -16,6 +16,7 @@ import 'package:new_ara_app/utils/time_utils.dart';
 import 'package:new_ara_app/pages/post_view_page.dart';
 import 'package:new_ara_app/utils/slide_routing.dart';
 import 'package:new_ara_app/providers/notification_provider.dart';
+import 'package:new_ara_app/utils/profile_image.dart';
 
 /// 유저 관련 정보 페이지 뷰, 이벤트 처리를 모두 관리하는 StatefulWidget
 class UserViewPage extends StatefulWidget {
@@ -183,27 +184,7 @@ class _UserViewPageState extends State<UserViewPage> {
               borderRadius: const BorderRadius.all(Radius.circular(100)),
               child: SizedBox.fromSize(
                 size: const Size.fromRadius(25),
-                child: Image.network(
-                  fit: BoxFit.cover,
-                  _userProfileModel.picture ?? "null",
-                  // 정상적인 이미지 로드에 실패했을 경우
-                  // warning 아이콘 표시하기
-                  errorBuilder: (BuildContext context, Object error,
-                      StackTrace? stackTrace) {
-                    debugPrint("$error");
-                    return SizedBox(
-                      child: SvgPicture.asset(
-                        "assets/icons/warning.svg",
-                        colorFilter: const ColorFilter.mode(
-                          Colors.black,
-                          BlendMode.srcIn,
-                        ),
-                        width: 45,
-                        height: 45,
-                      ),
-                    );
-                  },
-                ),
+                child: buildProfileImage(_userProfileModel.picture, 45, 45),
               ),
             ),
           ),
