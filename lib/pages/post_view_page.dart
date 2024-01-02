@@ -1116,7 +1116,7 @@ class _PostViewPageState extends State<PostViewPage> {
       decoration: const BoxDecoration(
         border: Border(
           top: BorderSide(
-              width: 1.0, color: Color(0x00F0F0F0)), // 원하는 색상과 두께로 설정
+              width: 1.0, color: Color(0xFFF0F0F0)), // 원하는 색상과 두께로 설정
         ),
       ),
       child: Column(
@@ -1190,17 +1190,18 @@ class _PostViewPageState extends State<PostViewPage> {
               // TextFormField
               Expanded(
                 child: Container(
+                  margin: EdgeInsets.only(top: 7),
                   constraints: const BoxConstraints(
-                    minHeight: 45,
+                    minHeight: 50,
                   ),
                   decoration: const BoxDecoration(
-                    color: Color.fromRGBO(235, 235, 235, 1),
+                    color: Color(0xFFF8F8F8),
                     borderRadius: BorderRadius.all(Radius.circular(10)),
                   ),
                   child: _buildForm(),
                 ),
               ),
-              const SizedBox(width: 5),
+              const SizedBox(width: 12),
               // send button
               AbsorbPointer(
                 absorbing: _isSending,
@@ -1249,6 +1250,11 @@ class _PostViewPageState extends State<PostViewPage> {
             decoration: const InputDecoration(
               border: InputBorder.none,
               hintText: '댓글을 입력해주세요',
+              hintStyle: TextStyle(
+                color: Color(0xFFBBBBBB),
+                fontSize: 14,
+                fontWeight: FontWeight.w500,
+              ),
             ),
             validator: (value) {
               if (value == null || value.isEmpty) {
