@@ -335,8 +335,8 @@ class _PostViewPageState extends State<PostViewPage> {
               children: [
                 SvgPicture.asset(
                   'assets/icons/like.svg',
-                  width: 13,
-                  height: 15,
+                  width: 10.06,
+                  height: 11,
                   color: _article.my_vote == false
                       ? ColorsInfo.noneVote
                       : ColorsInfo.newara,
@@ -344,7 +344,7 @@ class _PostViewPageState extends State<PostViewPage> {
                 const SizedBox(width: 3),
                 Text('${_article.positive_vote_count}',
                     style: TextStyle(
-                        fontSize: 14,
+                        fontSize: 12,
                         fontWeight: FontWeight.w500,
                         color: _article.my_vote == false
                             ? ColorsInfo.noneVote
@@ -352,8 +352,8 @@ class _PostViewPageState extends State<PostViewPage> {
                 const SizedBox(width: 10),
                 SvgPicture.asset(
                   'assets/icons/dislike.svg',
-                  width: 13,
-                  height: 15,
+                  width: 10.06,
+                  height: 11,
                   color: _article.my_vote == true
                       ? ColorsInfo.noneVote
                       : ColorsInfo.negVote,
@@ -361,7 +361,7 @@ class _PostViewPageState extends State<PostViewPage> {
                 const SizedBox(width: 3),
                 Text('${_article.negative_vote_count}',
                     style: TextStyle(
-                      fontSize: 14,
+                      fontSize: 12,
                       fontWeight: FontWeight.w500,
                       color: _article.my_vote == true
                           ? ColorsInfo.noneVote
@@ -370,14 +370,14 @@ class _PostViewPageState extends State<PostViewPage> {
                 const SizedBox(width: 10),
                 SvgPicture.asset(
                   'assets/icons/comment.svg',
-                  width: 13,
-                  height: 15,
+                  width: 11.85,
+                  height: 11,
                   color: const Color.fromRGBO(99, 99, 99, 1),
                 ),
                 const SizedBox(width: 3),
                 Text('${_article.comment_count}',
                     style: const TextStyle(
-                        fontSize: 14,
+                        fontSize: 12,
                         fontWeight: FontWeight.w500,
                         color: Color.fromRGBO(99, 99, 99, 1))),
               ],
