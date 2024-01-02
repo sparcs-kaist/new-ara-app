@@ -16,6 +16,7 @@ import 'package:new_ara_app/utils/time_utils.dart';
 import 'package:new_ara_app/pages/post_view_page.dart';
 import 'package:new_ara_app/utils/slide_routing.dart';
 import 'package:new_ara_app/providers/notification_provider.dart';
+import 'package:new_ara_app/utils/profile_image.dart';
 
 /// 유저 관련 정보 페이지 뷰, 이벤트 처리를 모두 관리하는 StatefulWidget
 class UserViewPage extends StatefulWidget {
@@ -177,16 +178,14 @@ class _UserViewPageState extends State<UserViewPage> {
             height: 50,
             decoration: const BoxDecoration(
               shape: BoxShape.circle,
+              color: Colors.grey,
             ),
             child: ClipRRect(
               borderRadius: const BorderRadius.all(Radius.circular(100)),
               child: SizedBox.fromSize(
-                size: const Size.fromRadius(48),
-                child: _userProfileModel.picture == null
-                    ? Container()
-                    : Image.network(
-                        fit: BoxFit.cover,
-                        _userProfileModel.picture.toString()),
+                size: const Size.fromRadius(25),
+                // 이미지 링크를 확인한 후 null인 이미지는 warning.svg를 빌드
+                child: buildProfileImage(_userProfileModel.picture, 45, 45),
               ),
             ),
           ),

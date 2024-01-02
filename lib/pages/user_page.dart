@@ -16,6 +16,7 @@ import 'package:new_ara_app/utils/time_utils.dart';
 import 'package:new_ara_app/utils/slide_routing.dart';
 import 'package:new_ara_app/pages/profile_edit_page.dart';
 import 'package:new_ara_app/providers/notification_provider.dart';
+import 'package:new_ara_app/utils/profile_image.dart';
 
 /// 작성한 글, 담아둔 글, 최근 본 글을 나타내기 위해 사용
 enum TabType { created, scrap, recent }
@@ -260,21 +261,21 @@ class _UserPageState extends State<UserPage>
       height: 60,
       child: Row(
         children: [
+          // 사용자 프로필 표시
+          // 사용자 프로필 링크가 null일 경우 warning 아이콘 표시
           Container(
             width: 50,
             height: 50,
             decoration: const BoxDecoration(
               shape: BoxShape.circle,
+              color: Colors.grey,
             ),
             child: ClipRRect(
               borderRadius: const BorderRadius.all(Radius.circular(100)),
               child: SizedBox.fromSize(
-                size: const Size.fromRadius(48),
-                child: userProvider.naUser?.picture == null
-                    ? Container()
-                    : Image.network(
-                        fit: BoxFit.cover,
-                        userProvider.naUser!.picture.toString()),
+                size: const Size.fromRadius(25),
+                // 이미지 링크를 확인한 후 null인 이미지는 warning.svg를 빌드
+                child: buildProfileImage(userProvider.naUser!.picture, 45, 45),
               ),
             ),
           ),

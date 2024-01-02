@@ -21,7 +21,7 @@ import 'package:new_ara_app/utils/slide_routing.dart';
 import 'package:new_ara_app/widgets/in_article_web_view.dart';
 import 'package:new_ara_app/providers/notification_provider.dart';
 import 'package:new_ara_app/widgets/pop_up_menu_buttons.dart';
-import 'package:webview_flutter/webview_flutter.dart';
+import 'package:new_ara_app/utils/profile_image.dart';
 
 /// 하나의 post에 대한 내용 뷰, 이벤트 처리를 모두 담당하는 StatefulWidget.
 class PostViewPage extends StatefulWidget {
@@ -390,6 +390,9 @@ class _PostViewPageState extends State<PostViewPage> {
   /// 작성자 정보 빌드를 담당하며 빌드된 위젯을 리턴.
   /// _article 클래스 전역변수를 사용함.
   Widget _buildAuthorInfo(UserProvider userProvider) {
+    debugPrint("**********************************************");
+    debugPrint("BUILDAUTHORINFO INVOKED");
+    debugPrint("**********************************************");
     return InkWell(
       // 익명일 경우 작성자 정보확인이 불가하도록 함.
       onTap: _article.name_type == 2
@@ -397,12 +400,16 @@ class _PostViewPageState extends State<PostViewPage> {
           : () async {
               await Navigator.of(context).push(
                   slideRoute(UserViewPage(userID: _article.created_by.id)));
+              debugPrint("**********************************************");
+              debugPrint("RETURN TO POSTVIEWPAGE");
+              debugPrint("**********************************************");
               // 유저 정보 페이지에서 돌아올 때 페이지를 업데이트함.
               _setIsPageLoaded(await _fetchArticle(userProvider));
             },
       child: Row(
         children: [
           // 사용자 프로필 사진.
+          // 프로필 이미지 링크가 null일 경우 warning 아이콘 표시
           Container(
             width: 30,
             height: 30,
@@ -413,10 +420,10 @@ class _PostViewPageState extends State<PostViewPage> {
             child: ClipRRect(
               borderRadius: const BorderRadius.all(Radius.circular(100)),
               child: SizedBox.fromSize(
-                size: const Size.fromRadius(48),
-                child: Image.network(
-                    fit: BoxFit.cover,
-                    _article.created_by.profile.picture.toString()),
+                size: const Size.fromRadius(15),
+                // 이미지 링크를 확인한 후 null인 이미지는 warning.svg를 빌드
+                child: buildProfileImage(
+                    _article.created_by.profile.picture, 25, 25),
               ),
             ),
           ),
@@ -830,15 +837,14 @@ class _PostViewPageState extends State<PostViewPage> {
                         onTap: curComment.name_type == 2
                             ? null
                             : () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) => UserViewPage(
-                                          userID: curComment.created_by.id)),
-                                );
+                                Navigator.of(context).push(slideRoute(
+                                    UserViewPage(
+                                        userID: curComment.created_by.id)));
                               },
                         child: Row(
                           children: [
+                            // 댓글 작성자 프로필 이미지 표시
+                            // 이미지 링크가 null일 경우 warning 아이콘 표시
                             Container(
                               width: 25,
                               height: 25,
@@ -849,16 +855,13 @@ class _PostViewPageState extends State<PostViewPage> {
                               child: ClipRRect(
                                 borderRadius: const BorderRadius.all(
                                     Radius.circular(100)),
-                                child: ClipRRect(
-                                  borderRadius: const BorderRadius.all(
-                                      Radius.circular(100)),
-                                  child: SizedBox.fromSize(
-                                    size: const Size.fromRadius(48),
-                                    child: Image.network(
-                                        fit: BoxFit.cover,
-                                        curComment.created_by.profile.picture
-                                            .toString()),
-                                  ),
+                                child: SizedBox.fromSize(
+                                  size: const Size.fromRadius(12.5),
+                                  // 이미지 링크를 확인한 후 null인 이미지는 warning.svg를 빌드
+                                  child: buildProfileImage(
+                                      curComment.created_by.profile.picture,
+                                      20,
+                                      20),
                                 ),
                               ),
                             ),
