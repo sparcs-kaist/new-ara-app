@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:new_ara_app/utils/create_dio_with_config.dart';
 import 'package:provider/provider.dart';
 import 'package:dio/dio.dart';
 
@@ -64,7 +65,7 @@ class _NotificationPageState extends State<NotificationPage> {
   /// 결과 리스트를 반환함.
   Future<List<NotificationModel>> _fetchEachPage(
       UserProvider userProvider, int targetPage) async {
-    var dio = Dio()
+    Dio dio = createDioWithConfig()
       ..options.headers["Cookie"] = userProvider.getCookiesToString();
     List<NotificationModel> resList = [];
     try {
@@ -98,7 +99,7 @@ class _NotificationPageState extends State<NotificationPage> {
       bool hasNext = true;
       UserProvider userProvider = context.read<UserProvider>();
       List<NotificationModel> resList = [];
-      var dio = Dio()
+      Dio dio = createDioWithConfig()
         ..options.headers["Cookie"] = userProvider.getCookiesToString();
       int page = 1;
       for (page = 1; hasNext; page++) {

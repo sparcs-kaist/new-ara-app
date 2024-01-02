@@ -17,6 +17,7 @@ import 'package:new_ara_app/models/board_detail_action_model.dart';
 import 'package:new_ara_app/models/simple_board_model.dart';
 import 'package:new_ara_app/models/topic_model.dart';
 import 'package:new_ara_app/providers/user_provider.dart';
+import 'package:new_ara_app/utils/create_dio_with_config.dart';
 import 'package:new_ara_app/widgets/loading_indicator.dart';
 import 'package:provider/provider.dart';
 import 'package:uuid/uuid.dart';
@@ -223,7 +224,7 @@ class _PostWritePageState extends State<PostWritePage> {
     // 사용자 정보 제공자로부터 쿠키 정보 가져오기.
     var userProvider = context.read<UserProvider>();
     try {
-      Dio dio = Dio();
+      Dio dio = createDioWithConfig();
       dio.options.headers['Cookie'] = userProvider.getCookiesToString();
       var response = await dio.get('$newAraDefaultUrl/api/boards/');
 
@@ -1177,7 +1178,7 @@ class _PostWritePageState extends State<PostWritePage> {
         _isLoading = true;
       });
 
-      Dio dio = Dio();
+      Dio dio = createDioWithConfig();
       dio.options.headers['Cookie'] = userProvider.getCookiesToString();
 
       for (int i = 0; i < _attachmentList.length; i++) {

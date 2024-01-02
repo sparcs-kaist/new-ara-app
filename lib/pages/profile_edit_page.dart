@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:http_parser/http_parser.dart';
 import 'package:flutter/material.dart';
 import 'package:new_ara_app/constants/url_info.dart';
+import 'package:new_ara_app/utils/create_dio_with_config.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:image_picker/image_picker.dart';
@@ -97,7 +98,7 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
       );
     }
     var formData = FormData.fromMap(payload);
-    var dio = Dio();
+    Dio dio = createDioWithConfig();
     dio.options.headers['Cookie'] = userProvider.getCookiesToString();
     try {
       var response = await dio.patch(
