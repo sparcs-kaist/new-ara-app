@@ -337,9 +337,12 @@ class _PostViewPageState extends State<PostViewPage> {
                   'assets/icons/like.svg',
                   width: 10.06,
                   height: 11,
-                  color: _article.my_vote == false
-                      ? ColorsInfo.noneVote
-                      : ColorsInfo.newara,
+                  colorFilter: ColorFilter.mode(
+                    _article.my_vote == false
+                        ? ColorsInfo.noneVote
+                        : ColorsInfo.newara,
+                    BlendMode.srcIn,
+                  ),
                 ),
                 const SizedBox(width: 3),
                 Text('${_article.positive_vote_count}',
@@ -354,9 +357,11 @@ class _PostViewPageState extends State<PostViewPage> {
                   'assets/icons/dislike.svg',
                   width: 10.06,
                   height: 11,
-                  color: _article.my_vote == true
-                      ? ColorsInfo.noneVote
-                      : ColorsInfo.negVote,
+                  colorFilter: ColorFilter.mode(
+                      _article.my_vote == true
+                          ? ColorsInfo.noneVote
+                          : ColorsInfo.negVote,
+                      BlendMode.srcIn),
                 ),
                 const SizedBox(width: 3),
                 Text('${_article.negative_vote_count}',
@@ -372,7 +377,10 @@ class _PostViewPageState extends State<PostViewPage> {
                   'assets/icons/comment.svg',
                   width: 11.85,
                   height: 11,
-                  color: const Color.fromRGBO(99, 99, 99, 1),
+                  colorFilter: const ColorFilter.mode(
+                    Color.fromRGBO(99, 99, 99, 1),
+                    BlendMode.srcIn,
+                  ),
                 ),
                 const SizedBox(width: 3),
                 Text('${_article.comment_count}',
