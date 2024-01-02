@@ -270,7 +270,6 @@ class _PostViewPageState extends State<PostViewPage> {
                         ),
                       ),
                     ),
-                    const SizedBox(height: 15),
                     // 댓글 입력 부분
                     _buildCommentTextFormField(userProvider),
                   ]),
@@ -1127,6 +1126,7 @@ class _PostViewPageState extends State<PostViewPage> {
             visible: _isNestedComment,
             child: Column(
               children: [
+                const SizedBox(height: 3),
                 Text(
                   '${(targetComment == null ? false : targetComment!.is_mine) ? '\'나\'에게' : "'${targetComment?.created_by.profile.nickname}'님께"} 답글을 작성하는 중',
                   maxLines: 1,
@@ -1136,7 +1136,7 @@ class _PostViewPageState extends State<PostViewPage> {
                     fontWeight: FontWeight.w500,
                   ),
                 ),
-                const SizedBox(height: 5)
+                const SizedBox(height: 4)
               ],
             ),
           ),
@@ -1144,6 +1144,7 @@ class _PostViewPageState extends State<PostViewPage> {
             visible: _isModify,
             child: Column(
               children: [
+                const SizedBox(height: 3),
                 Text(
                   '나의 댓글 "${targetComment?.content}" 수정 중',
                   maxLines: 1,
@@ -1153,7 +1154,7 @@ class _PostViewPageState extends State<PostViewPage> {
                     fontWeight: FontWeight.w500,
                   ),
                 ),
-                const SizedBox(height: 5)
+                const SizedBox(height: 4)
               ],
             ),
           ),
@@ -1190,9 +1191,9 @@ class _PostViewPageState extends State<PostViewPage> {
               // TextFormField
               Expanded(
                 child: Container(
-                  margin: EdgeInsets.only(top: 7),
+                  margin: const EdgeInsets.only(top: 7),
                   constraints: const BoxConstraints(
-                    minHeight: 50,
+                    minHeight: 36,
                   ),
                   decoration: const BoxDecoration(
                     color: Color(0xFFF8F8F8),
@@ -1227,7 +1228,7 @@ class _PostViewPageState extends State<PostViewPage> {
               ),
             ],
           ),
-          const SizedBox(height: 15),
+          const SizedBox(height: 7),
         ],
       ),
     );
@@ -1241,6 +1242,9 @@ class _PostViewPageState extends State<PostViewPage> {
       child: Container(
           margin: const EdgeInsets.only(left: 15),
           child: TextFormField(
+            style: TextStyle(
+              fontSize: 14,
+            ),
             cursorColor: ColorsInfo.newara,
             controller: _textEditingController,
             focusNode: textFocusNode,
