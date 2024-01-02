@@ -182,6 +182,7 @@ class _PostViewPageState extends State<PostViewPage> {
       children: [
         if (_isPageLoaded)
           Scaffold(
+            backgroundColor: Colors.white,
             appBar: AppBar(
               leading: IconButton(
                 color: ColorsInfo.newara,
@@ -311,7 +312,7 @@ class _PostViewPageState extends State<PostViewPage> {
             Row(
               children: [
                 Text(
-                  getTime(_article.created_at),
+                  specificTime(_article.created_at),
                   style: const TextStyle(
                     fontSize: 12,
                     fontWeight: FontWeight.w500,
@@ -883,7 +884,7 @@ class _PostViewPageState extends State<PostViewPage> {
                                 )),
                             const SizedBox(width: 7),
                             Text(
-                              getTime(curComment.created_at),
+                              specificTime(curComment.created_at),
                               style: const TextStyle(
                                   fontSize: 14,
                                   fontWeight: FontWeight.w400,
