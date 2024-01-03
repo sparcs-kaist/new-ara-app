@@ -315,7 +315,7 @@ class _PostViewPageState extends State<PostViewPage> {
                   style: const TextStyle(
                     fontSize: 12,
                     fontWeight: FontWeight.w500,
-                    color: Color.fromRGBO(177, 177, 177, 1),
+                    color: Color(0xFFBBBBBB),
                   ),
                 ),
                 const SizedBox(width: 10),
@@ -324,7 +324,7 @@ class _PostViewPageState extends State<PostViewPage> {
                   style: const TextStyle(
                     fontSize: 12,
                     fontWeight: FontWeight.w500,
-                    color: Color.fromRGBO(177, 177, 177, 1),
+                    color: Color(0xFFBBBBBB),
                   ),
                 ),
               ],
@@ -765,10 +765,9 @@ class _PostViewPageState extends State<PostViewPage> {
                         const Text(
                           '신고',
                           style: TextStyle(
-                            fontSize: 13,
-                            fontWeight: FontWeight.w500,
-                            color: Color(0xFF646464)
-                          ),
+                              fontSize: 13,
+                              fontWeight: FontWeight.w500,
+                              color: Color(0xFF646464)),
                         ),
                       ],
                     ),
@@ -802,17 +801,17 @@ class _PostViewPageState extends State<PostViewPage> {
                           width: 11,
                           height: 19,
                           colorFilter: const ColorFilter.mode(
-                            Color(0xFF646464), BlendMode.srcIn,
+                            Color(0xFF646464),
+                            BlendMode.srcIn,
                           ),
                         ),
                         const SizedBox(width: 3),
                         const Text(
                           '수정',
                           style: TextStyle(
-                            fontSize: 13,
-                            fontWeight: FontWeight.w500,
-                            color: Color(0xFF646464)
-                          ),
+                              fontSize: 13,
+                              fontWeight: FontWeight.w500,
+                              color: Color(0xFF646464)),
                         ),
                       ],
                     ),
@@ -899,13 +898,12 @@ class _PostViewPageState extends State<PostViewPage> {
                                   overflow: TextOverflow.ellipsis,
                                 )),
                             const SizedBox(width: 7),
-                            Text(
-                              specificTime(curComment.created_at),
-                              style: const TextStyle(
-                                  fontSize: 14,
+                            Text(getTime(curComment.created_at),
+                                style: const TextStyle(
+                                  fontSize: 12,
                                   fontWeight: FontWeight.w400,
-                                  color: Color.fromRGBO(51, 51, 51, 1)),
-                            ),
+                                  color: Color(0xFFBBBBBB),
+                                )),
                           ],
                         ),
                       ),
