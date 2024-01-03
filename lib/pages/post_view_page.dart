@@ -488,8 +488,8 @@ class _PostViewPageState extends State<PostViewPage> {
             color: _article.my_vote == false
                 ? ColorsInfo.noneVote
                 : ColorsInfo.newara,
-            width: 35,
-            height: 35,
+            width: 20.17,
+            height: 28,
           ),
         ),
         const SizedBox(width: 3),
@@ -517,8 +517,8 @@ class _PostViewPageState extends State<PostViewPage> {
             color: _article.my_vote == true
                 ? ColorsInfo.noneVote
                 : ColorsInfo.negVote,
-            width: 35,
-            height: 35,
+            width: 20.17,
+            height: 28,
           ),
         ),
         const SizedBox(width: 3),
