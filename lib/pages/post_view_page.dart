@@ -331,11 +331,12 @@ class _PostViewPageState extends State<PostViewPage> {
             ),
             // 좋아요, 싫어요, 댓글 갯수 표시 Row
             Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 SvgPicture.asset(
                   'assets/icons/like.svg',
                   width: 10.06,
-                  height: 11,
+                  height: 16,
                   colorFilter: ColorFilter.mode(
                     _article.my_vote == false
                         ? ColorsInfo.noneVote
@@ -343,7 +344,7 @@ class _PostViewPageState extends State<PostViewPage> {
                     BlendMode.srcIn,
                   ),
                 ),
-                const SizedBox(width: 3),
+                const SizedBox(width: 1.92),
                 Text('${_article.positive_vote_count}',
                     style: TextStyle(
                         fontSize: 12,
@@ -355,14 +356,14 @@ class _PostViewPageState extends State<PostViewPage> {
                 SvgPicture.asset(
                   'assets/icons/dislike.svg',
                   width: 10.06,
-                  height: 11,
+                  height: 16,
                   colorFilter: ColorFilter.mode(
                       _article.my_vote == true
                           ? ColorsInfo.noneVote
                           : ColorsInfo.negVote,
                       BlendMode.srcIn),
                 ),
-                const SizedBox(width: 3),
+                const SizedBox(width: 1.92),
                 Text('${_article.negative_vote_count}',
                     style: TextStyle(
                       fontSize: 12,
@@ -375,13 +376,13 @@ class _PostViewPageState extends State<PostViewPage> {
                 SvgPicture.asset(
                   'assets/icons/comment.svg',
                   width: 11.85,
-                  height: 11,
+                  height: 16,
                   colorFilter: const ColorFilter.mode(
                     Color.fromRGBO(99, 99, 99, 1),
                     BlendMode.srcIn,
                   ),
                 ),
-                const SizedBox(width: 3),
+                const SizedBox(width: 1.92),
                 Text('${_article.comment_count}',
                     style: const TextStyle(
                         fontSize: 12,
