@@ -187,7 +187,10 @@ class _PostViewPageState extends State<PostViewPage> {
               leading: IconButton(
                 color: ColorsInfo.newara,
                 icon: SvgPicture.asset('assets/icons/left_chevron.svg',
-                    color: ColorsInfo.newara, width: 35, height: 35),
+                    colorFilter: const ColorFilter.mode(
+                        ColorsInfo.newara, BlendMode.srcIn),
+                    width: 35,
+                    height: 35),
                 onPressed: () => Navigator.pop(context),
               ),
             ),
@@ -250,9 +253,7 @@ class _PostViewPageState extends State<PostViewPage> {
                               _buildUtilityButtons(userProvider),
                               const SizedBox(height: 15),
                               const Divider(
-                                thickness: 1,
-                                color: Color(0xFFF0F0F0)
-                              ),
+                                  thickness: 1, color: Color(0xFFF0F0F0)),
                               const SizedBox(height: 15),
                               SizedBox(
                                 width: MediaQuery.of(context).size.width - 40,
@@ -458,7 +459,8 @@ class _PostViewPageState extends State<PostViewPage> {
             visible: _article.created_by.profile.nickname != "익명",
             child: SvgPicture.asset(
               'assets/icons/right_chevron.svg',
-              color: Colors.black,
+              colorFilter:
+                  const ColorFilter.mode(Colors.black, BlendMode.srcIn),
               width: 5,
               height: 9,
             ),
@@ -485,9 +487,11 @@ class _PostViewPageState extends State<PostViewPage> {
           },
           child: SvgPicture.asset(
             'assets/icons/like.svg',
-            color: _article.my_vote == false
-                ? ColorsInfo.noneVote
-                : ColorsInfo.newara,
+            colorFilter: ColorFilter.mode(
+                _article.my_vote == false
+                    ? ColorsInfo.noneVote
+                    : ColorsInfo.newara,
+                BlendMode.srcIn),
             width: 20.17,
             height: 28,
           ),
@@ -514,9 +518,12 @@ class _PostViewPageState extends State<PostViewPage> {
           },
           child: SvgPicture.asset(
             'assets/icons/dislike.svg',
-            color: _article.my_vote == true
-                ? ColorsInfo.noneVote
-                : ColorsInfo.negVote,
+            colorFilter: ColorFilter.mode(
+              _article.my_vote == true
+                  ? ColorsInfo.noneVote
+                  : ColorsInfo.negVote,
+              BlendMode.srcIn,
+            ),
             width: 20.17,
             height: 28,
           ),
@@ -574,9 +581,11 @@ class _PostViewPageState extends State<PostViewPage> {
                         'assets/icons/bookmark.svg',
                         width: 15,
                         height: 15,
-                        color: _article.my_scrap == null
-                            ? const Color(0xFF646464)
-                            : ColorsInfo.newara,
+                        colorFilter: ColorFilter.mode(
+                            _article.my_scrap == null
+                                ? const Color(0xFF646464)
+                                : ColorsInfo.newara,
+                            BlendMode.srcIn),
                       ),
                       const SizedBox(width: 4),
                       Text(
@@ -620,7 +629,9 @@ class _PostViewPageState extends State<PostViewPage> {
                           'assets/icons/share.svg',
                           width: 11,
                           height: 19,
-                          color: const Color.fromRGBO(100, 100, 100, 1),
+                          colorFilter: const ColorFilter.mode(
+                              Color.fromRGBO(100, 100, 100, 1),
+                              BlendMode.srcIn),
                         ),
                         const SizedBox(width: 6),
                         const Text(
@@ -761,7 +772,8 @@ class _PostViewPageState extends State<PostViewPage> {
                           'assets/icons/warning.svg',
                           width: 15,
                           height: 15,
-                          color: const Color(0xFF646464),
+                          colorFilter: const ColorFilter.mode(
+                              Color(0xFF646464), BlendMode.srcIn),
                         ),
                         const SizedBox(width: 4),
                         const Text(
@@ -1002,9 +1014,11 @@ class _PostViewPageState extends State<PostViewPage> {
                                   'assets/icons/like.svg',
                                   width: 25,
                                   height: 25,
-                                  color: curComment.my_vote == false
-                                      ? ColorsInfo.noneVote
-                                      : ColorsInfo.newara,
+                                  colorFilter: ColorFilter.mode(
+                                      curComment.my_vote == false
+                                          ? ColorsInfo.noneVote
+                                          : ColorsInfo.newara,
+                                      BlendMode.srcIn),
                                 ),
                               ),
                               const SizedBox(width: 3),
@@ -1032,9 +1046,11 @@ class _PostViewPageState extends State<PostViewPage> {
                                   'assets/icons/dislike.svg',
                                   width: 25,
                                   height: 25,
-                                  color: curComment.my_vote == true
-                                      ? ColorsInfo.noneVote
-                                      : ColorsInfo.negVote,
+                                  colorFilter: ColorFilter.mode(
+                                      curComment.my_vote == true
+                                          ? ColorsInfo.noneVote
+                                          : ColorsInfo.negVote,
+                                      BlendMode.srcIn),
                                 ),
                               ),
                               const SizedBox(width: 3),
@@ -1087,9 +1103,7 @@ class _PostViewPageState extends State<PostViewPage> {
                 ],
               ),
             ),
-            const Divider(
-              color: Color(0xFFF0F0F0)
-            ),
+            const Divider(color: Color(0xFFF0F0F0)),
           ],
         );
       },
@@ -1189,7 +1203,8 @@ class _PostViewPageState extends State<PostViewPage> {
                             'assets/icons/close-2.svg',
                             width: 30,
                             height: 30,
-                            color: ColorsInfo.newara,
+                            colorFilter: const ColorFilter.mode(
+                                ColorsInfo.newara, BlendMode.srcIn),
                           ),
                         ),
                         const SizedBox(width: 5),
@@ -1231,7 +1246,9 @@ class _PostViewPageState extends State<PostViewPage> {
                   },
                   child: SvgPicture.asset(
                     'assets/icons/send.svg',
-                    color: ColorsInfo.newara,
+                    colorFilter: const ColorFilter.mode(
+                      ColorsInfo.newara, BlendMode.srcIn
+                    ),
                     width: 30,
                     height: 30,
                   ),
