@@ -517,9 +517,17 @@ class _UserPageState extends State<UserPage>
                                           fontSize: 14,
                                           fontWeight: FontWeight.w500,
                                           color: ColorsInfo.newara)),
-                                  const SizedBox(width: 6),
                                 ],
                               ),
+                            ),
+                            Visibility(
+                              visible: (curPost.positive_vote_count != null &&
+                                      curPost.positive_vote_count! > 0) &&
+                                  ((curPost.negative_vote_count != null &&
+                                      curPost.negative_vote_count! > 0) ||
+                                  (curPost.comment_count != null &&
+                                      curPost.comment_count! > 0)),
+                              child: const SizedBox(width: 6),
                             ),
                             Visibility(
                               visible: curPost.negative_vote_count != null &&
@@ -540,9 +548,15 @@ class _UserPageState extends State<UserPage>
                                           fontWeight: FontWeight.w500,
                                           color:
                                               Color.fromRGBO(83, 141, 209, 1))),
-                                  const SizedBox(width: 6),
                                 ],
                               ),
+                            ),
+                            Visibility(
+                              visible: (curPost.negative_vote_count != null &&
+                                      curPost.negative_vote_count! > 0) &&
+                                  (curPost.comment_count != null &&
+                                      curPost.comment_count! > 0),
+                              child: const SizedBox(width: 6),
                             ),
                             Visibility(
                               visible: curPost.comment_count != null &&
