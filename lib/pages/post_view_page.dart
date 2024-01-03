@@ -220,6 +220,7 @@ class _PostViewPageState extends State<PostViewPage> {
                               // 유저 정보 (프로필 이미지, 닉네임)
                               _buildAuthorInfo(userProvider),
                               const Divider(
+                                color: Color(0xFFF0F0F0),
                                 thickness: 1,
                               ),
                               // TODO: (2023.08.09)첨부파일 리스트뷰 프로토타입. 추후 디자이너와 조율 예정
@@ -250,6 +251,7 @@ class _PostViewPageState extends State<PostViewPage> {
                               const SizedBox(height: 15),
                               const Divider(
                                 thickness: 1,
+                                color: Color(0xFFF0F0F0)
                               ),
                               const SizedBox(height: 15),
                               SizedBox(
@@ -1085,7 +1087,9 @@ class _PostViewPageState extends State<PostViewPage> {
                 ],
               ),
             ),
-            const Divider(),
+            const Divider(
+              color: Color(0xFFF0F0F0)
+            ),
           ],
         );
       },
