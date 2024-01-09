@@ -1,4 +1,4 @@
-app_identifier("org.sparcs.newara") # The bundle identifier of your app
+app_identifier("org.sparcs.new-ara-app") # The bundle identifier of your app
 apple_id("sboh021214@icloud.com") # Your Apple Developer Portal username
 
 itc_team_name("SPARCS") # App Store Connect Team Name
