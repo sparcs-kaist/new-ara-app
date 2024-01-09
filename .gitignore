@@ -53,3 +53,5 @@ android/fastlane/newara-fastlane.json
 ios/fastlane/report.xml
 ios/fastlane/README.md
 ios/fastlane/.env.default
+ios/Runner.app.dSYM.zip
+ios/Runner.ipa
