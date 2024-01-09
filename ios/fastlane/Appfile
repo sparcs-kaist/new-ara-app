@@ -1,0 +1,8 @@
+app_identifier("org.sparcs.newara") # The bundle identifier of your app
+apple_id("sboh021214@icloud.com") # Your Apple Developer Portal username
+
+itc_team_name("SPARCS") # App Store Connect Team Name
+team_id("N5V8W52U3U") # Developer Portal Team ID
+
+# For more information about the Appfile, see:
+#     https://docs.fastlane.tools/advanced/#appfile
