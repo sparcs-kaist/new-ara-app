@@ -9,6 +9,11 @@
     <key>NSMicrophoneUsageDescription</key>
     <string>This is used for image_picker 0.8.7+5</string>
 
+	<key>LSSupportsOpeningDocumentsInPlace</key>
+    <true/>
+    <key>UIFileSharingEnabled</key>
+    <true/>
+
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<key>CFBundleDisplayName</key>
