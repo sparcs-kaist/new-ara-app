@@ -309,53 +309,93 @@ class _UserViewPageState extends State<UserViewPage> {
                         // 좋아요, 싫어요, 댓글 표시 Row
                         Row(
                           children: [
-                            SvgPicture.asset(
-                              'assets/icons/like.svg',
-                              width: 13,
-                              height: 15,
-                              colorFilter: const ColorFilter.mode(
-                                ColorsInfo.newara,
-                                BlendMode.srcIn,
+                            Visibility(
+                              visible: curPost.positive_vote_count != null &&
+                                  curPost.positive_vote_count! > 0,
+                              child: Row(
+                                children: [
+                                  SvgPicture.asset(
+                                    'assets/icons/like.svg',
+                                    width: 13,
+                                    height: 15,
+                                    colorFilter: const ColorFilter.mode(
+                                      ColorsInfo.newara,
+                                      BlendMode.srcIn,
+                                    ),
+                                  ),
+                                  const SizedBox(width: 3),
+                                  Text('${curPost.positive_vote_count}',
+                                      style: const TextStyle(
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.w500,
+                                          color: ColorsInfo.newara)),
+                                ],
                               ),
                             ),
-                            const SizedBox(width: 3),
-                            Text('${curPost.positive_vote_count}',
-                                style: const TextStyle(
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.w500,
-                                    color: ColorsInfo.newara)),
-                            const SizedBox(width: 10),
-                            SvgPicture.asset(
-                              'assets/icons/dislike.svg',
-                              width: 13,
-                              height: 15,
-                              colorFilter: const ColorFilter.mode(
-                                Color.fromRGBO(83, 141, 209, 1),
-                                BlendMode.srcIn,
+                            Visibility(
+                              visible: (curPost.positive_vote_count != null &&
+                                      curPost.positive_vote_count! > 0) &&
+                                  ((curPost.negative_vote_count != null &&
+                                          curPost.negative_vote_count! > 0) ||
+                                      (curPost.comment_count != null &&
+                                          curPost.comment_count! > 0)),
+                              child: const SizedBox(width: 6),
+                            ),
+                            Visibility(
+                              visible: curPost.negative_vote_count != null &&
+                                  curPost.negative_vote_count! > 0,
+                              child: Row(
+                                children: [
+                                  SvgPicture.asset(
+                                    'assets/icons/dislike.svg',
+                                    width: 13,
+                                    height: 15,
+                                    colorFilter: const ColorFilter.mode(
+                                      Color.fromRGBO(83, 141, 209, 1),
+                                      BlendMode.srcIn,
+                                    ),
+                                  ),
+                                  const SizedBox(width: 3),
+                                  Text('${curPost.negative_vote_count}',
+                                      style: const TextStyle(
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.w500,
+                                          color:
+                                              Color.fromRGBO(83, 141, 209, 1))),
+                                ],
                               ),
                             ),
-                            const SizedBox(width: 3),
-                            Text('${curPost.negative_vote_count}',
-                                style: const TextStyle(
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.w500,
-                                    color: Color.fromRGBO(83, 141, 209, 1))),
-                            const SizedBox(width: 10),
-                            SvgPicture.asset(
-                              'assets/icons/comment.svg',
-                              width: 13,
-                              height: 15,
-                              colorFilter: const ColorFilter.mode(
-                                Color.fromRGBO(99, 99, 99, 1),
-                                BlendMode.srcIn,
+                            Visibility(
+                              visible: (curPost.negative_vote_count != null &&
+                                      curPost.negative_vote_count! > 0) &&
+                                  (curPost.comment_count != null &&
+                                      curPost.comment_count! > 0),
+                              child: const SizedBox(width: 6),
+                            ),
+                            Visibility(
+                              visible: curPost.comment_count != null &&
+                                  curPost.comment_count! > 0,
+                              child: Row(
+                                children: [
+                                  SvgPicture.asset(
+                                    'assets/icons/comment.svg',
+                                    width: 13,
+                                    height: 15,
+                                    colorFilter: const ColorFilter.mode(
+                                      Color.fromRGBO(99, 99, 99, 1),
+                                      BlendMode.srcIn,
+                                    ),
+                                  ),
+                                  const SizedBox(width: 3),
+                                  Text('${curPost.comment_count}',
+                                      style: const TextStyle(
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.w500,
+                                          color:
+                                              Color.fromRGBO(99, 99, 99, 1))),
+                                ],
                               ),
                             ),
-                            const SizedBox(width: 3),
-                            Text('${curPost.comment_count}',
-                                style: const TextStyle(
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.w500,
-                                    color: Color.fromRGBO(99, 99, 99, 1))),
                           ],
                         ),
                       ],
