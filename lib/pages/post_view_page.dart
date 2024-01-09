@@ -182,11 +182,15 @@ class _PostViewPageState extends State<PostViewPage> {
       children: [
         if (_isPageLoaded)
           Scaffold(
+            backgroundColor: Colors.white,
             appBar: AppBar(
               leading: IconButton(
                 color: ColorsInfo.newara,
                 icon: SvgPicture.asset('assets/icons/left_chevron.svg',
-                    color: ColorsInfo.newara, width: 35, height: 35),
+                    colorFilter: const ColorFilter.mode(
+                        ColorsInfo.newara, BlendMode.srcIn),
+                    width: 35,
+                    height: 35),
                 onPressed: () => Navigator.pop(context),
               ),
             ),
@@ -219,6 +223,7 @@ class _PostViewPageState extends State<PostViewPage> {
                               // 유저 정보 (프로필 이미지, 닉네임)
                               _buildAuthorInfo(userProvider),
                               const Divider(
+                                color: Color(0xFFF0F0F0),
                                 thickness: 1,
                               ),
                               // TODO: (2023.08.09)첨부파일 리스트뷰 프로토타입. 추후 디자이너와 조율 예정
@@ -248,8 +253,7 @@ class _PostViewPageState extends State<PostViewPage> {
                               _buildUtilityButtons(userProvider),
                               const SizedBox(height: 15),
                               const Divider(
-                                thickness: 1,
-                              ),
+                                  thickness: 1, color: Color(0xFFF0F0F0)),
                               const SizedBox(height: 15),
                               SizedBox(
                                 width: MediaQuery.of(context).size.width - 40,
@@ -269,7 +273,6 @@ class _PostViewPageState extends State<PostViewPage> {
                         ),
                       ),
                     ),
-                    const SizedBox(height: 15),
                     // 댓글 입력 부분
                     _buildCommentTextFormField(userProvider),
                   ]),
@@ -311,11 +314,11 @@ class _PostViewPageState extends State<PostViewPage> {
             Row(
               children: [
                 Text(
-                  getTime(_article.created_at),
+                  specificTime(_article.created_at),
                   style: const TextStyle(
                     fontSize: 12,
                     fontWeight: FontWeight.w500,
-                    color: Color.fromRGBO(177, 177, 177, 1),
+                    color: Color(0xFFBBBBBB),
                   ),
                 ),
                 const SizedBox(width: 10),
@@ -324,26 +327,30 @@ class _PostViewPageState extends State<PostViewPage> {
                   style: const TextStyle(
                     fontSize: 12,
                     fontWeight: FontWeight.w500,
-                    color: Color.fromRGBO(177, 177, 177, 1),
+                    color: Color(0xFFBBBBBB),
                   ),
                 ),
               ],
             ),
             // 좋아요, 싫어요, 댓글 갯수 표시 Row
             Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 SvgPicture.asset(
                   'assets/icons/like.svg',
-                  width: 13,
-                  height: 15,
-                  color: _article.my_vote == false
-                      ? ColorsInfo.noneVote
-                      : ColorsInfo.newara,
+                  width: 10.06,
+                  height: 16,
+                  colorFilter: ColorFilter.mode(
+                    _article.my_vote == false
+                        ? ColorsInfo.noneVote
+                        : ColorsInfo.newara,
+                    BlendMode.srcIn,
+                  ),
                 ),
-                const SizedBox(width: 3),
+                const SizedBox(width: 1.92),
                 Text('${_article.positive_vote_count}',
                     style: TextStyle(
-                        fontSize: 14,
+                        fontSize: 12,
                         fontWeight: FontWeight.w500,
                         color: _article.my_vote == false
                             ? ColorsInfo.noneVote
@@ -351,16 +358,18 @@ class _PostViewPageState extends State<PostViewPage> {
                 const SizedBox(width: 10),
                 SvgPicture.asset(
                   'assets/icons/dislike.svg',
-                  width: 13,
-                  height: 15,
-                  color: _article.my_vote == true
-                      ? ColorsInfo.noneVote
-                      : ColorsInfo.negVote,
+                  width: 10.06,
+                  height: 16,
+                  colorFilter: ColorFilter.mode(
+                      _article.my_vote == true
+                          ? ColorsInfo.noneVote
+                          : ColorsInfo.negVote,
+                      BlendMode.srcIn),
                 ),
-                const SizedBox(width: 3),
+                const SizedBox(width: 1.92),
                 Text('${_article.negative_vote_count}',
                     style: TextStyle(
-                      fontSize: 14,
+                      fontSize: 12,
                       fontWeight: FontWeight.w500,
                       color: _article.my_vote == true
                           ? ColorsInfo.noneVote
@@ -369,14 +378,17 @@ class _PostViewPageState extends State<PostViewPage> {
                 const SizedBox(width: 10),
                 SvgPicture.asset(
                   'assets/icons/comment.svg',
-                  width: 13,
-                  height: 15,
-                  color: const Color.fromRGBO(99, 99, 99, 1),
+                  width: 11.85,
+                  height: 16,
+                  colorFilter: const ColorFilter.mode(
+                    Color.fromRGBO(99, 99, 99, 1),
+                    BlendMode.srcIn,
+                  ),
                 ),
-                const SizedBox(width: 3),
+                const SizedBox(width: 1.92),
                 Text('${_article.comment_count}',
                     style: const TextStyle(
-                        fontSize: 14,
+                        fontSize: 12,
                         fontWeight: FontWeight.w500,
                         color: Color.fromRGBO(99, 99, 99, 1))),
               ],
@@ -447,7 +459,8 @@ class _PostViewPageState extends State<PostViewPage> {
             visible: _article.created_by.profile.nickname != "익명",
             child: SvgPicture.asset(
               'assets/icons/right_chevron.svg',
-              color: Colors.black,
+              colorFilter:
+                  const ColorFilter.mode(Colors.black, BlendMode.srcIn),
               width: 5,
               height: 9,
             ),
@@ -474,11 +487,13 @@ class _PostViewPageState extends State<PostViewPage> {
           },
           child: SvgPicture.asset(
             'assets/icons/like.svg',
-            color: _article.my_vote == false
-                ? ColorsInfo.noneVote
-                : ColorsInfo.newara,
-            width: 35,
-            height: 35,
+            colorFilter: ColorFilter.mode(
+                _article.my_vote == false
+                    ? ColorsInfo.noneVote
+                    : ColorsInfo.newara,
+                BlendMode.srcIn),
+            width: 20.17,
+            height: 28,
           ),
         ),
         const SizedBox(width: 3),
@@ -503,11 +518,14 @@ class _PostViewPageState extends State<PostViewPage> {
           },
           child: SvgPicture.asset(
             'assets/icons/dislike.svg',
-            color: _article.my_vote == true
-                ? ColorsInfo.noneVote
-                : ColorsInfo.negVote,
-            width: 35,
-            height: 35,
+            colorFilter: ColorFilter.mode(
+              _article.my_vote == true
+                  ? ColorsInfo.noneVote
+                  : ColorsInfo.negVote,
+              BlendMode.srcIn,
+            ),
+            width: 20.17,
+            height: 28,
           ),
         ),
         const SizedBox(width: 3),
@@ -545,13 +563,13 @@ class _PostViewPageState extends State<PostViewPage> {
               },
               child: Container(
                 width: 88,
-                height: 40,
+                height: 35,
                 decoration: BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(8),
                   border: Border.all(
                     color: _article.my_scrap == null
-                        ? const Color.fromRGBO(230, 230, 230, 1)
+                        ? const Color(0xFFF0F0F0)
                         : ColorsInfo.newara,
                   ),
                 ),
@@ -559,21 +577,22 @@ class _PostViewPageState extends State<PostViewPage> {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      const SizedBox(width: 2),
                       SvgPicture.asset(
                         'assets/icons/bookmark.svg',
                         width: 15,
                         height: 15,
-                        color: _article.my_scrap == null
-                            ? const Color.fromRGBO(100, 100, 100, 1)
-                            : ColorsInfo.newara,
+                        colorFilter: ColorFilter.mode(
+                            _article.my_scrap == null
+                                ? const Color(0xFF646464)
+                                : ColorsInfo.newara,
+                            BlendMode.srcIn),
                       ),
-                      const SizedBox(width: 5),
+                      const SizedBox(width: 4),
                       Text(
                         _article.my_scrap == null ? '담아두기' : '담아둔 글',
                         style: TextStyle(
                           color: _article.my_scrap == null
-                              ? Colors.black
+                              ? const Color(0xFF646464)
                               : ColorsInfo.newara,
                           fontSize: 13,
                           fontWeight: FontWeight.w500,
@@ -593,37 +612,39 @@ class _PostViewPageState extends State<PostViewPage> {
                 ).share();
               },
               child: Container(
-                width: 64,
-                height: 40,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(8),
-                  border: Border.all(
-                    color: const Color.fromRGBO(230, 230, 230, 1),
+                  width: 64,
+                  height: 35,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(
+                      color: const Color(0xFFF0F0F0),
+                      width: 1,
+                    ),
                   ),
-                ),
-                child: Center(
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      const SizedBox(width: 2),
-                      SvgPicture.asset(
-                        'assets/icons/share.svg',
-                        width: 11,
-                        height: 25,
-                        color: const Color.fromRGBO(100, 100, 100, 1),
-                      ),
-                      const SizedBox(width: 10),
-                      const Text(
-                        '공유',
-                        style: TextStyle(
-                          fontSize: 13,
-                          fontWeight: FontWeight.w500,
+                  child: Center(
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        SvgPicture.asset(
+                          'assets/icons/share.svg',
+                          width: 11,
+                          height: 19,
+                          colorFilter: const ColorFilter.mode(
+                              Color.fromRGBO(100, 100, 100, 1),
+                              BlendMode.srcIn),
                         ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
+                        const SizedBox(width: 6),
+                        const Text(
+                          '공유',
+                          style: TextStyle(
+                            fontSize: 13,
+                            fontWeight: FontWeight.w500,
+                            color: Color(0xFF646464),
+                          ),
+                        ),
+                      ],
+                    ),
+                  )),
             ),
           ],
         ),
@@ -634,32 +655,34 @@ class _PostViewPageState extends State<PostViewPage> {
               InkWell(
                 onTap: null,
                 child: Container(
-                  width: 65,
-                  height: 40,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(8),
-                    border: Border.all(
-                      color: const Color.fromRGBO(230, 230, 230, 1),
-                    ),
-                  ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      SvgPicture.asset("assets/icons/barrior.svg",
-                          width: 11,
-                          height: 13,
-                          colorFilter: const ColorFilter.mode(
-                              Colors.black, BlendMode.srcIn)),
-                      const Text(
-                        '차단',
-                        style: TextStyle(
-                          fontSize: 13,
-                          fontWeight: FontWeight.w500,
-                        ),
+                    width: 65,
+                    height: 35,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(
+                        color: const Color(0xFFF0F0F0),
                       ),
-                    ],
-                  ),
-                ),
+                    ),
+                    child: Center(
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          SvgPicture.asset("assets/icons/barrior.svg",
+                              width: 11,
+                              height: 19,
+                              colorFilter: const ColorFilter.mode(
+                                  Color(0xFF646464), BlendMode.srcIn)),
+                          const SizedBox(width: 3),
+                          const Text(
+                            '차단',
+                            style: TextStyle(
+                                fontSize: 13,
+                                fontWeight: FontWeight.w500,
+                                color: Color(0xFF646464)),
+                          ),
+                        ],
+                      ),
+                    )),
               )
             else // 자신의 글
               InkWell(
@@ -692,32 +715,34 @@ class _PostViewPageState extends State<PostViewPage> {
                           ));
                 },
                 child: Container(
-                  width: 65,
-                  height: 40,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(8),
-                    border: Border.all(
-                      color: const Color.fromRGBO(230, 230, 230, 1),
-                    ),
-                  ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      SvgPicture.asset("assets/icons/delete.svg",
-                          width: 15,
-                          height: 15,
-                          colorFilter: const ColorFilter.mode(
-                              Colors.black, BlendMode.srcIn)),
-                      const Text(
-                        '삭제',
-                        style: TextStyle(
-                          fontSize: 13,
-                          fontWeight: FontWeight.w500,
-                        ),
+                    width: 65,
+                    height: 35,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(
+                        color: const Color(0xFFF0F0F0),
                       ),
-                    ],
-                  ),
-                ),
+                    ),
+                    child: Center(
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          SvgPicture.asset("assets/icons/delete.svg",
+                              width: 11,
+                              height: 19,
+                              colorFilter: const ColorFilter.mode(
+                                  Color(0xFF646464), BlendMode.srcIn)),
+                          const SizedBox(width: 3),
+                          const Text(
+                            '삭제',
+                            style: TextStyle(
+                                fontSize: 13,
+                                fontWeight: FontWeight.w500,
+                                color: Color(0xFF646464)),
+                          ),
+                        ],
+                      ),
+                    )),
               ),
             const SizedBox(width: 10),
             // 자신의 글일 경우 수정 버튼, 타인의 글일 경우 신고 버튼
@@ -731,32 +756,32 @@ class _PostViewPageState extends State<PostViewPage> {
                       });
                 },
                 child: Container(
-                  width: 90,
-                  height: 40,
+                  width: 65,
+                  height: 35,
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(8),
                     border: Border.all(
-                      color: const Color.fromRGBO(230, 230, 230, 1),
+                      color: const Color(0xFFF0F0F0),
                     ),
                   ),
                   child: Center(
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        const SizedBox(width: 2),
                         SvgPicture.asset(
                           'assets/icons/warning.svg',
-                          width: 25,
-                          height: 25,
-                          color: const Color.fromRGBO(100, 100, 100, 1),
+                          width: 15,
+                          height: 15,
+                          colorFilter: const ColorFilter.mode(
+                              Color(0xFF646464), BlendMode.srcIn),
                         ),
-                        const SizedBox(width: 10),
+                        const SizedBox(width: 4),
                         const Text(
                           '신고',
                           style: TextStyle(
-                            fontSize: 15,
-                            fontWeight: FontWeight.w500,
-                          ),
+                              fontSize: 13,
+                              fontWeight: FontWeight.w500,
+                              color: Color(0xFF646464)),
                         ),
                       ],
                     ),
@@ -774,11 +799,11 @@ class _PostViewPageState extends State<PostViewPage> {
                 },
                 child: Container(
                   width: 65,
-                  height: 40,
+                  height: 35,
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(8),
                     border: Border.all(
-                      color: const Color.fromRGBO(230, 230, 230, 1),
+                      color: const Color(0xFFF0F0F0),
                     ),
                   ),
                   child: Center(
@@ -788,14 +813,19 @@ class _PostViewPageState extends State<PostViewPage> {
                         SvgPicture.asset(
                           'assets/icons/modify.svg',
                           width: 11,
-                          height: 13,
+                          height: 19,
+                          colorFilter: const ColorFilter.mode(
+                            Color(0xFF646464),
+                            BlendMode.srcIn,
+                          ),
                         ),
+                        const SizedBox(width: 3),
                         const Text(
                           '수정',
                           style: TextStyle(
-                            fontSize: 15,
-                            fontWeight: FontWeight.w500,
-                          ),
+                              fontSize: 13,
+                              fontWeight: FontWeight.w500,
+                              color: Color(0xFF646464)),
                         ),
                       ],
                     ),
@@ -882,13 +912,12 @@ class _PostViewPageState extends State<PostViewPage> {
                                   overflow: TextOverflow.ellipsis,
                                 )),
                             const SizedBox(width: 7),
-                            Text(
-                              getTime(curComment.created_at),
-                              style: const TextStyle(
-                                  fontSize: 14,
+                            Text(getTime(curComment.created_at),
+                                style: const TextStyle(
+                                  fontSize: 12,
                                   fontWeight: FontWeight.w400,
-                                  color: Color.fromRGBO(51, 51, 51, 1)),
-                            ),
+                                  color: Color(0xFFBBBBBB),
+                                )),
                           ],
                         ),
                       ),
@@ -985,9 +1014,11 @@ class _PostViewPageState extends State<PostViewPage> {
                                   'assets/icons/like.svg',
                                   width: 25,
                                   height: 25,
-                                  color: curComment.my_vote == false
-                                      ? ColorsInfo.noneVote
-                                      : ColorsInfo.newara,
+                                  colorFilter: ColorFilter.mode(
+                                      curComment.my_vote == false
+                                          ? ColorsInfo.noneVote
+                                          : ColorsInfo.newara,
+                                      BlendMode.srcIn),
                                 ),
                               ),
                               const SizedBox(width: 3),
@@ -1015,9 +1046,11 @@ class _PostViewPageState extends State<PostViewPage> {
                                   'assets/icons/dislike.svg',
                                   width: 25,
                                   height: 25,
-                                  color: curComment.my_vote == true
-                                      ? ColorsInfo.noneVote
-                                      : ColorsInfo.negVote,
+                                  colorFilter: ColorFilter.mode(
+                                      curComment.my_vote == true
+                                          ? ColorsInfo.noneVote
+                                          : ColorsInfo.negVote,
+                                      BlendMode.srcIn),
                                 ),
                               ),
                               const SizedBox(width: 3),
@@ -1070,7 +1103,7 @@ class _PostViewPageState extends State<PostViewPage> {
                 ],
               ),
             ),
-            const Divider(),
+            const Divider(color: Color(0xFFF0F0F0)),
           ],
         );
       },
@@ -1107,7 +1140,7 @@ class _PostViewPageState extends State<PostViewPage> {
       decoration: const BoxDecoration(
         border: Border(
           top: BorderSide(
-              width: 1.0, color: Color(0x00F0F0F0)), // 원하는 색상과 두께로 설정
+              width: 1.0, color: Color(0xFFF0F0F0)), // 원하는 색상과 두께로 설정
         ),
       ),
       child: Column(
@@ -1118,6 +1151,7 @@ class _PostViewPageState extends State<PostViewPage> {
             visible: _isNestedComment,
             child: Column(
               children: [
+                const SizedBox(height: 3),
                 Text(
                   '${(targetComment == null ? false : targetComment!.is_mine) ? '\'나\'에게' : "'${targetComment?.created_by.profile.nickname}'님께"} 답글을 작성하는 중',
                   maxLines: 1,
@@ -1127,7 +1161,7 @@ class _PostViewPageState extends State<PostViewPage> {
                     fontWeight: FontWeight.w500,
                   ),
                 ),
-                const SizedBox(height: 5)
+                const SizedBox(height: 4)
               ],
             ),
           ),
@@ -1135,6 +1169,7 @@ class _PostViewPageState extends State<PostViewPage> {
             visible: _isModify,
             child: Column(
               children: [
+                const SizedBox(height: 3),
                 Text(
                   '나의 댓글 "${targetComment?.content}" 수정 중',
                   maxLines: 1,
@@ -1144,7 +1179,7 @@ class _PostViewPageState extends State<PostViewPage> {
                     fontWeight: FontWeight.w500,
                   ),
                 ),
-                const SizedBox(height: 5)
+                const SizedBox(height: 4)
               ],
             ),
           ),
@@ -1168,7 +1203,8 @@ class _PostViewPageState extends State<PostViewPage> {
                             'assets/icons/close-2.svg',
                             width: 30,
                             height: 30,
-                            color: ColorsInfo.newara,
+                            colorFilter: const ColorFilter.mode(
+                                ColorsInfo.newara, BlendMode.srcIn),
                           ),
                         ),
                         const SizedBox(width: 5),
@@ -1181,17 +1217,18 @@ class _PostViewPageState extends State<PostViewPage> {
               // TextFormField
               Expanded(
                 child: Container(
+                  margin: const EdgeInsets.only(top: 7),
                   constraints: const BoxConstraints(
-                    minHeight: 45,
+                    minHeight: 36,
                   ),
                   decoration: const BoxDecoration(
-                    color: Color.fromRGBO(235, 235, 235, 1),
+                    color: Color(0xFFF8F8F8),
                     borderRadius: BorderRadius.all(Radius.circular(10)),
                   ),
                   child: _buildForm(),
                 ),
               ),
-              const SizedBox(width: 5),
+              const SizedBox(width: 12),
               // send button
               AbsorbPointer(
                 absorbing: _isSending,
@@ -1209,7 +1246,9 @@ class _PostViewPageState extends State<PostViewPage> {
                   },
                   child: SvgPicture.asset(
                     'assets/icons/send.svg',
-                    color: ColorsInfo.newara,
+                    colorFilter: const ColorFilter.mode(
+                      ColorsInfo.newara, BlendMode.srcIn
+                    ),
                     width: 30,
                     height: 30,
                   ),
@@ -1217,7 +1256,7 @@ class _PostViewPageState extends State<PostViewPage> {
               ),
             ],
           ),
-          const SizedBox(height: 15),
+          const SizedBox(height: 7),
         ],
       ),
     );
@@ -1231,6 +1270,9 @@ class _PostViewPageState extends State<PostViewPage> {
       child: Container(
           margin: const EdgeInsets.only(left: 15),
           child: TextFormField(
+            style: TextStyle(
+              fontSize: 14,
+            ),
             cursorColor: ColorsInfo.newara,
             controller: _textEditingController,
             focusNode: textFocusNode,
@@ -1240,6 +1282,11 @@ class _PostViewPageState extends State<PostViewPage> {
             decoration: const InputDecoration(
               border: InputBorder.none,
               hintText: '댓글을 입력해주세요',
+              hintStyle: TextStyle(
+                color: Color(0xFFBBBBBB),
+                fontSize: 14,
+                fontWeight: FontWeight.w500,
+              ),
             ),
             validator: (value) {
               if (value == null || value.isEmpty) {
