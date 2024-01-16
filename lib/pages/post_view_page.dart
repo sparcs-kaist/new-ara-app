@@ -1136,7 +1136,7 @@ class _PostViewPageState extends State<PostViewPage> {
                     child: curComment.is_hidden == false
                         ? _buildCommentContent(curComment.content ?? "")
                         : Text(
-                            _isPostBlocked(_article) ? '차단된 댓글 입니다.' : '삭제된 댓글 입니다.',
+                            _isPostBlocked(_article) ? '차단한 사용자의 댓글 입니다.' : '삭제된 댓글 입니다.',
                             style: const TextStyle(
                               fontSize: 14,
                               fontWeight: FontWeight.w400,
