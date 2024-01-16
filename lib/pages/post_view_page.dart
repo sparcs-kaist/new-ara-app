@@ -684,7 +684,7 @@ class _PostViewPageState extends State<PostViewPage> {
               InkWell(
                 onTap: null,
                 child: Container(
-                    width: 65,
+                    width: _isAuthorBlocked() ? 85 : 65,
                     height: 35,
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(8),
@@ -702,9 +702,9 @@ class _PostViewPageState extends State<PostViewPage> {
                               colorFilter: const ColorFilter.mode(
                                   Color(0xFF646464), BlendMode.srcIn)),
                           const SizedBox(width: 3),
-                          const Text(
-                            '차단',
-                            style: TextStyle(
+                          Text(
+                            _isAuthorBlocked() ? '차단 해제' : '차단',
+                            style: const TextStyle(
                                 fontSize: 13,
                                 fontWeight: FontWeight.w500,
                                 color: Color(0xFF646464)),
