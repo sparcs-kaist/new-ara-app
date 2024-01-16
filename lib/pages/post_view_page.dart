@@ -735,19 +735,31 @@ class _PostViewPageState extends State<PostViewPage> {
                   child: InkWell(
                 onTap: () async {
                   bool isBlocked = _isPostBlocked(_article);
-                  // 차단되어 있지 않은 경우
+                  // 차단 되어있지 않은 경우
                   if (!isBlocked) {
-                    bool blockRes = await ArticleController(
-                            model: _article, userProvider: userProvider)
-                        .handleBlock(true);
-                    if (blockRes) {
-                      _article.is_hidden = true;
-                      _article.why_hidden.add("BLOCKED_USER_CONTENT");
-                      _setIsPostVisible(false);
-                    } else {
-                      debugPrint("blocking failed");
-                      // TODO: user 알림 메시지 추가해야함.
-                    }
+                    await showDialog(
+                      context: context,
+                      builder: (context) => BlockCheckDialog(
+                        onTap: () {
+                          ArticleController(
+                                  model: _article, userProvider: userProvider)
+                              .handleBlock(true)
+                              .then((blockRes) {
+                            if (blockRes) {
+                              _article.is_hidden = true;
+                              _article.why_hidden.add("BLOCKED_USER_CONTENT");
+                              _setIsPostVisible(false);
+                            } else {
+                              debugPrint("blocking failed");
+                              // TODO: user 알림 메시지 추가해야함.
+                            }
+                            Navigator.pop(context);
+                          });
+                        },
+                        userProvider: userProvider,
+                        targetContext: context,
+                      ),
+                    );
                   }
                   // 이미 차단되어 있는 경우
                   else {
