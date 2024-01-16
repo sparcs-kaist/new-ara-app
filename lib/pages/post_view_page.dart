@@ -258,7 +258,7 @@ class _PostViewPageState extends State<PostViewPage> {
                               ),
                               // TODO: (2023.08.09)첨부파일 리스트뷰 프로토타입. 추후 디자이너와 조율 예정
                               Visibility(
-                                visible: _article.attachments.isNotEmpty,
+                                visible: _article.attachments.isNotEmpty && _article.is_hidden,
                                 child: Row(
                                   mainAxisAlignment: MainAxisAlignment.end,
                                   children: [
