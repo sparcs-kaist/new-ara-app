@@ -134,10 +134,10 @@ class _PostViewPageState extends State<PostViewPage> {
     dynamic articleJson;
 
     String apiUrl = "$newAraDefaultUrl/api/articles/${widget.articleID}";
-    Dio _dio = createDioWithConfig();
 
     try {
-      articleJson = await _dio.get(apiUrl);
+      var response = await userProvider.myDio().get(apiUrl);
+      articleJson = response.data;
     } on DioException catch (e) {
       debugPrint("DioException occurred");
       if (e.response != null) {
