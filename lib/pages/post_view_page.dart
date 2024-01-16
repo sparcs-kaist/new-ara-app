@@ -3,7 +3,9 @@
 import 'dart:core';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:new_ara_app/constants/url_info.dart';
 import 'package:provider/provider.dart';
+import 'package:dio/dio.dart';
 
 import 'package:new_ara_app/constants/colors_info.dart';
 import 'package:new_ara_app/models/article_model.dart';
@@ -121,11 +123,38 @@ class _PostViewPageState extends State<PostViewPage> {
 
   /// 클래스 멤버변수 _article, _commentList, _commentKeys의 값을 설정하는 메서드.
   /// API 통신을 위해 [userProvider]를 전달받음.
+  /// 기존에 차단된 글에서는 title, content 등이 null이지만 override_hidden이 true이면 원래 내용이 로드됨.
   /// _article, _commentList, _commentKeys의 값이 모두 설정되면 true, 아닌 경우 false 반환.
-  Future<bool> _fetchArticle(UserProvider userProvider) async {
+  Future<bool> _fetchArticle(UserProvider userProvider, {override_hidden=false}) async {
     dynamic articleJson;
+    String apiUrl = "$newAraDefaultUrl/api/articles/${widget.articleID}";
+    // 차단된 유저의 글에 대한 내용을 로드하는 경우 주소를 수정함.
+    if (override_hidden) apiUrl += "/?override_hidden=true";
 
-    articleJson = await userProvider.getApiRes("articles/${widget.articleID}");
+    try {
+      var response = await userProvider.myDio().get(apiUrl);
+      articleJson = response.data;
+    } on DioException catch (e) {
+      debugPrint("DioException occurred");
+      if (e.response != null) {
+        debugPrint("${e.response!.data}");
+        debugPrint("${e.response!.headers}");
+        debugPrint("${e.response!.requestOptions}");
+      }
+      // request의 setting, sending에서 문제 발생
+      // requestOption, message를 출력.
+      else {
+        debugPrint("${e.requestOptions}");
+        debugPrint("${e.message}");
+      }
+
+      // fetch에 실패하는 경우 false 리턴
+      return false;
+    } catch (e) {
+      debugPrint("error on fetching article: $e");
+      return false;
+    }
+
     if (articleJson == null) {
       debugPrint("\nArticleJson is null\n");
       return false;
