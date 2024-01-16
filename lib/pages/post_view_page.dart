@@ -100,7 +100,6 @@ class _PostViewPageState extends State<PostViewPage> {
   @override
   void initState() {
     super.initState();
-    _isPostVisible = true;
     _isPageLoaded = false;
     _isModify = _isNestedComment = false;
     _isSending = false;
@@ -109,6 +108,7 @@ class _PostViewPageState extends State<PostViewPage> {
     userProvider.setIsContentLoaded(false, quiet: true);
     _fetchArticle(userProvider).then((value) {
       _isReportable = value ? !_article.is_mine : false;
+      _isPostVisible = value ? !_isPostBlocked(_article) : true;
       _setIsPageLoaded(value);
     });
 
