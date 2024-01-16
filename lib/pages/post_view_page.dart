@@ -323,19 +323,8 @@ class _PostViewPageState extends State<PostViewPage> {
                                         ),
                                         child: InkWell(
                                           onTap: () async {
-                                            // 아직 override_hidden=true 옵션으로 로드하지 않은 경우
-                                            if (_article.title == null) {
-                                              bool fetchRes =
-                                                  await _fetchArticle(
-                                                      userProvider,
-                                                      override_hidden: true);
-                                              // if (fetchRes)
-                                              //   _setIsPostVisible(true);
-                                            }
-                                            // 이미 override_hidden=true 옵션으로 로드 완료된 경우
-                                            else {
-                                              // _setIsPostVisible(true);
-                                            }
+                                            await _fetchArticle(userProvider, override_hidden: true);
+                                            _updateState();
                                           },
                                           child: const Center(
                                             child: Text(
@@ -784,8 +773,10 @@ class _PostViewPageState extends State<PostViewPage> {
                               .then((blockRes) {
                             // 차단이 성공한 경우
                             if (blockRes) {
-                              _fetchArticle(userProvider,
-                                  override_hidden: true);
+                              _fetchArticle(userProvider).then((_) {
+                                _updateState();
+                                Navigator.pop(context);
+                              });
                             }
                             // 차단에 실패할 경우 오류 메시지 출력
                             else {
@@ -807,6 +798,7 @@ class _PostViewPageState extends State<PostViewPage> {
                     // 차단 해제에 성공한 경우 다시 글을 fetch함.
                     if (unblockRes) {
                       await _fetchArticle(userProvider);
+                      _updateState();
                     }
                     // 차단 해제에 실패한 경우 오류 메시지를 출력함.
                     else {

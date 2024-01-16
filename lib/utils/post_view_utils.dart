@@ -151,7 +151,7 @@ class ArticleController {
   Future<bool> handleBlock(bool block) async {
     String apiUrl = "$newAraDefaultUrl/api/blocks/";
     // 차단 해제하는 경우 apiUrl을 변경
-    if (!block) apiUrl += "/without_id";
+    if (!block) apiUrl += "without_id/";
 
     int userID = model.created_by.id;
 
