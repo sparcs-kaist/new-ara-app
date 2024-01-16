@@ -130,7 +130,8 @@ class _PostViewPageState extends State<PostViewPage> {
   /// 클래스 멤버변수 _article, _commentList, _commentKeys의 값을 설정하는 메서드.
   /// API 통신을 위해 [userProvider]를 전달받음.
   /// _article, _commentList, _commentKeys의 값이 모두 설정되면 true, 아닌 경우 false 반환.
-  Future<bool> _fetchArticle(UserProvider userProvider, {override_hidden=false}) async {
+  Future<bool> _fetchArticle(UserProvider userProvider,
+      {override_hidden = false}) async {
     dynamic articleJson;
 
     String apiUrl = "$newAraDefaultUrl/api/articles/${widget.articleID}";
@@ -238,7 +239,11 @@ class _PostViewPageState extends State<PostViewPage> {
                         onRefresh: () async {
                           userProvider.setIsContentLoaded(false);
                           _setIsPageLoaded(false);
-                          _setIsPageLoaded(await _fetchArticle(userProvider));
+                          bool fetchRes = await _fetchArticle(userProvider);
+                          _isReportable = fetchRes ? !_article.is_mine : false;
+                          _isPostVisible =
+                              fetchRes ? !_isPostBlocked(_article) : true;
+                          _setIsPageLoaded(fetchRes);
                         },
                         child: SingleChildScrollView(
                           // 위젯이 화면을 넘어가지 않더라고 scrollable 처리.
@@ -322,8 +327,12 @@ class _PostViewPageState extends State<PostViewPage> {
                                           onTap: () async {
                                             // 아직 override_hidden=true 옵션으로 로드하지 않은 경우
                                             if (_article.title == null) {
-                                              bool fetchRes = await _fetchArticle(userProvider, override_hidden: true);
-                                              if (fetchRes) _setIsPostVisible(true);
+                                              bool fetchRes =
+                                                  await _fetchArticle(
+                                                      userProvider,
+                                                      override_hidden: true);
+                                              if (fetchRes)
+                                                _setIsPostVisible(true);
                                             }
                                             // 이미 override_hidden=true 옵션으로 로드 완료된 경우
                                             else {
@@ -780,12 +789,12 @@ class _PostViewPageState extends State<PostViewPage> {
                               .then((blockRes) {
                             // 차단이 성공할 경우 article model을 새로 로드한다.
                             if (blockRes) {
-                              _fetchArticle(userProvider, override_hidden: true).then((fetchRes) {
+                              _fetchArticle(userProvider, override_hidden: true)
+                                  .then((fetchRes) {
                                 // override_hidden=true 글 로드가 성공한 경우
                                 if (fetchRes) {
                                   _setIsPostVisible(false);
-                                }
-                                else {
+                                } else {
                                   // TODO: 유저 메시지 처리하기
                                   debugPrint("fetch failed...");
                                 }
@@ -813,8 +822,7 @@ class _PostViewPageState extends State<PostViewPage> {
                       bool fetchRes = await _fetchArticle(userProvider);
                       if (fetchRes) {
                         _setIsPostVisible(true);
-                      }
-                      else {
+                      } else {
                         debugPrint("blocking failed");
                         // TODO: user 알림 메시지 추가해야함.
                       }
@@ -1155,7 +1163,11 @@ class _PostViewPageState extends State<PostViewPage> {
                     child: curComment.is_hidden == false
                         ? _buildCommentContent(curComment.content ?? "")
                         : Text(
-                            _isPostBlocked(_article) && !curComment.why_hidden.contains("DELETED_CONTENT") ? '차단한 사용자의 댓글입니다.' : '삭제된 댓글입니다.',
+                            _isPostBlocked(_article) &&
+                                    !curComment.why_hidden
+                                        .contains("DELETED_CONTENT")
+                                ? '차단한 사용자의 댓글입니다.'
+                                : '삭제된 댓글입니다.',
                             style: const TextStyle(
                               fontSize: 14,
                               fontWeight: FontWeight.w400,
@@ -1528,7 +1540,7 @@ class _PostViewPageState extends State<PostViewPage> {
   /// 현재 글이 차단된 글인지 여부를 판단하여
   /// boolean값을 리턴.
   bool _isPostBlocked(ArticleModel article) {
-    return _article.created_by.is_blocked;
+    return _article.created_by.is_blocked ?? false;
   }
 
   // 둘 다 false 면 일반적인 댓글

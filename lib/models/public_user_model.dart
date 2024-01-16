@@ -4,13 +4,13 @@ class PublicUserModel {
   final dynamic id;
   final String username;
   final PublicUserProfileModel profile;
-  final bool is_blocked;
+  final bool? is_blocked;
 
   PublicUserModel({
     required this.id,
     required this.username,
     required this.profile,
-    required this.is_blocked,
+    this.is_blocked,
   });
 
   factory PublicUserModel.fromJson(Map<String, dynamic> json) {
