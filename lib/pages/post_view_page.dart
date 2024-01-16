@@ -320,8 +320,15 @@ class _PostViewPageState extends State<PostViewPage> {
                                         ),
                                         child: InkWell(
                                           onTap: () async {
-                                            bool fetchRes = await _fetchArticle(userProvider, override_hidden: true);
-                                            if (fetchRes) _setIsPostVisible(true);
+                                            // 아직 override_hidden=true 옵션으로 로드하지 않은 경우
+                                            if (_article.title == null) {
+                                              bool fetchRes = await _fetchArticle(userProvider, override_hidden: true);
+                                              if (fetchRes) _setIsPostVisible(true);
+                                            }
+                                            // 이미 override_hidden=true 옵션으로 로드 완료된 경우
+                                            else {
+                                              _setIsPostVisible(true);
+                                            }
                                           },
                                           child: const Center(
                                             child: Text(
