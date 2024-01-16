@@ -125,7 +125,8 @@ class _PostViewPageState extends State<PostViewPage> {
   /// API 통신을 위해 [userProvider]를 전달받음.
   /// 기존에 차단된 글에서는 title, content 등이 null이지만 override_hidden이 true이면 원래 내용이 로드됨.
   /// _article, _commentList, _commentKeys의 값이 모두 설정되면 true, 아닌 경우 false 반환.
-  Future<bool> _fetchArticle(UserProvider userProvider, {override_hidden=false}) async {
+  Future<bool> _fetchArticle(UserProvider userProvider,
+      {override_hidden = false}) async {
     dynamic articleJson;
     String apiUrl = "$newAraDefaultUrl/api/articles/${widget.articleID}";
     // 차단된 유저의 글에 대한 내용을 로드하는 경우 주소를 수정함.
@@ -269,10 +270,96 @@ class _PostViewPageState extends State<PostViewPage> {
                                 ),
                               ),
                               const SizedBox(height: 5),
-                              InArticleWebView(
-                                content: _article.content ?? "",
-                                initialHeight: 150,
-                                isComment: false,
+                              // 차단된 유저의 글에 대한 내용
+                              Visibility(
+                                // 차단이 되었고 사용자가 '숨긴내용 보기'를 누르지 않았을 때
+                                visible: _article.can_override_hidden == true &&
+                                    _article.is_hidden == true,
+                                child: Container(
+                                  decoration: const BoxDecoration(
+                                    borderRadius:
+                                        BorderRadius.all(Radius.circular(10)),
+                                    color: Color(0xfffafafa),
+                                  ),
+                                  width: MediaQuery.of(context).size.width - 20,
+                                  height: 170,
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      SvgPicture.asset(
+                                        'assets/icons/barrior.svg',
+                                        width: 40,
+                                        height: 40,
+                                      ),
+                                      const Text(
+                                        '차단한 사용자의 게시물입니다.',
+                                        style: TextStyle(
+                                          color: Color(0xFF4A4A4A),
+                                          fontWeight: FontWeight.w700,
+                                          fontSize: 16,
+                                        ),
+                                      ),
+                                      const Text(
+                                        '(차단 사용자 설정은 마이페이지에서 확인할 수 있습니다.)',
+                                        style: TextStyle(
+                                          fontWeight: FontWeight.w400,
+                                          fontSize: 14,
+                                          color: Color(0xFF4A4A4A),
+                                        ),
+                                      ),
+                                      const SizedBox(height: 8),
+                                      Container(
+                                        width: 104,
+                                        height: 36,
+                                        decoration: BoxDecoration(
+                                          borderRadius: const BorderRadius.all(
+                                              Radius.circular(10)),
+                                          border: Border.all(
+                                            width: 1,
+                                            color: Color(0xFFDBDBDB),
+                                          ),
+                                        ),
+                                        child: InkWell(
+                                          onTap: () async {
+                                            // 아직 override_hidden=true 옵션으로 로드하지 않은 경우
+                                            if (_article.title == null) {
+                                              bool fetchRes =
+                                                  await _fetchArticle(
+                                                      userProvider,
+                                                      override_hidden: true);
+                                              // if (fetchRes)
+                                              //   _setIsPostVisible(true);
+                                            }
+                                            // 이미 override_hidden=true 옵션으로 로드 완료된 경우
+                                            else {
+                                              // _setIsPostVisible(true);
+                                            }
+                                          },
+                                          child: const Center(
+                                            child: Text(
+                                              '숨긴내용 보기',
+                                              style: TextStyle(
+                                                color: Color(0xff4a4a4a),
+                                                fontWeight: FontWeight.w400,
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                              Visibility(
+                                // 차단이 되지 않았을 때 또는 사용자가 '숨긴내용 보기'를 눌렀을 때
+                                visible: _article.is_hidden == false,
+                                child: InArticleWebView(
+                                  content: _article.content ?? "",
+                                  initialHeight: 150,
+                                  isComment: false,
+                                ),
                               ),
                               const SizedBox(height: 10),
                               // 좋아요, 싫어요 버튼 Row
@@ -690,10 +777,14 @@ class _PostViewPageState extends State<PostViewPage> {
                       context: context,
                       builder: (context) => BlockConfirmDialog(
                         onTap: () {
-                          ArticleController(model: _article, userProvider: userProvider).handleBlock(true).then((blockRes) {
+                          ArticleController(
+                                  model: _article, userProvider: userProvider)
+                              .handleBlock(true)
+                              .then((blockRes) {
                             // 차단이 성공한 경우
                             if (blockRes) {
-                              _fetchArticle(userProvider, override_hidden: true);
+                              _fetchArticle(userProvider,
+                                  override_hidden: true);
                             }
                             // 차단에 실패할 경우 오류 메시지 출력
                             else {
@@ -709,7 +800,9 @@ class _PostViewPageState extends State<PostViewPage> {
                   }
                   // 이미 차단 되어있는 경우
                   else {
-                    bool unblockRes = await ArticleController(model: _article, userProvider: userProvider).handleBlock(false);
+                    bool unblockRes = await ArticleController(
+                            model: _article, userProvider: userProvider)
+                        .handleBlock(false);
                     // 차단 해제에 성공한 경우 다시 글을 fetch함.
                     if (unblockRes) {
                       await _fetchArticle(userProvider);
@@ -1314,8 +1407,7 @@ class _PostViewPageState extends State<PostViewPage> {
                   child: SvgPicture.asset(
                     'assets/icons/send.svg',
                     colorFilter: const ColorFilter.mode(
-                      ColorsInfo.newara, BlendMode.srcIn
-                    ),
+                        ColorsInfo.newara, BlendMode.srcIn),
                     width: 30,
                     height: 30,
                   ),
