@@ -1329,6 +1329,12 @@ class _PostViewPageState extends State<PostViewPage> {
     );
   }
 
+  /// 현재 post의 작성자가 사용자에 의해 차단되었는지 여부를 반환
+  /// created_by의 is_blocked 필드가 null이면 false 리턴.
+  bool _isAuthorBlocked() {
+    return _article.created_by.is_blocked ?? false;
+  }
+
   /// 대댓글, 수정 기능 사용 시 대상이 되는 댓글 컨테이너를
   /// 키보드 바로 위로 이동시키는 메서드.
   /// 댓글 식별을 위해 _commentKeys의 인덱스를 [idx]로 전달받음.
