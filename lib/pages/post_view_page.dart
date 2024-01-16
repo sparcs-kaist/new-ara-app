@@ -130,10 +130,11 @@ class _PostViewPageState extends State<PostViewPage> {
   /// 클래스 멤버변수 _article, _commentList, _commentKeys의 값을 설정하는 메서드.
   /// API 통신을 위해 [userProvider]를 전달받음.
   /// _article, _commentList, _commentKeys의 값이 모두 설정되면 true, 아닌 경우 false 반환.
-  Future<bool> _fetchArticle(UserProvider userProvider) async {
+  Future<bool> _fetchArticle(UserProvider userProvider, {override_hidden=false}) async {
     dynamic articleJson;
 
     String apiUrl = "$newAraDefaultUrl/api/articles/${widget.articleID}";
+    if (override_hidden) apiUrl += "/?override_hidden=true";
 
     try {
       var response = await userProvider.myDio().get(apiUrl);
@@ -318,8 +319,9 @@ class _PostViewPageState extends State<PostViewPage> {
                                           ),
                                         ),
                                         child: InkWell(
-                                          onTap: () {
-                                            _setIsPostVisible(true);
+                                          onTap: () async {
+                                            bool fetchRes = await _fetchArticle(userProvider, override_hidden: true);
+                                            if (fetchRes) _setIsPostVisible(true);
                                           },
                                           child: const Center(
                                             child: Text(
@@ -398,7 +400,7 @@ class _PostViewPageState extends State<PostViewPage> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          _article.title.toString(),
+          _isPostVisible ? _article.title.toString() : "차단한 사용자의 게시물입니다.",
           style: const TextStyle(
             fontSize: 18,
             fontWeight: FontWeight.w700,
