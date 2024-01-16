@@ -415,7 +415,8 @@ class _PostViewPageState extends State<PostViewPage> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          _article.title.toString(),
+          // 차단된 경우 title이 null이 되므로 아래와 같이 설정함.
+          _article.title ?? "차단한 사용자의 게시물입니다.",
           style: const TextStyle(
             fontSize: 18,
             fontWeight: FontWeight.w700,
