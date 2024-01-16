@@ -3,7 +3,9 @@
 import 'dart:core';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:new_ara_app/constants/url_info.dart';
 import 'package:provider/provider.dart';
+import 'package:dio/dio.dart';
 
 import 'package:new_ara_app/constants/colors_info.dart';
 import 'package:new_ara_app/models/article_model.dart';
@@ -22,6 +24,7 @@ import 'package:new_ara_app/widgets/in_article_web_view.dart';
 import 'package:new_ara_app/providers/notification_provider.dart';
 import 'package:new_ara_app/widgets/pop_up_menu_buttons.dart';
 import 'package:new_ara_app/utils/profile_image.dart';
+import 'package:new_ara_app/utils/create_dio_with_config.dart';
 
 /// 하나의 post에 대한 내용 뷰, 이벤트 처리를 모두 담당하는 StatefulWidget.
 class PostViewPage extends StatefulWidget {
@@ -130,7 +133,28 @@ class _PostViewPageState extends State<PostViewPage> {
   Future<bool> _fetchArticle(UserProvider userProvider) async {
     dynamic articleJson;
 
-    articleJson = await userProvider.getApiRes("articles/${widget.articleID}");
+    String apiUrl = "$newAraDefaultUrl/api/articles/${widget.articleID}";
+    Dio _dio = createDioWithConfig();
+
+    try {
+      articleJson = await _dio.get(apiUrl);
+    } on DioException catch (e) {
+      debugPrint("DioException occurred");
+      if (e.response != null) {
+        debugPrint("${e.response!.data}");
+        debugPrint("${e.response!.headers}");
+        debugPrint("${e.response!.requestOptions}");
+      }
+      // request의 setting, sending에서 문제 발생
+      // requestOption, message를 출력.
+      else {
+        debugPrint("${e.requestOptions}");
+        debugPrint("${e.message}");
+      }
+    } catch (e) {
+      debugPrint("error on _fetchArticle: $e");
+    }
+
     if (articleJson == null) {
       debugPrint("\nArticleJson is null\n");
       return false;
@@ -745,11 +769,14 @@ class _PostViewPageState extends State<PostViewPage> {
                                   model: _article, userProvider: userProvider)
                               .handleBlock(true)
                               .then((blockRes) {
+                            // 차단이 성공할 경우 article model을 새로 로드한다.
                             if (blockRes) {
                               _article.is_hidden = true;
                               _article.why_hidden.add("BLOCKED_USER_CONTENT");
                               _setIsPostVisible(false);
-                            } else {
+                            }
+                            // 차단이 실패할 경우 사용자 에러 메시지 출력
+                            else {
                               debugPrint("blocking failed");
                               // TODO: user 알림 메시지 추가해야함.
                             }
