@@ -1135,9 +1135,9 @@ class _PostViewPageState extends State<PostViewPage> {
                     margin: const EdgeInsets.only(left: 30, right: 0),
                     child: curComment.is_hidden == false
                         ? _buildCommentContent(curComment.content ?? "")
-                        : const Text(
-                            '삭제된 댓글 입니다.',
-                            style: TextStyle(
+                        : Text(
+                            _isPostBlocked(_article) ? '차단된 댓글 입니다.' : '삭제된 댓글 입니다.',
+                            style: const TextStyle(
                               fontSize: 14,
                               fontWeight: FontWeight.w400,
                               color: Colors.grey,
