@@ -249,7 +249,8 @@ class _PostViewPageState extends State<PostViewPage> {
                                 visible: !_isPostVisible,
                                 child: Container(
                                   decoration: const BoxDecoration(
-                                    borderRadius: BorderRadius.all(Radius.circular(10)),
+                                    borderRadius:
+                                        BorderRadius.all(Radius.circular(10)),
                                     color: Color(0xfffafafa),
                                   ),
                                   width: MediaQuery.of(context).size.width - 20,
@@ -298,12 +299,12 @@ class _PostViewPageState extends State<PostViewPage> {
                                           },
                                           child: const Center(
                                             child: Text(
-                                            '숨김글 보기',
-                                            style: TextStyle(
-                                              color: Color(0xff4a4a4a),
-                                              fontWeight: FontWeight.w400,
+                                              '숨김글 보기',
+                                              style: TextStyle(
+                                                color: Color(0xff4a4a4a),
+                                                fontWeight: FontWeight.w400,
+                                              ),
                                             ),
-                                          ),
                                           ),
                                         ),
                                       ),
@@ -624,75 +625,30 @@ class _PostViewPageState extends State<PostViewPage> {
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         // 담아두기,공유 버튼 Row
-        Row(
-          children: [
-            InkWell(
-              onTap: () {
-                ArticleController(
-                  model: _article,
-                  userProvider: userProvider,
-                ).scrap().then((result) {
-                  if (result) _updateState();
-                });
-              },
-              child: Container(
-                width: 88,
-                height: 35,
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(8),
-                  border: Border.all(
-                    color: _article.my_scrap == null
-                        ? const Color(0xFFF0F0F0)
-                        : ColorsInfo.newara,
-                  ),
-                ),
-                child: Center(
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      SvgPicture.asset(
-                        'assets/icons/bookmark.svg',
-                        width: 15,
-                        height: 15,
-                        colorFilter: ColorFilter.mode(
-                            _article.my_scrap == null
-                                ? const Color(0xFF646464)
-                                : ColorsInfo.newara,
-                            BlendMode.srcIn),
-                      ),
-                      const SizedBox(width: 4),
-                      Text(
-                        _article.my_scrap == null ? '담아두기' : '담아둔 글',
-                        style: TextStyle(
-                          color: _article.my_scrap == null
-                              ? const Color(0xFF646464)
-                              : ColorsInfo.newara,
-                          fontSize: 13,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-            const SizedBox(width: 10),
-            InkWell(
-              onTap: () async {
-                await ArticleController(
-                  model: _article,
-                  userProvider: userProvider,
-                ).share();
-              },
-              child: Container(
-                  width: 64,
+        // 차단되었을 경우에는 보이지 않음
+        Visibility(
+          visible: !_isPostBlocked(_article),
+          child: Row(
+            children: [
+              InkWell(
+                onTap: () {
+                  ArticleController(
+                    model: _article,
+                    userProvider: userProvider,
+                  ).scrap().then((result) {
+                    if (result) _updateState();
+                  });
+                },
+                child: Container(
+                  width: 88,
                   height: 35,
                   decoration: BoxDecoration(
+                    color: Colors.white,
                     borderRadius: BorderRadius.circular(8),
                     border: Border.all(
-                      color: const Color(0xFFF0F0F0),
-                      width: 1,
+                      color: _article.my_scrap == null
+                          ? const Color(0xFFF0F0F0)
+                          : ColorsInfo.newara,
                     ),
                   ),
                   child: Center(
@@ -700,33 +656,83 @@ class _PostViewPageState extends State<PostViewPage> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         SvgPicture.asset(
-                          'assets/icons/share.svg',
-                          width: 11,
-                          height: 19,
-                          colorFilter: const ColorFilter.mode(
-                              Color.fromRGBO(100, 100, 100, 1),
+                          'assets/icons/bookmark.svg',
+                          width: 15,
+                          height: 15,
+                          colorFilter: ColorFilter.mode(
+                              _article.my_scrap == null
+                                  ? const Color(0xFF646464)
+                                  : ColorsInfo.newara,
                               BlendMode.srcIn),
                         ),
-                        const SizedBox(width: 6),
-                        const Text(
-                          '공유',
+                        const SizedBox(width: 4),
+                        Text(
+                          _article.my_scrap == null ? '담아두기' : '담아둔 글',
                           style: TextStyle(
+                            color: _article.my_scrap == null
+                                ? const Color(0xFF646464)
+                                : ColorsInfo.newara,
                             fontSize: 13,
                             fontWeight: FontWeight.w500,
-                            color: Color(0xFF646464),
                           ),
                         ),
                       ],
                     ),
-                  )),
-            ),
-          ],
+                  ),
+                ),
+              ),
+              const SizedBox(width: 10),
+              InkWell(
+                onTap: () async {
+                  await ArticleController(
+                    model: _article,
+                    userProvider: userProvider,
+                  ).share();
+                },
+                child: Container(
+                    width: 64,
+                    height: 35,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(
+                        color: const Color(0xFFF0F0F0),
+                        width: 1,
+                      ),
+                    ),
+                    child: Center(
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          SvgPicture.asset(
+                            'assets/icons/share.svg',
+                            width: 11,
+                            height: 19,
+                            colorFilter: const ColorFilter.mode(
+                                Color.fromRGBO(100, 100, 100, 1),
+                                BlendMode.srcIn),
+                          ),
+                          const SizedBox(width: 6),
+                          const Text(
+                            '공유',
+                            style: TextStyle(
+                              fontSize: 13,
+                              fontWeight: FontWeight.w500,
+                              color: Color(0xFF646464),
+                            ),
+                          ),
+                        ],
+                      ),
+                    )),
+              ),
+            ],
+          ),
         ),
         Row(
           children: [
             // 자신의 글일 경우 삭제 버튼, 타인의 글일 경우 차단 버튼
             if (_isReportable) // 신고가 가능한 글(타인의 글)
-              InkWell(
+              Visibility(
+                  child: InkWell(
                 onTap: () async {
                   bool isBlocked = _isPostBlocked(_article);
                   // 차단되어 있지 않은 경우
@@ -787,7 +793,7 @@ class _PostViewPageState extends State<PostViewPage> {
                         ],
                       ),
                     )),
-              )
+              ))
             else // 자신의 글
               InkWell(
                 onTap: () async {
@@ -851,47 +857,49 @@ class _PostViewPageState extends State<PostViewPage> {
             const SizedBox(width: 10),
             // 자신의 글일 경우 수정 버튼, 타인의 글일 경우 신고 버튼
             if (_isReportable) // 타인의 글(신고가 가능한 글)
-              InkWell(
-                onTap: () {
-                  showDialog(
-                      context: context,
-                      builder: (context) {
-                        return ReportDialogWidget(articleID: _article.id);
-                      });
-                },
-                child: Container(
-                  width: 65,
-                  height: 35,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(8),
-                    border: Border.all(
-                      color: const Color(0xFFF0F0F0),
-                    ),
-                  ),
-                  child: Center(
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        SvgPicture.asset(
-                          'assets/icons/warning.svg',
-                          width: 15,
-                          height: 15,
-                          colorFilter: const ColorFilter.mode(
-                              Color(0xFF646464), BlendMode.srcIn),
+              Visibility(
+                  visible: !_isPostBlocked(_article),
+                  child: InkWell(
+                    onTap: () {
+                      showDialog(
+                          context: context,
+                          builder: (context) {
+                            return ReportDialogWidget(articleID: _article.id);
+                          });
+                    },
+                    child: Container(
+                      width: 65,
+                      height: 35,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(
+                          color: const Color(0xFFF0F0F0),
                         ),
-                        const SizedBox(width: 4),
-                        const Text(
-                          '신고',
-                          style: TextStyle(
-                              fontSize: 13,
-                              fontWeight: FontWeight.w500,
-                              color: Color(0xFF646464)),
+                      ),
+                      child: Center(
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            SvgPicture.asset(
+                              'assets/icons/warning.svg',
+                              width: 15,
+                              height: 15,
+                              colorFilter: const ColorFilter.mode(
+                                  Color(0xFF646464), BlendMode.srcIn),
+                            ),
+                            const SizedBox(width: 4),
+                            const Text(
+                              '신고',
+                              style: TextStyle(
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.w500,
+                                  color: Color(0xFF646464)),
+                            ),
+                          ],
                         ),
-                      ],
+                      ),
                     ),
-                  ),
-                ),
-              )
+                  ))
             else // 자신의 글
               InkWell(
                 onTap: () async {
