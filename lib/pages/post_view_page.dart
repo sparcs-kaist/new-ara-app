@@ -68,6 +68,10 @@ class _PostViewPageState extends State<PostViewPage> {
   /// 현재 페이지의 글에 달려있는 모든 댓글, 답글이 저장됨.
   late List<CommentNestedCommentListActionModel> _commentList;
 
+  /// 사용자가 글 내용을 볼 수 있는 지 여부를 나타냄
+  /// 차단 기능에서 '숨김 글 보기' 기능 등에 사용됨.
+  late bool _isPostVisible;
+
   /// 댓글 입력 TextField에 입력되어있는 텍스트.
   /// 댓글 전송 시에 사용됨.
   String _commentContent = "";
@@ -96,6 +100,7 @@ class _PostViewPageState extends State<PostViewPage> {
   @override
   void initState() {
     super.initState();
+    _isPostVisible = true;
     _isPageLoaded = false;
     _isModify = _isNestedComment = false;
     _isSending = false;
@@ -240,10 +245,18 @@ class _PostViewPageState extends State<PostViewPage> {
                                 ),
                               ),
                               const SizedBox(height: 5),
-                              InArticleWebView(
-                                content: _article.content ?? "",
-                                initialHeight: 150,
-                                isComment: false,
+                              Visibility(
+                                visible: !_isPostVisible,
+                                child:
+                                    Text("You're viewing blocked user's post."),
+                              ),
+                              Visibility(
+                                visible: _isPostVisible,
+                                child: InArticleWebView(
+                                  content: _article.content ?? "",
+                                  initialHeight: 150,
+                                  isComment: false,
+                                ),
                               ),
                               const SizedBox(height: 10),
                               // 좋아요, 싫어요 버튼 Row
@@ -653,9 +666,23 @@ class _PostViewPageState extends State<PostViewPage> {
             // 자신의 글일 경우 삭제 버튼, 타인의 글일 경우 차단 버튼
             if (_isReportable) // 신고가 가능한 글(타인의 글)
               InkWell(
-                onTap: null,
+                onTap: () {
+                  bool isBlocked = _isPostBlocked(_article);
+                  // 차단되어 있지 않은 경우
+                  if (!isBlocked) {
+                    _article.is_hidden = true;
+                    _article.why_hidden.add("BLOCKED_USER_CONTENT");
+                    _setIsPostVisible(false);
+                  }
+                  // 이미 차단되어 있는 경우
+                  else {
+                    _article.is_hidden = false;
+                    _article.why_hidden.remove("BLOCK_USER_CONTENT");
+                    _setIsPostVisible(true);
+                  }
+                },
                 child: Container(
-                    width: 65,
+                    width: _isPostBlocked(_article) == true ? 85 : 65,
                     height: 35,
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(8),
@@ -673,9 +700,9 @@ class _PostViewPageState extends State<PostViewPage> {
                               colorFilter: const ColorFilter.mode(
                                   Color(0xFF646464), BlendMode.srcIn)),
                           const SizedBox(width: 3),
-                          const Text(
-                            '차단',
-                            style: TextStyle(
+                          Text(
+                            _isPostBlocked(_article) == true ? '차단 해제' : '차단',
+                            style: const TextStyle(
                                 fontSize: 13,
                                 fontWeight: FontWeight.w500,
                                 color: Color(0xFF646464)),
@@ -1247,8 +1274,7 @@ class _PostViewPageState extends State<PostViewPage> {
                   child: SvgPicture.asset(
                     'assets/icons/send.svg',
                     colorFilter: const ColorFilter.mode(
-                      ColorsInfo.newara, BlendMode.srcIn
-                    ),
+                        ColorsInfo.newara, BlendMode.srcIn),
                     width: 30,
                     height: 30,
                   ),
@@ -1346,6 +1372,19 @@ class _PostViewPageState extends State<PostViewPage> {
   void _updateState() {
     if (!mounted) return;
     setState(() {});
+  }
+
+  /// _isPostVisible의 값을 수정하고 state를 업데이트함
+  /// '숨김 글 보기' 기능에서 사용
+  void _setIsPostVisible(bool value) {
+    if (mounted) setState(() => _isPostVisible = value);
+  }
+
+  /// 현재 글이 차단된 글인지 여부를 판단하여
+  /// boolean값을 리턴.
+  bool _isPostBlocked(ArticleModel article) {
+    return article.is_hidden &&
+        article.why_hidden.contains("BLOCKED_USER_CONTENT");
   }
 
   // 둘 다 false 면 일반적인 댓글
