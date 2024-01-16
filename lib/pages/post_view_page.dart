@@ -247,8 +247,69 @@ class _PostViewPageState extends State<PostViewPage> {
                               const SizedBox(height: 5),
                               Visibility(
                                 visible: !_isPostVisible,
-                                child:
-                                    Text("You're viewing blocked user's post."),
+                                child: Container(
+                                  decoration: const BoxDecoration(
+                                    borderRadius: BorderRadius.all(Radius.circular(10)),
+                                    color: Color(0xfffafafa),
+                                  ),
+                                  width: MediaQuery.of(context).size.width - 20,
+                                  height: 170,
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      SvgPicture.asset(
+                                        'assets/icons/barrior.svg',
+                                        width: 40,
+                                        height: 40,
+                                      ),
+                                      const Text(
+                                        '차단한 사용자의 게시물입니다.',
+                                        style: TextStyle(
+                                          color: Color(0xFF4A4A4A),
+                                          fontWeight: FontWeight.w700,
+                                          fontSize: 16,
+                                        ),
+                                      ),
+                                      const Text(
+                                        '(차단 사용자 설정은 마이페이지에서 확인할 수 있습니다.)',
+                                        style: TextStyle(
+                                          fontWeight: FontWeight.w400,
+                                          fontSize: 14,
+                                          color: Color(0xFF4A4A4A),
+                                        ),
+                                      ),
+                                      const SizedBox(height: 8),
+                                      Container(
+                                        width: 104,
+                                        height: 36,
+                                        decoration: BoxDecoration(
+                                          borderRadius: const BorderRadius.all(
+                                              Radius.circular(10)),
+                                          border: Border.all(
+                                            width: 1,
+                                            color: Color(0xFFDBDBDB),
+                                          ),
+                                        ),
+                                        child: InkWell(
+                                          onTap: () {
+                                            _setIsPostVisible(true);
+                                          },
+                                          child: const Center(
+                                            child: Text(
+                                            '숨김글 보기',
+                                            style: TextStyle(
+                                              color: Color(0xff4a4a4a),
+                                              fontWeight: FontWeight.w400,
+                                            ),
+                                          ),
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
                               ),
                               Visibility(
                                 visible: _isPostVisible,
@@ -691,8 +752,7 @@ class _PostViewPageState extends State<PostViewPage> {
                       _article.is_hidden = false;
                       _article.why_hidden.remove("BLOCK_USER_CONTENT");
                       _setIsPostVisible(true);
-                    }
-                    else {
+                    } else {
                       debugPrint("unblocking failed");
                       // TODO: user 알림 메시지 추가해야함
                     }
