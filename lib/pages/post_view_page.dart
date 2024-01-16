@@ -780,9 +780,16 @@ class _PostViewPageState extends State<PostViewPage> {
                               .then((blockRes) {
                             // 차단이 성공할 경우 article model을 새로 로드한다.
                             if (blockRes) {
-                              _article.is_hidden = true;
-                              _article.why_hidden.add("BLOCKED_USER_CONTENT");
-                              _setIsPostVisible(false);
+                              _fetchArticle(userProvider, override_hidden: true).then((fetchRes) {
+                                // override_hidden=true 글 로드가 성공한 경우
+                                if (fetchRes) {
+                                  _setIsPostVisible(false);
+                                }
+                                else {
+                                  // TODO: 유저 메시지 처리하기
+                                  debugPrint("fetch failed...");
+                                }
+                              });
                             }
                             // 차단이 실패할 경우 사용자 에러 메시지 출력
                             else {
@@ -803,9 +810,14 @@ class _PostViewPageState extends State<PostViewPage> {
                             model: _article, userProvider: userProvider)
                         .handleBlock(false);
                     if (unblockRes) {
-                      _article.is_hidden = false;
-                      _article.why_hidden.remove("BLOCK_USER_CONTENT");
-                      _setIsPostVisible(true);
+                      bool fetchRes = await _fetchArticle(userProvider);
+                      if (fetchRes) {
+                        _setIsPostVisible(true);
+                      }
+                      else {
+                        debugPrint("blocking failed");
+                        // TODO: user 알림 메시지 추가해야함.
+                      }
                     } else {
                       debugPrint("unblocking failed");
                       // TODO: user 알림 메시지 추가해야함
@@ -1140,10 +1152,10 @@ class _PostViewPageState extends State<PostViewPage> {
                   ),
                   Container(
                     margin: const EdgeInsets.only(left: 30, right: 0),
-                    child: (curComment.is_hidden == false && _isPostVisible == true)
+                    child: curComment.is_hidden == false
                         ? _buildCommentContent(curComment.content ?? "")
                         : Text(
-                            !_isPostVisible ? '차단한 사용자의 댓글입니다.' : '삭제된 댓글입니다.',
+                            _isPostBlocked(_article) && !curComment.why_hidden.contains("DELETED_CONTENT") ? '차단한 사용자의 댓글입니다.' : '삭제된 댓글입니다.',
                             style: const TextStyle(
                               fontSize: 14,
                               fontWeight: FontWeight.w400,
