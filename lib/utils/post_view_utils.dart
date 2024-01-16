@@ -145,6 +145,10 @@ class ArticleController {
     return false;
   }
 
+  /// 글을 작성한 사용자를 차단, 차단 해제할 때 쓰이는 함수
+  /// 차단하려면 isBlock을 true
+  /// 차단 해제하려면 isBlock을 false로 설정하여 실행
+  /// 성공할 시에 true, 아닌 경우 false를 리턴함.
   Future<bool> handleBlock(bool isBlock) async {
     String apiUrl = newAraDefaultUrl + (isBlock == true ? "/api/blocks/" : "/api/blocks/without_id/");
     int userID = model.created_by.id;
