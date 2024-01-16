@@ -144,6 +144,34 @@ class ArticleController {
     }
     return false;
   }
+
+  Future<bool> handleBlock(bool isBlock) async {
+    String apiUrl = newAraDefaultUrl + (isBlock == true ? "/api/blocks/" : "/api/blocks/without_id/");
+    int userID = model.created_by.id;
+    try {
+      await userProvider.myDio().post(
+        apiUrl,
+        data: isBlock == true ? {'user': userID} : {'blocked': userID},
+      );
+      return true;
+    } on DioException catch (e) {
+      debugPrint("DioException occurred");
+      if (e.response != null) {
+        debugPrint("${e.response!.data}");
+        debugPrint("${e.response!.headers}");
+        debugPrint("${e.response!.requestOptions}");
+      }
+      // request의 setting, sending에서 문제 발생
+      // requestOption, message를 출력.
+      else {
+        debugPrint("${e.requestOptions}");
+        debugPrint("${e.message}");
+      }
+    } catch (e) {
+      debugPrint("error at blockUser: $e");
+    }
+    return false;
+  }
 }
 
 class FileController {

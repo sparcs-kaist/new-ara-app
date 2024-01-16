@@ -666,19 +666,36 @@ class _PostViewPageState extends State<PostViewPage> {
             // 자신의 글일 경우 삭제 버튼, 타인의 글일 경우 차단 버튼
             if (_isReportable) // 신고가 가능한 글(타인의 글)
               InkWell(
-                onTap: () {
+                onTap: () async {
                   bool isBlocked = _isPostBlocked(_article);
                   // 차단되어 있지 않은 경우
                   if (!isBlocked) {
-                    _article.is_hidden = true;
-                    _article.why_hidden.add("BLOCKED_USER_CONTENT");
-                    _setIsPostVisible(false);
+                    bool blockRes = await ArticleController(
+                            model: _article, userProvider: userProvider)
+                        .handleBlock(true);
+                    if (blockRes) {
+                      _article.is_hidden = true;
+                      _article.why_hidden.add("BLOCKED_USER_CONTENT");
+                      _setIsPostVisible(false);
+                    } else {
+                      debugPrint("blocking failed");
+                      // TODO: user 알림 메시지 추가해야함.
+                    }
                   }
                   // 이미 차단되어 있는 경우
                   else {
-                    _article.is_hidden = false;
-                    _article.why_hidden.remove("BLOCK_USER_CONTENT");
-                    _setIsPostVisible(true);
+                    bool unblockRes = await ArticleController(
+                            model: _article, userProvider: userProvider)
+                        .handleBlock(false);
+                    if (unblockRes) {
+                      _article.is_hidden = false;
+                      _article.why_hidden.remove("BLOCK_USER_CONTENT");
+                      _setIsPostVisible(true);
+                    }
+                    else {
+                      debugPrint("unblocking failed");
+                      // TODO: user 알림 메시지 추가해야함
+                    }
                   }
                 },
                 child: Container(
