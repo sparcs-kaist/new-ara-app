@@ -682,7 +682,45 @@ class _PostViewPageState extends State<PostViewPage> {
             // 자신의 글일 경우 삭제 버튼, 타인의 글일 경우 차단 버튼
             if (_isReportable) // 신고가 가능한 글(타인의 글)
               InkWell(
-                onTap: null,
+                onTap: () async {
+                  bool isAuthorBlocked = _isAuthorBlocked();
+                  // 차단되지 않은 경우
+                  if (!isAuthorBlocked) {
+                    await showDialog(
+                      context: context,
+                      builder: (context) => BlockConfirmDialog(
+                        onTap: () {
+                          ArticleController(model: _article, userProvider: userProvider).handleBlock(true).then((blockRes) {
+                            // 차단이 성공한 경우
+                            if (blockRes) {
+                              _fetchArticle(userProvider, override_hidden: true);
+                            }
+                            // 차단에 실패할 경우 오류 메시지 출력
+                            else {
+                              // TODO: 사용자 메시지 구현 필요
+                              debugPrint("failed to block");
+                            }
+                          });
+                        },
+                        userProvider: userProvider,
+                        targetContext: context,
+                      ),
+                    );
+                  }
+                  // 이미 차단 되어있는 경우
+                  else {
+                    bool unblockRes = await ArticleController(model: _article, userProvider: userProvider).handleBlock(false);
+                    // 차단 해제에 성공한 경우 다시 글을 fetch함.
+                    if (unblockRes) {
+                      await _fetchArticle(userProvider);
+                    }
+                    // 차단 해제에 실패한 경우 오류 메시지를 출력함.
+                    else {
+                      // TODO: 사용자 메시지 구현 필요
+                      debugPrint("Failed to unblock");
+                    }
+                  }
+                },
                 child: Container(
                     width: _isAuthorBlocked() ? 85 : 65,
                     height: 35,
