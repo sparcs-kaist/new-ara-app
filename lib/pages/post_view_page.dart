@@ -325,7 +325,7 @@ class _PostViewPageState extends State<PostViewPage> {
                                           },
                                           child: const Center(
                                             child: Text(
-                                              '숨김글 보기',
+                                              '숨긴내용 보기',
                                               style: TextStyle(
                                                 color: Color(0xff4a4a4a),
                                                 fontWeight: FontWeight.w400,
@@ -1133,10 +1133,10 @@ class _PostViewPageState extends State<PostViewPage> {
                   ),
                   Container(
                     margin: const EdgeInsets.only(left: 30, right: 0),
-                    child: curComment.is_hidden == false
+                    child: (curComment.is_hidden == false && _isPostVisible == true)
                         ? _buildCommentContent(curComment.content ?? "")
                         : Text(
-                            _isPostBlocked(_article) ? '차단한 사용자의 댓글 입니다.' : '삭제된 댓글 입니다.',
+                            !_isPostVisible ? '차단한 사용자의 댓글입니다.' : '삭제된 댓글입니다.',
                             style: const TextStyle(
                               fontSize: 14,
                               fontWeight: FontWeight.w400,
@@ -1509,8 +1509,7 @@ class _PostViewPageState extends State<PostViewPage> {
   /// 현재 글이 차단된 글인지 여부를 판단하여
   /// boolean값을 리턴.
   bool _isPostBlocked(ArticleModel article) {
-    return article.is_hidden &&
-        article.why_hidden.contains("BLOCKED_USER_CONTENT");
+    return _article.created_by.is_blocked;
   }
 
   // 둘 다 false 면 일반적인 댓글
