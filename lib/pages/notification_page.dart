@@ -233,7 +233,7 @@ class _NotificationPageState extends State<NotificationPage> {
                                           _modelList[idx - 1].created_at,
                                           _modelList[idx].created_at)
                                       : const SizedBox(
-                                          height: 40,
+                                          height: 35,
                                           child: Text(
                                             '오늘',
                                             style: TextStyle(
@@ -275,9 +275,12 @@ class _NotificationPageState extends State<NotificationPage> {
                                         }
                                       },
                                       child: Container(
-                                        height: 90,
-                                        padding: const EdgeInsets.symmetric(
-                                            horizontal: 10),
+                                        height: 92,
+                                        padding: const EdgeInsets.only(
+                                            left: 10,
+                                            right: 10,
+                                            top: 14,
+                                            bottom: 14),
                                         decoration: BoxDecoration(
                                           border: Border.all(
                                             width: 1,
@@ -296,11 +299,12 @@ class _NotificationPageState extends State<NotificationPage> {
                                           color: Colors.white,
                                         ),
                                         child: Row(
-                                          //mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
                                           children: [
                                             Column(
                                               children: [
-                                                const SizedBox(height: 14),
+                                                const SizedBox(height: 5),
                                                 Container(
                                                   width: 40,
                                                   height: 40,
@@ -329,8 +333,6 @@ class _NotificationPageState extends State<NotificationPage> {
                                               child: Column(
                                                 crossAxisAlignment:
                                                     CrossAxisAlignment.start,
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment.center,
                                                 children: [
                                                   Text(
                                                     targetNoti.title,
@@ -348,7 +350,6 @@ class _NotificationPageState extends State<NotificationPage> {
                                                               : Colors.black,
                                                     ),
                                                   ),
-                                                  const SizedBox(height: 5),
                                                   Text(
                                                     targetNoti.content,
                                                     maxLines: 1,
@@ -360,7 +361,6 @@ class _NotificationPageState extends State<NotificationPage> {
                                                           FontWeight.w500,
                                                     ),
                                                   ),
-                                                  const SizedBox(height: 5),
                                                   Text(
                                                     "| 게시글: ${targetNoti.related_article.title}",
                                                     maxLines: 1,
