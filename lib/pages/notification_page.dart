@@ -199,7 +199,9 @@ class _NotificationPageState extends State<NotificationPage> {
               Expanded(
                 child: SizedBox(
                   width: MediaQuery.of(context).size.width - 40,
-                  child: RefreshIndicator(
+                  // Android, IOS에 따라 당겨서 새로고침 디자인이 다르므로
+                  // adaptive 적용.
+                  child: RefreshIndicator.adaptive(
                     color: ColorsInfo.newara,
                     onRefresh: () async {
                       // 새로고침 시 첫 페이지만 다시 불러옴.
