@@ -386,7 +386,6 @@ class _NotificationPageState extends State<NotificationPage> {
                   ),
                 ),
               ),
-              const SizedBox(height: 15),
             ],
           ),
         ),
