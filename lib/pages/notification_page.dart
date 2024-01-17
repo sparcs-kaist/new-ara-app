@@ -279,12 +279,19 @@ class _NotificationPageState extends State<NotificationPage> {
                                         decoration: BoxDecoration(
                                           border: Border.all(
                                             width: 1,
-                                            color: const Color.fromRGBO(
-                                                230, 230, 230, 1),
+                                            color: Color(0xfff0f0f0),
                                           ),
                                           borderRadius: const BorderRadius.all(
                                             Radius.circular(15),
                                           ),
+                                          boxShadow: const [
+                                            BoxShadow(
+                                              color: Color(0x0A000000),
+                                              blurRadius: 6,
+                                              offset: Offset(0, 2),
+                                            ),
+                                          ],
+                                          color: Colors.white,
                                         ),
                                         child: Row(
                                           //mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -430,7 +437,7 @@ class _NotificationPageState extends State<NotificationPage> {
           style: const TextStyle(
             fontSize: 14,
             fontWeight: FontWeight.w500,
-            color: Color.fromRGBO(177, 177, 177, 1),
+            color: Color(0xffbbbbbb),
           ),
         ),
       ),
