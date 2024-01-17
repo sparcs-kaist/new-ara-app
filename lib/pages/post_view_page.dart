@@ -180,8 +180,7 @@ class _PostViewPageState extends State<PostViewPage> {
     // TODO: Stack 리팩토링
     return Stack(
       children: [
-        if (_isPageLoaded)
-          Scaffold(
+        Scaffold(
             backgroundColor: Colors.white,
             appBar: AppBar(
               leading: IconButton(
@@ -194,99 +193,98 @@ class _PostViewPageState extends State<PostViewPage> {
                 onPressed: () => Navigator.pop(context),
               ),
             ),
-            body: SafeArea(
-              child: GestureDetector(
-                // 화면을 탭하면 키보드가 내려가도록 하기 위해 사용함.
-                onTap: () => FocusScope.of(context).unfocus(),
-                child: Container(
-                  margin: const EdgeInsets.symmetric(horizontal: 20),
-                  child: Column(children: [
-                    // article 부분
-                    Expanded(
-                      child: RefreshIndicator(
-                        color: ColorsInfo.newara,
-                        onRefresh: () async {
-                          userProvider.setIsContentLoaded(false);
-                          _setIsPageLoaded(false);
-                          _setIsPageLoaded(await _fetchArticle(userProvider));
-                        },
-                        child: SingleChildScrollView(
-                          // 위젯이 화면을 넘어가지 않더라고 scrollable 처리.
-                          // 새로고침 기능을 위한 physics.
-                          physics: const AlwaysScrollableScrollPhysics(),
-                          controller: _scrollController,
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              _buildTitle(),
-                              const SizedBox(height: 10),
-                              // 유저 정보 (프로필 이미지, 닉네임)
-                              _buildAuthorInfo(userProvider),
-                              const Divider(
-                                color: Color(0xFFF0F0F0),
-                                thickness: 1,
-                              ),
-                              // TODO: (2023.08.09)첨부파일 리스트뷰 프로토타입. 추후 디자이너와 조율 예정
-                              Visibility(
-                                visible: _article.attachments.isNotEmpty,
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.end,
+            body: _isPageLoaded
+                ? SafeArea(
+                    child: GestureDetector(
+                      // 화면을 탭하면 키보드가 내려가도록 하기 위해 사용함.
+                      onTap: () => FocusScope.of(context).unfocus(),
+                      child: Container(
+                        margin: const EdgeInsets.symmetric(horizontal: 20),
+                        child: Column(children: [
+                          // article 부분
+                          Expanded(
+                            // Android, iOS 여부에 따라 다른 새로고침
+                            child: RefreshIndicator.adaptive(
+                              color: ColorsInfo.newara,
+                              onRefresh: () async {
+                                userProvider.setIsContentLoaded(false);
+                                _setIsPageLoaded(false);
+                                _setIsPageLoaded(
+                                    await _fetchArticle(userProvider));
+                              },
+                              child: SingleChildScrollView(
+                                // 위젯이 화면을 넘어가지 않더라고 scrollable 처리.
+                                // 새로고침 기능을 위한 physics.
+                                physics: const AlwaysScrollableScrollPhysics(),
+                                controller: _scrollController,
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    AttachPopupMenuButton(
-                                      fileNum: _article.attachments.length,
-                                      attachments: _article.attachments,
+                                    _buildTitle(),
+                                    const SizedBox(height: 10),
+                                    // 유저 정보 (프로필 이미지, 닉네임)
+                                    _buildAuthorInfo(userProvider),
+                                    const Divider(
+                                      color: Color(0xFFF0F0F0),
+                                      thickness: 1,
                                     ),
+                                    // TODO: (2023.08.09)첨부파일 리스트뷰 프로토타입. 추후 디자이너와 조율 예정
+                                    Visibility(
+                                      visible: _article.attachments.isNotEmpty,
+                                      child: Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.end,
+                                        children: [
+                                          AttachPopupMenuButton(
+                                            fileNum:
+                                                _article.attachments.length,
+                                            attachments: _article.attachments,
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                    const SizedBox(height: 5),
+                                    InArticleWebView(
+                                      content: _article.content ?? "",
+                                      initialHeight: 150,
+                                      isComment: false,
+                                    ),
+                                    const SizedBox(height: 10),
+                                    // 좋아요, 싫어요 버튼 Row
+                                    _buildVoteButtons(userProvider),
+                                    const SizedBox(height: 10),
+                                    // 담아두기, 공유, 신고 버튼
+                                    _buildUtilityButtons(userProvider),
+                                    const SizedBox(height: 15),
+                                    const Divider(
+                                        thickness: 1, color: Color(0xFFF0F0F0)),
+                                    const SizedBox(height: 15),
+                                    SizedBox(
+                                      width: MediaQuery.of(context).size.width -
+                                          40,
+                                      child: Text(
+                                        '${_article.comment_count}개의 댓글',
+                                        style: const TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.w700,
+                                        ),
+                                      ),
+                                    ),
+                                    const SizedBox(height: 15),
+                                    // 댓글을 보여주는 ListView.
+                                    _buildCommentListView(userProvider),
                                   ],
                                 ),
                               ),
-                              const SizedBox(height: 5),
-                              InArticleWebView(
-                                content: _article.content ?? "",
-                                initialHeight: 150,
-                                isComment: false,
-                              ),
-                              const SizedBox(height: 10),
-                              // 좋아요, 싫어요 버튼 Row
-                              _buildVoteButtons(userProvider),
-                              const SizedBox(height: 10),
-                              // 담아두기, 공유, 신고 버튼
-                              _buildUtilityButtons(userProvider),
-                              const SizedBox(height: 15),
-                              const Divider(
-                                  thickness: 1, color: Color(0xFFF0F0F0)),
-                              const SizedBox(height: 15),
-                              SizedBox(
-                                width: MediaQuery.of(context).size.width - 40,
-                                child: Text(
-                                  '${_article.comment_count}개의 댓글',
-                                  style: const TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.w700,
-                                  ),
-                                ),
-                              ),
-                              const SizedBox(height: 15),
-                              // 댓글을 보여주는 ListView.
-                              _buildCommentListView(userProvider),
-                            ],
+                            ),
                           ),
-                        ),
+                          // 댓글 입력 부분
+                          _buildCommentTextFormField(userProvider),
+                        ]),
                       ),
                     ),
-                    // 댓글 입력 부분
-                    _buildCommentTextFormField(userProvider),
-                  ]),
-                ),
-              ),
-            ),
-          )
-        else
-          const LoadingIndicator(),
-        // TODO: 아래 기능에 대해 디자이너와 논의 필요 (2023.11.03)
-        // Visibility(
-        //   visible: !(context.watch<UserProvider>().isContentLoaded),
-        //   child: Container(color: Colors.white),
-        // ),
+                  )
+                : const LoadingIndicator())
       ],
     );
   }
@@ -1247,8 +1245,7 @@ class _PostViewPageState extends State<PostViewPage> {
                   child: SvgPicture.asset(
                     'assets/icons/send.svg',
                     colorFilter: const ColorFilter.mode(
-                      ColorsInfo.newara, BlendMode.srcIn
-                    ),
+                        ColorsInfo.newara, BlendMode.srcIn),
                     width: 30,
                     height: 30,
                   ),
