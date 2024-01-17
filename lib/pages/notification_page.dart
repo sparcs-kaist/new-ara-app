@@ -296,22 +296,31 @@ class _NotificationPageState extends State<NotificationPage> {
                                         child: Row(
                                           //mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                           children: [
-                                            Container(
-                                              width: 40,
-                                              height: 40,
-                                              decoration: BoxDecoration(
-                                                shape: BoxShape.circle,
-                                                color: (targetNoti.is_read ??
-                                                        false)
-                                                    ? Colors.grey
-                                                    : ColorsInfo.newara,
-                                              ),
-                                              child: SvgPicture.asset(
-                                                targetNoti.type == "default"
-                                                    ? "assets/icons/notification.svg"
-                                                    : "assets/icons/comment.svg",
-                                                color: Colors.white,
-                                              ),
+                                            Column(
+                                              children: [
+                                                const SizedBox(height: 14),
+                                                Container(
+                                                  width: 40,
+                                                  height: 40,
+                                                  decoration: BoxDecoration(
+                                                    shape: BoxShape.circle,
+                                                    color:
+                                                        (targetNoti.is_read ??
+                                                                false)
+                                                            ? Color(0xffbbbbbb)
+                                                            : ColorsInfo.newara,
+                                                  ),
+                                                  child: SvgPicture.asset(
+                                                    targetNoti.type == "default"
+                                                        ? "assets/icons/notification.svg"
+                                                        : "assets/icons/comment.svg",
+                                                    colorFilter:
+                                                        const ColorFilter.mode(
+                                                            Colors.white,
+                                                            BlendMode.srcIn),
+                                                  ),
+                                                ),
+                                              ],
                                             ),
                                             const SizedBox(width: 10),
                                             Flexible(
