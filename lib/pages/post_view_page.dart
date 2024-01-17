@@ -1010,8 +1010,8 @@ class _PostViewPageState extends State<PostViewPage> {
                                 },
                                 child: SvgPicture.asset(
                                   'assets/icons/like.svg',
-                                  width: 25,
-                                  height: 25,
+                                  width: 12,
+                                  height: 19,
                                   colorFilter: ColorFilter.mode(
                                       curComment.my_vote == false
                                           ? ColorsInfo.noneVote
@@ -1019,7 +1019,6 @@ class _PostViewPageState extends State<PostViewPage> {
                                       BlendMode.srcIn),
                                 ),
                               ),
-                              const SizedBox(width: 3),
                               Text(
                                 curComment.positive_vote_count.toString(),
                                 style: TextStyle(
@@ -1030,7 +1029,7 @@ class _PostViewPageState extends State<PostViewPage> {
                                       : ColorsInfo.posVote,
                                 ),
                               ),
-                              const SizedBox(width: 6),
+                              const SizedBox(width: 12),
                               InkWell(
                                 onTap: () async {
                                   CommentController(
@@ -1042,8 +1041,8 @@ class _PostViewPageState extends State<PostViewPage> {
                                 },
                                 child: SvgPicture.asset(
                                   'assets/icons/dislike.svg',
-                                  width: 25,
-                                  height: 25,
+                                  width: 12,
+                                  height: 19,
                                   colorFilter: ColorFilter.mode(
                                       curComment.my_vote == true
                                           ? ColorsInfo.noneVote
@@ -1051,7 +1050,6 @@ class _PostViewPageState extends State<PostViewPage> {
                                       BlendMode.srcIn),
                                 ),
                               ),
-                              const SizedBox(width: 3),
                               Text(
                                 curComment.negative_vote_count.toString(),
                                 style: TextStyle(
@@ -1066,6 +1064,7 @@ class _PostViewPageState extends State<PostViewPage> {
                             ],
                           ),
                         ),
+                        const SizedBox(width: 12),
                         // 대댓글인 경우 답글쓰기 버튼이 안보이게함.
                         Visibility(
                           visible: curComment.parent_comment == null,
@@ -1081,9 +1080,8 @@ class _PostViewPageState extends State<PostViewPage> {
                                 SvgPicture.asset(
                                   'assets/icons/right_arrow_2.svg',
                                   width: 11,
-                                  height: 12,
+                                  height: 19,
                                 ),
-                                const SizedBox(width: 5),
                                 const Text(
                                   '답글 쓰기',
                                   style: TextStyle(
