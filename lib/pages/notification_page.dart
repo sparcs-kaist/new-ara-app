@@ -275,7 +275,8 @@ class _NotificationPageState extends State<NotificationPage> {
                                         }
                                       },
                                       child: Container(
-                                        height: 92,
+                                        constraints: const BoxConstraints(minHeight: 92),
+                                        //height: 92,
                                         padding: const EdgeInsets.only(
                                             left: 10,
                                             right: 10,
