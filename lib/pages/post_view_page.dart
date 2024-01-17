@@ -47,10 +47,6 @@ class _PostViewPageState extends State<PostViewPage> {
   /// PostViewPage에서 표시할 글.
   late ArticleModel _article;
 
-  /// 현재 사용자가 글을 신고할 수 있는 지 여부.
-  /// initState에서 자신의 글일 경우 true, 아닐 경우 false로 설정됨.
-  late bool _isReportable;
-
   /// 웹뷰를 제외한 페이지 전체에 대한 로드 완료 여부를 나타냄.
   late bool _isPageLoaded;
 
@@ -105,7 +101,6 @@ class _PostViewPageState extends State<PostViewPage> {
     UserProvider userProvider = context.read<UserProvider>();
     userProvider.setIsContentLoaded(false, quiet: true);
     _fetchArticle(userProvider).then((value) {
-      _isReportable = value ? !_article.is_mine : false;
       _setIsPageLoaded(value);
     });
 
@@ -757,7 +752,8 @@ class _PostViewPageState extends State<PostViewPage> {
         Row(
           children: [
             // 자신의 글일 경우 삭제 버튼, 타인의 글일 경우 차단 버튼
-            if (_isReportable) // 신고가 가능한 글(타인의 글)
+            // 익명인 경우 자신의 글이 아니면 버튼이 표시되지 않음.
+            if (_article.is_mine == false && _article.name_type != 2)
               InkWell(
                 onTap: () async {
                   bool isAuthorBlocked = _isAuthorBlocked();
@@ -837,7 +833,7 @@ class _PostViewPageState extends State<PostViewPage> {
                       ),
                     )),
               )
-            else // 자신의 글
+            else if (_article.is_mine == true)  // 자신의 글
               InkWell(
                 onTap: () async {
                   await showDialog(
@@ -899,7 +895,7 @@ class _PostViewPageState extends State<PostViewPage> {
               ),
             const SizedBox(width: 10),
             // 자신의 글일 경우 수정 버튼, 타인의 글일 경우 신고 버튼
-            if (_isReportable) // 타인의 글(신고가 가능한 글)
+            if (_article.is_mine == false) // 타인의 글(신고가 가능한 글)
               InkWell(
                 onTap: () {
                   showDialog(
