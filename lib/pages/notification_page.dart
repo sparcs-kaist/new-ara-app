@@ -178,6 +178,7 @@ class _NotificationPageState extends State<NotificationPage> {
         context.read<NotificationProvider>();
     return Scaffold(
       appBar: AppBar(
+        centerTitle: false,
         title: Text(
           'appBar.notification'.tr(),
           style: const TextStyle(
