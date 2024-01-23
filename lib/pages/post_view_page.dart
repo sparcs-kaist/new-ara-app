@@ -72,7 +72,7 @@ class _PostViewPageState extends State<PostViewPage> {
 
   /// 댓글 입력 TextField에 대한 FocusNode.
   /// 답글 쓰기, 수정 버튼 클릭 시에 TextField에 자동으로 Focus를 주기 위해 사용됨.
-  FocusNode textFocusNode = FocusNode();
+  final FocusNode textFocusNode = FocusNode();
 
   /// 댓글 수정 혹은 대댓글을 전송할 경우 해당 댓글 모델을 의미.
   /// 새로운 댓글 작성의 경우 null로 설정됨.
