@@ -341,7 +341,7 @@ class _UserPageState extends State<UserPage>
   Widget _buildPostList(TabType tabType, UserProvider userProvider) {
     // build 대상 tab의 article 개수 조회
     int itemCount = getItemCount(tabType);
-    return RefreshIndicator(
+    return RefreshIndicator.adaptive(
       color: ColorsInfo.newara,
       onRefresh: () async {
         setIsLoaded(false, tabType);
