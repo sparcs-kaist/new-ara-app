@@ -102,10 +102,14 @@ class _MyAppState extends State<MyApp> {
         theme: _setThemeData(),
         // TODO: CustionScrollBehavior의 역할은?
         builder: (context, child) {
-          return ScrollConfiguration(
-            behavior: CustomScrollBehavior(),
-            child: child!,
-          );
+          final MediaQueryData data = MediaQuery.of(context);
+          return MediaQuery(
+              // 시스템 폰트 사이즈에 영향을 받지 않도록 textScaleFactor 지정함
+              data: data.copyWith(textScaleFactor: 1.0),
+              child: ScrollConfiguration(
+                behavior: CustomScrollBehavior(),
+                child: child!,
+              ));
         },
         // 로그인 상태에 따라서 다른 홈페이지 표시
         home: isLoading == true
