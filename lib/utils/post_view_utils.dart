@@ -177,12 +177,14 @@ class FileController {
     late Directory directory;
     if (Platform.isIOS) {
       directory = await getApplicationDocumentsDirectory();
+      debugPrint("ios download path: ${directory.path}");
     } else {
       directory = Directory('/storage/emulated/0/Download');
       if (!await directory.exists()) {
         directory =
             (await getExternalStorageDirectory())!; // Android 에서는 존재가 보장됨
       }
+      debugPrint("android download path: ${directory.path}");
     }
     return directory.path;
   }
