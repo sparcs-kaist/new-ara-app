@@ -144,6 +144,42 @@ class ArticleController {
     }
     return false;
   }
+
+  /// post의 작성자에 대한 차단 및 차단 해제 요청을 보내는 함수
+  /// block이 true이면 차단, false이면 차단 해제 요청을 보냄
+  /// 성공하면 true, 실패하면 false 리턴.
+  Future<bool> handleBlock(bool block) async {
+    String apiUrl = "$newAraDefaultUrl/api/blocks/";
+    // 차단 해제하는 경우 apiUrl을 변경
+    if (!block) apiUrl += "without_id/";
+
+    int userID = model.created_by.id;
+
+    try {
+      await userProvider.myDio().post(
+        apiUrl,
+        data: block ? {'user': userID} : {'blocked': userID}
+      );
+      return true;
+    } on DioException catch (e) {
+      debugPrint("DioException occurred");
+      if (e.response != null) {
+        debugPrint("${e.response!.data}");
+        debugPrint("${e.response!.headers}");
+        debugPrint("${e.response!.requestOptions}");
+      }
+      // request의 setting, sending에서 문제 발생
+      // requestOption, message를 출력.
+      else {
+        debugPrint("${e.requestOptions}");
+        debugPrint("${e.message}");
+      }
+    } catch (e) {
+      debugPrint("error on handleBlock: $e");
+    }
+
+    return false;
+  }
 }
 
 class FileController {

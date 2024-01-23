@@ -554,3 +554,112 @@ class _BlockedUserDialogState extends State<BlockedUserDialog> {
     return false;
   }
 }
+
+/// PostViewPage의 댓글 삭제 기능에 사용되는 Dialog
+class BlockConfirmDialog extends StatelessWidget {
+  final UserProvider userProvider;
+
+  /// PostViewPage의 context.
+  final BuildContext targetContext;
+
+  /// '확인' 버튼을 눌렀을 때 적용되는 onTap 메서드
+  final void Function()? onTap;
+
+  const BlockConfirmDialog({
+    super.key,
+    required this.userProvider,
+    required this.targetContext,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Dialog(
+      child: Container(
+        decoration: const BoxDecoration(
+          borderRadius: BorderRadius.all(Radius.circular(15)),
+        ),
+        width: 350,
+        height: 200,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            SvgPicture.asset(
+              'assets/icons/information.svg',
+              width: 55,
+              height: 55,
+              color: ColorsInfo.newara,
+            ),
+            const Text(
+              '정말로 차단하시겠습니까?',
+              style: TextStyle(
+                fontSize: 17,
+                fontWeight: FontWeight.w700,
+                color: Colors.black,
+              ),
+            ),
+            const SizedBox(height: 20),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                InkWell(
+                  onTap: () {
+                    // PostViewPage에서 pop해야 하므로
+                    // targetContext 사용.
+                    Navigator.pop(targetContext);
+                  },
+                  child: Container(
+                    decoration: BoxDecoration(
+                      border: Border.all(
+                        color: Colors.grey,
+                        width: 1,
+                      ),
+                      borderRadius: const BorderRadius.all(Radius.circular(20)),
+                      color: Colors.white,
+                    ),
+                    width: 60,
+                    height: 40,
+                    child: const Center(
+                      child: Text(
+                        '취소',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w500,
+                          color: Colors.black,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 10),
+                InkWell(
+                  // 인자로 전달받은 onTap 사용.
+                  onTap: onTap,
+                  child: Container(
+                    decoration: const BoxDecoration(
+                      borderRadius: BorderRadius.all(Radius.circular(20)),
+                      color: ColorsInfo.newara,
+                    ),
+                    width: 60,
+                    height: 40,
+                    child: const Center(
+                      child: Text(
+                        '확인',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w500,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            )
+          ],
+        ),
+      ),
+    );
+  }
+}
