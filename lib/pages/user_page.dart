@@ -246,7 +246,6 @@ class _UserPageState extends State<UserPage>
                   ),
                 ),
               ),
-              const SizedBox(height: 15),
             ],
           ),
         ),
