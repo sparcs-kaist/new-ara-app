@@ -571,33 +571,32 @@ class _PostViewPageState extends State<PostViewPage> {
                         : ColorsInfo.newara,
                   ),
                 ),
-                child: Center(
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      SvgPicture.asset(
-                        'assets/icons/bookmark.svg',
-                        width: 15,
-                        height: 15,
-                        colorFilter: ColorFilter.mode(
-                            _article.my_scrap == null
-                                ? const Color(0xFF646464)
-                                : ColorsInfo.newara,
-                            BlendMode.srcIn),
-                      ),
-                      const SizedBox(width: 4),
-                      Text(
-                        _article.my_scrap == null ? '담아두기' : '담아둔 글',
-                        style: TextStyle(
-                          color: _article.my_scrap == null
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    SvgPicture.asset(
+                      'assets/icons/bookmark.svg',
+                      width: 15,
+                      height: 22,
+                      colorFilter: ColorFilter.mode(
+                          _article.my_scrap == null
                               ? const Color(0xFF646464)
                               : ColorsInfo.newara,
-                          fontSize: 13,
-                          fontWeight: FontWeight.w500,
-                        ),
+                          BlendMode.srcIn),
+                    ),
+                    //const SizedBox(width: 4),
+                    Text(
+                      _article.my_scrap == null ? '담아두기' : '담아둔 글',
+                      style: TextStyle(
+                        color: _article.my_scrap == null
+                            ? const Color(0xFF646464)
+                            : ColorsInfo.newara,
+                        fontSize: 13,
+                        fontWeight: FontWeight.w500,
                       ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
               ),
             ),
@@ -610,39 +609,38 @@ class _PostViewPageState extends State<PostViewPage> {
                 ).share();
               },
               child: Container(
-                  width: 64,
-                  height: 35,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(8),
-                    border: Border.all(
-                      color: const Color(0xFFF0F0F0),
-                      width: 1,
-                    ),
+                width: 64,
+                height: 35,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(
+                    color: const Color(0xFFF0F0F0),
+                    width: 1,
                   ),
-                  child: Center(
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        SvgPicture.asset(
-                          'assets/icons/share.svg',
-                          width: 11,
-                          height: 19,
-                          colorFilter: const ColorFilter.mode(
-                              Color.fromRGBO(100, 100, 100, 1),
-                              BlendMode.srcIn),
-                        ),
-                        const SizedBox(width: 6),
-                        const Text(
-                          '공유',
-                          style: TextStyle(
-                            fontSize: 13,
-                            fontWeight: FontWeight.w500,
-                            color: Color(0xFF646464),
-                          ),
-                        ),
-                      ],
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    SvgPicture.asset(
+                      'assets/icons/share.svg',
+                      width: 19,
+                      height: 22,
+                      colorFilter: const ColorFilter.mode(
+                          Color.fromRGBO(100, 100, 100, 1), BlendMode.srcIn),
                     ),
-                  )),
+                    //const SizedBox(width: 6),
+                    const Text(
+                      '공유',
+                      style: TextStyle(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w500,
+                        color: Color(0xFF646464),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
             ),
           ],
         ),
@@ -653,34 +651,33 @@ class _PostViewPageState extends State<PostViewPage> {
               InkWell(
                 onTap: null,
                 child: Container(
-                    width: 65,
-                    height: 35,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(8),
-                      border: Border.all(
-                        color: const Color(0xFFF0F0F0),
-                      ),
+                  width: 65,
+                  height: 35,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(
+                      color: const Color(0xFFF0F0F0),
                     ),
-                    child: Center(
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          SvgPicture.asset("assets/icons/barrior.svg",
-                              width: 11,
-                              height: 19,
-                              colorFilter: const ColorFilter.mode(
-                                  Color(0xFF646464), BlendMode.srcIn)),
-                          const SizedBox(width: 3),
-                          const Text(
-                            '차단',
-                            style: TextStyle(
-                                fontSize: 13,
-                                fontWeight: FontWeight.w500,
-                                color: Color(0xFF646464)),
-                          ),
-                        ],
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      SvgPicture.asset("assets/icons/barrior.svg",
+                          width: 19,
+                          height: 22,
+                          colorFilter: const ColorFilter.mode(
+                              Color(0xFF646464), BlendMode.srcIn)),
+                      const Text(
+                        '차단',
+                        style: TextStyle(
+                            fontSize: 13,
+                            fontWeight: FontWeight.w500,
+                            color: Color(0xFF646464)),
                       ),
-                    )),
+                    ],
+                  ),
+                ),
               )
             else // 자신의 글
               InkWell(
@@ -721,16 +718,15 @@ class _PostViewPageState extends State<PostViewPage> {
                         color: const Color(0xFFF0F0F0),
                       ),
                     ),
-                    child: Center(
-                      child: Row(
+                    child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
                           SvgPicture.asset("assets/icons/delete.svg",
-                              width: 11,
-                              height: 19,
+                              width: 15,
+                              height: 22,
                               colorFilter: const ColorFilter.mode(
                                   Color(0xFF646464), BlendMode.srcIn)),
-                          const SizedBox(width: 3),
                           const Text(
                             '삭제',
                             style: TextStyle(
@@ -739,8 +735,7 @@ class _PostViewPageState extends State<PostViewPage> {
                                 color: Color(0xFF646464)),
                           ),
                         ],
-                      ),
-                    )),
+                      ),),
               ),
             const SizedBox(width: 10),
             // 자신의 글일 경우 수정 버튼, 타인의 글일 경우 신고 버튼
@@ -762,27 +757,25 @@ class _PostViewPageState extends State<PostViewPage> {
                       color: const Color(0xFFF0F0F0),
                     ),
                   ),
-                  child: Center(
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        SvgPicture.asset(
-                          'assets/icons/warning.svg',
-                          width: 15,
-                          height: 15,
-                          colorFilter: const ColorFilter.mode(
-                              Color(0xFF646464), BlendMode.srcIn),
-                        ),
-                        const SizedBox(width: 4),
-                        const Text(
-                          '신고',
-                          style: TextStyle(
-                              fontSize: 13,
-                              fontWeight: FontWeight.w500,
-                              color: Color(0xFF646464)),
-                        ),
-                      ],
-                    ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      SvgPicture.asset(
+                        'assets/icons/warning.svg',
+                        width: 19,
+                        height: 22,
+                        colorFilter: const ColorFilter.mode(
+                            Color(0xFF646464), BlendMode.srcIn),
+                      ),
+                      const Text(
+                        '신고',
+                        style: TextStyle(
+                            fontSize: 13,
+                            fontWeight: FontWeight.w500,
+                            color: Color(0xFF646464)),
+                      ),
+                    ],
                   ),
                 ),
               )
@@ -804,20 +797,19 @@ class _PostViewPageState extends State<PostViewPage> {
                       color: const Color(0xFFF0F0F0),
                     ),
                   ),
-                  child: Center(
-                    child: Row(
+                  child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
                         SvgPicture.asset(
                           'assets/icons/modify.svg',
-                          width: 11,
-                          height: 19,
+                          width: 15,
+                          height: 22,
                           colorFilter: const ColorFilter.mode(
                             Color(0xFF646464),
                             BlendMode.srcIn,
                           ),
                         ),
-                        const SizedBox(width: 3),
                         const Text(
                           '수정',
                           style: TextStyle(
@@ -827,7 +819,6 @@ class _PostViewPageState extends State<PostViewPage> {
                         ),
                       ],
                     ),
-                  ),
                 ),
               ),
           ],
