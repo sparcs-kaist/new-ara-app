@@ -91,7 +91,7 @@ class _SparcsSSOPageState extends State<SparcsSSOPage> {
             debugPrint('curUrl: $curUrl');
             /* /api/users/sso_login/가 성공적으로 실행되어 client_id, state를 발급받았지만
                소셜 로그인 비활성화가 되어있지 않은 경우, 관련 파리미터를 추가하려 리로드함. */
-            if (curUrl.startsWith(
+            if (Platform.isIOS && curUrl.startsWith(
                     'https://sparcssso.kaist.ac.kr/account/login/?next=/api/v2/token/require/') &&
                 curUrl.contains('social_enabled') == false) {
               // 소설 로그인 비활성화를 위해 social_enabled, show_disabled_button 파라미터를 모두 0으로 설정.
@@ -101,7 +101,7 @@ class _SparcsSSOPageState extends State<SparcsSSOPage> {
             /* 로그인 페이지에서 SPARCS SSO 내의 다른 페이지를 방문하였다가 다시 로그인 페이지로 돌아오는 경우,
                client_id, state가 아직 발급되지 않은 상태이기 때문에 소셜 로그인 비활성화를 할 수 없음.
                따라서 /api/users/sso_login/으로 리다이렉트함. */
-            else if (url == 'https://sparcssso.kaist.ac.kr/account/login/') {
+            else if (Platform.isIOS && url == 'https://sparcssso.kaist.ac.kr/account/login/') {
               await _controller.runJavaScript(
                   "window.location.href = '$newAraDefaultUrl/api/users/sso_login/'");
             } else {
