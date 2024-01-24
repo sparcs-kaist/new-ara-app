@@ -17,6 +17,7 @@ import 'package:new_ara_app/utils/slide_routing.dart';
 import 'package:new_ara_app/pages/profile_edit_page.dart';
 import 'package:new_ara_app/providers/notification_provider.dart';
 import 'package:new_ara_app/utils/profile_image.dart';
+import 'package:new_ara_app/utils/get_title.dart';
 
 /// 작성한 글, 담아둔 글, 최근 본 글을 나타내기 위해 사용
 enum TabType { created, scrap, recent }
@@ -412,9 +413,11 @@ class _UserPageState extends State<UserPage>
                       children: [
                         Flexible(
                           child: Text(
-                            curPost.title.toString(),
-                            style: const TextStyle(
-                                fontSize: 16, fontWeight: FontWeight.w500),
+                            getTitle(curPost),
+                            style: TextStyle(
+                              color: curPost.is_hidden ? const Color(0xFFBBBBBB) : Colors.black,
+                              fontSize: 16, 
+                              fontWeight: FontWeight.w500),
                             overflow: TextOverflow.ellipsis,
                             maxLines: 1,
                           ),
