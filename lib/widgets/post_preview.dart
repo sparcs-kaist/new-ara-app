@@ -3,6 +3,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 
 import 'package:new_ara_app/models/article_list_action_model.dart';
 import 'package:new_ara_app/utils/time_utils.dart';
+import 'package:new_ara_app/utils/get_title.dart';
 
 class PostPreview extends StatefulWidget {
   final ArticleListActionModel model;
@@ -27,10 +28,11 @@ class _PostPreviewState extends State<PostPreview> {
             children: [
               Flexible(
                 child: Text(
-                  widget.model.is_hidden
-                      ? "숨겨진 글 입니다."
-                      : widget.model.title.toString(),
-                  style: const TextStyle(
+                  getTitle(widget.model),
+                  style: TextStyle(
+                    color: widget.model.is_hidden
+                        ? const Color(0xFFBBBBBB)
+                        : Colors.black,
                     fontWeight: FontWeight.w500,
                     fontSize: 16,
                   ),
