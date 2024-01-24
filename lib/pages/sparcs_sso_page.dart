@@ -46,6 +46,18 @@ class _SparcsSSOPageState extends State<SparcsSSOPage> {
       ..setBackgroundColor(const Color(0x00000000))
       // 네비게이션 대리자 설정
       ..setNavigationDelegate(NavigationDelegate(
+        onNavigationRequest: (NavigationRequest request) async {
+          Uri uri = Uri.parse(request.url);
+          // SPARCS SSO 페이지에서 개발팀, 관리자에게 연락하기 기능이
+          // mailto scheme을 사용하는데 웹뷰에서 잘 처리가 되지 않아 비활성화시켜둠.
+          if (uri.scheme == 'mailto') {
+            // TODO: 사용자 알림 메시지 구현하기
+            debugPrint("아라앱에서 mailto scheme은 아직 관련 구현이 되어있지 않음(2023.01.24)");
+            return NavigationDecision.prevent;
+          }
+          // mailto를 제외한 scheme에 대해서는 navigate 처리.
+          return NavigationDecision.navigate;
+        },
         // 페이지 로딩 상태를 출력
         onProgress: (int progress) {
           debugPrint('WebView가 로딩 중입니다 (진행률: $progress)');
