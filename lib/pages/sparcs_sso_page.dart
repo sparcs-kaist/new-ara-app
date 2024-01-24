@@ -6,7 +6,6 @@ import 'package:new_ara_app/providers/user_provider.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 import 'package:new_ara_app/widgets/loading_indicator.dart';
 import 'package:provider/provider.dart';
-import 'package:dio/dio.dart';
 
 /// SparcsSSOPage
 /// Sparcs SSO(단일 서명 인증) 처리를 담당하는 Flutter 페이지 위젯입니다.
