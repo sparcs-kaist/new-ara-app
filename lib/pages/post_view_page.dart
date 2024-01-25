@@ -24,6 +24,7 @@ import 'package:new_ara_app/widgets/in_article_web_view.dart';
 import 'package:new_ara_app/providers/notification_provider.dart';
 import 'package:new_ara_app/widgets/pop_up_menu_buttons.dart';
 import 'package:new_ara_app/utils/profile_image.dart';
+import 'package:new_ara_app/utils/get_title.dart';
 
 /// 하나의 post에 대한 내용 뷰, 이벤트 처리를 모두 담당하는 StatefulWidget.
 class PostViewPage extends StatefulWidget {
@@ -253,7 +254,8 @@ class _PostViewPageState extends State<PostViewPage> {
                               ),
                               // TODO: (2023.08.09)첨부파일 리스트뷰 프로토타입. 추후 디자이너와 조율 예정
                               Visibility(
-                                visible: _article.attachments.isNotEmpty && _article.is_hidden,
+                                visible: _article.attachments.isNotEmpty &&
+                                    _article.is_hidden,
                                 child: Row(
                                   mainAxisAlignment: MainAxisAlignment.end,
                                   children: [
@@ -318,7 +320,8 @@ class _PostViewPageState extends State<PostViewPage> {
                                         ),
                                         child: InkWell(
                                           onTap: () async {
-                                            await _fetchArticle(userProvider, override_hidden: true);
+                                            await _fetchArticle(userProvider,
+                                                override_hidden: true);
                                             _updateState();
                                           },
                                           child: const Center(
@@ -399,8 +402,7 @@ class _PostViewPageState extends State<PostViewPage> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          // 차단된 경우 title이 null이 되므로 아래와 같이 설정함.
-          _article.title ?? "차단한 사용자의 게시물입니다.",
+          getTitle(_article.title, _article.is_hidden, _article.why_hidden),
           style: const TextStyle(
             fontSize: 18,
             fontWeight: FontWeight.w700,
@@ -833,7 +835,7 @@ class _PostViewPageState extends State<PostViewPage> {
                       ),
                     )),
               )
-            else if (_article.is_mine == true)  // 자신의 글
+            else if (_article.is_mine == true) // 자신의 글
               InkWell(
                 onTap: () async {
                   await showDialog(
@@ -1133,7 +1135,9 @@ class _PostViewPageState extends State<PostViewPage> {
                         ? _buildCommentContent(curComment.content ?? "")
                         : Text(
                             // 차단된 댓글인 경우 can_override_hidden이 false로 설정되어 있음.
-                            curComment.can_override_hidden == false ? '삭제된 댓글 입니다.' : '차단한 사용자의 댓글입니다.',
+                            curComment.can_override_hidden == false
+                                ? '삭제된 댓글 입니다.'
+                                : '차단한 사용자의 댓글입니다.',
                             style: const TextStyle(
                               fontSize: 14,
                               fontWeight: FontWeight.w400,
