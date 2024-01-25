@@ -16,6 +16,7 @@ import 'package:new_ara_app/models/article_list_action_model.dart';
 import 'package:new_ara_app/pages/post_view_page.dart';
 import 'package:new_ara_app/utils/slide_routing.dart';
 import 'package:new_ara_app/providers/notification_provider.dart';
+import 'package:new_ara_app/utils/get_title.dart';
 
 class MainPage extends StatefulWidget {
   const MainPage({Key? key}) : super(key: key);
@@ -446,9 +447,16 @@ class _MainPageState extends State<MainPage> {
                                     PostViewPage(id: portalContentList[0].id)));
                               },
                               child: Text(
-                                portalContentList[0].title.toString(),
-                                style: const TextStyle(
-                                    fontSize: 14, fontWeight: FontWeight.w400),
+                                getTitle(
+                                    portalContentList[0].title,
+                                    portalContentList[0].is_hidden,
+                                    portalContentList[0].why_hidden),
+                                style: TextStyle(
+                                    color: portalContentList[0].is_hidden
+                                        ? const Color(0xFFBBBBBB)
+                                        : Colors.black,
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w400),
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
                               ),
@@ -463,8 +471,14 @@ class _MainPageState extends State<MainPage> {
                                           id: portalContentList[1].id)));
                                 },
                                 child: Text(
-                                  portalContentList[1].title.toString(),
-                                  style: const TextStyle(
+                                  getTitle(
+                                      portalContentList[1].title,
+                                      portalContentList[1].is_hidden,
+                                      portalContentList[1].why_hidden),
+                                  style: TextStyle(
+                                      color: portalContentList[1].is_hidden
+                                          ? const Color(0xFFBBBBBB)
+                                          : Colors.black,
                                       fontSize: 14,
                                       fontWeight: FontWeight.w400),
                                   maxLines: 1,
@@ -480,8 +494,14 @@ class _MainPageState extends State<MainPage> {
                                           id: portalContentList[2].id)));
                                 },
                                 child: Text(
-                                  portalContentList[2].title.toString(),
-                                  style: const TextStyle(
+                                  getTitle(
+                                      portalContentList[2].title,
+                                      portalContentList[2].is_hidden,
+                                      portalContentList[2].why_hidden),
+                                  style: TextStyle(
+                                      color: portalContentList[2].is_hidden
+                                          ? const Color(0xFFBBBBBB)
+                                          : Colors.black,
                                       fontSize: 14,
                                       fontWeight: FontWeight.w400),
                                   maxLines: 1,
@@ -539,10 +559,16 @@ class _MainPageState extends State<MainPage> {
                                                       .id)));
                                         },
                                         child: Text(
-                                          facilityContentList[0]
-                                              .title
-                                              .toString(),
-                                          style: const TextStyle(
+                                          getTitle(
+                                              facilityContentList[0].title,
+                                              facilityContentList[0].is_hidden,
+                                              facilityContentList[0]
+                                                  .why_hidden),
+                                          style: TextStyle(
+                                              color:
+                                                  facilityContentList[0].is_hidden
+                                                      ? const Color(0xFFBBBBBB)
+                                                      : Colors.black,
                                               fontSize: 14,
                                               fontWeight: FontWeight.w400),
                                           maxLines: 1,
@@ -597,8 +623,15 @@ class _MainPageState extends State<MainPage> {
                                                       .id)));
                                         },
                                         child: Text(
-                                          newAraContentList[0].title.toString(),
-                                          style: const TextStyle(
+                                          getTitle(
+                                              newAraContentList[0].title,
+                                              newAraContentList[0].is_hidden,
+                                              newAraContentList[0].why_hidden),
+                                          style: TextStyle(
+                                              color:
+                                                  newAraContentList[0].is_hidden
+                                                      ? const Color(0xFFBBBBBB)
+                                                      : Colors.black,
                                               fontSize: 14,
                                               fontWeight: FontWeight.w400),
                                           maxLines: 1,
@@ -659,8 +692,15 @@ class _MainPageState extends State<MainPage> {
                                                   id: gradContentList[0].id)));
                                         },
                                         child: Text(
-                                          gradContentList[0].title.toString(),
-                                          style: const TextStyle(
+                                          getTitle(
+                                              gradContentList[0].title,
+                                              gradContentList[0].is_hidden,
+                                              gradContentList[0].why_hidden),
+                                          style: TextStyle(
+                                              color:
+                                                  gradContentList[0].is_hidden
+                                                      ? const Color(0xFFBBBBBB)
+                                                      : Colors.black,
                                               fontSize: 14,
                                               fontWeight: FontWeight.w400),
                                           maxLines: 1,
@@ -694,10 +734,16 @@ class _MainPageState extends State<MainPage> {
                                                       .id)));
                                         },
                                         child: Text(
-                                          underGradContentList[0]
-                                              .title
-                                              .toString(),
-                                          style: const TextStyle(
+                                          getTitle(
+                                              underGradContentList[0].title,
+                                              underGradContentList[0].is_hidden,
+                                              underGradContentList[0]
+                                                  .why_hidden),
+                                          style: TextStyle(
+                                              color:
+                                                  underGradContentList[0].is_hidden
+                                                      ? const Color(0xFFBBBBBB)
+                                                      : Colors.black,
                                               fontSize: 14,
                                               fontWeight: FontWeight.w400),
                                           maxLines: 1,
@@ -731,10 +777,16 @@ class _MainPageState extends State<MainPage> {
                                                       .id)));
                                         },
                                         child: Text(
-                                          freshmanContentList[0]
-                                              .title
-                                              .toString(),
-                                          style: const TextStyle(
+                                          getTitle(
+                                              freshmanContentList[0].title,
+                                              freshmanContentList[0].is_hidden,
+                                              freshmanContentList[0]
+                                                  .why_hidden),
+                                          style: TextStyle(
+                                              color:
+                                                  freshmanContentList[0].is_hidden
+                                                      ? const Color(0xFFBBBBBB)
+                                                      : Colors.black,
                                               fontSize: 14,
                                               fontWeight: FontWeight.w400),
                                           maxLines: 1,
