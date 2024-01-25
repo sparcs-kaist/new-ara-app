@@ -413,11 +413,14 @@ class _UserPageState extends State<UserPage>
                       children: [
                         Flexible(
                           child: Text(
-                            getTitle(curPost),
+                            getTitle(curPost.title, curPost.is_hidden,
+                                curPost.why_hidden),
                             style: TextStyle(
-                              color: curPost.is_hidden ? const Color(0xFFBBBBBB) : Colors.black,
-                              fontSize: 16, 
-                              fontWeight: FontWeight.w500),
+                                color: curPost.is_hidden
+                                    ? const Color(0xFFBBBBBB)
+                                    : Colors.black,
+                                fontSize: 16,
+                                fontWeight: FontWeight.w500),
                             overflow: TextOverflow.ellipsis,
                             maxLines: 1,
                           ),
@@ -530,9 +533,9 @@ class _UserPageState extends State<UserPage>
                               visible: (curPost.positive_vote_count != null &&
                                       curPost.positive_vote_count! > 0) &&
                                   ((curPost.negative_vote_count != null &&
-                                      curPost.negative_vote_count! > 0) ||
-                                  (curPost.comment_count != null &&
-                                      curPost.comment_count! > 0)),
+                                          curPost.negative_vote_count! > 0) ||
+                                      (curPost.comment_count != null &&
+                                          curPost.comment_count! > 0)),
                               child: const SizedBox(width: 6),
                             ),
                             Visibility(

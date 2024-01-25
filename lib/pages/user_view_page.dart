@@ -258,12 +258,14 @@ class _UserViewPageState extends State<UserViewPage> {
                         // 글 제목 텍스트
                         Flexible(
                           child: Text(
-                            getTitle(curPost),
+                            getTitle(curPost.title, curPost.is_hidden,
+                                curPost.why_hidden),
                             style: TextStyle(
-                              color: curPost.is_hidden ? const Color(0xFFBBBBBB) : Colors.black,
-                              fontSize: 16,
-                              fontWeight: FontWeight.w500
-                            ),
+                                color: curPost.is_hidden
+                                    ? const Color(0xFFBBBBBB)
+                                    : Colors.black,
+                                fontSize: 16,
+                                fontWeight: FontWeight.w500),
                             overflow: TextOverflow.ellipsis,
                             maxLines: 1,
                           ),

@@ -28,7 +28,7 @@ class _PostPreviewState extends State<PostPreview> {
             children: [
               Flexible(
                 child: Text(
-                  getTitle(widget.model),
+                  getTitle(widget.model.title, widget.model.is_hidden, widget.model.why_hidden),
                   style: TextStyle(
                     color: widget.model.is_hidden
                         ? const Color(0xFFBBBBBB)
