@@ -281,7 +281,6 @@ class _BulletinListPageState extends State<BulletinListPage> {
                         ),
 
                         BoardExpansionTile(1, "공지", boardsByGroup[1]),
-                        BoardExpansionTile(5, "소통", boardsByGroup[5]),
 
                         /// 자유 게시판은 별도의 하위 목록이 없기에 따로 처리
                         InkWell(
@@ -322,6 +321,7 @@ class _BulletinListPageState extends State<BulletinListPage> {
                             )),
                         BoardExpansionTile(3, "학생 단체 및 동아리", boardsByGroup[3]),
                         BoardExpansionTile(4, "거래", boardsByGroup[4]),
+                        BoardExpansionTile(5, "소통", boardsByGroup[5]),
                       ],
                     ),
                   ),
