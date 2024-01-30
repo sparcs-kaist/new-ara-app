@@ -86,14 +86,14 @@ class _MainPageState extends State<MainPage> {
 
     // api 호출과 Provider 정보 동기화.
     try {
-      List<dynamic>? recentJson = await loadApiData('daily_best');
+      List<dynamic>? recentJson = await loadApiData('articles/top/');
 
       if (recentJson == null) {
         recentJson = (await userProvider.getApiRes("articles/top/"))['results'];
-        await saveApiData('daily_best', recentJson);
+        await saveApiData('articles/top/', recentJson);
       } else {
         userProvider.getApiRes("articles/top/").then((response) async {
-          await saveApiData('daily_best', response['results']);
+          await saveApiData('articles/top/', response['results']);
         });
       }
 
@@ -114,14 +114,14 @@ class _MainPageState extends State<MainPage> {
 
   /// 게시판 목록 안의 게시물들을 새로 고침
   Future<void> refreshBoardList(UserProvider userProvider) async {
-    List<dynamic>? boardJson = await loadApiData('boards');
+    List<dynamic>? boardJson = await loadApiData('boards/');
     if (boardJson == null) {
       boardJson = await userProvider.getApiRes("boards/");
-      await saveApiData('boards', boardJson);
+      await saveApiData('boards/', boardJson);
     } else {
       userProvider
           .getApiRes("boards/")
-          .then((value) => {saveApiData('boards', value)});
+          .then((value) => {saveApiData('boards/', value)});
     }
     if (mounted) {
       setState(() {
