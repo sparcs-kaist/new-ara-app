@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -16,6 +18,22 @@ import 'package:new_ara_app/models/article_list_action_model.dart';
 import 'package:new_ara_app/pages/post_view_page.dart';
 import 'package:new_ara_app/utils/slide_routing.dart';
 import 'package:new_ara_app/providers/notification_provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+Future<void> saveApiData(String key, dynamic data) async {
+  final prefs = await SharedPreferences.getInstance();
+  String jsonString = jsonEncode(data);
+  await prefs.setString(key, jsonString);
+}
+
+Future<dynamic> loadApiData(String key) async {
+  final prefs = await SharedPreferences.getInstance();
+  String? jsonString = prefs.getString(key);
+  if (jsonString != null) {
+    return jsonDecode(jsonString);
+  }
+  return null;
+}
 
 class MainPage extends StatefulWidget {
   const MainPage({Key? key}) : super(key: key);
@@ -46,11 +64,11 @@ class _MainPageState extends State<MainPage> {
     // TODO: 현재 api 요청 속도가 너무 느림. 병렬 처리 방식과, api 요청 속도 개선 필요. Future.wait([])로 바꾸면 개선되지 않을까 고민. 반복되는 코드 구조 개선 필요.
     var startTime = DateTime.now(); // 시작 시간 기록
 
-    // 측정하고자 하는 코드 블록
+    //측정하고자 하는 코드 블록
 
     Future.wait([
-      refreshDailyBest(userProvider),
       refreshBoardList(userProvider),
+      refreshDailyBest(userProvider),
     ]).then((results) {
       var endTime = DateTime.now(); // 종료 시간 기록
 
@@ -63,31 +81,54 @@ class _MainPageState extends State<MainPage> {
 
   /// 일일 베스트 컨텐츠 데이터를 새로고침
   Future<void> refreshDailyBest(UserProvider userProvider) async {
+    //1. SharePreferences 값이 없으면 api 호출 후 sharePreferences에 저장.
+    //2. SharePreferences 값이 있으면 그 값을 먼저 보여주고, api 호출 후 sharePreferences에 저장.
+
     // api 호출과 Provider 정보 동기화.
-    List<dynamic> recentJson =
-        (await userProvider.getApiRes("articles/top/"))['results'];
-    if (mounted) {
-      setState(() {
-        for (Map<String, dynamic> json in recentJson) {
-          try {
+    try {
+      List<dynamic>? recentJson = await loadApiData('daily_best');
+
+      if (recentJson == null) {
+        recentJson = (await userProvider.getApiRes("articles/top/"))['results'];
+        await saveApiData('daily_best', recentJson);
+      } else {
+        userProvider.getApiRes("articles/top/").then((response) async {
+          await saveApiData('daily_best', response['results']);
+        });
+      }
+
+      if (mounted) {
+        setState(() {
+          dailyBestContentList.clear();
+          for (var json in recentJson!) {
             dailyBestContentList.add(ArticleListActionModel.fromJson(json));
-          } catch (error) {
-            debugPrint(
-                "refreshDailyBest ArticleListActionModel.fromJson error: $error");
           }
-        }
-        isLoading[0] = false;
-      });
+          isLoading[0] = false;
+        });
+      }
+    } catch (error) {
+      debugPrint("refreshDailyBest error: $error");
+      // 적절한 에러 처리 로직 추가
     }
   }
 
   /// 게시판 목록 안의 게시물들을 새로 고침
   Future<void> refreshBoardList(UserProvider userProvider) async {
-    List<dynamic> boardJson = await userProvider.getApiRes("boards/");
+    List<dynamic>? boardJson = await loadApiData('boards');
+    if (boardJson == null) {
+      boardJson = await userProvider.getApiRes("boards/");
+      await saveApiData('boards', boardJson);
+    } else {
+      userProvider
+          .getApiRes("boards/")
+          .then((value) => {saveApiData('boards', value)});
+    }
     if (mounted) {
       setState(() {
-        for (Map<String, dynamic> json in boardJson) {
+        boardList.clear();
+        for (Map<String, dynamic> json in boardJson!) {
           try {
+            // 밑
             boardList.add(BoardDetailActionModel.fromJson(json));
           } catch (error) {
             debugPrint(
