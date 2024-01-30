@@ -192,6 +192,8 @@ class _InArticleWebViewState extends State<InArticleWebView> {
             };
             return tabGestureRecognizer;
           }),
+          // pinch-to-zoom 기능을 위해서
+          Factory<ScaleGestureRecognizer>(() => ScaleGestureRecognizer()),
         },
       ),
     );
