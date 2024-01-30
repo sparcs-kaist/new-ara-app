@@ -25,7 +25,7 @@ class _MainNavigationTabPageState extends State<MainNavigationTabPage> {
   final List<Widget> _widgetOptions = <Widget>[
     const MainPage(),
     const BulletinListPage(),
-    const ChatListPage(),
+    //const ChatListPage(),
     const NotificationPage(),
     const UserPage(),
   ];
@@ -102,21 +102,21 @@ class _MainNavigationTabPageState extends State<MainNavigationTabPage> {
               ),
             ),
           ),
-          SizedBox(
-            width: 36,
-            height: 36,
-            child: GestureDetector(
-              onTap: (() => _onItemTapped(2)),
-              child: SvgPicture.asset(
-                'assets/icons/chat.svg',
-                colorFilter: ColorFilter.mode(
-                    _selectedIndex == 2 ? Colors.black : Colors.grey,
-                    BlendMode.srcIn),
-                width: 36,
-                height: 36,
-              ),
-            ),
-          ),
+          // SizedBox(
+          //   width: 36,
+          //   height: 36,
+          //   child: GestureDetector(
+          //     onTap: (() => _onItemTapped(2)),
+          //     child: SvgPicture.asset(
+          //       'assets/icons/chat.svg',
+          //       colorFilter: ColorFilter.mode(
+          //           _selectedIndex == 2 ? Colors.black : Colors.grey,
+          //           BlendMode.srcIn),
+          //       width: 36,
+          //       height: 36,
+          //     ),
+          //   ),
+          // ),
           SizedBox(
             width: 36,
             height: 36,

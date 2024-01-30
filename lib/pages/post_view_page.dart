@@ -205,8 +205,7 @@ class _PostViewPageState extends State<PostViewPage> {
     // TODO: Stack 리팩토링
     return Stack(
       children: [
-        if (_isPageLoaded)
-          Scaffold(
+        Scaffold(
             backgroundColor: Colors.white,
             appBar: AppBar(
               leading: IconButton(
@@ -219,48 +218,86 @@ class _PostViewPageState extends State<PostViewPage> {
                 onPressed: () => Navigator.pop(context),
               ),
             ),
-            body: SafeArea(
-              child: GestureDetector(
-                // 화면을 탭하면 키보드가 내려가도록 하기 위해 사용함.
-                onTap: () => FocusScope.of(context).unfocus(),
-                child: Container(
-                  margin: const EdgeInsets.symmetric(horizontal: 20),
-                  child: Column(children: [
-                    // article 부분
-                    Expanded(
-                      child: RefreshIndicator(
-                        color: ColorsInfo.newara,
-                        onRefresh: () async {
-                          userProvider.setIsContentLoaded(false);
-                          _setIsPageLoaded(false);
-                          _setIsPageLoaded(await _fetchArticle(userProvider));
-                        },
-                        child: SingleChildScrollView(
-                          // 위젯이 화면을 넘어가지 않더라고 scrollable 처리.
-                          // 새로고침 기능을 위한 physics.
-                          physics: const AlwaysScrollableScrollPhysics(),
-                          controller: _scrollController,
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              _buildTitle(),
-                              const SizedBox(height: 10),
-                              // 유저 정보 (프로필 이미지, 닉네임)
-                              _buildAuthorInfo(userProvider),
-                              const Divider(
-                                color: Color(0xFFF0F0F0),
-                                thickness: 1,
-                              ),
-                              // TODO: (2023.08.09)첨부파일 리스트뷰 프로토타입. 추후 디자이너와 조율 예정
-                              Visibility(
-                                visible: _article.attachments.isNotEmpty && _article.is_hidden,
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.end,
+            body: _isPageLoaded
+                ? SafeArea(
+                    child: GestureDetector(
+                      // 화면을 탭하면 키보드가 내려가도록 하기 위해 사용함.
+                      onTap: () => FocusScope.of(context).unfocus(),
+                      child: Container(
+                        margin: const EdgeInsets.symmetric(horizontal: 20),
+                        child: Column(children: [
+                          // article 부분
+                          Expanded(
+                            // Android, iOS 여부에 따라 다른 새로고침
+                            child: RefreshIndicator.adaptive(
+                              color: ColorsInfo.newara,
+                              onRefresh: () async {
+                                userProvider.setIsContentLoaded(false);
+                                _setIsPageLoaded(false);
+                                _setIsPageLoaded(
+                                    await _fetchArticle(userProvider));
+                              },
+                              child: SingleChildScrollView(
+                                // 위젯이 화면을 넘어가지 않더라고 scrollable 처리.
+                                // 새로고침 기능을 위한 physics.
+                                physics: const AlwaysScrollableScrollPhysics(),
+                                controller: _scrollController,
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    AttachPopupMenuButton(
-                                      fileNum: _article.attachments.length,
-                                      attachments: _article.attachments,
+                                    _buildTitle(),
+                                    const SizedBox(height: 10),
+                                    // 유저 정보 (프로필 이미지, 닉네임)
+                                    _buildAuthorInfo(userProvider),
+                                    const Divider(
+                                      color: Color(0xFFF0F0F0),
+                                      thickness: 1,
                                     ),
+                                    // TODO: (2023.08.09)첨부파일 리스트뷰 프로토타입. 추후 디자이너와 조율 예정
+                                    Visibility(
+                                      visible: _article.attachments.isNotEmpty,
+                                      child: Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.end,
+                                        children: [
+                                          AttachPopupMenuButton(
+                                            fileNum:
+                                                _article.attachments.length,
+                                            attachments: _article.attachments,
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                    const SizedBox(height: 5),
+                                    InArticleWebView(
+                                      content: _article.content ?? "",
+                                      initialHeight: 150,
+                                      isComment: false,
+                                    ),
+                                    const SizedBox(height: 10),
+                                    // 좋아요, 싫어요 버튼 Row
+                                    _buildVoteButtons(userProvider),
+                                    const SizedBox(height: 10),
+                                    // 담아두기, 공유, 신고 버튼
+                                    _buildUtilityButtons(userProvider),
+                                    const SizedBox(height: 15),
+                                    const Divider(
+                                        thickness: 1, color: Color(0xFFF0F0F0)),
+                                    const SizedBox(height: 15),
+                                    SizedBox(
+                                      width: MediaQuery.of(context).size.width -
+                                          40,
+                                      child: Text(
+                                        '${_article.comment_count}개의 댓글',
+                                        style: const TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.w700,
+                                        ),
+                                      ),
+                                    ),
+                                    const SizedBox(height: 15),
+                                    // 댓글을 보여주는 ListView.
+                                    _buildCommentListView(userProvider),
                                   ],
                                 ),
                               ),
@@ -370,23 +407,13 @@ class _PostViewPageState extends State<PostViewPage> {
                               _buildCommentListView(userProvider),
                             ],
                           ),
-                        ),
+                          // 댓글 입력 부분
+                          _buildCommentTextFormField(userProvider),
+                        ]),
                       ),
                     ),
-                    // 댓글 입력 부분
-                    _buildCommentTextFormField(userProvider),
-                  ]),
-                ),
-              ),
-            ),
-          )
-        else
-          const LoadingIndicator(),
-        // TODO: 아래 기능에 대해 디자이너와 논의 필요 (2023.11.03)
-        // Visibility(
-        //   visible: !(context.watch<UserProvider>().isContentLoaded),
-        //   child: Container(color: Colors.white),
-        // ),
+                  )
+                : const LoadingIndicator())
       ],
     );
   }
@@ -674,33 +701,32 @@ class _PostViewPageState extends State<PostViewPage> {
                         : ColorsInfo.newara,
                   ),
                 ),
-                child: Center(
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      SvgPicture.asset(
-                        'assets/icons/bookmark.svg',
-                        width: 15,
-                        height: 15,
-                        colorFilter: ColorFilter.mode(
-                            _article.my_scrap == null
-                                ? const Color(0xFF646464)
-                                : ColorsInfo.newara,
-                            BlendMode.srcIn),
-                      ),
-                      const SizedBox(width: 4),
-                      Text(
-                        _article.my_scrap == null ? '담아두기' : '담아둔 글',
-                        style: TextStyle(
-                          color: _article.my_scrap == null
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    SvgPicture.asset(
+                      'assets/icons/bookmark.svg',
+                      width: 15,
+                      height: 22,
+                      colorFilter: ColorFilter.mode(
+                          _article.my_scrap == null
                               ? const Color(0xFF646464)
                               : ColorsInfo.newara,
-                          fontSize: 13,
-                          fontWeight: FontWeight.w500,
-                        ),
+                          BlendMode.srcIn),
+                    ),
+                    //const SizedBox(width: 4),
+                    Text(
+                      _article.my_scrap == null ? '담아두기' : '담아둔 글',
+                      style: TextStyle(
+                        color: _article.my_scrap == null
+                            ? const Color(0xFF646464)
+                            : ColorsInfo.newara,
+                        fontSize: 13,
+                        fontWeight: FontWeight.w500,
                       ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
               ),
             ),
@@ -713,39 +739,38 @@ class _PostViewPageState extends State<PostViewPage> {
                 ).share();
               },
               child: Container(
-                  width: 64,
-                  height: 35,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(8),
-                    border: Border.all(
-                      color: const Color(0xFFF0F0F0),
-                      width: 1,
-                    ),
+                width: 64,
+                height: 35,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(
+                    color: const Color(0xFFF0F0F0),
+                    width: 1,
                   ),
-                  child: Center(
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        SvgPicture.asset(
-                          'assets/icons/share.svg',
-                          width: 11,
-                          height: 19,
-                          colorFilter: const ColorFilter.mode(
-                              Color.fromRGBO(100, 100, 100, 1),
-                              BlendMode.srcIn),
-                        ),
-                        const SizedBox(width: 6),
-                        const Text(
-                          '공유',
-                          style: TextStyle(
-                            fontSize: 13,
-                            fontWeight: FontWeight.w500,
-                            color: Color(0xFF646464),
-                          ),
-                        ),
-                      ],
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    SvgPicture.asset(
+                      'assets/icons/share.svg',
+                      width: 19,
+                      height: 22,
+                      colorFilter: const ColorFilter.mode(
+                          Color.fromRGBO(100, 100, 100, 1), BlendMode.srcIn),
                     ),
-                  )),
+                    //const SizedBox(width: 6),
+                    const Text(
+                      '공유',
+                      style: TextStyle(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w500,
+                        color: Color(0xFF646464),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
             ),
           ],
         ),
@@ -831,7 +856,9 @@ class _PostViewPageState extends State<PostViewPage> {
                           ),
                         ],
                       ),
-                    )),
+                    ],
+                  ),
+                ),
               )
             else if (_article.is_mine == true)  // 자신의 글
               InkWell(
@@ -872,16 +899,15 @@ class _PostViewPageState extends State<PostViewPage> {
                         color: const Color(0xFFF0F0F0),
                       ),
                     ),
-                    child: Center(
-                      child: Row(
+                    child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
                           SvgPicture.asset("assets/icons/delete.svg",
-                              width: 11,
-                              height: 19,
+                              width: 15,
+                              height: 22,
                               colorFilter: const ColorFilter.mode(
                                   Color(0xFF646464), BlendMode.srcIn)),
-                          const SizedBox(width: 3),
                           const Text(
                             '삭제',
                             style: TextStyle(
@@ -890,8 +916,7 @@ class _PostViewPageState extends State<PostViewPage> {
                                 color: Color(0xFF646464)),
                           ),
                         ],
-                      ),
-                    )),
+                      ),),
               ),
             const SizedBox(width: 10),
             // 자신의 글일 경우 수정 버튼, 타인의 글일 경우 신고 버튼
@@ -913,27 +938,25 @@ class _PostViewPageState extends State<PostViewPage> {
                       color: const Color(0xFFF0F0F0),
                     ),
                   ),
-                  child: Center(
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        SvgPicture.asset(
-                          'assets/icons/warning.svg',
-                          width: 15,
-                          height: 15,
-                          colorFilter: const ColorFilter.mode(
-                              Color(0xFF646464), BlendMode.srcIn),
-                        ),
-                        const SizedBox(width: 4),
-                        const Text(
-                          '신고',
-                          style: TextStyle(
-                              fontSize: 13,
-                              fontWeight: FontWeight.w500,
-                              color: Color(0xFF646464)),
-                        ),
-                      ],
-                    ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      SvgPicture.asset(
+                        'assets/icons/warning.svg',
+                        width: 19,
+                        height: 22,
+                        colorFilter: const ColorFilter.mode(
+                            Color(0xFF646464), BlendMode.srcIn),
+                      ),
+                      const Text(
+                        '신고',
+                        style: TextStyle(
+                            fontSize: 13,
+                            fontWeight: FontWeight.w500,
+                            color: Color(0xFF646464)),
+                      ),
+                    ],
                   ),
                 ),
               )
@@ -955,20 +978,19 @@ class _PostViewPageState extends State<PostViewPage> {
                       color: const Color(0xFFF0F0F0),
                     ),
                   ),
-                  child: Center(
-                    child: Row(
+                  child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
                         SvgPicture.asset(
                           'assets/icons/modify.svg',
-                          width: 11,
-                          height: 19,
+                          width: 15,
+                          height: 22,
                           colorFilter: const ColorFilter.mode(
                             Color(0xFF646464),
                             BlendMode.srcIn,
                           ),
                         ),
-                        const SizedBox(width: 3),
                         const Text(
                           '수정',
                           style: TextStyle(
@@ -978,7 +1000,6 @@ class _PostViewPageState extends State<PostViewPage> {
                         ),
                       ],
                     ),
-                  ),
                 ),
               ),
           ],
@@ -1162,8 +1183,8 @@ class _PostViewPageState extends State<PostViewPage> {
                                 },
                                 child: SvgPicture.asset(
                                   'assets/icons/like.svg',
-                                  width: 25,
-                                  height: 25,
+                                  width: 12,
+                                  height: 19,
                                   colorFilter: ColorFilter.mode(
                                       curComment.my_vote == false
                                           ? ColorsInfo.noneVote
@@ -1171,7 +1192,6 @@ class _PostViewPageState extends State<PostViewPage> {
                                       BlendMode.srcIn),
                                 ),
                               ),
-                              const SizedBox(width: 3),
                               Text(
                                 curComment.positive_vote_count.toString(),
                                 style: TextStyle(
@@ -1182,7 +1202,7 @@ class _PostViewPageState extends State<PostViewPage> {
                                       : ColorsInfo.posVote,
                                 ),
                               ),
-                              const SizedBox(width: 6),
+                              const SizedBox(width: 12),
                               InkWell(
                                 onTap: () async {
                                   CommentController(
@@ -1194,8 +1214,8 @@ class _PostViewPageState extends State<PostViewPage> {
                                 },
                                 child: SvgPicture.asset(
                                   'assets/icons/dislike.svg',
-                                  width: 25,
-                                  height: 25,
+                                  width: 12,
+                                  height: 19,
                                   colorFilter: ColorFilter.mode(
                                       curComment.my_vote == true
                                           ? ColorsInfo.noneVote
@@ -1203,7 +1223,6 @@ class _PostViewPageState extends State<PostViewPage> {
                                       BlendMode.srcIn),
                                 ),
                               ),
-                              const SizedBox(width: 3),
                               Text(
                                 curComment.negative_vote_count.toString(),
                                 style: TextStyle(
@@ -1218,6 +1237,7 @@ class _PostViewPageState extends State<PostViewPage> {
                             ],
                           ),
                         ),
+                        const SizedBox(width: 12),
                         // 대댓글인 경우 답글쓰기 버튼이 안보이게함.
                         Visibility(
                           visible: curComment.parent_comment == null,
@@ -1233,9 +1253,8 @@ class _PostViewPageState extends State<PostViewPage> {
                                 SvgPicture.asset(
                                   'assets/icons/right_arrow_2.svg',
                                   width: 11,
-                                  height: 12,
+                                  height: 19,
                                 ),
-                                const SizedBox(width: 5),
                                 const Text(
                                   '답글 쓰기',
                                   style: TextStyle(
