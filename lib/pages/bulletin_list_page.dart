@@ -391,17 +391,17 @@ class BoardExpansionTile extends StatelessWidget {
           children: boardsByGroup.map<Widget>((model) {
             return SizedBox(
               height: 39,
-              child: Row(
-                children: [
-                  const SizedBox(
-                    width: 40,
-                  ),
-                  InkWell(
-                    onTap: () {
-                      Navigator.of(context).push(slideRoute(PostListShowPage(
-                          boardType: BoardType.free, boardInfo: model)));
-                    },
-                    child: Text(
+              child: InkWell(
+                onTap: () {
+                  Navigator.of(context).push(slideRoute(PostListShowPage(
+                      boardType: BoardType.free, boardInfo: model)));
+                },
+                child: Row(
+                  children: [
+                    const SizedBox(
+                      width: 40,
+                    ),
+                    Text(
                       model.ko_name,
                       style: const TextStyle(
                         color: Color(0xFF333333),
@@ -409,8 +409,8 @@ class BoardExpansionTile extends StatelessWidget {
                         fontWeight: FontWeight.w500,
                       ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             );
           }).toList(),
