@@ -127,7 +127,7 @@ class _MainNavigationTabPageState extends State<MainNavigationTabPage> {
                   SvgPicture.asset(
                     'assets/icons/notification.svg',
                     colorFilter: ColorFilter.mode(
-                        _selectedIndex == 3 ? Colors.black : Colors.grey,
+                        _selectedIndex == 2 ? Colors.black : Colors.grey,
                         BlendMode.srcIn),
                     width: 36,
                     height: 36,
@@ -160,7 +160,7 @@ class _MainNavigationTabPageState extends State<MainNavigationTabPage> {
               child: SvgPicture.asset(
                 'assets/icons/member.svg',
                 colorFilter: ColorFilter.mode(
-                    _selectedIndex == 4 ? Colors.black : Colors.grey,
+                    _selectedIndex == 3 ? Colors.black : Colors.grey,
                     BlendMode.srcIn),
                 width: 36,
                 height: 36,
