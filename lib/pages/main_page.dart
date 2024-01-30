@@ -44,13 +44,25 @@ class _MainPageState extends State<MainPage> {
     var userProvider = Provider.of<UserProvider>(context, listen: false);
 
     // TODO: 현재 api 요청 속도가 너무 느림. 병렬 처리 방식과, api 요청 속도 개선 필요. Future.wait([])로 바꾸면 개선되지 않을까 고민. 반복되는 코드 구조 개선 필요.
-    refreshDailyBest(userProvider);
-    refreshBoardList(userProvider);
+    var startTime = DateTime.now(); // 시작 시간 기록
+
+    // 측정하고자 하는 코드 블록
+
+    Future.wait([
+      refreshDailyBest(userProvider),
+      refreshBoardList(userProvider),
+    ]).then((results) {
+      var endTime = DateTime.now(); // 종료 시간 기록
+
+      var duration = endTime.difference(startTime); // 두 시간의 차이 계산
+      print("소요 시간: ${duration.inMilliseconds} 밀리초");
+    });
+
     context.read<NotificationProvider>().checkIsNotReadExist();
   }
 
   /// 일일 베스트 컨텐츠 데이터를 새로고침
-  void refreshDailyBest(UserProvider userProvider) async {
+  Future<void> refreshDailyBest(UserProvider userProvider) async {
     // api 호출과 Provider 정보 동기화.
     List<dynamic> recentJson =
         (await userProvider.getApiRes("articles/top/"))['results'];
@@ -64,14 +76,13 @@ class _MainPageState extends State<MainPage> {
                 "refreshDailyBest ArticleListActionModel.fromJson error: $error");
           }
         }
-        //debugPrint(" ----- ${dailyBestContent["results"][0]}");
         isLoading[0] = false;
       });
     }
   }
 
   /// 게시판 목록 안의 게시물들을 새로 고침
-  void refreshBoardList(UserProvider userProvider) async {
+  Future<void> refreshBoardList(UserProvider userProvider) async {
     List<dynamic> boardJson = await userProvider.getApiRes("boards/");
     if (mounted) {
       setState(() {
@@ -85,14 +96,16 @@ class _MainPageState extends State<MainPage> {
         }
         isLoading[7] = false;
       });
+      await Future.wait([
+        refreshPortalNotice(userProvider),
+        refreshFacilityNotice(userProvider),
+        refreshNewAraNotice(userProvider),
+        refreshGradAssocNotice(userProvider),
+        refreshUndergradAssocNotice(userProvider),
+        refreshFreshmanCouncil(userProvider),
+      ]);
     }
     // 게시판 목록 로드 후 각 게시판의 공지사항들을 새로고침
-    refreshPortalNotice(userProvider);
-    refreshFacilityNotice(userProvider);
-    refreshNewAraNotice(userProvider);
-    refreshGradAssocNotice(userProvider);
-    refreshUndergradAssocNotice(userProvider);
-    refreshFreshmanCouncil(userProvider);
   }
 
   /// 주어진 slug 값을 통해 게시판과 토픽의 ID를 찾음. topic 이 없는 경우 slug2로 ""을 넘겨주면 된다.
@@ -114,7 +127,7 @@ class _MainPageState extends State<MainPage> {
   }
 
   ///포탈 게시물 글 불러오기.
-  void refreshPortalNotice(UserProvider userProvider) async {
+  Future<void> refreshPortalNotice(UserProvider userProvider) async {
     //포탈 공지
     //  articles/?parent_board=1
     // "slug": "portal-notice",
@@ -137,7 +150,7 @@ class _MainPageState extends State<MainPage> {
   }
 
   ///입주 업체 게시물 글 불러오기.
-  void refreshFacilityNotice(UserProvider userProvider) async {
+  Future<void> refreshFacilityNotice(UserProvider userProvider) async {
     //articles/?parent_board=11
     //입주 업체
     // "slug": "facility-feedback",
@@ -159,7 +172,7 @@ class _MainPageState extends State<MainPage> {
     }
   }
 
-  void refreshNewAraNotice(UserProvider userProvider) async {
+  Future<void> refreshNewAraNotice(UserProvider userProvider) async {
     //뉴아라
     //        "slug": "newara-feedback",
     int boardID = findBoardID("ara-feedback", "")[0];
@@ -180,7 +193,7 @@ class _MainPageState extends State<MainPage> {
     }
   }
 
-  void refreshGradAssocNotice(UserProvider userProvider) async {
+  Future<void> refreshGradAssocNotice(UserProvider userProvider) async {
     //원총
     // "slug": "students-group",
     // "slug": "grad-assoc",
@@ -205,7 +218,7 @@ class _MainPageState extends State<MainPage> {
     }
   }
 
-  void refreshUndergradAssocNotice(UserProvider userProvider) async {
+  Future<void> refreshUndergradAssocNotice(UserProvider userProvider) async {
     // 총학
     // "slug": "students-group",
     // "slug": "undergrad-assoc",
@@ -228,7 +241,7 @@ class _MainPageState extends State<MainPage> {
     }
   }
 
-  void refreshFreshmanCouncil(UserProvider userProvider) async {
+  Future<void> refreshFreshmanCouncil(UserProvider userProvider) async {
     //새학
     // "slug": "students-group",
     // "slug": "freshman-council",
