@@ -67,105 +67,123 @@ class _MainNavigationTabPageState extends State<MainNavigationTabPage> {
 
   /// 하단의 네비게이션 바를 구성하는 함수.
   Widget _buildBottomNavigationBar() {
+    double gapHalfWidth= (MediaQuery.of(context).size.width-36*4)/10;
+    double iconWidth = gapHalfWidth*2+36;
     return SizedBox(
       height: 50,
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
           SizedBox(
-            width: 36,
-            height: 36,
-            child: GestureDetector(
-              onTap: (() => _onItemTapped(0)),
-              child: SvgPicture.asset(
-                'assets/icons/home.svg',
-                colorFilter: ColorFilter.mode(
-                    _selectedIndex == 0 ? Colors.black : Colors.grey,
-                    BlendMode.srcIn),
-                width: 36,
-                height: 36,
-              ),
-            ),
+            width: gapHalfWidth,
           ),
-          SizedBox(
-            width: 36,
-            height: 36,
-            child: GestureDetector(
-              onTap: (() => _onItemTapped(1)),
-              child: SvgPicture.asset(
-                'assets/icons/post_list.svg',
-                colorFilter: ColorFilter.mode(
-                    _selectedIndex == 1 ? Colors.black : Colors.grey,
-                    BlendMode.srcIn),
-                width: 36,
-                height: 36,
-              ),
-            ),
-          ),
-          // SizedBox(
-          //   width: 36,
-          //   height: 36,
-          //   child: GestureDetector(
-          //     onTap: (() => _onItemTapped(2)),
-          //     child: SvgPicture.asset(
-          //       'assets/icons/chat.svg',
-          //       colorFilter: ColorFilter.mode(
-          //           _selectedIndex == 2 ? Colors.black : Colors.grey,
-          //           BlendMode.srcIn),
-          //       width: 36,
-          //       height: 36,
-          //     ),
-          //   ),
-          // ),
-          SizedBox(
-            width: 36,
-            height: 36,
-            child: GestureDetector(
-              onTap: (() => _onItemTapped(2)),
-              child: Stack(
-                children: [
-                  SvgPicture.asset(
-                    'assets/icons/notification.svg',
+          GestureDetector(
+            behavior: HitTestBehavior.translucent,
+            onTap: (() => _onItemTapped(0)),
+            child: SizedBox(
+              width: iconWidth,
+              height: 50,
+              child: Center(
+                child: SizedBox(
+                  width: 36,
+                  height: 36,
+                  child: SvgPicture.asset(
+                    'assets/icons/home.svg',
                     colorFilter: ColorFilter.mode(
-                        _selectedIndex == 2 ? Colors.black : Colors.grey,
+                        _selectedIndex == 0 ? Colors.black : Colors.grey,
+                        BlendMode.srcIn),
+                  ),
+                ),
+              ),
+            ),
+          ),
+          GestureDetector(
+            behavior: HitTestBehavior.translucent,
+            onTap: (() => _onItemTapped(1)),
+            child: SizedBox(
+              width: iconWidth,
+              height: 50,
+              child: Center(
+                child: SizedBox(
+                  width: 36,
+                  height: 36,
+                  child: SvgPicture.asset(
+                    'assets/icons/post_list.svg',
+                    colorFilter: ColorFilter.mode(
+                        _selectedIndex == 1 ? Colors.black : Colors.grey,
                         BlendMode.srcIn),
                     width: 36,
                     height: 36,
                   ),
-                  Visibility(
-                    visible:
-                        context.watch<NotificationProvider>().isNotReadExist,
-                    child: Positioned(
-                      top: 0,
-                      right: 5,
-                      child: Container(
-                        width: 7,
-                        height: 7,
-                        decoration: const BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: ColorsInfo.newara,
+                ),
+              ),
+            ),
+          ),
+          GestureDetector(
+            behavior: HitTestBehavior.translucent,
+            onTap: (() => _onItemTapped(2)),
+            child: SizedBox(
+              width: iconWidth,
+              height: 50,
+              child: Center(
+                child: SizedBox(
+                  width: 36,
+                  height: 36,
+                  child: Stack(
+                    children: [
+                      SvgPicture.asset(
+                        'assets/icons/notification.svg',
+                        colorFilter: ColorFilter.mode(
+                            _selectedIndex == 2 ? Colors.black : Colors.grey,
+                            BlendMode.srcIn),
+                      ),
+                      Visibility(
+                        visible: context
+                            .watch<NotificationProvider>()
+                            .isNotReadExist,
+                        child: Positioned(
+                          top: 0,
+                          right: 5,
+                          child: Container(
+                            width: 7,
+                            height: 7,
+                            decoration: const BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: ColorsInfo.newara,
+                            ),
+                          ),
                         ),
                       ),
-                    ),
+                    ],
                   ),
-                ],
+                ),
+              ),
+            ),
+          ),
+          GestureDetector(
+            behavior: HitTestBehavior.translucent,
+            onTap: () => _onItemTapped(3),
+            child: SizedBox(
+              width: iconWidth,
+              height: 50,
+              child: Center(
+                child: SizedBox(
+                  width: 36,
+                  height: 36,
+                  child: SvgPicture.asset(
+                    'assets/icons/member.svg',
+                    colorFilter: ColorFilter.mode(
+                        _selectedIndex == 3 ? Colors.black : Colors.grey,
+                        BlendMode.srcIn),
+                    width: 36,
+                    height: 36,
+                  ),
+                ),
               ),
             ),
           ),
           SizedBox(
-            width: 36,
-            height: 36,
-            child: GestureDetector(
-              onTap: () => _onItemTapped(3),
-              child: SvgPicture.asset(
-                'assets/icons/member.svg',
-                colorFilter: ColorFilter.mode(
-                    _selectedIndex == 3 ? Colors.black : Colors.grey,
-                    BlendMode.srcIn),
-                width: 36,
-                height: 36,
-              ),
-            ),
+            width: gapHalfWidth,
           ),
         ],
       ),
