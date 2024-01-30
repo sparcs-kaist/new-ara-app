@@ -167,71 +167,59 @@ class _MainPageState extends State<MainPage> {
     return returnValue;
   }
 
-  ///포탈 게시물 글 불러오기.
-  Future<void> refreshPortalNotice(UserProvider userProvider) async {
-    //포탈 공지
-    //  articles/?parent_board=1
-    // "slug": "portal-notice",
-    int boardID = findBoardID("portal-notice", "")[0];
-    List<dynamic> boardArticlesJson = (await userProvider
-        .getApiRes("articles/?parent_board=$boardID"))['results'];
+  Future<void> refreshBoardContent(
+      UserProvider userProvider,
+      String slug1,
+      String slug2,
+      List<ArticleListActionModel> contentList,
+      int isLoadingIndex) async {
+    List<int> ids = findBoardID(slug1, slug2);
+    int boardID = ids[0], topicID = ids[1];
+    String apiUrl = topicID == -1
+        ? "articles/?parent_board=$boardID"
+        : "articles/?parent_board=$boardID&parent_topic=$topicID";
+
+    Map<String, dynamic>? jsonResult = await loadApiData(apiUrl);
+    if (jsonResult == null) {
+      jsonResult = (await userProvider.getApiRes(apiUrl));
+      saveApiData(apiUrl, jsonResult);
+    } else {
+      userProvider
+          .getApiRes(apiUrl)
+          .then((value) => {saveApiData(apiUrl, value)});
+    }
+
     if (mounted) {
       setState(() {
-        for (Map<String, dynamic> json in boardArticlesJson) {
+        contentList.clear();
+        for (var json in jsonResult!['results']) {
           try {
-            portalContentList.add(ArticleListActionModel.fromJson(json));
+            contentList.add(ArticleListActionModel.fromJson(json));
           } catch (error) {
             debugPrint(
-                "refreshPortalNotice ArticleListActionModel.fromJson error: $error");
+                "refreshBoardContent ArticleListActionModel.fromJson failed: $error");
           }
         }
-        isLoading[1] = false;
+        isLoading[isLoadingIndex] = false;
       });
     }
+  }
+
+  ///포탈 게시물 글 불러오기.
+  Future<void> refreshPortalNotice(UserProvider userProvider) async {
+    await refreshBoardContent(
+        userProvider, "portal-notice", "", portalContentList, 1);
   }
 
   ///입주 업체 게시물 글 불러오기.
   Future<void> refreshFacilityNotice(UserProvider userProvider) async {
-    //articles/?parent_board=11
-    //입주 업체
-    // "slug": "facility-feedback",
-    int boardID = findBoardID("facility-notice", "")[0];
-    List<dynamic> facilityJson = (await userProvider
-        .getApiRes("articles/?parent_board=$boardID"))['results'];
-    if (mounted) {
-      setState(() {
-        for (Map<String, dynamic> json in facilityJson) {
-          try {
-            facilityContentList.add(ArticleListActionModel.fromJson(json));
-          } catch (error) {
-            debugPrint(
-                "refreshFacilityNotice ArticleListActionModel.fromJson failed: $error");
-          }
-        }
-        isLoading[2] = false;
-      });
-    }
+    await refreshBoardContent(
+        userProvider, "facility-notice", "", facilityContentList, 2);
   }
 
   Future<void> refreshNewAraNotice(UserProvider userProvider) async {
-    //뉴아라
-    //        "slug": "newara-feedback",
-    int boardID = findBoardID("ara-feedback", "")[0];
-    List<dynamic> newAraNoticeJson = (await userProvider
-        .getApiRes("articles/?parent_board=$boardID"))['results'];
-    if (mounted) {
-      setState(() {
-        for (Map<String, dynamic> json in newAraNoticeJson) {
-          try {
-            newAraContentList.add(ArticleListActionModel.fromJson(json));
-          } catch (error) {
-            debugPrint(
-                "refreshNewAraNotice ArticleListActionModel.fromJson failed: $error");
-          }
-        }
-        isLoading[3] = false;
-      });
-    }
+    await refreshBoardContent(
+        userProvider, "ara-feedback", "", newAraContentList, 3);
   }
 
   Future<void> refreshGradAssocNotice(UserProvider userProvider) async {
@@ -240,69 +228,24 @@ class _MainPageState extends State<MainPage> {
     // "slug": "grad-assoc",
     //dev 서버랑 실제 서버 parent_topic 이 다름을 유의하기.
     //https://newara.sparcs.org/api/articles/?parent_board=2&parent_topic=24
-    int boardID = findBoardID("students-group", "grad-assoc")[0];
-    int topicID = findBoardID("students-group", "grad-assoc")[1];
-    List<dynamic> gradJson = (await userProvider.getApiRes(
-        "articles/?parent_board=$boardID&parent_topic=$topicID"))['results'];
-    if (mounted) {
-      setState(() {
-        for (Map<String, dynamic> json in gradJson) {
-          try {
-            gradContentList.add(ArticleListActionModel.fromJson(json));
-          } catch (error) {
-            debugPrint(
-                "refreshGradAssocNotice ArticleListActionModel.fromJson failed: $error");
-          }
-        }
-        isLoading[4] = false;
-      });
-    }
+    await refreshBoardContent(
+        userProvider, "students-group", "grad-assoc", gradContentList, 4);
   }
 
   Future<void> refreshUndergradAssocNotice(UserProvider userProvider) async {
     // 총학
     // "slug": "students-group",
     // "slug": "undergrad-assoc",
-    int boardID = findBoardID("students-group", "undergrad-assoc")[0];
-    int topicID = findBoardID("students-group", "undergrad-assoc")[1];
-    List<dynamic> underGradJson = (await userProvider.getApiRes(
-        "articles/?parent_board=$boardID&parent_topic=$topicID"))['results'];
-    if (mounted) {
-      setState(() {
-        for (Map<String, dynamic> json in underGradJson) {
-          try {
-            underGradContentList.add(ArticleListActionModel.fromJson(json));
-          } catch (error) {
-            debugPrint(
-                "refreshUndergradAssocNotice ArticleListActionModel.fromJson failed: $error");
-          }
-        }
-        isLoading[5] = false;
-      });
-    }
+    await refreshBoardContent(userProvider, "students-group", "undergrad-assoc",
+        underGradContentList, 5);
   }
 
   Future<void> refreshFreshmanCouncil(UserProvider userProvider) async {
     //새학
     // "slug": "students-group",
     // "slug": "freshman-council",
-    int boardID = findBoardID("students-group", "freshman-council")[0];
-    int topicID = findBoardID("students-group", "freshman-council")[1];
-    List<dynamic> freshmanJson = (await userProvider.getApiRes(
-        "articles/?parent_board=$boardID&parent_topic=$topicID"))['results'];
-    if (mounted) {
-      setState(() {
-        for (Map<String, dynamic> json in freshmanJson) {
-          try {
-            freshmanContentList.add(ArticleListActionModel.fromJson(json));
-          } catch (error) {
-            debugPrint(
-                "refreshFreshmanCouncil ArticleListActionModel.fromJson failed: $error");
-          }
-        }
-        isLoading[6] = false;
-      });
-    }
+    await refreshBoardContent(userProvider, "students-group",
+        "freshman-council", freshmanContentList, 6);
   }
 
   @override
