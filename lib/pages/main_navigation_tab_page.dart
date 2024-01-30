@@ -121,7 +121,7 @@ class _MainNavigationTabPageState extends State<MainNavigationTabPage> {
             width: 36,
             height: 36,
             child: GestureDetector(
-              onTap: (() => _onItemTapped(3)),
+              onTap: (() => _onItemTapped(2)),
               child: Stack(
                 children: [
                   SvgPicture.asset(
@@ -156,7 +156,7 @@ class _MainNavigationTabPageState extends State<MainNavigationTabPage> {
             width: 36,
             height: 36,
             child: GestureDetector(
-              onTap: () => _onItemTapped(4),
+              onTap: () => _onItemTapped(3),
               child: SvgPicture.asset(
                 'assets/icons/member.svg',
                 colorFilter: ColorFilter.mode(
