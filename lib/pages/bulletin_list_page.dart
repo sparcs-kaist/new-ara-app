@@ -358,7 +358,7 @@ class BoardExpansionTile extends StatelessWidget {
         contentPadding: const EdgeInsets.all(0),
         dense: true,
         child: ExpansionTile(
-          // tilePadding: EdgeInsets.zero,
+          initiallyExpanded: true,
           title: SizedBox(
             height: 39,
             child: Row(
