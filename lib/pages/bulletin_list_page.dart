@@ -313,6 +313,7 @@ class _BulletinListPageState extends State<BulletinListPage> {
                                     style: const TextStyle(
                                       color: Color(0xFF333333),
                                       fontSize: 20,
+                                      fontFamily: 'NotoSansKR',
                                       fontWeight: FontWeight.w700,
                                     ),
                                   ),
@@ -350,7 +351,7 @@ class BoardExpansionTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Theme(
-      data: ThemeData(
+      data: Theme.of(context).copyWith(
         dividerColor: Colors.transparent, // 액센트 색상을 투명으로 설정
         splashColor: Colors.transparent,
       ),
