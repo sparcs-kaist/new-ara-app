@@ -30,6 +30,7 @@ class ArticleModel {
   String created_at;
   String updated_at;
   String deleted_at;
+
   /// name_type이 1이면 기본 이름, 2이면 익명 이름
   /// TODO: 현재 데브랑 본섭이랑 name_type 명명 규칙이 다름
   /// https://sparcs.slack.com/archives/CV6H8N4EM/p1699094779620889
@@ -96,11 +97,15 @@ class ArticleModel {
       }
     }
     List<AttachmentModel> fileList = [];
-    for (dynamic fileJson in json['attachments']) {
-      try {
-        fileList.add(AttachmentModel.fromJson(fileJson));
-      } catch (error) {
-        debugPrint("During ArticleModel.fromJson, adding attachment ${fileJson['id']} failed: $error");
+    // attachments 필드가 null이 아닐 때만 파일 정보를 받아옴.
+    if (json['attachments'] != null) {
+      for (dynamic fileJson in json['attachments']) {
+        try {
+          fileList.add(AttachmentModel.fromJson(fileJson));
+        } catch (error) {
+          debugPrint(
+              "During ArticleModel.fromJson, adding attachment ${fileJson['id']} failed: $error");
+        }
       }
     }
     return ArticleModel(
@@ -153,7 +158,9 @@ class ArticleModel {
         'can_override_hidden': can_override_hidden,
         'parent_topic': parent_topic?.toJson(),
         'parent_board': parent_board.toJson(),
-        'attachments': attachments == [] ? [] : attachments.map((model) => model.toJson()).toList(),
+        'attachments': attachments == []
+            ? []
+            : attachments.map((model) => model.toJson()).toList(),
         'my_comment_profile': my_comment_profile,
         'comments': comments == []
             ? []
