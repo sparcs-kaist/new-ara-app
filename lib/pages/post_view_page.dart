@@ -364,6 +364,8 @@ class _PostViewPageState extends State<PostViewPage> {
                                         ),
                                       ),
                                       const SizedBox(height: 10),
+                                      _buildVoteButtons(userProvider),
+                                      const SizedBox(height: 10),
                                       // 담아두기, 공유, 신고 버튼
                                       _buildUtilityButtons(userProvider),
                                       const SizedBox(height: 15),
