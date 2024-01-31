@@ -59,10 +59,11 @@ class _MainPageState extends State<MainPage> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    var userProvider = Provider.of<UserProvider>(context, listen: false);
+    UserProvider userProvider =
+        Provider.of<UserProvider>(context, listen: false);
 
     // TODO: 현재 api 요청 속도가 너무 느림. 병렬 처리 방식과, api 요청 속도 개선 필요. Future.wait([])로 바꾸면 개선되지 않을까 고민. 반복되는 코드 구조 개선 필요.
-    var startTime = DateTime.now(); // 시작 시간 기록
+    DateTime startTime = DateTime.now(); // 시작 시간 기록
 
     //측정하고자 하는 코드 블록
 
@@ -70,9 +71,9 @@ class _MainPageState extends State<MainPage> {
       refreshBoardList(userProvider),
       refreshDailyBest(userProvider),
     ]).then((results) {
-      var endTime = DateTime.now(); // 종료 시간 기록
+      DateTime endTime = DateTime.now(); // 종료 시간 기록
 
-      var duration = endTime.difference(startTime); // 두 시간의 차이 계산
+      Duration duration = endTime.difference(startTime); // 두 시간의 차이 계산
       print("소요 시간: ${duration.inMilliseconds} 밀리초");
     });
 
@@ -81,26 +82,30 @@ class _MainPageState extends State<MainPage> {
 
   /// 일일 베스트 컨텐츠 데이터를 새로고침
   Future<void> refreshDailyBest(UserProvider userProvider) async {
-    //1. SharePreferences 값이 없으면 api 호출 후 sharePreferences에 저장.
-    //2. SharePreferences 값이 있으면 그 값을 먼저 보여주고, api 호출 후 sharePreferences에 저장.
+    //1. Shared_Preferences 값이 있으면(if not null) 그 값으로 UI 업데이트.
+    //2. api 호출 후 새로운 response shared_preferences에 저장 후 UI 업데이트
 
     // api 호출과 Provider 정보 동기화.
     try {
-      List<dynamic>? recentJson = await loadApiData('articles/top/');
+      Map<String, dynamic>? recentJson = await loadApiData('articles/top/');
 
-      if (recentJson == null) {
-        recentJson = (await userProvider.getApiRes("articles/top/"))['results'];
-        await saveApiData('articles/top/', recentJson);
-      } else {
-        userProvider.getApiRes("articles/top/").then((response) async {
-          await saveApiData('articles/top/', response['results']);
-        });
+      if (recentJson != null) {
+        if (mounted) {
+          setState(() {
+            dailyBestContentList.clear();
+            for (Map<String, dynamic> json in recentJson['results']) {
+              dailyBestContentList.add(ArticleListActionModel.fromJson(json));
+            }
+            isLoading[0] = false;
+          });
+        }
       }
-
+      var response = await userProvider.getApiRes("articles/top/");
+      await saveApiData('articles/top/', response);
       if (mounted) {
         setState(() {
           dailyBestContentList.clear();
-          for (var json in recentJson!) {
+          for (Map<String, dynamic> json in response!['results']) {
             dailyBestContentList.add(ArticleListActionModel.fromJson(json));
           }
           isLoading[0] = false;
@@ -180,19 +185,29 @@ class _MainPageState extends State<MainPage> {
         : "articles/?parent_board=$boardID&parent_topic=$topicID";
 
     Map<String, dynamic>? jsonResult = await loadApiData(apiUrl);
-    if (jsonResult == null) {
-      jsonResult = (await userProvider.getApiRes(apiUrl));
-      saveApiData(apiUrl, jsonResult);
-    } else {
-      userProvider
-          .getApiRes(apiUrl)
-          .then((value) => {saveApiData(apiUrl, value)});
+    if (jsonResult != null) {
+      if (mounted) {
+        setState(() {
+          contentList.clear();
+          for (Map<String, dynamic> json in jsonResult!['results']) {
+            try {
+              contentList.add(ArticleListActionModel.fromJson(json));
+            } catch (error) {
+              debugPrint(
+                  "refreshBoardContent ArticleListActionModel.fromJson failed: $error");
+            }
+          }
+          isLoading[isLoadingIndex] = false;
+        });
+      }
     }
 
+    var value = await userProvider.getApiRes(apiUrl);
+    saveApiData(apiUrl, value);
     if (mounted) {
       setState(() {
         contentList.clear();
-        for (var json in jsonResult!['results']) {
+        for (Map<String, dynamic> json in value!['results']) {
           try {
             contentList.add(ArticleListActionModel.fromJson(json));
           } catch (error) {
