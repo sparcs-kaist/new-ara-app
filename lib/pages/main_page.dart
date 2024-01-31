@@ -76,7 +76,7 @@ class _MainPageState extends State<MainPage> {
       DateTime endTime = DateTime.now(); // 종료 시간 기록
 
       Duration duration = endTime.difference(startTime); // 두 시간의 차이 계산
-      print("소요 시간: ${duration.inMilliseconds} 밀리초");
+      debugPrint("소요 시간: ${duration.inMilliseconds} 밀리초");
     });
 
     context.read<NotificationProvider>().checkIsNotReadExist();
@@ -128,7 +128,7 @@ class _MainPageState extends State<MainPage> {
     } else {
       userProvider
           .getApiRes("boards/")
-          .then((value) => {saveApiData('boards/', value)});
+          .then((value) async => {await saveApiData('boards/', value)});
     }
     if (mounted) {
       setState(() {
@@ -217,7 +217,7 @@ class _MainPageState extends State<MainPage> {
       if (mounted) {
         setState(() {
           contentList.clear();
-          for (Map<String, dynamic> json in recentJson!['results']) {
+          for (Map<String, dynamic> json in recentJson['results']) {
             try {
               contentList.add(ArticleListActionModel.fromJson(json));
             } catch (error) {
