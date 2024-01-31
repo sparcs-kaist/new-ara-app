@@ -73,7 +73,7 @@ class _PostListShowPageState extends State<PostListShowPage> {
     }
 
     _scrollController.addListener(_scrollListener);
-    refreshPostList(userProvider);
+    initPostList(userProvider);
     context.read<NotificationProvider>().checkIsNotReadExist();
   }
 
@@ -85,7 +85,7 @@ class _PostListShowPageState extends State<PostListShowPage> {
   }
 
   // 게시글 목록을 새로고침하는 함수
-  void refreshPostList(UserProvider userProvider) async {
+  void initPostList(UserProvider userProvider) async {
     Map<String, dynamic>? myMap = await userProvider.getApiRes("${apiUrl}1");
     debugPrint(myMap?["results"].toString());
     if (mounted) {
@@ -122,26 +122,32 @@ class _PostListShowPageState extends State<PostListShowPage> {
         _isLoadingNextPage = true;
       });
 
-      currentPage = currentPage + 1;
       // api 호출과 Provider 정보 동기화.
       // await Future.delayed(Duration(seconds: 1));
-      // TODO: try catch로 감싸기
-      Map<String, dynamic>? myMap =
-          await userProvider.getApiRes("$apiUrl$currentPage");
+      try {
+        currentPage = currentPage + 1;
+        Map<String, dynamic>? myMap =
+            await userProvider.getApiRes("$apiUrl$currentPage");
+        if (mounted) {
+          setState(() {
+            for (int i = 0; i < (myMap!["results"].length ?? 0); i++) {
+              if (myMap["results"][i]["created_by"]["profile"] != null) {
+                postPreviewList.add(
+                    ArticleListActionModel.fromJson(myMap["results"][i] ?? {}));
+              } else if (widget.boardType == BoardType.scraps) {
+                // 스크랩 게시물이면
+                postPreviewList.add(ArticleListActionModel.fromJson(
+                    myMap["results"][i]["parent_article"] ?? {}));
+              }
+            }
+          });
+        }
+      } catch (error) {
+        currentPage = currentPage - 1;
+        debugPrint("scrollListener error : $error");
+      }
       if (mounted) {
         setState(() {
-          //TODO: 더 불러올 자료가 없으면 막기. 현재 에러남.
-          for (int i = 0; i < (myMap!["results"].length ?? 0); i++) {
-            //???/
-            if (myMap["results"][i]["created_by"]["profile"] != null) {
-              postPreviewList.add(
-                  ArticleListActionModel.fromJson(myMap["results"][i] ?? {}));
-            } else if (widget.boardType == BoardType.scraps) {
-              // 스크랩 게시물이면
-              postPreviewList.add(ArticleListActionModel.fromJson(
-                  myMap["results"][i]["parent_article"] ?? {}));
-            }
-          }
           isLoading = false;
           _isLoadingNextPage = false;
         });
