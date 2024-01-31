@@ -39,7 +39,7 @@ class _PostListShowPageState extends State<PostListShowPage> {
 
   @override
   void initState() {
-    // TODO: implement initState
+  
     super.initState();
 
     var userProvider = context.read<UserProvider>();
@@ -73,7 +73,7 @@ class _PostListShowPageState extends State<PostListShowPage> {
     }
 
     _scrollController.addListener(_scrollListener);
-    initPostList(userProvider);
+    updateAllBulletinList();
     context.read<NotificationProvider>().checkIsNotReadExist();
   }
 
@@ -84,29 +84,36 @@ class _PostListShowPageState extends State<PostListShowPage> {
     super.dispose();
   }
 
-  // 게시글 목록을 새로고침하는 함수
-  void initPostList(UserProvider userProvider) async {
-    Map<String, dynamic>? myMap = await userProvider.getApiRes("${apiUrl}1");
-    debugPrint(myMap?["results"].toString());
+  /// 게시물 update(게시판의 current페이지까지에 있는 게시물들을 불러옴)
+  Future<void> updateAllBulletinList() async {
+    List<ArticleListActionModel> newList = [];
+    UserProvider userProvider = context.read<UserProvider>();
+
+    // 모든 페이지를 순회하며 게시물 목록을 업데이트합니다.
+    for (int page = 1; page <= currentPage; page++) {
+      Map<String, dynamic>? json = await userProvider.getApiRes("$apiUrl$page");
+
+      if (json != null && json.containsKey("results")) {
+        for (var result in json["results"]) {
+          // 스크랩 게시물인 경우와 아닌 경우를 분기하여 처리합니다.
+          if (widget.boardType != BoardType.scraps &&
+              result["created_by"]["profile"] != null) {
+            newList.add(ArticleListActionModel.fromJson(result));
+          } else if (widget.boardType == BoardType.scraps &&
+              result.containsKey("parent_article")) {
+            newList
+                .add(ArticleListActionModel.fromJson(result["parent_article"]));
+          }
+        }
+      }
+    }
+
+    // 위젯이 마운트 상태인 경우 상태를 업데이트합니다.
     if (mounted) {
       setState(() {
         postPreviewList.clear();
-        for (int i = 0; i < (myMap?["results"].length ?? 0); i++) {
-          try {
-            if (widget.boardType != BoardType.scraps &&
-                myMap!["results"][i]["created_by"]["profile"] != null) {
-              postPreviewList
-                  .add(ArticleListActionModel.fromJson(myMap["results"][i]));
-            } else if (widget.boardType == BoardType.scraps) {
-              postPreviewList.add(ArticleListActionModel.fromJson(
-                  myMap!["results"][i]["parent_article"]));
-            }
-          } catch (error) {
-            debugPrint(
-                "refreshPostList error at $i : $error"); // invalid json 걸러내기
-          }
-        }
-        isLoading = false;
+        postPreviewList.addAll(newList);
+        isLoading = false; // 로딩 상태 업데이트
       });
     }
   }
@@ -157,36 +164,6 @@ class _PostListShowPageState extends State<PostListShowPage> {
 
   @override
   Widget build(BuildContext context) {
-    // TODO: void refreshPostList(UserProvider userProvider) async 메소드와 통합하기.
-    /// 게시물 클릭하고 다시 돌아올 때 게시물 목록 업데이트 해주는 함수.
-    Future<void> updateAllBulletinList() async {
-      List<ArticleListActionModel> newList = [];
-      UserProvider userProvider = context.read<UserProvider>();
-      for (int j = 1; j <= currentPage; j++) {
-        Map<String, dynamic>? json = await userProvider.getApiRes("$apiUrl$j");
-
-        for (int i = 0; i < (json!["results"].length ?? 0); i++) {
-          //???/
-          if (widget.boardType != BoardType.scraps &&
-              json["results"][i]["created_by"]["profile"] != null) {
-            newList
-                .add(ArticleListActionModel.fromJson(json["results"][i] ?? {}));
-          } else if (widget.boardType == BoardType.scraps) {
-            // 스크랩 게시물이면
-            newList.add(ArticleListActionModel.fromJson(
-                json["results"][i]["parent_article"] ?? {}));
-          }
-        }
-      }
-      if (mounted) {
-        setState(() {
-          postPreviewList.clear();
-          postPreviewList = [...newList];
-        });
-      }
-      return Future.value();
-    }
-
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
