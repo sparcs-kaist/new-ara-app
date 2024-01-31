@@ -20,12 +20,14 @@ import 'package:new_ara_app/utils/slide_routing.dart';
 import 'package:new_ara_app/providers/notification_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+///SharedPreferences를 이용해 데이터 저장( 키: api url, 값: api response)
 Future<void> saveApiData(String key, dynamic data) async {
   final prefs = await SharedPreferences.getInstance();
   String jsonString = jsonEncode(data);
   await prefs.setString(key, jsonString);
 }
 
+///SharedPreferences를 이용해 데이터 불러오기( 키: api url, 값: api response)
 Future<dynamic> loadApiData(String key) async {
   final prefs = await SharedPreferences.getInstance();
   String? jsonString = prefs.getString(key);
@@ -154,24 +156,50 @@ class _MainPageState extends State<MainPage> {
     // 게시판 목록 로드 후 각 게시판의 공지사항들을 새로고침
   }
 
-  /// 주어진 slug 값을 통해 게시판과 토픽의 ID를 찾음. topic 이 없는 경우 slug2로 ""을 넘겨주면 된다.
-  List<int> findBoardID(String slug1, String slug2) {
-    List<int> returnValue = [-1, -1];
-    for (int i = 0; i < boardList.length; i++) {
-      if (boardList[i].slug == slug1) {
-        returnValue[0] = boardList[i].id;
-        if (slug2 != "") {
-          for (int j = 0; j < boardList[i].topics.length; j++) {
-            if (boardList[i].topics[j].slug == slug2) {
-              returnValue[1] = boardList[i].topics[j].id;
-            }
-          }
-        }
-      }
-    }
-    return returnValue;
+  ///포탈 게시물 글 불러오기.
+  Future<void> refreshPortalNotice(UserProvider userProvider) async {
+    await refreshBoardContent(
+        userProvider, "portal-notice", "", portalContentList, 1);
   }
 
+  ///입주 업체 게시물 글 불러오기.
+  Future<void> refreshFacilityNotice(UserProvider userProvider) async {
+    await refreshBoardContent(
+        userProvider, "facility-notice", "", facilityContentList, 2);
+  }
+
+  Future<void> refreshNewAraNotice(UserProvider userProvider) async {
+    await refreshBoardContent(
+        userProvider, "ara-feedback", "", newAraContentList, 3);
+  }
+
+  Future<void> refreshGradAssocNotice(UserProvider userProvider) async {
+    //원총
+    // "slug": "students-group",
+    // "slug": "grad-assoc",
+    //dev 서버랑 실제 서버 parent_topic 이 다름을 유의하기.
+    //https://newara.sparcs.org/api/articles/?parent_board=2&parent_topic=24
+    await refreshBoardContent(
+        userProvider, "students-group", "grad-assoc", gradContentList, 4);
+  }
+
+  Future<void> refreshUndergradAssocNotice(UserProvider userProvider) async {
+    // 총학
+    // "slug": "students-group",
+    // "slug": "undergrad-assoc",
+    await refreshBoardContent(userProvider, "students-group", "undergrad-assoc",
+        underGradContentList, 5);
+  }
+
+  Future<void> refreshFreshmanCouncil(UserProvider userProvider) async {
+    //새학
+    // "slug": "students-group",
+    // "slug": "freshman-council",
+    await refreshBoardContent(userProvider, "students-group",
+        "freshman-council", freshmanContentList, 6);
+  }
+
+  /// 게시판의 게시물들을 불러옴. 코드 중복을 줄이기 위해 사용.
   Future<void> refreshBoardContent(
       UserProvider userProvider,
       String slug1,
@@ -220,47 +248,22 @@ class _MainPageState extends State<MainPage> {
     }
   }
 
-  ///포탈 게시물 글 불러오기.
-  Future<void> refreshPortalNotice(UserProvider userProvider) async {
-    await refreshBoardContent(
-        userProvider, "portal-notice", "", portalContentList, 1);
-  }
-
-  ///입주 업체 게시물 글 불러오기.
-  Future<void> refreshFacilityNotice(UserProvider userProvider) async {
-    await refreshBoardContent(
-        userProvider, "facility-notice", "", facilityContentList, 2);
-  }
-
-  Future<void> refreshNewAraNotice(UserProvider userProvider) async {
-    await refreshBoardContent(
-        userProvider, "ara-feedback", "", newAraContentList, 3);
-  }
-
-  Future<void> refreshGradAssocNotice(UserProvider userProvider) async {
-    //원총
-    // "slug": "students-group",
-    // "slug": "grad-assoc",
-    //dev 서버랑 실제 서버 parent_topic 이 다름을 유의하기.
-    //https://newara.sparcs.org/api/articles/?parent_board=2&parent_topic=24
-    await refreshBoardContent(
-        userProvider, "students-group", "grad-assoc", gradContentList, 4);
-  }
-
-  Future<void> refreshUndergradAssocNotice(UserProvider userProvider) async {
-    // 총학
-    // "slug": "students-group",
-    // "slug": "undergrad-assoc",
-    await refreshBoardContent(userProvider, "students-group", "undergrad-assoc",
-        underGradContentList, 5);
-  }
-
-  Future<void> refreshFreshmanCouncil(UserProvider userProvider) async {
-    //새학
-    // "slug": "students-group",
-    // "slug": "freshman-council",
-    await refreshBoardContent(userProvider, "students-group",
-        "freshman-council", freshmanContentList, 6);
+  /// 주어진 slug 값을 통해 게시판과 토픽의 ID를 찾음. topic 이 없는 경우 slug2로 ""을 넘겨주면 된다.
+  List<int> findBoardID(String slug1, String slug2) {
+    List<int> returnValue = [-1, -1];
+    for (int i = 0; i < boardList.length; i++) {
+      if (boardList[i].slug == slug1) {
+        returnValue[0] = boardList[i].id;
+        if (slug2 != "") {
+          for (int j = 0; j < boardList[i].topics.length; j++) {
+            if (boardList[i].topics[j].slug == slug2) {
+              returnValue[1] = boardList[i].topics[j].id;
+            }
+          }
+        }
+      }
+    }
+    return returnValue;
   }
 
   @override
