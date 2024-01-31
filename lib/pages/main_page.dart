@@ -100,7 +100,7 @@ class _MainPageState extends State<MainPage> {
           });
         }
       }
-      var response = await userProvider.getApiRes("articles/top/");
+      dynamic response = await userProvider.getApiRes("articles/top/");
       await saveApiData('articles/top/', response);
       if (mounted) {
         setState(() {
@@ -184,12 +184,12 @@ class _MainPageState extends State<MainPage> {
         ? "articles/?parent_board=$boardID"
         : "articles/?parent_board=$boardID&parent_topic=$topicID";
 
-    Map<String, dynamic>? jsonResult = await loadApiData(apiUrl);
-    if (jsonResult != null) {
+    Map<String, dynamic>? recentJson = await loadApiData(apiUrl);
+    if (recentJson != null) {
       if (mounted) {
         setState(() {
           contentList.clear();
-          for (Map<String, dynamic> json in jsonResult!['results']) {
+          for (Map<String, dynamic> json in recentJson!['results']) {
             try {
               contentList.add(ArticleListActionModel.fromJson(json));
             } catch (error) {
@@ -202,12 +202,12 @@ class _MainPageState extends State<MainPage> {
       }
     }
 
-    var value = await userProvider.getApiRes(apiUrl);
-    saveApiData(apiUrl, value);
+    dynamic response = await userProvider.getApiRes(apiUrl);
+    saveApiData(apiUrl, response);
     if (mounted) {
       setState(() {
         contentList.clear();
-        for (Map<String, dynamic> json in value!['results']) {
+        for (Map<String, dynamic> json in response!['results']) {
           try {
             contentList.add(ArticleListActionModel.fromJson(json));
           } catch (error) {
