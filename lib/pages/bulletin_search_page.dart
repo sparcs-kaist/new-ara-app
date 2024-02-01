@@ -50,12 +50,25 @@ class _BulletinSearchPageState extends State<BulletinSearchPage> {
         _apiUrl = "articles/?page=";
         _hintText = "전체 보기에서 검색";
         break;
+      case BoardType.recent:
+        _apiUrl = "articles/recent/?page=";
+        _hintText = "최근 본 글에서 검색";
+        break;
+      case BoardType.top:
+        _apiUrl = "articles/top/?page=";
+        _hintText = "실시간 인기글에서 검색";
+        break;
+      case BoardType.scraps:
+        _apiUrl = "scraps/?page=";
+        _hintText = "담아둔 글에서 검색";
+        break;
       default:
         _apiUrl = "articles/recent/?page=";
+        _hintText = "검색";
         break;
     }
 
-    var userProvider = context.read<UserProvider>();
+    UserProvider userProvider = context.read<UserProvider>();
     // 위젯이 빌드된 후에 포커스를 줍니다.
     WidgetsBinding.instance
         .addPostFrameCallback((_) => _focusNode.requestFocus());
@@ -84,6 +97,9 @@ class _BulletinSearchPageState extends State<BulletinSearchPage> {
       return;
     }
 
+    debugPrint("""refreshPostList : 
+${_apiUrl}1&main_search__contains=$_searchWord
+""");
     Map<String, dynamic>? myMap = await userProvider.getApiRes("""
 ${_apiUrl}1&main_search__contains=$_searchWord
 """);
@@ -107,6 +123,8 @@ ${_apiUrl}1&main_search__contains=$_searchWord
 
   /// 사용자가 스크롤을 내렸을 때 추가 게시물을 불러옴
   void _scrollListener() async {
+    //스크롤 시 포커스 해제
+    FocusScope.of(context).unfocus();
     if (_searchWord == "") {
       if (mounted) {
         setState(() {
@@ -117,10 +135,11 @@ ${_apiUrl}1&main_search__contains=$_searchWord
       return;
     }
 
-    var userProvider = context.read<UserProvider>();
+    UserProvider userProvider = context.read<UserProvider>();
     if (_scrollController.position.pixels ==
         _scrollController.position.maxScrollExtent) {
       _currentPage = _currentPage + 1;
+      //TODO: 더 이상 불러올 게시물이 없을 때의 처리
       Map<String, dynamic>? myMap = await userProvider.getApiRes(
           "$_apiUrl$_currentPage&main_search__contains=$_searchWord");
       if (mounted) {
@@ -186,6 +205,12 @@ ${_apiUrl}1&main_search__contains=$_searchWord
                             setState(() {
                               _searchWord = text;
                               _isLoading = true;
+                            });
+                            refreshPostList(context.read<UserProvider>());
+                          },
+                          onChanged: (value) {
+                            setState(() {
+                              _searchWord = value;
                             });
                             refreshPostList(context.read<UserProvider>());
                           },
