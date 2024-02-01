@@ -211,12 +211,13 @@ ${_apiUrl}1&main_search__contains=$_searchWord
                   width: MediaQuery.of(context).size.width - 40,
                   height: 36,
                   child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       Expanded(
                         child: TextField(
                           minLines: 1,
                           maxLines: 1,
-                          textAlignVertical: TextAlignVertical.bottom,
+                          textAlignVertical: TextAlignVertical.center,
                           focusNode: _focusNode,
                           textInputAction: TextInputAction.search,
                           onSubmitted: (String text) {
@@ -234,17 +235,22 @@ ${_apiUrl}1&main_search__contains=$_searchWord
                           },
                           style: const TextStyle(
                             //TODO: 커서 크기와 텍스트 베이스라인 교정하기.
-                            height: 1.5,
+                            height: 18 / 14,
                             fontSize: 14,
                             fontWeight: FontWeight.w500,
                           ),
                           decoration: InputDecoration(
+                            isCollapsed: true,
+                            isDense: true,
+                            filled: true,
+                            fillColor: const Color(0xFFF6F6F6),
+                            // richtext를 밑으로 내리고 싶으면 contentPadding의 B를 줄일것
                             contentPadding:
-                                const EdgeInsets.fromLTRB(0, 0, 0, 14),
+                                const EdgeInsets.fromLTRB(100, 10, 10, 9),
                             prefixIconConstraints: const BoxConstraints(
-                                maxHeight: 28, minHeight: 28),
+                                maxHeight: 24, maxWidth: 31),
                             prefixIcon: Padding(
-                              padding: const EdgeInsets.fromLTRB(6.0, 0, 0, 0),
+                              padding: const EdgeInsets.fromLTRB(6.0, 0, 1, 0),
                               child: SizedBox(
                                 // 원하는 세로 크기
                                 width: 24,
@@ -261,11 +267,10 @@ ${_apiUrl}1&main_search__contains=$_searchWord
                             hintStyle: const TextStyle(
                               color: Color(0xFFBBBBBB),
                               fontSize: 14,
+                              height: null,
                               fontWeight: FontWeight.w500,
                             ),
-                            filled: true,
-                            fillColor: const Color(0xFFF6F6F6),
-                            isDense: false,
+
                             // 모서리를 둥글게 설정
                             enabledBorder: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(10.0),
