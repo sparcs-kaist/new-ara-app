@@ -56,12 +56,17 @@ class _BulletinSearchPageState extends State<BulletinSearchPage> {
     }
 
     var userProvider = context.read<UserProvider>();
+    // 위젯이 빌드된 후에 포커스를 줍니다.
+    WidgetsBinding.instance
+        .addPostFrameCallback((_) => _focusNode.requestFocus());
     _scrollController.addListener(_scrollListener);
     refreshPostList(userProvider);
   }
 
   @override
   void dispose() {
+    // FocusNode를 정리합니다.
+    _focusNode.dispose();
     _scrollController.removeListener(_scrollListener);
     _scrollController.dispose();
     super.dispose();
