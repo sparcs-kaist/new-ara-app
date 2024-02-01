@@ -1009,6 +1009,7 @@ class _PostViewPageState extends State<PostViewPage> {
       itemBuilder: (BuildContext context, int idx) {
         CommentNestedCommentListActionModel curComment = _commentList[idx];
         // 각각의 댓글에 대한 컨테이너
+        // TODO: is_hidden && can_override_hidden 인 경우 댓글 내용 확인이 가능하게 해야함.
         return Column(
           children: [
             Container(
