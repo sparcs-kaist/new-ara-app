@@ -8,6 +8,14 @@ Map<String, String> hiddenReasons = {
   "ACCESS_DENIED_CONTENT": "접근 권한이 없는 게시물입니다." // BE에서 안전상 만들어둔 것으로 거의 쓰이지 않음
 };
 
+/// (2023.02.01) 현재 BE에 있는 모든 댓글 숨김 사유
+/// BE가 변경되면 새로 확인해볼 필요 있음.
+Map<String, String> hiddenReasonsComment = {
+  "REPORTED_CONTENT": "신고 누적으로 숨김된 댓글입니다.",
+  "BLOCKED_USER_CONTENT": "차단한 사용자의 댓글입니다.",
+  "DELETED_CONTENT": "삭제된 댓글입니다.",
+};
+
 /// (2023.02.01) 현재 BE에 있는 글 숨김 사유에 따른 사용자 안내 메시지
 Map<String, String> hiddenReasonNotices = {
   "REPORTED_CONTENT": "",
@@ -31,6 +39,13 @@ String getTitle(String? orignialTitle, bool isHidden, List<dynamic> whyHidden) {
 
   // TODO: hiddenReasons에 없는 사유가 있을 경우 코드에 반영하기.
   return hiddenReasons[whyHidden[0]] ?? "숨겨진 게시물입니다.";
+}
+
+/// is_hidden이 True인 댓글에 대해 숨김 사유를 리턴하는 함수
+/// PostViewPage에서 숨겨진 댓글을 표시할 때 사용됨.
+String getHiddenCommentReasons(List<dynamic> whyHidden) {
+  // TODO: hiddenReasonsComment에 없는 사유가 있을 경우 코드에 반영하기.
+  return hiddenReasonsComment[whyHidden[0]] ?? "숨겨진 댓글입니다.";
 }
 
 /// Article 모델의 why_hidden 값을 입력으로 받아 해당하는 모든 사유에 대한 내용을 담은 리스트를 반환
