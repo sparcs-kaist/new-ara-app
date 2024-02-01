@@ -17,7 +17,7 @@ import 'package:new_ara_app/pages/post_view_page.dart';
 import 'package:new_ara_app/utils/slide_routing.dart';
 import 'package:new_ara_app/providers/notification_provider.dart';
 import 'package:new_ara_app/utils/profile_image.dart';
-import 'package:new_ara_app/utils/get_title.dart';
+import 'package:new_ara_app/utils/handle_hidden.dart';
 
 /// 유저 관련 정보 페이지 뷰, 이벤트 처리를 모두 관리하는 StatefulWidget
 class UserViewPage extends StatefulWidget {

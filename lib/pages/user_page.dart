@@ -17,7 +17,7 @@ import 'package:new_ara_app/utils/slide_routing.dart';
 import 'package:new_ara_app/pages/profile_edit_page.dart';
 import 'package:new_ara_app/providers/notification_provider.dart';
 import 'package:new_ara_app/utils/profile_image.dart';
-import 'package:new_ara_app/utils/get_title.dart';
+import 'package:new_ara_app/utils/handle_hidden.dart';
 
 /// 작성한 글, 담아둔 글, 최근 본 글을 나타내기 위해 사용
 enum TabType { created, scrap, recent }

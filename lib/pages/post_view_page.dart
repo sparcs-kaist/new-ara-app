@@ -24,7 +24,7 @@ import 'package:new_ara_app/widgets/in_article_web_view.dart';
 import 'package:new_ara_app/providers/notification_provider.dart';
 import 'package:new_ara_app/widgets/pop_up_menu_buttons.dart';
 import 'package:new_ara_app/utils/profile_image.dart';
-import 'package:new_ara_app/utils/get_title.dart';
+import 'package:new_ara_app/utils/handle_hidden.dart';
 
 /// 하나의 post에 대한 내용 뷰, 이벤트 처리를 모두 담당하는 StatefulWidget.
 class PostViewPage extends StatefulWidget {

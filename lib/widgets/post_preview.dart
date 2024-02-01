@@ -3,7 +3,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 
 import 'package:new_ara_app/models/article_list_action_model.dart';
 import 'package:new_ara_app/utils/time_utils.dart';
-import 'package:new_ara_app/utils/get_title.dart';
+import 'package:new_ara_app/utils/handle_hidden.dart';
 
 class PostPreview extends StatefulWidget {
   final ArticleListActionModel model;
