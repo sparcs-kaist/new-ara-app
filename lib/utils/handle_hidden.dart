@@ -1,11 +1,11 @@
 /// (2023.02.01) 현재 BE에 있는 모든 글 숨김 사유
 /// BE가 변경되면 새로 확인해볼 필요 있음.
 Map<String, String> hiddenReasons = {
-  "REPORTED_CONTENT": "신고당한 게시물입니다.",
+  "REPORTED_CONTENT": "신고 누적으로 숨김된 게시물입니다.",
   "BLOCKED_USER_CONTENT": "차단한 사용자의 게시물입니다.",
   "ADULT_CONTENT": "성인/음란성 내용의 게시물입니다.",
   "SOCIAL_CONTENT": "정치/사회성 내용의 게시물입니다.",
-  "ACCESS_DENIED_CONTENT": "숨겨진 게시물입니다." // BE에서 안전상 만들어둔 것으로 거의 쓰이지 않음
+  "ACCESS_DENIED_CONTENT": "접근 권한이 없는 게시물입니다." // BE에서 안전상 만들어둔 것으로 거의 쓰이지 않음
 };
 
 /// (2023.02.01) 현재 BE에 있는 글 숨김 사유에 따른 사용자 안내 메시지
