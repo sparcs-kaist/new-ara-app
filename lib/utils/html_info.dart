@@ -16,33 +16,187 @@ String getContentHtml(String content, {double? width}) {
       .replaceAll('<h8>', '<u>')
       .replaceAll('</h8>', '</u>');
 
-  debugPrint("original html: $content");
-  debugPrint("sanitized html: $sanitized");
-
   return '''
   <html>
     <head>
       <meta name="viewport" content="width=device-width initial-scale=1.0">
       <style>
-        img {
-          max-width: 100%;
-        }
-        html, body {
-          margin: 0;
-          padding: 0;
-        }
-        a {
-          color: #00b8d4;
-          text-decoration: underline;
-        }
-        blockquote {
-          margin: 0;
-          padding: 0;
-          background-color: #f5f5f5;
-          border-left: 5px solid #dbdbdb;
-          padding: 0.2em 1.5em;
-          display: block;
-        }
+
+      /*! minireset.css v0.0.3 | MIT License | github.com/jgthms/minireset.css */
+      blockquote,body,dd,dl,dt,fieldset,figure,h1,h2,h3,h4,h5,h6,hr,html,iframe,legend,li,ol,p,pre,textarea,ul {
+        margin: 0;
+        padding: 0
+      }
+
+      strong {
+        color: #363636;
+        font-weight: 700
+      }
+
+      a {
+        color: #00b8d4;
+        text-decoration: underline;
+      }
+
+      h1, h2, h3, h4, h5, h6 {
+        color: #363636;
+        font-weight: 600;
+        line-height: 1.125;
+      }
+
+      h1 {
+        font-size: 32px;
+      }
+
+      h2 {
+        font-size: 28px;
+      }
+
+      h3 {
+        font-size: 24px;
+      }
+
+      h4 {
+        font-size: 20px;
+      }
+
+      h5 {
+        font-size: 20px;
+      }
+
+      h6 {
+        font-size: 16px;
+      }
+
+      code,hr {
+        background-color: #f5f5f5
+      }
+
+      hr {
+        border: none;
+        display: block;
+        height: 2px;
+        margin: 1.5rem 0
+      }
+
+      code {
+        color: #ff3860;
+        font-size: 14px;
+        font-weight: 400;
+        padding: .25em .5em .25em
+      }
+
+      ul {
+        list-style: none
+      }
+
+      button,input,select,textarea {
+        margin: 0
+      }
+
+      html {
+          -webkit-box-sizing: border-box;
+          box-sizing: border-box
+          font-family: "Noto Sans KR",sans-serif;
+      }
+
+      audio,img,video {
+        height: auto;
+        max-width: 100%
+      }
+
+      table {
+        border-collapse: collapse;
+        border-spacing: 0
+      }
+
+      td,th {
+        padding: 0;
+        text-align: left
+      }
+
+      html {
+        background-color: #fff;
+        font-size: 16px;
+        -moz-osx-font-smoothing: grayscale;
+        -webkit-font-smoothing: antialiased;
+        min-width: 300px;
+        overflow-x: hidden;
+        overflow-y: scroll;
+        text-rendering: auto;
+        -webkit-text-size-adjust: 100%;
+        -moz-text-size-adjust: 100%;
+        -ms-text-size-adjust: 100%;
+        text-size-adjust: 100%
+      }
+
+      article,aside,figure,footer,header,hgroup,section {
+        display: block
+      }
+
+      body,button,input,select,textarea {
+        font-family: "Noto Sans KR",sans-serif
+      }
+
+      code,pre {
+        -moz-osx-font-smoothing: auto;
+        -webkit-font-smoothing: auto;
+        font-family: monospace;
+        background-color: transparent;
+        color: currentColor;
+        font-size: 1em;
+        padding: 0
+      }
+
+      body {
+        color: #4a4a4a;
+        font-size: 1rem;
+        font-weight: 400;
+        line-height: 1.5
+      }
+
+      small {
+        font-size: .875em
+      }
+
+      span {
+        font-style: inherit;
+        font-weight: inherit
+      }
+
+      pre {
+        -webkit-overflow-scrolling: touch;
+        background-color: #f5f5f5;
+        color: #4a4a4a;
+        font-size: .875em;
+        overflow-x: auto;
+        padding: 1.25rem 1.5rem;
+        white-space: pre;
+        word-wrap: normal
+      }
+
+      table td,table th {
+        text-align: left;
+        vertical-align: top
+      }
+
+      table th {
+        color: #363636
+      }
+
+      html, body {
+        margin: 0;
+        padding: 0;
+      }
+
+      blockquote {
+        margin: 0;
+        padding: 0;
+        background-color: #f5f5f5;
+        border-left: 5px solid #dbdbdb;
+        padding: 1em 1.5em;
+        display: block;
+      }
       </style>
     </head>
     <body>
