@@ -360,6 +360,7 @@ class BoardExpansionTile extends StatelessWidget {
         dense: true,
         child: ExpansionTile(
           iconColor: Colors.black,
+          collapsedIconColor: ColorsInfo.newara,
           initiallyExpanded: true,
           title: SizedBox(
             height: 39,
