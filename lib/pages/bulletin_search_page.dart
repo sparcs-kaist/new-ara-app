@@ -234,7 +234,7 @@ ${_apiUrl}1&main_search__contains=$_searchWord
                             refreshPostList(context.read<UserProvider>());
                           },
                           style: const TextStyle(
-                            //TODO: 커서 크기와 텍스트 베이스라인 교정하기.
+                            //height * fontSize = line height(커서 크기)
                             height: 18 / 14,
                             fontSize: 14,
                             fontWeight: FontWeight.w500,
