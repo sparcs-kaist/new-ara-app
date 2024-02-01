@@ -28,6 +28,7 @@ class _BulletinSearchPageState extends State<BulletinSearchPage> {
   List<ArticleListActionModel> postPreviewList = [];
   int _currentPage = 1;
   bool _isLoading = true;
+  bool _isLoadingNextPage = false;
   String _apiUrl = "";
   String _hintText = "";
   String _searchWord = "";
@@ -135,25 +136,42 @@ ${_apiUrl}1&main_search__contains=$_searchWord
       return;
     }
 
-    UserProvider userProvider = context.read<UserProvider>();
-    if (_scrollController.position.pixels ==
-        _scrollController.position.maxScrollExtent) {
-      _currentPage = _currentPage + 1;
-      //TODO: 더 이상 불러올 게시물이 없을 때의 처리
-      Map<String, dynamic>? myMap = await userProvider.getApiRes(
-          "$_apiUrl$_currentPage&main_search__contains=$_searchWord");
+    try {
       if (mounted) {
         setState(() {
-          for (int i = 0; i < (myMap!["results"].length ?? 0); i++) {
-            //???/
-            if (myMap["results"][i]["created_by"]["profile"] != null) {
-              postPreviewList.add(
-                  ArticleListActionModel.fromJson(myMap["results"][i] ?? {}));
-            }
-          }
-          _isLoading = false;
+          _isLoadingNextPage = true;
         });
       }
+      UserProvider userProvider = context.read<UserProvider>();
+      if (_scrollController.position.pixels ==
+          _scrollController.position.maxScrollExtent) {
+        _currentPage = _currentPage + 1;
+        //TODO: 더 이상 불러올 게시물이 없을 때의 처리
+        Map<String, dynamic>? myMap = await userProvider.getApiRes(
+            "$_apiUrl$_currentPage&main_search__contains=$_searchWord");
+        if (mounted) {
+          setState(() {
+            for (int i = 0; i < (myMap!["results"].length ?? 0); i++) {
+              //???/
+              if (myMap["results"][i]["created_by"]["profile"] != null) {
+                postPreviewList.add(
+                    ArticleListActionModel.fromJson(myMap["results"][i] ?? {}));
+              }
+            }
+          });
+          setState(() {
+            _isLoading = false;
+            _isLoadingNextPage = false;
+          });
+        }
+      }
+    } catch (error) {
+      _currentPage = _currentPage - 1;
+      setState(() {
+        _isLoading = false;
+        _isLoadingNextPage = false;
+      });
+      debugPrint("scrollListener error : $error");
     }
   }
 
@@ -287,11 +305,21 @@ ${_apiUrl}1&main_search__contains=$_searchWord
                   width: MediaQuery.of(context).size.width - 18,
                   child: ListView.builder(
                     controller: _scrollController,
-                    itemCount: postPreviewList.length, // 아이템 개수
+                    itemCount: postPreviewList.length +
+                        (_isLoadingNextPage ? 1 : 0), // 아이템 개수
                     itemBuilder: (BuildContext context, int index) {
                       // 각 아이템을 위한 위젯 생성
 
                       // 숨겨진 게시물이면 일단 표현 안하는 걸로 함.
+                      if (_isLoadingNextPage &&
+                          index == postPreviewList.length) {
+                        return const SizedBox(
+                          height: 63,
+                          child: Center(
+                            child: LoadingIndicator(),
+                          ),
+                        );
+                      }
                       return postPreviewList[index].is_hidden
                           ? Container()
                           : InkWell(
