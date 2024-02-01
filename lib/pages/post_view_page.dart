@@ -1575,34 +1575,6 @@ class _PostViewPageState extends State<PostViewPage> {
     return true;
   }
 
-  /// 모델의 why_hidden 값을 입력으로 받아 해당하는 모든 사유에 대한 내용을 담은 리스트를 반환
-  /// PostViewPage에서 숨김, 차단된 글에 사용됨.
-  List<String> getAllHiddenReasons(List<dynamic> whyHidden) {
-    List<String> reasons = [];
-
-    for (String reason in whyHidden) {
-      // 차단한 사용자의 게시물인 경우
-      if (reason == "BLOCKED_USER_CONTENT") {
-        reasons.add("차단한 사용자의 게시물입니다.");
-      }
-      // 정치글인 경우
-      else if (reason == "SOCIAL_CONTENT") {
-        reasons.add("정치/사회성 내용의 게시물입니다.");
-      }
-      // 성인글인 경우
-      else if (reason == "ADULT_CONTENT") {
-        reasons.add("성인/음란성 내용의 게시물입니다.");
-      }
-      // 이외의 사유인 경우
-      // TODO: 이외의 사요 발견 시에 조건에 새로 추가해놓기
-      else {
-        reasons.add("숨겨진 내용의 게시물입니다.");
-      }
-    }
-
-    return reasons;
-  }
-
   /// 사용자에게 숨겨진 글에 대한 처리 방법을 알려주는 함수.
   String getHiddenInfo(List<dynamic> whyHidden) {
     // 숨김 사유가 없을 경우
