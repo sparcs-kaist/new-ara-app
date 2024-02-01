@@ -267,11 +267,10 @@ class _PostViewPageState extends State<PostViewPage> {
                                 ),
                               ),
                               const SizedBox(height: 5),
-                              // 차단된 유저의 글에 대한 내용
+                              // 숨겨진 게시물 관련 처리 위젯
                               Visibility(
-                                // 차단이 되었고 사용자가 '숨긴내용 보기'를 누르지 않았을 때
-                                visible: _article.can_override_hidden == true &&
-                                    _article.is_hidden == true,
+                                // 숨겨진 게시물인 경우
+                                visible: _article.is_hidden == true,
                                 child: Container(
                                   decoration: const BoxDecoration(
                                     borderRadius:
@@ -309,29 +308,36 @@ class _PostViewPageState extends State<PostViewPage> {
                                         ),
                                       ),
                                       const SizedBox(height: 8),
-                                      Container(
-                                        width: 104,
-                                        height: 36,
-                                        decoration: BoxDecoration(
-                                          borderRadius: const BorderRadius.all(
-                                              Radius.circular(10)),
-                                          border: Border.all(
-                                            width: 1,
-                                            color: Color(0xFFDBDBDB),
+                                      // TODO: 지금은 내용, 댓글 일괄 적용이지만 댓글만 적용하는 것도 필요
+                                      // 숨겨진 게시물이지만 사용자가 내용을 확인할 수 있는 경우
+                                      Visibility(
+                                        visible: _article.can_override_hidden ==
+                                            true,
+                                        child: Container(
+                                          width: 104,
+                                          height: 36,
+                                          decoration: BoxDecoration(
+                                            borderRadius:
+                                                const BorderRadius.all(
+                                                    Radius.circular(10)),
+                                            border: Border.all(
+                                              width: 1,
+                                              color: const Color(0xFFDBDBDB),
+                                            ),
                                           ),
-                                        ),
-                                        child: InkWell(
-                                          onTap: () async {
-                                            await _fetchArticle(userProvider,
-                                                override_hidden: true);
-                                            _updateState();
-                                          },
-                                          child: const Center(
-                                            child: Text(
-                                              '숨긴내용 보기',
-                                              style: TextStyle(
-                                                color: Color(0xff4a4a4a),
-                                                fontWeight: FontWeight.w400,
+                                          child: InkWell(
+                                            onTap: () async {
+                                              await _fetchArticle(userProvider,
+                                                  override_hidden: true);
+                                              _updateState();
+                                            },
+                                            child: const Center(
+                                              child: Text(
+                                                '숨긴내용 보기',
+                                                style: TextStyle(
+                                                  color: Color(0xff4a4a4a),
+                                                  fontWeight: FontWeight.w400,
+                                                ),
                                               ),
                                             ),
                                           ),
@@ -1607,7 +1613,8 @@ class _PostViewPageState extends State<PostViewPage> {
       return "차단 사용자 설정은 설정페이지에서 하실 수 있습니다.";
     }
     // 성인글 또는 정치글인 경우
-    else if (topHiddenReason == "SOCIAL_CONTENT" || topHiddenReason == "ADULT_CONTENT") {
+    else if (topHiddenReason == "SOCIAL_CONTENT" ||
+        topHiddenReason == "ADULT_CONTENT") {
       return "게시글 보기 설정은 설정페이지에서 하실 수 있습니다.";
     }
     // 그 외의 사유로 숨겨진 경우
