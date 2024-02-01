@@ -281,7 +281,6 @@ class _BulletinListPageState extends State<BulletinListPage> {
                         ),
 
                         BoardExpansionTile(1, "공지", boardsByGroup[1]),
-                        BoardExpansionTile(5, "소통", boardsByGroup[5]),
 
                         /// 자유 게시판은 별도의 하위 목록이 없기에 따로 처리
                         InkWell(
@@ -314,6 +313,7 @@ class _BulletinListPageState extends State<BulletinListPage> {
                                     style: const TextStyle(
                                       color: Color(0xFF333333),
                                       fontSize: 20,
+                                      fontFamily: 'NotoSansKR',
                                       fontWeight: FontWeight.w700,
                                     ),
                                   ),
@@ -322,6 +322,7 @@ class _BulletinListPageState extends State<BulletinListPage> {
                             )),
                         BoardExpansionTile(3, "학생 단체 및 동아리", boardsByGroup[3]),
                         BoardExpansionTile(4, "거래", boardsByGroup[4]),
+                        BoardExpansionTile(5, "소통", boardsByGroup[5]),
                       ],
                     ),
                   ),
@@ -350,7 +351,7 @@ class BoardExpansionTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Theme(
-      data: ThemeData(
+      data: Theme.of(context).copyWith(
         dividerColor: Colors.transparent, // 액센트 색상을 투명으로 설정
         splashColor: Colors.transparent,
       ),
@@ -358,7 +359,7 @@ class BoardExpansionTile extends StatelessWidget {
         contentPadding: const EdgeInsets.all(0),
         dense: true,
         child: ExpansionTile(
-          // tilePadding: EdgeInsets.zero,
+          initiallyExpanded: true,
           title: SizedBox(
             height: 39,
             child: Row(
@@ -391,17 +392,17 @@ class BoardExpansionTile extends StatelessWidget {
           children: boardsByGroup.map<Widget>((model) {
             return SizedBox(
               height: 39,
-              child: Row(
-                children: [
-                  const SizedBox(
-                    width: 40,
-                  ),
-                  InkWell(
-                    onTap: () {
-                      Navigator.of(context).push(slideRoute(PostListShowPage(
-                          boardType: BoardType.free, boardInfo: model)));
-                    },
-                    child: Text(
+              child: InkWell(
+                onTap: () {
+                  Navigator.of(context).push(slideRoute(PostListShowPage(
+                      boardType: BoardType.free, boardInfo: model)));
+                },
+                child: Row(
+                  children: [
+                    const SizedBox(
+                      width: 40,
+                    ),
+                    Text(
                       model.ko_name,
                       style: const TextStyle(
                         color: Color(0xFF333333),
@@ -409,8 +410,8 @@ class BoardExpansionTile extends StatelessWidget {
                         fontWeight: FontWeight.w500,
                       ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             );
           }).toList(),

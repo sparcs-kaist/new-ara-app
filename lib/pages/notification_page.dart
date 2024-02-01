@@ -178,6 +178,7 @@ class _NotificationPageState extends State<NotificationPage> {
         context.read<NotificationProvider>();
     return Scaffold(
       appBar: AppBar(
+        centerTitle: false,
         title: Text(
           'appBar.notification'.tr(),
           style: const TextStyle(
@@ -198,7 +199,9 @@ class _NotificationPageState extends State<NotificationPage> {
               Expanded(
                 child: SizedBox(
                   width: MediaQuery.of(context).size.width - 40,
-                  child: RefreshIndicator(
+                  // Android, IOS에 따라 당겨서 새로고침 디자인이 다르므로
+                  // adaptive 적용.
+                  child: RefreshIndicator.adaptive(
                     color: ColorsInfo.newara,
                     onRefresh: () async {
                       // 새로고침 시 첫 페이지만 다시 불러옴.
@@ -230,7 +233,7 @@ class _NotificationPageState extends State<NotificationPage> {
                                           _modelList[idx - 1].created_at,
                                           _modelList[idx].created_at)
                                       : const SizedBox(
-                                          height: 40,
+                                          height: 35,
                                           child: Text(
                                             '오늘',
                                             style: TextStyle(
@@ -272,46 +275,64 @@ class _NotificationPageState extends State<NotificationPage> {
                                         }
                                       },
                                       child: Container(
-                                        height: 90,
-                                        padding: const EdgeInsets.symmetric(
-                                            horizontal: 10),
+                                        constraints: const BoxConstraints(minHeight: 92),
+                                        padding: const EdgeInsets.only(
+                                            left: 10,
+                                            right: 10,
+                                            top: 14,
+                                            bottom: 14),
                                         decoration: BoxDecoration(
                                           border: Border.all(
                                             width: 1,
-                                            color: const Color.fromRGBO(
-                                                230, 230, 230, 1),
+                                            color: Color(0xfff0f0f0),
                                           ),
                                           borderRadius: const BorderRadius.all(
                                             Radius.circular(15),
                                           ),
+                                          boxShadow: const [
+                                            BoxShadow(
+                                              color: Color(0x0A000000),
+                                              blurRadius: 6,
+                                              offset: Offset(0, 2),
+                                            ),
+                                          ],
+                                          color: Colors.white,
                                         ),
                                         child: Row(
-                                          //mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
                                           children: [
-                                            Container(
-                                              width: 40,
-                                              height: 40,
-                                              decoration: BoxDecoration(
-                                                shape: BoxShape.circle,
-                                                color: (targetNoti.is_read ??
-                                                        false)
-                                                    ? Colors.grey
-                                                    : ColorsInfo.newara,
-                                              ),
-                                              child: SvgPicture.asset(
-                                                targetNoti.type == "default"
-                                                    ? "assets/icons/notification.svg"
-                                                    : "assets/icons/comment.svg",
-                                                color: Colors.white,
-                                              ),
+                                            Column(
+                                              children: [
+                                                const SizedBox(height: 5),
+                                                Container(
+                                                  width: 40,
+                                                  height: 40,
+                                                  decoration: BoxDecoration(
+                                                    shape: BoxShape.circle,
+                                                    color:
+                                                        (targetNoti.is_read ??
+                                                                false)
+                                                            ? Color(0xffbbbbbb)
+                                                            : ColorsInfo.newara,
+                                                  ),
+                                                  child: SvgPicture.asset(
+                                                    targetNoti.type == "default"
+                                                        ? "assets/icons/notification.svg"
+                                                        : "assets/icons/comment.svg",
+                                                    colorFilter:
+                                                        const ColorFilter.mode(
+                                                            Colors.white,
+                                                            BlendMode.srcIn),
+                                                  ),
+                                                ),
+                                              ],
                                             ),
                                             const SizedBox(width: 10),
                                             Flexible(
                                               child: Column(
                                                 crossAxisAlignment:
                                                     CrossAxisAlignment.start,
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment.center,
                                                 children: [
                                                   Text(
                                                     targetNoti.title,
@@ -329,7 +350,6 @@ class _NotificationPageState extends State<NotificationPage> {
                                                               : Colors.black,
                                                     ),
                                                   ),
-                                                  const SizedBox(height: 5),
                                                   Text(
                                                     targetNoti.content,
                                                     maxLines: 1,
@@ -341,7 +361,6 @@ class _NotificationPageState extends State<NotificationPage> {
                                                           FontWeight.w500,
                                                     ),
                                                   ),
-                                                  const SizedBox(height: 5),
                                                   Text(
                                                     "| 게시글: ${targetNoti.related_article.title}",
                                                     maxLines: 1,
@@ -369,7 +388,6 @@ class _NotificationPageState extends State<NotificationPage> {
                   ),
                 ),
               ),
-              const SizedBox(height: 15),
             ],
           ),
         ),
@@ -429,7 +447,7 @@ class _NotificationPageState extends State<NotificationPage> {
           style: const TextStyle(
             fontSize: 14,
             fontWeight: FontWeight.w500,
-            color: Color.fromRGBO(177, 177, 177, 1),
+            color: Color(0xffbbbbbb),
           ),
         ),
       ),

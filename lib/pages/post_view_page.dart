@@ -3,7 +3,9 @@
 import 'dart:core';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:new_ara_app/constants/url_info.dart';
 import 'package:provider/provider.dart';
+import 'package:dio/dio.dart';
 
 import 'package:new_ara_app/constants/colors_info.dart';
 import 'package:new_ara_app/models/article_model.dart';
@@ -45,10 +47,6 @@ class _PostViewPageState extends State<PostViewPage> {
   /// PostViewPage에서 표시할 글.
   late ArticleModel _article;
 
-  /// 현재 사용자가 글을 신고할 수 있는 지 여부.
-  /// initState에서 자신의 글일 경우 true, 아닐 경우 false로 설정됨.
-  late bool _isReportable;
-
   /// 웹뷰를 제외한 페이지 전체에 대한 로드 완료 여부를 나타냄.
   late bool _isPageLoaded;
 
@@ -74,7 +72,7 @@ class _PostViewPageState extends State<PostViewPage> {
 
   /// 댓글 입력 TextField에 대한 FocusNode.
   /// 답글 쓰기, 수정 버튼 클릭 시에 TextField에 자동으로 Focus를 주기 위해 사용됨.
-  FocusNode textFocusNode = FocusNode();
+  final FocusNode textFocusNode = FocusNode();
 
   /// 댓글 수정 혹은 대댓글을 전송할 경우 해당 댓글 모델을 의미.
   /// 새로운 댓글 작성의 경우 null로 설정됨.
@@ -103,7 +101,6 @@ class _PostViewPageState extends State<PostViewPage> {
     UserProvider userProvider = context.read<UserProvider>();
     userProvider.setIsContentLoaded(false, quiet: true);
     _fetchArticle(userProvider).then((value) {
-      _isReportable = value ? !_article.is_mine : false;
       _setIsPageLoaded(value);
     });
 
@@ -121,11 +118,39 @@ class _PostViewPageState extends State<PostViewPage> {
 
   /// 클래스 멤버변수 _article, _commentList, _commentKeys의 값을 설정하는 메서드.
   /// API 통신을 위해 [userProvider]를 전달받음.
+  /// 기존에 차단된 글에서는 title, content 등이 null이지만 override_hidden이 true이면 원래 내용이 로드됨.
   /// _article, _commentList, _commentKeys의 값이 모두 설정되면 true, 아닌 경우 false 반환.
-  Future<bool> _fetchArticle(UserProvider userProvider) async {
+  Future<bool> _fetchArticle(UserProvider userProvider,
+      {override_hidden = false}) async {
     dynamic articleJson;
+    String apiUrl = "$newAraDefaultUrl/api/articles/${widget.articleID}";
+    // 차단된 유저의 글에 대한 내용을 로드하는 경우 주소를 수정함.
+    if (override_hidden) apiUrl += "/?override_hidden=true";
 
-    articleJson = await userProvider.getApiRes("articles/${widget.articleID}");
+    try {
+      var response = await userProvider.myDio().get(apiUrl);
+      articleJson = response.data;
+    } on DioException catch (e) {
+      debugPrint("DioException occurred");
+      if (e.response != null) {
+        debugPrint("${e.response!.data}");
+        debugPrint("${e.response!.headers}");
+        debugPrint("${e.response!.requestOptions}");
+      }
+      // request의 setting, sending에서 문제 발생
+      // requestOption, message를 출력.
+      else {
+        debugPrint("${e.requestOptions}");
+        debugPrint("${e.message}");
+      }
+
+      // fetch에 실패하는 경우 false 리턴
+      return false;
+    } catch (e) {
+      debugPrint("error on fetching article: $e");
+      return false;
+    }
+
     if (articleJson == null) {
       debugPrint("\nArticleJson is null\n");
       return false;
@@ -180,8 +205,7 @@ class _PostViewPageState extends State<PostViewPage> {
     // TODO: Stack 리팩토링
     return Stack(
       children: [
-        if (_isPageLoaded)
-          Scaffold(
+        Scaffold(
             backgroundColor: Colors.white,
             appBar: AppBar(
               leading: IconButton(
@@ -194,99 +218,189 @@ class _PostViewPageState extends State<PostViewPage> {
                 onPressed: () => Navigator.pop(context),
               ),
             ),
-            body: SafeArea(
-              child: GestureDetector(
-                // 화면을 탭하면 키보드가 내려가도록 하기 위해 사용함.
-                onTap: () => FocusScope.of(context).unfocus(),
-                child: Container(
-                  margin: const EdgeInsets.symmetric(horizontal: 20),
-                  child: Column(children: [
-                    // article 부분
-                    Expanded(
-                      child: RefreshIndicator(
-                        color: ColorsInfo.newara,
-                        onRefresh: () async {
-                          userProvider.setIsContentLoaded(false);
-                          _setIsPageLoaded(false);
-                          _setIsPageLoaded(await _fetchArticle(userProvider));
-                        },
-                        child: SingleChildScrollView(
-                          // 위젯이 화면을 넘어가지 않더라고 scrollable 처리.
-                          // 새로고침 기능을 위한 physics.
-                          physics: const AlwaysScrollableScrollPhysics(),
-                          controller: _scrollController,
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              _buildTitle(),
-                              const SizedBox(height: 10),
-                              // 유저 정보 (프로필 이미지, 닉네임)
-                              _buildAuthorInfo(userProvider),
-                              const Divider(
-                                color: Color(0xFFF0F0F0),
-                                thickness: 1,
-                              ),
-                              // TODO: (2023.08.09)첨부파일 리스트뷰 프로토타입. 추후 디자이너와 조율 예정
-                              Visibility(
-                                visible: _article.attachments.isNotEmpty,
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.end,
-                                  children: [
-                                    AttachPopupMenuButton(
-                                      fileNum: _article.attachments.length,
-                                      attachments: _article.attachments,
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              const SizedBox(height: 5),
-                              InArticleWebView(
-                                content: _article.content ?? "",
-                                initialHeight: 150,
-                                isComment: false,
-                              ),
-                              const SizedBox(height: 10),
-                              // 좋아요, 싫어요 버튼 Row
-                              _buildVoteButtons(userProvider),
-                              const SizedBox(height: 10),
-                              // 담아두기, 공유, 신고 버튼
-                              _buildUtilityButtons(userProvider),
-                              const SizedBox(height: 15),
-                              const Divider(
-                                  thickness: 1, color: Color(0xFFF0F0F0)),
-                              const SizedBox(height: 15),
-                              SizedBox(
-                                width: MediaQuery.of(context).size.width - 40,
-                                child: Text(
-                                  '${_article.comment_count}개의 댓글',
-                                  style: const TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.w700,
+            body: _isPageLoaded
+                ? SafeArea(
+                    child: GestureDetector(
+                      // 화면을 탭하면 키보드가 내려가도록 하기 위해 사용함.
+                      onTap: () => FocusScope.of(context).unfocus(),
+                      child: Container(
+                        margin: const EdgeInsets.symmetric(horizontal: 20),
+                        child: Column(
+                          children: [
+                            // article 부분
+                            Expanded(
+                              // Android, iOS 여부에 따라 다른 새로고침
+                              child: RefreshIndicator.adaptive(
+                                color: ColorsInfo.newara,
+                                onRefresh: () async {
+                                  userProvider.setIsContentLoaded(false);
+                                  _setIsPageLoaded(false);
+                                  _setIsPageLoaded(
+                                      await _fetchArticle(userProvider));
+                                },
+                                child: SingleChildScrollView(
+                                  // 위젯이 화면을 넘어가지 않더라고 scrollable 처리.
+                                  // 새로고침 기능을 위한 physics.
+                                  physics:
+                                      const AlwaysScrollableScrollPhysics(),
+                                  controller: _scrollController,
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      _buildTitle(),
+                                      const SizedBox(height: 10),
+                                      // 유저 정보 (프로필 이미지, 닉네임)
+                                      _buildAuthorInfo(userProvider),
+                                      const Divider(
+                                        color: Color(0xFFF0F0F0),
+                                        thickness: 1,
+                                      ),
+                                      // TODO: (2023.08.09)첨부파일 리스트뷰 프로토타입. 추후 디자이너와 조율 예정
+                                      Visibility(
+                                        visible:
+                                            _article.attachments.isNotEmpty,
+                                        child: Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.end,
+                                          children: [
+                                            AttachPopupMenuButton(
+                                              fileNum:
+                                                  _article.attachments.length,
+                                              attachments: _article.attachments,
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                      const SizedBox(height: 5),
+                                      // 차단된 유저의 글에 대한 내용
+                                      Visibility(
+                                        // 차단이 되었고 사용자가 '숨긴내용 보기'를 누르지 않았을 때
+                                        visible: _article.can_override_hidden ==
+                                                true &&
+                                            _article.is_hidden == true,
+                                        child: Container(
+                                          decoration: const BoxDecoration(
+                                            borderRadius: BorderRadius.all(
+                                                Radius.circular(10)),
+                                            color: Color(0xfffafafa),
+                                          ),
+                                          width: MediaQuery.of(context)
+                                                  .size
+                                                  .width -
+                                              20,
+                                          height: 170,
+                                          child: Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.center,
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.center,
+                                            children: [
+                                              SvgPicture.asset(
+                                                'assets/icons/barrior.svg',
+                                                width: 40,
+                                                height: 40,
+                                              ),
+                                              const Text(
+                                                '차단한 사용자의 게시물입니다.',
+                                                style: TextStyle(
+                                                  color: Color(0xFF4A4A4A),
+                                                  fontWeight: FontWeight.w700,
+                                                  fontSize: 16,
+                                                ),
+                                              ),
+                                              const Text(
+                                                '(차단 사용자 설정은 마이페이지에서 확인할 수 있습니다.)',
+                                                style: TextStyle(
+                                                  fontWeight: FontWeight.w400,
+                                                  fontSize: 14,
+                                                  color: Color(0xFF4A4A4A),
+                                                ),
+                                              ),
+                                              const SizedBox(height: 8),
+                                              Container(
+                                                width: 104,
+                                                height: 36,
+                                                decoration: BoxDecoration(
+                                                  borderRadius:
+                                                      const BorderRadius.all(
+                                                          Radius.circular(10)),
+                                                  border: Border.all(
+                                                    width: 1,
+                                                    color: Color(0xFFDBDBDB),
+                                                  ),
+                                                ),
+                                                child: InkWell(
+                                                  onTap: () async {
+                                                    await _fetchArticle(
+                                                        userProvider,
+                                                        override_hidden: true);
+                                                    _updateState();
+                                                  },
+                                                  child: const Center(
+                                                    child: Text(
+                                                      '숨긴내용 보기',
+                                                      style: TextStyle(
+                                                        color:
+                                                            Color(0xff4a4a4a),
+                                                        fontWeight:
+                                                            FontWeight.w400,
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                      Visibility(
+                                        // 차단이 되지 않았을 때 또는 사용자가 '숨긴내용 보기'를 눌렀을 때
+                                        visible: _article.is_hidden == false,
+                                        child: InArticleWebView(
+                                          content: _article.content ?? "",
+                                          initialHeight: 150,
+                                          isComment: false,
+                                        ),
+                                      ),
+                                      const SizedBox(height: 10),
+                                      _buildVoteButtons(userProvider),
+                                      const SizedBox(height: 10),
+                                      // 담아두기, 공유, 신고 버튼
+                                      _buildUtilityButtons(userProvider),
+                                      const SizedBox(height: 15),
+                                      const Divider(
+                                          thickness: 1,
+                                          color: Color(0xFFF0F0F0)),
+                                      const SizedBox(height: 15),
+                                      SizedBox(
+                                        width:
+                                            MediaQuery.of(context).size.width -
+                                                40,
+                                        child: Text(
+                                          '${_article.comment_count}개의 댓글',
+                                          style: const TextStyle(
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.w700,
+                                          ),
+                                        ),
+                                      ),
+                                      const SizedBox(height: 15),
+                                      // 댓글을 보여주는 ListView.
+                                      _buildCommentListView(userProvider),
+                                    ],
                                   ),
                                 ),
                               ),
-                              const SizedBox(height: 15),
-                              // 댓글을 보여주는 ListView.
-                              _buildCommentListView(userProvider),
-                            ],
-                          ),
+                            ),
+                            // 댓글 입력 부분
+                            _buildCommentTextFormField(userProvider),
+                          ],
                         ),
                       ),
                     ),
-                    // 댓글 입력 부분
-                    _buildCommentTextFormField(userProvider),
-                  ]),
-                ),
-              ),
-            ),
-          )
-        else
-          const LoadingIndicator(),
-        // TODO: 아래 기능에 대해 디자이너와 논의 필요 (2023.11.03)
-        // Visibility(
-        //   visible: !(context.watch<UserProvider>().isContentLoaded),
-        //   child: Container(color: Colors.white),
-        // ),
+                  )
+                : const LoadingIndicator())
       ],
     );
   }
@@ -299,7 +413,8 @@ class _PostViewPageState extends State<PostViewPage> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          _article.title.toString(),
+          // 차단된 경우 title이 null이 되므로 아래와 같이 설정함.
+          _article.title ?? "차단한 사용자의 게시물입니다.",
           style: const TextStyle(
             fontSize: 18,
             fontWeight: FontWeight.w700,
@@ -573,33 +688,32 @@ class _PostViewPageState extends State<PostViewPage> {
                         : ColorsInfo.newara,
                   ),
                 ),
-                child: Center(
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      SvgPicture.asset(
-                        'assets/icons/bookmark.svg',
-                        width: 15,
-                        height: 15,
-                        colorFilter: ColorFilter.mode(
-                            _article.my_scrap == null
-                                ? const Color(0xFF646464)
-                                : ColorsInfo.newara,
-                            BlendMode.srcIn),
-                      ),
-                      const SizedBox(width: 4),
-                      Text(
-                        _article.my_scrap == null ? '담아두기' : '담아둔 글',
-                        style: TextStyle(
-                          color: _article.my_scrap == null
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    SvgPicture.asset(
+                      'assets/icons/bookmark.svg',
+                      width: 15,
+                      height: 22,
+                      colorFilter: ColorFilter.mode(
+                          _article.my_scrap == null
                               ? const Color(0xFF646464)
                               : ColorsInfo.newara,
-                          fontSize: 13,
-                          fontWeight: FontWeight.w500,
-                        ),
+                          BlendMode.srcIn),
+                    ),
+                    //const SizedBox(width: 4),
+                    Text(
+                      _article.my_scrap == null ? '담아두기' : '담아둔 글',
+                      style: TextStyle(
+                        color: _article.my_scrap == null
+                            ? const Color(0xFF646464)
+                            : ColorsInfo.newara,
+                        fontSize: 13,
+                        fontWeight: FontWeight.w500,
                       ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
               ),
             ),
@@ -612,79 +726,127 @@ class _PostViewPageState extends State<PostViewPage> {
                 ).share();
               },
               child: Container(
-                  width: 64,
-                  height: 35,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(8),
-                    border: Border.all(
-                      color: const Color(0xFFF0F0F0),
-                      width: 1,
-                    ),
+                width: 64,
+                height: 35,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(
+                    color: const Color(0xFFF0F0F0),
+                    width: 1,
                   ),
-                  child: Center(
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        SvgPicture.asset(
-                          'assets/icons/share.svg',
-                          width: 11,
-                          height: 19,
-                          colorFilter: const ColorFilter.mode(
-                              Color.fromRGBO(100, 100, 100, 1),
-                              BlendMode.srcIn),
-                        ),
-                        const SizedBox(width: 6),
-                        const Text(
-                          '공유',
-                          style: TextStyle(
-                            fontSize: 13,
-                            fontWeight: FontWeight.w500,
-                            color: Color(0xFF646464),
-                          ),
-                        ),
-                      ],
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    SvgPicture.asset(
+                      'assets/icons/share.svg',
+                      width: 19,
+                      height: 22,
+                      colorFilter: const ColorFilter.mode(
+                          Color.fromRGBO(100, 100, 100, 1), BlendMode.srcIn),
                     ),
-                  )),
+                    //const SizedBox(width: 6),
+                    const Text(
+                      '공유',
+                      style: TextStyle(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w500,
+                        color: Color(0xFF646464),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
             ),
           ],
         ),
         Row(
           children: [
             // 자신의 글일 경우 삭제 버튼, 타인의 글일 경우 차단 버튼
-            if (_isReportable) // 신고가 가능한 글(타인의 글)
+            // 익명인 경우 자신의 글이 아니면 버튼이 표시되지 않음.
+            if (_article.is_mine == false && _article.name_type != 2)
               InkWell(
-                onTap: null,
+                onTap: () async {
+                  bool isAuthorBlocked = _isAuthorBlocked();
+                  // 차단되지 않은 경우
+                  if (!isAuthorBlocked) {
+                    await showDialog(
+                      context: context,
+                      builder: (context) => BlockConfirmDialog(
+                        onTap: () {
+                          ArticleController(
+                                  model: _article, userProvider: userProvider)
+                              .handleBlock(true)
+                              .then((blockRes) {
+                            // 차단이 성공한 경우
+                            if (blockRes) {
+                              _fetchArticle(userProvider).then((_) {
+                                _updateState();
+                                Navigator.pop(context);
+                              });
+                            }
+                            // 차단에 실패할 경우 오류 메시지 출력
+                            else {
+                              // TODO: 사용자 메시지 구현 필요
+                              debugPrint("failed to block");
+                            }
+                          });
+                        },
+                        userProvider: userProvider,
+                        targetContext: context,
+                      ),
+                    );
+                  }
+                  // 이미 차단 되어있는 경우
+                  else {
+                    bool unblockRes = await ArticleController(
+                            model: _article, userProvider: userProvider)
+                        .handleBlock(false);
+                    // 차단 해제에 성공한 경우 다시 글을 fetch함.
+                    if (unblockRes) {
+                      await _fetchArticle(userProvider);
+                      _updateState();
+                    }
+                    // 차단 해제에 실패한 경우 오류 메시지를 출력함.
+                    else {
+                      // TODO: 사용자 메시지 구현 필요
+                      debugPrint("Failed to unblock");
+                    }
+                  }
+                },
                 child: Container(
-                    width: 65,
-                    height: 35,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(8),
-                      border: Border.all(
-                        color: const Color(0xFFF0F0F0),
-                      ),
+                  width: _isAuthorBlocked() ? 85 : 65,
+                  height: 35,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(
+                      color: const Color(0xFFF0F0F0),
                     ),
-                    child: Center(
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          SvgPicture.asset("assets/icons/barrior.svg",
-                              width: 11,
-                              height: 19,
-                              colorFilter: const ColorFilter.mode(
-                                  Color(0xFF646464), BlendMode.srcIn)),
-                          const SizedBox(width: 3),
-                          const Text(
-                            '차단',
-                            style: TextStyle(
-                                fontSize: 13,
-                                fontWeight: FontWeight.w500,
-                                color: Color(0xFF646464)),
-                          ),
-                        ],
-                      ),
-                    )),
+                  ),
+                  child: Center(
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        SvgPicture.asset("assets/icons/barrior.svg",
+                            width: 11,
+                            height: 19,
+                            colorFilter: const ColorFilter.mode(
+                                Color(0xFF646464), BlendMode.srcIn)),
+                        const SizedBox(width: 3),
+                        Text(
+                          _isAuthorBlocked() ? '차단 해제' : '차단',
+                          style: const TextStyle(
+                              fontSize: 13,
+                              fontWeight: FontWeight.w500,
+                              color: Color(0xFF646464)),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
               )
-            else // 자신의 글
+            else if (_article.is_mine == true) // 자신의 글
               InkWell(
                 onTap: () async {
                   await showDialog(
@@ -715,38 +877,37 @@ class _PostViewPageState extends State<PostViewPage> {
                           ));
                 },
                 child: Container(
-                    width: 65,
-                    height: 35,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(8),
-                      border: Border.all(
-                        color: const Color(0xFFF0F0F0),
-                      ),
+                  width: 65,
+                  height: 35,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(
+                      color: const Color(0xFFF0F0F0),
                     ),
-                    child: Center(
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          SvgPicture.asset("assets/icons/delete.svg",
-                              width: 11,
-                              height: 19,
-                              colorFilter: const ColorFilter.mode(
-                                  Color(0xFF646464), BlendMode.srcIn)),
-                          const SizedBox(width: 3),
-                          const Text(
-                            '삭제',
-                            style: TextStyle(
-                                fontSize: 13,
-                                fontWeight: FontWeight.w500,
-                                color: Color(0xFF646464)),
-                          ),
-                        ],
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      SvgPicture.asset("assets/icons/delete.svg",
+                          width: 15,
+                          height: 22,
+                          colorFilter: const ColorFilter.mode(
+                              Color(0xFF646464), BlendMode.srcIn)),
+                      const Text(
+                        '삭제',
+                        style: TextStyle(
+                            fontSize: 13,
+                            fontWeight: FontWeight.w500,
+                            color: Color(0xFF646464)),
                       ),
-                    )),
+                    ],
+                  ),
+                ),
               ),
             const SizedBox(width: 10),
             // 자신의 글일 경우 수정 버튼, 타인의 글일 경우 신고 버튼
-            if (_isReportable) // 타인의 글(신고가 가능한 글)
+            if (_article.is_mine == false) // 타인의 글(신고가 가능한 글)
               InkWell(
                 onTap: () {
                   showDialog(
@@ -764,27 +925,25 @@ class _PostViewPageState extends State<PostViewPage> {
                       color: const Color(0xFFF0F0F0),
                     ),
                   ),
-                  child: Center(
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        SvgPicture.asset(
-                          'assets/icons/warning.svg',
-                          width: 15,
-                          height: 15,
-                          colorFilter: const ColorFilter.mode(
-                              Color(0xFF646464), BlendMode.srcIn),
-                        ),
-                        const SizedBox(width: 4),
-                        const Text(
-                          '신고',
-                          style: TextStyle(
-                              fontSize: 13,
-                              fontWeight: FontWeight.w500,
-                              color: Color(0xFF646464)),
-                        ),
-                      ],
-                    ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      SvgPicture.asset(
+                        'assets/icons/warning.svg',
+                        width: 19,
+                        height: 22,
+                        colorFilter: const ColorFilter.mode(
+                            Color(0xFF646464), BlendMode.srcIn),
+                      ),
+                      const Text(
+                        '신고',
+                        style: TextStyle(
+                            fontSize: 13,
+                            fontWeight: FontWeight.w500,
+                            color: Color(0xFF646464)),
+                      ),
+                    ],
                   ),
                 ),
               )
@@ -806,29 +965,27 @@ class _PostViewPageState extends State<PostViewPage> {
                       color: const Color(0xFFF0F0F0),
                     ),
                   ),
-                  child: Center(
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        SvgPicture.asset(
-                          'assets/icons/modify.svg',
-                          width: 11,
-                          height: 19,
-                          colorFilter: const ColorFilter.mode(
-                            Color(0xFF646464),
-                            BlendMode.srcIn,
-                          ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      SvgPicture.asset(
+                        'assets/icons/modify.svg',
+                        width: 15,
+                        height: 22,
+                        colorFilter: const ColorFilter.mode(
+                          Color(0xFF646464),
+                          BlendMode.srcIn,
                         ),
-                        const SizedBox(width: 3),
-                        const Text(
-                          '수정',
-                          style: TextStyle(
-                              fontSize: 13,
-                              fontWeight: FontWeight.w500,
-                              color: Color(0xFF646464)),
-                        ),
-                      ],
-                    ),
+                      ),
+                      const Text(
+                        '수정',
+                        style: TextStyle(
+                            fontSize: 13,
+                            fontWeight: FontWeight.w500,
+                            color: Color(0xFF646464)),
+                      ),
+                    ],
                   ),
                 ),
               ),
@@ -982,9 +1139,12 @@ class _PostViewPageState extends State<PostViewPage> {
                     margin: const EdgeInsets.only(left: 30, right: 0),
                     child: curComment.is_hidden == false
                         ? _buildCommentContent(curComment.content ?? "")
-                        : const Text(
-                            '삭제된 댓글 입니다.',
-                            style: TextStyle(
+                        : Text(
+                            // 차단된 댓글인 경우 can_override_hidden이 false로 설정되어 있음.
+                            curComment.can_override_hidden == false
+                                ? '삭제된 댓글 입니다.'
+                                : '차단한 사용자의 댓글입니다.',
+                            style: const TextStyle(
                               fontSize: 14,
                               fontWeight: FontWeight.w400,
                               color: Colors.grey,
@@ -1012,8 +1172,8 @@ class _PostViewPageState extends State<PostViewPage> {
                                 },
                                 child: SvgPicture.asset(
                                   'assets/icons/like.svg',
-                                  width: 25,
-                                  height: 25,
+                                  width: 12,
+                                  height: 19,
                                   colorFilter: ColorFilter.mode(
                                       curComment.my_vote == false
                                           ? ColorsInfo.noneVote
@@ -1021,7 +1181,6 @@ class _PostViewPageState extends State<PostViewPage> {
                                       BlendMode.srcIn),
                                 ),
                               ),
-                              const SizedBox(width: 3),
                               Text(
                                 curComment.positive_vote_count.toString(),
                                 style: TextStyle(
@@ -1032,7 +1191,7 @@ class _PostViewPageState extends State<PostViewPage> {
                                       : ColorsInfo.posVote,
                                 ),
                               ),
-                              const SizedBox(width: 6),
+                              const SizedBox(width: 12),
                               InkWell(
                                 onTap: () async {
                                   CommentController(
@@ -1044,8 +1203,8 @@ class _PostViewPageState extends State<PostViewPage> {
                                 },
                                 child: SvgPicture.asset(
                                   'assets/icons/dislike.svg',
-                                  width: 25,
-                                  height: 25,
+                                  width: 12,
+                                  height: 19,
                                   colorFilter: ColorFilter.mode(
                                       curComment.my_vote == true
                                           ? ColorsInfo.noneVote
@@ -1053,7 +1212,6 @@ class _PostViewPageState extends State<PostViewPage> {
                                       BlendMode.srcIn),
                                 ),
                               ),
-                              const SizedBox(width: 3),
                               Text(
                                 curComment.negative_vote_count.toString(),
                                 style: TextStyle(
@@ -1068,6 +1226,7 @@ class _PostViewPageState extends State<PostViewPage> {
                             ],
                           ),
                         ),
+                        const SizedBox(width: 12),
                         // 대댓글인 경우 답글쓰기 버튼이 안보이게함.
                         Visibility(
                           visible: curComment.parent_comment == null,
@@ -1083,9 +1242,8 @@ class _PostViewPageState extends State<PostViewPage> {
                                 SvgPicture.asset(
                                   'assets/icons/right_arrow_2.svg',
                                   width: 11,
-                                  height: 12,
+                                  height: 19,
                                 ),
-                                const SizedBox(width: 5),
                                 const Text(
                                   '답글 쓰기',
                                   style: TextStyle(
@@ -1247,8 +1405,7 @@ class _PostViewPageState extends State<PostViewPage> {
                   child: SvgPicture.asset(
                     'assets/icons/send.svg',
                     colorFilter: const ColorFilter.mode(
-                      ColorsInfo.newara, BlendMode.srcIn
-                    ),
+                        ColorsInfo.newara, BlendMode.srcIn),
                     width: 30,
                     height: 30,
                   ),
@@ -1298,6 +1455,12 @@ class _PostViewPageState extends State<PostViewPage> {
             onSaved: (value) => _commentContent = value ?? '',
           )),
     );
+  }
+
+  /// 현재 post의 작성자가 사용자에 의해 차단되었는지 여부를 반환
+  /// created_by의 is_blocked 필드가 null이면 false 리턴.
+  bool _isAuthorBlocked() {
+    return _article.created_by.is_blocked ?? false;
   }
 
   /// 대댓글, 수정 기능 사용 시 대상이 되는 댓글 컨테이너를
