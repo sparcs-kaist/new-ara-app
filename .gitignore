@@ -47,3 +47,11 @@ app.*.map.json
 /android/app/profile
 /android/app/release
 
+android/fastlane/report.xml
+android/fastlane/README.md
+android/fastlane/newara-fastlane.json
+ios/fastlane/report.xml
+ios/fastlane/README.md
+ios/fastlane/.env.default
+ios/Runner.app.dSYM.zip
+ios/Runner.ipa
