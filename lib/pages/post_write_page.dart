@@ -41,8 +41,12 @@ class PostWritePage extends StatefulWidget {
   /// 사용자가 기존 게시물을 편집하는 경우 이 변수에 이전 게시물의 데이터가 저장됩니다.
   final ArticleModel? previousArticle;
 
+  /// 특정 게시판에서 넘어온 경우 이 정보를 참조할 수 있습니다.
+  final BoardDetailActionModel? previousBoard;
+
   /// 생성자에서 이전 게시물의 데이터를 선택적으로 받을 수 있습니다.
-  const PostWritePage({Key? key, this.previousArticle}) : super(key: key);
+  const PostWritePage({Key? key, this.previousArticle, this.previousBoard})
+      : super(key: key);
 
   @override
   State<PostWritePage> createState() => _PostWritePageState();
@@ -92,7 +96,7 @@ class _PostWritePageState extends State<PostWritePage> {
   /// 현재 이 페이지가 수정페이지이면 true, 처음 작성하는 게시물이면 false
   bool _isEditingPost = false;
 
-  /// 기본 게시판 및 주제 모델.
+  /// 기본 게시판 및 토픽 모델.
   /// 아무 것도 선택하기 전 초기 상태를 나타냄.
   final _defaultTopicModelNone = TopicModel(
     id: -1,
@@ -101,8 +105,8 @@ class _PostWritePageState extends State<PostWritePage> {
     en_name: "No Topic",
   );
 
-  // 기본 게시판 및 주제 모델.
-  // 메뉴바에서 게시물 주제 선택 후 토픽 메뉴 초기 상태를 나타낸다.
+  // 기본 게시판 및 토픽 모델.
+  // 메뉴바에서 게시물 선택 후 토픽 메뉴 초기 상태를 나타낸다.
   final _defaultTopicModelSelect = TopicModel(
     id: -1,
     slug: "",
@@ -264,13 +268,30 @@ class _PostWritePageState extends State<PostWritePage> {
       return;
     }
 
-    // 상태 업데이트.
-    setState(() {
-      _specTopicList.add(_defaultTopicModelSelect);
-      _chosenTopicValue = _specTopicList[0];
-      _chosenBoardValue = _boardList[0];
-      _isLoading = false;
-    });
+    // 게시판 목록 상태 업데이트.(넘어본 게시판의 정보가 있을 경우 && 게시물을 쓸 수 있는 게시판의 경우)
+    if (widget.previousBoard != null && widget.previousBoard!.user_writable) {
+      setState(() {
+        BoardDetailActionModel boardDetailActionModel =
+            _findBoardListValue(widget.previousBoard!.slug);
+        _specTopicList = [_defaultTopicModelNone];
+        _specTopicList.addAll(boardDetailActionModel.topics);
+
+        _chosenTopicValue = _specTopicList[0];
+
+        _chosenBoardValue = boardDetailActionModel;
+        _isLoading = false;
+      });
+    }
+
+    // 게시판 목록 상태 업데이트(else)
+    else {
+      setState(() {
+        _specTopicList.add(_defaultTopicModelSelect);
+        _chosenTopicValue = _specTopicList[0];
+        _chosenBoardValue = _boardList[0];
+        _isLoading = false;
+      });
+    }
   }
 
   /// 기존 게시물의 내용과 첨부 파일 가져오기.
@@ -318,7 +339,7 @@ class _PostWritePageState extends State<PostWritePage> {
       _isLoading = false;
     });
 
-    // 게시판 및 주제 정보 업데이트.
+    // 게시판 및 토픽 정보 업데이트.
     setState(() {
       BoardDetailActionModel boardDetailActionModel =
           _findBoardListValue(widget.previousArticle!.parent_board.slug);
@@ -341,7 +362,7 @@ class _PostWritePageState extends State<PostWritePage> {
     return _defaultBoardDetailActionModel;
   }
 
-  /// 주어진 slug 값을 사용하여 토픽 목록에서 해당 주제를 찾는 함수.
+  /// 주어진 slug 값을 사용하여 토픽 목록에서 해당 토픽을 찾는 함수.
   TopicModel _findSpecTopicListValue(String slug) {
     for (TopicModel topic in _specTopicList) {
       if (topic.slug == slug) {
@@ -496,38 +517,44 @@ class _PostWritePageState extends State<PostWritePage> {
                   borderRadius: BorderRadius.circular(20.0),
                 ),
                 child: DropdownButtonHideUnderline(
-                  child: DropdownButton<BoardDetailActionModel>(
-                    // TODO: 원하는 메뉴 모양 만들기 위해 속성 테스트 할 것
-                    // isDense: true,
-                    // isExpanded: true,
+                  child: ButtonTheme(
+                    alignedDropdown: true,
+                    child: DropdownButton<BoardDetailActionModel>(
+                      // TODO: 원하는 메뉴 모양 만들기 위해 속성 테스트 할 것
+                      // isDense: true,
+                      // isExpanded: true,
 
-                    value: _chosenBoardValue,
-                    style: const TextStyle(color: Colors.red),
-                    items: _boardList
-                        .map<DropdownMenuItem<BoardDetailActionModel>>(
-                            (BoardDetailActionModel value) {
-                      return DropdownMenuItem<BoardDetailActionModel>(
-                        enabled: value.id != -1,
-                        value: value,
-                        child: Padding(
-                          padding: const EdgeInsets.only(left: 12.0),
-                          child: Text(
-                            value.ko_name,
-                            style: TextStyle(
-                              color: value.id == -1 || _isEditingPost
-                                  ? const Color(0xFFBBBBBB)
-                                  : ColorsInfo.newara,
-                              fontWeight: FontWeight.w500,
-                              fontSize: 16,
+                      value: _chosenBoardValue,
+                      style: const TextStyle(color: ColorsInfo.newara),
+                      borderRadius: BorderRadius.circular(20.0),
+                      items: _boardList
+                          .map<DropdownMenuItem<BoardDetailActionModel>>(
+                              (BoardDetailActionModel value) {
+                        return DropdownMenuItem<BoardDetailActionModel>(
+                          enabled: value.id != -1,
+                          value: value,
+                          child: Container(
+                            child: Padding(
+                              padding: const EdgeInsets.only(left: 0.0),
+                              child: Text(
+                                value.ko_name,
+                                style: TextStyle(
+                                  color: value.id == -1 || _isEditingPost
+                                      ? const Color(0xFFBBBBBB)
+                                      : ColorsInfo.newara,
+                                  fontWeight: FontWeight.w500,
+                                  fontSize: 16,
+                                ),
+                              ),
                             ),
                           ),
-                        ),
-                      );
-                    }).toList(),
+                        );
+                      }).toList(),
 
-                    /// 게시판 선택 이후 토픽 목록이 변해야 하므로 변경하는 기능 추가
-                    /// TODO: 함수 따로 빼기
-                    onChanged: _isEditingPost ? null : setSpecTopicList,
+                      /// 게시판 선택 이후 토픽 목록이 변해야 하므로 변경하는 기능 추가
+                      /// TODO: 함수 따로 빼기
+                      onChanged: _isEditingPost ? null : setSpecTopicList,
+                    ),
                   ),
                 ),
               ),
@@ -545,6 +572,7 @@ class _PostWritePageState extends State<PostWritePage> {
                   child: DropdownButton<TopicModel>(
                     value: _chosenTopicValue,
                     style: const TextStyle(color: Colors.red),
+                    borderRadius: BorderRadius.circular(20.0),
                     items: _specTopicList
                         .map<DropdownMenuItem<TopicModel>>((TopicModel value) {
                       return DropdownMenuItem<TopicModel>(
@@ -1350,9 +1378,7 @@ class _PostWritePageState extends State<PostWritePage> {
   /// 3. 제목, 내용 및 첨부 파일 ID를 함께 서버에 전송하여 포스트를 생성한다.
   /// isUpdate: 수정하는 경우 true, 새로운 글 작성하는 경우 false
   /// previousArticleId: 수정하는 경우 수정할 글의 id
-  void Function() _managePost(
-      {bool isUpdate = false, int? previousArticleId 
-      }) {
+  void Function() _managePost({bool isUpdate = false, int? previousArticleId}) {
     UserProvider userProvider = context.read<UserProvider>();
     return () async {
       String titleValue;
@@ -1570,7 +1596,7 @@ class _PostWritePageState extends State<PostWritePage> {
     });
   }
 
-  /// 게시판 주제 선택 이후 토픽 목록 변경
+  /// 게시판 선택 이후 토픽 목록 변경
   void setSpecTopicList(BoardDetailActionModel? value) {
     setState(() {
       _specTopicList = [];

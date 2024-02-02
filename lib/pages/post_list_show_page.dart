@@ -39,7 +39,6 @@ class _PostListShowPageState extends State<PostListShowPage> {
 
   @override
   void initState() {
-  
     super.initState();
 
     var userProvider = context.read<UserProvider>();
@@ -224,8 +223,8 @@ class _PostListShowPageState extends State<PostListShowPage> {
         children: [
           FloatingActionButton(
             onPressed: () async {
-              await Navigator.of(context)
-                  .push(slideRoute(const PostWritePage()));
+              await Navigator.of(context).push(
+                  slideRoute(PostWritePage(previousBoard: widget.boardInfo)));
               updateAllBulletinList();
               debugPrint('FloatingActionButton pressed');
             },
