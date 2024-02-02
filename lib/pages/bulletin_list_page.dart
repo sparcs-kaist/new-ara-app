@@ -84,67 +84,80 @@ class _BulletinListPageState extends State<BulletinListPage> {
                     padding: const EdgeInsets.symmetric(horizontal: 20),
                     child: Column(
                       children: [
-                        TextField(
-                          minLines: 1,
-                          maxLines: 1,
-                          focusNode: _focusNode,
-                          onTap: () async {
-                            // TODO: 검색 창 누를 때 실행되는 함수로 나중에 별로도 빼기
-                            Navigator.of(context).push(slideRoute(
-                                const BulletinSearchPage(
-                                    boardType: BoardType.all,
-                                    boardInfo: null)));
+                        SizedBox(
+                          height: 40,
+                          child: TextField(
+                            minLines: 1,
+                            maxLines: 1,
+                            textAlignVertical: TextAlignVertical.center,
+                            focusNode: _focusNode,
+                            onTap: () async {
+                              // TODO: 검색 창 누를 때 실행되는 함수로 나중에 별로도 빼기
+                              Navigator.of(context).push(slideRoute(
+                                  const BulletinSearchPage(
+                                      boardType: BoardType.all,
+                                      boardInfo: null)));
 
-                            FocusScope.of(context).requestFocus(FocusNode());
-                          },
-                          textInputAction: TextInputAction.search,
-                          onSubmitted: (String text) {},
-                          style: const TextStyle(
-                            height: 1,
-                            fontSize: 16,
-                            fontWeight: FontWeight.w500,
-                          ),
-                          decoration: InputDecoration(
-                            prefixIconConstraints: const BoxConstraints(
-                                maxHeight: 28, maxWidth: 28),
-                            prefixIcon: SizedBox(
-                              // 원하는 세로 크기
-                              child: SvgPicture.asset(
-                                'assets/icons/search.svg',
-                                colorFilter: const ColorFilter.mode(
-                                    Colors.grey, BlendMode.srcIn),
-                                fit: BoxFit.contain,
+                              FocusScope.of(context).requestFocus(FocusNode());
+                            },
+
+                            textInputAction: TextInputAction.search,
+                            onSubmitted: (String text) {},
+                            // style: const TextStyle(
+                            //   height: 2,
+                            //   fontSize: 16,
+                            //   fontWeight: FontWeight.w500,
+                            // ),
+                            decoration: InputDecoration(
+                              filled: true,
+                              fillColor: const Color(0xFFF6F6F6),
+                              isCollapsed: true,
+                              isDense: true,
+                              contentPadding: const EdgeInsets.fromLTRB(
+                                100.0,
+                                10.0,
+                                0,
+                                10.0,
                               ),
+                              prefixIconConstraints: const BoxConstraints(
+                                  maxHeight: 28, maxWidth: 36),
+                              prefixIcon: Padding(
+                                padding: const EdgeInsets.fromLTRB(6, 0, 2, 0),
+                                child: SizedBox(
+                                  // 원하는 세로 크기
+                                  child: SvgPicture.asset(
+                                    'assets/icons/search.svg',
+                                    colorFilter: const ColorFilter.mode(
+                                        Colors.grey, BlendMode.srcIn),
+                                    fit: BoxFit.contain,
+                                  ),
+                                ),
+                              ),
+                              hintText: '게시판, 게시글 및 댓글 검색',
+                              hintStyle: const TextStyle(
+                                color: Color(0xFFBBBBBB),
+                                fontSize: 16,
+                                fontFamily: 'NotoSansKR',
+                                height: null,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            
+                              // 모서리를 둥글게 설정
+                              enabledBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(10.0),
+                                borderSide: const BorderSide(
+                                  color: Colors.transparent, // 테두리 색상 설정
+                                ), // 모서리를 둥글게 설정
+                              ),
+                              // focusedBorder: OutlineInputBorder(
+                              //   borderRadius: BorderRadius.circular(10.0),
+                              //   borderSide: const BorderSide(
+                              //     color: Colors.transparent, // 테두리 색상 설정
+                              //   ), // 모서리를 둥글게 설정
+                              // ),
                             ),
-                            hintText: '게시판, 게시글 및 댓글 검색',
-                            hintStyle: const TextStyle(
-                              color: Color(0xFFBBBBBB),
-                              fontSize: 16,
-                              fontWeight: FontWeight.w500,
-                            ),
-                            filled: true,
-                            fillColor: const Color(0xFFF6F6F6),
-                            isDense: true,
-                            contentPadding: const EdgeInsets.fromLTRB(
-                              10.0,
-                              10.0,
-                              10.0,
-                              10.0,
-                            ), // 모서리를 둥글게 설정
-                            enabledBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(10.0),
-                              borderSide: const BorderSide(
-                                color: Colors.transparent, // 테두리 색상 설정
-                              ), // 모서리를 둥글게 설정
-                            ),
-                            focusedBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(10.0),
-                              borderSide: const BorderSide(
-                                color: Colors.transparent, // 테두리 색상 설정
-                              ), // 모서리를 둥글게 설정
-                            ),
+                            cursorColor: Colors.transparent,
                           ),
-                          cursorColor: Colors.transparent,
                         ),
                         const SizedBox(
                           height: 21,
