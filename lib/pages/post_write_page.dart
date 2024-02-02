@@ -765,6 +765,22 @@ class _PostWritePageState extends State<PostWritePage> {
                         const SizedBox(
                           width: 20,
                         ),
+                        InkWell(
+                          onTap: () => _pickFile(),
+                          child: SvgPicture.asset(
+                            'assets/icons/add.svg',
+                            width: 34,
+                            height: 34,
+                            colorFilter: const ColorFilter.mode(
+                              Color(0xFFED3A3A),
+                              BlendMode.srcIn,
+                            ),
+                          ),
+                        ),
+                        const Spacer(),
+                        const SizedBox(
+                          width: 20,
+                        ),
                         SizedBox(
                           height: 34,
                           child: GestureDetector(
@@ -822,21 +838,8 @@ class _PostWritePageState extends State<PostWritePage> {
                             ),
                           ),
                         ),
-                        const Spacer(),
-                        InkWell(
-                          onTap: () => _pickFile(),
-                          child: SvgPicture.asset(
-                            'assets/icons/add.svg',
-                            width: 34,
-                            height: 34,
-                            colorFilter: const ColorFilter.mode(
-                              Color(0xFFED3A3A),
-                              BlendMode.srcIn,
-                            ),
-                          ),
-                        ),
                         const SizedBox(
-                          width: 14,
+                          width: 20,
                         ),
                       ],
                     ),
