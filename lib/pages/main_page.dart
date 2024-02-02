@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -17,6 +19,24 @@ import 'package:new_ara_app/pages/post_view_page.dart';
 import 'package:new_ara_app/utils/slide_routing.dart';
 import 'package:new_ara_app/providers/notification_provider.dart';
 import 'package:new_ara_app/utils/handle_hidden.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+///SharedPreferences를 이용해 데이터 저장( 키: api url, 값: api response)
+Future<void> saveApiData(String key, dynamic data) async {
+  final prefs = await SharedPreferences.getInstance();
+  String jsonString = jsonEncode(data);
+  await prefs.setString(key, jsonString);
+}
+
+///SharedPreferences를 이용해 데이터 불러오기( 키: api url, 값: api response)
+Future<dynamic> loadApiData(String key) async {
+  final prefs = await SharedPreferences.getInstance();
+  String? jsonString = prefs.getString(key);
+  if (jsonString != null) {
+    return jsonDecode(jsonString);
+  }
+  return null;
+}
 
 class MainPage extends StatefulWidget {
   const MainPage({Key? key}) : super(key: key);
@@ -42,42 +62,81 @@ class _MainPageState extends State<MainPage> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    var userProvider = Provider.of<UserProvider>(context, listen: false);
+    UserProvider userProvider =
+        Provider.of<UserProvider>(context, listen: false);
 
     // TODO: 현재 api 요청 속도가 너무 느림. 병렬 처리 방식과, api 요청 속도 개선 필요. Future.wait([])로 바꾸면 개선되지 않을까 고민. 반복되는 코드 구조 개선 필요.
-    refreshDailyBest(userProvider);
-    refreshBoardList(userProvider);
+    DateTime startTime = DateTime.now(); // 시작 시간 기록
+
+    //측정하고자 하는 코드 블록
+
+    Future.wait([
+      refreshBoardList(userProvider),
+      refreshDailyBest(userProvider),
+    ]).then((results) {
+      DateTime endTime = DateTime.now(); // 종료 시간 기록
+
+      Duration duration = endTime.difference(startTime); // 두 시간의 차이 계산
+      debugPrint("소요 시간: ${duration.inMilliseconds} 밀리초");
+    });
+
     context.read<NotificationProvider>().checkIsNotReadExist();
   }
 
   /// 일일 베스트 컨텐츠 데이터를 새로고침
-  void refreshDailyBest(UserProvider userProvider) async {
+  Future<void> refreshDailyBest(UserProvider userProvider) async {
+    //1. Shared_Preferences 값이 있으면(if not null) 그 값으로 UI 업데이트.
+    //2. api 호출 후 새로운 response shared_preferences에 저장 후 UI 업데이트
+
     // api 호출과 Provider 정보 동기화.
-    List<dynamic> recentJson =
-        (await userProvider.getApiRes("articles/top/"))['results'];
-    if (mounted) {
-      setState(() {
-        for (Map<String, dynamic> json in recentJson) {
-          try {
-            dailyBestContentList.add(ArticleListActionModel.fromJson(json));
-          } catch (error) {
-            debugPrint(
-                "refreshDailyBest ArticleListActionModel.fromJson error: $error");
-          }
+    try {
+      Map<String, dynamic>? recentJson = await loadApiData('articles/top/');
+
+      if (recentJson != null) {
+        if (mounted) {
+          setState(() {
+            dailyBestContentList.clear();
+            for (Map<String, dynamic> json in recentJson['results']) {
+              dailyBestContentList.add(ArticleListActionModel.fromJson(json));
+            }
+            isLoading[0] = false;
+          });
         }
-        //debugPrint(" ----- ${dailyBestContent["results"][0]}");
-        isLoading[0] = false;
-      });
+      }
+      dynamic response = await userProvider.getApiRes("articles/top/");
+      await saveApiData('articles/top/', response);
+      if (mounted) {
+        setState(() {
+          dailyBestContentList.clear();
+          for (Map<String, dynamic> json in response!['results']) {
+            dailyBestContentList.add(ArticleListActionModel.fromJson(json));
+          }
+          isLoading[0] = false;
+        });
+      }
+    } catch (error) {
+      debugPrint("refreshDailyBest error: $error");
+      // 적절한 에러 처리 로직 추가
     }
   }
 
   /// 게시판 목록 안의 게시물들을 새로 고침
-  void refreshBoardList(UserProvider userProvider) async {
-    List<dynamic> boardJson = await userProvider.getApiRes("boards/");
+  Future<void> refreshBoardList(UserProvider userProvider) async {
+    List<dynamic>? boardJson = await loadApiData('boards/');
+    if (boardJson == null) {
+      boardJson = await userProvider.getApiRes("boards/");
+      await saveApiData('boards/', boardJson);
+    } else {
+      userProvider
+          .getApiRes("boards/")
+          .then((value) async => {await saveApiData('boards/', value)});
+    }
     if (mounted) {
       setState(() {
-        for (Map<String, dynamic> json in boardJson) {
+        boardList.clear();
+        for (Map<String, dynamic> json in boardJson!) {
           try {
+            // 밑
             boardList.add(BoardDetailActionModel.fromJson(json));
           } catch (error) {
             debugPrint(
@@ -86,14 +145,108 @@ class _MainPageState extends State<MainPage> {
         }
         isLoading[7] = false;
       });
+      await Future.wait([
+        refreshPortalNotice(userProvider),
+        refreshFacilityNotice(userProvider),
+        refreshNewAraNotice(userProvider),
+        refreshGradAssocNotice(userProvider),
+        refreshUndergradAssocNotice(userProvider),
+        refreshFreshmanCouncil(userProvider),
+      ]);
     }
     // 게시판 목록 로드 후 각 게시판의 공지사항들을 새로고침
-    refreshPortalNotice(userProvider);
-    refreshFacilityNotice(userProvider);
-    refreshNewAraNotice(userProvider);
-    refreshGradAssocNotice(userProvider);
-    refreshUndergradAssocNotice(userProvider);
-    refreshFreshmanCouncil(userProvider);
+  }
+
+  ///포탈 게시물 글 불러오기.
+  Future<void> refreshPortalNotice(UserProvider userProvider) async {
+    await refreshBoardContent(
+        userProvider, "portal-notice", "", portalContentList, 1);
+  }
+
+  ///입주 업체 게시물 글 불러오기.
+  Future<void> refreshFacilityNotice(UserProvider userProvider) async {
+    await refreshBoardContent(
+        userProvider, "facility-notice", "", facilityContentList, 2);
+  }
+
+  Future<void> refreshNewAraNotice(UserProvider userProvider) async {
+    await refreshBoardContent(
+        userProvider, "ara-feedback", "", newAraContentList, 3);
+  }
+
+  Future<void> refreshGradAssocNotice(UserProvider userProvider) async {
+    //원총
+    // "slug": "students-group",
+    // "slug": "grad-assoc",
+    //dev 서버랑 실제 서버 parent_topic 이 다름을 유의하기.
+    //https://newara.sparcs.org/api/articles/?parent_board=2&parent_topic=24
+    await refreshBoardContent(
+        userProvider, "students-group", "grad-assoc", gradContentList, 4);
+  }
+
+  Future<void> refreshUndergradAssocNotice(UserProvider userProvider) async {
+    // 총학
+    // "slug": "students-group",
+    // "slug": "undergrad-assoc",
+    await refreshBoardContent(userProvider, "students-group", "undergrad-assoc",
+        underGradContentList, 5);
+  }
+
+  Future<void> refreshFreshmanCouncil(UserProvider userProvider) async {
+    //새학
+    // "slug": "students-group",
+    // "slug": "freshman-council",
+    await refreshBoardContent(userProvider, "students-group",
+        "freshman-council", freshmanContentList, 6);
+  }
+
+  /// 게시판의 게시물들을 불러옴. 코드 중복을 줄이기 위해 사용.
+  Future<void> refreshBoardContent(
+      UserProvider userProvider,
+      String slug1,
+      String slug2,
+      List<ArticleListActionModel> contentList,
+      int isLoadingIndex) async {
+    List<int> ids = findBoardID(slug1, slug2);
+    int boardID = ids[0], topicID = ids[1];
+    String apiUrl = topicID == -1
+        ? "articles/?parent_board=$boardID"
+        : "articles/?parent_board=$boardID&parent_topic=$topicID";
+
+    Map<String, dynamic>? recentJson = await loadApiData(apiUrl);
+    if (recentJson != null) {
+      if (mounted) {
+        setState(() {
+          contentList.clear();
+          for (Map<String, dynamic> json in recentJson['results']) {
+            try {
+              contentList.add(ArticleListActionModel.fromJson(json));
+            } catch (error) {
+              debugPrint(
+                  "refreshBoardContent ArticleListActionModel.fromJson failed: $error");
+            }
+          }
+          isLoading[isLoadingIndex] = false;
+        });
+      }
+    }
+
+    dynamic response = await userProvider.getApiRes(apiUrl);
+    saveApiData(apiUrl, response);
+    if (mounted) {
+      setState(() {
+        contentList.clear();
+        for (Map<String, dynamic> json in response!['results']) {
+          try {
+            contentList.add(ArticleListActionModel.fromJson(json));
+          } catch (error) {
+            debugPrint(
+                "refreshBoardContent ArticleListActionModel.fromJson failed: $error");
+          }
+        }
+        isLoading[isLoadingIndex] = false;
+      });
+    }
   }
 
   /// 주어진 slug 값을 통해 게시판과 토픽의 ID를 찾음. topic 이 없는 경우 slug2로 ""을 넘겨주면 된다.
@@ -112,144 +265,6 @@ class _MainPageState extends State<MainPage> {
       }
     }
     return returnValue;
-  }
-
-  ///포탈 게시물 글 불러오기.
-  void refreshPortalNotice(UserProvider userProvider) async {
-    //포탈 공지
-    //  articles/?parent_board=1
-    // "slug": "portal-notice",
-    int boardID = findBoardID("portal-notice", "")[0];
-    List<dynamic> boardArticlesJson = (await userProvider
-        .getApiRes("articles/?parent_board=$boardID"))['results'];
-    if (mounted) {
-      setState(() {
-        for (Map<String, dynamic> json in boardArticlesJson) {
-          try {
-            portalContentList.add(ArticleListActionModel.fromJson(json));
-          } catch (error) {
-            debugPrint(
-                "refreshPortalNotice ArticleListActionModel.fromJson error: $error");
-          }
-        }
-        isLoading[1] = false;
-      });
-    }
-  }
-
-  ///입주 업체 게시물 글 불러오기.
-  void refreshFacilityNotice(UserProvider userProvider) async {
-    //articles/?parent_board=11
-    //입주 업체
-    // "slug": "facility-feedback",
-    int boardID = findBoardID("facility-notice", "")[0];
-    List<dynamic> facilityJson = (await userProvider
-        .getApiRes("articles/?parent_board=$boardID"))['results'];
-    if (mounted) {
-      setState(() {
-        for (Map<String, dynamic> json in facilityJson) {
-          try {
-            facilityContentList.add(ArticleListActionModel.fromJson(json));
-          } catch (error) {
-            debugPrint(
-                "refreshFacilityNotice ArticleListActionModel.fromJson failed: $error");
-          }
-        }
-        isLoading[2] = false;
-      });
-    }
-  }
-
-  void refreshNewAraNotice(UserProvider userProvider) async {
-    //뉴아라
-    //        "slug": "newara-feedback",
-    int boardID = findBoardID("ara-feedback", "")[0];
-    List<dynamic> newAraNoticeJson = (await userProvider
-        .getApiRes("articles/?parent_board=$boardID"))['results'];
-    if (mounted) {
-      setState(() {
-        for (Map<String, dynamic> json in newAraNoticeJson) {
-          try {
-            newAraContentList.add(ArticleListActionModel.fromJson(json));
-          } catch (error) {
-            debugPrint(
-                "refreshNewAraNotice ArticleListActionModel.fromJson failed: $error");
-          }
-        }
-        isLoading[3] = false;
-      });
-    }
-  }
-
-  void refreshGradAssocNotice(UserProvider userProvider) async {
-    //원총
-    // "slug": "students-group",
-    // "slug": "grad-assoc",
-    //dev 서버랑 실제 서버 parent_topic 이 다름을 유의하기.
-    //https://newara.sparcs.org/api/articles/?parent_board=2&parent_topic=24
-    int boardID = findBoardID("students-group", "grad-assoc")[0];
-    int topicID = findBoardID("students-group", "grad-assoc")[1];
-    List<dynamic> gradJson = (await userProvider.getApiRes(
-        "articles/?parent_board=$boardID&parent_topic=$topicID"))['results'];
-    if (mounted) {
-      setState(() {
-        for (Map<String, dynamic> json in gradJson) {
-          try {
-            gradContentList.add(ArticleListActionModel.fromJson(json));
-          } catch (error) {
-            debugPrint(
-                "refreshGradAssocNotice ArticleListActionModel.fromJson failed: $error");
-          }
-        }
-        isLoading[4] = false;
-      });
-    }
-  }
-
-  void refreshUndergradAssocNotice(UserProvider userProvider) async {
-    // 총학
-    // "slug": "students-group",
-    // "slug": "undergrad-assoc",
-    int boardID = findBoardID("students-group", "undergrad-assoc")[0];
-    int topicID = findBoardID("students-group", "undergrad-assoc")[1];
-    List<dynamic> underGradJson = (await userProvider.getApiRes(
-        "articles/?parent_board=$boardID&parent_topic=$topicID"))['results'];
-    if (mounted) {
-      setState(() {
-        for (Map<String, dynamic> json in underGradJson) {
-          try {
-            underGradContentList.add(ArticleListActionModel.fromJson(json));
-          } catch (error) {
-            debugPrint(
-                "refreshUndergradAssocNotice ArticleListActionModel.fromJson failed: $error");
-          }
-        }
-        isLoading[5] = false;
-      });
-    }
-  }
-
-  void refreshFreshmanCouncil(UserProvider userProvider) async {
-    //새학
-    // "slug": "students-group",
-    // "slug": "freshman-council",
-    int boardID = findBoardID("students-group", "freshman-council")[0];
-    int topicID = findBoardID("students-group", "freshman-council")[1];
-    List<dynamic> freshmanJson = (await userProvider.getApiRes(
-        "articles/?parent_board=$boardID&parent_topic=$topicID"))['results'];
-    if (mounted) {
-      setState(() {
-        for (Map<String, dynamic> json in freshmanJson) {
-          try {
-            freshmanContentList.add(ArticleListActionModel.fromJson(json));
-          } catch (error) {
-            debugPrint(
-                "refreshFreshmanCouncil ArticleListActionModel.fromJson failed: $error");
-          }
-        }
-        isLoading[6] = false;
-      });
-    }
   }
 
   @override

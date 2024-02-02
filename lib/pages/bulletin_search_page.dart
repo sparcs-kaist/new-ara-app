@@ -28,6 +28,7 @@ class _BulletinSearchPageState extends State<BulletinSearchPage> {
   List<ArticleListActionModel> postPreviewList = [];
   int _currentPage = 1;
   bool _isLoading = true;
+  bool _isLoadingNextPage = false;
   String _apiUrl = "";
   String _hintText = "";
   String _searchWord = "";
@@ -50,18 +51,36 @@ class _BulletinSearchPageState extends State<BulletinSearchPage> {
         _apiUrl = "articles/?page=";
         _hintText = "전체 보기에서 검색";
         break;
+      case BoardType.recent:
+        _apiUrl = "articles/recent/?page=";
+        _hintText = "최근 본 글에서 검색";
+        break;
+      case BoardType.top:
+        _apiUrl = "articles/top/?page=";
+        _hintText = "실시간 인기글에서 검색";
+        break;
+      case BoardType.scraps:
+        _apiUrl = "scraps/?page=";
+        _hintText = "담아둔 글에서 검색";
+        break;
       default:
         _apiUrl = "articles/recent/?page=";
+        _hintText = "검색";
         break;
     }
 
-    var userProvider = context.read<UserProvider>();
+    UserProvider userProvider = context.read<UserProvider>();
+    // 위젯이 빌드된 후에 포커스를 줍니다.
+    WidgetsBinding.instance
+        .addPostFrameCallback((_) => _focusNode.requestFocus());
     _scrollController.addListener(_scrollListener);
     refreshPostList(userProvider);
   }
 
   @override
   void dispose() {
+    // FocusNode를 정리합니다.
+    _focusNode.dispose();
     _scrollController.removeListener(_scrollListener);
     _scrollController.dispose();
     super.dispose();
@@ -79,6 +98,9 @@ class _BulletinSearchPageState extends State<BulletinSearchPage> {
       return;
     }
 
+    debugPrint("""refreshPostList : 
+${_apiUrl}1&main_search__contains=$_searchWord
+""");
     Map<String, dynamic>? myMap = await userProvider.getApiRes("""
 ${_apiUrl}1&main_search__contains=$_searchWord
 """);
@@ -102,6 +124,8 @@ ${_apiUrl}1&main_search__contains=$_searchWord
 
   /// 사용자가 스크롤을 내렸을 때 추가 게시물을 불러옴
   void _scrollListener() async {
+    //스크롤 시 포커스 해제
+    FocusScope.of(context).unfocus();
     if (_searchWord == "") {
       if (mounted) {
         setState(() {
@@ -112,24 +136,42 @@ ${_apiUrl}1&main_search__contains=$_searchWord
       return;
     }
 
-    var userProvider = context.read<UserProvider>();
-    if (_scrollController.position.pixels ==
-        _scrollController.position.maxScrollExtent) {
-      _currentPage = _currentPage + 1;
-      Map<String, dynamic>? myMap = await userProvider.getApiRes(
-          "$_apiUrl$_currentPage&main_search__contains=$_searchWord");
+    try {
       if (mounted) {
         setState(() {
-          for (int i = 0; i < (myMap!["results"].length ?? 0); i++) {
-            //???/
-            if (myMap["results"][i]["created_by"]["profile"] != null) {
-              postPreviewList.add(
-                  ArticleListActionModel.fromJson(myMap["results"][i] ?? {}));
-            }
-          }
-          _isLoading = false;
+          _isLoadingNextPage = true;
         });
       }
+      UserProvider userProvider = context.read<UserProvider>();
+      if (_scrollController.position.pixels ==
+          _scrollController.position.maxScrollExtent) {
+        _currentPage = _currentPage + 1;
+        //TODO: 더 이상 불러올 게시물이 없을 때의 처리
+        Map<String, dynamic>? myMap = await userProvider.getApiRes(
+            "$_apiUrl$_currentPage&main_search__contains=$_searchWord");
+        if (mounted) {
+          setState(() {
+            for (int i = 0; i < (myMap!["results"].length ?? 0); i++) {
+              //???/
+              if (myMap["results"][i]["created_by"]["profile"] != null) {
+                postPreviewList.add(
+                    ArticleListActionModel.fromJson(myMap["results"][i] ?? {}));
+              }
+            }
+          });
+          setState(() {
+            _isLoading = false;
+            _isLoadingNextPage = false;
+          });
+        }
+      }
+    } catch (error) {
+      _currentPage = _currentPage - 1;
+      setState(() {
+        _isLoading = false;
+        _isLoadingNextPage = false;
+      });
+      debugPrint("scrollListener error : $error");
     }
   }
 
@@ -169,12 +211,13 @@ ${_apiUrl}1&main_search__contains=$_searchWord
                   width: MediaQuery.of(context).size.width - 40,
                   height: 36,
                   child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       Expanded(
                         child: TextField(
                           minLines: 1,
                           maxLines: 1,
-                          textAlignVertical: TextAlignVertical.bottom,
+                          textAlignVertical: TextAlignVertical.center,
                           focusNode: _focusNode,
                           textInputAction: TextInputAction.search,
                           onSubmitted: (String text) {
@@ -184,19 +227,30 @@ ${_apiUrl}1&main_search__contains=$_searchWord
                             });
                             refreshPostList(context.read<UserProvider>());
                           },
+                          onChanged: (value) {
+                            setState(() {
+                              _searchWord = value;
+                            });
+                            refreshPostList(context.read<UserProvider>());
+                          },
                           style: const TextStyle(
-                            //TODO: 커서 크기와 텍스트 베이스라인 교정하기.
-                            height: 1.5,
+                            //height * fontSize = line height(커서 크기)
+                            height: 18 / 14,
                             fontSize: 14,
                             fontWeight: FontWeight.w500,
                           ),
                           decoration: InputDecoration(
+                            isCollapsed: true,
+                            isDense: true,
+                            filled: true,
+                            fillColor: const Color(0xFFF6F6F6),
+                            // richtext를 밑으로 내리고 싶으면 contentPadding의 B를 줄일것
                             contentPadding:
-                                const EdgeInsets.fromLTRB(0, 0, 0, 14),
+                                const EdgeInsets.fromLTRB(100, 10, 10, 9),
                             prefixIconConstraints: const BoxConstraints(
-                                maxHeight: 28, minHeight: 28),
+                                maxHeight: 24, maxWidth: 31),
                             prefixIcon: Padding(
-                              padding: const EdgeInsets.fromLTRB(6.0, 0, 0, 0),
+                              padding: const EdgeInsets.fromLTRB(6.0, 0, 1, 0),
                               child: SizedBox(
                                 // 원하는 세로 크기
                                 width: 24,
@@ -213,11 +267,10 @@ ${_apiUrl}1&main_search__contains=$_searchWord
                             hintStyle: const TextStyle(
                               color: Color(0xFFBBBBBB),
                               fontSize: 14,
+                              height: null,
                               fontWeight: FontWeight.w500,
                             ),
-                            filled: true,
-                            fillColor: const Color(0xFFF6F6F6),
-                            isDense: false,
+
                             // 모서리를 둥글게 설정
                             enabledBorder: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(10.0),
@@ -257,11 +310,21 @@ ${_apiUrl}1&main_search__contains=$_searchWord
                   width: MediaQuery.of(context).size.width - 18,
                   child: ListView.builder(
                     controller: _scrollController,
-                    itemCount: postPreviewList.length, // 아이템 개수
+                    itemCount: postPreviewList.length +
+                        (_isLoadingNextPage ? 1 : 0), // 아이템 개수
                     itemBuilder: (BuildContext context, int index) {
                       // 각 아이템을 위한 위젯 생성
 
                       // 숨겨진 게시물이면 일단 표현 안하는 걸로 함.
+                      if (_isLoadingNextPage &&
+                          index == postPreviewList.length) {
+                        return const SizedBox(
+                          height: 63,
+                          child: Center(
+                            child: LoadingIndicator(),
+                          ),
+                        );
+                      }
                       return postPreviewList[index].is_hidden
                           ? Container()
                           : InkWell(

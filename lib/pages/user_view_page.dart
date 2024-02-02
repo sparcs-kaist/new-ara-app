@@ -110,26 +110,26 @@ class _UserViewPageState extends State<UserViewPage> {
   @override
   Widget build(BuildContext context) {
     UserProvider userProvider = context.read<UserProvider>();
-    return !_isLoaded
-        ? const LoadingIndicator()
-        : Scaffold(
-            appBar: AppBar(
-              leading: IconButton(
-                color: ColorsInfo.newara,
-                icon: SvgPicture.asset('assets/icons/left_chevron.svg',
-                    colorFilter: const ColorFilter.mode(
-                        ColorsInfo.newara, BlendMode.srcIn),
-                    width: 35,
-                    height: 35),
-                onPressed: () {
-                  Navigator.pop(context);
-                },
-              ),
-            ),
-            body: SafeArea(
-              child: SizedBox(
+    return Scaffold(
+      appBar: AppBar(
+        leading: IconButton(
+          color: ColorsInfo.newara,
+          icon: SvgPicture.asset('assets/icons/left_chevron.svg',
+              colorFilter:
+                  const ColorFilter.mode(ColorsInfo.newara, BlendMode.srcIn),
+              width: 35,
+              height: 35),
+          onPressed: () {
+            Navigator.pop(context);
+          },
+        ),
+      ),
+      body: SafeArea(
+        child: !_isLoaded
+            ? const LoadingIndicator()
+            : SizedBox(
                 width: MediaQuery.of(context).size.width,
-                child: RefreshIndicator(
+                child: RefreshIndicator.adaptive(
                   color: ColorsInfo.newara,
                   onRefresh: () async {
                     _setIsLoaded(false);
@@ -156,13 +156,12 @@ class _UserViewPageState extends State<UserViewPage> {
                       const SizedBox(height: 5),
                       // 작성한 글 목록 표시
                       _buildArticleList(userProvider),
-                      const SizedBox(height: 20),
                     ],
                   ),
                 ),
               ),
-            ),
-          );
+      ),
+    );
   }
 
   /// 사용자 프로필 이미지, 닉네임을 빌드.

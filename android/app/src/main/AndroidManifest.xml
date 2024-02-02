@@ -8,7 +8,7 @@
        </intent>
    </queries>
    <application
-        android:label="new_ara_app"
+        android:label="Ara"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity
@@ -38,4 +38,5 @@
             android:name="flutterEmbedding"
             android:value="2" />
     </application>
+    <uses-permission android:name="android.permission.INTERNET"/>
 </manifest>
