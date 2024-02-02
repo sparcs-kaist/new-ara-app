@@ -683,41 +683,49 @@ class _PostWritePageState extends State<PostWritePage> {
                           const SizedBox(
                             width: 20,
                           ),
-                          const Text(
-                            "첨부파일",
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                          const SizedBox(
-                            width: 8,
-                          ),
-                          Text(
-                            _attachmentList.length.toString(),
-                            style: const TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w500,
-                              color: ColorsInfo.newara,
-                            ),
-                          ),
-                          const SizedBox(
-                            width: 5,
-                          ),
-                          InkWell(
-                            onTap: () {
-                              setState(() {
-                                _isFileMenuBarSelected =
-                                    !_isFileMenuBarSelected;
-                              });
-                            },
-                            child: SvgPicture.asset(
-                              'assets/icons/chevron_down.svg',
-                              width: 20,
-                              height: 20,
-                              colorFilter: const ColorFilter.mode(
-                                Colors.red,
-                                BlendMode.srcIn,
+                          SizedBox(
+                            height: 34,
+                            child: GestureDetector(
+                              behavior: HitTestBehavior.translucent,
+                              onTap: () {
+                                setState(() {
+                                  _isFileMenuBarSelected =
+                                      !_isFileMenuBarSelected;
+                                });
+                              },
+                              child: Row(
+                                children: [
+                                  const Text(
+                                    "첨부파일",
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                  const SizedBox(
+                                    width: 8,
+                                  ),
+                                  Text(
+                                    _attachmentList.length.toString(),
+                                    style: const TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w500,
+                                      color: ColorsInfo.newara,
+                                    ),
+                                  ),
+                                  const SizedBox(
+                                    width: 5,
+                                  ),
+                                  SvgPicture.asset(
+                                    'assets/icons/chevron_down.svg',
+                                    width: 20,
+                                    height: 20,
+                                    colorFilter: const ColorFilter.mode(
+                                      Colors.red,
+                                      BlendMode.srcIn,
+                                    ),
+                                  ),
+                                ],
                               ),
                             ),
                           ),
