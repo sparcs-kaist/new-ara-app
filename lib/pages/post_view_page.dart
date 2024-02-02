@@ -456,17 +456,7 @@ class _PostViewPageState extends State<PostViewPage> {
             Row(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                SvgPicture.asset(
-                  'assets/icons/like.svg',
-                  width: 10.06,
-                  height: 16,
-                  colorFilter: ColorFilter.mode(
-                    _article.my_vote == false
-                        ? ColorsInfo.noneVote
-                        : ColorsInfo.newara,
-                    BlendMode.srcIn,
-                  ),
-                ),
+                _buildVoteIcons(true, _article.my_vote, ColorsInfo.posVote, 10.08, 11),
                 const SizedBox(width: 1.92),
                 Text('${_article.positive_vote_count}',
                     style: TextStyle(
@@ -476,16 +466,7 @@ class _PostViewPageState extends State<PostViewPage> {
                             ? ColorsInfo.noneVote
                             : ColorsInfo.newara)),
                 const SizedBox(width: 10),
-                SvgPicture.asset(
-                  'assets/icons/dislike.svg',
-                  width: 10.06,
-                  height: 16,
-                  colorFilter: ColorFilter.mode(
-                      _article.my_vote == true
-                          ? ColorsInfo.noneVote
-                          : ColorsInfo.negVote,
-                      BlendMode.srcIn),
-                ),
+                _buildVoteIcons(false, _article.my_vote, ColorsInfo.negVote, 10.08, 11),
                 const SizedBox(width: 1.92),
                 Text('${_article.negative_vote_count}',
                     style: TextStyle(
@@ -499,7 +480,7 @@ class _PostViewPageState extends State<PostViewPage> {
                 SvgPicture.asset(
                   'assets/icons/comment.svg',
                   width: 11.85,
-                  height: 16,
+                  height: 12,
                   colorFilter: const ColorFilter.mode(
                     Color.fromRGBO(99, 99, 99, 1),
                     BlendMode.srcIn,
@@ -1180,17 +1161,9 @@ class _PostViewPageState extends State<PostViewPage> {
                                     if (result) _updateState();
                                   });
                                 },
-                                child: SvgPicture.asset(
-                                  'assets/icons/like.svg',
-                                  width: 12,
-                                  height: 19,
-                                  colorFilter: ColorFilter.mode(
-                                      curComment.my_vote == false
-                                          ? ColorsInfo.noneVote
-                                          : ColorsInfo.newara,
-                                      BlendMode.srcIn),
-                                ),
+                                child: _buildVoteIcons(true, curComment.my_vote, ColorsInfo.posVote, 11.52, 12.57),
                               ),
+                              const SizedBox(width: 2.19),
                               Text(
                                 curComment.positive_vote_count.toString(),
                                 style: TextStyle(
@@ -1211,17 +1184,9 @@ class _PostViewPageState extends State<PostViewPage> {
                                     if (result) _updateState();
                                   });
                                 },
-                                child: SvgPicture.asset(
-                                  'assets/icons/dislike.svg',
-                                  width: 12,
-                                  height: 19,
-                                  colorFilter: ColorFilter.mode(
-                                      curComment.my_vote == true
-                                          ? ColorsInfo.noneVote
-                                          : ColorsInfo.negVote,
-                                      BlendMode.srcIn),
-                                ),
+                                child: _buildVoteIcons(false, curComment.my_vote, ColorsInfo.negVote, 11.52, 12.57),
                               ),
+                              const SizedBox(width: 2.19),
                               Text(
                                 curComment.negative_vote_count.toString(),
                                 style: TextStyle(
