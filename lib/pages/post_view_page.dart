@@ -1572,24 +1572,4 @@ class _PostViewPageState extends State<PostViewPage> {
     }
     return true;
   }
-
-  /// 사용자에게 숨겨진 글에 대한 처리 방법을 알려주는 함수.
-  String getHiddenInfo(List<dynamic> whyHidden) {
-    // 숨김 사유가 없을 경우
-    if (whyHidden.isEmpty) return "";
-    String topHiddenReason = whyHidden[0];
-    // 차단한 사용자의 게시물인 경우
-    if (topHiddenReason == "BLOCKED_USER_CONTENT") {
-      return "차단 사용자 설정은 설정페이지에서 하실 수 있습니다.";
-    }
-    // 성인글 또는 정치글인 경우
-    else if (topHiddenReason == "SOCIAL_CONTENT" ||
-        topHiddenReason == "ADULT_CONTENT") {
-      return "게시글 보기 설정은 설정페이지에서 하실 수 있습니다.";
-    }
-    // 그 외의 사유로 숨겨진 경우
-    else {
-      return "";
-    }
-  }
 }
