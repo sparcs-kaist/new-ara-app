@@ -3,6 +3,7 @@ import 'dart:math' as math;
 import 'dart:convert';
 import 'package:delta_to_html/delta_to_html.dart';
 import 'package:dio/dio.dart';
+import 'package:file_icon/file_icon.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
@@ -890,14 +891,15 @@ class _PostWritePageState extends State<PostWritePage> {
                                                 const SizedBox(
                                                   width: 6,
                                                 ),
-                                                SvgPicture.asset(
-                                                  'assets/icons/pdf.svg',
-                                                  width: 30,
-                                                  height: 30,
-                                                  colorFilter:
-                                                      const ColorFilter.mode(
-                                                          Colors.black,
-                                                          BlendMode.srcIn),
+                                                FileIcon(
+                                                  _attachmentList[index]
+                                                          .isNewFile
+                                                      ? path.basename(
+                                                          _attachmentList[index]
+                                                              .fileLocalPath!)
+                                                      : _attachmentList[index]
+                                                          .fileUrlName,
+                                                  size: 30,
                                                 ),
                                                 const SizedBox(
                                                   width: 3,
