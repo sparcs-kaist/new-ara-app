@@ -716,15 +716,26 @@ class _PostWritePageState extends State<PostWritePage> {
                                   const SizedBox(
                                     width: 5,
                                   ),
-                                  SvgPicture.asset(
-                                    'assets/icons/chevron_down.svg',
-                                    width: 20,
-                                    height: 20,
-                                    colorFilter: const ColorFilter.mode(
-                                      Colors.red,
-                                      BlendMode.srcIn,
+                                  if (_isFileMenuBarSelected)
+                                    SvgPicture.asset(
+                                      'assets/icons/chevron_up.svg',
+                                      width: 20,
+                                      height: 20,
+                                      colorFilter: const ColorFilter.mode(
+                                        Colors.red,
+                                        BlendMode.srcIn,
+                                      ),
+                                    )
+                                  else
+                                    SvgPicture.asset(
+                                      'assets/icons/chevron_down.svg',
+                                      width: 20,
+                                      height: 20,
+                                      colorFilter: const ColorFilter.mode(
+                                        Colors.red,
+                                        BlendMode.srcIn,
+                                      ),
                                     ),
-                                  ),
                                 ],
                               ),
                             ),
@@ -1483,7 +1494,7 @@ class _PostWritePageState extends State<PostWritePage> {
   /// 첨부 파일 삭제 및 관련 HTML 내용 업데이트
   /// 기존에 업로드된 파일인 경우 API 요청으로 삭제
   /// 새로 추가한 파일인 경우 HTML 내용에서 해당 이미지 태그 삭제
-  void _onAttachmentDelete(int index) async {
+  void _onAttachmentDelete(int index) {
     String toFind;
 
     if (_attachmentList[index].isNewFile) {
