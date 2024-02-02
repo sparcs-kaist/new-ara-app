@@ -1139,7 +1139,21 @@ class _PostWritePageState extends State<PostWritePage> {
           fontFamily: 'NatoSansKR',
           decoration: TextDecoration.underline,
         ),
-     //   small
+        code: quill.DefaultTextBlockStyle(
+          const TextStyle(
+            //  backgroundColor: Colors.grey,
+            color: Color(0xFF4a4a4a),
+            fontWeight: FontWeight.w400,
+            fontFamily: 'NotoSansKR',
+            height: 1.5,
+            fontSize: 16,
+          ),
+          const quill.VerticalSpacing(2, 0),
+          const quill.VerticalSpacing(0, 0),
+          null,
+        ),
+
+        //   small
       );
     }
 
