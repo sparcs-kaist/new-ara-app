@@ -425,6 +425,7 @@ class _UserPageState extends State<UserPage>
                             maxLines: 1,
                           ),
                         ),
+                        // TODO: PR #41 참고해서 PostPreview 활용한 리팩토링 진행하기 (2023.02.02)
                         if (curPost.attachment_type.toString() == "NONE")
                           Container()
                         else
