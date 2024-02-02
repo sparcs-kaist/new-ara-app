@@ -1445,7 +1445,17 @@ class _PostWritePageState extends State<PostWritePage> {
 
         debugPrint('Response data: ${response.data}');
         if (mounted) {
-          Navigator.pop(context);
+          if (_isEditingPost) {
+            Navigator.pop(context);
+          } else {
+            await Navigator.of(context).pushReplacement(
+              slideRoute(
+                PostViewPage(
+                  id: response.data['id'],
+                ),
+              ),
+            );
+          }
         }
       } on DioException catch (error) {
         debugPrint('post Error: ${error.response!.data}');
