@@ -605,16 +605,7 @@ class _PostViewPageState extends State<PostViewPage> {
             ).posVote();
             if (res) _updateState();
           },
-          child: SvgPicture.asset(
-            'assets/icons/like.svg',
-            colorFilter: ColorFilter.mode(
-                _article.my_vote == false
-                    ? ColorsInfo.noneVote
-                    : ColorsInfo.newara,
-                BlendMode.srcIn),
-            width: 20.17,
-            height: 28,
-          ),
+          child: _buildVoteIcons(true, _article.my_vote, ColorsInfo.posVote),
         ),
         const SizedBox(width: 3),
         Text('${_article.positive_vote_count}',
@@ -636,17 +627,7 @@ class _PostViewPageState extends State<PostViewPage> {
               if (result) _updateState();
             });
           },
-          child: SvgPicture.asset(
-            'assets/icons/dislike.svg',
-            colorFilter: ColorFilter.mode(
-              _article.my_vote == true
-                  ? ColorsInfo.noneVote
-                  : ColorsInfo.negVote,
-              BlendMode.srcIn,
-            ),
-            width: 20.17,
-            height: 28,
-          ),
+          child: _buildVoteIcons(false, _article.my_vote, ColorsInfo.negVote),
         ),
         const SizedBox(width: 3),
         Text('${_article.negative_vote_count}',
@@ -658,6 +639,32 @@ class _PostViewPageState extends State<PostViewPage> {
                   : ColorsInfo.negVote,
             )),
       ],
+    );
+  }
+
+  Widget _buildVoteIcons(bool isPositive, bool? myVote, Color highlightColor) {
+    late Color widgetColor;
+    late String iconPath;
+    // 투표한 반대 위젯을 설정하는 경우
+    if (myVote == !isPositive) {
+      widgetColor = ColorsInfo.noneVote;
+      iconPath = 'assets/icons/${isPositive ? 'like.svg' : 'dislike.svg'}';
+    }
+    else {
+      widgetColor = highlightColor;
+      // 투표하지 않은 경우
+      if (myVote == null) {
+        iconPath = 'assets/icons/${isPositive ? 'like.svg' : 'dislike.svg'}';
+      }
+      else {
+        iconPath = 'assets/icons/${isPositive ? 'like-filled.svg' : 'dislike-filled.svg'}';
+      }
+    }
+    return SvgPicture.asset(
+      iconPath,
+      colorFilter: ColorFilter.mode(widgetColor, BlendMode.srcIn),
+      width: 20.17,
+      height: 28
     );
   }
 
