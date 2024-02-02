@@ -1081,13 +1081,82 @@ class _PostWritePageState extends State<PostWritePage> {
       );
     }
 
+    quill.DefaultStyles editorStyles() {
+      TextStyle h1h2h3h4h5h6CommonStyle = const TextStyle(
+        color: Colors.black,
+        fontWeight: FontWeight.w600,
+        fontFamily: 'NotoSansKR',
+        height: 1.15,
+      );
+      return quill.DefaultStyles(
+        h1: quill.DefaultTextBlockStyle(
+          h1h2h3h4h5h6CommonStyle.copyWith(
+            fontSize: 32,
+          ),
+          // Vertical spacing around a text block.
+          const quill.VerticalSpacing(2, 0),
+          // Vertical spacing for individual lines within a text block.
+          const quill.VerticalSpacing(0, 0),
+          null,
+        ),
+        h2: quill.DefaultTextBlockStyle(
+          h1h2h3h4h5h6CommonStyle.copyWith(
+            fontSize: 28,
+          ),
+          const quill.VerticalSpacing(2, 0),
+          const quill.VerticalSpacing(0, 0),
+          null,
+        ),
+        h3: quill.DefaultTextBlockStyle(
+          h1h2h3h4h5h6CommonStyle.copyWith(
+            fontSize: 24,
+          ),
+          const quill.VerticalSpacing(2, 0),
+          const quill.VerticalSpacing(0, 0),
+          null,
+        ),
+        paragraph: quill.DefaultTextBlockStyle(
+          const TextStyle(
+            color: Color(0xFF4a4a4a),
+            fontWeight: FontWeight.w500,
+            fontFamily: 'NotoSansKR',
+            height: 1.5,
+            fontSize: 16,
+          ),
+          const quill.VerticalSpacing(2, 0),
+          const quill.VerticalSpacing(0, 0),
+          null,
+        ),
+        bold: const TextStyle(
+            color: Color(0xff363636),
+            fontFamily: 'NotoSansKR',
+            fontWeight: FontWeight.w700),
+        italic: const TextStyle(
+          fontFamily: 'NotoSansKR',
+          fontStyle: FontStyle.italic,
+        ),
+        underline: const TextStyle(
+          fontFamily: 'NatoSansKR',
+          decoration: TextDecoration.underline,
+        ),
+     //   small
+      );
+    }
+
     Widget buildEditor() {
-      return quill.QuillEditor.basic(
+      return quill.QuillEditor(
         focusNode: _editorFocusNode,
         controller: _quillController,
         placeholder: '내용을 입력해주세요.',
         embedBuilders: FlutterQuillEmbeds.builders(),
         readOnly: false, // The editor is editable
+
+        scrollController: ScrollController(),
+        padding: EdgeInsets.zero,
+        scrollable: true,
+        autoFocus: true,
+        expands: false,
+        customStyles: editorStyles(),
       );
     }
 
