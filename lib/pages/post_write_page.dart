@@ -1152,6 +1152,18 @@ class _PostWritePageState extends State<PostWritePage> {
           const quill.VerticalSpacing(0, 0),
           null,
         ),
+        placeHolder: quill.DefaultTextBlockStyle(
+          const TextStyle(
+            color: Color(0xFFBBBBBB),
+            fontWeight: FontWeight.w500,
+            fontFamily: 'NotoSansKR',
+            height: 1.5,
+            fontSize: 16,
+          ),
+          const quill.VerticalSpacing(2, 0),
+          const quill.VerticalSpacing(0, 0),
+          null,
+        ),
 
         //   small
       );
