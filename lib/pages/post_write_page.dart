@@ -17,8 +17,10 @@ import 'package:new_ara_app/models/attachment_model.dart';
 import 'package:new_ara_app/models/board_detail_action_model.dart';
 import 'package:new_ara_app/models/simple_board_model.dart';
 import 'package:new_ara_app/models/topic_model.dart';
+import 'package:new_ara_app/pages/post_view_page.dart';
 import 'package:new_ara_app/providers/user_provider.dart';
 import 'package:new_ara_app/utils/create_dio_with_config.dart';
+import 'package:new_ara_app/utils/slide_routing.dart';
 import 'package:new_ara_app/widgets/loading_indicator.dart';
 import 'package:provider/provider.dart';
 import 'package:uuid/uuid.dart';
@@ -548,46 +550,55 @@ class _PostWritePageState extends State<PostWritePage> {
     }
 
     Widget buildTitle() {
-      return TextField(
-        controller: _titleController,
-        focusNode: _titleFocusNode,
-        minLines: 1,
-        maxLines: 1,
-        maxLength: 255,
-        style: const TextStyle(
-          height: 1,
-          fontSize: 22,
-          fontWeight: FontWeight.w700,
-        ),
-        onChanged: (String s) {
-          // build 함수를 다시 실행하여 올릴 수 있는 게시물인지 유효성 검사
-          setState(() {});
-        },
-        decoration: const InputDecoration(
-          hintText: "제목을 입력해주세요.",
-          hintStyle: TextStyle(
+      return SizedBox(
+        height: 39,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 20),
+          child: TextField(
+            controller: _titleController,
+            focusNode: _titleFocusNode,
+            minLines: 1,
+            maxLines: 1,
+            maxLength: 255,
+            style: const TextStyle(
+              height: 32.56 / 22,
               fontSize: 22,
-              color: Color(0xFFBBBBBB),
-              fontWeight: FontWeight.w700),
-          counterStyle: TextStyle(
-            height: double.minPositive,
-          ),
-          counterText: "",
-          filled: true,
-          fillColor: Colors.white,
-          isDense: true,
-          enabledBorder: OutlineInputBorder(
-            borderSide: BorderSide(
-              color: Colors.transparent, // 테두리 색상 설정
-            ), // 모서리를 둥글게 설정
-          ),
-          focusedBorder: OutlineInputBorder(
-            borderSide: BorderSide(
-              color: Colors.transparent, // 테두리 색상 설정
-            ), // 모서리를 둥글게 설정
+              fontWeight: FontWeight.w700,
+            ),
+            onChanged: (String s) {
+              // build 함수를 다시 실행하여 올릴 수 있는 게시물인지 유효성 검사
+              setState(() {});
+            },
+            decoration: const InputDecoration(
+              hintText: "제목을 입력해주세요.",
+              hintStyle: TextStyle(
+                  height: 32.56 / 22,
+                  fontSize: 22,
+                  color: Color(0xFFBBBBBB),
+                  fontWeight: FontWeight.w700),
+              // counterStyle: TextStyle(
+              //   height: double.minPositive,
+              // ),
+              counterText: "",
+              filled: true,
+              fillColor: Colors.white,
+              isDense: true,
+              isCollapsed: true,
+              contentPadding: EdgeInsets.fromLTRB(0, 0, 0, 0),
+              enabledBorder: OutlineInputBorder(
+                borderSide: BorderSide(
+                  color: Colors.transparent, // 테두리 색상 설정
+                ), // 모서리를 둥글게 설정
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderSide: BorderSide(
+                  color: Colors.transparent, // 테두리 색상 설정
+                ), // 모서리를 둥글게 설정
+              ),
+            ),
+            cursorColor: Colors.transparent,
           ),
         ),
-        cursorColor: Colors.transparent,
       );
     }
 
@@ -1073,30 +1084,33 @@ class _PostWritePageState extends State<PostWritePage> {
     }
 
     Widget buildToolbar() {
-      return quill.QuillToolbar.basic(
-        controller: _quillController,
-        multiRowsDisplay: true,
-        showUndo: false,
-        showRedo: false,
-        showColorButton: false,
-        showBackgroundColorButton: false,
-        showFontFamily: false,
-        showFontSize: false,
-        showDividers: false,
-        showListCheck: false,
-        showSearchButton: false,
-        showSubscript: false,
-        showSuperscript: false,
+      return Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 20),
+        child: quill.QuillToolbar.basic(
+          controller: _quillController,
+          multiRowsDisplay: true,
+          showUndo: false,
+          showRedo: false,
+          showColorButton: false,
+          showBackgroundColorButton: false,
+          showFontFamily: false,
+          showFontSize: false,
+          showDividers: false,
+          showListCheck: false,
+          showSearchButton: false,
+          showSubscript: false,
+          showSuperscript: false,
 
-        toolbarIconAlignment: WrapAlignment.start,
-        toolbarIconCrossAlignment: WrapCrossAlignment.start,
-        customButtons: [
-          quill.QuillCustomButton(
-            icon: Icons.camera_alt,
-            onTap: _pickImage,
-          ),
-        ],
-        // embedButtons: FlutterQuillEmbeds.buttons(),
+          toolbarIconAlignment: WrapAlignment.start,
+          toolbarIconCrossAlignment: WrapCrossAlignment.start,
+          customButtons: [
+            quill.QuillCustomButton(
+              icon: Icons.camera_alt,
+              onTap: _pickImage,
+            ),
+          ],
+          // embedButtons: FlutterQuillEmbeds.buttons(),
+        ),
       );
     }
 
@@ -1189,19 +1203,22 @@ class _PostWritePageState extends State<PostWritePage> {
     }
 
     Widget buildEditor() {
-      return quill.QuillEditor(
-        focusNode: _editorFocusNode,
-        controller: _quillController,
-        placeholder: '내용을 입력해주세요.',
-        embedBuilders: FlutterQuillEmbeds.builders(),
-        readOnly: false, // The editor is editable
+      return Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 20),
+        child: quill.QuillEditor(
+          focusNode: _editorFocusNode,
+          controller: _quillController,
+          placeholder: '내용을 입력해주세요.',
+          embedBuilders: FlutterQuillEmbeds.builders(),
+          readOnly: false, // The editor is editable
 
-        scrollController: ScrollController(),
-        padding: EdgeInsets.zero,
-        scrollable: true,
-        autoFocus: true,
-        expands: false,
-        customStyles: editorStyles(),
+          scrollController: ScrollController(),
+          padding: EdgeInsets.zero,
+          scrollable: true,
+          autoFocus: true,
+          expands: false,
+          customStyles: editorStyles(),
+        ),
       );
     }
 
@@ -1213,17 +1230,26 @@ class _PostWritePageState extends State<PostWritePage> {
               child: Column(
                 children: [
                   buildMenubar(),
+                  SizedBox(
+                    height: 20,
+                  ),
                   buildTitle(),
-                  Container(
-                    height: 1,
-                    color: const Color(0xFFF0F0F0),
+                  SizedBox(height: 15),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                    child: Container(
+                      height: 1,
+                      color: const Color(0xFFF0F0F0),
+                    ),
+                  ),
+                  SizedBox(
+                    height: 20,
                   ),
                   buildToolbar(),
-                  Expanded(
-                      child: Padding(
-                    padding: const EdgeInsets.all(12.0),
-                    child: buildEditor(),
-                  )),
+                  SizedBox(
+                    height: 10,
+                  ),
+                  Expanded(child: buildEditor()),
                   buildAttachmentShow()
                 ],
               ),
