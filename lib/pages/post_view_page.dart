@@ -24,6 +24,7 @@ import 'package:new_ara_app/widgets/in_article_web_view.dart';
 import 'package:new_ara_app/providers/notification_provider.dart';
 import 'package:new_ara_app/widgets/pop_up_menu_buttons.dart';
 import 'package:new_ara_app/utils/profile_image.dart';
+import 'package:new_ara_app/utils/handle_hidden.dart';
 
 /// 하나의 post에 대한 내용 뷰, 이벤트 처리를 모두 담당하는 StatefulWidget.
 class PostViewPage extends StatefulWidget {
@@ -301,57 +302,62 @@ class _PostViewPageState extends State<PostViewPage> {
                                                 width: 40,
                                                 height: 40,
                                               ),
-                                              const Text(
-                                                '차단한 사용자의 게시물입니다.',
-                                                style: TextStyle(
+                                              Text(
+                                                getAllHiddenReasons(_article.why_hidden)
+                                                .join('\n'),
+                                                textAlign: TextAlign.center,
+                                                style: const TextStyle(
                                                   color: Color(0xFF4A4A4A),
                                                   fontWeight: FontWeight.w700,
                                                   fontSize: 16,
                                                 ),
                                               ),
-                                              const Text(
-                                                '(차단 사용자 설정은 마이페이지에서 확인할 수 있습니다.)',
-                                                style: TextStyle(
+                                              Text(
+                                                "(${getHiddenInfo(_article.why_hidden)})",
+                                                style: const TextStyle(
                                                   fontWeight: FontWeight.w400,
                                                   fontSize: 14,
                                                   color: Color(0xFF4A4A4A),
                                                 ),
                                               ),
                                               const SizedBox(height: 8),
-                                              Container(
-                                                width: 104,
-                                                height: 36,
-                                                decoration: BoxDecoration(
+                                              // TODO: 지금은 내용, 댓글 일괄 적용이지만 댓글만 적용하는 것도 필요
+                                              // 숨겨진 게시물이지만 사용자가 내용을 확인할 수 있는 경우
+                                              Visibility(
+                                                visible: _article.can_override_hidden ==
+                                                  true,
+                                                child: Container(
+                                                  width: 104,
+                                                  height: 36,
+                                                  decoration: BoxDecoration(
                                                   borderRadius:
-                                                      const BorderRadius.all(
-                                                          Radius.circular(10)),
-                                                  border: Border.all(
-                                                    width: 1,
-                                                    color: Color(0xFFDBDBDB),
+                                                    const BorderRadius.all(
+                                                      Radius.circular(10)),
+                                                      border: Border.all(
+                                                      width: 1,
+                                                      color: const Color(0xFFDBDBDB),
+                                                   ),
                                                   ),
-                                                ),
-                                                child: InkWell(
-                                                  onTap: () async {
-                                                    await _fetchArticle(
-                                                        userProvider,
+                                                  child: InkWell(
+                                                    onTap: () async {
+                                                      await _fetchArticle(userProvider,
                                                         override_hidden: true);
-                                                    _updateState();
-                                                  },
-                                                  child: const Center(
-                                                    child: Text(
+                                                      _updateState();
+                                                    },
+                                                    child: const Center(
+                                                      child: Text(
                                                       '숨긴내용 보기',
                                                       style: TextStyle(
-                                                        color:
-                                                            Color(0xff4a4a4a),
-                                                        fontWeight:
-                                                            FontWeight.w400,
+                                                        color: Color(0xff4a4a4a),
+                                                        fontWeight: FontWeight.w400,
                                                       ),
                                                     ),
-                                                  ),
-                                                ),
-                                              ),
+                                                    ),
+                                                  )
+                                                )
+                                              )
                                             ],
-                                          ),
+                                          )
                                         ),
                                       ),
                                       Visibility(
@@ -413,8 +419,7 @@ class _PostViewPageState extends State<PostViewPage> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          // 차단된 경우 title이 null이 되므로 아래와 같이 설정함.
-          _article.title ?? "차단한 사용자의 게시물입니다.",
+          getTitle(_article.title, _article.is_hidden, _article.why_hidden),
           style: const TextStyle(
             fontSize: 18,
             fontWeight: FontWeight.w700,
@@ -1007,6 +1012,7 @@ class _PostViewPageState extends State<PostViewPage> {
       itemBuilder: (BuildContext context, int idx) {
         CommentNestedCommentListActionModel curComment = _commentList[idx];
         // 각각의 댓글에 대한 컨테이너
+        // TODO: is_hidden && can_override_hidden 인 경우 댓글 내용 확인이 가능하게 해야함.
         return Column(
           children: [
             Container(
@@ -1140,10 +1146,7 @@ class _PostViewPageState extends State<PostViewPage> {
                     child: curComment.is_hidden == false
                         ? _buildCommentContent(curComment.content ?? "")
                         : Text(
-                            // 차단된 댓글인 경우 can_override_hidden이 false로 설정되어 있음.
-                            curComment.can_override_hidden == false
-                                ? '삭제된 댓글 입니다.'
-                                : '차단한 사용자의 댓글입니다.',
+                            getHiddenCommentReasons(curComment.why_hidden),
                             style: const TextStyle(
                               fontSize: 14,
                               fontWeight: FontWeight.w400,

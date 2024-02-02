@@ -17,6 +17,7 @@ import 'package:new_ara_app/utils/slide_routing.dart';
 import 'package:new_ara_app/pages/profile_edit_page.dart';
 import 'package:new_ara_app/providers/notification_provider.dart';
 import 'package:new_ara_app/utils/profile_image.dart';
+import 'package:new_ara_app/utils/handle_hidden.dart';
 
 /// 작성한 글, 담아둔 글, 최근 본 글을 나타내기 위해 사용
 enum TabType { created, scrap, recent }
@@ -411,13 +412,19 @@ class _UserPageState extends State<UserPage>
                       children: [
                         Flexible(
                           child: Text(
-                            curPost.title.toString(),
-                            style: const TextStyle(
-                                fontSize: 16, fontWeight: FontWeight.w500),
+                            getTitle(curPost.title, curPost.is_hidden,
+                                curPost.why_hidden),
+                            style: TextStyle(
+                                color: curPost.is_hidden
+                                    ? const Color(0xFFBBBBBB)
+                                    : Colors.black,
+                                fontSize: 16,
+                                fontWeight: FontWeight.w500),
                             overflow: TextOverflow.ellipsis,
                             maxLines: 1,
                           ),
                         ),
+                        // TODO: PR #41 참고해서 PostPreview 활용한 리팩토링 진행하기 (2023.02.02)
                         if (curPost.attachment_type.toString() == "NONE")
                           Container()
                         else
@@ -526,9 +533,9 @@ class _UserPageState extends State<UserPage>
                               visible: (curPost.positive_vote_count != null &&
                                       curPost.positive_vote_count! > 0) &&
                                   ((curPost.negative_vote_count != null &&
-                                      curPost.negative_vote_count! > 0) ||
-                                  (curPost.comment_count != null &&
-                                      curPost.comment_count! > 0)),
+                                          curPost.negative_vote_count! > 0) ||
+                                      (curPost.comment_count != null &&
+                                          curPost.comment_count! > 0)),
                               child: const SizedBox(width: 6),
                             ),
                             Visibility(
