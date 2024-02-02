@@ -688,6 +688,28 @@ class _PostWritePageState extends State<PostWritePage> {
                 height: 50,
                 child: Row(
                   children: [
+                    const SizedBox(
+                      width: 7,
+                    ),
+                    InkWell(
+                      onTap: () async {
+                        bool picktf = await _pickFile();
+                        if (picktf) {
+                          FocusScope.of(context).unfocus();
+                        }
+                        else{
+                          //TODO: 에디터로 포커스 이동 안하는 문제점이 있음.
+                          _editorFocusNode.requestFocus();
+                        }
+                      },
+                      child: SizedBox(
+                        width: 36,
+                        height: 36,
+                        child: SvgPicture.asset(
+                          'assets/icons/clip.svg',
+                        ),
+                      ),
+                    ),
                     const Spacer(),
                     Container(
                       height: 30,
@@ -1543,7 +1565,9 @@ class _PostWritePageState extends State<PostWritePage> {
   }
 
   /// 첨부파일 추가 시 실행되는 함수
-  Future<void> _pickFile() async {
+  /// 파일을 선택하면 해당 파일을 첨부파일 리스트에 추가한다.
+  /// 파일 선택이 취소되면 false return;
+  Future<bool> _pickFile() async {
     filePickerResult = await FilePicker.platform.pickFiles();
     if (filePickerResult != null) {
       File file = File(filePickerResult!.files.single.path!);
@@ -1561,6 +1585,9 @@ class _PostWritePageState extends State<PostWritePage> {
           fileLocalPath: file.path,
         ));
       });
+      return true;
+    } else {
+      return false;
     }
   }
 
