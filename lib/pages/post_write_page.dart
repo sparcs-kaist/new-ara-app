@@ -357,8 +357,6 @@ class _PostWritePageState extends State<PostWritePage> {
 
   @override
   Widget build(BuildContext context) {
-    // if (_isLoading) return const LoadingIndicator();
-
     var userProvider = context.watch<UserProvider>();
 
     /// 게시물 업로드 가능한지 확인
@@ -367,6 +365,9 @@ class _PostWritePageState extends State<PostWritePage> {
         _chosenBoardValue!.id != -1 &&
         _isUploadingPost == false &&
         _hasEditorText;
+
+    //빌드 전 첨부파일의 유효성 확인
+    _checkAttachmentsValid();
 
     PreferredSizeWidget buildAppBar() {
       return AppBar(
@@ -1089,9 +1090,6 @@ class _PostWritePageState extends State<PostWritePage> {
         readOnly: false, // The editor is editable
       );
     }
-
-    //빌드 전 첨부파일의 유효성 확인
-    _checkAttachmentsValid();
 
     return _isLoading
         ? const LoadingIndicator()
