@@ -605,9 +605,9 @@ class _PostViewPageState extends State<PostViewPage> {
             ).posVote();
             if (res) _updateState();
           },
-          child: _buildVoteIcons(true, _article.my_vote, ColorsInfo.posVote),
+          child: _buildVoteIcons(true, _article.my_vote, ColorsInfo.posVote, 20.17, 22),
         ),
-        const SizedBox(width: 3),
+        const SizedBox(width: 4),
         Text('${_article.positive_vote_count}',
             style: TextStyle(
               fontSize: 20,
@@ -627,9 +627,9 @@ class _PostViewPageState extends State<PostViewPage> {
               if (result) _updateState();
             });
           },
-          child: _buildVoteIcons(false, _article.my_vote, ColorsInfo.negVote),
+          child: _buildVoteIcons(false, _article.my_vote, ColorsInfo.negVote, 20.17, 22),
         ),
-        const SizedBox(width: 3),
+        const SizedBox(width: 4),
         Text('${_article.negative_vote_count}',
             style: TextStyle(
               fontSize: 20,
@@ -642,7 +642,7 @@ class _PostViewPageState extends State<PostViewPage> {
     );
   }
 
-  Widget _buildVoteIcons(bool isPositive, bool? myVote, Color highlightColor) {
+  Widget _buildVoteIcons(bool isPositive, bool? myVote, Color highlightColor, double width, double height) {
     late Color widgetColor;
     late String iconPath;
     // 투표한 반대 위젯을 설정하는 경우
@@ -663,8 +663,8 @@ class _PostViewPageState extends State<PostViewPage> {
     return SvgPicture.asset(
       iconPath,
       colorFilter: ColorFilter.mode(widgetColor, BlendMode.srcIn),
-      width: 20.17,
-      height: 28
+      width: width,
+      height: height
     );
   }
 
