@@ -1594,13 +1594,14 @@ class _PostWritePageState extends State<PostWritePage> {
     // 수정된 Delta를 다시 JSON으로 인코딩하고 Document로 변환합니다.
     String newJson = jsonEncode(nwDelta);
     quill.Delta newDelta = quill.Delta.fromJson(jsonDecode(newJson));
-    setState(() {
-      _quillController.document = quill.Document.fromJson(newDelta.toJson());
-    });
+    // TODO: 첨부파일을 삭제하는 과정에서 자꾸 에디터에 포커스 되는 문제가 발생하여 아래 코드를 주석처리함.
+    // setState(() {
+    //   _quillController.document = quill.Document.fromJson(newDelta.toJson());
+    // });
 
     setState(() {
+      FocusScope.of(context).unfocus();
       _attachmentList.removeAt(index);
-      _isLoading = false;
     });
   }
 
