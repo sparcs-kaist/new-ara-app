@@ -6,5 +6,5 @@ class ColorsInfo {
   static const Color newaraSoft = Color.fromRGBO(255, 112, 112, 1);
   static const Color posVote = newara;
   static const Color negVote = Color.fromRGBO(83, 141, 209, 1);
-  static const Color noneVote = Color.fromRGBO(100, 100, 100, 1);
+  static const Color noneVote = Color(0xFFBBBBBB);
 }
