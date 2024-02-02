@@ -251,14 +251,14 @@ class _PostWritePageState extends State<PostWritePage> {
     } on DioException catch (e) {
       if (e.response != null) {
         // 응답이 있는 에러
-        print('Dio error!');
-        print('STATUS: ${e.response?.statusCode}');
-        print('DATA: ${e.response?.data}');
-        print('HEADERS: ${e.response?.headers}');
+        debugPrint('Dio error!');
+        debugPrint('STATUS: ${e.response?.statusCode}');
+        debugPrint('DATA: ${e.response?.data}');
+        debugPrint('HEADERS: ${e.response?.headers}');
       } else {
         // 응답이 없는 에러
-        print('Error sending request!');
-        print(e.message);
+        debugPrint('Error sending request!');
+        debugPrint(e.message);
       }
     } catch (error) {
       return;
@@ -371,869 +371,18 @@ class _PostWritePageState extends State<PostWritePage> {
     //빌드 전 첨부파일의 유효성 확인
     _checkAttachmentsValid();
 
-    PreferredSizeWidget buildAppBar() {
-      return AppBar(
-        centerTitle: true,
-        leading: IconButton(
-          icon: SvgPicture.asset('assets/icons/left_chevron.svg',
-              colorFilter: const ColorFilter.mode(
-                Colors.red,
-                BlendMode.srcIn,
-              ),
-              width: 35,
-              height: 35),
-          onPressed: () => Navigator.pop(context),
-        ),
-        title: const SizedBox(
-          child: Text(
-            "글 쓰기",
-            style: TextStyle(
-              color: ColorsInfo.newara,
-              fontSize: 18,
-              fontWeight: FontWeight.w700,
-            ),
-          ),
-        ),
-        actions: [
-          MaterialButton(
-            /// 포스트 업로드하는 기능
-            /// TODO: 함수 따로 빼기
-            onPressed: canIupload
-                ? (_isEditingPost
-                    ? _managePost(userProvider,
-                        isUpdate: true,
-                        previousArticleId: widget.previousArticle!.id)
-                    : _managePost(userProvider))
-                : null,
-            // 버튼이 클릭되었을 때 수행할 동작
-            padding: EdgeInsets.zero, // 패딩 제거
-            child: canIupload
-                ? Ink(
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(10.0),
-                      color: ColorsInfo.newara,
-                    ),
-                    child: Container(
-                      constraints:
-                          const BoxConstraints(maxWidth: 65.0, maxHeight: 35.0),
-                      alignment: Alignment.center,
-                      child: const Text(
-                        '올리기',
-                        style: TextStyle(color: Colors.white),
-                      ),
-                    ),
-                  )
-                : Ink(
-                    decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(10.0),
-                        color: Colors.transparent,
-                        border: Border.all(
-                          color: const Color(0xFFF0F0F0), // #F0F0F0 색상
-                          width: 1, // 테두리 두께 1픽셀
-                        )),
-                    child: Container(
-                      constraints:
-                          const BoxConstraints(maxWidth: 65.0, maxHeight: 35.0),
-                      alignment: Alignment.center,
-                      child: const Text(
-                        '올리기',
-                        style: TextStyle(color: Color(0xFFBBBBBB)),
-                      ),
-                    ),
-                  ),
-          ),
-        ],
-      );
-    }
-
-    Widget buildMenubar() {
-      return Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 15),
-        child: SizedBox(
-          width: double.infinity,
-          height: 34,
-          child: Row(
-            children: [
-              Flexible(
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: const Color(0xFFF8F8F8),
-                    borderRadius: BorderRadius.circular(20.0),
-                  ),
-                  child: DropdownButtonHideUnderline(
-                    child: DropdownButton<BoardDetailActionModel>(
-                      // TODO: 원하는 메뉴 모양 만들기 위해 속성 테스트 할 것
-                      // isDense: true,
-                      // isExpanded: true,
-
-                      value: _chosenBoardValue,
-                      style: const TextStyle(color: Colors.red),
-                      items: _boardList
-                          .map<DropdownMenuItem<BoardDetailActionModel>>(
-                              (BoardDetailActionModel value) {
-                        return DropdownMenuItem<BoardDetailActionModel>(
-                          enabled: value.id != -1,
-                          value: value,
-                          child: Padding(
-                            padding: const EdgeInsets.only(left: 12.0),
-                            child: Text(
-                              value.ko_name,
-                              style: TextStyle(
-                                color: value.id == -1 || _isEditingPost
-                                    ? const Color(0xFFBBBBBB)
-                                    : ColorsInfo.newara,
-                                fontWeight: FontWeight.w500,
-                                fontSize: 16,
-                              ),
-                            ),
-                          ),
-                        );
-                      }).toList(),
-
-                      /// 게시판 선택 이후 토픽 목록이 변해야 하므로 변경하는 기능 추가
-                      /// TODO: 함수 따로 빼기
-                      onChanged: _isEditingPost ? null : setSpecTopicList,
-                    ),
-                  ),
-                ),
-              ),
-              const SizedBox(
-                width: 10,
-              ),
-              Flexible(
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: const Color(0xFFF8F8F8),
-                    borderRadius: BorderRadius.circular(20.0),
-                  ),
-                  child: DropdownButtonHideUnderline(
-                    child: DropdownButton<TopicModel>(
-                      value: _chosenTopicValue,
-                      style: const TextStyle(color: Colors.red),
-                      items: _specTopicList.map<DropdownMenuItem<TopicModel>>(
-                          (TopicModel value) {
-                        return DropdownMenuItem<TopicModel>(
-                          value: value,
-                          child: Padding(
-                            padding: const EdgeInsets.only(left: 12.0),
-                            child: Text(
-                              value.ko_name,
-                              style: TextStyle(
-                                color: value.id == -1 || _isEditingPost
-                                    ? const Color(0xFFBBBBBB)
-                                    : Colors.black,
-                                fontWeight: FontWeight.w500,
-                                fontSize: 16,
-                              ),
-                            ),
-                          ),
-                        );
-                      }).toList(),
-
-                      /// 토픽 선택하는 기능
-                      /// TODO: 함수 따로 빼기
-                      onChanged: _isEditingPost
-                          ? null
-                          : (TopicModel? value) {
-                              setState(() {
-                                _chosenTopicValue = value;
-                              });
-                            },
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-      );
-    }
-
-    Widget buildTitle() {
-      return SizedBox(
-        height: 39,
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 20),
-          child: TextField(
-            controller: _titleController,
-            focusNode: _titleFocusNode,
-            minLines: 1,
-            maxLines: 1,
-            maxLength: 255,
-            style: const TextStyle(
-              height: 32.56 / 22,
-              fontSize: 22,
-              fontWeight: FontWeight.w700,
-            ),
-            onChanged: (String s) {
-              // build 함수를 다시 실행하여 올릴 수 있는 게시물인지 유효성 검사
-              setState(() {});
-            },
-            decoration: const InputDecoration(
-              hintText: "제목을 입력해주세요.",
-              hintStyle: TextStyle(
-                  height: 32.56 / 22,
-                  fontSize: 22,
-                  color: Color(0xFFBBBBBB),
-                  fontWeight: FontWeight.w700),
-              // counterStyle: TextStyle(
-              //   height: double.minPositive,
-              // ),
-              counterText: "",
-              filled: true,
-              fillColor: Colors.white,
-              isDense: true,
-              isCollapsed: true,
-              contentPadding: EdgeInsets.fromLTRB(0, 0, 0, 0),
-              enabledBorder: OutlineInputBorder(
-                borderSide: BorderSide(
-                  color: Colors.transparent, // 테두리 색상 설정
-                ), // 모서리를 둥글게 설정
-              ),
-              focusedBorder: OutlineInputBorder(
-                borderSide: BorderSide(
-                  color: Colors.transparent, // 테두리 색상 설정
-                ), // 모서리를 둥글게 설정
-              ),
-            ),
-            cursorColor: Colors.transparent,
-          ),
-        ),
-      );
-    }
-
-    Widget buildAttachmentShow() {
-      return KeyboardVisibilityBuilder(
-        builder: (context, isKeyboardVisible) {
-          if (isKeyboardVisible) {
-            return Column(
-              children: [
-                Container(
-                  height: 1,
-                  color: const Color(0xFFF0F0F0),
-                ),
-                SizedBox(
-                  height: 50,
-                  child: Row(
-                    children: [
-                      const Spacer(),
-                      Container(
-                        height: 30,
-                        width: 1,
-                        color: const Color(0xFFF0F0F0),
-                      ),
-                      const SizedBox(
-                        width: 7,
-                      ),
-                      InkWell(
-                        onTap: () {
-                          FocusScope.of(context).unfocus();
-                        },
-                        child: SizedBox(
-                          width: 36,
-                          height: 36,
-                          child: SvgPicture.asset(
-                            'assets/icons/keyboard_down.svg',
-                          ),
-                        ),
-                      ),
-                      const SizedBox(
-                        width: 7,
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            );
-          }
-          return Column(
-            children: [
-              if (_attachmentList.isEmpty)
-                Row(
-                  children: [
-                    Row(
-                      children: [
-                        const SizedBox(
-                          width: 10,
-                        ),
-                        InkWell(
-                          onTap: _pickFile,
-                          child: Row(
-                            children: [
-                              SvgPicture.asset(
-                                'assets/icons/clip.svg',
-                                colorFilter: const ColorFilter.mode(
-                                  Color(0xFF636363),
-                                  BlendMode.srcIn,
-                                ),
-                                width: 34,
-                                height: 34,
-                              ),
-                              const Text(
-                                "첨부파일 추가",
-                                style: TextStyle(
-                                    fontWeight: FontWeight.w500,
-                                    fontSize: 16,
-                                    color: Color(0xFF636363)),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                )
-              else
-                AnimatedSize(
-                  duration: const Duration(milliseconds: 100),
-                  alignment: AlignmentDirectional.topCenter,
-                  child: Column(
-                    children: [
-                      Row(
-                        children: [
-                          const SizedBox(
-                            width: 20,
-                          ),
-                          SizedBox(
-                            height: 34,
-                            child: GestureDetector(
-                              behavior: HitTestBehavior.translucent,
-                              onTap: () {
-                                setState(() {
-                                  _isFileMenuBarSelected =
-                                      !_isFileMenuBarSelected;
-                                });
-                              },
-                              child: Row(
-                                children: [
-                                  const Text(
-                                    "첨부파일",
-                                    style: TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.w500,
-                                    ),
-                                  ),
-                                  const SizedBox(
-                                    width: 8,
-                                  ),
-                                  Text(
-                                    _attachmentList.length.toString(),
-                                    style: const TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.w500,
-                                      color: ColorsInfo.newara,
-                                    ),
-                                  ),
-                                  const SizedBox(
-                                    width: 5,
-                                  ),
-                                  if (_isFileMenuBarSelected)
-                                    SvgPicture.asset(
-                                      'assets/icons/chevron_up.svg',
-                                      width: 20,
-                                      height: 20,
-                                      colorFilter: const ColorFilter.mode(
-                                        Colors.red,
-                                        BlendMode.srcIn,
-                                      ),
-                                    )
-                                  else
-                                    SvgPicture.asset(
-                                      'assets/icons/chevron_down.svg',
-                                      width: 20,
-                                      height: 20,
-                                      colorFilter: const ColorFilter.mode(
-                                        Colors.red,
-                                        BlendMode.srcIn,
-                                      ),
-                                    ),
-                                ],
-                              ),
-                            ),
-                          ),
-                          const Spacer(),
-                          InkWell(
-                            onTap: () => _pickFile(),
-                            child: SvgPicture.asset(
-                              'assets/icons/add.svg',
-                              width: 34,
-                              height: 34,
-                              colorFilter: const ColorFilter.mode(
-                                Color(0xFFED3A3A),
-                                BlendMode.srcIn,
-                              ),
-                            ),
-                          ),
-                          const SizedBox(
-                            width: 14,
-                          ),
-                        ],
-                      ),
-                      if (_isFileMenuBarSelected) ...[
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 15),
-                          child: SizedBox(
-                            //최대 4개까지 첨부파일 보여주고 그 이후로는 스크롤.
-                            //피그마 디자인 기준으로 필요한 높이를 계산함.
-                            height: 10 +
-                                math.min(3, _attachmentList.length) * 44 +
-                                5 * (math.min(3, _attachmentList.length) - 1),
-
-                            child: Column(
-                              children: [
-                                const SizedBox(
-                                  height: 10,
-                                ),
-                                Expanded(
-                                  child: CupertinoScrollbar(
-                                    thumbVisibility: true,
-                                    controller: _listScrollController,
-                                    child: ListView.builder(
-                                      controller: _listScrollController,
-                                      shrinkWrap: true,
-                                      itemCount: _attachmentList.length,
-                                      itemBuilder: (context, index) {
-                                        return Column(
-                                          children: [
-                                            if (index != 0)
-                                              const SizedBox(
-                                                height: 5,
-                                              ),
-                                            Container(
-                                              height: 44,
-                                              decoration: BoxDecoration(
-                                                border: Border.all(
-                                                  color: const Color(
-                                                      0xFFF0F0F0), // #F0F0F0 색상
-                                                  width: 1, // 테두리 두께 1픽셀
-                                                ),
-                                                borderRadius:
-                                                    BorderRadius.circular(
-                                                        15), // 반지름 15
-                                              ),
-                                              child: Row(
-                                                children: [
-                                                  const SizedBox(
-                                                    width: 6,
-                                                  ),
-                                                  SvgPicture.asset(
-                                                    'assets/icons/pdf.svg',
-                                                    width: 30,
-                                                    height: 30,
-                                                    colorFilter:
-                                                        const ColorFilter.mode(
-                                                            Colors.black,
-                                                            BlendMode.srcIn),
-                                                  ),
-                                                  const SizedBox(
-                                                    width: 3,
-                                                  ),
-                                                  Expanded(
-                                                    child: Text(
-                                                      _attachmentList[index]
-                                                              .isNewFile
-                                                          ? path.basename(
-                                                              _attachmentList[
-                                                                      index]
-                                                                  .fileLocalPath!)
-                                                          : _attachmentList[
-                                                                  index]
-                                                              .fileUrlName,
-                                                      maxLines: 1,
-                                                      overflow:
-                                                          TextOverflow.ellipsis,
-                                                    ),
-                                                  ),
-                                                  const SizedBox(
-                                                    width: 3,
-                                                  ),
-                                                  Text(
-                                                    _attachmentList[index]
-                                                            .isNewFile
-                                                        ? formatBytes(File(
-                                                                _attachmentList[
-                                                                        index]
-                                                                    .fileLocalPath!)
-                                                            .lengthSync())
-                                                        : formatBytes(
-                                                            _attachmentList[
-                                                                    index]
-                                                                .fileUrlSize),
-                                                    style: const TextStyle(
-                                                        fontSize: 14,
-                                                        fontWeight:
-                                                            FontWeight.w500,
-                                                        color:
-                                                            Color(0xFFBBBBBB)),
-                                                  ),
-                                                  InkWell(
-                                                    onTap: () {
-                                                      _onAttachmentDelete(
-                                                          index);
-                                                    },
-                                                    child: SvgPicture.asset(
-                                                      'assets/icons/close.svg',
-                                                      width: 30,
-                                                      height: 30,
-                                                      colorFilter:
-                                                          const ColorFilter
-                                                              .mode(
-                                                              Color(0xFFBBBBBB),
-                                                              BlendMode.srcIn),
-                                                    ),
-                                                  ),
-                                                  const SizedBox(
-                                                    width: 8.52,
-                                                  ),
-                                                ],
-                                              ),
-                                            ),
-                                          ],
-                                        );
-                                      },
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                      ],
-                    ],
-                  ),
-                ),
-              const SizedBox(
-                height: 15,
-              ),
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
-                  const SizedBox(
-                    width: 20,
-                  ),
-                  // TODO: 익명 선택 범위 화면 영역 확대(resolved)
-                  // 자유 게시판인 경우 && 수정 게시물이 아닌 경우
-                  if (_chosenBoardValue != null &&
-                      _isEditingPost == false &&
-                      _chosenBoardValue!.slug == 'talk')
-                    Row(
-                      children: [
-                        GestureDetector(
-                          onTap: () {
-                            setState(() {
-                              _selectedCheckboxes[0] = !_selectedCheckboxes[0]!;
-                            });
-                          },
-                          child: Row(
-                            children: [
-                              Container(
-                                width: 20,
-                                height: 20,
-                                decoration: BoxDecoration(
-                                  color: _selectedCheckboxes[0]!
-                                      ? ColorsInfo.newara
-                                      : const Color(0xFFF0F0F0),
-                                  borderRadius: BorderRadius.circular(5.0),
-                                ),
-                                alignment: Alignment.center,
-                                child: SvgPicture.asset(
-                                    'assets/icons/check.svg',
-                                    width: 16,
-                                    height: 16,
-                                    colorFilter: const ColorFilter.mode(
-                                        Colors.white, BlendMode.srcIn)),
-                              ),
-                              const SizedBox(
-                                width: 6,
-                              ),
-                              Text(
-                                "익명",
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w500,
-                                  color: _selectedCheckboxes[0]!
-                                      ? ColorsInfo.newara
-                                      : const Color(0xFFBBBBBB),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        const SizedBox(
-                          width: 15,
-                        ),
-                      ],
-                    ),
-
-                  //TODO: 터치 부분이 너무 작아서 불편함.
-                  GestureDetector(
-                    onTap: () {
-                      setState(() {
-                        //성인 체크 박스
-                        _selectedCheckboxes[1] = !_selectedCheckboxes[1]!;
-                      });
-                    },
-                    child: Row(
-                      children: [
-                        Container(
-                          width: 20,
-                          height: 20,
-                          decoration: BoxDecoration(
-                            color: _selectedCheckboxes[1]!
-                                ? ColorsInfo.newara
-                                : const Color(0xFFF0F0F0),
-                            borderRadius: BorderRadius.circular(5.0),
-                          ),
-                          alignment: Alignment.center,
-                          child: SvgPicture.asset(
-                            'assets/icons/check.svg',
-                            width: 16,
-                            height: 16,
-                            colorFilter: const ColorFilter.mode(
-                                Colors.white, BlendMode.srcIn), // #FFFFFF 색상
-                          ),
-                        ),
-                        const SizedBox(
-                          width: 6,
-                        ),
-                        Text(
-                          "성인",
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w500,
-                            color: _selectedCheckboxes[1]!
-                                ? ColorsInfo.newara
-                                : const Color(0xFFBBBBBB),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-
-                  const SizedBox(
-                    width: 15,
-                  ),
-                  GestureDetector(
-                    onTap: () {
-                      setState(() {
-                        //정치 체크 박스
-                        _selectedCheckboxes[2] = !_selectedCheckboxes[2]!;
-                      });
-                    },
-                    child: Row(
-                      children: [
-                        Container(
-                          width: 20,
-                          height: 20,
-                          decoration: BoxDecoration(
-                            color: _selectedCheckboxes[2]!
-                                ? ColorsInfo.newara
-                                : const Color(0xFFF0F0F0),
-                            borderRadius: BorderRadius.circular(5.0),
-                          ),
-                          alignment: Alignment.center,
-                          child: SvgPicture.asset(
-                            'assets/icons/check.svg',
-                            width: 16,
-                            height: 16,
-                            colorFilter: const ColorFilter.mode(
-                                Colors.white, BlendMode.srcIn), // #FFFFFF 색상
-                          ),
-                        ),
-                        const SizedBox(
-                          width: 6,
-                        ),
-                        Text(
-                          "정치",
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w500,
-                            color: _selectedCheckboxes[2]!
-                                ? ColorsInfo.newara
-                                : const Color(0xFFBBBBBB),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-
-                  const Spacer(),
-                  GestureDetector(
-                    child: const Text(
-                      "이용약관",
-                      style: TextStyle(
-                        decoration: TextDecoration.underline,
-                        fontSize: 16,
-                        fontWeight: FontWeight.w500,
-                        color: Color(0xFFBBBBBB),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(
-                    width: 20,
-                  ),
-                ],
-              ),
-              const SizedBox(
-                height: 20,
-              )
-            ],
-          );
-        },
-      );
-    }
-
-    Widget buildToolbar() {
-      return Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 20),
-        child: quill.QuillToolbar.basic(
-          controller: _quillController,
-          multiRowsDisplay: true,
-          showUndo: false,
-          showRedo: false,
-          showColorButton: false,
-          showBackgroundColorButton: false,
-          showFontFamily: false,
-          showFontSize: false,
-          showDividers: false,
-          showListCheck: false,
-          showSearchButton: false,
-          showSubscript: false,
-          showSuperscript: false,
-
-          toolbarIconAlignment: WrapAlignment.start,
-          toolbarIconCrossAlignment: WrapCrossAlignment.start,
-          customButtons: [
-            quill.QuillCustomButton(
-              icon: Icons.camera_alt,
-              onTap: _pickImage,
-            ),
-          ],
-          // embedButtons: FlutterQuillEmbeds.buttons(),
-        ),
-      );
-    }
-
-    quill.DefaultStyles editorStyles() {
-      TextStyle h1h2h3h4h5h6CommonStyle = const TextStyle(
-        color: Colors.black,
-        fontWeight: FontWeight.w600,
-        fontFamily: 'NotoSansKR',
-        height: 1.15,
-      );
-      return quill.DefaultStyles(
-        h1: quill.DefaultTextBlockStyle(
-          h1h2h3h4h5h6CommonStyle.copyWith(
-            fontSize: 32,
-          ),
-          // Vertical spacing around a text block.
-          const quill.VerticalSpacing(2, 0),
-          // Vertical spacing for individual lines within a text block.
-          const quill.VerticalSpacing(0, 0),
-          null,
-        ),
-        h2: quill.DefaultTextBlockStyle(
-          h1h2h3h4h5h6CommonStyle.copyWith(
-            fontSize: 28,
-          ),
-          const quill.VerticalSpacing(2, 0),
-          const quill.VerticalSpacing(0, 0),
-          null,
-        ),
-        h3: quill.DefaultTextBlockStyle(
-          h1h2h3h4h5h6CommonStyle.copyWith(
-            fontSize: 24,
-          ),
-          const quill.VerticalSpacing(2, 0),
-          const quill.VerticalSpacing(0, 0),
-          null,
-        ),
-        paragraph: quill.DefaultTextBlockStyle(
-          const TextStyle(
-            color: Color(0xFF4a4a4a),
-            fontWeight: FontWeight.w500,
-            fontFamily: 'NotoSansKR',
-            height: 1.5,
-            fontSize: 16,
-          ),
-          const quill.VerticalSpacing(2, 0),
-          const quill.VerticalSpacing(0, 0),
-          null,
-        ),
-        bold: const TextStyle(
-            color: Color(0xff363636),
-            fontFamily: 'NotoSansKR',
-            fontWeight: FontWeight.w700),
-        italic: const TextStyle(
-          fontFamily: 'NotoSansKR',
-          fontStyle: FontStyle.italic,
-        ),
-        underline: const TextStyle(
-          fontFamily: 'NatoSansKR',
-          decoration: TextDecoration.underline,
-        ),
-        code: quill.DefaultTextBlockStyle(
-          const TextStyle(
-            //  backgroundColor: Colors.grey,
-            color: Color(0xFF4a4a4a),
-            fontWeight: FontWeight.w400,
-            fontFamily: 'NotoSansKR',
-            height: 1.5,
-            fontSize: 16,
-          ),
-          const quill.VerticalSpacing(2, 0),
-          const quill.VerticalSpacing(0, 0),
-          null,
-        ),
-        placeHolder: quill.DefaultTextBlockStyle(
-          const TextStyle(
-            color: Color(0xFFBBBBBB),
-            fontWeight: FontWeight.w500,
-            fontFamily: 'NotoSansKR',
-            height: 1.5,
-            fontSize: 16,
-          ),
-          const quill.VerticalSpacing(2, 0),
-          const quill.VerticalSpacing(0, 0),
-          null,
-        ),
-
-        //   small
-      );
-    }
-
-    Widget buildEditor() {
-      return Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 20),
-        child: quill.QuillEditor(
-          focusNode: _editorFocusNode,
-          controller: _quillController,
-          placeholder: '내용을 입력해주세요.',
-          embedBuilders: FlutterQuillEmbeds.builders(),
-          readOnly: false, // The editor is editable
-
-          scrollController: ScrollController(),
-          padding: EdgeInsets.zero,
-          scrollable: true,
-          autoFocus: true,
-          expands: false,
-          customStyles: editorStyles(),
-        ),
-      );
-    }
-
     return _isLoading
         ? const LoadingIndicator()
         : Scaffold(
-            appBar: buildAppBar(),
+            appBar: _buildAppBar(canIupload),
             body: SafeArea(
               child: Column(
                 children: [
-                  buildMenubar(),
+                  _buildMenubar(),
                   SizedBox(
                     height: 20,
                   ),
-                  buildTitle(),
+                  _buildTitle(),
                   SizedBox(height: 15),
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -1245,16 +394,861 @@ class _PostWritePageState extends State<PostWritePage> {
                   SizedBox(
                     height: 20,
                   ),
-                  buildToolbar(),
+                  _buildToolbar(),
                   SizedBox(
                     height: 10,
                   ),
-                  Expanded(child: buildEditor()),
-                  buildAttachmentShow()
+                  Expanded(child: _buildEditor()),
+                  _buildAttachmentShow()
                 ],
               ),
             ),
           );
+  }
+
+  PreferredSizeWidget _buildAppBar(bool canIupload) {
+    return AppBar(
+      centerTitle: true,
+      leading: IconButton(
+        icon: SvgPicture.asset('assets/icons/left_chevron.svg',
+            colorFilter: const ColorFilter.mode(
+              Colors.red,
+              BlendMode.srcIn,
+            ),
+            width: 35,
+            height: 35),
+        onPressed: () => Navigator.pop(context),
+      ),
+      title: const SizedBox(
+        child: Text(
+          "글 쓰기",
+          style: TextStyle(
+            color: ColorsInfo.newara,
+            fontSize: 18,
+            fontWeight: FontWeight.w700,
+          ),
+        ),
+      ),
+      actions: [
+        MaterialButton(
+          /// 포스트 업로드하는 기능
+          /// TODO: 함수 따로 빼기
+          onPressed: canIupload
+              ? (_isEditingPost
+                  ? _managePost(
+                      isUpdate: true,
+                      previousArticleId: widget.previousArticle!.id)
+                  : _managePost())
+              : null,
+          // 버튼이 클릭되었을 때 수행할 동작
+          padding: EdgeInsets.zero, // 패딩 제거
+          child: canIupload
+              ? Ink(
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(10.0),
+                    color: ColorsInfo.newara,
+                  ),
+                  child: Container(
+                    constraints:
+                        const BoxConstraints(maxWidth: 65.0, maxHeight: 35.0),
+                    alignment: Alignment.center,
+                    child: const Text(
+                      '올리기',
+                      style: TextStyle(color: Colors.white),
+                    ),
+                  ),
+                )
+              : Ink(
+                  decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(10.0),
+                      color: Colors.transparent,
+                      border: Border.all(
+                        color: const Color(0xFFF0F0F0), // #F0F0F0 색상
+                        width: 1, // 테두리 두께 1픽셀
+                      )),
+                  child: Container(
+                    constraints:
+                        const BoxConstraints(maxWidth: 65.0, maxHeight: 35.0),
+                    alignment: Alignment.center,
+                    child: const Text(
+                      '올리기',
+                      style: TextStyle(color: Color(0xFFBBBBBB)),
+                    ),
+                  ),
+                ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildMenubar() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 15),
+      child: SizedBox(
+        width: double.infinity,
+        height: 34,
+        child: Row(
+          children: [
+            Flexible(
+              child: Container(
+                decoration: BoxDecoration(
+                  color: const Color(0xFFF8F8F8),
+                  borderRadius: BorderRadius.circular(20.0),
+                ),
+                child: DropdownButtonHideUnderline(
+                  child: DropdownButton<BoardDetailActionModel>(
+                    // TODO: 원하는 메뉴 모양 만들기 위해 속성 테스트 할 것
+                    // isDense: true,
+                    // isExpanded: true,
+
+                    value: _chosenBoardValue,
+                    style: const TextStyle(color: Colors.red),
+                    items: _boardList
+                        .map<DropdownMenuItem<BoardDetailActionModel>>(
+                            (BoardDetailActionModel value) {
+                      return DropdownMenuItem<BoardDetailActionModel>(
+                        enabled: value.id != -1,
+                        value: value,
+                        child: Padding(
+                          padding: const EdgeInsets.only(left: 12.0),
+                          child: Text(
+                            value.ko_name,
+                            style: TextStyle(
+                              color: value.id == -1 || _isEditingPost
+                                  ? const Color(0xFFBBBBBB)
+                                  : ColorsInfo.newara,
+                              fontWeight: FontWeight.w500,
+                              fontSize: 16,
+                            ),
+                          ),
+                        ),
+                      );
+                    }).toList(),
+
+                    /// 게시판 선택 이후 토픽 목록이 변해야 하므로 변경하는 기능 추가
+                    /// TODO: 함수 따로 빼기
+                    onChanged: _isEditingPost ? null : setSpecTopicList,
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(
+              width: 10,
+            ),
+            Flexible(
+              child: Container(
+                decoration: BoxDecoration(
+                  color: const Color(0xFFF8F8F8),
+                  borderRadius: BorderRadius.circular(20.0),
+                ),
+                child: DropdownButtonHideUnderline(
+                  child: DropdownButton<TopicModel>(
+                    value: _chosenTopicValue,
+                    style: const TextStyle(color: Colors.red),
+                    items: _specTopicList
+                        .map<DropdownMenuItem<TopicModel>>((TopicModel value) {
+                      return DropdownMenuItem<TopicModel>(
+                        value: value,
+                        child: Padding(
+                          padding: const EdgeInsets.only(left: 12.0),
+                          child: Text(
+                            value.ko_name,
+                            style: TextStyle(
+                              color: value.id == -1 || _isEditingPost
+                                  ? const Color(0xFFBBBBBB)
+                                  : Colors.black,
+                              fontWeight: FontWeight.w500,
+                              fontSize: 16,
+                            ),
+                          ),
+                        ),
+                      );
+                    }).toList(),
+
+                    /// 토픽 선택하는 기능
+                    /// TODO: 함수 따로 빼기
+                    onChanged: _isEditingPost
+                        ? null
+                        : (TopicModel? value) {
+                            setState(() {
+                              _chosenTopicValue = value;
+                            });
+                          },
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildTitle() {
+    return SizedBox(
+      height: 39,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 20),
+        child: TextField(
+          controller: _titleController,
+          focusNode: _titleFocusNode,
+          minLines: 1,
+          maxLines: 1,
+          maxLength: 255,
+          style: const TextStyle(
+            height: 32.56 / 22,
+            fontSize: 22,
+            fontWeight: FontWeight.w700,
+          ),
+          onChanged: (String s) {
+            // build 함수를 다시 실행하여 올릴 수 있는 게시물인지 유효성 검사
+            setState(() {});
+          },
+          decoration: const InputDecoration(
+            hintText: "제목을 입력해주세요.",
+            hintStyle: TextStyle(
+                height: 32.56 / 22,
+                fontSize: 22,
+                color: Color(0xFFBBBBBB),
+                fontWeight: FontWeight.w700),
+            // counterStyle: TextStyle(
+            //   height: double.minPositive,
+            // ),
+            counterText: "",
+            filled: true,
+            fillColor: Colors.white,
+            isDense: true,
+            isCollapsed: true,
+            contentPadding: EdgeInsets.fromLTRB(0, 0, 0, 0),
+            enabledBorder: OutlineInputBorder(
+              borderSide: BorderSide(
+                color: Colors.transparent, // 테두리 색상 설정
+              ), // 모서리를 둥글게 설정
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderSide: BorderSide(
+                color: Colors.transparent, // 테두리 색상 설정
+              ), // 모서리를 둥글게 설정
+            ),
+          ),
+          cursorColor: Colors.transparent,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildAttachmentShow() {
+    return KeyboardVisibilityBuilder(
+      builder: (context, isKeyboardVisible) {
+        if (isKeyboardVisible) {
+          return Column(
+            children: [
+              Container(
+                height: 1,
+                color: const Color(0xFFF0F0F0),
+              ),
+              SizedBox(
+                height: 50,
+                child: Row(
+                  children: [
+                    const Spacer(),
+                    Container(
+                      height: 30,
+                      width: 1,
+                      color: const Color(0xFFF0F0F0),
+                    ),
+                    const SizedBox(
+                      width: 7,
+                    ),
+                    InkWell(
+                      onTap: () {
+                        FocusScope.of(context).unfocus();
+                      },
+                      child: SizedBox(
+                        width: 36,
+                        height: 36,
+                        child: SvgPicture.asset(
+                          'assets/icons/keyboard_down.svg',
+                        ),
+                      ),
+                    ),
+                    const SizedBox(
+                      width: 7,
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          );
+        }
+        return Column(
+          children: [
+            if (_attachmentList.isEmpty)
+              Row(
+                children: [
+                  Row(
+                    children: [
+                      const SizedBox(
+                        width: 10,
+                      ),
+                      InkWell(
+                        onTap: _pickFile,
+                        child: Row(
+                          children: [
+                            SvgPicture.asset(
+                              'assets/icons/clip.svg',
+                              colorFilter: const ColorFilter.mode(
+                                Color(0xFF636363),
+                                BlendMode.srcIn,
+                              ),
+                              width: 34,
+                              height: 34,
+                            ),
+                            const Text(
+                              "첨부파일 추가",
+                              style: TextStyle(
+                                  fontWeight: FontWeight.w500,
+                                  fontSize: 16,
+                                  color: Color(0xFF636363)),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              )
+            else
+              AnimatedSize(
+                duration: const Duration(milliseconds: 100),
+                alignment: AlignmentDirectional.topCenter,
+                child: Column(
+                  children: [
+                    Row(
+                      children: [
+                        const SizedBox(
+                          width: 20,
+                        ),
+                        SizedBox(
+                          height: 34,
+                          child: GestureDetector(
+                            behavior: HitTestBehavior.translucent,
+                            onTap: () {
+                              setState(() {
+                                _isFileMenuBarSelected =
+                                    !_isFileMenuBarSelected;
+                              });
+                            },
+                            child: Row(
+                              children: [
+                                const Text(
+                                  "첨부파일",
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                                const SizedBox(
+                                  width: 8,
+                                ),
+                                Text(
+                                  _attachmentList.length.toString(),
+                                  style: const TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w500,
+                                    color: ColorsInfo.newara,
+                                  ),
+                                ),
+                                const SizedBox(
+                                  width: 5,
+                                ),
+                                if (_isFileMenuBarSelected)
+                                  SvgPicture.asset(
+                                    'assets/icons/chevron_up.svg',
+                                    width: 20,
+                                    height: 20,
+                                    colorFilter: const ColorFilter.mode(
+                                      Colors.red,
+                                      BlendMode.srcIn,
+                                    ),
+                                  )
+                                else
+                                  SvgPicture.asset(
+                                    'assets/icons/chevron_down.svg',
+                                    width: 20,
+                                    height: 20,
+                                    colorFilter: const ColorFilter.mode(
+                                      Colors.red,
+                                      BlendMode.srcIn,
+                                    ),
+                                  ),
+                              ],
+                            ),
+                          ),
+                        ),
+                        const Spacer(),
+                        InkWell(
+                          onTap: () => _pickFile(),
+                          child: SvgPicture.asset(
+                            'assets/icons/add.svg',
+                            width: 34,
+                            height: 34,
+                            colorFilter: const ColorFilter.mode(
+                              Color(0xFFED3A3A),
+                              BlendMode.srcIn,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(
+                          width: 14,
+                        ),
+                      ],
+                    ),
+                    if (_isFileMenuBarSelected) ...[
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 15),
+                        child: SizedBox(
+                          //최대 4개까지 첨부파일 보여주고 그 이후로는 스크롤.
+                          //피그마 디자인 기준으로 필요한 높이를 계산함.
+                          height: 10 +
+                              math.min(3, _attachmentList.length) * 44 +
+                              5 * (math.min(3, _attachmentList.length) - 1),
+
+                          child: Column(
+                            children: [
+                              const SizedBox(
+                                height: 10,
+                              ),
+                              Expanded(
+                                child: CupertinoScrollbar(
+                                  thumbVisibility: true,
+                                  controller: _listScrollController,
+                                  child: ListView.builder(
+                                    controller: _listScrollController,
+                                    shrinkWrap: true,
+                                    itemCount: _attachmentList.length,
+                                    itemBuilder: (context, index) {
+                                      return Column(
+                                        children: [
+                                          if (index != 0)
+                                            const SizedBox(
+                                              height: 5,
+                                            ),
+                                          Container(
+                                            height: 44,
+                                            decoration: BoxDecoration(
+                                              border: Border.all(
+                                                color: const Color(
+                                                    0xFFF0F0F0), // #F0F0F0 색상
+                                                width: 1, // 테두리 두께 1픽셀
+                                              ),
+                                              borderRadius:
+                                                  BorderRadius.circular(
+                                                      15), // 반지름 15
+                                            ),
+                                            child: Row(
+                                              children: [
+                                                const SizedBox(
+                                                  width: 6,
+                                                ),
+                                                SvgPicture.asset(
+                                                  'assets/icons/pdf.svg',
+                                                  width: 30,
+                                                  height: 30,
+                                                  colorFilter:
+                                                      const ColorFilter.mode(
+                                                          Colors.black,
+                                                          BlendMode.srcIn),
+                                                ),
+                                                const SizedBox(
+                                                  width: 3,
+                                                ),
+                                                Expanded(
+                                                  child: Text(
+                                                    _attachmentList[index]
+                                                            .isNewFile
+                                                        ? path.basename(
+                                                            _attachmentList[
+                                                                    index]
+                                                                .fileLocalPath!)
+                                                        : _attachmentList[index]
+                                                            .fileUrlName,
+                                                    maxLines: 1,
+                                                    overflow:
+                                                        TextOverflow.ellipsis,
+                                                  ),
+                                                ),
+                                                const SizedBox(
+                                                  width: 3,
+                                                ),
+                                                Text(
+                                                  _attachmentList[index]
+                                                          .isNewFile
+                                                      ? formatBytes(File(
+                                                              _attachmentList[
+                                                                      index]
+                                                                  .fileLocalPath!)
+                                                          .lengthSync())
+                                                      : formatBytes(
+                                                          _attachmentList[index]
+                                                              .fileUrlSize),
+                                                  style: const TextStyle(
+                                                      fontSize: 14,
+                                                      fontWeight:
+                                                          FontWeight.w500,
+                                                      color: Color(0xFFBBBBBB)),
+                                                ),
+                                                InkWell(
+                                                  onTap: () {
+                                                    _onAttachmentDelete(index);
+                                                  },
+                                                  child: SvgPicture.asset(
+                                                    'assets/icons/close.svg',
+                                                    width: 30,
+                                                    height: 30,
+                                                    colorFilter:
+                                                        const ColorFilter.mode(
+                                                            Color(0xFFBBBBBB),
+                                                            BlendMode.srcIn),
+                                                  ),
+                                                ),
+                                                const SizedBox(
+                                                  width: 8.52,
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        ],
+                                      );
+                                    },
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
+                  ],
+                ),
+              ),
+            const SizedBox(
+              height: 15,
+            ),
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                const SizedBox(
+                  width: 20,
+                ),
+                // TODO: 익명 선택 범위 화면 영역 확대(resolved)
+                // 자유 게시판인 경우 && 수정 게시물이 아닌 경우
+                if (_chosenBoardValue != null &&
+                    _isEditingPost == false &&
+                    _chosenBoardValue!.slug == 'talk')
+                  Row(
+                    children: [
+                      GestureDetector(
+                        onTap: () {
+                          setState(() {
+                            _selectedCheckboxes[0] = !_selectedCheckboxes[0]!;
+                          });
+                        },
+                        child: Row(
+                          children: [
+                            Container(
+                              width: 20,
+                              height: 20,
+                              decoration: BoxDecoration(
+                                color: _selectedCheckboxes[0]!
+                                    ? ColorsInfo.newara
+                                    : const Color(0xFFF0F0F0),
+                                borderRadius: BorderRadius.circular(5.0),
+                              ),
+                              alignment: Alignment.center,
+                              child: SvgPicture.asset('assets/icons/check.svg',
+                                  width: 16,
+                                  height: 16,
+                                  colorFilter: const ColorFilter.mode(
+                                      Colors.white, BlendMode.srcIn)),
+                            ),
+                            const SizedBox(
+                              width: 6,
+                            ),
+                            Text(
+                              "익명",
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w500,
+                                color: _selectedCheckboxes[0]!
+                                    ? ColorsInfo.newara
+                                    : const Color(0xFFBBBBBB),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(
+                        width: 15,
+                      ),
+                    ],
+                  ),
+
+                //TODO: 터치 부분이 너무 작아서 불편함.
+                GestureDetector(
+                  onTap: () {
+                    setState(() {
+                      //성인 체크 박스
+                      _selectedCheckboxes[1] = !_selectedCheckboxes[1]!;
+                    });
+                  },
+                  child: Row(
+                    children: [
+                      Container(
+                        width: 20,
+                        height: 20,
+                        decoration: BoxDecoration(
+                          color: _selectedCheckboxes[1]!
+                              ? ColorsInfo.newara
+                              : const Color(0xFFF0F0F0),
+                          borderRadius: BorderRadius.circular(5.0),
+                        ),
+                        alignment: Alignment.center,
+                        child: SvgPicture.asset(
+                          'assets/icons/check.svg',
+                          width: 16,
+                          height: 16,
+                          colorFilter: const ColorFilter.mode(
+                              Colors.white, BlendMode.srcIn), // #FFFFFF 색상
+                        ),
+                      ),
+                      const SizedBox(
+                        width: 6,
+                      ),
+                      Text(
+                        "성인",
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w500,
+                          color: _selectedCheckboxes[1]!
+                              ? ColorsInfo.newara
+                              : const Color(0xFFBBBBBB),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+
+                const SizedBox(
+                  width: 15,
+                ),
+                GestureDetector(
+                  onTap: () {
+                    setState(() {
+                      //정치 체크 박스
+                      _selectedCheckboxes[2] = !_selectedCheckboxes[2]!;
+                    });
+                  },
+                  child: Row(
+                    children: [
+                      Container(
+                        width: 20,
+                        height: 20,
+                        decoration: BoxDecoration(
+                          color: _selectedCheckboxes[2]!
+                              ? ColorsInfo.newara
+                              : const Color(0xFFF0F0F0),
+                          borderRadius: BorderRadius.circular(5.0),
+                        ),
+                        alignment: Alignment.center,
+                        child: SvgPicture.asset(
+                          'assets/icons/check.svg',
+                          width: 16,
+                          height: 16,
+                          colorFilter: const ColorFilter.mode(
+                              Colors.white, BlendMode.srcIn), // #FFFFFF 색상
+                        ),
+                      ),
+                      const SizedBox(
+                        width: 6,
+                      ),
+                      Text(
+                        "정치",
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w500,
+                          color: _selectedCheckboxes[2]!
+                              ? ColorsInfo.newara
+                              : const Color(0xFFBBBBBB),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+
+                const Spacer(),
+                GestureDetector(
+                  child: const Text(
+                    "이용약관",
+                    style: TextStyle(
+                      decoration: TextDecoration.underline,
+                      fontSize: 16,
+                      fontWeight: FontWeight.w500,
+                      color: Color(0xFFBBBBBB),
+                    ),
+                  ),
+                ),
+                const SizedBox(
+                  width: 20,
+                ),
+              ],
+            ),
+            const SizedBox(
+              height: 20,
+            )
+          ],
+        );
+      },
+    );
+  }
+
+  Widget _buildToolbar() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 20),
+      child: quill.QuillToolbar.basic(
+        controller: _quillController,
+        multiRowsDisplay: true,
+        showUndo: false,
+        showRedo: false,
+        showColorButton: false,
+        showBackgroundColorButton: false,
+        showFontFamily: false,
+        showFontSize: false,
+        showDividers: false,
+        showListCheck: false,
+        showSearchButton: false,
+        showSubscript: false,
+        showSuperscript: false,
+
+        toolbarIconAlignment: WrapAlignment.start,
+        toolbarIconCrossAlignment: WrapCrossAlignment.start,
+        customButtons: [
+          quill.QuillCustomButton(
+            icon: Icons.camera_alt,
+            onTap: _pickImage,
+          ),
+        ],
+        // embedButtons: FlutterQuillEmbeds.buttons(),
+      ),
+    );
+  }
+
+  quill.DefaultStyles editorStyles() {
+    TextStyle h1h2h3h4h5h6CommonStyle = const TextStyle(
+      color: Colors.black,
+      fontWeight: FontWeight.w600,
+      fontFamily: 'NotoSansKR',
+      height: 1.15,
+    );
+    return quill.DefaultStyles(
+      h1: quill.DefaultTextBlockStyle(
+        h1h2h3h4h5h6CommonStyle.copyWith(
+          fontSize: 32,
+        ),
+        // Vertical spacing around a text block.
+        const quill.VerticalSpacing(2, 0),
+        // Vertical spacing for individual lines within a text block.
+        const quill.VerticalSpacing(0, 0),
+        null,
+      ),
+      h2: quill.DefaultTextBlockStyle(
+        h1h2h3h4h5h6CommonStyle.copyWith(
+          fontSize: 28,
+        ),
+        const quill.VerticalSpacing(2, 0),
+        const quill.VerticalSpacing(0, 0),
+        null,
+      ),
+      h3: quill.DefaultTextBlockStyle(
+        h1h2h3h4h5h6CommonStyle.copyWith(
+          fontSize: 24,
+        ),
+        const quill.VerticalSpacing(2, 0),
+        const quill.VerticalSpacing(0, 0),
+        null,
+      ),
+      paragraph: quill.DefaultTextBlockStyle(
+        const TextStyle(
+          color: Color(0xFF4a4a4a),
+          fontWeight: FontWeight.w500,
+          fontFamily: 'NotoSansKR',
+          height: 1.5,
+          fontSize: 16,
+        ),
+        const quill.VerticalSpacing(2, 0),
+        const quill.VerticalSpacing(0, 0),
+        null,
+      ),
+      bold: const TextStyle(
+          color: Color(0xff363636),
+          fontFamily: 'NotoSansKR',
+          fontWeight: FontWeight.w700),
+      italic: const TextStyle(
+        fontFamily: 'NotoSansKR',
+        fontStyle: FontStyle.italic,
+      ),
+      underline: const TextStyle(
+        fontFamily: 'NatoSansKR',
+        decoration: TextDecoration.underline,
+      ),
+      code: quill.DefaultTextBlockStyle(
+        const TextStyle(
+          //  backgroundColor: Colors.grey,
+          color: Color(0xFF4a4a4a),
+          fontWeight: FontWeight.w400,
+          fontFamily: 'NotoSansKR',
+          height: 1.5,
+          fontSize: 16,
+        ),
+        const quill.VerticalSpacing(2, 0),
+        const quill.VerticalSpacing(0, 0),
+        null,
+      ),
+      placeHolder: quill.DefaultTextBlockStyle(
+        const TextStyle(
+          color: Color(0xFFBBBBBB),
+          fontWeight: FontWeight.w500,
+          fontFamily: 'NotoSansKR',
+          height: 1.5,
+          fontSize: 16,
+        ),
+        const quill.VerticalSpacing(2, 0),
+        const quill.VerticalSpacing(0, 0),
+        null,
+      ),
+
+      //   small
+    );
+  }
+
+  Widget _buildEditor() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 20),
+      child: quill.QuillEditor(
+        focusNode: _editorFocusNode,
+        controller: _quillController,
+        placeholder: '내용을 입력해주세요.',
+        embedBuilders: FlutterQuillEmbeds.builders(),
+        readOnly: false, // The editor is editable
+
+        scrollController: ScrollController(),
+        padding: EdgeInsets.zero,
+        scrollable: true,
+        autoFocus: true,
+        expands: false,
+        customStyles: editorStyles(),
+      ),
+    );
   }
 
   /// _attachmentList 의 첨부파일이 존재하는 파일인지 유효성 확인하는 함수
@@ -1354,8 +1348,12 @@ class _PostWritePageState extends State<PostWritePage> {
   /// 1. 포스트 입력 값을 가져온다..
   /// 2. 첨부 파일이 있으면 서버에 업로드하고, 해당 파일의 ID를 가져온다.
   /// 3. 제목, 내용 및 첨부 파일 ID를 함께 서버에 전송하여 포스트를 생성한다.
-  void Function() _managePost(UserProvider userProvider,
-      {bool isUpdate = false, int? previousArticleId}) {
+  /// isUpdate: 수정하는 경우 true, 새로운 글 작성하는 경우 false
+  /// previousArticleId: 수정하는 경우 수정할 글의 id
+  void Function() _managePost(
+      {bool isUpdate = false, int? previousArticleId 
+      }) {
+    UserProvider userProvider = context.read<UserProvider>();
     return () async {
       String titleValue;
       String contentValue;
@@ -1397,14 +1395,14 @@ class _PostWritePageState extends State<PostWritePage> {
               // Handle the DioError separately to handle only Dio related errors
               if (e.response != null) {
                 // DioError contains response data
-                print('Dio error!');
-                print('STATUS: ${e.response?.statusCode}');
-                print('DATA: ${e.response?.data}');
-                print('HEADERS: ${e.response?.headers}');
+                debugPrint('Dio error!');
+                debugPrint('STATUS: ${e.response?.statusCode}');
+                debugPrint('DATA: ${e.response?.data}');
+                debugPrint('HEADERS: ${e.response?.headers}');
               } else {
                 // Error due to setting up or sending/receiving the request
-                print('Error sending request!');
-                print(e.message);
+                debugPrint('Error sending request!');
+                debugPrint(e.message);
               }
             } catch (error) {
               debugPrint("$error");
