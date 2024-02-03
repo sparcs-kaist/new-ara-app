@@ -103,6 +103,17 @@ class _UserPageState extends State<UserPage>
   /// API 통신을 위해 userProvider를 전달받으며
   /// 별도의 리턴값 없이 작업 완료 후 state를 바로 업데이트함.
   Future<void> fetchInitData(UserProvider userProvider) async {
+    userProvider.apiMeUserInfo().then(
+      (userFetchRes) {
+        if (!userFetchRes) {
+          debugPrint("Fail: 최신 유저정보 조회");
+        } else {
+          debugPrint("Success: 최신 유저정보 조회");
+          setState(() {});
+        }
+      },
+    ); // 유저 정보 조회
+
     TabType tabType = TabType.created;
     // 작성한 글 조회하기
     isLoadedList[tabType.index] =
