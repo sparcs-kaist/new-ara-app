@@ -623,6 +623,11 @@ class _PostViewPageState extends State<PostViewPage> {
     );
   }
 
+  /// 좋아요, 싫어요 아이콘을 모델의 상태에 알맞게 색상, filled 여부를 지정하여 리턴하는 함수
+  /// isPositive가 true면 좋아요 아이콘, false면 싫어요 아이콘을 설정함
+  /// highlightColor는 아이콘이 클릭되었을 때 지정되는 색상을 의미하며 
+  /// width, height는 아이콘의 크기를 지정하기 위해 사용됨.
+  /// PostViewPage에서 화면 상단 및 댓글 위의 좋아요, 싫어요 아이콘 설정을 위해 사용됨.
   Widget _buildVoteIcons(bool isPositive, bool? myVote, Color highlightColor, double width, double height) {
     late Color widgetColor;
     late String iconPath;
