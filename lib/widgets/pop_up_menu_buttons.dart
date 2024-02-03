@@ -9,6 +9,7 @@ import 'package:new_ara_app/providers/user_provider.dart';
 import 'package:new_ara_app/constants/file_type.dart';
 import 'package:new_ara_app/utils/post_view_utils.dart';
 import 'package:new_ara_app/constants/colors_info.dart';
+import 'package:new_ara_app/widgets/snackbar_noti.dart';
 
 /// PostViewPage에서 첨부파일 표시에 쓰이는 PopupMenuButton
 class AttachPopupMenuButton extends StatelessWidget {
@@ -35,13 +36,36 @@ class AttachPopupMenuButton extends StatelessWidget {
       ),
       padding: const EdgeInsets.all(2.0),
       itemBuilder: _buildItems,
-      onSelected: (int result) async {
+      onSelected: (int result) {
         AttachmentModel model = attachments[result];
         UserProvider userProvider = context.read<UserProvider>();
-        bool res =
-            await FileController(model: model, userProvider: userProvider)
-                .download();
-        debugPrint(res ? "파일 다운로드 성공" : "파일 다운로드 실패");
+        FileController(model: model, userProvider: userProvider)
+            .download()
+            .then((res) {
+          debugPrint(res ? "파일 다운로드 성공" : "파일 다운로드 실패");
+          ScaffoldMessenger.of(context).showSnackBar(buildAraSnackBar(
+            context,
+            content: Row(
+              children: [
+                SvgPicture.asset(
+                  'assets/icons/close-1.svg',
+                  colorFilter:
+                      const ColorFilter.mode(Colors.black, BlendMode.srcIn),
+                  width: 32,
+                  height: 32,
+                ),
+                Text(
+                  res ? "파일 다운로드에 성공했습니다" : "파일 다운로드에 실패했습니다.",
+                  style: const TextStyle(
+                    color: Colors.black,
+                    fontWeight: FontWeight.w400,
+                    fontSize: 15,
+                  ),
+                ),
+              ],
+            ),
+          ));
+        });
       },
       child: Text(
         '첨부파일 모아보기 $fileNum',
@@ -222,7 +246,6 @@ class OthersPopupMenuButton extends StatelessWidget {
         }
       },
     );
-  
   }
 }
 
@@ -231,9 +254,11 @@ class MyPopupMenuButton extends StatelessWidget {
   /// 대상이 되는 댓글의 id
   final int commentID;
   final UserProvider userProvider;
+
   /// 대상이 되는 댓글의 _commentList에서의 인덱스
   /// _commentList: PostViewPage에서 사용되는 댓글 리스트
   final int commentIdx;
+
   /// PopupMenuButton에서 유저가 특정 항목을 선택했을 때 적용
   /// PostViewPage와 밀접하게 연관되는 부분이 있어 클래스에서
   /// 직접 구현하지 않고 전달받음.
@@ -246,7 +271,7 @@ class MyPopupMenuButton extends StatelessWidget {
     required this.commentIdx,
     required this.onSelected,
   });
- 
+
   @override
   Widget build(BuildContext context) {
     return PopupMenuButton<String>(
@@ -310,6 +335,5 @@ class MyPopupMenuButton extends StatelessWidget {
         height: 20,
       ),
     );
-  
   }
 }
