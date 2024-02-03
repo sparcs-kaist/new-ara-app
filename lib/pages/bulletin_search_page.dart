@@ -25,7 +25,7 @@ class BulletinSearchPage extends StatefulWidget {
 }
 
 class _BulletinSearchPageState extends State<BulletinSearchPage> {
-  List<ArticleListActionModel> postPreviewList = [];
+  final List<ArticleListActionModel> postPreviewList = [];
   int _currentPage = 1;
   bool _isLoading = true;
   bool _isLoadingNextPage = false;
@@ -34,6 +34,8 @@ class _BulletinSearchPageState extends State<BulletinSearchPage> {
   String _searchWord = "";
   final ScrollController _scrollController = ScrollController();
   final FocusNode _focusNode = FocusNode();
+  final TextEditingController _textEdtingController = TextEditingController();
+
   @override
   void initState() {
     // TODO: implement initState
@@ -74,7 +76,7 @@ class _BulletinSearchPageState extends State<BulletinSearchPage> {
     WidgetsBinding.instance
         .addPostFrameCallback((_) => _focusNode.requestFocus());
     _scrollController.addListener(_scrollListener);
-    refreshPostList(userProvider);
+    refreshPostList("");
   }
 
   @override
@@ -87,8 +89,8 @@ class _BulletinSearchPageState extends State<BulletinSearchPage> {
   }
 
   /// 사용자가 입력한 검색어를 기반으로 게시물 새로 고침.
-  void refreshPostList(UserProvider userProvider) async {
-    if (_searchWord == "") {
+  void refreshPostList(String targetWord) async {
+    if (targetWord == "") {
       if (mounted) {
         setState(() {
           postPreviewList.clear();
@@ -97,21 +99,19 @@ class _BulletinSearchPageState extends State<BulletinSearchPage> {
       }
       return;
     }
-
-    debugPrint("""refreshPostList : 
-${_apiUrl}1&main_search__contains=$_searchWord
-""");
-    Map<String, dynamic>? myMap = await userProvider.getApiRes("""
-${_apiUrl}1&main_search__contains=$_searchWord
-""");
-
-    if (mounted) {
+    final UserProvider userProvider = context.read<UserProvider>();
+    final Map<String, dynamic>? myMap = await userProvider
+        .getApiRes("${_apiUrl}1&main_search__contains=$targetWord");
+    debugPrint(
+        "refreshPostList : myMap : ${myMap?["results"].length} {$targetWord}");
+    if (mounted && targetWord == _textEdtingController.text) {
       setState(() {
         postPreviewList.clear();
         for (int i = 0; i < (myMap?["results"].length ?? 0); i++) {
           try {
             postPreviewList
                 .add(ArticleListActionModel.fromJson(myMap!["results"][i]));
+            //     debugPrint("refreshPostList : postPreviewList[$i] : ${_temp[i].title}");
           } catch (error) {
             debugPrint(
                 "refreshPostList error at $i : $error"); // invalid json 걸러내기
@@ -220,18 +220,21 @@ ${_apiUrl}1&main_search__contains=$_searchWord
                           textAlignVertical: TextAlignVertical.center,
                           focusNode: _focusNode,
                           textInputAction: TextInputAction.search,
+                          controller: _textEdtingController,
                           onSubmitted: (String text) {
                             setState(() {
+                              _textEdtingController.text = text;
                               _searchWord = text;
                               _isLoading = true;
                             });
-                            refreshPostList(context.read<UserProvider>());
+                            refreshPostList(text);
                           },
-                          onChanged: (value) {
+                          onChanged: (String text) {
                             setState(() {
-                              _searchWord = value;
+                              _textEdtingController.text = text;
+                              _searchWord = text;
                             });
-                            refreshPostList(context.read<UserProvider>());
+                            refreshPostList(text);
                           },
                           style: const TextStyle(
                             //height * fontSize = line height(커서 크기)
