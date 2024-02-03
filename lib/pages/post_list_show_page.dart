@@ -39,7 +39,6 @@ class _PostListShowPageState extends State<PostListShowPage> {
 
   @override
   void initState() {
-  
     super.initState();
 
     var userProvider = context.read<UserProvider>();
@@ -219,32 +218,38 @@ class _PostListShowPageState extends State<PostListShowPage> {
           ),
         ],
       ),
-      floatingActionButton: Column(
-        mainAxisAlignment: MainAxisAlignment.end,
-        children: [
-          FloatingActionButton(
-            onPressed: () async {
-              await Navigator.of(context)
-                  .push(slideRoute(const PostWritePage()));
-              updateAllBulletinList();
-              debugPrint('FloatingActionButton pressed');
-            },
-            backgroundColor: Colors.white,
-            child: SizedBox(
-              width: 42,
-              height: 42,
-              child: SvgPicture.asset(
-                'assets/icons/modify.svg',
-                fit: BoxFit.fill,
-                colorFilter: const ColorFilter.mode(
-                    ColorsInfo.newara, BlendMode.srcIn), // 글쓰기 아이콘 색상 변경
+      // snackbar와 floatingActionButton이 충돌을 일으킬 수 있어서
+      // 기존에 Column()으로 선언되어있는 floatingActionButton에
+      // SizedBox로 크기를 지정함.
+      floatingActionButton: SizedBox(
+        height: 80,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.end,
+          children: [
+            FloatingActionButton(
+              onPressed: () async {
+                await Navigator.of(context)
+                    .push(slideRoute(const PostWritePage()));
+                updateAllBulletinList();
+                debugPrint('FloatingActionButton pressed');
+              },
+              backgroundColor: Colors.white,
+              child: SizedBox(
+                width: 42,
+                height: 42,
+                child: SvgPicture.asset(
+                  'assets/icons/modify.svg',
+                  fit: BoxFit.fill,
+                  colorFilter: const ColorFilter.mode(
+                      ColorsInfo.newara, BlendMode.srcIn), // 글쓰기 아이콘 색상 변경
+                ),
               ),
             ),
-          ),
-          const SizedBox(
-            height: 20,
-          )
-        ],
+            const SizedBox(
+              height: 20,
+            )
+          ],
+        ),
       ),
       body: isLoading
           ? const LoadingIndicator()
