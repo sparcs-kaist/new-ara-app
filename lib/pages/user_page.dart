@@ -1,4 +1,5 @@
 /// 사용자 본인 정보 표시 페이지를 관리하는 파일
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:new_ara_app/constants/url_info.dart';
@@ -103,10 +104,17 @@ class _UserPageState extends State<UserPage>
   /// API 통신을 위해 userProvider를 전달받으며
   /// 별도의 리턴값 없이 작업 완료 후 state를 바로 업데이트함.
   Future<void> fetchInitData(UserProvider userProvider) async {
-    bool userFetchRes = await userProvider.apiMeUserInfo(); // 유저 정보 조회
-    if (!userFetchRes) {
-      debugPrint("최신 유저정보 조회 실패!");
-    }
+    userProvider.apiMeUserInfo().then(
+      (userFetchRes) {
+        if (!userFetchRes) {
+          debugPrint("Fail: 최신 유저정보 조회");
+        } else {
+          debugPrint("Success: 최신 유저정보 조회");
+          setState(() {});
+        }
+      },
+    ); // 유저 정보 조회
+
     TabType tabType = TabType.created;
     // 작성한 글 조회하기
     isLoadedList[tabType.index] =
@@ -520,23 +528,35 @@ class _UserPageState extends State<UserPage>
 
     try {
       var response = await userProvider.myDio().get('$newAraDefaultUrl$apiUrl');
-      if (response.statusCode == 200) {
-        List<dynamic> rawPostList = response.data['results'];
-        for (int i = 0; i < rawPostList.length; i++) {
-          Map<String, dynamic>? rawPost = rawPostList[i];
-          if (rawPost != null) {
-            bool addRes = addList(tabType, rawPost);
-            // articleList에 추가하지 못한 글의 경우
-            // 별도의 exception 없이 debugPrint한 후에 넘어감.
-            if (!addRes) {
-              debugPrint("addList failed at index $i: (id: ${rawPost['id']})");
-            }
+
+      List<dynamic> rawPostList = response.data['results'];
+      for (int i = 0; i < rawPostList.length; i++) {
+        Map<String, dynamic>? rawPost = rawPostList[i];
+        if (rawPost != null) {
+          bool addRes = addList(tabType, rawPost);
+          // articleList에 추가하지 못한 글의 경우
+          // 별도의 exception 없이 debugPrint한 후에 넘어감.
+          if (!addRes) {
+            debugPrint("addList failed at index $i: (id: ${rawPost['id']})");
           }
         }
-        // pageT에 해당하는 페이지의 글 개수를 업데이트함.
-        articleCount[tabType.index] = response.data['num_items'];
-        debugPrint("fetchArticles() succeeded for page: $page");
-        return true;
+      }
+      // pageT에 해당하는 페이지의 글 개수를 업데이트함.
+      articleCount[tabType.index] = response.data['num_items'];
+      debugPrint("fetchArticles() succeeded for page: $page");
+      return true;
+    } on DioException catch (e) {
+      // Handle the DioError separately to handle only Dio related errors
+      if (e.response != null) {
+        // DioError contains response data
+        debugPrint('Dio error!');
+        debugPrint('STATUS: ${e.response?.statusCode}');
+        debugPrint('DATA: ${e.response?.data}');
+        debugPrint('HEADERS: ${e.response?.headers}');
+      } else {
+        // Error due to setting up or sending/receiving the request
+        debugPrint('Error sending request!');
+        debugPrint(e.message);
       }
     } catch (error) {
       debugPrint("fetchArticles() failed with error: $error");
