@@ -18,6 +18,7 @@ import 'package:new_ara_app/utils/slide_routing.dart';
 import 'package:new_ara_app/providers/notification_provider.dart';
 import 'package:new_ara_app/utils/profile_image.dart';
 import 'package:new_ara_app/utils/handle_hidden.dart';
+import 'package:new_ara_app/widgets/post_preview.dart';
 
 /// 유저 관련 정보 페이지 뷰, 이벤트 처리를 모두 관리하는 StatefulWidget
 class UserViewPage extends StatefulWidget {
@@ -245,173 +246,17 @@ class _UserViewPageState extends State<UserViewPage> {
                 _setIsLoaded(true);
               },
               // 각각의 작성한 글
-              child: SizedBox(
-                height: 61,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    // 글 제목 및 첨부파일 이미지 표시
-                    Row(
-                      children: [
-                        // 글 제목 텍스트
-                        Flexible(
-                          child: Text(
-                            getTitle(curPost.title, curPost.is_hidden,
-                                curPost.why_hidden),
-                            style: TextStyle(
-                                color: curPost.is_hidden
-                                    ? const Color(0xFFBBBBBB)
-                                    : Colors.black,
-                                fontSize: 16,
-                                fontWeight: FontWeight.w500),
-                            overflow: TextOverflow.ellipsis,
-                            maxLines: 1,
-                          ),
-                        ),
-                        // 첨부파일 이미지
-                        _buildAttachImage(curPost.attachment_type.toString())
-                      ],
-                    ),
-                    const SizedBox(height: 5),
-                    // 사용자 닉네임부터 댓글 개수까지 표시하는 Row
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        // 닉네임, 작성한 날짜, 조회수 표시 Row
-                        Flexible(
-                          child: Row(
-                            children: [
-                              Flexible(
-                                child: Text(
-                                  curPost.created_by.profile.nickname
-                                      .toString(),
-                                  style: const TextStyle(
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.w500,
-                                      color: Color.fromRGBO(177, 177, 177, 1)),
-                                  overflow: TextOverflow.ellipsis,
-                                  maxLines: 1,
-                                ),
-                              ),
-                              const SizedBox(width: 10),
-                              Text(
-                                getTime(curPost.created_at.toString()),
-                                style: const TextStyle(
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.w500,
-                                    color: Color.fromRGBO(177, 177, 177, 1)),
-                              ),
-                              const SizedBox(width: 10),
-                              Text('조회 ${curPost.hit_count}',
-                                  style: const TextStyle(
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.w500,
-                                      color: Color.fromRGBO(177, 177, 177, 1))),
-                            ],
-                          ),
-                        ),
-                        // 좋아요, 싫어요, 댓글 표시 Row
-                        Row(
-                          children: [
-                            Visibility(
-                              visible: curPost.positive_vote_count != null &&
-                                  curPost.positive_vote_count! > 0,
-                              child: Row(
-                                children: [
-                                  SvgPicture.asset(
-                                    'assets/icons/like.svg',
-                                    width: 13,
-                                    height: 15,
-                                    colorFilter: const ColorFilter.mode(
-                                      ColorsInfo.newara,
-                                      BlendMode.srcIn,
-                                    ),
-                                  ),
-                                  const SizedBox(width: 3),
-                                  Text('${curPost.positive_vote_count}',
-                                      style: const TextStyle(
-                                          fontSize: 14,
-                                          fontWeight: FontWeight.w500,
-                                          color: ColorsInfo.newara)),
-                                ],
-                              ),
-                            ),
-                            Visibility(
-                              visible: (curPost.positive_vote_count != null &&
-                                      curPost.positive_vote_count! > 0) &&
-                                  ((curPost.negative_vote_count != null &&
-                                          curPost.negative_vote_count! > 0) ||
-                                      (curPost.comment_count != null &&
-                                          curPost.comment_count! > 0)),
-                              child: const SizedBox(width: 6),
-                            ),
-                            Visibility(
-                              visible: curPost.negative_vote_count != null &&
-                                  curPost.negative_vote_count! > 0,
-                              child: Row(
-                                children: [
-                                  SvgPicture.asset(
-                                    'assets/icons/dislike.svg',
-                                    width: 13,
-                                    height: 15,
-                                    colorFilter: const ColorFilter.mode(
-                                      Color.fromRGBO(83, 141, 209, 1),
-                                      BlendMode.srcIn,
-                                    ),
-                                  ),
-                                  const SizedBox(width: 3),
-                                  Text('${curPost.negative_vote_count}',
-                                      style: const TextStyle(
-                                          fontSize: 14,
-                                          fontWeight: FontWeight.w500,
-                                          color:
-                                              Color.fromRGBO(83, 141, 209, 1))),
-                                ],
-                              ),
-                            ),
-                            Visibility(
-                              visible: (curPost.negative_vote_count != null &&
-                                      curPost.negative_vote_count! > 0) &&
-                                  (curPost.comment_count != null &&
-                                      curPost.comment_count! > 0),
-                              child: const SizedBox(width: 6),
-                            ),
-                            Visibility(
-                              visible: curPost.comment_count != null &&
-                                  curPost.comment_count! > 0,
-                              child: Row(
-                                children: [
-                                  SvgPicture.asset(
-                                    'assets/icons/comment.svg',
-                                    width: 13,
-                                    height: 15,
-                                    colorFilter: const ColorFilter.mode(
-                                      Color.fromRGBO(99, 99, 99, 1),
-                                      BlendMode.srcIn,
-                                    ),
-                                  ),
-                                  const SizedBox(width: 3),
-                                  Text('${curPost.comment_count}',
-                                      style: const TextStyle(
-                                          fontSize: 14,
-                                          fontWeight: FontWeight.w500,
-                                          color:
-                                              Color.fromRGBO(99, 99, 99, 1))),
-                                ],
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(vertical: 11.0),
+                child: PostPreview(model: curPost)
               ),
             );
           },
           separatorBuilder: (BuildContext context, int idx) {
-            return const Divider();
+            return Container(
+              height: 1,
+              color: const Color(0xFFF0F0F0),
+            );
           },
         ),
       ),

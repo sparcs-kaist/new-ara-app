@@ -456,17 +456,7 @@ class _PostViewPageState extends State<PostViewPage> {
             Row(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                SvgPicture.asset(
-                  'assets/icons/like.svg',
-                  width: 10.06,
-                  height: 16,
-                  colorFilter: ColorFilter.mode(
-                    _article.my_vote == false
-                        ? ColorsInfo.noneVote
-                        : ColorsInfo.newara,
-                    BlendMode.srcIn,
-                  ),
-                ),
+                _buildVoteIcons(true, _article.my_vote, ColorsInfo.posVote, 10.08, 11),
                 const SizedBox(width: 1.92),
                 Text('${_article.positive_vote_count}',
                     style: TextStyle(
@@ -476,16 +466,7 @@ class _PostViewPageState extends State<PostViewPage> {
                             ? ColorsInfo.noneVote
                             : ColorsInfo.newara)),
                 const SizedBox(width: 10),
-                SvgPicture.asset(
-                  'assets/icons/dislike.svg',
-                  width: 10.06,
-                  height: 16,
-                  colorFilter: ColorFilter.mode(
-                      _article.my_vote == true
-                          ? ColorsInfo.noneVote
-                          : ColorsInfo.negVote,
-                      BlendMode.srcIn),
-                ),
+                _buildVoteIcons(false, _article.my_vote, ColorsInfo.negVote, 10.08, 11),
                 const SizedBox(width: 1.92),
                 Text('${_article.negative_vote_count}',
                     style: TextStyle(
@@ -499,7 +480,7 @@ class _PostViewPageState extends State<PostViewPage> {
                 SvgPicture.asset(
                   'assets/icons/comment.svg',
                   width: 11.85,
-                  height: 16,
+                  height: 12,
                   colorFilter: const ColorFilter.mode(
                     Color.fromRGBO(99, 99, 99, 1),
                     BlendMode.srcIn,
@@ -605,18 +586,9 @@ class _PostViewPageState extends State<PostViewPage> {
             ).posVote();
             if (res) _updateState();
           },
-          child: SvgPicture.asset(
-            'assets/icons/like.svg',
-            colorFilter: ColorFilter.mode(
-                _article.my_vote == false
-                    ? ColorsInfo.noneVote
-                    : ColorsInfo.newara,
-                BlendMode.srcIn),
-            width: 20.17,
-            height: 28,
-          ),
+          child: _buildVoteIcons(true, _article.my_vote, ColorsInfo.posVote, 20.17, 22),
         ),
-        const SizedBox(width: 3),
+        const SizedBox(width: 4),
         Text('${_article.positive_vote_count}',
             style: TextStyle(
               fontSize: 20,
@@ -636,19 +608,9 @@ class _PostViewPageState extends State<PostViewPage> {
               if (result) _updateState();
             });
           },
-          child: SvgPicture.asset(
-            'assets/icons/dislike.svg',
-            colorFilter: ColorFilter.mode(
-              _article.my_vote == true
-                  ? ColorsInfo.noneVote
-                  : ColorsInfo.negVote,
-              BlendMode.srcIn,
-            ),
-            width: 20.17,
-            height: 28,
-          ),
+          child: _buildVoteIcons(false, _article.my_vote, ColorsInfo.negVote, 20.17, 22),
         ),
-        const SizedBox(width: 3),
+        const SizedBox(width: 4),
         Text('${_article.negative_vote_count}',
             style: TextStyle(
               fontSize: 20,
@@ -658,6 +620,37 @@ class _PostViewPageState extends State<PostViewPage> {
                   : ColorsInfo.negVote,
             )),
       ],
+    );
+  }
+
+  /// 좋아요, 싫어요 아이콘을 모델의 상태에 알맞게 색상, filled 여부를 지정하여 리턴하는 함수
+  /// isPositive가 true면 좋아요 아이콘, false면 싫어요 아이콘을 설정함
+  /// highlightColor는 아이콘이 클릭되었을 때 지정되는 색상을 의미하며 
+  /// width, height는 아이콘의 크기를 지정하기 위해 사용됨.
+  /// PostViewPage에서 화면 상단 및 댓글 위의 좋아요, 싫어요 아이콘 설정을 위해 사용됨.
+  Widget _buildVoteIcons(bool isPositive, bool? myVote, Color highlightColor, double width, double height) {
+    late Color widgetColor;
+    late String iconPath;
+    // 투표한 반대 위젯을 설정하는 경우
+    if (myVote == !isPositive) {
+      widgetColor = ColorsInfo.noneVote;
+      iconPath = 'assets/icons/${isPositive ? 'like.svg' : 'dislike.svg'}';
+    }
+    else {
+      widgetColor = highlightColor;
+      // 투표하지 않은 경우
+      if (myVote == null) {
+        iconPath = 'assets/icons/${isPositive ? 'like.svg' : 'dislike.svg'}';
+      }
+      else {
+        iconPath = 'assets/icons/${isPositive ? 'like-filled.svg' : 'dislike-filled.svg'}';
+      }
+    }
+    return SvgPicture.asset(
+      iconPath,
+      colorFilter: ColorFilter.mode(widgetColor, BlendMode.srcIn),
+      width: width,
+      height: height
     );
   }
 
@@ -1173,17 +1166,9 @@ class _PostViewPageState extends State<PostViewPage> {
                                     if (result) _updateState();
                                   });
                                 },
-                                child: SvgPicture.asset(
-                                  'assets/icons/like.svg',
-                                  width: 12,
-                                  height: 19,
-                                  colorFilter: ColorFilter.mode(
-                                      curComment.my_vote == false
-                                          ? ColorsInfo.noneVote
-                                          : ColorsInfo.newara,
-                                      BlendMode.srcIn),
-                                ),
+                                child: _buildVoteIcons(true, curComment.my_vote, ColorsInfo.posVote, 11.52, 12.57),
                               ),
+                              const SizedBox(width: 2.19),
                               Text(
                                 curComment.positive_vote_count.toString(),
                                 style: TextStyle(
@@ -1204,17 +1189,9 @@ class _PostViewPageState extends State<PostViewPage> {
                                     if (result) _updateState();
                                   });
                                 },
-                                child: SvgPicture.asset(
-                                  'assets/icons/dislike.svg',
-                                  width: 12,
-                                  height: 19,
-                                  colorFilter: ColorFilter.mode(
-                                      curComment.my_vote == true
-                                          ? ColorsInfo.noneVote
-                                          : ColorsInfo.negVote,
-                                      BlendMode.srcIn),
-                                ),
+                                child: _buildVoteIcons(false, curComment.my_vote, ColorsInfo.negVote, 11.52, 12.57),
                               ),
+                              const SizedBox(width: 2.19),
                               Text(
                                 curComment.negative_vote_count.toString(),
                                 style: TextStyle(

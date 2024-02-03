@@ -121,11 +121,12 @@ class _PostPreviewState extends State<PostPreview> {
           children: [
             SvgPicture.asset(
               'assets/icons/like.svg',
-              width: 20,
-              height: 20,
+              width: 10,
+              height: 12.46,
               colorFilter:
                   const ColorFilter.mode(Color(0xFFED3A3A), BlendMode.srcIn),
             ),
+            const SizedBox(width: 1.97),
             Text(
               widget.model.positive_vote_count.toString(),
               style: const TextStyle(
@@ -149,10 +150,11 @@ class _PostPreviewState extends State<PostPreview> {
         Row(
           children: [
             SvgPicture.asset('assets/icons/dislike.svg',
-                width: 20,
-                height: 20,
+                width: 10,
+                height: 12.46,
                 colorFilter:
                     const ColorFilter.mode(Color(0xFF538DD1), BlendMode.srcIn)),
+            const SizedBox(width: 1.97),
             Text(
               widget.model.negative_vote_count.toString(),
               style: const TextStyle(
@@ -175,10 +177,11 @@ class _PostPreviewState extends State<PostPreview> {
         Row(
           children: [
             SvgPicture.asset('assets/icons/comment.svg',
-                width: 20,
-                height: 20,
+                width: 13.75,
+                height: 12.21,
                 colorFilter:
                     const ColorFilter.mode(Color(0xFF636363), BlendMode.srcIn)),
+            const SizedBox(width: 3.13),
             Text(
               widget.model.comment_count.toString(),
               style: const TextStyle(

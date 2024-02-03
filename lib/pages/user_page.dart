@@ -18,6 +18,7 @@ import 'package:new_ara_app/pages/profile_edit_page.dart';
 import 'package:new_ara_app/providers/notification_provider.dart';
 import 'package:new_ara_app/utils/profile_image.dart';
 import 'package:new_ara_app/utils/handle_hidden.dart';
+import 'package:new_ara_app/widgets/post_preview.dart';
 
 /// 작성한 글, 담아둔 글, 최근 본 글을 나타내기 위해 사용
 enum TabType { created, scrap, recent }
@@ -402,205 +403,13 @@ class _UserPageState extends State<UserPage>
                 curPage[tabType.index] = newMaxPage;
                 setCurCount(tabType);
               },
-              child: SizedBox(
-                height: 61,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Row(
-                      children: [
-                        Flexible(
-                          child: Text(
-                            getTitle(curPost.title, curPost.is_hidden,
-                                curPost.why_hidden),
-                            style: TextStyle(
-                                color: curPost.is_hidden
-                                    ? const Color(0xFFBBBBBB)
-                                    : Colors.black,
-                                fontSize: 16,
-                                fontWeight: FontWeight.w500),
-                            overflow: TextOverflow.ellipsis,
-                            maxLines: 1,
-                          ),
-                        ),
-                        // TODO: PR #41 참고해서 PostPreview 활용한 리팩토링 진행하기 (2023.02.02)
-                        if (curPost.attachment_type.toString() == "NONE")
-                          Container()
-                        else
-                          const SizedBox(width: 5),
-                        if (curPost.attachment_type.toString() == "BOTH")
-                          Row(
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              SvgPicture.asset(
-                                'assets/icons/image.svg',
-                                color: Colors.grey,
-                                width: 30,
-                                height: 25,
-                              ),
-                              SvgPicture.asset(
-                                'assets/icons/clip.svg',
-                                color: Colors.grey,
-                                width: 15,
-                                height: 20,
-                              ),
-                            ],
-                          )
-                        else if (curPost.attachment_type.toString() == "IMAGE")
-                          SvgPicture.asset(
-                            'assets/icons/image.svg',
-                            color: Colors.grey,
-                            width: 30,
-                            height: 25,
-                          )
-                        else if (curPost.attachment_type.toString() ==
-                            "NON_IMAGE")
-                          SvgPicture.asset(
-                            'assets/icons/clip.svg',
-                            color: Colors.grey,
-                            width: 15,
-                            height: 20,
-                          )
-                        else
-                          Container()
-                      ],
-                    ),
-                    const SizedBox(height: 5),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Flexible(
-                          child: Row(
-                            children: [
-                              Flexible(
-                                child: Text(
-                                  curPost.created_by.profile.nickname
-                                      .toString(),
-                                  style: const TextStyle(
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.w500,
-                                      color: Color.fromRGBO(177, 177, 177, 1)),
-                                  overflow: TextOverflow.ellipsis,
-                                  maxLines: 1,
-                                ),
-                              ),
-                              const SizedBox(width: 10),
-                              Text(
-                                getTime(tabType == TabType.scrap
-                                    ? scrapInfo!.created_at.toString()
-                                    : curPost.created_at.toString()),
-                                style: const TextStyle(
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.w500,
-                                    color: Color.fromRGBO(177, 177, 177, 1)),
-                              ),
-                              const SizedBox(width: 10),
-                              Text('조회 ${curPost.hit_count}',
-                                  style: const TextStyle(
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.w500,
-                                      color: Color.fromRGBO(177, 177, 177, 1))),
-                            ],
-                          ),
-                        ),
-                        Row(
-                          children: [
-                            Visibility(
-                              // 현재 좋아요가 1 이상일 대 표시함
-                              visible: curPost.positive_vote_count != null &&
-                                  curPost.positive_vote_count! > 0,
-                              child: Row(
-                                children: [
-                                  SvgPicture.asset(
-                                    'assets/icons/like.svg',
-                                    width: 20,
-                                    height: 20,
-                                    color: ColorsInfo.newara,
-                                  ),
-                                  const SizedBox(width: 1),
-                                  Text('${curPost.positive_vote_count}',
-                                      style: const TextStyle(
-                                          fontSize: 14,
-                                          fontWeight: FontWeight.w500,
-                                          color: ColorsInfo.newara)),
-                                ],
-                              ),
-                            ),
-                            Visibility(
-                              // 좋아요, 싫어요 사이의 간격은 좋아요가 1이상이며
-                              // 싫어요, 댓글 중 적어도 하나가 1 이상일 때 표시됨
-                              visible: (curPost.positive_vote_count != null &&
-                                      curPost.positive_vote_count! > 0) &&
-                                  ((curPost.negative_vote_count != null &&
-                                          curPost.negative_vote_count! > 0) ||
-                                      (curPost.comment_count != null &&
-                                          curPost.comment_count! > 0)),
-                              child: const SizedBox(width: 6),
-                            ),
-                            Visibility(
-                              // 싫어요 아이콘은 싫어요가 1 이상일 때 표시됨
-                              visible: curPost.negative_vote_count != null &&
-                                  curPost.negative_vote_count! > 0,
-                              child: Row(
-                                children: [
-                                  SvgPicture.asset(
-                                    'assets/icons/dislike.svg',
-                                    width: 20,
-                                    height: 20,
-                                    color:
-                                        const Color.fromRGBO(83, 141, 209, 1),
-                                  ),
-                                  const SizedBox(width: 1),
-                                  Text('${curPost.negative_vote_count}',
-                                      style: const TextStyle(
-                                          fontSize: 14,
-                                          fontWeight: FontWeight.w500,
-                                          color:
-                                              Color.fromRGBO(83, 141, 209, 1))),
-                                ],
-                              ),
-                            ),
-                            Visibility(
-                              // 싫어요, 댓글 사이의 간격은 싫어요와 댓글 수가 모두 1 이상일 때 표시됨
-                              visible: (curPost.negative_vote_count != null &&
-                                      curPost.negative_vote_count! > 0) &&
-                                  (curPost.comment_count != null &&
-                                      curPost.comment_count! > 0),
-                              child: const SizedBox(width: 6),
-                            ),
-                            Visibility(
-                              // 댓글 아이콘은 댓글이 1 이상일 때 표시됨
-                              visible: curPost.comment_count != null &&
-                                  curPost.comment_count! > 0,
-                              child: Row(
-                                children: [
-                                  SvgPicture.asset(
-                                    'assets/icons/comment.svg',
-                                    width: 20,
-                                    height: 20,
-                                    color: const Color.fromRGBO(99, 99, 99, 1),
-                                  ),
-                                  const SizedBox(width: 1),
-                                  Text('${curPost.comment_count}',
-                                      style: const TextStyle(
-                                          fontSize: 14,
-                                          fontWeight: FontWeight.w500,
-                                          color:
-                                              Color.fromRGBO(99, 99, 99, 1))),
-                                ],
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ));
+              child: SizedBox(height: 62, child: PostPreview(model: curPost)));
         },
         separatorBuilder: (context, index) {
-          return const Divider();
+          return Container(
+            height: 1,
+            color: const Color(0xFFF0F0F0),
+          );
         },
       ),
     );
