@@ -47,29 +47,28 @@ class MainPage extends StatefulWidget {
 /// 네이게이션 페이지에서 제일 먼저 보이는 메인 페이지.
 class _MainPageState extends State<MainPage> {
   //각 컨텐츠 로딩을 확인하기 위한 변수
-  List<bool> isLoading = [true, true, true, true, true, true, true, true];
+  final List<bool> _isLoading = [true, true, true, true, true, true, true, true];
   //각 컨텐츠 별 데이터 리스트
-  List<BoardDetailActionModel> boardList = [];
-  List<ArticleListActionModel> dailyBestContentList = [];
-  List<ArticleListActionModel> portalContentList = [];
-  List<ArticleListActionModel> facilityContentList = [];
-  List<ArticleListActionModel> newAraContentList = [];
-  List<ArticleListActionModel> gradContentList = [];
-  List<ArticleListActionModel> underGradContentList = [];
-  List<ArticleListActionModel> freshmanContentList = [];
+
+  /// api 요청으로 모든 게시물 목록을 가져왔을 때 저장하는 변수
+  final List<BoardDetailActionModel> _boards = [];
+
+  final List<ArticleListActionModel> _dailyBestContents = [];
+  final List<ArticleListActionModel> _portalContents = [];
+  final List<ArticleListActionModel> _facilityContents = [];
+  final List<ArticleListActionModel> _newAraContents = [];
+  final List<ArticleListActionModel> _gradContents = [];
+  final List<ArticleListActionModel> _underGradContents = [];
+  final List<ArticleListActionModel> _freshmanContents = [];
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     UserProvider userProvider =
         Provider.of<UserProvider>(context, listen: false);
-
-    // TODO: 현재 api 요청 속도가 너무 느림. 병렬 처리 방식과, api 요청 속도 개선 필요. Future.wait([])로 바꾸면 개선되지 않을까 고민. 반복되는 코드 구조 개선 필요.
     DateTime startTime = DateTime.now(); // 시작 시간 기록
 
     //측정하고자 하는 코드 블록
-
     Future.wait([
       refreshBoardList(userProvider),
       refreshDailyBest(userProvider),
@@ -95,11 +94,11 @@ class _MainPageState extends State<MainPage> {
       if (recentJson != null) {
         if (mounted) {
           setState(() {
-            dailyBestContentList.clear();
+            _dailyBestContents.clear();
             for (Map<String, dynamic> json in recentJson['results']) {
-              dailyBestContentList.add(ArticleListActionModel.fromJson(json));
+              _dailyBestContents.add(ArticleListActionModel.fromJson(json));
             }
-            isLoading[0] = false;
+            _isLoading[0] = false;
           });
         }
       }
@@ -107,11 +106,11 @@ class _MainPageState extends State<MainPage> {
       await saveApiData('articles/top/', response);
       if (mounted) {
         setState(() {
-          dailyBestContentList.clear();
+          _dailyBestContents.clear();
           for (Map<String, dynamic> json in response!['results']) {
-            dailyBestContentList.add(ArticleListActionModel.fromJson(json));
+            _dailyBestContents.add(ArticleListActionModel.fromJson(json));
           }
-          isLoading[0] = false;
+          _isLoading[0] = false;
         });
       }
     } catch (error) {
@@ -133,17 +132,17 @@ class _MainPageState extends State<MainPage> {
     }
     if (mounted) {
       setState(() {
-        boardList.clear();
+        _boards.clear();
         for (Map<String, dynamic> json in boardJson!) {
           try {
             // 밑
-            boardList.add(BoardDetailActionModel.fromJson(json));
+            _boards.add(BoardDetailActionModel.fromJson(json));
           } catch (error) {
             debugPrint(
                 "refreshBoardList BoardDetailActionModel.fromJson failed: $error");
           }
         }
-        isLoading[7] = false;
+        _isLoading[7] = false;
       });
       await Future.wait([
         refreshPortalNotice(userProvider),
@@ -160,18 +159,18 @@ class _MainPageState extends State<MainPage> {
   ///포탈 게시물 글 불러오기.
   Future<void> refreshPortalNotice(UserProvider userProvider) async {
     await refreshBoardContent(
-        userProvider, "portal-notice", "", portalContentList, 1);
+        userProvider, "portal-notice", "", _portalContents, 1);
   }
 
   ///입주 업체 게시물 글 불러오기.
   Future<void> refreshFacilityNotice(UserProvider userProvider) async {
     await refreshBoardContent(
-        userProvider, "facility-notice", "", facilityContentList, 2);
+        userProvider, "facility-notice", "", _facilityContents, 2);
   }
 
   Future<void> refreshNewAraNotice(UserProvider userProvider) async {
     await refreshBoardContent(
-        userProvider, "ara-feedback", "", newAraContentList, 3);
+        userProvider, "ara-feedback", "", _newAraContents, 3);
   }
 
   Future<void> refreshGradAssocNotice(UserProvider userProvider) async {
@@ -181,7 +180,7 @@ class _MainPageState extends State<MainPage> {
     //dev 서버랑 실제 서버 parent_topic 이 다름을 유의하기.
     //https://newara.sparcs.org/api/articles/?parent_board=2&parent_topic=24
     await refreshBoardContent(
-        userProvider, "students-group", "grad-assoc", gradContentList, 4);
+        userProvider, "students-group", "grad-assoc", _gradContents, 4);
   }
 
   Future<void> refreshUndergradAssocNotice(UserProvider userProvider) async {
@@ -189,7 +188,7 @@ class _MainPageState extends State<MainPage> {
     // "slug": "students-group",
     // "slug": "undergrad-assoc",
     await refreshBoardContent(userProvider, "students-group", "undergrad-assoc",
-        underGradContentList, 5);
+        _underGradContents, 5);
   }
 
   Future<void> refreshFreshmanCouncil(UserProvider userProvider) async {
@@ -197,7 +196,7 @@ class _MainPageState extends State<MainPage> {
     // "slug": "students-group",
     // "slug": "freshman-council",
     await refreshBoardContent(userProvider, "students-group",
-        "freshman-council", freshmanContentList, 6);
+        "freshman-council", _freshmanContents, 6);
   }
 
   /// 게시판의 게시물들을 불러옴. 코드 중복을 줄이기 위해 사용.
@@ -226,7 +225,7 @@ class _MainPageState extends State<MainPage> {
                   "refreshBoardContent ArticleListActionModel.fromJson failed: $error");
             }
           }
-          isLoading[isLoadingIndex] = false;
+          _isLoading[isLoadingIndex] = false;
         });
       }
     }
@@ -244,7 +243,7 @@ class _MainPageState extends State<MainPage> {
                 "refreshBoardContent ArticleListActionModel.fromJson failed: $error");
           }
         }
-        isLoading[isLoadingIndex] = false;
+        _isLoading[isLoadingIndex] = false;
       });
     }
   }
@@ -252,13 +251,13 @@ class _MainPageState extends State<MainPage> {
   /// 주어진 slug 값을 통해 게시판과 토픽의 ID를 찾음. topic 이 없는 경우 slug2로 ""을 넘겨주면 된다.
   List<int> findBoardID(String slug1, String slug2) {
     List<int> returnValue = [-1, -1];
-    for (int i = 0; i < boardList.length; i++) {
-      if (boardList[i].slug == slug1) {
-        returnValue[0] = boardList[i].id;
+    for (int i = 0; i < _boards.length; i++) {
+      if (_boards[i].slug == slug1) {
+        returnValue[0] = _boards[i].id;
         if (slug2 != "") {
-          for (int j = 0; j < boardList[i].topics.length; j++) {
-            if (boardList[i].topics[j].slug == slug2) {
-              returnValue[1] = boardList[i].topics[j].id;
+          for (int j = 0; j < _boards[i].topics.length; j++) {
+            if (_boards[i].topics[j].slug == slug2) {
+              returnValue[1] = _boards[i].topics[j].id;
             }
           }
         }
@@ -308,14 +307,14 @@ class _MainPageState extends State<MainPage> {
         ],
       ),
       body: SafeArea(
-        child: isLoading[0] ||
-                isLoading[1] ||
-                isLoading[2] ||
-                isLoading[3] ||
-                isLoading[4] ||
-                isLoading[5] ||
-                isLoading[6] ||
-                isLoading[7]
+        child: _isLoading[0] ||
+                _isLoading[1] ||
+                _isLoading[2] ||
+                _isLoading[3] ||
+                _isLoading[4] ||
+                _isLoading[5] ||
+                _isLoading[6] ||
+                _isLoading[7]
             ? const LoadingIndicator()
             : SingleChildScrollView(
                 child: SizedBox(
@@ -341,7 +340,7 @@ class _MainPageState extends State<MainPage> {
                         child: Column(
                           children: [
                             PopularBoard(
-                              model: dailyBestContentList[0],
+                              model: _dailyBestContents[0],
                               ingiNum: 1,
                             ),
                             Row(
@@ -358,7 +357,7 @@ class _MainPageState extends State<MainPage> {
                               ],
                             ),
                             PopularBoard(
-                              model: dailyBestContentList[1],
+                              model: _dailyBestContents[1],
                               ingiNum: 2,
                             ),
                             Row(
@@ -375,7 +374,7 @@ class _MainPageState extends State<MainPage> {
                               ],
                             ),
                             PopularBoard(
-                              model: dailyBestContentList[2],
+                              model: _dailyBestContents[2],
                               ingiNum: 3,
                             ),
                           ],
@@ -415,7 +414,7 @@ class _MainPageState extends State<MainPage> {
                                     .push(slideRoute(PostListShowPage(
                                   boardType: BoardType.free,
                                   // TODO: 포탈 공지가 boardList[0]가 아닐 수도 있다. slug로 확인해야 한다.
-                                  boardInfo: boardList[0],
+                                  boardInfo: _boards[0],
                                 )));
                               },
                               child: Row(
@@ -459,15 +458,15 @@ class _MainPageState extends State<MainPage> {
                             InkWell(
                               onTap: () {
                                 Navigator.of(context).push(slideRoute(
-                                    PostViewPage(id: portalContentList[0].id)));
+                                    PostViewPage(id: _portalContents[0].id)));
                               },
                               child: Text(
                                 getTitle(
-                                    portalContentList[0].title,
-                                    portalContentList[0].is_hidden,
-                                    portalContentList[0].why_hidden),
+                                    _portalContents[0].title,
+                                    _portalContents[0].is_hidden,
+                                    _portalContents[0].why_hidden),
                                 style: TextStyle(
-                                    color: portalContentList[0].is_hidden
+                                    color: _portalContents[0].is_hidden
                                         ? const Color(0xFFBBBBBB)
                                         : Colors.black,
                                     fontSize: 14,
@@ -483,15 +482,15 @@ class _MainPageState extends State<MainPage> {
                                 onTap: () {
                                   Navigator.of(context).push(slideRoute(
                                       PostViewPage(
-                                          id: portalContentList[1].id)));
+                                          id: _portalContents[1].id)));
                                 },
                                 child: Text(
                                   getTitle(
-                                      portalContentList[1].title,
-                                      portalContentList[1].is_hidden,
-                                      portalContentList[1].why_hidden),
+                                      _portalContents[1].title,
+                                      _portalContents[1].is_hidden,
+                                      _portalContents[1].why_hidden),
                                   style: TextStyle(
-                                      color: portalContentList[1].is_hidden
+                                      color: _portalContents[1].is_hidden
                                           ? const Color(0xFFBBBBBB)
                                           : Colors.black,
                                       fontSize: 14,
@@ -506,15 +505,15 @@ class _MainPageState extends State<MainPage> {
                                 onTap: () {
                                   Navigator.of(context).push(slideRoute(
                                       PostViewPage(
-                                          id: portalContentList[2].id)));
+                                          id: _portalContents[2].id)));
                                 },
                                 child: Text(
                                   getTitle(
-                                      portalContentList[2].title,
-                                      portalContentList[2].is_hidden,
-                                      portalContentList[2].why_hidden),
+                                      _portalContents[2].title,
+                                      _portalContents[2].is_hidden,
+                                      _portalContents[2].why_hidden),
                                   style: TextStyle(
-                                      color: portalContentList[2].is_hidden
+                                      color: _portalContents[2].is_hidden
                                           ? const Color(0xFFBBBBBB)
                                           : Colors.black,
                                       fontSize: 14,
@@ -538,7 +537,7 @@ class _MainPageState extends State<MainPage> {
                                     .push(slideRoute(PostListShowPage(
                                   boardType: BoardType.free,
                                   // TODO: 입주 업체가 boardList[7]가 아닐 수도 있다. slug로 확인해야 한다.
-                                  boardInfo: boardList[7],
+                                  boardInfo: _boards[7],
                                 )));
                               },
                               child: Row(
@@ -570,20 +569,20 @@ class _MainPageState extends State<MainPage> {
                                         onTap: () {
                                           Navigator.of(context).push(slideRoute(
                                               PostViewPage(
-                                                  id: facilityContentList[0]
+                                                  id: _facilityContents[0]
                                                       .id)));
                                         },
                                         child: Text(
                                           getTitle(
-                                              facilityContentList[0].title,
-                                              facilityContentList[0].is_hidden,
-                                              facilityContentList[0]
+                                              _facilityContents[0].title,
+                                              _facilityContents[0].is_hidden,
+                                              _facilityContents[0]
                                                   .why_hidden),
                                           style: TextStyle(
-                                              color:
-                                                  facilityContentList[0].is_hidden
-                                                      ? const Color(0xFFBBBBBB)
-                                                      : Colors.black,
+                                              color: _facilityContents[0]
+                                                      .is_hidden
+                                                  ? const Color(0xFFBBBBBB)
+                                                  : Colors.black,
                                               fontSize: 14,
                                               fontWeight: FontWeight.w400),
                                           maxLines: 1,
@@ -602,7 +601,7 @@ class _MainPageState extends State<MainPage> {
                                     .push(slideRoute(PostListShowPage(
                                   boardType: BoardType.free,
                                   // TODO: 뉴아라가 boardList[11]가 아닐 수도 있다. slug로 확인해야 한다.
-                                  boardInfo: boardList[11],
+                                  boardInfo: _boards[11],
                                 )));
                               },
                               child: Row(
@@ -634,17 +633,17 @@ class _MainPageState extends State<MainPage> {
                                         onTap: () {
                                           Navigator.of(context).push(slideRoute(
                                               PostViewPage(
-                                                  id: newAraContentList[0]
+                                                  id: _newAraContents[0]
                                                       .id)));
                                         },
                                         child: Text(
                                           getTitle(
-                                              newAraContentList[0].title,
-                                              newAraContentList[0].is_hidden,
-                                              newAraContentList[0].why_hidden),
+                                              _newAraContents[0].title,
+                                              _newAraContents[0].is_hidden,
+                                              _newAraContents[0].why_hidden),
                                           style: TextStyle(
                                               color:
-                                                  newAraContentList[0].is_hidden
+                                                  _newAraContents[0].is_hidden
                                                       ? const Color(0xFFBBBBBB)
                                                       : Colors.black,
                                               fontSize: 14,
@@ -664,7 +663,7 @@ class _MainPageState extends State<MainPage> {
                         Navigator.of(context).push(slideRoute(PostListShowPage(
                           boardType: BoardType.free,
                           // TODO: 원총이 boardList[1]가 아닐 수도 있다. slug로 확인해야 한다.
-                          boardInfo: boardList[1],
+                          boardInfo: _boards[1],
                         )));
                       }),
                       const SizedBox(height: 5),
@@ -704,16 +703,16 @@ class _MainPageState extends State<MainPage> {
                                         onTap: () {
                                           Navigator.of(context).push(slideRoute(
                                               PostViewPage(
-                                                  id: gradContentList[0].id)));
+                                                  id: _gradContents[0].id)));
                                         },
                                         child: Text(
                                           getTitle(
-                                              gradContentList[0].title,
-                                              gradContentList[0].is_hidden,
-                                              gradContentList[0].why_hidden),
+                                              _gradContents[0].title,
+                                              _gradContents[0].is_hidden,
+                                              _gradContents[0].why_hidden),
                                           style: TextStyle(
                                               color:
-                                                  gradContentList[0].is_hidden
+                                                  _gradContents[0].is_hidden
                                                       ? const Color(0xFFBBBBBB)
                                                       : Colors.black,
                                               fontSize: 14,
@@ -745,20 +744,20 @@ class _MainPageState extends State<MainPage> {
                                         onTap: () {
                                           Navigator.of(context).push(slideRoute(
                                               PostViewPage(
-                                                  id: underGradContentList[0]
+                                                  id: _underGradContents[0]
                                                       .id)));
                                         },
                                         child: Text(
                                           getTitle(
-                                              underGradContentList[0].title,
-                                              underGradContentList[0].is_hidden,
-                                              underGradContentList[0]
+                                              _underGradContents[0].title,
+                                              _underGradContents[0].is_hidden,
+                                              _underGradContents[0]
                                                   .why_hidden),
                                           style: TextStyle(
-                                              color:
-                                                  underGradContentList[0].is_hidden
-                                                      ? const Color(0xFFBBBBBB)
-                                                      : Colors.black,
+                                              color: _underGradContents[0]
+                                                      .is_hidden
+                                                  ? const Color(0xFFBBBBBB)
+                                                  : Colors.black,
                                               fontSize: 14,
                                               fontWeight: FontWeight.w400),
                                           maxLines: 1,
@@ -788,20 +787,20 @@ class _MainPageState extends State<MainPage> {
                                         onTap: () {
                                           Navigator.of(context).push(slideRoute(
                                               PostViewPage(
-                                                  id: freshmanContentList[0]
+                                                  id: _freshmanContents[0]
                                                       .id)));
                                         },
                                         child: Text(
                                           getTitle(
-                                              freshmanContentList[0].title,
-                                              freshmanContentList[0].is_hidden,
-                                              freshmanContentList[0]
+                                              _freshmanContents[0].title,
+                                              _freshmanContents[0].is_hidden,
+                                              _freshmanContents[0]
                                                   .why_hidden),
                                           style: TextStyle(
-                                              color:
-                                                  freshmanContentList[0].is_hidden
-                                                      ? const Color(0xFFBBBBBB)
-                                                      : Colors.black,
+                                              color: _freshmanContents[0]
+                                                      .is_hidden
+                                                  ? const Color(0xFFBBBBBB)
+                                                  : Colors.black,
                                               fontSize: 14,
                                               fontWeight: FontWeight.w400),
                                           maxLines: 1,
