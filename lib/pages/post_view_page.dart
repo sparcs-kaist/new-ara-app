@@ -1690,6 +1690,11 @@ class _PostViewPageState extends State<PostViewPage> {
     return true;
   }
 
+  // TODO: in_article_web_view.dart의 함수와 통합 고려해보기
+  
+  /// _article.url (포탈공지글일 경우 포탈 링크가 있음)을
+  /// 브라우저로 띄워주는 함수
+  /// 브라우저로 url 열기에 성공하면 true, 아니면 false를 반환함.
   Future<bool> launchInBrowser(String url) async {
     final Uri targetUrl = Uri.parse(url);
     if (!await canLaunchUrl(targetUrl)) {
