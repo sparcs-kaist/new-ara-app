@@ -6,6 +6,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:new_ara_app/constants/url_info.dart';
 import 'package:provider/provider.dart';
 import 'package:dio/dio.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import 'package:new_ara_app/constants/colors_info.dart';
 import 'package:new_ara_app/models/article_model.dart';
@@ -259,69 +260,82 @@ class _PostViewPageState extends State<PostViewPage> {
                                       ),
                                       if (_article.parent_board.slug ==
                                           'portal-notice')
-                                        Container(
-                                          width: MediaQuery.of(context)
-                                                  .size
-                                                  .width -
-                                              40,
-                                          height: 85,
-                                          decoration: BoxDecoration(
-                                            color: Colors.white,
-                                            borderRadius: const BorderRadius.all(
-                                                Radius.circular(10)),
-                                            border: Border.all(
-                                                color: Color(0xFFDBDBDB),
-                                                width: 1),
-                                            boxShadow: const [
-                                              BoxShadow(
-                                                blurRadius: 2,
-                                                spreadRadius: 0,
-                                                offset: Offset(0, 0),
-                                                color: Color(0xFFA9A9A9),
-                                              ),
-                                            ],
-                                          ),
-                                          margin: const EdgeInsets.only(bottom: 15),
-                                          padding: const EdgeInsets.only(
-                                              left: 28, right: 28, top: 18, bottom: 18),
-                                          child: Column(
-                                            mainAxisAlignment: MainAxisAlignment.start,
-                                            children: [
-                                              Row(
-                                                children: [
-                                                  Expanded(
-                                                    child: Text(
-                                                      _article.title.toString(),
-                                                      overflow:
-                                                          TextOverflow.ellipsis,
-                                                      style: const TextStyle(
-                                                          fontWeight:
-                                                              FontWeight.w400,
-                                                          fontSize: 14,
-                                                          color: Color(
-                                                              0xFF4A4A4A)),
+                                        InkWell(
+                                          onTap: null,
+                                          child: Container(
+                                            width: MediaQuery.of(context)
+                                                    .size
+                                                    .width -
+                                                40,
+                                            height: 85,
+                                            decoration: BoxDecoration(
+                                              color: Colors.white,
+                                              borderRadius:
+                                                  const BorderRadius.all(
+                                                      Radius.circular(10)),
+                                              border: Border.all(
+                                                  color: Color(0xFFDBDBDB),
+                                                  width: 1),
+                                              boxShadow: const [
+                                                BoxShadow(
+                                                  blurRadius: 2,
+                                                  spreadRadius: 0,
+                                                  offset: Offset(0, 0),
+                                                  color: Color(0xFFA9A9A9),
+                                                ),
+                                              ],
+                                            ),
+                                            margin: const EdgeInsets.only(
+                                                bottom: 15),
+                                            padding: const EdgeInsets.only(
+                                                left: 28,
+                                                right: 28,
+                                                top: 18,
+                                                bottom: 18),
+                                            child: Column(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.start,
+                                              children: [
+                                                Row(
+                                                  children: [
+                                                    Expanded(
+                                                      child: Text(
+                                                        _article.title
+                                                            .toString(),
+                                                        overflow: TextOverflow
+                                                            .ellipsis,
+                                                        style: const TextStyle(
+                                                            fontWeight:
+                                                                FontWeight.w400,
+                                                            fontSize: 14,
+                                                            color: Color(
+                                                                0xFF4A4A4A)),
+                                                      ),
                                                     ),
-                                                  ),
-                                                  SvgPicture.asset(
-                                                    'assets/icons/right_chevron.svg',
-                                                    width: 15,
-                                                    height: 25,
-                                                    colorFilter:
-                                                        const ColorFilter.mode(
-                                                            Color(0xFF4A4A4A),
-                                                            BlendMode.srcIn),
-                                                  ),
-                                                ],
-                                              ),
-                                              Text(
-                                                _article.url.toString(),
-                                                overflow: TextOverflow.ellipsis,
-                                                style: const TextStyle(
-                                                    fontWeight: FontWeight.w400,
-                                                    fontSize: 14,
-                                                    color: Color(0xFF4A4A4A)),
-                                              ),
-                                            ],
+                                                    SvgPicture.asset(
+                                                      'assets/icons/right_chevron.svg',
+                                                      width: 15,
+                                                      height: 25,
+                                                      colorFilter:
+                                                          const ColorFilter
+                                                              .mode(
+                                                              Color(0xFF4A4A4A),
+                                                              BlendMode.srcIn),
+                                                    ),
+                                                  ],
+                                                ),
+                                                Text(
+                                                  _article.url.toString(),
+                                                  overflow:
+                                                      TextOverflow.ellipsis,
+                                                  style: const TextStyle(
+                                                      fontWeight:
+                                                          FontWeight.w400,
+                                                      fontSize: 14,
+                                                      color: Color(0xFF4A4A4A)),
+                                                ),
+                                              ],
+                                            ),
                                           ),
                                         ),
                                       // TODO: (2023.08.09)첨부파일 리스트뷰 프로토타입. 추후 디자이너와 조율 예정
@@ -1632,5 +1646,20 @@ class _PostViewPageState extends State<PostViewPage> {
       _setCommentMode(false, false);
     }
     return true;
+  }
+
+  Future<void> launchInBrowser(String url) async {
+    final Uri targetUrl = Uri.parse(url);
+    if (!await canLaunchUrl(targetUrl)) {
+      debugPrint("$url을 열 수 없습니다.");
+      return;
+    }
+    if (!await launchUrl(
+      Uri.parse(url),
+      mode: LaunchMode.externalApplication,
+    )) {
+      // TODO: debugPrint 및 Toast message로 수정하기
+      throw Exception('Could not launch $url');
+    }
   }
 }
