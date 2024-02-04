@@ -76,13 +76,15 @@ class _MyAppState extends State<MyApp> {
     FlutterSecureStorage secureStorage = const FlutterSecureStorage();
     var cookiesBySecureStorage = await secureStorage.read(key: 'cookie');
 
-    debugPrint("main.dart : $cookiesBySecureStorage");
+    debugPrint("main.dart : $cookiesBySecureStorage.toString()");
     if (cookiesBySecureStorage != null) {
       setState(() {
         isLoading = true;
       });
+      debugPrint("main.dart s");
       bool tf = await userProvider.apiMeUserInfo(
           initCookieString: cookiesBySecureStorage);
+      debugPrint("main.dart : tf: $tf");
       if (tf) {
         userProvider.setHasData(true);
         userProvider.setCookieToList(cookiesBySecureStorage);
