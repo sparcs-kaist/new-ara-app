@@ -127,6 +127,9 @@ class _MyAppState extends State<MyApp> {
       fontFamily: 'NotoSansKR',
       scaffoldBackgroundColor: Colors.white,
       splashColor: Colors.transparent,
+      textSelectionTheme: const TextSelectionThemeData(
+        cursorColor: Colors.transparent,
+      ),
     );
   }
 }
