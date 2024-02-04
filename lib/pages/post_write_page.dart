@@ -941,6 +941,8 @@ class _PostWritePageState extends State<PostWritePage>
                                               const SizedBox(
                                                 width: 6,
                                               ),
+
+                                              ///TODO: 파일 아이콘 커스텀 함수 만들기
                                               FileIcon(
                                                 _attachmentList[index].isNewFile
                                                     ? path.basename(
