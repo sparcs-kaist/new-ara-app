@@ -295,7 +295,7 @@ class _UserPageState extends State<UserPage>
                     ),
                   ),
                   Text(
-                    userProvider.naUser == null
+                    userProvider.naUser == null || userProvider.naUser?.email == null
                         ? "이메일 정보가 없습니다."
                         : "${userProvider.naUser?.email}",
                     style: const TextStyle(

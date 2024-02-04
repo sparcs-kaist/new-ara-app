@@ -279,7 +279,7 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
                               const SizedBox(width: 45),
                               Expanded(
                                 child: Text(
-                                  userProviderData.naUser!.email,
+                                  userProviderData.naUser!.email ?? "이메일 정보가 없습니다.",
                                   style: const TextStyle(
                                     fontWeight: FontWeight.w500,
                                     fontSize: 15,

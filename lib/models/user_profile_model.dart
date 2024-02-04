@@ -1,6 +1,6 @@
 class UserProfileModel {
   final int user;
-  final String email;
+  final String? email;
   final bool is_official;
   final String created_at; // $date-time
   final String updated_at; // $date-time
