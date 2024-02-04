@@ -26,6 +26,7 @@ import 'package:new_ara_app/providers/notification_provider.dart';
 import 'package:new_ara_app/widgets/pop_up_menu_buttons.dart';
 import 'package:new_ara_app/utils/profile_image.dart';
 import 'package:new_ara_app/utils/handle_hidden.dart';
+import 'package:new_ara_app/widgets/snackbar_noti.dart';
 
 /// 하나의 post에 대한 내용 뷰, 이벤트 처리를 모두 담당하는 StatefulWidget.
 class PostViewPage extends StatefulWidget {
@@ -261,8 +262,47 @@ class _PostViewPageState extends State<PostViewPage> {
                                       if (_article.parent_board.slug ==
                                           'portal-notice')
                                         InkWell(
-                                          onTap: () async {
-                                            await launchInBrowser(_article.url.toString());
+                                          onTap: () {
+                                            launchInBrowser(
+                                                    _article.url.toString())
+                                                .then((launchRes) {
+                                              if (launchRes == false) {
+                                                ScaffoldMessenger.of(context)
+                                                    .showSnackBar(
+                                                        buildAraSnackBar(
+                                                            context,
+                                                            content: Row(
+                                                              children: [
+                                                                SvgPicture
+                                                                    .asset(
+                                                                  'assets/icons/information.svg',
+                                                                  colorFilter: const ColorFilter
+                                                                      .mode(
+                                                                      Colors
+                                                                          .red,
+                                                                      BlendMode
+                                                                          .srcIn),
+                                                                  width: 32,
+                                                                  height: 32,
+                                                                ),
+                                                                const SizedBox(width: 8),
+                                                                const Text(
+                                                                  "브라우저로 URL을 열 수 없습니다.",
+                                                                  style:
+                                                                      TextStyle(
+                                                                    color: Colors
+                                                                        .black,
+                                                                    fontWeight:
+                                                                        FontWeight
+                                                                            .w400,
+                                                                    fontSize:
+                                                                        15,
+                                                                  ),
+                                                                ),
+                                                              ],
+                                                            )));
+                                              }
+                                            });
                                           },
                                           child: Container(
                                             width: MediaQuery.of(context)
@@ -1650,18 +1690,21 @@ class _PostViewPageState extends State<PostViewPage> {
     return true;
   }
 
-  Future<void> launchInBrowser(String url) async {
+  Future<bool> launchInBrowser(String url) async {
     final Uri targetUrl = Uri.parse(url);
     if (!await canLaunchUrl(targetUrl)) {
       debugPrint("$url을 열 수 없습니다.");
-      return;
+      return false;
     }
     if (!await launchUrl(
       Uri.parse(url),
       mode: LaunchMode.externalApplication,
     )) {
       // TODO: debugPrint 및 Toast message로 수정하기
-      throw Exception('Could not launch $url');
+      debugPrint('Could not launch $url');
+      return false;
     }
+
+    return true;
   }
 }
