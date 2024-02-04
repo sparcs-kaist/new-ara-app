@@ -172,7 +172,7 @@ class _PostWritePageState extends State<PostWritePage>
 
   late FocusNode _editorFocusNode;
 
-  bool isKeyboardClosed = true;
+  bool _isKeyboardClosed = true;
 
   @override
   void initState() {
@@ -228,12 +228,12 @@ class _PostWritePageState extends State<PostWritePage>
   void didChangeMetrics() {
     final value = MediaQuery.of(context).viewInsets.bottom;
     if (value > 0) {
-      if (isKeyboardClosed) {
+      if (_isKeyboardClosed) {
         _onKeyboardChanged(false);
       }
-      isKeyboardClosed = false;
+      _isKeyboardClosed = false;
     } else {
-      isKeyboardClosed = true;
+      _isKeyboardClosed = true;
       _onKeyboardChanged(true);
     }
   }
@@ -246,7 +246,7 @@ class _PostWritePageState extends State<PostWritePage>
       setState(() {});
     }
     setState(() {
-      isKeyboardClosed = isVisible;
+      _isKeyboardClosed = isVisible;
     });
   }
 
@@ -706,244 +706,254 @@ class _PostWritePageState extends State<PostWritePage>
   }
 
   Widget _buildAttachmentShow() {
-    return KeyboardVisibilityBuilder(
-      builder: (context, isKeyboardVisible) {
-        if (!isKeyboardClosed) {
-          return Column(
-            children: [
-              Container(
-                height: 1,
-                color: const Color(0xFFF0F0F0),
-              ),
-              SizedBox(
-                height: 50,
-                child: Row(
+    if (!_isKeyboardClosed) {
+      // 키보드가 열려있다면
+      return Column(
+        children: [
+          Container(
+            height: 1,
+            color: const Color(0xFFF0F0F0),
+          ),
+          SizedBox(
+            height: 50,
+            child: Row(
+              children: [
+                const SizedBox(
+                  width: 7,
+                ),
+                InkWell(
+                  onTap: () async {
+                    bool picktf = await _pickFile();
+                    if (picktf) {
+                      FocusScope.of(context).unfocus();
+                    } else {
+                      //TODO: 에디터로 포커스 이동 안하는 문제점이 있음.
+                      _editorFocusNode.requestFocus();
+                    }
+                  },
+                  child: SizedBox(
+                    width: 36,
+                    height: 36,
+                    child: SvgPicture.asset(
+                      'assets/icons/clip.svg',
+                    ),
+                  ),
+                ),
+                const Spacer(),
+                Container(
+                  height: 30,
+                  width: 1,
+                  color: const Color(0xFFF0F0F0),
+                ),
+                const SizedBox(
+                  width: 7,
+                ),
+                InkWell(
+                  onTap: () {
+                    FocusScope.of(context).unfocus();
+                  },
+                  child: SizedBox(
+                    width: 36,
+                    height: 36,
+                    child: SvgPicture.asset(
+                      'assets/icons/keyboard_down.svg',
+                    ),
+                  ),
+                ),
+                const SizedBox(
+                  width: 7,
+                ),
+              ],
+            ),
+          ),
+        ],
+      );
+    } else {
+      return Column(
+        children: [
+          if (_attachmentList.isEmpty)
+            Row(
+              children: [
+                Row(
                   children: [
                     const SizedBox(
-                      width: 7,
+                      width: 10,
                     ),
                     InkWell(
-                      onTap: () async {
-                        bool picktf = await _pickFile();
-                        if (picktf) {
-                          FocusScope.of(context).unfocus();
-                        } else {
-                          //TODO: 에디터로 포커스 이동 안하는 문제점이 있음.
-                          _editorFocusNode.requestFocus();
-                        }
-                      },
-                      child: SizedBox(
-                        width: 36,
-                        height: 36,
-                        child: SvgPicture.asset(
-                          'assets/icons/clip.svg',
-                        ),
+                      onTap: _pickFile,
+                      child: Row(
+                        children: [
+                          SvgPicture.asset(
+                            'assets/icons/clip.svg',
+                            colorFilter: const ColorFilter.mode(
+                              Color(0xFF636363),
+                              BlendMode.srcIn,
+                            ),
+                            width: 34,
+                            height: 34,
+                          ),
+                          const Text(
+                            "첨부파일 추가",
+                            style: TextStyle(
+                                fontWeight: FontWeight.w500,
+                                fontSize: 16,
+                                color: Color(0xFF636363)),
+                          ),
+                        ],
                       ),
-                    ),
-                    const Spacer(),
-                    Container(
-                      height: 30,
-                      width: 1,
-                      color: const Color(0xFFF0F0F0),
-                    ),
-                    const SizedBox(
-                      width: 7,
-                    ),
-                    InkWell(
-                      onTap: () {
-                        FocusScope.of(context).unfocus();
-                      },
-                      child: SizedBox(
-                        width: 36,
-                        height: 36,
-                        child: SvgPicture.asset(
-                          'assets/icons/keyboard_down.svg',
-                        ),
-                      ),
-                    ),
-                    const SizedBox(
-                      width: 7,
                     ),
                   ],
                 ),
-              ),
-            ],
-          );
-        }
-        return Column(
-          children: [
-            if (_attachmentList.isEmpty)
-              Row(
+              ],
+            )
+          else
+            AnimatedSize(
+              duration: const Duration(milliseconds: 100),
+              alignment: AlignmentDirectional.topCenter,
+              child: Column(
                 children: [
                   Row(
                     children: [
                       const SizedBox(
-                        width: 10,
+                        width: 20,
                       ),
                       InkWell(
-                        onTap: _pickFile,
-                        child: Row(
-                          children: [
-                            SvgPicture.asset(
-                              'assets/icons/clip.svg',
-                              colorFilter: const ColorFilter.mode(
-                                Color(0xFF636363),
-                                BlendMode.srcIn,
-                              ),
-                              width: 34,
-                              height: 34,
-                            ),
-                            const Text(
-                              "첨부파일 추가",
-                              style: TextStyle(
-                                  fontWeight: FontWeight.w500,
-                                  fontSize: 16,
-                                  color: Color(0xFF636363)),
-                            ),
-                          ],
+                        onTap: () => _pickFile(),
+                        child: SvgPicture.asset(
+                          'assets/icons/add.svg',
+                          width: 34,
+                          height: 34,
+                          colorFilter: const ColorFilter.mode(
+                            Color(0xFFED3A3A),
+                            BlendMode.srcIn,
+                          ),
                         ),
+                      ),
+                      const Spacer(),
+                      const SizedBox(
+                        width: 20,
+                      ),
+                      SizedBox(
+                        height: 34,
+                        child: GestureDetector(
+                          behavior: HitTestBehavior.translucent,
+                          onTap: () {
+                            setState(() {
+                              _isFileMenuBarSelected = !_isFileMenuBarSelected;
+                            });
+                          },
+                          child: Row(
+                            children: [
+                              const Text(
+                                "첨부파일",
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                              const SizedBox(
+                                width: 8,
+                              ),
+                              Text(
+                                _attachmentList.length.toString(),
+                                style: const TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w500,
+                                  color: ColorsInfo.newara,
+                                ),
+                              ),
+                              const SizedBox(
+                                width: 5,
+                              ),
+                              if (_isFileMenuBarSelected)
+                                SvgPicture.asset(
+                                  'assets/icons/chevron_up.svg',
+                                  width: 20,
+                                  height: 20,
+                                  colorFilter: const ColorFilter.mode(
+                                    Colors.red,
+                                    BlendMode.srcIn,
+                                  ),
+                                )
+                              else
+                                SvgPicture.asset(
+                                  'assets/icons/chevron_down.svg',
+                                  width: 20,
+                                  height: 20,
+                                  colorFilter: const ColorFilter.mode(
+                                    Colors.red,
+                                    BlendMode.srcIn,
+                                  ),
+                                ),
+                            ],
+                          ),
+                        ),
+                      ),
+                      const SizedBox(
+                        width: 20,
                       ),
                     ],
                   ),
-                ],
-              )
-            else
-              AnimatedSize(
-                duration: const Duration(milliseconds: 100),
-                alignment: AlignmentDirectional.topCenter,
-                child: Column(
-                  children: [
-                    Row(
-                      children: [
-                        const SizedBox(
-                          width: 20,
-                        ),
-                        InkWell(
-                          onTap: () => _pickFile(),
-                          child: SvgPicture.asset(
-                            'assets/icons/add.svg',
-                            width: 34,
-                            height: 34,
-                            colorFilter: const ColorFilter.mode(
-                              Color(0xFFED3A3A),
-                              BlendMode.srcIn,
-                            ),
-                          ),
-                        ),
-                        const Spacer(),
-                        const SizedBox(
-                          width: 20,
-                        ),
-                        SizedBox(
-                          height: 34,
-                          child: GestureDetector(
-                            behavior: HitTestBehavior.translucent,
-                            onTap: () {
-                              setState(() {
-                                _isFileMenuBarSelected =
-                                    !_isFileMenuBarSelected;
-                              });
-                            },
-                            child: Row(
-                              children: [
-                                const Text(
-                                  "첨부파일",
-                                  style: TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.w500,
-                                  ),
-                                ),
-                                const SizedBox(
-                                  width: 8,
-                                ),
-                                Text(
-                                  _attachmentList.length.toString(),
-                                  style: const TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.w500,
-                                    color: ColorsInfo.newara,
-                                  ),
-                                ),
-                                const SizedBox(
-                                  width: 5,
-                                ),
-                                if (_isFileMenuBarSelected)
-                                  SvgPicture.asset(
-                                    'assets/icons/chevron_up.svg',
-                                    width: 20,
-                                    height: 20,
-                                    colorFilter: const ColorFilter.mode(
-                                      Colors.red,
-                                      BlendMode.srcIn,
-                                    ),
-                                  )
-                                else
-                                  SvgPicture.asset(
-                                    'assets/icons/chevron_down.svg',
-                                    width: 20,
-                                    height: 20,
-                                    colorFilter: const ColorFilter.mode(
-                                      Colors.red,
-                                      BlendMode.srcIn,
-                                    ),
-                                  ),
-                              ],
-                            ),
-                          ),
-                        ),
-                        const SizedBox(
-                          width: 20,
-                        ),
-                      ],
-                    ),
-                    if (_isFileMenuBarSelected) ...[
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 15),
-                        child: SizedBox(
-                          //최대 4개까지 첨부파일 보여주고 그 이후로는 스크롤.
-                          //피그마 디자인 기준으로 필요한 높이를 계산함.
-                          height: 10 +
-                              math.min(3, _attachmentList.length) * 44 +
-                              5 * (math.min(3, _attachmentList.length) - 1),
+                  if (_isFileMenuBarSelected) ...[
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 15),
+                      child: SizedBox(
+                        //최대 4개까지 첨부파일 보여주고 그 이후로는 스크롤.
+                        //피그마 디자인 기준으로 필요한 높이를 계산함.
+                        height: 10 +
+                            math.min(3, _attachmentList.length) * 44 +
+                            5 * (math.min(3, _attachmentList.length) - 1),
 
-                          child: Column(
-                            children: [
-                              const SizedBox(
-                                height: 10,
-                              ),
-                              Expanded(
-                                child: CupertinoScrollbar(
-                                  thumbVisibility: true,
+                        child: Column(
+                          children: [
+                            const SizedBox(
+                              height: 10,
+                            ),
+                            Expanded(
+                              child: CupertinoScrollbar(
+                                thumbVisibility: true,
+                                controller: _listScrollController,
+                                child: ListView.builder(
                                   controller: _listScrollController,
-                                  child: ListView.builder(
-                                    controller: _listScrollController,
-                                    shrinkWrap: true,
-                                    itemCount: _attachmentList.length,
-                                    itemBuilder: (context, index) {
-                                      return Column(
-                                        children: [
-                                          if (index != 0)
-                                            const SizedBox(
-                                              height: 5,
+                                  shrinkWrap: true,
+                                  itemCount: _attachmentList.length,
+                                  itemBuilder: (context, index) {
+                                    return Column(
+                                      children: [
+                                        if (index != 0)
+                                          const SizedBox(
+                                            height: 5,
+                                          ),
+                                        Container(
+                                          height: 44,
+                                          decoration: BoxDecoration(
+                                            border: Border.all(
+                                              color: const Color(
+                                                  0xFFF0F0F0), // #F0F0F0 색상
+                                              width: 1, // 테두리 두께 1픽셀
                                             ),
-                                          Container(
-                                            height: 44,
-                                            decoration: BoxDecoration(
-                                              border: Border.all(
-                                                color: const Color(
-                                                    0xFFF0F0F0), // #F0F0F0 색상
-                                                width: 1, // 테두리 두께 1픽셀
+                                            borderRadius: BorderRadius.circular(
+                                                15), // 반지름 15
+                                          ),
+                                          child: Row(
+                                            children: [
+                                              const SizedBox(
+                                                width: 6,
                                               ),
-                                              borderRadius:
-                                                  BorderRadius.circular(
-                                                      15), // 반지름 15
-                                            ),
-                                            child: Row(
-                                              children: [
-                                                const SizedBox(
-                                                  width: 6,
-                                                ),
-                                                FileIcon(
+                                              FileIcon(
+                                                _attachmentList[index].isNewFile
+                                                    ? path.basename(
+                                                        _attachmentList[index]
+                                                            .fileLocalPath!)
+                                                    : _attachmentList[index]
+                                                        .fileUrlName,
+                                                size: 30,
+                                              ),
+                                              const SizedBox(
+                                                width: 3,
+                                              ),
+                                              Expanded(
+                                                child: Text(
                                                   _attachmentList[index]
                                                           .isNewFile
                                                       ? path.basename(
@@ -951,258 +961,240 @@ class _PostWritePageState extends State<PostWritePage>
                                                               .fileLocalPath!)
                                                       : _attachmentList[index]
                                                           .fileUrlName,
-                                                  size: 30,
+                                                  maxLines: 1,
+                                                  overflow:
+                                                      TextOverflow.ellipsis,
                                                 ),
-                                                const SizedBox(
-                                                  width: 3,
-                                                ),
-                                                Expanded(
-                                                  child: Text(
-                                                    _attachmentList[index]
-                                                            .isNewFile
-                                                        ? path.basename(
+                                              ),
+                                              const SizedBox(
+                                                width: 3,
+                                              ),
+                                              Text(
+                                                _attachmentList[index].isNewFile
+                                                    ? formatBytes(File(
                                                             _attachmentList[
                                                                     index]
                                                                 .fileLocalPath!)
-                                                        : _attachmentList[index]
-                                                            .fileUrlName,
-                                                    maxLines: 1,
-                                                    overflow:
-                                                        TextOverflow.ellipsis,
-                                                  ),
+                                                        .lengthSync())
+                                                    : formatBytes(
+                                                        _attachmentList[index]
+                                                            .fileUrlSize),
+                                                style: const TextStyle(
+                                                    fontSize: 14,
+                                                    fontWeight: FontWeight.w500,
+                                                    color: Color(0xFFBBBBBB)),
+                                              ),
+                                              InkWell(
+                                                onTap: () {
+                                                  _onAttachmentDelete(index);
+                                                },
+                                                child: SvgPicture.asset(
+                                                  'assets/icons/close.svg',
+                                                  width: 30,
+                                                  height: 30,
+                                                  colorFilter:
+                                                      const ColorFilter.mode(
+                                                          Color(0xFFBBBBBB),
+                                                          BlendMode.srcIn),
                                                 ),
-                                                const SizedBox(
-                                                  width: 3,
-                                                ),
-                                                Text(
-                                                  _attachmentList[index]
-                                                          .isNewFile
-                                                      ? formatBytes(File(
-                                                              _attachmentList[
-                                                                      index]
-                                                                  .fileLocalPath!)
-                                                          .lengthSync())
-                                                      : formatBytes(
-                                                          _attachmentList[index]
-                                                              .fileUrlSize),
-                                                  style: const TextStyle(
-                                                      fontSize: 14,
-                                                      fontWeight:
-                                                          FontWeight.w500,
-                                                      color: Color(0xFFBBBBBB)),
-                                                ),
-                                                InkWell(
-                                                  onTap: () {
-                                                    _onAttachmentDelete(index);
-                                                  },
-                                                  child: SvgPicture.asset(
-                                                    'assets/icons/close.svg',
-                                                    width: 30,
-                                                    height: 30,
-                                                    colorFilter:
-                                                        const ColorFilter.mode(
-                                                            Color(0xFFBBBBBB),
-                                                            BlendMode.srcIn),
-                                                  ),
-                                                ),
-                                                const SizedBox(
-                                                  width: 8.52,
-                                                ),
-                                              ],
-                                            ),
+                                              ),
+                                              const SizedBox(
+                                                width: 8.52,
+                                              ),
+                                            ],
                                           ),
-                                        ],
-                                      );
-                                    },
-                                  ),
+                                        ),
+                                      ],
+                                    );
+                                  },
                                 ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ],
-                  ],
-                ),
-              ),
-            const SizedBox(
-              height: 15,
-            ),
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.end,
-              children: [
-                const SizedBox(
-                  width: 20,
-                ),
-                // TODO: 익명 선택 범위 화면 영역 확대(resolved)
-                // 자유 게시판인 경우 && 수정 게시물이 아닌 경우
-                if (_chosenBoardValue != null &&
-                    _isEditingPost == false &&
-                    _chosenBoardValue!.slug == 'talk')
-                  Row(
-                    children: [
-                      GestureDetector(
-                        onTap: () {
-                          setState(() {
-                            _selectedCheckboxes[0] = !_selectedCheckboxes[0]!;
-                          });
-                        },
-                        child: Row(
-                          children: [
-                            Container(
-                              width: 20,
-                              height: 20,
-                              decoration: BoxDecoration(
-                                color: _selectedCheckboxes[0]!
-                                    ? ColorsInfo.newara
-                                    : const Color(0xFFF0F0F0),
-                                borderRadius: BorderRadius.circular(5.0),
-                              ),
-                              alignment: Alignment.center,
-                              child: SvgPicture.asset('assets/icons/check.svg',
-                                  width: 16,
-                                  height: 16,
-                                  colorFilter: const ColorFilter.mode(
-                                      Colors.white, BlendMode.srcIn)),
-                            ),
-                            const SizedBox(
-                              width: 6,
-                            ),
-                            Text(
-                              "익명",
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w500,
-                                color: _selectedCheckboxes[0]!
-                                    ? ColorsInfo.newara
-                                    : const Color(0xFFBBBBBB),
                               ),
                             ),
                           ],
                         ),
                       ),
-                      const SizedBox(
-                        width: 15,
-                      ),
-                    ],
-                  ),
-
-                //TODO: 터치 부분이 너무 작아서 불편함.
-                GestureDetector(
-                  onTap: () {
-                    setState(() {
-                      //성인 체크 박스
-                      _selectedCheckboxes[1] = !_selectedCheckboxes[1]!;
-                    });
-                  },
-                  child: Row(
-                    children: [
-                      Container(
-                        width: 20,
-                        height: 20,
-                        decoration: BoxDecoration(
-                          color: _selectedCheckboxes[1]!
-                              ? ColorsInfo.newara
-                              : const Color(0xFFF0F0F0),
-                          borderRadius: BorderRadius.circular(5.0),
-                        ),
-                        alignment: Alignment.center,
-                        child: SvgPicture.asset(
-                          'assets/icons/check.svg',
-                          width: 16,
-                          height: 16,
-                          colorFilter: const ColorFilter.mode(
-                              Colors.white, BlendMode.srcIn), // #FFFFFF 색상
-                        ),
-                      ),
-                      const SizedBox(
-                        width: 6,
-                      ),
-                      Text(
-                        "성인",
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w500,
-                          color: _selectedCheckboxes[1]!
-                              ? ColorsInfo.newara
-                              : const Color(0xFFBBBBBB),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-
-                const SizedBox(
-                  width: 15,
-                ),
-                GestureDetector(
-                  onTap: () {
-                    setState(() {
-                      //정치 체크 박스
-                      _selectedCheckboxes[2] = !_selectedCheckboxes[2]!;
-                    });
-                  },
-                  child: Row(
-                    children: [
-                      Container(
-                        width: 20,
-                        height: 20,
-                        decoration: BoxDecoration(
-                          color: _selectedCheckboxes[2]!
-                              ? ColorsInfo.newara
-                              : const Color(0xFFF0F0F0),
-                          borderRadius: BorderRadius.circular(5.0),
-                        ),
-                        alignment: Alignment.center,
-                        child: SvgPicture.asset(
-                          'assets/icons/check.svg',
-                          width: 16,
-                          height: 16,
-                          colorFilter: const ColorFilter.mode(
-                              Colors.white, BlendMode.srcIn), // #FFFFFF 색상
-                        ),
-                      ),
-                      const SizedBox(
-                        width: 6,
-                      ),
-                      Text(
-                        "정치",
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w500,
-                          color: _selectedCheckboxes[2]!
-                              ? ColorsInfo.newara
-                              : const Color(0xFFBBBBBB),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-
-                const Spacer(),
-                GestureDetector(
-                  child: const Text(
-                    "이용약관",
-                    style: TextStyle(
-                      decoration: TextDecoration.underline,
-                      fontSize: 16,
-                      fontWeight: FontWeight.w500,
-                      color: Color(0xFFBBBBBB),
                     ),
+                  ],
+                ],
+              ),
+            ),
+          const SizedBox(
+            height: 15,
+          ),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              const SizedBox(
+                width: 20,
+              ),
+              // TODO: 익명 선택 범위 화면 영역 확대(resolved)
+              // 자유 게시판인 경우 && 수정 게시물이 아닌 경우
+              if (_chosenBoardValue != null &&
+                  _isEditingPost == false &&
+                  _chosenBoardValue!.slug == 'talk')
+                Row(
+                  children: [
+                    GestureDetector(
+                      onTap: () {
+                        setState(() {
+                          _selectedCheckboxes[0] = !_selectedCheckboxes[0]!;
+                        });
+                      },
+                      child: Row(
+                        children: [
+                          Container(
+                            width: 20,
+                            height: 20,
+                            decoration: BoxDecoration(
+                              color: _selectedCheckboxes[0]!
+                                  ? ColorsInfo.newara
+                                  : const Color(0xFFF0F0F0),
+                              borderRadius: BorderRadius.circular(5.0),
+                            ),
+                            alignment: Alignment.center,
+                            child: SvgPicture.asset('assets/icons/check.svg',
+                                width: 16,
+                                height: 16,
+                                colorFilter: const ColorFilter.mode(
+                                    Colors.white, BlendMode.srcIn)),
+                          ),
+                          const SizedBox(
+                            width: 6,
+                          ),
+                          Text(
+                            "익명",
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w500,
+                              color: _selectedCheckboxes[0]!
+                                  ? ColorsInfo.newara
+                                  : const Color(0xFFBBBBBB),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(
+                      width: 15,
+                    ),
+                  ],
+                ),
+
+              //TODO: 터치 부분이 너무 작아서 불편함.
+              GestureDetector(
+                onTap: () {
+                  setState(() {
+                    //성인 체크 박스
+                    _selectedCheckboxes[1] = !_selectedCheckboxes[1]!;
+                  });
+                },
+                child: Row(
+                  children: [
+                    Container(
+                      width: 20,
+                      height: 20,
+                      decoration: BoxDecoration(
+                        color: _selectedCheckboxes[1]!
+                            ? ColorsInfo.newara
+                            : const Color(0xFFF0F0F0),
+                        borderRadius: BorderRadius.circular(5.0),
+                      ),
+                      alignment: Alignment.center,
+                      child: SvgPicture.asset(
+                        'assets/icons/check.svg',
+                        width: 16,
+                        height: 16,
+                        colorFilter: const ColorFilter.mode(
+                            Colors.white, BlendMode.srcIn), // #FFFFFF 색상
+                      ),
+                    ),
+                    const SizedBox(
+                      width: 6,
+                    ),
+                    Text(
+                      "성인",
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w500,
+                        color: _selectedCheckboxes[1]!
+                            ? ColorsInfo.newara
+                            : const Color(0xFFBBBBBB),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+
+              const SizedBox(
+                width: 15,
+              ),
+              GestureDetector(
+                onTap: () {
+                  setState(() {
+                    //정치 체크 박스
+                    _selectedCheckboxes[2] = !_selectedCheckboxes[2]!;
+                  });
+                },
+                child: Row(
+                  children: [
+                    Container(
+                      width: 20,
+                      height: 20,
+                      decoration: BoxDecoration(
+                        color: _selectedCheckboxes[2]!
+                            ? ColorsInfo.newara
+                            : const Color(0xFFF0F0F0),
+                        borderRadius: BorderRadius.circular(5.0),
+                      ),
+                      alignment: Alignment.center,
+                      child: SvgPicture.asset(
+                        'assets/icons/check.svg',
+                        width: 16,
+                        height: 16,
+                        colorFilter: const ColorFilter.mode(
+                            Colors.white, BlendMode.srcIn), // #FFFFFF 색상
+                      ),
+                    ),
+                    const SizedBox(
+                      width: 6,
+                    ),
+                    Text(
+                      "정치",
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w500,
+                        color: _selectedCheckboxes[2]!
+                            ? ColorsInfo.newara
+                            : const Color(0xFFBBBBBB),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+
+              const Spacer(),
+              GestureDetector(
+                child: const Text(
+                  "이용약관",
+                  style: TextStyle(
+                    decoration: TextDecoration.underline,
+                    fontSize: 16,
+                    fontWeight: FontWeight.w500,
+                    color: Color(0xFFBBBBBB),
                   ),
                 ),
-                const SizedBox(
-                  width: 20,
-                ),
-              ],
-            ),
-            const SizedBox(
-              height: 20,
-            )
-          ],
-        );
-      },
-    );
+              ),
+              const SizedBox(
+                width: 20,
+              ),
+            ],
+          ),
+          const SizedBox(
+            height: 20,
+          )
+        ],
+      );
+    }
   }
 
   Widget _buildToolbar() {
