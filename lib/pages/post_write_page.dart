@@ -24,6 +24,7 @@ import 'package:new_ara_app/utils/create_dio_with_config.dart';
 import 'package:new_ara_app/utils/slide_routing.dart';
 import 'package:new_ara_app/widgets/loading_indicator.dart';
 import 'package:provider/provider.dart';
+import 'package:quill_markdown/notus/convert.dart';
 import 'package:uuid/uuid.dart';
 import 'package:new_ara_app/providers/notification_provider.dart';
 import 'package:path/path.dart' as path;
@@ -1274,6 +1275,7 @@ class _PostWritePageState extends State<PostWritePage>
         const quill.VerticalSpacing(0, 0),
         null,
       ),
+
       bold: const TextStyle(
           color: Color(0xff363636),
           fontFamily: 'NotoSansKR',
@@ -1286,6 +1288,32 @@ class _PostWritePageState extends State<PostWritePage>
         fontFamily: 'NatoSansKR',
         decoration: TextDecoration.underline,
       ),
+      //<code> 태그
+      inlineCode: quill.InlineCodeStyle(
+        style: const TextStyle(
+          color: Color(0xffff3860),
+          fontWeight: FontWeight.w400,
+          fontFamily: 'NotoSansKR',
+          height: 1.5,
+          fontSize: 14,
+        ),
+        backgroundColor: const Color(0xfff5f5f5),
+        radius: const Radius.circular(0),
+      ),
+
+      placeHolder: quill.DefaultTextBlockStyle(
+        const TextStyle(
+          color: Color(0xffBBBBBB),
+          fontWeight: FontWeight.w500,
+          fontFamily: 'NotoSansKR',
+          height: 1.5,
+          fontSize: 16,
+        ),
+        const quill.VerticalSpacing(2, 0),
+        const quill.VerticalSpacing(0, 0),
+        null,
+      ),
+      // <pre> 태그
       code: quill.DefaultTextBlockStyle(
         const TextStyle(
           //  backgroundColor: Colors.grey,
@@ -1297,19 +1325,9 @@ class _PostWritePageState extends State<PostWritePage>
         ),
         const quill.VerticalSpacing(2, 0),
         const quill.VerticalSpacing(0, 0),
-        null,
-      ),
-      placeHolder: quill.DefaultTextBlockStyle(
-        const TextStyle(
-          color: Color(0xFFBBBBBB),
-          fontWeight: FontWeight.w500,
-          fontFamily: 'NotoSansKR',
-          height: 1.5,
-          fontSize: 16,
+        const BoxDecoration(
+          color: Color(0xfff5f5f5),
         ),
-        const quill.VerticalSpacing(2, 0),
-        const quill.VerticalSpacing(0, 0),
-        null,
       ),
 
       //   small
@@ -1351,6 +1369,7 @@ class _PostWritePageState extends State<PostWritePage>
 
   quill.Delta _htmlToQuillDelta(String html) {
     debugPrint("1 : $html");
+
     // HTML을 마크다운으로 변환
     var markdown = html2md.convert(
       html,
