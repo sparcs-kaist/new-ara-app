@@ -1,4 +1,5 @@
 /// 사용자 본인 정보 표시 페이지를 관리하는 파일
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:new_ara_app/constants/url_info.dart';
@@ -17,6 +18,8 @@ import 'package:new_ara_app/utils/slide_routing.dart';
 import 'package:new_ara_app/pages/profile_edit_page.dart';
 import 'package:new_ara_app/providers/notification_provider.dart';
 import 'package:new_ara_app/utils/profile_image.dart';
+import 'package:new_ara_app/utils/handle_hidden.dart';
+import 'package:new_ara_app/widgets/post_preview.dart';
 
 /// 작성한 글, 담아둔 글, 최근 본 글을 나타내기 위해 사용
 enum TabType { created, scrap, recent }
@@ -101,10 +104,17 @@ class _UserPageState extends State<UserPage>
   /// API 통신을 위해 userProvider를 전달받으며
   /// 별도의 리턴값 없이 작업 완료 후 state를 바로 업데이트함.
   Future<void> fetchInitData(UserProvider userProvider) async {
-    bool userFetchRes = await userProvider.apiMeUserInfo(); // 유저 정보 조회
-    if (!userFetchRes) {
-      debugPrint("최신 유저정보 조회 실패!");
-    }
+    userProvider.apiMeUserInfo().then(
+      (userFetchRes) {
+        if (!userFetchRes) {
+          debugPrint("Fail: 최신 유저정보 조회");
+        } else {
+          debugPrint("Success: 최신 유저정보 조회");
+          setState(() {});
+        }
+      },
+    ); // 유저 정보 조회
+
     TabType tabType = TabType.created;
     // 작성한 글 조회하기
     isLoadedList[tabType.index] =
@@ -401,199 +411,13 @@ class _UserPageState extends State<UserPage>
                 curPage[tabType.index] = newMaxPage;
                 setCurCount(tabType);
               },
-              child: SizedBox(
-                height: 61,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Row(
-                      children: [
-                        Flexible(
-                          child: Text(
-                            curPost.title.toString(),
-                            style: const TextStyle(
-                                fontSize: 16, fontWeight: FontWeight.w500),
-                            overflow: TextOverflow.ellipsis,
-                            maxLines: 1,
-                          ),
-                        ),
-                        if (curPost.attachment_type.toString() == "NONE")
-                          Container()
-                        else
-                          const SizedBox(width: 5),
-                        if (curPost.attachment_type.toString() == "BOTH")
-                          Row(
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              SvgPicture.asset(
-                                'assets/icons/image.svg',
-                                color: Colors.grey,
-                                width: 30,
-                                height: 25,
-                              ),
-                              SvgPicture.asset(
-                                'assets/icons/clip.svg',
-                                color: Colors.grey,
-                                width: 15,
-                                height: 20,
-                              ),
-                            ],
-                          )
-                        else if (curPost.attachment_type.toString() == "IMAGE")
-                          SvgPicture.asset(
-                            'assets/icons/image.svg',
-                            color: Colors.grey,
-                            width: 30,
-                            height: 25,
-                          )
-                        else if (curPost.attachment_type.toString() ==
-                            "NON_IMAGE")
-                          SvgPicture.asset(
-                            'assets/icons/clip.svg',
-                            color: Colors.grey,
-                            width: 15,
-                            height: 20,
-                          )
-                        else
-                          Container()
-                      ],
-                    ),
-                    const SizedBox(height: 5),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Flexible(
-                          child: Row(
-                            children: [
-                              Flexible(
-                                child: Text(
-                                  curPost.created_by.profile.nickname
-                                      .toString(),
-                                  style: const TextStyle(
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.w500,
-                                      color: Color.fromRGBO(177, 177, 177, 1)),
-                                  overflow: TextOverflow.ellipsis,
-                                  maxLines: 1,
-                                ),
-                              ),
-                              const SizedBox(width: 10),
-                              Text(
-                                getTime(tabType == TabType.scrap
-                                    ? scrapInfo!.created_at.toString()
-                                    : curPost.created_at.toString()),
-                                style: const TextStyle(
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.w500,
-                                    color: Color.fromRGBO(177, 177, 177, 1)),
-                              ),
-                              const SizedBox(width: 10),
-                              Text('조회 ${curPost.hit_count}',
-                                  style: const TextStyle(
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.w500,
-                                      color: Color.fromRGBO(177, 177, 177, 1))),
-                            ],
-                          ),
-                        ),
-                        Row(
-                          children: [
-                            Visibility(
-                              // 현재 좋아요가 1 이상일 대 표시함
-                              visible: curPost.positive_vote_count != null &&
-                                  curPost.positive_vote_count! > 0,
-                              child: Row(
-                                children: [
-                                  SvgPicture.asset(
-                                    'assets/icons/like.svg',
-                                    width: 20,
-                                    height: 20,
-                                    color: ColorsInfo.newara,
-                                  ),
-                                  const SizedBox(width: 1),
-                                  Text('${curPost.positive_vote_count}',
-                                      style: const TextStyle(
-                                          fontSize: 14,
-                                          fontWeight: FontWeight.w500,
-                                          color: ColorsInfo.newara)),
-                                ],
-                              ),
-                            ),
-                            Visibility(
-                              // 좋아요, 싫어요 사이의 간격은 좋아요가 1이상이며
-                              // 싫어요, 댓글 중 적어도 하나가 1 이상일 때 표시됨
-                              visible: (curPost.positive_vote_count != null &&
-                                      curPost.positive_vote_count! > 0) &&
-                                  ((curPost.negative_vote_count != null &&
-                                      curPost.negative_vote_count! > 0) ||
-                                  (curPost.comment_count != null &&
-                                      curPost.comment_count! > 0)),
-                              child: const SizedBox(width: 6),
-                            ),
-                            Visibility(
-                              // 싫어요 아이콘은 싫어요가 1 이상일 때 표시됨
-                              visible: curPost.negative_vote_count != null &&
-                                  curPost.negative_vote_count! > 0,
-                              child: Row(
-                                children: [
-                                  SvgPicture.asset(
-                                    'assets/icons/dislike.svg',
-                                    width: 20,
-                                    height: 20,
-                                    color:
-                                        const Color.fromRGBO(83, 141, 209, 1),
-                                  ),
-                                  const SizedBox(width: 1),
-                                  Text('${curPost.negative_vote_count}',
-                                      style: const TextStyle(
-                                          fontSize: 14,
-                                          fontWeight: FontWeight.w500,
-                                          color:
-                                              Color.fromRGBO(83, 141, 209, 1))),
-                                ],
-                              ),
-                            ),
-                            Visibility(
-                              // 싫어요, 댓글 사이의 간격은 싫어요와 댓글 수가 모두 1 이상일 때 표시됨
-                              visible: (curPost.negative_vote_count != null &&
-                                      curPost.negative_vote_count! > 0) &&
-                                  (curPost.comment_count != null &&
-                                      curPost.comment_count! > 0),
-                              child: const SizedBox(width: 6),
-                            ),
-                            Visibility(
-                              // 댓글 아이콘은 댓글이 1 이상일 때 표시됨
-                              visible: curPost.comment_count != null &&
-                                  curPost.comment_count! > 0,
-                              child: Row(
-                                children: [
-                                  SvgPicture.asset(
-                                    'assets/icons/comment.svg',
-                                    width: 20,
-                                    height: 20,
-                                    color: const Color.fromRGBO(99, 99, 99, 1),
-                                  ),
-                                  const SizedBox(width: 1),
-                                  Text('${curPost.comment_count}',
-                                      style: const TextStyle(
-                                          fontSize: 14,
-                                          fontWeight: FontWeight.w500,
-                                          color:
-                                              Color.fromRGBO(99, 99, 99, 1))),
-                                ],
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ));
+              child: SizedBox(height: 62, child: PostPreview(model: curPost)));
         },
         separatorBuilder: (context, index) {
-          return const Divider();
+          return Container(
+            height: 1,
+            color: const Color(0xFFF0F0F0),
+          );
         },
       ),
     );
@@ -704,23 +528,35 @@ class _UserPageState extends State<UserPage>
 
     try {
       var response = await userProvider.myDio().get('$newAraDefaultUrl$apiUrl');
-      if (response.statusCode == 200) {
-        List<dynamic> rawPostList = response.data['results'];
-        for (int i = 0; i < rawPostList.length; i++) {
-          Map<String, dynamic>? rawPost = rawPostList[i];
-          if (rawPost != null) {
-            bool addRes = addList(tabType, rawPost);
-            // articleList에 추가하지 못한 글의 경우
-            // 별도의 exception 없이 debugPrint한 후에 넘어감.
-            if (!addRes) {
-              debugPrint("addList failed at index $i: (id: ${rawPost['id']})");
-            }
+
+      List<dynamic> rawPostList = response.data['results'];
+      for (int i = 0; i < rawPostList.length; i++) {
+        Map<String, dynamic>? rawPost = rawPostList[i];
+        if (rawPost != null) {
+          bool addRes = addList(tabType, rawPost);
+          // articleList에 추가하지 못한 글의 경우
+          // 별도의 exception 없이 debugPrint한 후에 넘어감.
+          if (!addRes) {
+            debugPrint("addList failed at index $i: (id: ${rawPost['id']})");
           }
         }
-        // pageT에 해당하는 페이지의 글 개수를 업데이트함.
-        articleCount[tabType.index] = response.data['num_items'];
-        debugPrint("fetchArticles() succeeded for page: $page");
-        return true;
+      }
+      // pageT에 해당하는 페이지의 글 개수를 업데이트함.
+      articleCount[tabType.index] = response.data['num_items'];
+      debugPrint("fetchArticles() succeeded for page: $page");
+      return true;
+    } on DioException catch (e) {
+      // Handle the DioError separately to handle only Dio related errors
+      if (e.response != null) {
+        // DioError contains response data
+        debugPrint('Dio error!');
+        debugPrint('STATUS: ${e.response?.statusCode}');
+        debugPrint('DATA: ${e.response?.data}');
+        debugPrint('HEADERS: ${e.response?.headers}');
+      } else {
+        // Error due to setting up or sending/receiving the request
+        debugPrint('Error sending request!');
+        debugPrint(e.message);
       }
     } catch (error) {
       debugPrint("fetchArticles() failed with error: $error");

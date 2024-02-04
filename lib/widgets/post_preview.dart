@@ -3,6 +3,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 
 import 'package:new_ara_app/models/article_list_action_model.dart';
 import 'package:new_ara_app/utils/time_utils.dart';
+import 'package:new_ara_app/utils/handle_hidden.dart';
 
 class PostPreview extends StatefulWidget {
   final ArticleListActionModel model;
@@ -27,10 +28,11 @@ class _PostPreviewState extends State<PostPreview> {
             children: [
               Flexible(
                 child: Text(
-                  widget.model.is_hidden
-                      ? "숨겨진 글 입니다."
-                      : widget.model.title.toString(),
-                  style: const TextStyle(
+                  getTitle(widget.model.title, widget.model.is_hidden, widget.model.why_hidden),
+                  style: TextStyle(
+                    color: widget.model.is_hidden
+                        ? const Color(0xFFBBBBBB)
+                        : Colors.black,
                     fontWeight: FontWeight.w500,
                     fontSize: 16,
                   ),
@@ -119,11 +121,12 @@ class _PostPreviewState extends State<PostPreview> {
           children: [
             SvgPicture.asset(
               'assets/icons/like.svg',
-              width: 20,
-              height: 20,
+              width: 10,
+              height: 12.46,
               colorFilter:
                   const ColorFilter.mode(Color(0xFFED3A3A), BlendMode.srcIn),
             ),
+            const SizedBox(width: 1.97),
             Text(
               widget.model.positive_vote_count.toString(),
               style: const TextStyle(
@@ -147,10 +150,11 @@ class _PostPreviewState extends State<PostPreview> {
         Row(
           children: [
             SvgPicture.asset('assets/icons/dislike.svg',
-                width: 20,
-                height: 20,
+                width: 10,
+                height: 12.46,
                 colorFilter:
                     const ColorFilter.mode(Color(0xFF538DD1), BlendMode.srcIn)),
+            const SizedBox(width: 1.97),
             Text(
               widget.model.negative_vote_count.toString(),
               style: const TextStyle(
@@ -173,10 +177,11 @@ class _PostPreviewState extends State<PostPreview> {
         Row(
           children: [
             SvgPicture.asset('assets/icons/comment.svg',
-                width: 20,
-                height: 20,
+                width: 13.75,
+                height: 12.21,
                 colorFilter:
                     const ColorFilter.mode(Color(0xFF636363), BlendMode.srcIn)),
+            const SizedBox(width: 3.13),
             Text(
               widget.model.comment_count.toString(),
               style: const TextStyle(

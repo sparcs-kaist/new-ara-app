@@ -275,7 +275,8 @@ class _NotificationPageState extends State<NotificationPage> {
                                         }
                                       },
                                       child: Container(
-                                        constraints: const BoxConstraints(minHeight: 92),
+                                        constraints:
+                                            const BoxConstraints(minHeight: 92),
                                         padding: const EdgeInsets.only(
                                             left: 10,
                                             right: 10,
@@ -316,14 +317,20 @@ class _NotificationPageState extends State<NotificationPage> {
                                                             ? Color(0xffbbbbbb)
                                                             : ColorsInfo.newara,
                                                   ),
-                                                  child: SvgPicture.asset(
-                                                    targetNoti.type == "default"
-                                                        ? "assets/icons/notification.svg"
-                                                        : "assets/icons/comment.svg",
-                                                    colorFilter:
-                                                        const ColorFilter.mode(
-                                                            Colors.white,
-                                                            BlendMode.srcIn),
+                                                  child: Center(
+                                                    child: SvgPicture.asset(
+                                                      width: 30,
+                                                      height: 28,
+                                                      targetNoti.type ==
+                                                              "default"
+                                                          ? "assets/icons/notification.svg"
+                                                          : "assets/icons/comment.svg",
+                                                      colorFilter:
+                                                          const ColorFilter
+                                                              .mode(
+                                                              Colors.white,
+                                                              BlendMode.srcIn),
+                                                    ),
                                                   ),
                                                 ),
                                               ],

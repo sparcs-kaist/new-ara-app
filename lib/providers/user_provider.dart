@@ -124,8 +124,9 @@ class UserProvider with ChangeNotifier {
     late dynamic response;
     try {
       response = await dio.get(totUrl);
+      debugPrint("GET $totUrl success: ${response.data.toString()}");
     } catch (error) {
-      debugPrint("GET /api/$apiUrl failed with error: $error");
+      debugPrint("GET $totUrl failed with error: $error");
       return null;
     }
     if (response.statusCode == 200) {
