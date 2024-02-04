@@ -22,14 +22,14 @@ import 'package:new_ara_app/utils/handle_hidden.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 ///SharedPreferences를 이용해 데이터 저장( 키: api url, 값: api response)
-Future<void> saveApiData(String key, dynamic data) async {
+Future<void> _saveApiDataToCache(String key, dynamic data) async {
   final prefs = await SharedPreferences.getInstance();
   String jsonString = jsonEncode(data);
   await prefs.setString(key, jsonString);
 }
 
 ///SharedPreferences를 이용해 데이터 불러오기( 키: api url, 값: api response)
-Future<dynamic> loadApiData(String key) async {
+Future<dynamic> _loadApiDataFromCache(String key) async {
   final prefs = await SharedPreferences.getInstance();
   String? jsonString = prefs.getString(key);
   if (jsonString != null) {
@@ -79,8 +79,8 @@ class _MainPageState extends State<MainPage> {
 
     //측정하고자 하는 코드 블록
     Future.wait([
-      refreshBoardList(userProvider),
-      refreshDailyBest(userProvider),
+      _refreshBoardList(userProvider),
+      _refreshDailyBest(userProvider),
     ]).then((results) {
       DateTime endTime = DateTime.now(); // 종료 시간 기록
 
@@ -92,13 +92,14 @@ class _MainPageState extends State<MainPage> {
   }
 
   /// 일일 베스트 컨텐츠 데이터를 새로고침
-  Future<void> refreshDailyBest(UserProvider userProvider) async {
+  Future<void> _refreshDailyBest(UserProvider userProvider) async {
     //1. Shared_Preferences 값이 있으면(if not null) 그 값으로 UI 업데이트.
     //2. api 호출 후 새로운 response shared_preferences에 저장 후 UI 업데이트
 
     // api 호출과 Provider 정보 동기화.
     try {
-      Map<String, dynamic>? recentJson = await loadApiData('articles/top/');
+      Map<String, dynamic>? recentJson =
+          await _loadApiDataFromCache('articles/top/');
 
       if (recentJson != null) {
         if (mounted) {
@@ -112,7 +113,7 @@ class _MainPageState extends State<MainPage> {
         }
       }
       dynamic response = await userProvider.getApiRes("articles/top/");
-      await saveApiData('articles/top/', response);
+      await _saveApiDataToCache('articles/top/', response);
       if (mounted) {
         setState(() {
           _dailyBestContents.clear();
@@ -129,15 +130,15 @@ class _MainPageState extends State<MainPage> {
   }
 
   /// 게시판 목록 안의 게시물들을 새로 고침
-  Future<void> refreshBoardList(UserProvider userProvider) async {
-    List<dynamic>? boardJson = await loadApiData('boards/');
+  Future<void> _refreshBoardList(UserProvider userProvider) async {
+    List<dynamic>? boardJson = await _loadApiDataFromCache('boards/');
     if (boardJson == null) {
       boardJson = await userProvider.getApiRes("boards/");
-      await saveApiData('boards/', boardJson);
+      await _saveApiDataToCache('boards/', boardJson);
     } else {
       userProvider
           .getApiRes("boards/")
-          .then((value) async => {await saveApiData('boards/', value)});
+          .then((value) async => {await _saveApiDataToCache('boards/', value)});
     }
     if (mounted) {
       setState(() {
@@ -154,74 +155,74 @@ class _MainPageState extends State<MainPage> {
         _isLoading[7] = false;
       });
       await Future.wait([
-        refreshPortalNotice(userProvider),
+        _refreshPortalNotice(userProvider),
         refreshFacilityNotice(userProvider),
-        refreshNewAraNotice(userProvider),
-        refreshGradAssocNotice(userProvider),
-        refreshUndergradAssocNotice(userProvider),
-        refreshFreshmanCouncil(userProvider),
+        _refreshNewAraNotice(userProvider),
+        _refreshGradAssocNotice(userProvider),
+        _refreshUndergradAssocNotice(userProvider),
+        _refreshFreshmanCouncil(userProvider),
       ]);
     }
     // 게시판 목록 로드 후 각 게시판의 공지사항들을 새로고침
   }
 
   ///포탈 게시물 글 불러오기.
-  Future<void> refreshPortalNotice(UserProvider userProvider) async {
-    await refreshBoardContent(
+  Future<void> _refreshPortalNotice(UserProvider userProvider) async {
+    await _refreshBoardContent(
         userProvider, "portal-notice", "", _portalContents, 1);
   }
 
   ///입주 업체 게시물 글 불러오기.
   Future<void> refreshFacilityNotice(UserProvider userProvider) async {
-    await refreshBoardContent(
+    await _refreshBoardContent(
         userProvider, "facility-notice", "", _facilityContents, 2);
   }
 
-  Future<void> refreshNewAraNotice(UserProvider userProvider) async {
-    await refreshBoardContent(
+  Future<void> _refreshNewAraNotice(UserProvider userProvider) async {
+    await _refreshBoardContent(
         userProvider, "ara-feedback", "", _newAraContents, 3);
   }
 
-  Future<void> refreshGradAssocNotice(UserProvider userProvider) async {
+  Future<void> _refreshGradAssocNotice(UserProvider userProvider) async {
     //원총
     // "slug": "students-group",
     // "slug": "grad-assoc",
     //dev 서버랑 실제 서버 parent_topic 이 다름을 유의하기.
     //https://newara.sparcs.org/api/articles/?parent_board=2&parent_topic=24
-    await refreshBoardContent(
+    await _refreshBoardContent(
         userProvider, "students-group", "grad-assoc", _gradContents, 4);
   }
 
-  Future<void> refreshUndergradAssocNotice(UserProvider userProvider) async {
+  Future<void> _refreshUndergradAssocNotice(UserProvider userProvider) async {
     // 총학
     // "slug": "students-group",
     // "slug": "undergrad-assoc",
-    await refreshBoardContent(userProvider, "students-group", "undergrad-assoc",
-        _underGradContents, 5);
+    await _refreshBoardContent(userProvider, "students-group",
+        "undergrad-assoc", _underGradContents, 5);
   }
 
-  Future<void> refreshFreshmanCouncil(UserProvider userProvider) async {
+  Future<void> _refreshFreshmanCouncil(UserProvider userProvider) async {
     //새학
     // "slug": "students-group",
     // "slug": "freshman-council",
-    await refreshBoardContent(userProvider, "students-group",
+    await _refreshBoardContent(userProvider, "students-group",
         "freshman-council", _freshmanContents, 6);
   }
 
   /// 게시판의 게시물들을 불러옴. 코드 중복을 줄이기 위해 사용.
-  Future<void> refreshBoardContent(
+  Future<void> _refreshBoardContent(
       UserProvider userProvider,
       String slug1,
       String slug2,
       List<ArticleListActionModel> contentList,
       int isLoadingIndex) async {
-    List<int> ids = findBoardID(slug1, slug2);
+    List<int> ids = _searchBoardID(slug1, slug2);
     int boardID = ids[0], topicID = ids[1];
     String apiUrl = topicID == -1
         ? "articles/?parent_board=$boardID"
         : "articles/?parent_board=$boardID&parent_topic=$topicID";
 
-    Map<String, dynamic>? recentJson = await loadApiData(apiUrl);
+    Map<String, dynamic>? recentJson = await _loadApiDataFromCache(apiUrl);
     if (recentJson != null) {
       if (mounted) {
         setState(() {
@@ -240,7 +241,7 @@ class _MainPageState extends State<MainPage> {
     }
 
     dynamic response = await userProvider.getApiRes(apiUrl);
-    saveApiData(apiUrl, response);
+    _saveApiDataToCache(apiUrl, response);
     if (mounted) {
       setState(() {
         contentList.clear();
@@ -258,7 +259,7 @@ class _MainPageState extends State<MainPage> {
   }
 
   /// 주어진 slug 값을 통해 게시판과 토픽의 ID를 찾음. topic 이 없는 경우 slug2로 ""을 넘겨주면 된다.
-  List<int> findBoardID(String slug1, String slug2) {
+  List<int> _searchBoardID(String slug1, String slug2) {
     List<int> returnValue = [-1, -1];
     for (int i = 0; i < _boards.length; i++) {
       if (_boards[i].slug == slug1) {
@@ -275,7 +276,7 @@ class _MainPageState extends State<MainPage> {
     return returnValue;
   }
 
-  BoardDetailActionModel findBoardBySlug(String slug1) {
+  BoardDetailActionModel _searchBoard(String slug1) {
     for (int i = 0; i < _boards.length; i++) {
       if (_boards[i].slug == slug1) {
         return _boards[i];
@@ -429,7 +430,7 @@ class _MainPageState extends State<MainPage> {
                                 Navigator.of(context)
                                     .push(slideRoute(PostListShowPage(
                                   boardType: BoardType.free,
-                                  boardInfo: findBoardBySlug("portal-notice"),
+                                  boardInfo: _searchBoard("portal-notice"),
                                 )));
                               },
                               child: Row(
@@ -549,8 +550,8 @@ class _MainPageState extends State<MainPage> {
                                 Navigator.of(context).push(slideRoute(
                                     PostListShowPage(
                                         boardType: BoardType.free,
-                                        boardInfo: findBoardBySlug(
-                                            "facility-notice"))));
+                                        boardInfo:
+                                            _searchBoard("facility-notice"))));
                               },
                               child: Row(
                                 children: [
@@ -611,7 +612,7 @@ class _MainPageState extends State<MainPage> {
                                 Navigator.of(context)
                                     .push(slideRoute(PostListShowPage(
                                   boardType: BoardType.free,
-                                  boardInfo: findBoardBySlug("ara-feedback"),
+                                  boardInfo: _searchBoard("ara-feedback"),
                                 )));
                               },
                               child: Row(
@@ -671,7 +672,7 @@ class _MainPageState extends State<MainPage> {
                       MainPageTextButton('main_page.stu_community', () {
                         Navigator.of(context).push(slideRoute(PostListShowPage(
                             boardType: BoardType.free,
-                            boardInfo: findBoardBySlug("students-group"))));
+                            boardInfo: _searchBoard("students-group"))));
                       }),
                       const SizedBox(height: 5),
                       Container(
