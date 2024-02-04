@@ -1368,27 +1368,32 @@ class _PostWritePageState extends State<PostWritePage>
   }
 
   quill.Delta _htmlToQuillDelta(String html) {
+    //TODO: quill에서 <hr> 지원 안됨
+    //TODO: phase3에서 MarkdownToDelta 이 strikethrough 지원 안됨
+    html = html
+        .replaceAll('<hr>', '')
+        .replaceAll('<s>', '')
+        .replaceAll('</s>', '');
     debugPrint("1 : $html");
 
-    // HTML을 마크다운으로 변환
+    // Phase2: HTML을 마크다운으로 변환
     var markdown = html2md.convert(
       html,
       styleOptions: {
         'headingStyle': 'atx',
       },
     );
-    debugPrint("2 : $markdown");
+    debugPrint("phase2 :\n$markdown");
 
-    // 마크다운을 Delta로 변환
-    var deltaJson = markdownToQuill(markdown);
-    debugPrint("3 : ${deltaJson!}");
+    // Phase3: 마크다운을 Delta로 변환
+    // markdownToQuill 과 MarkdownToDelta 둘 중 하나 선택해서 사용
+
+    // var deltaJson = markdownToQuill(markdown);
 
     final mdDocument = md.Document(encodeHtml: false);
-
     final mdToDelta = MarkdownToDelta(markdownDocument: mdDocument);
-
     var deltaJson2 = mdToDelta.convert(markdown);
-    debugPrint("4 : $deltaJson2");
+    debugPrint("phase3 : \n$deltaJson2");
 
     // Delta를 JSON으로 변환
     //var delta = quill.Delta.fromJson(jsonDecode(deltaJson!));
