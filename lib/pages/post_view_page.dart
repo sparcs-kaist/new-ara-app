@@ -261,7 +261,9 @@ class _PostViewPageState extends State<PostViewPage> {
                                       if (_article.parent_board.slug ==
                                           'portal-notice')
                                         InkWell(
-                                          onTap: null,
+                                          onTap: () async {
+                                            await launchInBrowser(_article.url.toString());
+                                          },
                                           child: Container(
                                             width: MediaQuery.of(context)
                                                     .size
