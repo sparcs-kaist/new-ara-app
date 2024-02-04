@@ -47,7 +47,16 @@ class MainPage extends StatefulWidget {
 /// 네이게이션 페이지에서 제일 먼저 보이는 메인 페이지.
 class _MainPageState extends State<MainPage> {
   //각 컨텐츠 로딩을 확인하기 위한 변수
-  final List<bool> _isLoading = [true, true, true, true, true, true, true, true];
+  final List<bool> _isLoading = [
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true
+  ];
   //각 컨텐츠 별 데이터 리스트
 
   /// api 요청으로 모든 게시물 목록을 가져왔을 때 저장하는 변수
@@ -266,6 +275,15 @@ class _MainPageState extends State<MainPage> {
     return returnValue;
   }
 
+  BoardDetailActionModel findBoardBySlug(String slug1) {
+    for (int i = 0; i < _boards.length; i++) {
+      if (_boards[i].slug == slug1) {
+        return _boards[i];
+      }
+    }
+    return _boards[0];
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -325,7 +343,6 @@ class _MainPageState extends State<MainPage> {
                       MainPageTextButton(
                         'main_page.realtime',
                         () {
-                          //잠시 free_bulletin_board 들 테스트 하기 위한
                           Navigator.of(context)
                               .push(slideRoute(const PostListShowPage(
                             boardType: BoardType.top,
@@ -334,7 +351,6 @@ class _MainPageState extends State<MainPage> {
                         },
                       ),
                       const SizedBox(height: 5),
-                      // 실시간 인기 글을 ListView 로 도입 예정
                       SizedBox(
                         width: MediaQuery.of(context).size.width - 40,
                         child: Column(
@@ -413,8 +429,7 @@ class _MainPageState extends State<MainPage> {
                                 Navigator.of(context)
                                     .push(slideRoute(PostListShowPage(
                                   boardType: BoardType.free,
-                                  // TODO: 포탈 공지가 boardList[0]가 아닐 수도 있다. slug로 확인해야 한다.
-                                  boardInfo: _boards[0],
+                                  boardInfo: findBoardBySlug("portal-notice"),
                                 )));
                               },
                               child: Row(
@@ -481,8 +496,7 @@ class _MainPageState extends State<MainPage> {
                             InkWell(
                                 onTap: () {
                                   Navigator.of(context).push(slideRoute(
-                                      PostViewPage(
-                                          id: _portalContents[1].id)));
+                                      PostViewPage(id: _portalContents[1].id)));
                                 },
                                 child: Text(
                                   getTitle(
@@ -504,8 +518,7 @@ class _MainPageState extends State<MainPage> {
                             InkWell(
                                 onTap: () {
                                   Navigator.of(context).push(slideRoute(
-                                      PostViewPage(
-                                          id: _portalContents[2].id)));
+                                      PostViewPage(id: _portalContents[2].id)));
                                 },
                                 child: Text(
                                   getTitle(
@@ -533,12 +546,11 @@ class _MainPageState extends State<MainPage> {
                             ),
                             InkWell(
                               onTap: () {
-                                Navigator.of(context)
-                                    .push(slideRoute(PostListShowPage(
-                                  boardType: BoardType.free,
-                                  // TODO: 입주 업체가 boardList[7]가 아닐 수도 있다. slug로 확인해야 한다.
-                                  boardInfo: _boards[7],
-                                )));
+                                Navigator.of(context).push(slideRoute(
+                                    PostListShowPage(
+                                        boardType: BoardType.free,
+                                        boardInfo: findBoardBySlug(
+                                            "facility-notice"))));
                               },
                               child: Row(
                                 children: [
@@ -576,13 +588,12 @@ class _MainPageState extends State<MainPage> {
                                           getTitle(
                                               _facilityContents[0].title,
                                               _facilityContents[0].is_hidden,
-                                              _facilityContents[0]
-                                                  .why_hidden),
+                                              _facilityContents[0].why_hidden),
                                           style: TextStyle(
-                                              color: _facilityContents[0]
-                                                      .is_hidden
-                                                  ? const Color(0xFFBBBBBB)
-                                                  : Colors.black,
+                                              color:
+                                                  _facilityContents[0].is_hidden
+                                                      ? const Color(0xFFBBBBBB)
+                                                      : Colors.black,
                                               fontSize: 14,
                                               fontWeight: FontWeight.w400),
                                           maxLines: 1,
@@ -600,8 +611,7 @@ class _MainPageState extends State<MainPage> {
                                 Navigator.of(context)
                                     .push(slideRoute(PostListShowPage(
                                   boardType: BoardType.free,
-                                  // TODO: 뉴아라가 boardList[11]가 아닐 수도 있다. slug로 확인해야 한다.
-                                  boardInfo: _boards[11],
+                                  boardInfo: findBoardBySlug("ara-feedback"),
                                 )));
                               },
                               child: Row(
@@ -633,8 +643,7 @@ class _MainPageState extends State<MainPage> {
                                         onTap: () {
                                           Navigator.of(context).push(slideRoute(
                                               PostViewPage(
-                                                  id: _newAraContents[0]
-                                                      .id)));
+                                                  id: _newAraContents[0].id)));
                                         },
                                         child: Text(
                                           getTitle(
@@ -661,10 +670,8 @@ class _MainPageState extends State<MainPage> {
                       const SizedBox(height: 10),
                       MainPageTextButton('main_page.stu_community', () {
                         Navigator.of(context).push(slideRoute(PostListShowPage(
-                          boardType: BoardType.free,
-                          // TODO: 원총이 boardList[1]가 아닐 수도 있다. slug로 확인해야 한다.
-                          boardInfo: _boards[1],
-                        )));
+                            boardType: BoardType.free,
+                            boardInfo: findBoardBySlug("students-group"))));
                       }),
                       const SizedBox(height: 5),
                       Container(
@@ -711,10 +718,9 @@ class _MainPageState extends State<MainPage> {
                                               _gradContents[0].is_hidden,
                                               _gradContents[0].why_hidden),
                                           style: TextStyle(
-                                              color:
-                                                  _gradContents[0].is_hidden
-                                                      ? const Color(0xFFBBBBBB)
-                                                      : Colors.black,
+                                              color: _gradContents[0].is_hidden
+                                                  ? const Color(0xFFBBBBBB)
+                                                  : Colors.black,
                                               fontSize: 14,
                                               fontWeight: FontWeight.w400),
                                           maxLines: 1,
@@ -751,8 +757,7 @@ class _MainPageState extends State<MainPage> {
                                           getTitle(
                                               _underGradContents[0].title,
                                               _underGradContents[0].is_hidden,
-                                              _underGradContents[0]
-                                                  .why_hidden),
+                                              _underGradContents[0].why_hidden),
                                           style: TextStyle(
                                               color: _underGradContents[0]
                                                       .is_hidden
@@ -794,13 +799,12 @@ class _MainPageState extends State<MainPage> {
                                           getTitle(
                                               _freshmanContents[0].title,
                                               _freshmanContents[0].is_hidden,
-                                              _freshmanContents[0]
-                                                  .why_hidden),
+                                              _freshmanContents[0].why_hidden),
                                           style: TextStyle(
-                                              color: _freshmanContents[0]
-                                                      .is_hidden
-                                                  ? const Color(0xFFBBBBBB)
-                                                  : Colors.black,
+                                              color:
+                                                  _freshmanContents[0].is_hidden
+                                                      ? const Color(0xFFBBBBBB)
+                                                      : Colors.black,
                                               fontSize: 14,
                                               fontWeight: FontWeight.w400),
                                           maxLines: 1,
