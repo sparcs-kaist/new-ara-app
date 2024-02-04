@@ -93,7 +93,8 @@ class AttachmentsFormat {
   });
 }
 
-class _PostWritePageState extends State<PostWritePage> {
+class _PostWritePageState extends State<PostWritePage>
+    with WidgetsBindingObserver {
   /// 현재 이 페이지가 수정페이지이면 true, 처음 작성하는 게시물이면 false
   bool _isEditingPost = false;
 
@@ -171,6 +172,8 @@ class _PostWritePageState extends State<PostWritePage> {
 
   late FocusNode _editorFocusNode;
 
+  bool isKeyboardClosed = true;
+
   @override
   void initState() {
     super.initState();
@@ -198,6 +201,7 @@ class _PostWritePageState extends State<PostWritePage> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       FocusScope.of(context).requestFocus(_titleFocusNode);
     });
+    WidgetsBinding.instance!.addObserver(this);
   }
 
   void _onTextChanged() {
@@ -217,6 +221,33 @@ class _PostWritePageState extends State<PostWritePage> {
     _titleFocusNode.dispose();
     _editorFocusNode.dispose();
     _quillController.removeListener(_onTextChanged);
+    WidgetsBinding.instance.removeObserver(this);
+  }
+
+  @override
+  void didChangeMetrics() {
+    final value = MediaQuery.of(context).viewInsets.bottom;
+    if (value > 0) {
+      if (isKeyboardClosed) {
+        _onKeyboardChanged(false);
+      }
+      isKeyboardClosed = false;
+    } else {
+      isKeyboardClosed = true;
+      _onKeyboardChanged(true);
+    }
+  }
+
+  _onKeyboardChanged(bool isVisible) {
+    if (isVisible) {
+      print("키보드가 내려갔습니다.(애니메이션 종료)");
+    } else {
+      print("키보드가 올라갔습니다.(애니메이션 종료)");
+      setState(() {});
+    }
+    setState(() {
+      isKeyboardClosed = isVisible;
+    });
   }
 
   /// 게시판 목록을 가져온다.
@@ -677,7 +708,7 @@ class _PostWritePageState extends State<PostWritePage> {
   Widget _buildAttachmentShow() {
     return KeyboardVisibilityBuilder(
       builder: (context, isKeyboardVisible) {
-        if (isKeyboardVisible) {
+        if (!isKeyboardClosed) {
           return Column(
             children: [
               Container(
@@ -696,8 +727,7 @@ class _PostWritePageState extends State<PostWritePage> {
                         bool picktf = await _pickFile();
                         if (picktf) {
                           FocusScope.of(context).unfocus();
-                        }
-                        else{
+                        } else {
                           //TODO: 에디터로 포커스 이동 안하는 문제점이 있음.
                           _editorFocusNode.requestFocus();
                         }
