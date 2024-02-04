@@ -257,6 +257,73 @@ class _PostViewPageState extends State<PostViewPage> {
                                         color: Color(0xFFF0F0F0),
                                         thickness: 1,
                                       ),
+                                      if (_article.parent_board.slug ==
+                                          'portal-notice')
+                                        Container(
+                                          width: MediaQuery.of(context)
+                                                  .size
+                                                  .width -
+                                              40,
+                                          height: 85,
+                                          decoration: BoxDecoration(
+                                            color: Colors.white,
+                                            borderRadius: const BorderRadius.all(
+                                                Radius.circular(10)),
+                                            border: Border.all(
+                                                color: Color(0xFFDBDBDB),
+                                                width: 1),
+                                            boxShadow: const [
+                                              BoxShadow(
+                                                blurRadius: 2,
+                                                spreadRadius: 0,
+                                                offset: Offset(0, 0),
+                                                color: Color(0xFFA9A9A9),
+                                              ),
+                                            ],
+                                          ),
+                                          margin: const EdgeInsets.only(bottom: 15),
+                                          padding: const EdgeInsets.only(
+                                              left: 28, right: 28, top: 18, bottom: 18),
+                                          child: Column(
+                                            mainAxisAlignment: MainAxisAlignment.start,
+                                            children: [
+                                              Row(
+                                                children: [
+                                                  Expanded(
+                                                    child: Text(
+                                                      _article.title.toString(),
+                                                      overflow:
+                                                          TextOverflow.ellipsis,
+                                                      style: const TextStyle(
+                                                          fontWeight:
+                                                              FontWeight.w400,
+                                                          fontSize: 14,
+                                                          color: Color(
+                                                              0xFF4A4A4A)),
+                                                    ),
+                                                  ),
+                                                  SvgPicture.asset(
+                                                    'assets/icons/right_chevron.svg',
+                                                    width: 15,
+                                                    height: 25,
+                                                    colorFilter:
+                                                        const ColorFilter.mode(
+                                                            Color(0xFF4A4A4A),
+                                                            BlendMode.srcIn),
+                                                  ),
+                                                ],
+                                              ),
+                                              Text(
+                                                _article.url.toString(),
+                                                overflow: TextOverflow.ellipsis,
+                                                style: const TextStyle(
+                                                    fontWeight: FontWeight.w400,
+                                                    fontSize: 14,
+                                                    color: Color(0xFF4A4A4A)),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
                                       // TODO: (2023.08.09)첨부파일 리스트뷰 프로토타입. 추후 디자이너와 조율 예정
                                       Visibility(
                                         visible:
@@ -281,84 +348,92 @@ class _PostViewPageState extends State<PostViewPage> {
                                                 true &&
                                             _article.is_hidden == true,
                                         child: Container(
-                                          decoration: const BoxDecoration(
-                                            borderRadius: BorderRadius.all(
-                                                Radius.circular(10)),
-                                            color: Color(0xfffafafa),
-                                          ),
-                                          width: MediaQuery.of(context)
-                                                  .size
-                                                  .width -
-                                              20,
-                                          height: 170,
-                                          child: Column(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.center,
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.center,
-                                            children: [
-                                              SvgPicture.asset(
-                                                'assets/icons/barrior.svg',
-                                                width: 40,
-                                                height: 40,
-                                              ),
-                                              Text(
-                                                getAllHiddenReasons(_article.why_hidden)
-                                                .join('\n'),
-                                                textAlign: TextAlign.center,
-                                                style: const TextStyle(
-                                                  color: Color(0xFF4A4A4A),
-                                                  fontWeight: FontWeight.w700,
-                                                  fontSize: 16,
+                                            decoration: const BoxDecoration(
+                                              borderRadius: BorderRadius.all(
+                                                  Radius.circular(10)),
+                                              color: Color(0xfffafafa),
+                                            ),
+                                            width: MediaQuery.of(context)
+                                                    .size
+                                                    .width -
+                                                20,
+                                            height: 170,
+                                            child: Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.center,
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.center,
+                                              children: [
+                                                SvgPicture.asset(
+                                                  'assets/icons/barrior.svg',
+                                                  width: 40,
+                                                  height: 40,
                                                 ),
-                                              ),
-                                              Text(
-                                                "(${getHiddenInfo(_article.why_hidden)})",
-                                                style: const TextStyle(
-                                                  fontWeight: FontWeight.w400,
-                                                  fontSize: 14,
-                                                  color: Color(0xFF4A4A4A),
-                                                ),
-                                              ),
-                                              const SizedBox(height: 8),
-                                              // TODO: 지금은 내용, 댓글 일괄 적용이지만 댓글만 적용하는 것도 필요
-                                              // 숨겨진 게시물이지만 사용자가 내용을 확인할 수 있는 경우
-                                              Visibility(
-                                                visible: _article.can_override_hidden ==
-                                                  true,
-                                                child: Container(
-                                                  width: 104,
-                                                  height: 36,
-                                                  decoration: BoxDecoration(
-                                                  borderRadius:
-                                                    const BorderRadius.all(
-                                                      Radius.circular(10)),
-                                                      border: Border.all(
-                                                      width: 1,
-                                                      color: const Color(0xFFDBDBDB),
-                                                   ),
+                                                Text(
+                                                  getAllHiddenReasons(
+                                                          _article.why_hidden)
+                                                      .join('\n'),
+                                                  textAlign: TextAlign.center,
+                                                  style: const TextStyle(
+                                                    color: Color(0xFF4A4A4A),
+                                                    fontWeight: FontWeight.w700,
+                                                    fontSize: 16,
                                                   ),
-                                                  child: InkWell(
-                                                    onTap: () async {
-                                                      await _fetchArticle(userProvider,
-                                                        override_hidden: true);
-                                                      _updateState();
-                                                    },
-                                                    child: const Center(
-                                                      child: Text(
-                                                      '숨긴내용 보기',
-                                                      style: TextStyle(
-                                                        color: Color(0xff4a4a4a),
-                                                        fontWeight: FontWeight.w400,
-                                                      ),
-                                                    ),
-                                                    ),
-                                                  )
-                                                )
-                                              )
-                                            ],
-                                          )
-                                        ),
+                                                ),
+                                                Text(
+                                                  "(${getHiddenInfo(_article.why_hidden)})",
+                                                  style: const TextStyle(
+                                                    fontWeight: FontWeight.w400,
+                                                    fontSize: 14,
+                                                    color: Color(0xFF4A4A4A),
+                                                  ),
+                                                ),
+                                                const SizedBox(height: 8),
+                                                // TODO: 지금은 내용, 댓글 일괄 적용이지만 댓글만 적용하는 것도 필요
+                                                // 숨겨진 게시물이지만 사용자가 내용을 확인할 수 있는 경우
+                                                Visibility(
+                                                    visible: _article
+                                                            .can_override_hidden ==
+                                                        true,
+                                                    child: Container(
+                                                        width: 104,
+                                                        height: 36,
+                                                        decoration:
+                                                            BoxDecoration(
+                                                          borderRadius:
+                                                              const BorderRadius
+                                                                  .all(Radius
+                                                                      .circular(
+                                                                          10)),
+                                                          border: Border.all(
+                                                            width: 1,
+                                                            color: const Color(
+                                                                0xFFDBDBDB),
+                                                          ),
+                                                        ),
+                                                        child: InkWell(
+                                                          onTap: () async {
+                                                            await _fetchArticle(
+                                                                userProvider,
+                                                                override_hidden:
+                                                                    true);
+                                                            _updateState();
+                                                          },
+                                                          child: const Center(
+                                                            child: Text(
+                                                              '숨긴내용 보기',
+                                                              style: TextStyle(
+                                                                color: Color(
+                                                                    0xff4a4a4a),
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .w400,
+                                                              ),
+                                                            ),
+                                                          ),
+                                                        )))
+                                              ],
+                                            )),
                                       ),
                                       Visibility(
                                         // 차단이 되지 않았을 때 또는 사용자가 '숨긴내용 보기'를 눌렀을 때
@@ -456,7 +531,8 @@ class _PostViewPageState extends State<PostViewPage> {
             Row(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                _buildVoteIcons(true, _article.my_vote, ColorsInfo.posVote, 10.08, 11),
+                _buildVoteIcons(
+                    true, _article.my_vote, ColorsInfo.posVote, 10.08, 11),
                 const SizedBox(width: 1.92),
                 Text('${_article.positive_vote_count}',
                     style: TextStyle(
@@ -466,7 +542,8 @@ class _PostViewPageState extends State<PostViewPage> {
                             ? ColorsInfo.noneVote
                             : ColorsInfo.newara)),
                 const SizedBox(width: 10),
-                _buildVoteIcons(false, _article.my_vote, ColorsInfo.negVote, 10.08, 11),
+                _buildVoteIcons(
+                    false, _article.my_vote, ColorsInfo.negVote, 10.08, 11),
                 const SizedBox(width: 1.92),
                 Text('${_article.negative_vote_count}',
                     style: TextStyle(
@@ -586,7 +663,8 @@ class _PostViewPageState extends State<PostViewPage> {
             ).posVote();
             if (res) _updateState();
           },
-          child: _buildVoteIcons(true, _article.my_vote, ColorsInfo.posVote, 20.17, 22),
+          child: _buildVoteIcons(
+              true, _article.my_vote, ColorsInfo.posVote, 20.17, 22),
         ),
         const SizedBox(width: 4),
         Text('${_article.positive_vote_count}',
@@ -608,7 +686,8 @@ class _PostViewPageState extends State<PostViewPage> {
               if (result) _updateState();
             });
           },
-          child: _buildVoteIcons(false, _article.my_vote, ColorsInfo.negVote, 20.17, 22),
+          child: _buildVoteIcons(
+              false, _article.my_vote, ColorsInfo.negVote, 20.17, 22),
         ),
         const SizedBox(width: 4),
         Text('${_article.negative_vote_count}',
@@ -625,33 +704,31 @@ class _PostViewPageState extends State<PostViewPage> {
 
   /// 좋아요, 싫어요 아이콘을 모델의 상태에 알맞게 색상, filled 여부를 지정하여 리턴하는 함수
   /// isPositive가 true면 좋아요 아이콘, false면 싫어요 아이콘을 설정함
-  /// highlightColor는 아이콘이 클릭되었을 때 지정되는 색상을 의미하며 
+  /// highlightColor는 아이콘이 클릭되었을 때 지정되는 색상을 의미하며
   /// width, height는 아이콘의 크기를 지정하기 위해 사용됨.
   /// PostViewPage에서 화면 상단 및 댓글 위의 좋아요, 싫어요 아이콘 설정을 위해 사용됨.
-  Widget _buildVoteIcons(bool isPositive, bool? myVote, Color highlightColor, double width, double height) {
+  Widget _buildVoteIcons(bool isPositive, bool? myVote, Color highlightColor,
+      double width, double height) {
     late Color widgetColor;
     late String iconPath;
     // 투표한 반대 위젯을 설정하는 경우
     if (myVote == !isPositive) {
       widgetColor = ColorsInfo.noneVote;
       iconPath = 'assets/icons/${isPositive ? 'like.svg' : 'dislike.svg'}';
-    }
-    else {
+    } else {
       widgetColor = highlightColor;
       // 투표하지 않은 경우
       if (myVote == null) {
         iconPath = 'assets/icons/${isPositive ? 'like.svg' : 'dislike.svg'}';
-      }
-      else {
-        iconPath = 'assets/icons/${isPositive ? 'like-filled.svg' : 'dislike-filled.svg'}';
+      } else {
+        iconPath =
+            'assets/icons/${isPositive ? 'like-filled.svg' : 'dislike-filled.svg'}';
       }
     }
-    return SvgPicture.asset(
-      iconPath,
-      colorFilter: ColorFilter.mode(widgetColor, BlendMode.srcIn),
-      width: width,
-      height: height
-    );
+    return SvgPicture.asset(iconPath,
+        colorFilter: ColorFilter.mode(widgetColor, BlendMode.srcIn),
+        width: width,
+        height: height);
   }
 
   // TODO: 버튼 세부적인 다지인(아이콘 종류, 크기 등등) 조정 필요
@@ -1166,7 +1243,8 @@ class _PostViewPageState extends State<PostViewPage> {
                                     if (result) _updateState();
                                   });
                                 },
-                                child: _buildVoteIcons(true, curComment.my_vote, ColorsInfo.posVote, 11.52, 12.57),
+                                child: _buildVoteIcons(true, curComment.my_vote,
+                                    ColorsInfo.posVote, 11.52, 12.57),
                               ),
                               const SizedBox(width: 2.19),
                               Text(
@@ -1189,7 +1267,12 @@ class _PostViewPageState extends State<PostViewPage> {
                                     if (result) _updateState();
                                   });
                                 },
-                                child: _buildVoteIcons(false, curComment.my_vote, ColorsInfo.negVote, 11.52, 12.57),
+                                child: _buildVoteIcons(
+                                    false,
+                                    curComment.my_vote,
+                                    ColorsInfo.negVote,
+                                    11.52,
+                                    12.57),
                               ),
                               const SizedBox(width: 2.19),
                               Text(
