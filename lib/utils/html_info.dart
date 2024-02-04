@@ -68,22 +68,15 @@ String getContentHtml(String content, {double? width}) {
         font-size: 16px;
       }
 
-      code,hr {
-        background-color: #f5f5f5
-      }
+      
+
+      
 
       hr {
         border: none;
         display: block;
         height: 2px;
         margin: 1.5rem 0
-      }
-
-      code {
-        color: #ff3860;
-        font-size: 14px;
-        font-weight: 400;
-        padding: .25em .5em .25em
       }
 
       ul {
@@ -142,10 +135,17 @@ String getContentHtml(String content, {double? width}) {
         -moz-osx-font-smoothing: auto;
         -webkit-font-smoothing: auto;
         font-family: monospace;
-        background-color: transparent;
-        color: currentColor;
-        font-size: 1em;
-        padding: 0
+      }
+
+      code {
+        color: #ff3860;
+        font-size: .875em;
+        font-weight: 400;
+        padding: .25em .5em .25em
+      }
+
+      code,hr {
+        background-color: #f5f5f5
       }
 
       body {
@@ -173,6 +173,13 @@ String getContentHtml(String content, {double? width}) {
         padding: 1.25rem 1.5rem;
         white-space: pre;
         word-wrap: normal
+      }
+
+      pre code {
+        background-color: transparent;
+        color: currentColor;
+        font-size: 1em;
+        padding: 0
       }
 
       table td,table th {
