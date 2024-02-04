@@ -945,7 +945,8 @@ class _PostViewPageState extends State<PostViewPage> {
                   ),
                 ),
               )
-            else // 자신의 글
+            // 자신의 글이며 숨겨지지 않았을 때
+            else if (_article.is_hidden == false)
               InkWell(
                 onTap: () async {
                   await Navigator.of(context).push(
