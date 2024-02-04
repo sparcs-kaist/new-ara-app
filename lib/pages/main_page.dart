@@ -133,14 +133,18 @@ class _MainPageState extends State<MainPage> {
   Future<void> _refreshBoardList(UserProvider userProvider) async {
     List<dynamic>? boardJson = await _loadApiDataFromCache('boards/');
     if (boardJson == null) {
-      boardJson = await userProvider.getApiRes("boards/");
+      boardJson = await userProvider.getApiRes("boards/", sendText: "here");
       await _saveApiDataToCache('boards/', boardJson);
+
+      // 게시판 목록 로드 후 각 게시판의 공지사항들을 새로고침
     } else {
       userProvider
-          .getApiRes("boards/")
+          .getApiRes("boards/", sendText: "There")
           .then((value) async => {await _saveApiDataToCache('boards/', value)});
+      // 게시판 목록 로드 후 각 게시판의 공지사항들을 새로고침
     }
     if (mounted) {
+      debugPrint(boardJson.toString());
       setState(() {
         _boards.clear();
         for (Map<String, dynamic> json in boardJson!) {
@@ -163,7 +167,6 @@ class _MainPageState extends State<MainPage> {
         _refreshFreshmanCouncil(userProvider),
       ]);
     }
-    // 게시판 목록 로드 후 각 게시판의 공지사항들을 새로고침
   }
 
   ///포탈 게시물 글 불러오기.
@@ -180,7 +183,7 @@ class _MainPageState extends State<MainPage> {
 
   Future<void> _refreshNewAraNotice(UserProvider userProvider) async {
     await _refreshBoardContent(
-        userProvider, "ara-feedback", "", _newAraContents, 3);
+        userProvider, "ara-notice", "", _newAraContents, 3);
   }
 
   Future<void> _refreshGradAssocNotice(UserProvider userProvider) async {
@@ -218,6 +221,8 @@ class _MainPageState extends State<MainPage> {
       int isLoadingIndex) async {
     List<int> ids = _searchBoardID(slug1, slug2);
     int boardID = ids[0], topicID = ids[1];
+    debugPrint("slug1, slug2 : $slug1, $slug2");
+    debugPrint("${ids[0].toString()} ${ids[1].toString()}");
     String apiUrl = topicID == -1
         ? "articles/?parent_board=$boardID"
         : "articles/?parent_board=$boardID&parent_topic=$topicID";
@@ -612,7 +617,7 @@ class _MainPageState extends State<MainPage> {
                                 Navigator.of(context)
                                     .push(slideRoute(PostListShowPage(
                                   boardType: BoardType.free,
-                                  boardInfo: _searchBoard("ara-feedback"),
+                                  boardInfo: _searchBoard("ara-notice"),
                                 )));
                               },
                               child: Row(

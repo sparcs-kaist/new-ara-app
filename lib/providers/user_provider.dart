@@ -112,9 +112,11 @@ class UserProvider with ChangeNotifier {
     return dio;
   }
 
-  /// 지정된 API URL로 GET 요청을 전송하고 응답을 반환합니다.
+  /// 지정된 API URL로 GET 요청을 전송하고 응답의 data를 반환합니다.
   /// 실패 시 null을 반환합니다.
-  Future<dynamic> getApiRes(String apiUrl, {String? initCookieString}) async {
+  /// sendText는 개발자가 디버깅을 위한 문자열입니다.
+  Future<dynamic> getApiRes(String apiUrl,
+      {String? initCookieString, String? sendText}) async {
     String cookieString = initCookieString ?? getCookiesToString();
     var totUrl = "$newAraDefaultUrl/api/$apiUrl";
 
@@ -125,16 +127,27 @@ class UserProvider with ChangeNotifier {
     try {
       response = await dio.get(totUrl);
       debugPrint("GET $totUrl success: ${response.data.toString()}");
-    } catch (error) {
-      debugPrint("GET $totUrl failed with error: $error");
+      debugPrint("$sendText");
+    } on DioException catch (e) {
+      debugPrint("getApiRes failed with DioException: $e");
+      // 서버에서 response를 보냈지만 invalid한 statusCode일 때
+      if (e.response != null) {
+        debugPrint("${e.response!.data}");
+        debugPrint("${e.response!.headers}");
+        debugPrint("${e.response!.requestOptions}");
+      }
+      // request의 setting, sending에서 문제 발생
+      // requestOption, message를 출력.
+      else {
+        debugPrint("${e.requestOptions}");
+        debugPrint("${e.message}");
+      }
+      return null;
+    } catch (e) {
+      debugPrint("_fetchUser failed with error: $e");
       return null;
     }
-    if (response.statusCode == 200) {
-      return response.data;
-    } else {
-      debugPrint("Get /api/$apiUrl ${response.statusCode}");
-      return null;
-    }
+    return response.data;
   }
 
   Future<dynamic> postApiRes(String apiUrl,
