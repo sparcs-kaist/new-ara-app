@@ -1189,7 +1189,7 @@ class _PostViewPageState extends State<PostViewPage> {
                             Container(
                                 constraints: BoxConstraints(
                                   maxWidth:
-                                      MediaQuery.of(context).size.width - 200,
+                                      MediaQuery.of(context).size.width - 250,
                                 ),
                                 child: Text(
                                   curComment.created_by.profile.nickname
