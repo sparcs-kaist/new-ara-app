@@ -52,10 +52,10 @@ class UserProvider with ChangeNotifier {
         .join('; ');
     return cookieString;
   }
+
   String getCsrftoken() {
-    String csrfToken = _loginCookie
-        .firstWhere((cookie) => cookie.name == 'csrftoken')
-        .value;
+    String csrfToken =
+        _loginCookie.firstWhere((cookie) => cookie.name == 'csrftoken').value;
     return csrfToken;
   }
 
@@ -109,11 +109,10 @@ class UserProvider with ChangeNotifier {
   }
 
   /// 주어진 쿠키 설정으로 Dio 객체를 초기화하고 반환합니다.
-  Dio myDio({String? initCookieString}) {
-    String cookieString = initCookieString ?? getCookiesToString();
-
+  Dio myDio() {
     Dio dio = createDioWithConfig();
-    dio.options.headers['Cookie'] = cookieString;
+    dio.options.headers['Cookie'] = getCookiesToString();
+    dio.options.headers['X-Csrftoken'] = getCsrftoken();
 
     return dio;
   }
@@ -121,13 +120,11 @@ class UserProvider with ChangeNotifier {
   /// 지정된 API URL로 GET 요청을 전송하고 응답의 data를 반환합니다.
   /// 실패 시 null을 반환합니다.
   /// sendText는 개발자가 디버깅을 위한 문자열입니다.
-  Future<dynamic> getApiRes(String apiUrl,
-      {String? initCookieString, String? sendText}) async {
-    String cookieString = initCookieString ?? getCookiesToString();
+  Future<dynamic> getApiRes(String apiUrl, {String? sendText}) async {
     var totUrl = "$newAraDefaultUrl/api/$apiUrl";
 
     Dio dio = createDioWithConfig();
-    dio.options.headers['Cookie'] = cookieString;
+    dio.options.headers['Cookie'] = getCookiesToString();
 
     late dynamic response;
     try {
@@ -156,13 +153,12 @@ class UserProvider with ChangeNotifier {
     return response.data;
   }
 
-  Future<dynamic> postApiRes(String apiUrl,
-      {dynamic payload, String? initCookieString}) async {
-    String cookieString = initCookieString ?? getCookiesToString();
+  Future<dynamic> postApiRes(String apiUrl, {dynamic payload}) async {
     String totUrl = "$newAraDefaultUrl/api/$apiUrl";
 
     Dio dio = createDioWithConfig();
-    dio.options.headers['Cookie'] = cookieString;
+    dio.options.headers['Cookie'] = getCookiesToString();
+    dio.options.headers['X-Csrftoken'] = getCsrftoken();
 
     late dynamic response;
     try {
@@ -173,13 +169,12 @@ class UserProvider with ChangeNotifier {
     return response;
   }
 
-  Future<dynamic> delApiRes(String apiUrl,
-      {dynamic payload, String? initCookieString}) async {
-    String cookieString = initCookieString ?? getCookiesToString();
+  Future<dynamic> delApiRes(String apiUrl, {dynamic payload}) async {
     String totUrl = "$newAraDefaultUrl/api/$apiUrl";
 
     Dio dio = createDioWithConfig();
-    dio.options.headers['Cookie'] = cookieString;
+    dio.options.headers['Cookie'] = getCookiesToString();
+    dio.options.headers['X-Csrftoken'] = getCsrftoken();
 
     late dynamic response;
     try {
@@ -190,13 +185,12 @@ class UserProvider with ChangeNotifier {
     return response;
   }
 
-  Future<dynamic> patchApiRes(String apiUrl,
-      {dynamic payload, String? initCookieString}) async {
-    String cookieString = initCookieString ?? getCookiesToString();
+  Future<dynamic> patchApiRes(String apiUrl, {dynamic payload}) async {
     String totUrl = "$newAraDefaultUrl/api/$apiUrl";
 
     Dio dio = createDioWithConfig();
-    dio.options.headers['Cookie'] = cookieString;
+    dio.options.headers['Cookie'] = getCookiesToString();
+    dio.options.headers['X-Csrftoken'] = getCsrftoken();
 
     late dynamic response;
     try {

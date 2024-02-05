@@ -65,8 +65,9 @@ class _NotificationPageState extends State<NotificationPage> {
   /// 결과 리스트를 반환함.
   Future<List<NotificationModel>> _fetchEachPage(
       UserProvider userProvider, int targetPage) async {
-    Dio dio = createDioWithConfig()
-      ..options.headers["Cookie"] = userProvider.getCookiesToString();
+    Dio dio = createDioWithConfig();
+    dio.options.headers["Cookie"] = userProvider.getCookiesToString();
+    dio.options.headers["X-Csrftoken"] = userProvider.getCsrftoken();
     List<NotificationModel> resList = [];
     try {
       var response = await dio

@@ -100,6 +100,7 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
     var formData = FormData.fromMap(payload);
     Dio dio = createDioWithConfig();
     dio.options.headers['Cookie'] = userProvider.getCookiesToString();
+    dio.options.headers['X-Csrftoken'] = userProvider.getCsrftoken();
     try {
       var response = await dio.patch(
         "$newAraDefaultUrl/api/user_profiles/${userProfileModel.user}/",
@@ -279,7 +280,8 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
                               const SizedBox(width: 45),
                               Expanded(
                                 child: Text(
-                                  userProviderData.naUser!.email ?? "이메일 정보가 없습니다.",
+                                  userProviderData.naUser!.email ??
+                                      "이메일 정보가 없습니다.",
                                   style: const TextStyle(
                                     fontWeight: FontWeight.w500,
                                     fontSize: 15,
