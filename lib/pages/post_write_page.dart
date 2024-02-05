@@ -180,7 +180,7 @@ class _PostWritePageState extends State<PostWritePage>
     super.initState();
 
     context.read<NotificationProvider>().checkIsNotReadExist();
-
+    debugPrint("post_write_page.dart: ${widget.previousBoard}");
     if (widget.previousArticle != null) {
       _isEditingPost = true;
     } else {
