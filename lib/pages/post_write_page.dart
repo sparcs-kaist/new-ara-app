@@ -6,7 +6,6 @@ import 'package:dio/dio.dart';
 import 'package:file_icon/file_icon.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 import 'package:new_ara_app/constants/url_info.dart';
 import 'dart:io';
 import 'package:flutter/material.dart';
@@ -24,7 +23,6 @@ import 'package:new_ara_app/utils/create_dio_with_config.dart';
 import 'package:new_ara_app/utils/slide_routing.dart';
 import 'package:new_ara_app/widgets/loading_indicator.dart';
 import 'package:provider/provider.dart';
-import 'package:quill_markdown/notus/convert.dart';
 import 'package:uuid/uuid.dart';
 import 'package:new_ara_app/providers/notification_provider.dart';
 import 'package:path/path.dart' as path;
@@ -34,7 +32,6 @@ import 'package:html/dom.dart' as html;
 import 'package:flutter_quill/flutter_quill.dart' as quill;
 import 'package:flutter_quill_extensions/flutter_quill_extensions.dart';
 import 'package:html2md/html2md.dart' as html2md;
-import 'package:quill_markdown/quill_markdown.dart';
 import 'package:markdown_quill/markdown_quill.dart';
 import 'package:markdown/markdown.dart' as md;
 
@@ -180,7 +177,7 @@ class _PostWritePageState extends State<PostWritePage>
     super.initState();
 
     context.read<NotificationProvider>().checkIsNotReadExist();
-
+    debugPrint("post_write_page.dart: ${widget.previousBoard}");
     if (widget.previousArticle != null) {
       _isEditingPost = true;
     } else {
@@ -202,7 +199,7 @@ class _PostWritePageState extends State<PostWritePage>
     WidgetsBinding.instance.addPostFrameCallback((_) {
       FocusScope.of(context).requestFocus(_titleFocusNode);
     });
-    WidgetsBinding.instance!.addObserver(this);
+    WidgetsBinding.instance.addObserver(this);
   }
 
   void _onTextChanged() {
@@ -241,9 +238,9 @@ class _PostWritePageState extends State<PostWritePage>
 
   _onKeyboardChanged(bool isVisible) {
     if (isVisible) {
-      print("키보드가 내려갔습니다.(애니메이션 종료)");
+      debugPrint("키보드가 내려갔습니다.(애니메이션 종료)");
     } else {
-      print("키보드가 올라갔습니다.(애니메이션 종료)");
+      debugPrint("키보드가 올라갔습니다.(애니메이션 종료)");
       setState(() {});
     }
     setState(() {
@@ -413,8 +410,6 @@ class _PostWritePageState extends State<PostWritePage>
 
   @override
   Widget build(BuildContext context) {
-    var userProvider = context.watch<UserProvider>();
-
     /// 게시물 업로드 가능한지 확인
     /// TODO: 업로드 로딩 인디케이터 추가하기
     bool canIupload = _titleController.text != '' &&
@@ -433,11 +428,11 @@ class _PostWritePageState extends State<PostWritePage>
               child: Column(
                 children: [
                   _buildMenubar(),
-                  SizedBox(
+                  const SizedBox(
                     height: 20,
                   ),
                   _buildTitle(),
-                  SizedBox(height: 15),
+                  const SizedBox(height: 15),
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 20),
                     child: Container(
@@ -445,11 +440,11 @@ class _PostWritePageState extends State<PostWritePage>
                       color: const Color(0xFFF0F0F0),
                     ),
                   ),
-                  SizedBox(
+                  const SizedBox(
                     height: 20,
                   ),
                   _buildToolbar(),
-                  SizedBox(
+                  const SizedBox(
                     height: 10,
                   ),
                   Expanded(child: _buildEditor()),
@@ -572,18 +567,16 @@ class _PostWritePageState extends State<PostWritePage>
                             return DropdownMenuItem<BoardDetailActionModel>(
                               enabled: value.id != -1,
                               value: value,
-                              child: Container(
-                                child: Padding(
-                                  padding: const EdgeInsets.only(left: 0.0),
-                                  child: Text(
-                                    value.ko_name,
-                                    style: TextStyle(
-                                      color: value.id == -1 || _isEditingPost
-                                          ? const Color(0xFFBBBBBB)
-                                          : ColorsInfo.newara,
-                                      fontWeight: FontWeight.w500,
-                                      fontSize: 16,
-                                    ),
+                              child: Padding(
+                                padding: const EdgeInsets.only(left: 0.0),
+                                child: Text(
+                                  value.ko_name,
+                                  style: TextStyle(
+                                    color: value.id == -1 || _isEditingPost
+                                        ? const Color(0xFFBBBBBB)
+                                        : ColorsInfo.newara,
+                                    fontWeight: FontWeight.w500,
+                                    fontSize: 16,
                                   ),
                                 ),
                               ),
@@ -725,6 +718,7 @@ class _PostWritePageState extends State<PostWritePage>
                 InkWell(
                   onTap: () async {
                     bool picktf = await _pickFile();
+                    if (!mounted) return;
                     if (picktf) {
                       FocusScope.of(context).unfocus();
                     } else {
@@ -1672,12 +1666,15 @@ class _PostWritePageState extends State<PostWritePage>
     }
 
     // 수정된 Delta를 다시 JSON으로 인코딩하고 Document로 변환합니다.
-    String newJson = jsonEncode(nwDelta);
-    quill.Delta newDelta = quill.Delta.fromJson(jsonDecode(newJson));
+
     // TODO: 첨부파일을 삭제하는 과정에서 자꾸 에디터에 포커스 되는 문제가 발생하여 아래 코드를 주석처리함.
-    // setState(() {
-    //   _quillController.document = quill.Document.fromJson(newDelta.toJson());
-    // });
+    /* 
+   String newJson = jsonEncode(nwDelta);
+     quill.Delta newDelta = quill.Delta.fromJson(jsonDecode(newJson));
+     setState(() {
+       _quillController.document = quill.Document.fromJson(newDelta.toJson());
+     }); 
+  */
 
     setState(() {
       FocusScope.of(context).unfocus();
