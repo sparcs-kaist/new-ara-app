@@ -52,6 +52,12 @@ class UserProvider with ChangeNotifier {
         .join('; ');
     return cookieString;
   }
+  String getCsrftoken() {
+    String csrfToken = _loginCookie
+        .firstWhere((cookie) => cookie.name == 'csrftoken')
+        .value;
+    return csrfToken;
+  }
 
   /// 지정된 URL의 웹뷰에서 쿠키를 가져와 저장합니다.
   Future<void> setCookiesFromUrl(url) async {
