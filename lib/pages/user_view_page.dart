@@ -20,7 +20,9 @@ import 'package:new_ara_app/utils/profile_image.dart';
 import 'package:new_ara_app/utils/handle_hidden.dart';
 import 'package:new_ara_app/widgets/post_preview.dart';
 
+
 /// 유저 관련 정보 페이지 뷰, 이벤트 처리를 모두 관리하는 StatefulWidget
+/// **중요: name_type == 1 이 아닌 경우에 대해서는 사용하면 안됨.**
 class UserViewPage extends StatefulWidget {
   /// 정보 조회의 대상이되는 user의 ID.
   final int userID;

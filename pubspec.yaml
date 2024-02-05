@@ -66,6 +66,7 @@ dependencies:
   markdown_quill: ^2.0.0
   markdown: ^7.1.1
   shared_preferences: ^2.2.2
+  file_icon: ^1.0.0
 
 dev_dependencies:
   flutter_test:

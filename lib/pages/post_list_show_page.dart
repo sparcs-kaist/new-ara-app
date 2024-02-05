@@ -229,7 +229,7 @@ class _PostListShowPageState extends State<PostListShowPage> {
             FloatingActionButton(
               onPressed: () async {
                 await Navigator.of(context)
-                    .push(slideRoute(const PostWritePage()));
+                    .push(slideRoute(PostWritePage(previousBoard: widget.boardInfo,)));
                 updateAllBulletinList();
                 debugPrint('FloatingActionButton pressed');
               },

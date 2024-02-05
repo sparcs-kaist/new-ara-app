@@ -641,7 +641,7 @@ class _PostViewPageState extends State<PostViewPage> {
     debugPrint("**********************************************");
     return InkWell(
       // 익명일 경우 작성자 정보확인이 불가하도록 함.
-      onTap: _article.name_type == 2
+      onTap: !isRegular(_article.name_type)
           ? null
           : () async {
               await Navigator.of(context).push(
@@ -690,7 +690,7 @@ class _PostViewPageState extends State<PostViewPage> {
           const SizedBox(width: 10),
           // 익명일 경우 작성자 정보 확인을 불가하도록 함.
           Visibility(
-            visible: _article.created_by.profile.nickname != "익명",
+            visible: isRegular(_article.name_type),
             child: SvgPicture.asset(
               'assets/icons/right_chevron.svg',
               colorFilter:
@@ -1078,7 +1078,8 @@ class _PostViewPageState extends State<PostViewPage> {
                   ),
                 ),
               )
-            else // 자신의 글
+            // 자신의 글이며 숨겨지지 않았을 때
+            else if (_article.is_hidden == false)
               InkWell(
                 onTap: () async {
                   await Navigator.of(context).push(
@@ -1153,7 +1154,7 @@ class _PostViewPageState extends State<PostViewPage> {
                     children: [
                       InkWell(
                         // 익명일 경우 댓글 작성자 정보 확인이 불가능하도록 함.
-                        onTap: curComment.name_type == 2
+                        onTap: !isRegular(curComment.name_type)
                             ? null
                             : () {
                                 Navigator.of(context).push(slideRoute(
@@ -1711,5 +1712,11 @@ class _PostViewPageState extends State<PostViewPage> {
     }
 
     return true;
+  }
+  
+  /// 주어진 nameType에 따라 유저 정보를 볼 수 있는지 여부를 리턴하는 함수
+  /// PostViewPage에서 UserViewPage로 리다이렉트 될 수 있는지 여부를 나타냄.
+  bool isRegular(int? nameType) {
+    return nameType == 1;
   }
 }
