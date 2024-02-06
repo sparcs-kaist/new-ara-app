@@ -54,9 +54,16 @@ class UserProvider with ChangeNotifier {
   }
 
   String getCsrftokenToString() {
-    String csrfToken =
-        _loginCookie.firstWhere((cookie) => cookie.name == 'csrftoken').value;
-    return csrfToken;
+    debugPrint(_loginCookie.toString());
+    //Android 웹뷰 기준, ara dev 서버의 sso에서는 csrfoken을 주지 않지만, api 요청 시 사용하지 않으므로 ""를 반환한다.
+    try {
+      String csrfToken =
+          _loginCookie.firstWhere((cookie) => cookie.name == 'csrftoken').value;
+      return csrfToken;
+    } catch (e) {
+      debugPrint("getCsrftokenToString failed with error: $e");
+    }
+    return "";
   }
 
   /// 지정된 URL의 웹뷰에서 쿠키를 가져와 저장합니다.
@@ -114,6 +121,7 @@ class UserProvider with ChangeNotifier {
     dio.options.headers['Cookie'] = getCookiesToString();
     return dio;
   }
+
   Dio createDioWithHeadersForPost() {
     Dio dio = createDioWithConfig();
     dio.options.headers['Cookie'] = getCookiesToString();
@@ -121,7 +129,6 @@ class UserProvider with ChangeNotifier {
 
     return dio;
   }
-  
 
   /// 지정된 API URL로 GET 요청을 전송하고 응답의 data를 반환합니다.
   /// 실패 시 null을 반환합니다.
