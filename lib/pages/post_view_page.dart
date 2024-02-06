@@ -285,7 +285,8 @@ class _PostViewPageState extends State<PostViewPage> {
                                                                   width: 32,
                                                                   height: 32,
                                                                 ),
-                                                                const SizedBox(width: 8),
+                                                                const SizedBox(
+                                                                    width: 8),
                                                                 const Text(
                                                                   "브라우저로 URL을 열 수 없습니다.",
                                                                   style:
@@ -712,12 +713,46 @@ class _PostViewPageState extends State<PostViewPage> {
       children: [
         // 좋아요 버튼
         InkWell(
+          // TODO: onTap 메서드 함수로 빼놓기
           onTap: () async {
-            bool res = await ArticleController(
-              model: _article,
-              userProvider: userProvider,
-            ).posVote();
-            if (res) _updateState();
+            // 자신의 글에는 요청을 보내지 않고 미리 차단하기
+            if (_article.is_mine) {
+              ScaffoldMessenger.of(context)
+                  .showSnackBar(buildAraSnackBar(context,
+                      content: Row(
+                        children: [
+                          SvgPicture.asset(
+                            'assets/icons/information.svg',
+                            colorFilter: const ColorFilter.mode(
+                                Colors.red, BlendMode.srcIn),
+                            width: 32,
+                            height: 32,
+                          ),
+                          const SizedBox(width: 8),
+                          const Flexible(
+                            child: Text(
+                              "본인 게시글이나 댓글에는 좋아요를 누를 수 없습니다!",
+                              // 오버플로우 나면 다음줄로 넘어가도록 하기 위해
+                              overflow: TextOverflow.visible,
+                              style: TextStyle(
+                                color: Colors.black,
+                                fontWeight: FontWeight.w400,
+                                fontSize: 15,
+                              ),
+                            ),
+                          ),
+                        ],
+                      )));
+              return;
+            }
+            // 다른 사람의 글인 경우
+            else {
+              bool res = await ArticleController(
+                model: _article,
+                userProvider: userProvider,
+              ).posVote();
+              if (res) _updateState();
+            }
           },
           child: _buildVoteIcons(
               true, _article.my_vote, ColorsInfo.posVote, 20.17, 22),
@@ -734,13 +769,44 @@ class _PostViewPageState extends State<PostViewPage> {
         const SizedBox(width: 20),
         // 싫어요 버튼
         InkWell(
+          // TODO: onTap 메서드 함수화하기
           onTap: () {
-            ArticleController(
-              model: _article,
-              userProvider: userProvider,
-            ).negVote().then((result) {
-              if (result) _updateState();
-            });
+            if (_article.is_mine) {
+              ScaffoldMessenger.of(context)
+                  .showSnackBar(buildAraSnackBar(context,
+                      content: Row(
+                        children: [
+                          SvgPicture.asset(
+                            'assets/icons/information.svg',
+                            colorFilter: const ColorFilter.mode(
+                                Colors.red, BlendMode.srcIn),
+                            width: 32,
+                            height: 32,
+                          ),
+                          const SizedBox(width: 8),
+                          const Flexible(
+                            child: Text(
+                              "본인 게시글이나 댓글에는 좋아요를 누를 수 없습니다!",
+                              // 오버플로우 나면 다음줄로 넘어가도록 하기 위해
+                              overflow: TextOverflow.visible,
+                              style: TextStyle(
+                                color: Colors.black,
+                                fontWeight: FontWeight.w400,
+                                fontSize: 15,
+                              ),
+                            ),
+                          ),
+                        ],
+                      )));
+              return;
+            } else {
+              ArticleController(
+                model: _article,
+                userProvider: userProvider,
+              ).negVote().then((result) {
+                if (result) _updateState();
+              });
+            }
           },
           child: _buildVoteIcons(
               false, _article.my_vote, ColorsInfo.negVote, 20.17, 22),
@@ -1692,7 +1758,7 @@ class _PostViewPageState extends State<PostViewPage> {
   }
 
   // TODO: in_article_web_view.dart의 함수와 통합 고려해보기
-  
+
   /// _article.url (포탈공지글일 경우 포탈 링크가 있음)을
   /// 브라우저로 띄워주는 함수
   /// 브라우저로 url 열기에 성공하면 true, 아니면 false를 반환함.
@@ -1713,7 +1779,7 @@ class _PostViewPageState extends State<PostViewPage> {
 
     return true;
   }
-  
+
   /// 주어진 nameType에 따라 유저 정보를 볼 수 있는지 여부를 리턴하는 함수
   /// PostViewPage에서 UserViewPage로 리다이렉트 될 수 있는지 여부를 나타냄.
   bool isRegular(int? nameType) {
