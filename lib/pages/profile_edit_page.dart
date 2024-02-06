@@ -100,7 +100,7 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
     var formData = FormData.fromMap(payload);
     Dio dio = createDioWithConfig();
     dio.options.headers['Cookie'] = userProvider.getCookiesToString();
-    dio.options.headers['X-Csrftoken'] = userProvider.getCsrftoken();
+    dio.options.headers['X-Csrftoken'] = userProvider.getCsrftokenToString();
     try {
       var response = await dio.patch(
         "$newAraDefaultUrl/api/user_profiles/${userProfileModel.user}/",

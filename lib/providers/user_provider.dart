@@ -53,7 +53,7 @@ class UserProvider with ChangeNotifier {
     return cookieString;
   }
 
-  String getCsrftoken() {
+  String getCsrftokenToString() {
     String csrfToken =
         _loginCookie.firstWhere((cookie) => cookie.name == 'csrftoken').value;
     return csrfToken;
@@ -109,10 +109,10 @@ class UserProvider with ChangeNotifier {
   }
 
   /// 주어진 쿠키 설정으로 Dio 객체를 초기화하고 반환합니다.
-  Dio myDio() {
+  Dio createDioWithHeaders() {
     Dio dio = createDioWithConfig();
     dio.options.headers['Cookie'] = getCookiesToString();
-    dio.options.headers['X-Csrftoken'] = getCsrftoken();
+    dio.options.headers['X-Csrftoken'] = getCsrftokenToString();
 
     return dio;
   }
@@ -158,7 +158,7 @@ class UserProvider with ChangeNotifier {
 
     Dio dio = createDioWithConfig();
     dio.options.headers['Cookie'] = getCookiesToString();
-    dio.options.headers['X-Csrftoken'] = getCsrftoken();
+    dio.options.headers['X-Csrftoken'] = getCsrftokenToString();
 
     late dynamic response;
     try {
@@ -174,7 +174,7 @@ class UserProvider with ChangeNotifier {
 
     Dio dio = createDioWithConfig();
     dio.options.headers['Cookie'] = getCookiesToString();
-    dio.options.headers['X-Csrftoken'] = getCsrftoken();
+    dio.options.headers['X-Csrftoken'] = getCsrftokenToString();
 
     late dynamic response;
     try {
@@ -190,7 +190,7 @@ class UserProvider with ChangeNotifier {
 
     Dio dio = createDioWithConfig();
     dio.options.headers['Cookie'] = getCookiesToString();
-    dio.options.headers['X-Csrftoken'] = getCsrftoken();
+    dio.options.headers['X-Csrftoken'] = getCsrftokenToString();
 
     late dynamic response;
     try {

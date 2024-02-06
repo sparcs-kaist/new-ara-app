@@ -527,7 +527,7 @@ class _UserPageState extends State<UserPage>
     if (page == 1) clearList(tabType);
 
     try {
-      var response = await userProvider.myDio().get('$newAraDefaultUrl$apiUrl');
+      var response = await userProvider.createDioWithHeaders().get('$newAraDefaultUrl$apiUrl');
 
       List<dynamic> rawPostList = response.data['results'];
       for (int i = 0; i < rawPostList.length; i++) {

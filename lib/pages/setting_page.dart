@@ -54,7 +54,7 @@ class SettingPageState extends State<SettingPage> {
 
     Dio dio = createDioWithConfig();
     dio.options.headers['Cookie'] = userProvider.getCookiesToString();
-    dio.options.headers['X-Csrftoken']= userProvider.getCsrftoken();
+    dio.options.headers['X-Csrftoken']= userProvider.getCsrftokenToString();
 
     return Scaffold(
       appBar: AppBar(

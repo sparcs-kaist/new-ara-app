@@ -1476,7 +1476,7 @@ class _PostWritePageState extends State<PostWritePage>
 
       Dio dio = createDioWithConfig();
       dio.options.headers['Cookie'] = userProvider.getCookiesToString();
-      dio.options.headers['X-Csrftoken'] = userProvider.getCsrftoken();
+      dio.options.headers['X-Csrftoken'] = userProvider.getCsrftokenToString();
 
       for (int i = 0; i < _attachmentList.length; i++) {
         //새로 올리는 파일이면 새로운 id 할당 받기.

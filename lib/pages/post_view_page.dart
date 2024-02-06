@@ -131,7 +131,7 @@ class _PostViewPageState extends State<PostViewPage> {
     if (override_hidden) apiUrl += "/?override_hidden=true";
 
     try {
-      var response = await userProvider.myDio().get(apiUrl);
+      var response = await userProvider.createDioWithHeaders().get(apiUrl);
       articleJson = response.data;
     } on DioException catch (e) {
       debugPrint("DioException occurred");

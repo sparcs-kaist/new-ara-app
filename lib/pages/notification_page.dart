@@ -67,7 +67,7 @@ class _NotificationPageState extends State<NotificationPage> {
       UserProvider userProvider, int targetPage) async {
     Dio dio = createDioWithConfig();
     dio.options.headers["Cookie"] = userProvider.getCookiesToString();
-    dio.options.headers["X-Csrftoken"] = userProvider.getCsrftoken();
+    dio.options.headers["X-Csrftoken"] = userProvider.getCsrftokenToString();
     List<NotificationModel> resList = [];
     try {
       var response = await dio
@@ -148,7 +148,7 @@ class _NotificationPageState extends State<NotificationPage> {
   Future<bool> _readNotification(UserProvider userProvider, int id) async {
     try {
       await userProvider
-          .myDio()
+          .createDioWithHeaders()
           .post("$newAraDefaultUrl/api/notifications/$id/read/");
     } catch (error) {
       debugPrint("POST /api/notifications/$id/read/ failed: $error");
@@ -163,7 +163,7 @@ class _NotificationPageState extends State<NotificationPage> {
   Future<bool> _readAllNotification(UserProvider userProvider) async {
     try {
       await userProvider
-          .myDio()
+          .createDioWithHeaders()
           .post("$newAraDefaultUrl/api/notifications/read_all/");
     } catch (error) {
       debugPrint("POST /api/notifications/read_all failed: $error");
