@@ -187,27 +187,28 @@ class OthersPopupMenuButton extends StatelessWidget {
         height: 20,
       ),
       itemBuilder: (BuildContext context) => [
-        PopupMenuItem<String>(
-          value: 'Chat',
-          child: Row(
-            children: [
-              SvgPicture.asset(
-                'assets/icons/chat.svg',
-                width: 20,
-                height: 20,
-                color: const Color.fromRGBO(51, 51, 51, 1),
-              ),
-              const SizedBox(width: 10),
-              const Text(
-                '채팅',
-                style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w700,
-                    color: Color.fromRGBO(51, 51, 51, 1)),
-              ),
-            ],
-          ),
-        ),
+        // TODO: 채팅 기능 지원될 시에 사용하기
+        // PopupMenuItem<String>(
+        //   value: 'Chat',
+        //   child: Row(
+        //     children: [
+        //       SvgPicture.asset(
+        //         'assets/icons/chat.svg',
+        //         width: 20,
+        //         height: 20,
+        //         color: const Color.fromRGBO(51, 51, 51, 1),
+        //       ),
+        //       const SizedBox(width: 10),
+        //       const Text(
+        //         '채팅',
+        //         style: TextStyle(
+        //             fontSize: 16,
+        //             fontWeight: FontWeight.w700,
+        //             color: Color.fromRGBO(51, 51, 51, 1)),
+        //       ),
+        //     ],
+        //   ),
+        // ),
         PopupMenuItem<String>(
           value: 'Report',
           child: Row(
