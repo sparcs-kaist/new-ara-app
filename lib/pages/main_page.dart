@@ -88,7 +88,7 @@ class _MainPageState extends State<MainPage> {
       debugPrint("소요 시간: ${duration.inMilliseconds} 밀리초");
     });
 
-    context.read<NotificationProvider>().checkIsNotReadExist();
+    context.read<NotificationProvider>().checkIsNotReadExist(userProvider);
   }
 
   /// 일일 베스트 컨텐츠 데이터를 새로고침

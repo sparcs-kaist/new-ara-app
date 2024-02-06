@@ -175,8 +175,9 @@ class _PostWritePageState extends State<PostWritePage>
   @override
   void initState() {
     super.initState();
+    UserProvider userProvider = context.read<UserProvider>();
 
-    context.read<NotificationProvider>().checkIsNotReadExist();
+    context.read<NotificationProvider>().checkIsNotReadExist(userProvider);
     debugPrint("post_write_page.dart: ${widget.previousBoard}");
     if (widget.previousArticle != null) {
       _isEditingPost = true;
@@ -261,8 +262,7 @@ class _PostWritePageState extends State<PostWritePage>
     // 사용자 정보 제공자로부터 쿠키 정보 가져오기.
     var userProvider = context.read<UserProvider>();
     try {
-      Dio dio = createDioWithConfig();
-      dio.options.headers['Cookie'] = userProvider.getCookiesToString();
+      Dio dio = userProvider.createDioWithHeaders();
       var response = await dio.get('$newAraDefaultUrl/api/boards/');
 
       // 기본 게시판 정보를 `_boardList`에 초기화.
@@ -1474,8 +1474,7 @@ class _PostWritePageState extends State<PostWritePage>
         _isLoading = true;
       });
 
-      Dio dio = createDioWithConfig();
-      dio.options.headers['Cookie'] = userProvider.getCookiesToString();
+      Dio dio = userProvider.createDioWithHeaders();
 
       for (int i = 0; i < _attachmentList.length; i++) {
         //새로 올리는 파일이면 새로운 id 할당 받기.

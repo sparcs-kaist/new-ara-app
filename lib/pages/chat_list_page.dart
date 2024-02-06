@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:new_ara_app/providers/user_provider.dart';
 import 'package:new_ara_app/utils/slide_routing.dart';
 import 'package:provider/provider.dart';
 
@@ -21,7 +22,8 @@ class _ChatListPageState extends State<ChatListPage> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    context.read<NotificationProvider>().checkIsNotReadExist();
+    UserProvider userProvider = context.read<UserProvider>();
+    context.read<NotificationProvider>().checkIsNotReadExist(userProvider);
 
     //totest: 채팅창 하나는 미리 추가해놓은 로직
     chatPreviewList.add(

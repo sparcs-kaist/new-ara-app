@@ -124,7 +124,7 @@ class ArticleController {
   Future<bool> delete() async {
     String apiUrl = "$newAraDefaultUrl/api/articles/${model.id}/";
     try {
-      await userProvider.myDio().delete(apiUrl);
+      await userProvider.createDioWithHeaders().delete(apiUrl);
       return true;
     } on DioException catch (e) {
       debugPrint("DioException occurred");
@@ -156,7 +156,7 @@ class ArticleController {
     int userID = model.created_by.id;
 
     try {
-      await userProvider.myDio().post(
+      await userProvider.createDioWithHeaders().post(
         apiUrl,
         data: block ? {'user': userID} : {'blocked': userID}
       );
@@ -243,7 +243,7 @@ class FileController {
   /// 다운로드가 성공하면 true, 그렇지 않으면 false 리턴.
   Future<bool> _downloadFile(String uri, String totalPath) async {
     try {
-      await userProvider.myDio().download(uri, totalPath);
+      await userProvider.createDioWithHeaders().download(uri, totalPath);
     } catch (error) {
       return false;
     }

@@ -65,8 +65,7 @@ class _NotificationPageState extends State<NotificationPage> {
   /// 결과 리스트를 반환함.
   Future<List<NotificationModel>> _fetchEachPage(
       UserProvider userProvider, int targetPage) async {
-    Dio dio = createDioWithConfig()
-      ..options.headers["Cookie"] = userProvider.getCookiesToString();
+    Dio dio = userProvider.createDioWithHeaders();
     List<NotificationModel> resList = [];
     try {
       var response = await dio
@@ -99,8 +98,7 @@ class _NotificationPageState extends State<NotificationPage> {
       bool hasNext = true;
       UserProvider userProvider = context.read<UserProvider>();
       List<NotificationModel> resList = [];
-      Dio dio = createDioWithConfig()
-        ..options.headers["Cookie"] = userProvider.getCookiesToString();
+      Dio dio = userProvider.createDioWithHeaders();
       int page = 1;
       for (page = 1; hasNext; page++) {
         if (page > _curPage + 1) break;
@@ -147,7 +145,7 @@ class _NotificationPageState extends State<NotificationPage> {
   Future<bool> _readNotification(UserProvider userProvider, int id) async {
     try {
       await userProvider
-          .myDio()
+          .createDioWithHeaders()
           .post("$newAraDefaultUrl/api/notifications/$id/read/");
     } catch (error) {
       debugPrint("POST /api/notifications/$id/read/ failed: $error");
@@ -162,7 +160,7 @@ class _NotificationPageState extends State<NotificationPage> {
   Future<bool> _readAllNotification(UserProvider userProvider) async {
     try {
       await userProvider
-          .myDio()
+          .createDioWithHeaders()
           .post("$newAraDefaultUrl/api/notifications/read_all/");
     } catch (error) {
       debugPrint("POST /api/notifications/read_all failed: $error");
@@ -206,7 +204,7 @@ class _NotificationPageState extends State<NotificationPage> {
                     onRefresh: () async {
                       // 새로고침 시 첫 페이지만 다시 불러옴.
                       await _initNotificationPage(userProvider);
-                      await notificationProvider.checkIsNotReadExist();
+                      await notificationProvider.checkIsNotReadExist(userProvider);
                       updateState();
                     },
                     child: _isLoadingTotal
@@ -262,7 +260,7 @@ class _NotificationPageState extends State<NotificationPage> {
                                               () => targetNoti.is_read = false);
                                         }
                                         await notificationProvider
-                                            .checkIsNotReadExist();
+                                            .checkIsNotReadExist(userProvider);
                                         List<NotificationModel> newList = [];
                                         for (int page = 1;
                                             page <= _curPage;

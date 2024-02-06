@@ -38,7 +38,7 @@ class _BulletinListPageState extends State<BulletinListPage> {
     super.initState();
     var userProvider = Provider.of<UserProvider>(context, listen: false);
     refreshBoardList(userProvider);
-    context.read<NotificationProvider>().checkIsNotReadExist();
+    context.read<NotificationProvider>().checkIsNotReadExist(userProvider);
   }
 
   /// 게시판 목록을 새로고침하는 함수
