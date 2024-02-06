@@ -45,16 +45,14 @@ class SettingPageState extends State<SettingPage> {
     see_sexual = userProvider.naUser?.see_sexual ?? true;
     see_social = userProvider.naUser?.see_social ?? true;
     // 페이지 전환 과정에서 새로운 알림을 확인하기 위한 호출.
-    context.read<NotificationProvider>().checkIsNotReadExist();
+    context.read<NotificationProvider>().checkIsNotReadExist(userProvider);
   }
 
   @override
   Widget build(BuildContext context) {
     var userProvider = context.watch<UserProvider>();
 
-    Dio dio = createDioWithConfig();
-    dio.options.headers['Cookie'] = userProvider.getCookiesToString();
-    dio.options.headers['X-Csrftoken']= userProvider.getCsrftokenToString();
+    Dio dio = userProvider.createDioWithHeaders();
 
     return Scaffold(
       appBar: AppBar(

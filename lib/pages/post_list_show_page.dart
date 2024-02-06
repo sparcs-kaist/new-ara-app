@@ -73,7 +73,7 @@ class _PostListShowPageState extends State<PostListShowPage> {
 
     _scrollController.addListener(_scrollListener);
     updateAllBulletinList();
-    context.read<NotificationProvider>().checkIsNotReadExist();
+    context.read<NotificationProvider>().checkIsNotReadExist(userProvider);
   }
 
   @override

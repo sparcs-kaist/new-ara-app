@@ -108,7 +108,7 @@ class _PostViewPageState extends State<PostViewPage> {
     });
 
     // 페이지가 로드될 때 새로운 알림이 있는지 조회.
-    context.read<NotificationProvider>().checkIsNotReadExist();
+    context.read<NotificationProvider>().checkIsNotReadExist(userProvider);
   }
 
   @override

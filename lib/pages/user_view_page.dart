@@ -64,7 +64,7 @@ class _UserViewPageState extends State<UserViewPage> {
     _listViewController.addListener(_listViewListener);
 
     // 페이지 로드 시 새로운 알림이 있는 지 조회.
-    context.read<NotificationProvider>().checkIsNotReadExist();
+    context.read<NotificationProvider>().checkIsNotReadExist(userProvider);
     loadAll(userProvider, 1);
   }
 

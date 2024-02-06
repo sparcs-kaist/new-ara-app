@@ -9,7 +9,8 @@ import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
 
 import 'package:new_ara_app/constants/url_info.dart';
-import 'package:new_ara_app/utils/create_dio_with_config.dart';
+import 'package:new_ara_app/providers/user_provider.dart';
+import 'package:provider/provider.dart';
 
 /// 새로운 알림 여부를 알려주는 ChangeNotifier.
 /// 알림 생성 여부가 필요한 다양한 위젯에 활용하기 위해 ChangeNotifier로 구현함.
@@ -36,10 +37,11 @@ class NotificationProvider with ChangeNotifier {
   /// 받은 알림 별로 읽음 여부를 확인하여 isNotReadExist 변수를 설정함.
   /// 구독 중인 리스너에게 isNotReadExist 결과를 알려줌.
   /// 페이지가 전환될 때마다 전환되는 페이지의 initState에서 호출됨.
-  Future<void> checkIsNotReadExist() async {
+  /// UserProvider는 createDioWithHeaders 함수를 쓰기 위해 사용됨.
+  Future<void> checkIsNotReadExist(UserProvider userProvider) async {
     bool res = false;
 
-    Dio dio = createDioWithConfig()..options.headers["Cookie"] = _cookieString;
+    Dio dio = userProvider.createDioWithHeaders();
 
     int curPage = 1;
 

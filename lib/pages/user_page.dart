@@ -90,10 +90,10 @@ class _UserPageState extends State<UserPage>
     scrollControllerList[1].addListener(_scrollListener1);
     scrollControllerList[2].addListener(_scrollListener2);
 
-    // 페이지 로드 시에 새로운 알림 여부를 조회함.
-    context.read<NotificationProvider>().checkIsNotReadExist();
-
     UserProvider userProvider = context.read<UserProvider>();
+
+    // 페이지 로드 시에 새로운 알림 여부를 조회함.
+    context.read<NotificationProvider>().checkIsNotReadExist(userProvider);
 
     // 초기 데이터를 로드함.
     fetchInitData(userProvider);
@@ -304,7 +304,8 @@ class _UserPageState extends State<UserPage>
                     ),
                   ),
                   Text(
-                    userProvider.naUser == null || userProvider.naUser?.email == null
+                    userProvider.naUser == null ||
+                            userProvider.naUser?.email == null
                         ? "이메일 정보가 없습니다."
                         : "${userProvider.naUser?.email}",
                     style: const TextStyle(
@@ -527,7 +528,9 @@ class _UserPageState extends State<UserPage>
     if (page == 1) clearList(tabType);
 
     try {
-      var response = await userProvider.createDioWithHeaders().get('$newAraDefaultUrl$apiUrl');
+      var response = await userProvider
+          .createDioWithHeaders()
+          .get('$newAraDefaultUrl$apiUrl');
 
       List<dynamic> rawPostList = response.data['results'];
       for (int i = 0; i < rawPostList.length; i++) {

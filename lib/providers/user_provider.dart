@@ -123,8 +123,7 @@ class UserProvider with ChangeNotifier {
   Future<dynamic> getApiRes(String apiUrl, {String? sendText}) async {
     var totUrl = "$newAraDefaultUrl/api/$apiUrl";
 
-    Dio dio = createDioWithConfig();
-    dio.options.headers['Cookie'] = getCookiesToString();
+    Dio dio = createDioWithHeaders();
 
     late dynamic response;
     try {
@@ -156,7 +155,7 @@ class UserProvider with ChangeNotifier {
   Future<dynamic> postApiRes(String apiUrl, {dynamic payload}) async {
     String totUrl = "$newAraDefaultUrl/api/$apiUrl";
 
-    Dio dio = createDioWithConfig();
+    Dio dio = createDioWithHeaders();
     dio.options.headers['Cookie'] = getCookiesToString();
     dio.options.headers['X-Csrftoken'] = getCsrftokenToString();
 
@@ -172,7 +171,7 @@ class UserProvider with ChangeNotifier {
   Future<dynamic> delApiRes(String apiUrl, {dynamic payload}) async {
     String totUrl = "$newAraDefaultUrl/api/$apiUrl";
 
-    Dio dio = createDioWithConfig();
+    Dio dio = createDioWithHeaders();
     dio.options.headers['Cookie'] = getCookiesToString();
     dio.options.headers['X-Csrftoken'] = getCsrftokenToString();
 
@@ -188,7 +187,7 @@ class UserProvider with ChangeNotifier {
   Future<dynamic> patchApiRes(String apiUrl, {dynamic payload}) async {
     String totUrl = "$newAraDefaultUrl/api/$apiUrl";
 
-    Dio dio = createDioWithConfig();
+    Dio dio = createDioWithHeaders();
     dio.options.headers['Cookie'] = getCookiesToString();
     dio.options.headers['X-Csrftoken'] = getCsrftokenToString();
 

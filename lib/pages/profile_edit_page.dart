@@ -33,7 +33,8 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
   @override
   void initState() {
     super.initState();
-    context.read<NotificationProvider>().checkIsNotReadExist();
+    UserProvider userProvider = context.read<UserProvider>();
+    context.read<NotificationProvider>().checkIsNotReadExist(userProvider);
   }
 
   void setIsCamClicked(bool tf) {
@@ -98,9 +99,7 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
       );
     }
     var formData = FormData.fromMap(payload);
-    Dio dio = createDioWithConfig();
-    dio.options.headers['Cookie'] = userProvider.getCookiesToString();
-    dio.options.headers['X-Csrftoken'] = userProvider.getCsrftokenToString();
+    Dio dio = userProvider.createDioWithHeaders();
     try {
       var response = await dio.patch(
         "$newAraDefaultUrl/api/user_profiles/${userProfileModel.user}/",
