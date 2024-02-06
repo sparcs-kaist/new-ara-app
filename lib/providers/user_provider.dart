@@ -109,13 +109,19 @@ class UserProvider with ChangeNotifier {
   }
 
   /// 주어진 쿠키 설정으로 Dio 객체를 초기화하고 반환합니다.
-  Dio createDioWithHeaders() {
+  Dio createDioWithHeadersForGet() {
+    Dio dio = createDioWithConfig();
+    dio.options.headers['Cookie'] = getCookiesToString();
+    return dio;
+  }
+  Dio createDioWithHeadersForPost() {
     Dio dio = createDioWithConfig();
     dio.options.headers['Cookie'] = getCookiesToString();
     dio.options.headers['X-Csrftoken'] = getCsrftokenToString();
 
     return dio;
   }
+  
 
   /// 지정된 API URL로 GET 요청을 전송하고 응답의 data를 반환합니다.
   /// 실패 시 null을 반환합니다.
@@ -123,7 +129,7 @@ class UserProvider with ChangeNotifier {
   Future<dynamic> getApiRes(String apiUrl, {String? sendText}) async {
     var totUrl = "$newAraDefaultUrl/api/$apiUrl";
 
-    Dio dio = createDioWithHeaders();
+    Dio dio = createDioWithHeadersForGet();
 
     late dynamic response;
     try {
@@ -155,7 +161,7 @@ class UserProvider with ChangeNotifier {
   Future<dynamic> postApiRes(String apiUrl, {dynamic payload}) async {
     String totUrl = "$newAraDefaultUrl/api/$apiUrl";
 
-    Dio dio = createDioWithHeaders();
+    Dio dio = createDioWithHeadersForPost();
     dio.options.headers['Cookie'] = getCookiesToString();
     dio.options.headers['X-Csrftoken'] = getCsrftokenToString();
 
@@ -171,7 +177,7 @@ class UserProvider with ChangeNotifier {
   Future<dynamic> delApiRes(String apiUrl, {dynamic payload}) async {
     String totUrl = "$newAraDefaultUrl/api/$apiUrl";
 
-    Dio dio = createDioWithHeaders();
+    Dio dio = createDioWithHeadersForPost();
     dio.options.headers['Cookie'] = getCookiesToString();
     dio.options.headers['X-Csrftoken'] = getCsrftokenToString();
 
@@ -187,7 +193,7 @@ class UserProvider with ChangeNotifier {
   Future<dynamic> patchApiRes(String apiUrl, {dynamic payload}) async {
     String totUrl = "$newAraDefaultUrl/api/$apiUrl";
 
-    Dio dio = createDioWithHeaders();
+    Dio dio = createDioWithHeadersForPost();
     dio.options.headers['Cookie'] = getCookiesToString();
     dio.options.headers['X-Csrftoken'] = getCsrftokenToString();
 
