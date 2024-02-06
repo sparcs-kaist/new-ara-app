@@ -1358,13 +1358,48 @@ class _PostViewPageState extends State<PostViewPage> {
                           child: Row(
                             children: [
                               InkWell(
+                                // onTap 메서드 함수화하기
                                 onTap: () {
-                                  CommentController(
-                                    model: curComment,
-                                    userProvider: userProvider,
-                                  ).posVote().then((result) {
-                                    if (result) _updateState();
-                                  });
+                                  if (curComment.is_mine) {
+                                    ScaffoldMessenger.of(context)
+                                        .showSnackBar(buildAraSnackBar(context,
+                                            content: Row(
+                                              children: [
+                                                SvgPicture.asset(
+                                                  'assets/icons/information.svg',
+                                                  colorFilter:
+                                                      const ColorFilter.mode(
+                                                          Colors.red,
+                                                          BlendMode.srcIn),
+                                                  width: 32,
+                                                  height: 32,
+                                                ),
+                                                const SizedBox(width: 8),
+                                                const Flexible(
+                                                  child: Text(
+                                                    "본인 게시글이나 댓글에는 좋아요를 누를 수 없습니다!",
+                                                    // 오버플로우 나면 다음줄로 넘어가도록 하기 위해
+                                                    overflow:
+                                                        TextOverflow.visible,
+                                                    style: TextStyle(
+                                                      color: Colors.black,
+                                                      fontWeight:
+                                                          FontWeight.w400,
+                                                      fontSize: 15,
+                                                    ),
+                                                  ),
+                                                ),
+                                              ],
+                                            )));
+                                    return;
+                                  } else {
+                                    CommentController(
+                                      model: curComment,
+                                      userProvider: userProvider,
+                                    ).posVote().then((result) {
+                                      if (result) _updateState();
+                                    });
+                                  }
                                 },
                                 child: _buildVoteIcons(true, curComment.my_vote,
                                     ColorsInfo.posVote, 11.52, 12.57),
@@ -1383,12 +1418,47 @@ class _PostViewPageState extends State<PostViewPage> {
                               const SizedBox(width: 12),
                               InkWell(
                                 onTap: () async {
-                                  CommentController(
-                                    model: curComment,
-                                    userProvider: userProvider,
-                                  ).negVote().then((result) {
-                                    if (result) _updateState();
-                                  });
+                                  // onTap 메서드 함수화하기
+                                  if (curComment.is_mine) {
+                                    ScaffoldMessenger.of(context)
+                                        .showSnackBar(buildAraSnackBar(context,
+                                            content: Row(
+                                              children: [
+                                                SvgPicture.asset(
+                                                  'assets/icons/information.svg',
+                                                  colorFilter:
+                                                      const ColorFilter.mode(
+                                                          Colors.red,
+                                                          BlendMode.srcIn),
+                                                  width: 32,
+                                                  height: 32,
+                                                ),
+                                                const SizedBox(width: 8),
+                                                const Flexible(
+                                                  child: Text(
+                                                    "본인 게시글이나 댓글에는 좋아요를 누를 수 없습니다!",
+                                                    // 오버플로우 나면 다음줄로 넘어가도록 하기 위해
+                                                    overflow:
+                                                        TextOverflow.visible,
+                                                    style: TextStyle(
+                                                      color: Colors.black,
+                                                      fontWeight:
+                                                          FontWeight.w400,
+                                                      fontSize: 15,
+                                                    ),
+                                                  ),
+                                                ),
+                                              ],
+                                            )));
+                                    return;
+                                  } else {
+                                    CommentController(
+                                      model: curComment,
+                                      userProvider: userProvider,
+                                    ).negVote().then((result) {
+                                      if (result) _updateState();
+                                    });
+                                  }
                                 },
                                 child: _buildVoteIcons(
                                     false,
