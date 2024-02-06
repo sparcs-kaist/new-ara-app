@@ -3,11 +3,34 @@ import 'package:flutter/material.dart';
 const Duration _araSnackBarDisplayDuration = Duration(seconds: 4);
 
 /// Ara 디자인에 맞는 SnackBar 위젯을 리턴하는 함수
-/// Ara 디자인에 맞게 커스텀되어야 하는 파라미터는 기본값으로 지정되어 있음. 상황에 따라 변경하여 적용도 가능
+/// Ara 디자인에 맞게 커스텀되어야 하는 파라미터는 기본값으로 지정되어 있음. 상황에 따라 변경하여 적용도 가능.
+/// Overflow를 방지하기 위해 Flexible 활용하여 작성하는 것 추천
 /// ```
-/// ScaffoldMessengar.of(context).showSnackBar(
-///     buildAraSnackBar(context, Text('hello world'))
-/// );
+/// ScaffoldMessenger.of(context)
+///                   .showSnackBar(buildAraSnackBar(context,
+///                       content: Row(
+///                         children: [
+///                           SvgPicture.asset(
+///                             'assets/icons/information.svg',
+///                             colorFilter: const ColorFilter.mode(
+///                                 Colors.red, BlendMode.srcIn),
+///                             width: 32,
+///                             height: 32,
+///                           ),
+///                           const SizedBox(width: 8),
+///                           const Flexible(
+///                             child: Text(
+///                               "본인 게시글이나 댓글에는 좋아요를 누를 수 없습니다!",
+///                               overflow: TextOverflow.visible,
+///                               style: TextStyle(
+///                                 color: Colors.black,
+///                                 fontWeight: FontWeight.w400,
+///                                 fontSize: 15,
+///                               ),
+///                             ),
+///                           ),
+///                         ],
+///                       )));
 /// ```
 SnackBar buildAraSnackBar(context,
     {Key? key,
