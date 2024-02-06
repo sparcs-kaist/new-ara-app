@@ -234,9 +234,9 @@ class OthersPopupMenuButton extends StatelessWidget {
       ],
       onSelected: (String result) {
         switch (result) {
-          case 'Chat':
-            // (2023.08.01) 채팅 기능은 추후에 구현 예정이기 때문에 아직은 Placeholder
-            break;
+          // case 'Chat':
+          //   // (2023.08.01) 채팅 기능은 추후에 구현 예정이기 때문에 아직은 Placeholder
+          //   break;
           case 'Report':
             showDialog(
                 context: context,
