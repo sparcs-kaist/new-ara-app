@@ -717,32 +717,7 @@ class _PostViewPageState extends State<PostViewPage> {
           onTap: () async {
             // 자신의 글에는 요청을 보내지 않고 미리 차단하기
             if (_article.is_mine) {
-              ScaffoldMessenger.of(context)
-                  .showSnackBar(buildAraSnackBar(context,
-                      content: Row(
-                        children: [
-                          SvgPicture.asset(
-                            'assets/icons/information.svg',
-                            colorFilter: const ColorFilter.mode(
-                                Colors.red, BlendMode.srcIn),
-                            width: 32,
-                            height: 32,
-                          ),
-                          const SizedBox(width: 8),
-                          const Flexible(
-                            child: Text(
-                              "본인 게시글이나 댓글에는 좋아요를 누를 수 없습니다!",
-                              // 오버플로우 나면 다음줄로 넘어가도록 하기 위해
-                              overflow: TextOverflow.visible,
-                              style: TextStyle(
-                                color: Colors.black,
-                                fontWeight: FontWeight.w400,
-                                fontSize: 15,
-                              ),
-                            ),
-                          ),
-                        ],
-                      )));
+              _showAraSnackBar();
               return;
             }
             // 다른 사람의 글인 경우
@@ -772,32 +747,7 @@ class _PostViewPageState extends State<PostViewPage> {
           // TODO: onTap 메서드 함수화하기
           onTap: () {
             if (_article.is_mine) {
-              ScaffoldMessenger.of(context)
-                  .showSnackBar(buildAraSnackBar(context,
-                      content: Row(
-                        children: [
-                          SvgPicture.asset(
-                            'assets/icons/information.svg',
-                            colorFilter: const ColorFilter.mode(
-                                Colors.red, BlendMode.srcIn),
-                            width: 32,
-                            height: 32,
-                          ),
-                          const SizedBox(width: 8),
-                          const Flexible(
-                            child: Text(
-                              "본인 게시글이나 댓글에는 좋아요를 누를 수 없습니다!",
-                              // 오버플로우 나면 다음줄로 넘어가도록 하기 위해
-                              overflow: TextOverflow.visible,
-                              style: TextStyle(
-                                color: Colors.black,
-                                fontWeight: FontWeight.w400,
-                                fontSize: 15,
-                              ),
-                            ),
-                          ),
-                        ],
-                      )));
+              _showAraSnackBar();
               return;
             } else {
               ArticleController(
@@ -1361,36 +1311,7 @@ class _PostViewPageState extends State<PostViewPage> {
                                 // onTap 메서드 함수화하기
                                 onTap: () {
                                   if (curComment.is_mine) {
-                                    ScaffoldMessenger.of(context)
-                                        .showSnackBar(buildAraSnackBar(context,
-                                            content: Row(
-                                              children: [
-                                                SvgPicture.asset(
-                                                  'assets/icons/information.svg',
-                                                  colorFilter:
-                                                      const ColorFilter.mode(
-                                                          Colors.red,
-                                                          BlendMode.srcIn),
-                                                  width: 32,
-                                                  height: 32,
-                                                ),
-                                                const SizedBox(width: 8),
-                                                const Flexible(
-                                                  child: Text(
-                                                    "본인 게시글이나 댓글에는 좋아요를 누를 수 없습니다!",
-                                                    // 오버플로우 나면 다음줄로 넘어가도록 하기 위해
-                                                    overflow:
-                                                        TextOverflow.visible,
-                                                    style: TextStyle(
-                                                      color: Colors.black,
-                                                      fontWeight:
-                                                          FontWeight.w400,
-                                                      fontSize: 15,
-                                                    ),
-                                                  ),
-                                                ),
-                                              ],
-                                            )));
+                                    _showAraSnackBar();
                                     return;
                                   } else {
                                     CommentController(
@@ -1420,36 +1341,7 @@ class _PostViewPageState extends State<PostViewPage> {
                                 onTap: () async {
                                   // onTap 메서드 함수화하기
                                   if (curComment.is_mine) {
-                                    ScaffoldMessenger.of(context)
-                                        .showSnackBar(buildAraSnackBar(context,
-                                            content: Row(
-                                              children: [
-                                                SvgPicture.asset(
-                                                  'assets/icons/information.svg',
-                                                  colorFilter:
-                                                      const ColorFilter.mode(
-                                                          Colors.red,
-                                                          BlendMode.srcIn),
-                                                  width: 32,
-                                                  height: 32,
-                                                ),
-                                                const SizedBox(width: 8),
-                                                const Flexible(
-                                                  child: Text(
-                                                    "본인 게시글이나 댓글에는 좋아요를 누를 수 없습니다!",
-                                                    // 오버플로우 나면 다음줄로 넘어가도록 하기 위해
-                                                    overflow:
-                                                        TextOverflow.visible,
-                                                    style: TextStyle(
-                                                      color: Colors.black,
-                                                      fontWeight:
-                                                          FontWeight.w400,
-                                                      fontSize: 15,
-                                                    ),
-                                                  ),
-                                                ),
-                                              ],
-                                            )));
+                                    _showAraSnackBar();
                                     return;
                                   } else {
                                     CommentController(
@@ -1711,6 +1603,34 @@ class _PostViewPageState extends State<PostViewPage> {
             onSaved: (value) => _commentContent = value ?? '',
           )),
     );
+  }
+
+  /// showSnackBar 함수가 자주 쓰여서 함수로 분리함.
+  void _showAraSnackBar() {
+    ScaffoldMessenger.of(context).showSnackBar(buildAraSnackBar(context,
+        content: Row(
+          children: [
+            SvgPicture.asset(
+              'assets/icons/information.svg',
+              colorFilter: const ColorFilter.mode(Colors.red, BlendMode.srcIn),
+              width: 32,
+              height: 32,
+            ),
+            const SizedBox(width: 8),
+            const Flexible(
+              child: Text(
+                "본인 게시글이나 댓글에는 좋아요를 누를 수 없습니다!",
+                // 오버플로우 나면 다음줄로 넘어가도록 하기 위해
+                overflow: TextOverflow.visible,
+                style: TextStyle(
+                  color: Colors.black,
+                  fontWeight: FontWeight.w400,
+                  fontSize: 15,
+                ),
+              ),
+            ),
+          ],
+        )));
   }
 
   /// 현재 post의 작성자가 사용자에 의해 차단되었는지 여부를 반환
