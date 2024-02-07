@@ -230,10 +230,10 @@ class _PostWritePageState extends State<PostWritePage>
       if (_isKeyboardClosed) {
         _onKeyboardChanged(false);
       }
-      _isKeyboardClosed = false;
     } else {
-      _isKeyboardClosed = true;
-      _onKeyboardChanged(true);
+      if (!_isKeyboardClosed) {
+        _onKeyboardChanged(true);
+      }
     }
   }
 
@@ -717,12 +717,11 @@ class _PostWritePageState extends State<PostWritePage>
                 ),
                 InkWell(
                   onTap: () async {
+                    FocusScope.of(context).unfocus();
                     bool picktf = await _pickFile();
                     if (!mounted) return;
                     if (picktf) {
-                      FocusScope.of(context).unfocus();
                     } else {
-                      //TODO: 에디터로 포커스 이동 안하는 문제점이 있음.
                       _editorFocusNode.requestFocus();
                     }
                   },
@@ -1343,7 +1342,7 @@ class _PostWritePageState extends State<PostWritePage>
         scrollController: ScrollController(),
         padding: EdgeInsets.zero,
         scrollable: true,
-        autoFocus: true,
+        autoFocus: false,
         expands: false,
         customStyles: editorStyles(),
       ),
