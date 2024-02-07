@@ -1578,16 +1578,20 @@ class _PostWritePageState extends State<PostWritePage>
     if (image != null) {
       final String imageUrl = image.path;
       final TextSelection selection = _quillController.selection;
-      setState(() {
-        _quillController.document.insert(
-          selection.baseOffset,
-          quill.BlockEmbed('image', imageUrl),
-        );
-      });
+      _quillController.document.insert(
+        selection.baseOffset,
+        "\n", // Assume ParagraphBlock is a valid Quill block for creating paragraphs
+      );
+
+      _quillController.document.insert(
+        selection.baseOffset,
+        quill.BlockEmbed('image', imageUrl),
+      );
+
       // Insert a blank line (new paragraph) after the image
       _quillController.document.insert(
-        selection.baseOffset + 1,
-        "\n\n", // Assume ParagraphBlock is a valid Quill block for creating paragraphs
+        selection.baseOffset,
+        "\n", // Assume ParagraphBlock is a valid Quill block for creating paragraphs
       );
 
       /// TODO: 사진 첨부 시 첨부파일에도 같이 올라갈 것인지 결정하기.
