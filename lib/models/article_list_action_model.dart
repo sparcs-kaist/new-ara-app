@@ -101,7 +101,7 @@ class ArticleListActionModel {
         'id': id,
         'is_hidden': is_hidden,
         'can_override_hidden': can_override_hidden,
-        'parent_topic': parent_topic ?? parent_topic!.toJson(),
+        'parent_topic': parent_topic !=null? parent_topic!.toJson():null,
         'parent_board': parent_board.toJson(),
         'title': title,
         'created_by': created_by.toJson(),

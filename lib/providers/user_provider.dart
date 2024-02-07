@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+import 'dart:math';
 import 'package:http/http.dart' as http;
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
@@ -141,8 +142,8 @@ class UserProvider with ChangeNotifier {
     late dynamic response;
     try {
       response = await dio.get(totUrl);
-      debugPrint("GET $totUrl success: ${response.data.toString()}");
-      debugPrint("$sendText");
+      debugPrint(
+          "GET $totUrl success: ${response.data.toString().substring(0, min(300, response.data.toString().length))}");
     } on DioException catch (e) {
       debugPrint("getApiRes failed with DioException: $e");
       // 서버에서 response를 보냈지만 invalid한 statusCode일 때
