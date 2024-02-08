@@ -1050,6 +1050,14 @@ class _PostWritePageState extends State<PostWritePage>
   }
 
   Widget _buildCheckBox() {
+    if (_chosenBoardValue != null && _chosenBoardValue!.slug == 'with-school') {
+      return const Text("이 게시물은 실명으로 게시됩니다.",
+          style: TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.w500,
+            color: ColorsInfo.newara,
+          ));
+    }
     return Row(
       children: [
         // 자유 게시판인 경우 && 수정 게시물이 아닌 경우
