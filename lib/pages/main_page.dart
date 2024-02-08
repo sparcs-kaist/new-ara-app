@@ -48,14 +48,15 @@ class MainPage extends StatefulWidget {
 class _MainPageState extends State<MainPage> {
   //각 컨텐츠 로딩을 확인하기 위한 변수
   final List<bool> _isLoading = [
-    true,
-    true,
-    true,
-    true,
-    true,
-    true,
-    true,
-    true
+    true, //_dailyBestContents
+    true, //_portalContents
+    true, //_facilityContents
+    true, //_newAraContents
+    true, //_gradContents
+    true, //_underGradContents
+    true, //_freshmanContents
+    true, //_boards
+    true, //_talksContents
   ];
   //각 컨텐츠 별 데이터 리스트
 
@@ -69,6 +70,7 @@ class _MainPageState extends State<MainPage> {
   final List<ArticleListActionModel> _gradContents = [];
   final List<ArticleListActionModel> _underGradContents = [];
   final List<ArticleListActionModel> _freshmanContents = [];
+  final List<ArticleListActionModel> _talksContents = [];
 
   @override
   void initState() {
@@ -165,6 +167,7 @@ class _MainPageState extends State<MainPage> {
         _refreshGradAssocNotice(userProvider),
         _refreshUndergradAssocNotice(userProvider),
         _refreshFreshmanCouncil(userProvider),
+        _refreshTalks(userProvider),
       ]);
     }
   }
@@ -210,6 +213,11 @@ class _MainPageState extends State<MainPage> {
     // "slug": "freshman-council",
     await _refreshBoardContent(userProvider, "students-group",
         "freshman-council", _freshmanContents, 6);
+  }
+
+  Future<void> _refreshTalks(UserProvider userProvider) async {
+    //자유게시판
+    await _refreshBoardContent(userProvider, "talk", "", _talksContents, 8);
   }
 
   /// 게시판의 게시물들을 불러옴. 코드 중복을 줄이기 위해 사용.
@@ -338,7 +346,8 @@ class _MainPageState extends State<MainPage> {
                 _isLoading[4] ||
                 _isLoading[5] ||
                 _isLoading[6] ||
-                _isLoading[7]
+                _isLoading[7] ||
+                _isLoading[8]
             ? const LoadingIndicator()
             : SingleChildScrollView(
                 child: SizedBox(
@@ -363,7 +372,7 @@ class _MainPageState extends State<MainPage> {
                           children: [
                             PopularBoard(
                               model: _dailyBestContents[0],
-                              ingiNum: 1,
+                              boardNum: 1,
                             ),
                             Row(
                               children: [
@@ -380,7 +389,7 @@ class _MainPageState extends State<MainPage> {
                             ),
                             PopularBoard(
                               model: _dailyBestContents[1],
-                              ingiNum: 2,
+                              boardNum: 2,
                             ),
                             Row(
                               children: [
@@ -397,12 +406,62 @@ class _MainPageState extends State<MainPage> {
                             ),
                             PopularBoard(
                               model: _dailyBestContents[2],
-                              ingiNum: 3,
+                              boardNum: 3,
                             ),
                           ],
                         ),
                       ),
                       const SizedBox(height: 10),
+                      MainPageTextButton(
+                        '자유게시판',
+                        () {
+                          Navigator.of(context)
+                              .push(slideRoute(PostListShowPage(
+                            boardType: BoardType.free,
+                            boardInfo: _searchBoard("talk"),
+                          )));
+                        },
+                      ),
+                      const SizedBox(height: 5),
+                      SizedBox(
+                        width: MediaQuery.of(context).size.width - 40,
+                        child: Column(
+                          children: [
+                            PopularBoard(
+                              model: _talksContents[0],
+                              showBoardNumber: false,
+                            ),
+                            Row(
+                              children: [
+                                Expanded(
+                                  child: Container(
+                                    height: 1,
+                                    color: const Color(0xFFF0F0F0),
+                                  ),
+                                ),
+                              ],
+                            ),
+                            PopularBoard(
+                              model: _talksContents[1],
+                              showBoardNumber: false,
+                            ),
+                            Row(
+                              children: [
+                                Expanded(
+                                  child: Container(
+                                    height: 1,
+                                    color: const Color(0xFFF0F0F0),
+                                  ),
+                                ),
+                              ],
+                            ),
+                            PopularBoard(
+                              model: _talksContents[2],
+                              showBoardNumber: false,
+                            ),
+                          ],
+                        ),
+                      ),
                       SizedBox(
                         width: MediaQuery.of(context).size.width - 40,
                         child: const Text(
@@ -838,10 +897,14 @@ class _MainPageState extends State<MainPage> {
 /// [ingiNum] 은 인기 글 순위를 표시한다.
 class PopularBoard extends StatelessWidget {
   final ArticleListActionModel model;
-  final int boardNum;
+  final int? boardNum;
+  final bool? showBoardNumber;
 
-  const PopularBoard({super.key, required this.model, int ingiNum = 1})
-      : boardNum = ingiNum;
+  const PopularBoard(
+      {super.key,
+      required this.model,
+      this.boardNum = 1,
+      this.showBoardNumber = true});
 
   @override
   Widget build(BuildContext context) {
@@ -855,25 +918,30 @@ class PopularBoard extends StatelessWidget {
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              SizedBox(
-                width: 13,
-                child: Center(
-                  child: Container(
-                    padding: const EdgeInsets.only(right: 10),
-                    child: Text(
-                      boardNum.toString(),
-                      style: const TextStyle(
-                        color: Colors.red,
-                        fontSize: 22,
-                        fontWeight: FontWeight.bold,
+              if (showBoardNumber!)
+                Row(
+                  children: [
+                    SizedBox(
+                      width: 13,
+                      child: Center(
+                        child: Container(
+                          padding: const EdgeInsets.only(right: 10),
+                          child: Text(
+                            boardNum.toString(),
+                            style: const TextStyle(
+                              color: Colors.red,
+                              fontSize: 22,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
                       ),
                     ),
-                  ),
+                    const SizedBox(
+                      width: 15,
+                    ),
+                  ],
                 ),
-              ),
-              const SizedBox(
-                width: 15,
-              ),
               Expanded(child: PostPreview(model: model)),
             ],
           ),
