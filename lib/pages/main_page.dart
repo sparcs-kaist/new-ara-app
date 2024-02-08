@@ -356,14 +356,12 @@ class _MainPageState extends State<MainPage> {
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       _buildTopContents(),
-                      const SizedBox(height: 10),
+                      const SizedBox(height: 20),
                       _buildTalkContents(),
-                      const SizedBox(height: 10),
+                      const SizedBox(height: 20),
                       _buildNoticeContents(),
-                      const SizedBox(height: 10),
+                      const SizedBox(height: 20),
                       _buildStuCommunityContents(),
-                      
-                      
                       const SizedBox(height: 20),
                     ],
                   ),
@@ -385,7 +383,7 @@ class _MainPageState extends State<MainPage> {
             )));
           },
         ),
-        const SizedBox(height: 5),
+        const SizedBox(height: 0),
         SizedBox(
           width: MediaQuery.of(context).size.width - 40,
           child: Column(
@@ -447,7 +445,6 @@ class _MainPageState extends State<MainPage> {
             )));
           },
         ),
-        const SizedBox(height: 5),
         SizedBox(
           width: MediaQuery.of(context).size.width - 40,
           child: Column(
@@ -505,7 +502,7 @@ class _MainPageState extends State<MainPage> {
             ),
           ),
         ),
-        const SizedBox(height: 7),
+        const SizedBox(height: 9),
         Container(
           padding: const EdgeInsets.all(12),
           width: MediaQuery.of(context).size.width - 40,
@@ -766,7 +763,7 @@ class _MainPageState extends State<MainPage> {
               boardType: BoardType.free,
               boardInfo: _searchBoard("students-group"))));
         }),
-        const SizedBox(height: 5),
+        const SizedBox(height: 9),
         Container(
           width: MediaQuery.of(context).size.width - 40,
           //   height: 110,
