@@ -355,539 +355,554 @@ class _MainPageState extends State<MainPage> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
-                      MainPageTextButton(
-                        'main_page.realtime',
-                        () {
-                          Navigator.of(context)
-                              .push(slideRoute(const PostListShowPage(
-                            boardType: BoardType.top,
-                            boardInfo: null,
-                          )));
-                        },
-                      ),
-                      const SizedBox(height: 5),
-                      SizedBox(
-                        width: MediaQuery.of(context).size.width - 40,
-                        child: Column(
-                          children: [
-                            PopularBoard(
-                              model: _dailyBestContents[0],
-                              boardNum: 1,
-                            ),
-                            Row(
-                              children: [
-                                const SizedBox(
-                                  width: 28,
-                                ),
-                                Expanded(
-                                  child: Container(
-                                    height: 1,
-                                    color: const Color(0xFFF0F0F0),
-                                  ),
-                                ),
-                              ],
-                            ),
-                            PopularBoard(
-                              model: _dailyBestContents[1],
-                              boardNum: 2,
-                            ),
-                            Row(
-                              children: [
-                                const SizedBox(
-                                  width: 28,
-                                ),
-                                Expanded(
-                                  child: Container(
-                                    height: 1,
-                                    color: const Color(0xFFF0F0F0),
-                                  ),
-                                ),
-                              ],
-                            ),
-                            PopularBoard(
-                              model: _dailyBestContents[2],
-                              boardNum: 3,
-                            ),
-                          ],
-                        ),
-                      ),
+                      _buildTopContents(),
                       const SizedBox(height: 10),
-                      MainPageTextButton(
-                        '자유게시판',
-                        () {
-                          Navigator.of(context)
-                              .push(slideRoute(PostListShowPage(
-                            boardType: BoardType.free,
-                            boardInfo: _searchBoard("talk"),
-                          )));
-                        },
-                      ),
-                      const SizedBox(height: 5),
-                      SizedBox(
-                        width: MediaQuery.of(context).size.width - 40,
-                        child: Column(
-                          children: [
-                            PopularBoard(
-                              model: _talksContents[0],
-                              showBoardNumber: false,
-                            ),
-                            Row(
-                              children: [
-                                Expanded(
-                                  child: Container(
-                                    height: 1,
-                                    color: const Color(0xFFF0F0F0),
-                                  ),
-                                ),
-                              ],
-                            ),
-                            PopularBoard(
-                              model: _talksContents[1],
-                              showBoardNumber: false,
-                            ),
-                            Row(
-                              children: [
-                                Expanded(
-                                  child: Container(
-                                    height: 1,
-                                    color: const Color(0xFFF0F0F0),
-                                  ),
-                                ),
-                              ],
-                            ),
-                            PopularBoard(
-                              model: _talksContents[2],
-                              showBoardNumber: false,
-                            ),
-                          ],
-                        ),
-                      ),
-                      SizedBox(
-                        width: MediaQuery.of(context).size.width - 40,
-                        child: const Text(
-                          '공지',
-                          style: TextStyle(
-                            fontWeight: FontWeight.w600,
-                            fontSize: 20,
-                            color: Colors.black,
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 7),
-                      Container(
-                        padding: const EdgeInsets.all(12),
-                        width: MediaQuery.of(context).size.width - 40,
-                        // height: 200,
-                        decoration: BoxDecoration(
-                          border: Border.all(
-                            width: 1,
-                            color: const Color.fromRGBO(240, 240, 240, 1),
-                          ),
-                          borderRadius:
-                              const BorderRadius.all(Radius.circular(20)),
-                        ),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            InkWell(
-                              onTap: () {
-                                Navigator.of(context)
-                                    .push(slideRoute(PostListShowPage(
-                                  boardType: BoardType.free,
-                                  boardInfo: _searchBoard("portal-notice"),
-                                )));
-                              },
-                              child: Row(
-                                children: [
-                                  SizedBox(
-                                    width: 19,
-                                    height: 19,
-                                    child: Image.asset(
-                                      'assets/icons/kaist.png',
-                                      fit: BoxFit.cover,
-                                    ),
-                                  ),
-                                  const SizedBox(
-                                    width: 5,
-                                  ),
-                                  const Text(
-                                    "포탈 공지",
-                                    style: TextStyle(
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.w700,
-                                      color: Color(0xFF1F4899),
-                                    ),
-                                  ),
-                                  const SizedBox(
-                                    width: 5,
-                                  ),
-                                  SvgPicture.asset(
-                                    'assets/icons/right_chevron.svg',
-                                    colorFilter: const ColorFilter.mode(
-                                        Color(0xFF1F4899), BlendMode.srcIn),
-                                    fit: BoxFit.fill,
-                                    width: 17,
-                                    height: 17,
-                                  ),
-                                ],
-                              ),
-                            ),
-                            const SizedBox(
-                              height: 10,
-                            ),
-                            InkWell(
-                              onTap: () {
-                                Navigator.of(context).push(slideRoute(
-                                    PostViewPage(id: _portalContents[0].id)));
-                              },
-                              child: Text(
-                                getTitle(
-                                    _portalContents[0].title,
-                                    _portalContents[0].is_hidden,
-                                    _portalContents[0].why_hidden),
-                                style: TextStyle(
-                                    color: _portalContents[0].is_hidden
-                                        ? const Color(0xFFBBBBBB)
-                                        : Colors.black,
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.w400),
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                            ),
-                            const SizedBox(
-                              height: 10,
-                            ),
-                            InkWell(
-                                onTap: () {
-                                  Navigator.of(context).push(slideRoute(
-                                      PostViewPage(id: _portalContents[1].id)));
-                                },
-                                child: Text(
-                                  getTitle(
-                                      _portalContents[1].title,
-                                      _portalContents[1].is_hidden,
-                                      _portalContents[1].why_hidden),
-                                  style: TextStyle(
-                                      color: _portalContents[1].is_hidden
-                                          ? const Color(0xFFBBBBBB)
-                                          : Colors.black,
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.w400),
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
-                                )),
-                            const SizedBox(
-                              height: 10,
-                            ),
-                            InkWell(
-                                onTap: () {
-                                  Navigator.of(context).push(slideRoute(
-                                      PostViewPage(id: _portalContents[2].id)));
-                                },
-                                child: Text(
-                                  getTitle(
-                                      _portalContents[2].title,
-                                      _portalContents[2].is_hidden,
-                                      _portalContents[2].why_hidden),
-                                  style: TextStyle(
-                                      color: _portalContents[2].is_hidden
-                                          ? const Color(0xFFBBBBBB)
-                                          : Colors.black,
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.w400),
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
-                                )),
-                            const SizedBox(
-                              height: 14,
-                            ),
-                            Container(
-                              height: 1,
-                              color: const Color(0xFFF0F0F0),
-                            ),
-                            const SizedBox(
-                              height: 14,
-                            ),
-                            InkWell(
-                              onTap: () {
-                                Navigator.of(context).push(slideRoute(
-                                    PostListShowPage(
-                                        boardType: BoardType.free,
-                                        boardInfo:
-                                            _searchBoard("facility-notice"))));
-                              },
-                              child: Row(
-                                children: [
-                                  const Text(
-                                    "입주 업체",
-                                    style: TextStyle(
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.w700,
-                                      color: Color(0xFF646464),
-                                    ),
-                                  ),
-                                  const SizedBox(
-                                    width: 5,
-                                  ),
-                                  SvgPicture.asset(
-                                    'assets/icons/right_chevron.svg',
-                                    colorFilter: const ColorFilter.mode(
-                                        Color(0xFF646464), BlendMode.srcIn),
-                                    fit: BoxFit.fill,
-                                    width: 17,
-                                    height: 17,
-                                  ),
-                                  const SizedBox(
-                                    width: 10,
-                                  ),
-                                  Expanded(
-                                    child: InkWell(
-                                        onTap: () {
-                                          Navigator.of(context).push(slideRoute(
-                                              PostViewPage(
-                                                  id: _facilityContents[0]
-                                                      .id)));
-                                        },
-                                        child: Text(
-                                          getTitle(
-                                              _facilityContents[0].title,
-                                              _facilityContents[0].is_hidden,
-                                              _facilityContents[0].why_hidden),
-                                          style: TextStyle(
-                                              color:
-                                                  _facilityContents[0].is_hidden
-                                                      ? const Color(0xFFBBBBBB)
-                                                      : Colors.black,
-                                              fontSize: 14,
-                                              fontWeight: FontWeight.w400),
-                                          maxLines: 1,
-                                          overflow: TextOverflow.ellipsis,
-                                        )),
-                                  )
-                                ],
-                              ),
-                            ),
-                            const SizedBox(
-                              height: 10,
-                            ),
-                            InkWell(
-                              onTap: () {
-                                Navigator.of(context)
-                                    .push(slideRoute(PostListShowPage(
-                                  boardType: BoardType.free,
-                                  boardInfo: _searchBoard("ara-notice"),
-                                )));
-                              },
-                              child: Row(
-                                children: [
-                                  const Text(
-                                    "뉴아라",
-                                    style: TextStyle(
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.w700,
-                                      color: Color(0xFFED3A3A),
-                                    ),
-                                  ),
-                                  const SizedBox(
-                                    width: 5,
-                                  ),
-                                  SvgPicture.asset(
-                                    'assets/icons/right_chevron.svg',
-                                    colorFilter: const ColorFilter.mode(
-                                        Color(0xFFED3A3A), BlendMode.srcIn),
-                                    fit: BoxFit.fill,
-                                    width: 17,
-                                    height: 17,
-                                  ),
-                                  const SizedBox(
-                                    width: 10,
-                                  ),
-                                  Expanded(
-                                    child: InkWell(
-                                        onTap: () {
-                                          Navigator.of(context).push(slideRoute(
-                                              PostViewPage(
-                                                  id: _newAraContents[0].id)));
-                                        },
-                                        child: Text(
-                                          getTitle(
-                                              _newAraContents[0].title,
-                                              _newAraContents[0].is_hidden,
-                                              _newAraContents[0].why_hidden),
-                                          style: TextStyle(
-                                              color:
-                                                  _newAraContents[0].is_hidden
-                                                      ? const Color(0xFFBBBBBB)
-                                                      : Colors.black,
-                                              fontSize: 14,
-                                              fontWeight: FontWeight.w400),
-                                          maxLines: 1,
-                                          overflow: TextOverflow.ellipsis,
-                                        )),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
+                      _buildTalkContents(),
                       const SizedBox(height: 10),
-                      MainPageTextButton('main_page.stu_community', () {
-                        Navigator.of(context).push(slideRoute(PostListShowPage(
-                            boardType: BoardType.free,
-                            boardInfo: _searchBoard("students-group"))));
-                      }),
-                      const SizedBox(height: 5),
-                      Container(
-                        width: MediaQuery.of(context).size.width - 40,
-                        //   height: 110,
-                        padding: const EdgeInsets.all(12),
-                        decoration: BoxDecoration(
-                          border: Border.all(
-                            width: 1,
-                            color: const Color.fromRGBO(240, 240, 240, 1),
-                          ),
-                          borderRadius:
-                              const BorderRadius.all(Radius.circular(20)),
-                        ),
-                        child: Column(
-                          //  padding: const EdgeInsets.only(
-                          //       top: 10, bottom: 10, left: 15, right: 15),
-                          children: [
-                            SizedBox(
-                              height: 28,
-                              child: Row(
-                                children: [
-                                  const Text(
-                                    '원총',
-                                    style: TextStyle(
-                                      fontWeight: FontWeight.w700,
-                                      fontSize: 14,
-                                      color: Color.fromRGBO(177, 177, 177, 1),
-                                    ),
-                                  ),
-                                  const SizedBox(
-                                    width: 10,
-                                  ),
-                                  Expanded(
-                                    child: InkWell(
-                                        onTap: () {
-                                          Navigator.of(context).push(slideRoute(
-                                              PostViewPage(
-                                                  id: _gradContents[0].id)));
-                                        },
-                                        child: Text(
-                                          getTitle(
-                                              _gradContents[0].title,
-                                              _gradContents[0].is_hidden,
-                                              _gradContents[0].why_hidden),
-                                          style: TextStyle(
-                                              color: _gradContents[0].is_hidden
-                                                  ? const Color(0xFFBBBBBB)
-                                                  : Colors.black,
-                                              fontSize: 14,
-                                              fontWeight: FontWeight.w400),
-                                          maxLines: 1,
-                                          overflow: TextOverflow.ellipsis,
-                                        )),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            SizedBox(
-                              height: 28,
-                              child: Row(
-                                children: [
-                                  const Text(
-                                    '총학',
-                                    style: TextStyle(
-                                      fontWeight: FontWeight.w700,
-                                      fontSize: 14,
-                                      color: Color.fromRGBO(177, 177, 177, 1),
-                                    ),
-                                  ),
-                                  const SizedBox(
-                                    width: 10,
-                                  ),
-                                  Expanded(
-                                    child: InkWell(
-                                        onTap: () {
-                                          Navigator.of(context).push(slideRoute(
-                                              PostViewPage(
-                                                  id: _underGradContents[0]
-                                                      .id)));
-                                        },
-                                        child: Text(
-                                          getTitle(
-                                              _underGradContents[0].title,
-                                              _underGradContents[0].is_hidden,
-                                              _underGradContents[0].why_hidden),
-                                          style: TextStyle(
-                                              color: _underGradContents[0]
-                                                      .is_hidden
-                                                  ? const Color(0xFFBBBBBB)
-                                                  : Colors.black,
-                                              fontSize: 14,
-                                              fontWeight: FontWeight.w400),
-                                          maxLines: 1,
-                                          overflow: TextOverflow.ellipsis,
-                                        )),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            SizedBox(
-                              height: 28,
-                              child: Row(
-                                children: [
-                                  const Text(
-                                    '새학',
-                                    style: TextStyle(
-                                      fontWeight: FontWeight.w700,
-                                      fontSize: 14,
-                                      color: Color.fromRGBO(177, 177, 177, 1),
-                                    ),
-                                  ),
-                                  const SizedBox(
-                                    width: 10,
-                                  ),
-                                  Expanded(
-                                    child: InkWell(
-                                        onTap: () {
-                                          Navigator.of(context).push(slideRoute(
-                                              PostViewPage(
-                                                  id: _freshmanContents[0]
-                                                      .id)));
-                                        },
-                                        child: Text(
-                                          getTitle(
-                                              _freshmanContents[0].title,
-                                              _freshmanContents[0].is_hidden,
-                                              _freshmanContents[0].why_hidden),
-                                          style: TextStyle(
-                                              color:
-                                                  _freshmanContents[0].is_hidden
-                                                      ? const Color(0xFFBBBBBB)
-                                                      : Colors.black,
-                                              fontSize: 14,
-                                              fontWeight: FontWeight.w400),
-                                          maxLines: 1,
-                                          overflow: TextOverflow.ellipsis,
-                                        )),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
+                      _buildNoticeContents(),
+                      const SizedBox(height: 10),
+                      _buildStuCommunityContents(),
+                      
+                      
                       const SizedBox(height: 20),
                     ],
                   ),
                 ),
               ),
       ),
+    );
+  }
+
+  Widget _buildTopContents() {
+    return Column(
+      children: [
+        MainPageTextButton(
+          'main_page.realtime',
+          () {
+            Navigator.of(context).push(slideRoute(const PostListShowPage(
+              boardType: BoardType.top,
+              boardInfo: null,
+            )));
+          },
+        ),
+        const SizedBox(height: 5),
+        SizedBox(
+          width: MediaQuery.of(context).size.width - 40,
+          child: Column(
+            children: [
+              PopularBoard(
+                model: _dailyBestContents[0],
+                boardNum: 1,
+              ),
+              Row(
+                children: [
+                  const SizedBox(
+                    width: 28,
+                  ),
+                  Expanded(
+                    child: Container(
+                      height: 1,
+                      color: const Color(0xFFF0F0F0),
+                    ),
+                  ),
+                ],
+              ),
+              PopularBoard(
+                model: _dailyBestContents[1],
+                boardNum: 2,
+              ),
+              Row(
+                children: [
+                  const SizedBox(
+                    width: 28,
+                  ),
+                  Expanded(
+                    child: Container(
+                      height: 1,
+                      color: const Color(0xFFF0F0F0),
+                    ),
+                  ),
+                ],
+              ),
+              PopularBoard(
+                model: _dailyBestContents[2],
+                boardNum: 3,
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildTalkContents() {
+    return Column(
+      children: [
+        MainPageTextButton(
+          '자유게시판',
+          () {
+            Navigator.of(context).push(slideRoute(PostListShowPage(
+              boardType: BoardType.free,
+              boardInfo: _searchBoard("talk"),
+            )));
+          },
+        ),
+        const SizedBox(height: 5),
+        SizedBox(
+          width: MediaQuery.of(context).size.width - 40,
+          child: Column(
+            children: [
+              PopularBoard(
+                model: _talksContents[0],
+                showBoardNumber: false,
+              ),
+              Row(
+                children: [
+                  Expanded(
+                    child: Container(
+                      height: 1,
+                      color: const Color(0xFFF0F0F0),
+                    ),
+                  ),
+                ],
+              ),
+              PopularBoard(
+                model: _talksContents[1],
+                showBoardNumber: false,
+              ),
+              Row(
+                children: [
+                  Expanded(
+                    child: Container(
+                      height: 1,
+                      color: const Color(0xFFF0F0F0),
+                    ),
+                  ),
+                ],
+              ),
+              PopularBoard(
+                model: _talksContents[2],
+                showBoardNumber: false,
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildNoticeContents() {
+    return Column(
+      children: [
+        SizedBox(
+          width: MediaQuery.of(context).size.width - 40,
+          child: const Text(
+            '공지',
+            style: TextStyle(
+              fontWeight: FontWeight.w600,
+              fontSize: 20,
+              color: Colors.black,
+            ),
+          ),
+        ),
+        const SizedBox(height: 7),
+        Container(
+          padding: const EdgeInsets.all(12),
+          width: MediaQuery.of(context).size.width - 40,
+          // height: 200,
+          decoration: BoxDecoration(
+            border: Border.all(
+              width: 1,
+              color: const Color.fromRGBO(240, 240, 240, 1),
+            ),
+            borderRadius: const BorderRadius.all(Radius.circular(20)),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              InkWell(
+                onTap: () {
+                  Navigator.of(context).push(slideRoute(PostListShowPage(
+                    boardType: BoardType.free,
+                    boardInfo: _searchBoard("portal-notice"),
+                  )));
+                },
+                child: Row(
+                  children: [
+                    SizedBox(
+                      width: 19,
+                      height: 19,
+                      child: Image.asset(
+                        'assets/icons/kaist.png',
+                        fit: BoxFit.cover,
+                      ),
+                    ),
+                    const SizedBox(
+                      width: 5,
+                    ),
+                    const Text(
+                      "포탈 공지",
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w700,
+                        color: Color(0xFF1F4899),
+                      ),
+                    ),
+                    const SizedBox(
+                      width: 5,
+                    ),
+                    SvgPicture.asset(
+                      'assets/icons/right_chevron.svg',
+                      colorFilter: const ColorFilter.mode(
+                          Color(0xFF1F4899), BlendMode.srcIn),
+                      fit: BoxFit.fill,
+                      width: 17,
+                      height: 17,
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(
+                height: 10,
+              ),
+              InkWell(
+                onTap: () {
+                  Navigator.of(context).push(
+                      slideRoute(PostViewPage(id: _portalContents[0].id)));
+                },
+                child: Text(
+                  getTitle(
+                      _portalContents[0].title,
+                      _portalContents[0].is_hidden,
+                      _portalContents[0].why_hidden),
+                  style: TextStyle(
+                      color: _portalContents[0].is_hidden
+                          ? const Color(0xFFBBBBBB)
+                          : Colors.black,
+                      fontSize: 14,
+                      fontWeight: FontWeight.w400),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+              const SizedBox(
+                height: 10,
+              ),
+              InkWell(
+                  onTap: () {
+                    Navigator.of(context).push(
+                        slideRoute(PostViewPage(id: _portalContents[1].id)));
+                  },
+                  child: Text(
+                    getTitle(
+                        _portalContents[1].title,
+                        _portalContents[1].is_hidden,
+                        _portalContents[1].why_hidden),
+                    style: TextStyle(
+                        color: _portalContents[1].is_hidden
+                            ? const Color(0xFFBBBBBB)
+                            : Colors.black,
+                        fontSize: 14,
+                        fontWeight: FontWeight.w400),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  )),
+              const SizedBox(
+                height: 10,
+              ),
+              InkWell(
+                  onTap: () {
+                    Navigator.of(context).push(
+                        slideRoute(PostViewPage(id: _portalContents[2].id)));
+                  },
+                  child: Text(
+                    getTitle(
+                        _portalContents[2].title,
+                        _portalContents[2].is_hidden,
+                        _portalContents[2].why_hidden),
+                    style: TextStyle(
+                        color: _portalContents[2].is_hidden
+                            ? const Color(0xFFBBBBBB)
+                            : Colors.black,
+                        fontSize: 14,
+                        fontWeight: FontWeight.w400),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  )),
+              const SizedBox(
+                height: 14,
+              ),
+              Container(
+                height: 1,
+                color: const Color(0xFFF0F0F0),
+              ),
+              const SizedBox(
+                height: 14,
+              ),
+              InkWell(
+                onTap: () {
+                  Navigator.of(context).push(slideRoute(PostListShowPage(
+                      boardType: BoardType.free,
+                      boardInfo: _searchBoard("facility-notice"))));
+                },
+                child: Row(
+                  children: [
+                    const Text(
+                      "입주 업체",
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w700,
+                        color: Color(0xFF646464),
+                      ),
+                    ),
+                    const SizedBox(
+                      width: 5,
+                    ),
+                    SvgPicture.asset(
+                      'assets/icons/right_chevron.svg',
+                      colorFilter: const ColorFilter.mode(
+                          Color(0xFF646464), BlendMode.srcIn),
+                      fit: BoxFit.fill,
+                      width: 17,
+                      height: 17,
+                    ),
+                    const SizedBox(
+                      width: 10,
+                    ),
+                    Expanded(
+                      child: InkWell(
+                          onTap: () {
+                            Navigator.of(context).push(slideRoute(
+                                PostViewPage(id: _facilityContents[0].id)));
+                          },
+                          child: Text(
+                            getTitle(
+                                _facilityContents[0].title,
+                                _facilityContents[0].is_hidden,
+                                _facilityContents[0].why_hidden),
+                            style: TextStyle(
+                                color: _facilityContents[0].is_hidden
+                                    ? const Color(0xFFBBBBBB)
+                                    : Colors.black,
+                                fontSize: 14,
+                                fontWeight: FontWeight.w400),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          )),
+                    )
+                  ],
+                ),
+              ),
+              const SizedBox(
+                height: 10,
+              ),
+              InkWell(
+                onTap: () {
+                  Navigator.of(context).push(slideRoute(PostListShowPage(
+                    boardType: BoardType.free,
+                    boardInfo: _searchBoard("ara-notice"),
+                  )));
+                },
+                child: Row(
+                  children: [
+                    const Text(
+                      "뉴아라",
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w700,
+                        color: Color(0xFFED3A3A),
+                      ),
+                    ),
+                    const SizedBox(
+                      width: 5,
+                    ),
+                    SvgPicture.asset(
+                      'assets/icons/right_chevron.svg',
+                      colorFilter: const ColorFilter.mode(
+                          Color(0xFFED3A3A), BlendMode.srcIn),
+                      fit: BoxFit.fill,
+                      width: 17,
+                      height: 17,
+                    ),
+                    const SizedBox(
+                      width: 10,
+                    ),
+                    Expanded(
+                      child: InkWell(
+                          onTap: () {
+                            Navigator.of(context).push(slideRoute(
+                                PostViewPage(id: _newAraContents[0].id)));
+                          },
+                          child: Text(
+                            getTitle(
+                                _newAraContents[0].title,
+                                _newAraContents[0].is_hidden,
+                                _newAraContents[0].why_hidden),
+                            style: TextStyle(
+                                color: _newAraContents[0].is_hidden
+                                    ? const Color(0xFFBBBBBB)
+                                    : Colors.black,
+                                fontSize: 14,
+                                fontWeight: FontWeight.w400),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          )),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildStuCommunityContents() {
+    return Column(
+      children: [
+        MainPageTextButton('main_page.stu_community', () {
+          Navigator.of(context).push(slideRoute(PostListShowPage(
+              boardType: BoardType.free,
+              boardInfo: _searchBoard("students-group"))));
+        }),
+        const SizedBox(height: 5),
+        Container(
+          width: MediaQuery.of(context).size.width - 40,
+          //   height: 110,
+          padding: const EdgeInsets.all(12),
+          decoration: BoxDecoration(
+            border: Border.all(
+              width: 1,
+              color: const Color.fromRGBO(240, 240, 240, 1),
+            ),
+            borderRadius: const BorderRadius.all(Radius.circular(20)),
+          ),
+          child: Column(
+            //  padding: const EdgeInsets.only(
+            //       top: 10, bottom: 10, left: 15, right: 15),
+            children: [
+              SizedBox(
+                height: 28,
+                child: Row(
+                  children: [
+                    const Text(
+                      '원총',
+                      style: TextStyle(
+                        fontWeight: FontWeight.w700,
+                        fontSize: 14,
+                        color: Color.fromRGBO(177, 177, 177, 1),
+                      ),
+                    ),
+                    const SizedBox(
+                      width: 10,
+                    ),
+                    Expanded(
+                      child: InkWell(
+                          onTap: () {
+                            Navigator.of(context).push(slideRoute(
+                                PostViewPage(id: _gradContents[0].id)));
+                          },
+                          child: Text(
+                            getTitle(
+                                _gradContents[0].title,
+                                _gradContents[0].is_hidden,
+                                _gradContents[0].why_hidden),
+                            style: TextStyle(
+                                color: _gradContents[0].is_hidden
+                                    ? const Color(0xFFBBBBBB)
+                                    : Colors.black,
+                                fontSize: 14,
+                                fontWeight: FontWeight.w400),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          )),
+                    ),
+                  ],
+                ),
+              ),
+              SizedBox(
+                height: 28,
+                child: Row(
+                  children: [
+                    const Text(
+                      '총학',
+                      style: TextStyle(
+                        fontWeight: FontWeight.w700,
+                        fontSize: 14,
+                        color: Color.fromRGBO(177, 177, 177, 1),
+                      ),
+                    ),
+                    const SizedBox(
+                      width: 10,
+                    ),
+                    Expanded(
+                      child: InkWell(
+                          onTap: () {
+                            Navigator.of(context).push(slideRoute(
+                                PostViewPage(id: _underGradContents[0].id)));
+                          },
+                          child: Text(
+                            getTitle(
+                                _underGradContents[0].title,
+                                _underGradContents[0].is_hidden,
+                                _underGradContents[0].why_hidden),
+                            style: TextStyle(
+                                color: _underGradContents[0].is_hidden
+                                    ? const Color(0xFFBBBBBB)
+                                    : Colors.black,
+                                fontSize: 14,
+                                fontWeight: FontWeight.w400),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          )),
+                    ),
+                  ],
+                ),
+              ),
+              SizedBox(
+                height: 28,
+                child: Row(
+                  children: [
+                    const Text(
+                      '새학',
+                      style: TextStyle(
+                        fontWeight: FontWeight.w700,
+                        fontSize: 14,
+                        color: Color.fromRGBO(177, 177, 177, 1),
+                      ),
+                    ),
+                    const SizedBox(
+                      width: 10,
+                    ),
+                    Expanded(
+                      child: InkWell(
+                          onTap: () {
+                            Navigator.of(context).push(slideRoute(
+                                PostViewPage(id: _freshmanContents[0].id)));
+                          },
+                          child: Text(
+                            getTitle(
+                                _freshmanContents[0].title,
+                                _freshmanContents[0].is_hidden,
+                                _freshmanContents[0].why_hidden),
+                            style: TextStyle(
+                                color: _freshmanContents[0].is_hidden
+                                    ? const Color(0xFFBBBBBB)
+                                    : Colors.black,
+                                fontSize: 14,
+                                fontWeight: FontWeight.w400),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          )),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
     );
   }
 }
