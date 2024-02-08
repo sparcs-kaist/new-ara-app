@@ -211,15 +211,35 @@ class _PostViewPageState extends State<PostViewPage> {
         Scaffold(
             backgroundColor: Colors.white,
             appBar: AppBar(
-              leading: IconButton(
-                color: ColorsInfo.newara,
-                icon: SvgPicture.asset('assets/icons/left_chevron.svg',
-                    colorFilter: const ColorFilter.mode(
-                        ColorsInfo.newara, BlendMode.srcIn),
-                    width: 35,
-                    height: 35),
-                onPressed: () => Navigator.pop(context),
+              centerTitle: true,
+        leadingWidth: 100,
+              leading: InkWell(
+          onTap: () => Navigator.pop(context),
+          child: Stack(
+            alignment: Alignment.centerLeft,
+            children: [
+              SvgPicture.asset(
+                'assets/icons/left_chevron.svg',
+                colorFilter: const ColorFilter.mode(
+                    ColorsInfo.newara, BlendMode.srcATop),
+                fit: BoxFit.fill,
+                width: 35,
+                height: 35,
               ),
+              Padding(
+                padding: const EdgeInsets.only(left: 29),
+                child: Text(
+                  widget.articleID.toString(),
+                  style: TextStyle(
+                    color: Color(0xFFED3A3A),
+                    fontSize: 17,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
             ),
             body: _isPageLoaded
                 ? SafeArea(
