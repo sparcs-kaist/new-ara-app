@@ -533,7 +533,7 @@ class _BlockedUserDialogState extends State<BlockedUserDialog> {
     UserProvider userProvider = context.read<UserProvider>();
     String apiUrl = "/api/blocks/$userID/";
     try {
-      await userProvider.createDioWithHeadersForPost().delete("$newAraDefaultUrl$apiUrl");
+      await userProvider.createDioWithHeadersForNonget().delete("$newAraDefaultUrl$apiUrl");
       return true;
     } on DioException catch (e) {
       debugPrint("DioException occurred");

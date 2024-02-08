@@ -145,7 +145,7 @@ class _NotificationPageState extends State<NotificationPage> {
   Future<bool> _readNotification(UserProvider userProvider, int id) async {
     try {
       await userProvider
-          .createDioWithHeadersForPost()
+          .createDioWithHeadersForNonget()
           .post("$newAraDefaultUrl/api/notifications/$id/read/");
     } catch (error) {
       debugPrint("POST /api/notifications/$id/read/ failed: $error");
@@ -160,7 +160,7 @@ class _NotificationPageState extends State<NotificationPage> {
   Future<bool> _readAllNotification(UserProvider userProvider) async {
     try {
       await userProvider
-          .createDioWithHeadersForPost()
+          .createDioWithHeadersForNonget()
           .post("$newAraDefaultUrl/api/notifications/read_all/");
     } catch (error) {
       debugPrint("POST /api/notifications/read_all failed: $error");

@@ -1474,7 +1474,7 @@ class _PostWritePageState extends State<PostWritePage>
         _isLoading = true;
       });
 
-      Dio dio = userProvider.createDioWithHeadersForPost();
+      Dio dio = userProvider.createDioWithHeadersForNonget();
 
       for (int i = 0; i < _attachmentList.length; i++) {
         //새로 올리는 파일이면 새로운 id 할당 받기.

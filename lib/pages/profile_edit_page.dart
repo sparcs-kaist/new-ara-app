@@ -99,7 +99,7 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
       );
     }
     var formData = FormData.fromMap(payload);
-    Dio dio = userProvider.createDioWithHeadersForPost();
+    Dio dio = userProvider.createDioWithHeadersForNonget();
     try {
       var response = await dio.patch(
         "$newAraDefaultUrl/api/user_profiles/${userProfileModel.user}/",

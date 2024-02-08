@@ -52,7 +52,7 @@ class SettingPageState extends State<SettingPage> {
   Widget build(BuildContext context) {
     var userProvider = context.watch<UserProvider>();
 
-    Dio dio = userProvider.createDioWithHeadersForPost();
+    Dio dio = userProvider.createDioWithHeadersForNonget();
 
     return Scaffold(
       appBar: AppBar(
