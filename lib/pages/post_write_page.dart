@@ -1538,7 +1538,11 @@ class _PostWritePageState extends State<PostWritePage>
           'is_content_sexual': _selectedCheckboxes[1],
           'is_content_social': _selectedCheckboxes[2],
           // TODO: 명명 규칙 다름
-          'name_type': _selectedCheckboxes[0] == true ? 'ANONYMOUS' : 'REGULAR',
+          'name_type': _chosenBoardValue!.slug == 'with-school'
+              ? 'REALNAME'
+              : _chosenBoardValue!.slug == "talk"
+                  ? 'ANONYMOUS'
+                  : 'REGULAR',
         };
 
         if (isUpdate) {
