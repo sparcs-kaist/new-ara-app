@@ -1594,10 +1594,10 @@ class _PostWritePageState extends State<PostWritePage>
         "\n", // Assume ParagraphBlock is a valid Quill block for creating paragraphs
       );
 
-      /// TODO: 사진 첨부 시 첨부파일에도 같이 올라갈 것인지 결정하기.
       String uuid = const Uuid().v4();
       setState(() {
-        _isFileMenuBarSelected = true;
+        /// TODO: 사진 첨부 시 첨부 창을 다시 열어 놓을 지 결정하기.
+        // _isFileMenuBarSelected = true;
         _attachmentList.add(AttachmentsFormat(
           fileType: FileType.image,
           isNewFile: true,
@@ -1621,7 +1621,8 @@ class _PostWritePageState extends State<PostWritePage>
         file = await file.copy('$documentPath/${path.basename(file.path)}');
       }
       setState(() {
-        _isFileMenuBarSelected = true;
+        //TODO: 첨부파일 추가 시 창을 다시 열어 놓을 지 결정하기.
+        //  _isFileMenuBarSelected = true;
         _attachmentList.add(AttachmentsFormat(
           //TODO: 파일 타입 결정해서 FileType에 추가하기, svg파일도 추가하기.
           fileType: FileType.other,
