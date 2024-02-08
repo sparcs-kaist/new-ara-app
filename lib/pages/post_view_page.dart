@@ -212,7 +212,7 @@ class _PostViewPageState extends State<PostViewPage> {
             backgroundColor: Colors.white,
             appBar: AppBar(
               centerTitle: true,
-        leadingWidth: 100,
+        leadingWidth: 200,
               leading: InkWell(
           onTap: () => Navigator.pop(context),
           child: Stack(
@@ -229,8 +229,8 @@ class _PostViewPageState extends State<PostViewPage> {
               Padding(
                 padding: const EdgeInsets.only(left: 29),
                 child: Text(
-                  widget.articleID.toString(),
-                  style: TextStyle(
+                  _isPageLoaded? _article.parent_board.ko_name:"",
+                  style: const TextStyle(
                     color: Color(0xFFED3A3A),
                     fontSize: 17,
                     fontWeight: FontWeight.w500,
