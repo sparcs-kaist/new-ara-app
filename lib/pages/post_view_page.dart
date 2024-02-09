@@ -212,34 +212,34 @@ class _PostViewPageState extends State<PostViewPage> {
             backgroundColor: Colors.white,
             appBar: AppBar(
               centerTitle: true,
-        leadingWidth: 200,
-              leading: InkWell(
-          onTap: () => Navigator.pop(context),
-          child: Stack(
-            alignment: Alignment.centerLeft,
-            children: [
-              SvgPicture.asset(
-                'assets/icons/left_chevron.svg',
-                colorFilter: const ColorFilter.mode(
-                    ColorsInfo.newara, BlendMode.srcATop),
-                fit: BoxFit.fill,
-                width: 35,
-                height: 35,
-              ),
-              Padding(
-                padding: const EdgeInsets.only(left: 29),
-                child: Text(
-                  _isPageLoaded? _article.parent_board.ko_name:"",
-                  style: const TextStyle(
-                    color: Color(0xFFED3A3A),
-                    fontSize: 17,
-                    fontWeight: FontWeight.w500,
-                  ),
+              leadingWidth: 200,
+              leading: GestureDetector(
+                onTap: () => Navigator.pop(context),
+                child: Stack(
+                  alignment: Alignment.centerLeft,
+                  children: [
+                    SvgPicture.asset(
+                      'assets/icons/left_chevron.svg',
+                      colorFilter: const ColorFilter.mode(
+                          ColorsInfo.newara, BlendMode.srcATop),
+                      fit: BoxFit.fill,
+                      width: 35,
+                      height: 35,
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.only(left: 29),
+                      child: Text(
+                        _isPageLoaded ? _article.parent_board.ko_name : "",
+                        style: const TextStyle(
+                          color: Color(0xFFED3A3A),
+                          fontSize: 17,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ),
-            ],
-          ),
-        ),
             ),
             body: _isPageLoaded
                 ? SafeArea(
@@ -305,7 +305,8 @@ class _PostViewPageState extends State<PostViewPage> {
                                                                   width: 32,
                                                                   height: 32,
                                                                 ),
-                                                                const SizedBox(width: 8),
+                                                                const SizedBox(
+                                                                    width: 8),
                                                                 const Text(
                                                                   "브라우저로 URL을 열 수 없습니다.",
                                                                   style:
@@ -1712,7 +1713,7 @@ class _PostViewPageState extends State<PostViewPage> {
   }
 
   // TODO: in_article_web_view.dart의 함수와 통합 고려해보기
-  
+
   /// _article.url (포탈공지글일 경우 포탈 링크가 있음)을
   /// 브라우저로 띄워주는 함수
   /// 브라우저로 url 열기에 성공하면 true, 아니면 false를 반환함.
@@ -1733,7 +1734,7 @@ class _PostViewPageState extends State<PostViewPage> {
 
     return true;
   }
-  
+
   /// 주어진 nameType에 따라 유저 정보를 볼 수 있는지 여부를 리턴하는 함수
   /// PostViewPage에서 UserViewPage로 리다이렉트 될 수 있는지 여부를 나타냄.
   bool isRegular(int? nameType) {

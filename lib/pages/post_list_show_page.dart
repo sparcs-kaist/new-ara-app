@@ -167,7 +167,7 @@ class _PostListShowPageState extends State<PostListShowPage> {
       appBar: AppBar(
         centerTitle: true,
         leadingWidth: 100,
-        leading: InkWell(
+        leading: GestureDetector(
           onTap: () => Navigator.pop(context),
           child: Stack(
             alignment: Alignment.centerLeft,
