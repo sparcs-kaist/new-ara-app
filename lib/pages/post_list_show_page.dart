@@ -167,9 +167,10 @@ class _PostListShowPageState extends State<PostListShowPage> {
       appBar: AppBar(
         centerTitle: true,
         leadingWidth: 100,
-        leading: InkWell(
+        leading: GestureDetector(
           onTap: () => Navigator.pop(context),
-          child: Row(
+          child: Stack(
+            alignment: Alignment.centerLeft,
             children: [
               SvgPicture.asset(
                 'assets/icons/left_chevron.svg',
@@ -179,12 +180,15 @@ class _PostListShowPageState extends State<PostListShowPage> {
                 width: 35,
                 height: 35,
               ),
-              const Text(
-                "게시판",
-                style: TextStyle(
-                  color: Color(0xFFED3A3A),
-                  fontSize: 17,
-                  fontWeight: FontWeight.w500,
+              const Padding(
+                padding: EdgeInsets.only(left: 29),
+                child: Text(
+                  "게시판",
+                  style: TextStyle(
+                    color: Color(0xFFED3A3A),
+                    fontSize: 17,
+                    fontWeight: FontWeight.w500,
+                  ),
                 ),
               ),
             ],
@@ -228,8 +232,9 @@ class _PostListShowPageState extends State<PostListShowPage> {
           children: [
             FloatingActionButton(
               onPressed: () async {
-                await Navigator.of(context)
-                    .push(slideRoute(PostWritePage(previousBoard: widget.boardInfo,)));
+                await Navigator.of(context).push(slideRoute(PostWritePage(
+                  previousBoard: widget.boardInfo,
+                )));
                 updateAllBulletinList();
                 debugPrint('FloatingActionButton pressed');
               },
