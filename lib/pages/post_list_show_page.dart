@@ -279,7 +279,6 @@ class _PostListShowPageState extends State<PostListShowPage> {
                             ),
                           );
                         } else {
-                          // 숨겨진 게시물이면 일단 표현 안하는 걸로 함.
                           return InkWell(
                             onTap: () async {
                               await Navigator.of(context).push(slideRoute(
