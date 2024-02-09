@@ -921,7 +921,8 @@ class _MainPageState extends State<MainPage> {
 
 /// 실시간 인기 글을 표시하는 위젯
 /// [model] 은 ArticleListActionModel 을 통해 데이터를 받아온다.
-/// [ingiNum] 은 인기 글 순위를 표시한다.
+/// [boardNum] 은 인기 글 순위를 표시한다.
+/// [showBoardNumber] 은 인기 글 순위를 표시할지 말지 결정한다.
 class PopularBoard extends StatelessWidget {
   final ArticleListActionModel model;
   final int? boardNum;
