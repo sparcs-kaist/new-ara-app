@@ -374,7 +374,7 @@ class _BlockedUserDialogState extends State<BlockedUserDialog> {
     String apiUrl = "/api/blocks/";
     List<BlockModel> resList = [];
     try {
-      var response = await userProvider.createDioWithHeaders().get("$newAraDefaultUrl$apiUrl");
+      var response = await userProvider.createDioWithHeadersForGet().get("$newAraDefaultUrl$apiUrl");
       List<dynamic> jsonUserList = response.data['results'];
       for (Map<String, dynamic> json in jsonUserList) {
         try {
@@ -533,7 +533,7 @@ class _BlockedUserDialogState extends State<BlockedUserDialog> {
     UserProvider userProvider = context.read<UserProvider>();
     String apiUrl = "/api/blocks/$userID/";
     try {
-      await userProvider.createDioWithHeaders().delete("$newAraDefaultUrl$apiUrl");
+      await userProvider.createDioWithHeadersForNonget().delete("$newAraDefaultUrl$apiUrl");
       return true;
     } on DioException catch (e) {
       debugPrint("DioException occurred");

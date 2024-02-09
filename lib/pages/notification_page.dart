@@ -65,7 +65,7 @@ class _NotificationPageState extends State<NotificationPage> {
   /// 결과 리스트를 반환함.
   Future<List<NotificationModel>> _fetchEachPage(
       UserProvider userProvider, int targetPage) async {
-    Dio dio = userProvider.createDioWithHeaders();
+    Dio dio = userProvider.createDioWithHeadersForGet();
     List<NotificationModel> resList = [];
     try {
       var response = await dio
@@ -98,7 +98,7 @@ class _NotificationPageState extends State<NotificationPage> {
       bool hasNext = true;
       UserProvider userProvider = context.read<UserProvider>();
       List<NotificationModel> resList = [];
-      Dio dio = userProvider.createDioWithHeaders();
+      Dio dio = userProvider.createDioWithHeadersForGet();
       int page = 1;
       for (page = 1; hasNext; page++) {
         if (page > _curPage + 1) break;
@@ -145,7 +145,7 @@ class _NotificationPageState extends State<NotificationPage> {
   Future<bool> _readNotification(UserProvider userProvider, int id) async {
     try {
       await userProvider
-          .createDioWithHeaders()
+          .createDioWithHeadersForNonget()
           .post("$newAraDefaultUrl/api/notifications/$id/read/");
     } catch (error) {
       debugPrint("POST /api/notifications/$id/read/ failed: $error");
@@ -160,7 +160,7 @@ class _NotificationPageState extends State<NotificationPage> {
   Future<bool> _readAllNotification(UserProvider userProvider) async {
     try {
       await userProvider
-          .createDioWithHeaders()
+          .createDioWithHeadersForNonget()
           .post("$newAraDefaultUrl/api/notifications/read_all/");
     } catch (error) {
       debugPrint("POST /api/notifications/read_all failed: $error");
