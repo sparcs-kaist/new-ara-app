@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+import 'dart:math';
 import 'package:http/http.dart' as http;
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
@@ -54,9 +55,16 @@ class UserProvider with ChangeNotifier {
   }
 
   String getCsrftokenToString() {
-    String csrfToken =
-        _loginCookie.firstWhere((cookie) => cookie.name == 'csrftoken').value;
-    return csrfToken;
+    debugPrint(_loginCookie.toString());
+    //Android 웹뷰 기준, ara dev 서버의 sso에서는 csrfoken을 주지 않지만, api 요청 시 사용하지 않으므로 ""를 반환한다.
+    try {
+      String csrfToken =
+          _loginCookie.firstWhere((cookie) => cookie.name == 'csrftoken').value;
+      return csrfToken;
+    } catch (e) {
+      debugPrint("getCsrftokenToString failed with error: $e");
+    }
+    return "";
   }
 
   /// 지정된 URL의 웹뷰에서 쿠키를 가져와 저장합니다.
@@ -109,11 +117,17 @@ class UserProvider with ChangeNotifier {
   }
 
   /// 주어진 쿠키 설정으로 Dio 객체를 초기화하고 반환합니다.
-  Dio createDioWithHeaders() {
+  /// get 요청과 non-get 요청에 따라 다른 헤더 설정이 필요할 것을 대비하여 분리하여 설계하였음.
+  Dio createDioWithHeadersForGet() {
+    Dio dio = createDioWithConfig();
+    dio.options.headers['Cookie'] = getCookiesToString();
+    return dio;
+  }
+
+  Dio createDioWithHeadersForNonget() {
     Dio dio = createDioWithConfig();
     dio.options.headers['Cookie'] = getCookiesToString();
     dio.options.headers['X-Csrftoken'] = getCsrftokenToString();
-
     return dio;
   }
 
@@ -123,13 +137,13 @@ class UserProvider with ChangeNotifier {
   Future<dynamic> getApiRes(String apiUrl, {String? sendText}) async {
     var totUrl = "$newAraDefaultUrl/api/$apiUrl";
 
-    Dio dio = createDioWithHeaders();
+    Dio dio = createDioWithHeadersForGet();
 
     late dynamic response;
     try {
       response = await dio.get(totUrl);
-      debugPrint("GET $totUrl success: ${response.data.toString()}");
-      debugPrint("$sendText");
+      debugPrint(
+          "GET $totUrl success: ${response.data.toString().substring(0, min(300, response.data.toString().length))}");
     } on DioException catch (e) {
       debugPrint("getApiRes failed with DioException: $e");
       // 서버에서 response를 보냈지만 invalid한 statusCode일 때
@@ -155,7 +169,7 @@ class UserProvider with ChangeNotifier {
   Future<dynamic> postApiRes(String apiUrl, {dynamic payload}) async {
     String totUrl = "$newAraDefaultUrl/api/$apiUrl";
 
-    Dio dio = createDioWithHeaders();
+    Dio dio = createDioWithHeadersForNonget();
     dio.options.headers['Cookie'] = getCookiesToString();
     dio.options.headers['X-Csrftoken'] = getCsrftokenToString();
 
@@ -171,7 +185,7 @@ class UserProvider with ChangeNotifier {
   Future<dynamic> delApiRes(String apiUrl, {dynamic payload}) async {
     String totUrl = "$newAraDefaultUrl/api/$apiUrl";
 
-    Dio dio = createDioWithHeaders();
+    Dio dio = createDioWithHeadersForNonget();
     dio.options.headers['Cookie'] = getCookiesToString();
     dio.options.headers['X-Csrftoken'] = getCsrftokenToString();
 
@@ -187,7 +201,7 @@ class UserProvider with ChangeNotifier {
   Future<dynamic> patchApiRes(String apiUrl, {dynamic payload}) async {
     String totUrl = "$newAraDefaultUrl/api/$apiUrl";
 
-    Dio dio = createDioWithHeaders();
+    Dio dio = createDioWithHeadersForNonget();
     dio.options.headers['Cookie'] = getCookiesToString();
     dio.options.headers['X-Csrftoken'] = getCsrftokenToString();
 
