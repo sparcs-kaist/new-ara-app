@@ -866,11 +866,40 @@ class _PostViewPageState extends State<PostViewPage> {
             ),
             const SizedBox(width: 10),
             InkWell(
-              onTap: () async {
-                await ArticleController(
+              // TODO: onTap 함수화하기
+              onTap: () {
+                ArticleController(
                   model: _article,
                   userProvider: userProvider,
-                ).share();
+                ).share().then((_) {
+                  ScaffoldMessenger.of(context)
+                      .showSnackBar(buildAraSnackBar(context,
+                          duration: const Duration(seconds: 1),
+                          content: Row(
+                            children: [
+                              SvgPicture.asset(
+                                'assets/icons/close-1.svg',
+                                colorFilter: const ColorFilter.mode(
+                                    Colors.red, BlendMode.srcIn),
+                                width: 32,
+                                height: 32,
+                              ),
+                              const SizedBox(width: 8),
+                              const Flexible(
+                                child: Text(
+                                  "URL을 클립 보드에 복사했습니다.",
+                                  // 오버플로우 나면 다음줄로 넘어가도록 하기 위해
+                                  overflow: TextOverflow.visible,
+                                  style: TextStyle(
+                                    color: Colors.black,
+                                    fontWeight: FontWeight.w400,
+                                    fontSize: 15,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          )));
+                });
               },
               child: Container(
                 width: 64,
