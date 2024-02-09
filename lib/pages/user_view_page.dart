@@ -330,7 +330,7 @@ class _UserViewPageState extends State<UserViewPage> {
   Future<bool> _fetchUser(UserProvider userProvider) async {
     String apiUrl = "/api/user_profiles/${widget.userID}";
     try {
-      var response = await userProvider.createDioWithHeaders().get("$newAraDefaultUrl$apiUrl");
+      var response = await userProvider.createDioWithHeadersForGet().get("$newAraDefaultUrl$apiUrl");
       dynamic json = response.data;
       try {
         _userProfileModel = PublicUserProfileModel.fromJson(json);
@@ -370,7 +370,7 @@ class _UserViewPageState extends State<UserViewPage> {
       _nextPage = 1;
     }
     try {
-      var response = await userProvider.createDioWithHeaders().get("$newAraDefaultUrl$apiUrl");
+      var response = await userProvider.createDioWithHeadersForGet().get("$newAraDefaultUrl$apiUrl");
       List<dynamic> rawPostList = response.data['results'];
       for (int i = 0; i < rawPostList.length; i++) {
         Map<String, dynamic>? rawPost = rawPostList[i];

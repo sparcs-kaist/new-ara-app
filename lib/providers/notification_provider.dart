@@ -41,7 +41,7 @@ class NotificationProvider with ChangeNotifier {
   Future<void> checkIsNotReadExist(UserProvider userProvider) async {
     bool res = false;
 
-    Dio dio = userProvider.createDioWithHeaders();
+    Dio dio = userProvider.createDioWithHeadersForGet();
 
     int curPage = 1;
 

@@ -230,10 +230,10 @@ class _PostWritePageState extends State<PostWritePage>
       if (_isKeyboardClosed) {
         _onKeyboardChanged(false);
       }
-      _isKeyboardClosed = false;
     } else {
-      _isKeyboardClosed = true;
-      _onKeyboardChanged(true);
+      if (!_isKeyboardClosed) {
+        _onKeyboardChanged(true);
+      }
     }
   }
 
@@ -262,7 +262,7 @@ class _PostWritePageState extends State<PostWritePage>
     // 사용자 정보 제공자로부터 쿠키 정보 가져오기.
     var userProvider = context.read<UserProvider>();
     try {
-      Dio dio = userProvider.createDioWithHeaders();
+      Dio dio = userProvider.createDioWithHeadersForGet();
       var response = await dio.get('$newAraDefaultUrl/api/boards/');
 
       // 기본 게시판 정보를 `_boardList`에 초기화.
@@ -717,12 +717,11 @@ class _PostWritePageState extends State<PostWritePage>
                 ),
                 InkWell(
                   onTap: () async {
+                    FocusScope.of(context).unfocus();
                     bool picktf = await _pickFile();
                     if (!mounted) return;
                     if (picktf) {
-                      FocusScope.of(context).unfocus();
                     } else {
-                      //TODO: 에디터로 포커스 이동 안하는 문제점이 있음.
                       _editorFocusNode.requestFocus();
                     }
                   },
@@ -1024,151 +1023,7 @@ class _PostWritePageState extends State<PostWritePage>
               const SizedBox(
                 width: 20,
               ),
-              // TODO: 익명 선택 범위 화면 영역 확대(resolved)
-              // 자유 게시판인 경우 && 수정 게시물이 아닌 경우
-              if (_chosenBoardValue != null &&
-                  _isEditingPost == false &&
-                  _chosenBoardValue!.slug == 'talk')
-                Row(
-                  children: [
-                    GestureDetector(
-                      onTap: () {
-                        setState(() {
-                          _selectedCheckboxes[0] = !_selectedCheckboxes[0]!;
-                        });
-                      },
-                      child: Row(
-                        children: [
-                          Container(
-                            width: 20,
-                            height: 20,
-                            decoration: BoxDecoration(
-                              color: _selectedCheckboxes[0]!
-                                  ? ColorsInfo.newara
-                                  : const Color(0xFFF0F0F0),
-                              borderRadius: BorderRadius.circular(5.0),
-                            ),
-                            alignment: Alignment.center,
-                            child: SvgPicture.asset('assets/icons/check.svg',
-                                width: 16,
-                                height: 16,
-                                colorFilter: const ColorFilter.mode(
-                                    Colors.white, BlendMode.srcIn)),
-                          ),
-                          const SizedBox(
-                            width: 6,
-                          ),
-                          Text(
-                            "익명",
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w500,
-                              color: _selectedCheckboxes[0]!
-                                  ? ColorsInfo.newara
-                                  : const Color(0xFFBBBBBB),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(
-                      width: 15,
-                    ),
-                  ],
-                ),
-
-              //TODO: 터치 부분이 너무 작아서 불편함.
-              GestureDetector(
-                onTap: () {
-                  setState(() {
-                    //성인 체크 박스
-                    _selectedCheckboxes[1] = !_selectedCheckboxes[1]!;
-                  });
-                },
-                child: Row(
-                  children: [
-                    Container(
-                      width: 20,
-                      height: 20,
-                      decoration: BoxDecoration(
-                        color: _selectedCheckboxes[1]!
-                            ? ColorsInfo.newara
-                            : const Color(0xFFF0F0F0),
-                        borderRadius: BorderRadius.circular(5.0),
-                      ),
-                      alignment: Alignment.center,
-                      child: SvgPicture.asset(
-                        'assets/icons/check.svg',
-                        width: 16,
-                        height: 16,
-                        colorFilter: const ColorFilter.mode(
-                            Colors.white, BlendMode.srcIn), // #FFFFFF 색상
-                      ),
-                    ),
-                    const SizedBox(
-                      width: 6,
-                    ),
-                    Text(
-                      "성인",
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w500,
-                        color: _selectedCheckboxes[1]!
-                            ? ColorsInfo.newara
-                            : const Color(0xFFBBBBBB),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-
-              const SizedBox(
-                width: 15,
-              ),
-              GestureDetector(
-                onTap: () {
-                  setState(() {
-                    //정치 체크 박스
-                    _selectedCheckboxes[2] = !_selectedCheckboxes[2]!;
-                  });
-                },
-                child: Row(
-                  children: [
-                    Container(
-                      width: 20,
-                      height: 20,
-                      decoration: BoxDecoration(
-                        color: _selectedCheckboxes[2]!
-                            ? ColorsInfo.newara
-                            : const Color(0xFFF0F0F0),
-                        borderRadius: BorderRadius.circular(5.0),
-                      ),
-                      alignment: Alignment.center,
-                      child: SvgPicture.asset(
-                        'assets/icons/check.svg',
-                        width: 16,
-                        height: 16,
-                        colorFilter: const ColorFilter.mode(
-                            Colors.white, BlendMode.srcIn), // #FFFFFF 색상
-                      ),
-                    ),
-                    const SizedBox(
-                      width: 6,
-                    ),
-                    Text(
-                      "정치",
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w500,
-                        color: _selectedCheckboxes[2]!
-                            ? ColorsInfo.newara
-                            : const Color(0xFFBBBBBB),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-
+              _buildCheckBox(),
               const Spacer(),
               GestureDetector(
                 child: const Text(
@@ -1192,6 +1047,164 @@ class _PostWritePageState extends State<PostWritePage>
         ],
       );
     }
+  }
+
+  Widget _buildCheckBox() {
+    if (_chosenBoardValue != null && _chosenBoardValue!.slug == 'with-school') {
+      return const Text("이 게시물은 실명으로 게시됩니다.",
+          style: TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.w500,
+            color: ColorsInfo.newara,
+          ));
+    }
+    return Row(
+      children: [
+        // 자유 게시판인 경우 && 수정 게시물이 아닌 경우
+        if (_chosenBoardValue != null &&
+            _isEditingPost == false &&
+            _chosenBoardValue!.slug == 'talk')
+          Row(
+            children: [
+              GestureDetector(
+                onTap: () {
+                  setState(() {
+                    _selectedCheckboxes[0] = !_selectedCheckboxes[0]!;
+                  });
+                },
+                child: Row(
+                  children: [
+                    Container(
+                      width: 20,
+                      height: 20,
+                      decoration: BoxDecoration(
+                        color: _selectedCheckboxes[0]!
+                            ? ColorsInfo.newara
+                            : const Color(0xFFF0F0F0),
+                        borderRadius: BorderRadius.circular(5.0),
+                      ),
+                      alignment: Alignment.center,
+                      child: SvgPicture.asset('assets/icons/check.svg',
+                          width: 16,
+                          height: 16,
+                          colorFilter: const ColorFilter.mode(
+                              Colors.white, BlendMode.srcIn)),
+                    ),
+                    const SizedBox(
+                      width: 6,
+                    ),
+                    Text(
+                      "익명",
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w500,
+                        color: _selectedCheckboxes[0]!
+                            ? ColorsInfo.newara
+                            : const Color(0xFFBBBBBB),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(
+                width: 15,
+              ),
+            ],
+          ),
+
+        //TODO: 터치 부분이 너무 작아서 불편함.
+        GestureDetector(
+          onTap: () {
+            setState(() {
+              //성인 체크 박스
+              _selectedCheckboxes[1] = !_selectedCheckboxes[1]!;
+            });
+          },
+          child: Row(
+            children: [
+              Container(
+                width: 20,
+                height: 20,
+                decoration: BoxDecoration(
+                  color: _selectedCheckboxes[1]!
+                      ? ColorsInfo.newara
+                      : const Color(0xFFF0F0F0),
+                  borderRadius: BorderRadius.circular(5.0),
+                ),
+                alignment: Alignment.center,
+                child: SvgPicture.asset(
+                  'assets/icons/check.svg',
+                  width: 16,
+                  height: 16,
+                  colorFilter: const ColorFilter.mode(
+                      Colors.white, BlendMode.srcIn), // #FFFFFF 색상
+                ),
+              ),
+              const SizedBox(
+                width: 6,
+              ),
+              Text(
+                "성인",
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w500,
+                  color: _selectedCheckboxes[1]!
+                      ? ColorsInfo.newara
+                      : const Color(0xFFBBBBBB),
+                ),
+              ),
+            ],
+          ),
+        ),
+
+        const SizedBox(
+          width: 15,
+        ),
+        GestureDetector(
+          onTap: () {
+            setState(() {
+              //정치 체크 박스
+              _selectedCheckboxes[2] = !_selectedCheckboxes[2]!;
+            });
+          },
+          child: Row(
+            children: [
+              Container(
+                width: 20,
+                height: 20,
+                decoration: BoxDecoration(
+                  color: _selectedCheckboxes[2]!
+                      ? ColorsInfo.newara
+                      : const Color(0xFFF0F0F0),
+                  borderRadius: BorderRadius.circular(5.0),
+                ),
+                alignment: Alignment.center,
+                child: SvgPicture.asset(
+                  'assets/icons/check.svg',
+                  width: 16,
+                  height: 16,
+                  colorFilter: const ColorFilter.mode(
+                      Colors.white, BlendMode.srcIn), // #FFFFFF 색상
+                ),
+              ),
+              const SizedBox(
+                width: 6,
+              ),
+              Text(
+                "정치",
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w500,
+                  color: _selectedCheckboxes[2]!
+                      ? ColorsInfo.newara
+                      : const Color(0xFFBBBBBB),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
   }
 
   Widget _buildToolbar() {
@@ -1343,7 +1356,7 @@ class _PostWritePageState extends State<PostWritePage>
         scrollController: ScrollController(),
         padding: EdgeInsets.zero,
         scrollable: true,
-        autoFocus: true,
+        autoFocus: false,
         expands: false,
         customStyles: editorStyles(),
       ),
@@ -1474,7 +1487,7 @@ class _PostWritePageState extends State<PostWritePage>
         _isLoading = true;
       });
 
-      Dio dio = userProvider.createDioWithHeaders();
+      Dio dio = userProvider.createDioWithHeadersForNonget();
 
       for (int i = 0; i < _attachmentList.length; i++) {
         //새로 올리는 파일이면 새로운 id 할당 받기.
@@ -1525,7 +1538,11 @@ class _PostWritePageState extends State<PostWritePage>
           'is_content_sexual': _selectedCheckboxes[1],
           'is_content_social': _selectedCheckboxes[2],
           // TODO: 명명 규칙 다름
-          'name_type': _selectedCheckboxes[0] == true ? 'ANONYMOUS' : 'REGULAR',
+          'name_type': _chosenBoardValue!.slug == 'with-school'
+              ? 'REALNAME'
+              : _chosenBoardValue!.slug == "talk"
+                  ? 'ANONYMOUS'
+                  : 'REGULAR',
         };
 
         if (isUpdate) {
@@ -1579,22 +1596,26 @@ class _PostWritePageState extends State<PostWritePage>
     if (image != null) {
       final String imageUrl = image.path;
       final TextSelection selection = _quillController.selection;
-      setState(() {
-        _quillController.document.insert(
-          selection.baseOffset,
-          quill.BlockEmbed('image', imageUrl),
-        );
-      });
-      // Insert a blank line (new paragraph) after the image
       _quillController.document.insert(
-        selection.baseOffset + 1,
-        "\n\n", // Assume ParagraphBlock is a valid Quill block for creating paragraphs
+        selection.baseOffset,
+        "\n", // Assume ParagraphBlock is a valid Quill block for creating paragraphs
       );
 
-      /// TODO: 사진 첨부 시 첨부파일에도 같이 올라갈 것인지 결정하기.
+      _quillController.document.insert(
+        selection.baseOffset,
+        quill.BlockEmbed('image', imageUrl),
+      );
+
+      // Insert a blank line (new paragraph) after the image
+      _quillController.document.insert(
+        selection.baseOffset,
+        "\n", // Assume ParagraphBlock is a valid Quill block for creating paragraphs
+      );
+
       String uuid = const Uuid().v4();
       setState(() {
-        _isFileMenuBarSelected = true;
+        /// TODO: 사진 첨부 시 첨부 창을 다시 열어 놓을 지 결정하기.
+        // _isFileMenuBarSelected = true;
         _attachmentList.add(AttachmentsFormat(
           fileType: FileType.image,
           isNewFile: true,
@@ -1618,7 +1639,8 @@ class _PostWritePageState extends State<PostWritePage>
         file = await file.copy('$documentPath/${path.basename(file.path)}');
       }
       setState(() {
-        _isFileMenuBarSelected = true;
+        //TODO: 첨부파일 추가 시 창을 다시 열어 놓을 지 결정하기.
+        //  _isFileMenuBarSelected = true;
         _attachmentList.add(AttachmentsFormat(
           //TODO: 파일 타입 결정해서 FileType에 추가하기, svg파일도 추가하기.
           fileType: FileType.other,
