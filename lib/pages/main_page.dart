@@ -144,12 +144,10 @@ class _MainPageState extends State<MainPage> {
       // 게시판 목록 로드 후 각 게시판의 공지사항들을 새로고침
     }
     if (mounted) {
-      debugPrint(boardJson.toString());
       setState(() {
         _boards.clear();
         for (Map<String, dynamic> json in boardJson!) {
           try {
-            // 밑
             _boards.add(BoardDetailActionModel.fromJson(json));
           } catch (error) {
             debugPrint(
@@ -221,17 +219,17 @@ class _MainPageState extends State<MainPage> {
       int isLoadingIndex) async {
     List<int> ids = _searchBoardID(slug1, slug2);
     int boardID = ids[0], topicID = ids[1];
-    debugPrint("slug1, slug2 : $slug1, $slug2");
-    debugPrint("${ids[0].toString()} ${ids[1].toString()}");
     String apiUrl = topicID == -1
         ? "articles/?parent_board=$boardID"
         : "articles/?parent_board=$boardID&parent_topic=$topicID";
 
-    Map<String, dynamic>? recentJson = await _loadApiDataFromCache(apiUrl);
+    final Map<String, dynamic>? recentJson =
+        await _loadApiDataFromCache(apiUrl);
     if (recentJson != null) {
       if (mounted) {
         setState(() {
           contentList.clear();
+
           for (Map<String, dynamic> json in recentJson['results']) {
             try {
               contentList.add(ArticleListActionModel.fromJson(json));
@@ -245,8 +243,8 @@ class _MainPageState extends State<MainPage> {
       }
     }
 
-    dynamic response = await userProvider.getApiRes(apiUrl);
-    _saveApiDataToCache(apiUrl, response);
+    final dynamic response = await userProvider.getApiRes(apiUrl);
+    await _saveApiDataToCache(apiUrl, response);
     if (mounted) {
       setState(() {
         contentList.clear();
@@ -322,7 +320,6 @@ class _MainPageState extends State<MainPage> {
               height: 35,
             ),
             onPressed: () async {
-              debugPrint("BulletinSearch");
               await Navigator.of(context).push(slideRoute(
                   const BulletinSearchPage(
                       boardType: BoardType.all, boardInfo: null)));
@@ -476,70 +473,81 @@ class _MainPageState extends State<MainPage> {
                             const SizedBox(
                               height: 10,
                             ),
-                            InkWell(
-                              onTap: () {
-                                Navigator.of(context).push(slideRoute(
-                                    PostViewPage(id: _portalContents[0].id)));
-                              },
-                              child: Text(
-                                getTitle(
-                                    _portalContents[0].title,
-                                    _portalContents[0].is_hidden,
-                                    _portalContents[0].why_hidden),
-                                style: TextStyle(
-                                    color: _portalContents[0].is_hidden
-                                        ? const Color(0xFFBBBBBB)
-                                        : Colors.black,
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.w400),
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                            ),
+                            _portalContents.isNotEmpty
+                                ? InkWell(
+                                    onTap: () {
+                                      Navigator.of(context).push(slideRoute(
+                                          PostViewPage(
+                                              id: _portalContents[0].id)));
+                                    },
+                                    child: Text(
+                                      getTitle(
+                                          _portalContents[0].title,
+                                          _portalContents[0].is_hidden,
+                                          _portalContents[0].why_hidden),
+                                      style: TextStyle(
+                                          color: _portalContents[0].is_hidden
+                                              ? const Color(0xFFBBBBBB)
+                                              : Colors.black,
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.w400),
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  )
+                                : Container(),
                             const SizedBox(
                               height: 10,
                             ),
-                            InkWell(
-                                onTap: () {
-                                  Navigator.of(context).push(slideRoute(
-                                      PostViewPage(id: _portalContents[1].id)));
-                                },
-                                child: Text(
-                                  getTitle(
-                                      _portalContents[1].title,
-                                      _portalContents[1].is_hidden,
-                                      _portalContents[1].why_hidden),
-                                  style: TextStyle(
-                                      color: _portalContents[1].is_hidden
-                                          ? const Color(0xFFBBBBBB)
-                                          : Colors.black,
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.w400),
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
-                                )),
+                            _portalContents.length >= 2
+                                ? InkWell(
+                                    onTap: () {
+                                      Navigator.of(context).push(slideRoute(
+                                          PostViewPage(
+                                              id: _portalContents[1].id)));
+                                    },
+                                    child: Text(
+                                      getTitle(
+                                          _portalContents[1].title,
+                                          _portalContents[1].is_hidden,
+                                          _portalContents[1].why_hidden),
+                                      style: TextStyle(
+                                          color: _portalContents[1].is_hidden
+                                              ? const Color(0xFFBBBBBB)
+                                              : Colors.black,
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.w400),
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  )
+                                : Container(),
                             const SizedBox(
                               height: 10,
                             ),
-                            InkWell(
-                                onTap: () {
-                                  Navigator.of(context).push(slideRoute(
-                                      PostViewPage(id: _portalContents[2].id)));
-                                },
-                                child: Text(
-                                  getTitle(
-                                      _portalContents[2].title,
-                                      _portalContents[2].is_hidden,
-                                      _portalContents[2].why_hidden),
-                                  style: TextStyle(
-                                      color: _portalContents[2].is_hidden
-                                          ? const Color(0xFFBBBBBB)
-                                          : Colors.black,
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.w400),
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
-                                )),
+                            _portalContents.length >= 3
+                                ? InkWell(
+                                    onTap: () {
+                                      Navigator.of(context).push(slideRoute(
+                                          PostViewPage(
+                                              id: _portalContents[2].id)));
+                                    },
+                                    child: Text(
+                                      getTitle(
+                                          _portalContents[2].title,
+                                          _portalContents[2].is_hidden,
+                                          _portalContents[2].why_hidden),
+                                      style: TextStyle(
+                                          color: _portalContents[2].is_hidden
+                                              ? const Color(0xFFBBBBBB)
+                                              : Colors.black,
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.w400),
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  )
+                                : Container(),
                             const SizedBox(
                               height: 14,
                             ),
@@ -583,28 +591,33 @@ class _MainPageState extends State<MainPage> {
                                     width: 10,
                                   ),
                                   Expanded(
-                                    child: InkWell(
-                                        onTap: () {
-                                          Navigator.of(context).push(slideRoute(
-                                              PostViewPage(
-                                                  id: _facilityContents[0]
-                                                      .id)));
-                                        },
-                                        child: Text(
-                                          getTitle(
-                                              _facilityContents[0].title,
-                                              _facilityContents[0].is_hidden,
-                                              _facilityContents[0].why_hidden),
-                                          style: TextStyle(
-                                              color:
-                                                  _facilityContents[0].is_hidden
+                                    child: _facilityContents.isNotEmpty
+                                        ? InkWell(
+                                            onTap: () {
+                                              Navigator.of(context).push(
+                                                  slideRoute(PostViewPage(
+                                                      id: _facilityContents[0]
+                                                          .id)));
+                                            },
+                                            child: Text(
+                                              getTitle(
+                                                  _facilityContents[0].title,
+                                                  _facilityContents[0]
+                                                      .is_hidden,
+                                                  _facilityContents[0]
+                                                      .why_hidden),
+                                              style: TextStyle(
+                                                  color: _facilityContents[0]
+                                                          .is_hidden
                                                       ? const Color(0xFFBBBBBB)
                                                       : Colors.black,
-                                              fontSize: 14,
-                                              fontWeight: FontWeight.w400),
-                                          maxLines: 1,
-                                          overflow: TextOverflow.ellipsis,
-                                        )),
+                                                  fontSize: 14,
+                                                  fontWeight: FontWeight.w400),
+                                              maxLines: 1,
+                                              overflow: TextOverflow.ellipsis,
+                                            ),
+                                          )
+                                        : Container(),
                                   )
                                 ],
                               ),
@@ -645,27 +658,32 @@ class _MainPageState extends State<MainPage> {
                                     width: 10,
                                   ),
                                   Expanded(
-                                    child: InkWell(
-                                        onTap: () {
-                                          Navigator.of(context).push(slideRoute(
-                                              PostViewPage(
-                                                  id: _newAraContents[0].id)));
-                                        },
-                                        child: Text(
-                                          getTitle(
-                                              _newAraContents[0].title,
-                                              _newAraContents[0].is_hidden,
-                                              _newAraContents[0].why_hidden),
-                                          style: TextStyle(
-                                              color:
-                                                  _newAraContents[0].is_hidden
+                                    child: _newAraContents.isNotEmpty
+                                        ? InkWell(
+                                            onTap: () {
+                                              Navigator.of(context).push(
+                                                  slideRoute(PostViewPage(
+                                                      id: _newAraContents[0]
+                                                          .id)));
+                                            },
+                                            child: Text(
+                                              getTitle(
+                                                  _newAraContents[0].title,
+                                                  _newAraContents[0].is_hidden,
+                                                  _newAraContents[0]
+                                                      .why_hidden),
+                                              style: TextStyle(
+                                                  color: _newAraContents[0]
+                                                          .is_hidden
                                                       ? const Color(0xFFBBBBBB)
                                                       : Colors.black,
-                                              fontSize: 14,
-                                              fontWeight: FontWeight.w400),
-                                          maxLines: 1,
-                                          overflow: TextOverflow.ellipsis,
-                                        )),
+                                                  fontSize: 14,
+                                                  fontWeight: FontWeight.w400),
+                                              maxLines: 1,
+                                              overflow: TextOverflow.ellipsis,
+                                            ),
+                                          )
+                                        : Container(),
                                   ),
                                 ],
                               ),
@@ -712,26 +730,31 @@ class _MainPageState extends State<MainPage> {
                                     width: 10,
                                   ),
                                   Expanded(
-                                    child: InkWell(
-                                        onTap: () {
-                                          Navigator.of(context).push(slideRoute(
-                                              PostViewPage(
-                                                  id: _gradContents[0].id)));
-                                        },
-                                        child: Text(
-                                          getTitle(
-                                              _gradContents[0].title,
-                                              _gradContents[0].is_hidden,
-                                              _gradContents[0].why_hidden),
-                                          style: TextStyle(
-                                              color: _gradContents[0].is_hidden
-                                                  ? const Color(0xFFBBBBBB)
-                                                  : Colors.black,
-                                              fontSize: 14,
-                                              fontWeight: FontWeight.w400),
-                                          maxLines: 1,
-                                          overflow: TextOverflow.ellipsis,
-                                        )),
+                                    child: _gradContents.isNotEmpty
+                                        ? InkWell(
+                                            onTap: () {
+                                              Navigator.of(context).push(
+                                                  slideRoute(PostViewPage(
+                                                      id: _gradContents[0]
+                                                          .id)));
+                                            },
+                                            child: Text(
+                                              getTitle(
+                                                  _gradContents[0].title,
+                                                  _gradContents[0].is_hidden,
+                                                  _gradContents[0].why_hidden),
+                                              style: TextStyle(
+                                                  color: _gradContents[0]
+                                                          .is_hidden
+                                                      ? const Color(0xFFBBBBBB)
+                                                      : Colors.black,
+                                                  fontSize: 14,
+                                                  fontWeight: FontWeight.w400),
+                                              maxLines: 1,
+                                              overflow: TextOverflow.ellipsis,
+                                            ),
+                                          )
+                                        : Container(),
                                   ),
                                 ],
                               ),
@@ -752,28 +775,33 @@ class _MainPageState extends State<MainPage> {
                                     width: 10,
                                   ),
                                   Expanded(
-                                    child: InkWell(
-                                        onTap: () {
-                                          Navigator.of(context).push(slideRoute(
-                                              PostViewPage(
-                                                  id: _underGradContents[0]
-                                                      .id)));
-                                        },
-                                        child: Text(
-                                          getTitle(
-                                              _underGradContents[0].title,
-                                              _underGradContents[0].is_hidden,
-                                              _underGradContents[0].why_hidden),
-                                          style: TextStyle(
-                                              color: _underGradContents[0]
-                                                      .is_hidden
-                                                  ? const Color(0xFFBBBBBB)
-                                                  : Colors.black,
-                                              fontSize: 14,
-                                              fontWeight: FontWeight.w400),
-                                          maxLines: 1,
-                                          overflow: TextOverflow.ellipsis,
-                                        )),
+                                    child: _underGradContents.isNotEmpty
+                                        ? InkWell(
+                                            onTap: () {
+                                              Navigator.of(context).push(
+                                                  slideRoute(PostViewPage(
+                                                      id: _underGradContents[0]
+                                                          .id)));
+                                            },
+                                            child: Text(
+                                              getTitle(
+                                                  _underGradContents[0].title,
+                                                  _underGradContents[0]
+                                                      .is_hidden,
+                                                  _underGradContents[0]
+                                                      .why_hidden),
+                                              style: TextStyle(
+                                                  color: _underGradContents[0]
+                                                          .is_hidden
+                                                      ? const Color(0xFFBBBBBB)
+                                                      : Colors.black,
+                                                  fontSize: 14,
+                                                  fontWeight: FontWeight.w400),
+                                              maxLines: 1,
+                                              overflow: TextOverflow.ellipsis,
+                                            ),
+                                          )
+                                        : Container(),
                                   ),
                                 ],
                               ),
@@ -794,28 +822,32 @@ class _MainPageState extends State<MainPage> {
                                     width: 10,
                                   ),
                                   Expanded(
-                                    child: InkWell(
-                                        onTap: () {
-                                          Navigator.of(context).push(slideRoute(
-                                              PostViewPage(
-                                                  id: _freshmanContents[0]
-                                                      .id)));
-                                        },
-                                        child: Text(
-                                          getTitle(
-                                              _freshmanContents[0].title,
-                                              _freshmanContents[0].is_hidden,
-                                              _freshmanContents[0].why_hidden),
-                                          style: TextStyle(
-                                              color:
-                                                  _freshmanContents[0].is_hidden
+                                    child: _freshmanContents.isNotEmpty
+                                        ? InkWell(
+                                            onTap: () {
+                                              Navigator.of(context).push(
+                                                  slideRoute(PostViewPage(
+                                                      id: _freshmanContents[0]
+                                                          .id)));
+                                            },
+                                            child: Text(
+                                              getTitle(
+                                                  _freshmanContents[0].title,
+                                                  _freshmanContents[0]
+                                                      .is_hidden,
+                                                  _freshmanContents[0]
+                                                      .why_hidden),
+                                              style: TextStyle(
+                                                  color: _freshmanContents[0]
+                                                          .is_hidden
                                                       ? const Color(0xFFBBBBBB)
                                                       : Colors.black,
-                                              fontSize: 14,
-                                              fontWeight: FontWeight.w400),
-                                          maxLines: 1,
-                                          overflow: TextOverflow.ellipsis,
-                                        )),
+                                                  fontSize: 14,
+                                                  fontWeight: FontWeight.w400),
+                                              maxLines: 1,
+                                              overflow: TextOverflow.ellipsis,
+                                            ))
+                                        : Container(),
                                   ),
                                 ],
                               ),

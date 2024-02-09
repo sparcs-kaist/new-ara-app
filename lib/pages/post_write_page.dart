@@ -262,7 +262,7 @@ class _PostWritePageState extends State<PostWritePage>
     // 사용자 정보 제공자로부터 쿠키 정보 가져오기.
     var userProvider = context.read<UserProvider>();
     try {
-      Dio dio = userProvider.createDioWithHeaders();
+      Dio dio = userProvider.createDioWithHeadersForGet();
       var response = await dio.get('$newAraDefaultUrl/api/boards/');
 
       // 기본 게시판 정보를 `_boardList`에 초기화.
@@ -1474,7 +1474,7 @@ class _PostWritePageState extends State<PostWritePage>
         _isLoading = true;
       });
 
-      Dio dio = userProvider.createDioWithHeaders();
+      Dio dio = userProvider.createDioWithHeadersForNonget();
 
       for (int i = 0; i < _attachmentList.length; i++) {
         //새로 올리는 파일이면 새로운 id 할당 받기.

@@ -529,7 +529,7 @@ class _UserPageState extends State<UserPage>
 
     try {
       var response = await userProvider
-          .createDioWithHeaders()
+          .createDioWithHeadersForGet()
           .get('$newAraDefaultUrl$apiUrl');
 
       List<dynamic> rawPostList = response.data['results'];
