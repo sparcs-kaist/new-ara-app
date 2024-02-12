@@ -56,7 +56,10 @@ class _MainPageState extends State<MainPage> {
     true, //_underGradContents
     true, //_freshmanContents
     true, //_boards
-    true, //_talksContents
+    true, //_talksContents(자유게시판)
+    true, //_wantedContents(구인구직)
+    true, //_marketContents(중고거래)
+    true, //_realEstateContents(부동산)
   ];
   //각 컨텐츠 별 데이터 리스트
 
@@ -71,6 +74,9 @@ class _MainPageState extends State<MainPage> {
   final List<ArticleListActionModel> _underGradContents = [];
   final List<ArticleListActionModel> _freshmanContents = [];
   final List<ArticleListActionModel> _talksContents = [];
+  final List<ArticleListActionModel> _wantedContents = [];
+  final List<ArticleListActionModel> _marketContents = [];
+  final List<ArticleListActionModel> _realEstateContents = [];
 
   @override
   void initState() {
@@ -166,6 +172,10 @@ class _MainPageState extends State<MainPage> {
         _refreshUndergradAssocNotice(userProvider),
         _refreshFreshmanCouncil(userProvider),
         _refreshTalks(userProvider),
+        
+        _refreshMarket(userProvider),
+        _refreshWanted(userProvider),
+        _refreshRealEstate(userProvider)
       ]);
     }
   }
@@ -216,6 +226,22 @@ class _MainPageState extends State<MainPage> {
   Future<void> _refreshTalks(UserProvider userProvider) async {
     //자유게시판
     await _refreshBoardContent(userProvider, "talk", "", _talksContents, 8);
+  }
+
+  Future<void> _refreshWanted(UserProvider userProvider) async {
+    //구인구직
+    await _refreshBoardContent(userProvider, "wanted", "", _wantedContents, 9);
+  }
+
+  Future<void> _refreshMarket(UserProvider userProvider) async {
+    //중고거래
+    await _refreshBoardContent(userProvider, "market", "", _marketContents, 10);
+  }
+
+  Future<void> _refreshRealEstate(UserProvider userProvider) async {
+    //부동산
+    await _refreshBoardContent(
+        userProvider, "real-estate", "", _realEstateContents, 11);
   }
 
   /// 게시판의 게시물들을 불러옴. 코드 중복을 줄이기 위해 사용.
@@ -344,7 +370,10 @@ class _MainPageState extends State<MainPage> {
                 _isLoading[5] ||
                 _isLoading[6] ||
                 _isLoading[7] ||
-                _isLoading[8]
+                _isLoading[8] ||
+                _isLoading[9] ||
+                _isLoading[10] ||
+                _isLoading[11]
             ? const LoadingIndicator()
             : SingleChildScrollView(
                 child: SizedBox(
@@ -357,6 +386,8 @@ class _MainPageState extends State<MainPage> {
                       _buildTalkContents(),
                       const SizedBox(height: 20),
                       _buildNoticeContents(),
+                      const SizedBox(height: 20),
+                      _buildTradeContents(),
                       const SizedBox(height: 20),
                       _buildStuCommunityContents(),
                       const SizedBox(height: 20),
@@ -743,6 +774,221 @@ class _MainPageState extends State<MainPage> {
                                     _newAraContents[0].why_hidden),
                                 style: TextStyle(
                                     color: _newAraContents[0].is_hidden
+                                        ? const Color(0xFFBBBBBB)
+                                        : Colors.black,
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w400),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            )
+                          : Container(),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildTradeContents() {
+    return Column(
+      children: [
+        SizedBox(
+          width: MediaQuery.of(context).size.width - 40,
+          child: const Text(
+            '거래',
+            style: TextStyle(
+              fontWeight: FontWeight.w600,
+              fontSize: 20,
+              color: Colors.black,
+            ),
+          ),
+        ),
+        const SizedBox(height: 9),
+        Container(
+          padding: const EdgeInsets.all(12),
+          width: MediaQuery.of(context).size.width - 40,
+          // height: 200,
+          decoration: BoxDecoration(
+            border: Border.all(
+              width: 1,
+              color: const Color.fromRGBO(240, 240, 240, 1),
+            ),
+            borderRadius: const BorderRadius.all(Radius.circular(20)),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              InkWell(
+                onTap: () {
+                  Navigator.of(context).push(slideRoute(PostListShowPage(
+                    boardType: BoardType.free,
+                    boardInfo: _searchBoard("real-estate"),
+                  )));
+                },
+                child: Row(
+                  children: [
+                    const Text(
+                      "부동산",
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w700,
+                        color: Color(0xFF1F4899),
+                      ),
+                    ),
+                    const SizedBox(
+                      width: 5,
+                    ),
+                    SvgPicture.asset(
+                      'assets/icons/right_chevron.svg',
+                      colorFilter: const ColorFilter.mode(
+                          Color(0xFF1F4899), BlendMode.srcIn),
+                      fit: BoxFit.fill,
+                      width: 17,
+                      height: 17,
+                    ),
+                    const SizedBox(
+                      width: 10,
+                    ),
+                    Expanded(
+                      child: _realEstateContents.isNotEmpty
+                          ? InkWell(
+                              onTap: () {
+                                Navigator.of(context).push(slideRoute(
+                                    PostViewPage(
+                                        id: _realEstateContents[0].id)));
+                              },
+                              child: Text(
+                                getTitle(
+                                    _realEstateContents[0].title,
+                                    _realEstateContents[0].is_hidden,
+                                    _realEstateContents[0].why_hidden),
+                                style: TextStyle(
+                                    color: _realEstateContents[0].is_hidden
+                                        ? const Color(0xFFBBBBBB)
+                                        : Colors.black,
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w400),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            )
+                          : Container(),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(
+                height: 10,
+              ),
+              InkWell(
+                onTap: () {
+                  Navigator.of(context).push(slideRoute(PostListShowPage(
+                      boardType: BoardType.free,
+                      boardInfo: _searchBoard("market"))));
+                },
+                child: Row(
+                  children: [
+                    const Text(
+                      "중고거래",
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w700,
+                        color: Color(0xFF646464),
+                      ),
+                    ),
+                    const SizedBox(
+                      width: 5,
+                    ),
+                    SvgPicture.asset(
+                      'assets/icons/right_chevron.svg',
+                      colorFilter: const ColorFilter.mode(
+                          Color(0xFF646464), BlendMode.srcIn),
+                      fit: BoxFit.fill,
+                      width: 17,
+                      height: 17,
+                    ),
+                    const SizedBox(
+                      width: 10,
+                    ),
+                    Expanded(
+                      child: _marketContents.isNotEmpty
+                          ? InkWell(
+                              onTap: () {
+                                Navigator.of(context).push(slideRoute(
+                                    PostViewPage(id: _marketContents[0].id)));
+                              },
+                              child: Text(
+                                getTitle(
+                                    _marketContents[0].title,
+                                    _marketContents[0].is_hidden,
+                                    _marketContents[0].why_hidden),
+                                style: TextStyle(
+                                    color: _marketContents[0].is_hidden
+                                        ? const Color(0xFFBBBBBB)
+                                        : Colors.black,
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w400),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ))
+                          : Container(),
+                    )
+                  ],
+                ),
+              ),
+              const SizedBox(
+                height: 10,
+              ),
+              InkWell(
+                onTap: () {
+                  Navigator.of(context).push(slideRoute(PostListShowPage(
+                    boardType: BoardType.free,
+                    boardInfo: _searchBoard("wanted"),
+                  )));
+                },
+                child: Row(
+                  children: [
+                    const Text(
+                      "구인구직",
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w700,
+                        color: Color(0xFFED3A3A),
+                      ),
+                    ),
+                    const SizedBox(
+                      width: 5,
+                    ),
+                    SvgPicture.asset(
+                      'assets/icons/right_chevron.svg',
+                      colorFilter: const ColorFilter.mode(
+                          Color(0xFFED3A3A), BlendMode.srcIn),
+                      fit: BoxFit.fill,
+                      width: 17,
+                      height: 17,
+                    ),
+                    const SizedBox(
+                      width: 10,
+                    ),
+                    Expanded(
+                      child: _wantedContents.isNotEmpty
+                          ? InkWell(
+                              onTap: () {
+                                Navigator.of(context).push(slideRoute(
+                                    PostViewPage(id: _wantedContents[0].id)));
+                              },
+                              child: Text(
+                                getTitle(
+                                    _wantedContents[0].title,
+                                    _wantedContents[0].is_hidden,
+                                    _wantedContents[0].why_hidden),
+                                style: TextStyle(
+                                    color: _wantedContents[0].is_hidden
                                         ? const Color(0xFFBBBBBB)
                                         : Colors.black,
                                     fontSize: 14,
