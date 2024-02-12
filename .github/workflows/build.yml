@@ -8,7 +8,7 @@ on:
 
 env:
   FLUTTER_VERSION: "3.13"
-  JAVA_VERSION: "8"
+  JAVA_VERSION: "11"
 
 jobs:
   build-android:
