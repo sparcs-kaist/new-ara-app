@@ -1,0 +1,61 @@
+name: Build
+
+on:
+  push:
+    branches: [dev, main]
+  pull_request:
+    branches: [dev]
+
+env:
+  FLUTTER_VERSION: "3.13"
+  JAVA_VERSION: "11"
+
+jobs:
+  build-android:
+    name: Build Android
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up Java
+        uses: actions/setup-java@v3
+        with:
+          distribution: "adopt"
+          java-version: ${{ env.JAVA_VERSION }}
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          channel: "stable"
+      - name: Create key.properties
+        run: |
+          echo "storeFile=../ci.jks" > android/key.properties
+          echo "storePassword=123456" >> android/key.properties
+          echo "keyPassword=123456" >> android/key.properties
+          echo "keyAlias=ci" >> android/key.properties
+      - name: Install dependencies
+        run: flutter pub get
+      - name: Build APK
+        run: flutter build apk --release --no-tree-shake-icons
+
+  build-ios:
+    name: Build iOS
+    runs-on: macos-13
+    steps:
+      - uses: actions/checkout@v3
+      - name: Select Xcode version
+        run: sudo xcode-select -s '/Applications/Xcode_15.0.app/Contents/Developer'
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          channel: "stable"
+      - uses: actions/cache@v3
+        with:
+          path: Pods
+          key: ${{ runner.os }}-pods-${{ hashFiles('**/Podfile.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-pods-
+      - name: Install dependencies
+        run: flutter pub get
+      - name: Build iOS
+        run: flutter build ios --release --no-codesign --no-tree-shake-icons
