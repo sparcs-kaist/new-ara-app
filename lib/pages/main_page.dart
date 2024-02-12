@@ -160,7 +160,7 @@ class _MainPageState extends State<MainPage> {
       });
       await Future.wait([
         _refreshPortalNotice(userProvider),
-        refreshFacilityNotice(userProvider),
+        _refreshFacilityNotice(userProvider),
         _refreshNewAraNotice(userProvider),
         _refreshGradAssocNotice(userProvider),
         _refreshUndergradAssocNotice(userProvider),
@@ -177,7 +177,7 @@ class _MainPageState extends State<MainPage> {
   }
 
   ///입주 업체 게시물 글 불러오기.
-  Future<void> refreshFacilityNotice(UserProvider userProvider) async {
+  Future<void> _refreshFacilityNotice(UserProvider userProvider) async {
     await _refreshBoardContent(
         userProvider, "facility-notice", "", _facilityContents, 2);
   }
