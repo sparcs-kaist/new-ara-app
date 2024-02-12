@@ -172,7 +172,6 @@ class _MainPageState extends State<MainPage> {
         _refreshUndergradAssocNotice(userProvider),
         _refreshFreshmanCouncil(userProvider),
         _refreshTalks(userProvider),
-        
         _refreshMarket(userProvider),
         _refreshWanted(userProvider),
         _refreshRealEstate(userProvider)
@@ -532,7 +531,7 @@ class _MainPageState extends State<MainPage> {
         ),
         const SizedBox(height: 9),
         Container(
-          padding: const EdgeInsets.all(12),
+          padding: const EdgeInsets.all(15),
           width: MediaQuery.of(context).size.width - 40,
           // height: 200,
           decoration: BoxDecoration(
@@ -810,7 +809,7 @@ class _MainPageState extends State<MainPage> {
         ),
         const SizedBox(height: 9),
         Container(
-          padding: const EdgeInsets.all(12),
+          padding: const EdgeInsets.all(15),
           width: MediaQuery.of(context).size.width - 40,
           // height: 200,
           decoration: BoxDecoration(
@@ -1021,7 +1020,7 @@ class _MainPageState extends State<MainPage> {
         Container(
           width: MediaQuery.of(context).size.width - 40,
           //   height: 110,
-          padding: const EdgeInsets.all(12),
+          padding: const EdgeInsets.all(15),
           decoration: BoxDecoration(
             border: Border.all(
               width: 1,
@@ -1033,129 +1032,125 @@ class _MainPageState extends State<MainPage> {
             //  padding: const EdgeInsets.only(
             //       top: 10, bottom: 10, left: 15, right: 15),
             children: [
-              SizedBox(
-                height: 28,
-                child: Row(
-                  children: [
-                    const Text(
-                      '원총',
-                      style: TextStyle(
-                        fontWeight: FontWeight.w700,
-                        fontSize: 14,
-                        color: Color.fromRGBO(177, 177, 177, 1),
-                      ),
+              Row(
+                children: [
+                  const Text(
+                    '원총',
+                    style: TextStyle(
+                      fontWeight: FontWeight.w700,
+                      fontSize: 14,
+                      color: Color.fromRGBO(177, 177, 177, 1),
                     ),
-                    const SizedBox(
-                      width: 10,
-                    ),
-                    Expanded(
-                      child: _gradContents.isNotEmpty
-                          ? InkWell(
-                              onTap: () {
-                                Navigator.of(context).push(slideRoute(
-                                    PostViewPage(id: _gradContents[0].id)));
-                              },
-                              child: Text(
-                                getTitle(
-                                    _gradContents[0].title,
-                                    _gradContents[0].is_hidden,
-                                    _gradContents[0].why_hidden),
-                                style: TextStyle(
-                                    color: _gradContents[0].is_hidden
-                                        ? const Color(0xFFBBBBBB)
-                                        : Colors.black,
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.w400),
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                              ))
-                          : Container(),
-                    ),
-                  ],
-                ),
+                  ),
+                  const SizedBox(
+                    width: 10,
+                  ),
+                  Expanded(
+                    child: _gradContents.isNotEmpty
+                        ? InkWell(
+                            onTap: () {
+                              Navigator.of(context).push(slideRoute(
+                                  PostViewPage(id: _gradContents[0].id)));
+                            },
+                            child: Text(
+                              getTitle(
+                                  _gradContents[0].title,
+                                  _gradContents[0].is_hidden,
+                                  _gradContents[0].why_hidden),
+                              style: TextStyle(
+                                  color: _gradContents[0].is_hidden
+                                      ? const Color(0xFFBBBBBB)
+                                      : Colors.black,
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w400),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ))
+                        : Container(),
+                  ),
+                ],
               ),
-              SizedBox(
-                height: 28,
-                child: Row(
-                  children: [
-                    const Text(
-                      '총학',
-                      style: TextStyle(
-                        fontWeight: FontWeight.w700,
-                        fontSize: 14,
-                        color: Color.fromRGBO(177, 177, 177, 1),
-                      ),
-                    ),
-                    const SizedBox(
-                      width: 10,
-                    ),
-                    Expanded(
-                      child: _underGradContents.isNotEmpty
-                          ? InkWell(
-                              onTap: () {
-                                Navigator.of(context).push(slideRoute(
-                                    PostViewPage(
-                                        id: _underGradContents[0].id)));
-                              },
-                              child: Text(
-                                getTitle(
-                                    _underGradContents[0].title,
-                                    _underGradContents[0].is_hidden,
-                                    _underGradContents[0].why_hidden),
-                                style: TextStyle(
-                                    color: _underGradContents[0].is_hidden
-                                        ? const Color(0xFFBBBBBB)
-                                        : Colors.black,
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.w400),
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                              ))
-                          : Container(),
-                    ),
-                  ],
-                ),
+              const SizedBox(
+                height: 10,
               ),
-              SizedBox(
-                height: 28,
-                child: Row(
-                  children: [
-                    const Text(
-                      '새학',
-                      style: TextStyle(
-                        fontWeight: FontWeight.w700,
-                        fontSize: 14,
-                        color: Color.fromRGBO(177, 177, 177, 1),
-                      ),
+              Row(
+                children: [
+                  const Text(
+                    '총학',
+                    style: TextStyle(
+                      fontWeight: FontWeight.w700,
+                      fontSize: 14,
+                      color: Color.fromRGBO(177, 177, 177, 1),
                     ),
-                    const SizedBox(
-                      width: 10,
+                  ),
+                  const SizedBox(
+                    width: 10,
+                  ),
+                  Expanded(
+                    child: _underGradContents.isNotEmpty
+                        ? InkWell(
+                            onTap: () {
+                              Navigator.of(context).push(slideRoute(
+                                  PostViewPage(id: _underGradContents[0].id)));
+                            },
+                            child: Text(
+                              getTitle(
+                                  _underGradContents[0].title,
+                                  _underGradContents[0].is_hidden,
+                                  _underGradContents[0].why_hidden),
+                              style: TextStyle(
+                                  color: _underGradContents[0].is_hidden
+                                      ? const Color(0xFFBBBBBB)
+                                      : Colors.black,
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w400),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ))
+                        : Container(),
+                  ),
+                ],
+              ),
+              const SizedBox(
+                height: 10,
+              ),
+              Row(
+                children: [
+                  const Text(
+                    '새학',
+                    style: TextStyle(
+                      fontWeight: FontWeight.w700,
+                      fontSize: 14,
+                      color: Color.fromRGBO(177, 177, 177, 1),
                     ),
-                    Expanded(
-                      child: _freshmanContents.isNotEmpty
-                          ? InkWell(
-                              onTap: () {
-                                Navigator.of(context).push(slideRoute(
-                                    PostViewPage(id: _freshmanContents[0].id)));
-                              },
-                              child: Text(
-                                getTitle(
-                                    _freshmanContents[0].title,
-                                    _freshmanContents[0].is_hidden,
-                                    _freshmanContents[0].why_hidden),
-                                style: TextStyle(
-                                    color: _freshmanContents[0].is_hidden
-                                        ? const Color(0xFFBBBBBB)
-                                        : Colors.black,
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.w400),
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                              ))
-                          : Container(),
-                    ),
-                  ],
-                ),
+                  ),
+                  const SizedBox(
+                    width: 10,
+                  ),
+                  Expanded(
+                    child: _freshmanContents.isNotEmpty
+                        ? InkWell(
+                            onTap: () {
+                              Navigator.of(context).push(slideRoute(
+                                  PostViewPage(id: _freshmanContents[0].id)));
+                            },
+                            child: Text(
+                              getTitle(
+                                  _freshmanContents[0].title,
+                                  _freshmanContents[0].is_hidden,
+                                  _freshmanContents[0].why_hidden),
+                              style: TextStyle(
+                                  color: _freshmanContents[0].is_hidden
+                                      ? const Color(0xFFBBBBBB)
+                                      : Colors.black,
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w400),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ))
+                        : Container(),
+                  ),
+                ],
               ),
             ],
           ),
