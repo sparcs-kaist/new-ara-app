@@ -40,6 +40,15 @@ FASTLANE_PASSWORD=********
 FASTLANE_APPLE_APPLICATION_SPECIFIC_PASSWORD=****-****-****-****
 ```
 
+- `ios/fastlane/Appfile` : 아래와 같이 Apple ID 계정 정보를 입력합니다.
+```env
+app_identifier("org.sparcs.new-ara-app") # The bundle identifier of your app
+apple_id("****@****.***") # Your Apple Developer Portal username
+
+itc_team_name("SPARCS") # App Store Connect Team Name
+team_id("N5V8W52U3U") # Developer Portal Team ID
+```
+
 ### 알파 버전 배포
 
 - Android: Google Play 스토어 `비공개 테스트 - Alpha` 트랙으로 업로드
