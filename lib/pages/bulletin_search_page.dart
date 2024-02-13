@@ -223,7 +223,6 @@ class _BulletinSearchPageState extends State<BulletinSearchPage> {
                           controller: _textEdtingController,
                           onSubmitted: (String text) {
                             setState(() {
-                              _textEdtingController.text = text;
                               _searchWord = text;
                               _isLoading = true;
                             });
@@ -231,7 +230,6 @@ class _BulletinSearchPageState extends State<BulletinSearchPage> {
                           },
                           onChanged: (String text) {
                             setState(() {
-                              _textEdtingController.text = text;
                               _searchWord = text;
                             });
                             refreshPostList(text);
