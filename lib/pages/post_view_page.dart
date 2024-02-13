@@ -131,7 +131,8 @@ class _PostViewPageState extends State<PostViewPage> {
     if (override_hidden) apiUrl += "/?override_hidden=true";
 
     try {
-      var response = await userProvider.createDioWithHeadersForGet().get(apiUrl);
+      var response =
+          await userProvider.createDioWithHeadersForGet().get(apiUrl);
       articleJson = response.data;
     } on DioException catch (e) {
       debugPrint("DioException occurred");
@@ -571,13 +572,30 @@ class _PostViewPageState extends State<PostViewPage> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          getTitle(_article.title, _article.is_hidden, _article.why_hidden),
-          style: const TextStyle(
-            fontSize: 18,
-            fontWeight: FontWeight.w700,
+        Text.rich(
+          TextSpan(
+            children: [
+              if (_article.parent_topic != null)
+                TextSpan(
+                  text: "[${_article.parent_topic!.ko_name}] ",
+                  style: const TextStyle(
+                    color: Color(0xFFED3A3A),
+                    fontWeight: FontWeight.w700,
+                    fontSize: 18,
+                  ),
+                ),
+              TextSpan(
+                text: getTitle(
+                    _article.title, _article.is_hidden, _article.why_hidden),
+                style: const TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+            ],
           ),
         ),
+
         const SizedBox(height: 5),
         // 날짜, 조회수, 좋아요, 싫어요, 댓글 수를 표시하는 Row
         Row(

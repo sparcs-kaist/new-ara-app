@@ -26,6 +26,16 @@ class _PostPreviewState extends State<PostPreview> {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
+              if (widget.model.parent_topic!=null)
+                Text(
+                  "[${widget.model.parent_topic!.ko_name}] ",
+                  style: const TextStyle(
+                    color: Color(0xFFED3A3A),
+                    fontWeight: FontWeight.w500,
+                    fontSize: 16,
+                  ),
+                  maxLines: 1,
+                ),
               Flexible(
                 child: Text(
                   getTitle(widget.model.title, widget.model.is_hidden, widget.model.why_hidden),
