@@ -168,6 +168,7 @@ class _PostListShowPageState extends State<PostListShowPage> {
         centerTitle: true,
         leadingWidth: 100,
         leading: GestureDetector(
+          behavior: HitTestBehavior.translucent,
           onTap: () => Navigator.pop(context),
           child: Stack(
             alignment: Alignment.centerLeft,

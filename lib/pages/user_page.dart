@@ -323,6 +323,7 @@ class _UserPageState extends State<UserPage>
             width: 26,
             height: 21,
             child: GestureDetector(
+              behavior: HitTestBehavior.translucent,
               onTap: () async {
                 await Navigator.push(
                   context,

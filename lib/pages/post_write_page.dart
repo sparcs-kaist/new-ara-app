@@ -1067,6 +1067,7 @@ class _PostWritePageState extends State<PostWritePage>
           Row(
             children: [
               GestureDetector(
+                behavior: HitTestBehavior.translucent,
                 onTap: () {
                   setState(() {
                     _selectedCheckboxes[0] = !_selectedCheckboxes[0]!;
@@ -1112,8 +1113,9 @@ class _PostWritePageState extends State<PostWritePage>
             ],
           ),
 
-        //TODO: 터치 부분이 너무 작아서 불편함.
+        
         GestureDetector(
+          behavior: HitTestBehavior.translucent,
           onTap: () {
             setState(() {
               //성인 체크 박스
@@ -1161,6 +1163,7 @@ class _PostWritePageState extends State<PostWritePage>
           width: 15,
         ),
         GestureDetector(
+          behavior: HitTestBehavior.translucent,
           onTap: () {
             setState(() {
               //정치 체크 박스

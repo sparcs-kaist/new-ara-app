@@ -315,7 +315,7 @@ class SettingPageState extends State<SettingPage> {
                   ),
                   child: SizedBox(
                     width: MediaQuery.of(context).size.width - 60,
-                    child: GestureDetector(
+                    child: InkWell(
                       onTap: () => _logout(),
                       child: const Center(
                         child: Text(
