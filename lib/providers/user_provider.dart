@@ -142,8 +142,6 @@ class UserProvider with ChangeNotifier {
     late dynamic response;
     try {
       response = await dio.get(totUrl);
-      debugPrint(
-          "GET $totUrl success: ${response.data.toString().substring(0, min(300, response.data.toString().length))}");
     } on DioException catch (e) {
       debugPrint("getApiRes failed with DioException: $e");
       // 서버에서 response를 보냈지만 invalid한 statusCode일 때
