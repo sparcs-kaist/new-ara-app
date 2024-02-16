@@ -754,13 +754,15 @@ class _PostViewPageState extends State<PostViewPage> {
       children: [
         // 좋아요 버튼
         InkWell(
+          // API 요청 이전에 먼저 state를 변경한 뒤에 요청 결과에 따라 처리하기
           onTap: () async {
-            // API 요청 이전에 먼저 state를 변경한 뒤에 요청 결과에 따라 처리하기
+            // 원래의 상태를 보관하기 위해 임시 모델 생성
+            ArticleModel tmpArticle = ArticleModel.fromJson(_article.toJson());
             ArticleController(model: _article, userProvider: userProvider)
                 .setVote(true);
             _updateState();
             bool res = await ArticleController(
-              model: _article,
+              model: tmpArticle,
               userProvider: userProvider,
             ).posVote();
             debugPrint('좋아요 결과 ${res}');
@@ -785,13 +787,15 @@ class _PostViewPageState extends State<PostViewPage> {
         const SizedBox(width: 20),
         // 싫어요 버튼
         InkWell(
+          // API 요청 이전에 먼저 state를 변경한 뒤에 요청 결과에 따라 처리하기
           onTap: () async {
-            // API 요청 이전에 먼저 state를 변경한 뒤에 요청 결과에 따라 처리하기
+            // 원래의 상태를 보관하기 위해 임시 모델 생성
+            ArticleModel tmpArticle = ArticleModel.fromJson(_article.toJson());
             ArticleController(model: _article, userProvider: userProvider)
                 .setVote(false);
             _updateState();
             bool res = await ArticleController(
-              model: _article,
+              model: tmpArticle,
               userProvider: userProvider,
             ).negVote();
             debugPrint('싫어요 결과 ${res}');
@@ -1351,15 +1355,20 @@ class _PostViewPageState extends State<PostViewPage> {
                           child: Row(
                             children: [
                               InkWell(
+                                // API 요청 이전에 먼저 state를 변경한 뒤에 요청 결과에 따라 처리하기
                                 onTap: () async {
-                                  // API 요청 이전에 먼저 state를 변경한 뒤에 요청 결과에 따라 처리하기
+                                  // 원래 모델값을 저장하기 위해 임시 모델 생성
+                                  CommentNestedCommentListActionModel
+                                      tmpCurComment =
+                                      CommentNestedCommentListActionModel
+                                          .fromJson(curComment.toJson());
                                   CommentController(
                                           model: curComment,
                                           userProvider: userProvider)
                                       .setVote(true);
                                   _updateState();
-                                  bool res = await ArticleController(
-                                    model: _article,
+                                  bool res = await CommentController(
+                                    model: tmpCurComment,
                                     userProvider: userProvider,
                                   ).posVote();
                                   debugPrint('좋아요 결과 ${res}');
@@ -1387,15 +1396,20 @@ class _PostViewPageState extends State<PostViewPage> {
                               ),
                               const SizedBox(width: 12),
                               InkWell(
+                                // API 요청 이전에 먼저 state를 변경한 뒤에 요청 결과에 따라 처리하기
                                 onTap: () async {
-                                  // API 요청 이전에 먼저 state를 변경한 뒤에 요청 결과에 따라 처리하기
+                                  // 원래 모델값을 저장하기 위해 임시 모델 생성
+                                  CommentNestedCommentListActionModel
+                                      tmpCurComment =
+                                      CommentNestedCommentListActionModel
+                                          .fromJson(curComment.toJson());
                                   CommentController(
                                           model: curComment,
                                           userProvider: userProvider)
                                       .setVote(false);
                                   _updateState();
-                                  bool res = await ArticleController(
-                                    model: _article,
+                                  bool res = await CommentController(
+                                    model: tmpCurComment,
                                     userProvider: userProvider,
                                   ).negVote();
                                   debugPrint('좋아요 결과 ${res}');
