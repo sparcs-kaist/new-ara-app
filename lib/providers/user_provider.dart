@@ -176,8 +176,25 @@ class UserProvider with ChangeNotifier {
     late dynamic response;
     try {
       response = await dio.post(totUrl, data: payload);
-    } catch (error) {
-      debugPrint("POST /api/$apiUrl failed with error: $error");
+    } on DioException catch (e) {
+      debugPrint("getApiRes failed with DioException: $e");
+      // 서버에서 response를 보냈지만 invalid한 statusCode일 때
+      if (e.response != null) {
+        debugPrint("${e.response!.data}");
+        debugPrint("${e.response!.headers}");
+        debugPrint("${e.response!.requestOptions}");
+        return e.response;
+      }
+      // request의 setting, sending에서 문제 발생
+      // requestOption, message를 출력.
+      else {
+        debugPrint("${e.requestOptions}");
+        debugPrint("${e.message}");
+        return null;
+      }
+    } catch (e) {
+      debugPrint("_fetchUser failed with error: $e");
+      return null;
     }
     return response;
   }
@@ -192,8 +209,25 @@ class UserProvider with ChangeNotifier {
     late dynamic response;
     try {
       response = await dio.delete(totUrl, data: payload);
-    } catch (error) {
-      debugPrint("DELETE /api/$apiUrl failed with error: $error");
+    } on DioException catch (e) {
+      debugPrint("getApiRes failed with DioException: $e");
+      // 서버에서 response를 보냈지만 invalid한 statusCode일 때
+      if (e.response != null) {
+        debugPrint("${e.response!.data}");
+        debugPrint("${e.response!.headers}");
+        debugPrint("${e.response!.requestOptions}");
+        return e.response;
+      }
+      // request의 setting, sending에서 문제 발생
+      // requestOption, message를 출력.
+      else {
+        debugPrint("${e.requestOptions}");
+        debugPrint("${e.message}");
+        return null;
+      }
+    } catch (e) {
+      debugPrint("_fetchUser failed with error: $e");
+      return null;
     }
     return response;
   }
@@ -208,8 +242,25 @@ class UserProvider with ChangeNotifier {
     late dynamic response;
     try {
       response = await dio.patch(totUrl, data: payload);
-    } catch (error) {
-      debugPrint("PATCH /api/$apiUrl failed with error: $error");
+    } on DioException catch (e) {
+      debugPrint("getApiRes failed with DioException: $e");
+      // 서버에서 response를 보냈지만 invalid한 statusCode일 때
+      if (e.response != null) {
+        debugPrint("${e.response!.data}");
+        debugPrint("${e.response!.headers}");
+        debugPrint("${e.response!.requestOptions}");
+        return e.response;
+      }
+      // request의 setting, sending에서 문제 발생
+      // requestOption, message를 출력.
+      else {
+        debugPrint("${e.requestOptions}");
+        debugPrint("${e.message}");
+        return null;
+      }
+    } catch (e) {
+      debugPrint("_fetchUser failed with error: $e");
+      return null;
     }
     return response;
   }
