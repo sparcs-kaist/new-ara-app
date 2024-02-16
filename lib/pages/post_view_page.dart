@@ -1760,6 +1760,7 @@ class _PostViewPageState extends State<PostViewPage> {
     )) {
       // TODO: debugPrint 및 Toast message로 수정하기
       debugPrint('Could not launch $url');
+      _showInfoBySnackBar('브라우저로 URL을 열 수 없습니다.');
       return false;
     }
 
