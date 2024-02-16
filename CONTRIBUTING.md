@@ -1,5 +1,16 @@
 # 기여하기
 
+## Release 절차
+
+1. [Releases](https://github.com/sparcs-kaist/new-ara-app/releases)에 갑니다.
+2. 이번 버전에서 변경된 사항을 Changes에 작성합니다.드래프트로 올립니다.
+3. `pubspec.yaml`의 버전을 하나 올리는 커밋을 원격 저장소에 Pull Request하고 Merge 합니다.
+4. fastlane으로 Android와 iOS에 deploy를 합니다.
+5. github release 페이지에서 드래프트를 풉니다.
+
+~~버전을 하나 올린 후 `flutter build ios`를 반드시 실행해 주도록 합니다~~
+ios FastFile에 `sh "flutter build ios --release --no-codesign --no-tree-shake-icons"` 추가해서 fastlane시 항상 자동으로 빌드하도록 수정했습니다.
+
 ## How to deploy
 
 ### Fastlane 설정
@@ -54,16 +65,11 @@ team_id("N5V8W52U3U") # Developer Portal Team ID
 - Android: Google Play 스토어 `비공개 테스트 - Alpha` 트랙으로 업로드
 - iOS: TestFlight로 업로드
 
+아래 명령어 시 `pubspec.yaml`에 있는 버젼 정보와 현재 시각으로 지정된 빌드 정보 기준으로 업로드 됩니다.
+
 ```bash
 cd android && bundle exec fastlane alpha && cd ../ios && bundle exec fastlane alpha
 ```
 
-배포 후 `pubspec.yaml`과 iOS Xcode 프로젝트 관련 파일들의 변경사항을 Discard 합니다.
+배포 후, `pubspec.yaml`과 iOS Xcode 프로젝트 관련 파일들( `ios/Runner.xcodeproj/project.pbxproj`, `ios/Runner/Info.plist` )의 변경사항을 Discard 합니다.
 
-### Release Note 작성
-
-1. [Releases](https://github.com/sparcs-kaist/otl-app/releases)에 갑니다.
-2. 이번 버전에서 변경된 사항을 Changes에 작성합니다.
-3. `pubspec.yaml`의 버전을 하나 올리는 커밋을 추가합니다.
-
-**버전을 하나 올린 후 `flutter build ios`를 반드시 실행해 주도록 합니다.**

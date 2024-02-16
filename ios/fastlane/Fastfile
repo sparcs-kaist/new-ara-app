@@ -29,6 +29,9 @@ platform :ios do
       teamid: CredentialsManager::AppfileConfig.try_fetch_value(:team_id)
     )
 
+    #버젼 변경할 때마다 빌드해야하는 번거로움을 줄이기 위해서 코드 추가
+    sh "flutter build ios --release --no-codesign --no-tree-shake-icons"
+
     build_app(
       workspace: "Runner.xcworkspace",
       scheme: "Runner",
