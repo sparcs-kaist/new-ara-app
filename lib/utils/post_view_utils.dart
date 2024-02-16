@@ -35,7 +35,7 @@ class ArticleController {
       var cancelRes = await userProvider.postApiRes(
         "articles/$id/vote_cancel/",
       );
-      if (cancelRes.statusCode != 200) return false;
+      if (cancelRes == null || cancelRes.statusCode != 200) return false;
     } else {
       var postRes = await userProvider.postApiRes(
         "articles/$id/vote_positive/",

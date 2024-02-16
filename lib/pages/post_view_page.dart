@@ -753,11 +753,17 @@ class _PostViewPageState extends State<PostViewPage> {
         // 좋아요 버튼
         InkWell(
           onTap: () async {
+            ArticleController(model: _article, userProvider: userProvider).setVote(true);
+            _updateState();
             bool res = await ArticleController(
               model: _article,
               userProvider: userProvider,
             ).posVote();
-            if (res) _updateState();
+            debugPrint('좋아요 결과 ${res}');
+            if (!res) {
+              ArticleController(model: _article, userProvider: userProvider).setVote(true);
+              _updateState();
+            }
           },
           child: _buildVoteIcons(
               true, _article.my_vote, ColorsInfo.posVote, 20.17, 22),
