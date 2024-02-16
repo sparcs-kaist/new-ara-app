@@ -301,7 +301,7 @@ class SettingPageState extends State<SettingPage> {
                 ),
                 const SizedBox(height: 5),
                 // 유저 차단 기능 설명 문구
-                TextInfo('setting_page.block_howto'.tr()),
+                TextInfo('유저 차단은 게시글의 더보기 기능에서 하실 수 있습니다.\n하루에 최대 10번만 변경 가능합니다.'),
                 const SizedBox(height: 20),
                 // 로그아웃 버튼 UI (border도 포함)
                 Container(
