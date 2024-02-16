@@ -42,7 +42,7 @@ class ArticleController {
       );
       if (postRes.statusCode != 200) return false;
     }
-    _setVote(true);
+    setVote(true);
     return true;
   }
 
@@ -62,14 +62,14 @@ class ArticleController {
       );
       if (postRes.statusCode != 200) return false;
     }
-    _setVote(false);
+    setVote(false);
     return true;
   }
 
   /// 멤버 변수 model 내부의
   /// 좋아요, 싫어요 상태를 [value]에 맞게 한번에 업데이트.
   /// value: true = 좋아요, false = 싫어요
-  void _setVote(bool value) {
+  void setVote(bool value) {
     /* positive_vote_count, negative_vote_count 모두 int?
        타입이므로 null일 경우 0으로 초기화함. */
     model.positive_vote_count ??= 0;
