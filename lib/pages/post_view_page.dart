@@ -754,7 +754,8 @@ class _PostViewPageState extends State<PostViewPage> {
         InkWell(
           onTap: () async {
             // API 요청 이전에 먼저 state를 변경한 뒤에 요청 결과에 따라 처리하기
-            ArticleController(model: _article, userProvider: userProvider).setVote(true);
+            ArticleController(model: _article, userProvider: userProvider)
+                .setVote(true);
             _updateState();
             bool res = await ArticleController(
               model: _article,
@@ -762,7 +763,8 @@ class _PostViewPageState extends State<PostViewPage> {
             ).posVote();
             debugPrint('좋아요 결과 ${res}');
             if (!res) {
-              ArticleController(model: _article, userProvider: userProvider).setVote(true);
+              ArticleController(model: _article, userProvider: userProvider)
+                  .setVote(true);
               _updateState();
             }
           },
@@ -783,7 +785,8 @@ class _PostViewPageState extends State<PostViewPage> {
         InkWell(
           onTap: () async {
             // API 요청 이전에 먼저 state를 변경한 뒤에 요청 결과에 따라 처리하기
-            ArticleController(model: _article, userProvider: userProvider).setVote(false);
+            ArticleController(model: _article, userProvider: userProvider)
+                .setVote(false);
             _updateState();
             bool res = await ArticleController(
               model: _article,
@@ -791,7 +794,8 @@ class _PostViewPageState extends State<PostViewPage> {
             ).negVote();
             debugPrint('싫어요 결과 ${res}');
             if (!res) {
-              ArticleController(model: _article, userProvider: userProvider).setVote(false);
+              ArticleController(model: _article, userProvider: userProvider)
+                  .setVote(false);
               _updateState();
             }
           },
@@ -1345,13 +1349,25 @@ class _PostViewPageState extends State<PostViewPage> {
                           child: Row(
                             children: [
                               InkWell(
-                                onTap: () {
+                                onTap: () async {
+                                  // API 요청 이전에 먼저 state를 변경한 뒤에 요청 결과에 따라 처리하기
                                   CommentController(
-                                    model: curComment,
+                                          model: curComment,
+                                          userProvider: userProvider)
+                                      .setVote(true);
+                                  _updateState();
+                                  bool res = await ArticleController(
+                                    model: _article,
                                     userProvider: userProvider,
-                                  ).posVote().then((result) {
-                                    if (result) _updateState();
-                                  });
+                                  ).posVote();
+                                  debugPrint('좋아요 결과 ${res}');
+                                  if (!res) {
+                                    CommentController(
+                                            model: curComment,
+                                            userProvider: userProvider)
+                                        .setVote(true);
+                                    _updateState();
+                                  }
                                 },
                                 child: _buildVoteIcons(true, curComment.my_vote,
                                     ColorsInfo.posVote, 11.52, 12.57),
@@ -1370,12 +1386,24 @@ class _PostViewPageState extends State<PostViewPage> {
                               const SizedBox(width: 12),
                               InkWell(
                                 onTap: () async {
+                                  // API 요청 이전에 먼저 state를 변경한 뒤에 요청 결과에 따라 처리하기
                                   CommentController(
-                                    model: curComment,
+                                          model: curComment,
+                                          userProvider: userProvider)
+                                      .setVote(false);
+                                  _updateState();
+                                  bool res = await ArticleController(
+                                    model: _article,
                                     userProvider: userProvider,
-                                  ).negVote().then((result) {
-                                    if (result) _updateState();
-                                  });
+                                  ).negVote();
+                                  debugPrint('좋아요 결과 ${res}');
+                                  if (!res) {
+                                    CommentController(
+                                            model: curComment,
+                                            userProvider: userProvider)
+                                        .setVote(false);
+                                    _updateState();
+                                  }
                                 },
                                 child: _buildVoteIcons(
                                     false,

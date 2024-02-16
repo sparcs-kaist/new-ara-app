@@ -266,14 +266,13 @@ class CommentController {
       var cancelRes = await userProvider.postApiRes(
         "comments/$id/vote_cancel/",
       );
-      if (cancelRes.statusCode != 200) return false;
+      if (cancelRes == null || cancelRes.statusCode != 200) return false;
     } else {
       var postRes = await userProvider.postApiRes(
         "comments/$id/vote_positive/",
       );
-      if (postRes.statusCode != 200) return false;
+      if (postRes == null || postRes.statusCode != 200) return false;
     }
-    setVote(true);
     return true;
   }
 
@@ -285,14 +284,13 @@ class CommentController {
       var cancelRes = await userProvider.postApiRes(
         "comments/$id/vote_cancel/",
       );
-      if (cancelRes.statusCode != 200) return false;
+      if (cancelRes == null || cancelRes.statusCode != 200) return false;
     } else {
       var postRes = await userProvider.postApiRes(
         "comments/$id/vote_negative/",
       );
-      if (postRes.statusCode != 200) return false;
+      if (postRes == null || postRes.statusCode != 200) return false;
     }
-    setVote(false);
     return true;
   }
 
