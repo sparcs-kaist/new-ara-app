@@ -267,7 +267,8 @@ class _PostViewPageState extends State<PostViewPage> {
                                                     _article.url.toString())
                                                 .then((launchRes) {
                                               if (launchRes == false) {
-                                                showInfoBySnackBar(context, '브라우저로 URL을 열 수 없습니다.');
+                                                showInfoBySnackBar(context,
+                                                    '브라우저로 URL을 열 수 없습니다.');
                                               }
                                             });
                                           },
@@ -838,8 +839,9 @@ class _PostViewPageState extends State<PostViewPage> {
                   model: _article,
                   userProvider: userProvider,
                 ).share().then((_) {
-                  ScaffoldMessenger.of(context)
-                      .showSnackBar(buildAraSnackBar(context,
+                  hideOldsAndShowAraSnackBar(
+                      context,
+                      buildAraSnackBar(context,
                           duration: const Duration(seconds: 1),
                           content: Row(
                             children: [
@@ -1307,7 +1309,8 @@ class _PostViewPageState extends State<PostViewPage> {
                                 // onTap 메서드 함수화하기
                                 onTap: () {
                                   if (curComment.is_mine) {
-                                    showInfoBySnackBar(context, "본인 게시글이나 댓글에는 좋아요를 누를 수 없습니다.");
+                                    showInfoBySnackBar(context,
+                                        "본인 게시글이나 댓글에는 좋아요를 누를 수 없습니다.");
                                     return;
                                   } else {
                                     CommentController(
@@ -1337,7 +1340,8 @@ class _PostViewPageState extends State<PostViewPage> {
                                 onTap: () async {
                                   // onTap 메서드 함수화하기
                                   if (curComment.is_mine) {
-                                    showInfoBySnackBar(context, "본인 게시글이나 댓글에는 좋아요를 누를 수 없습니다.");
+                                    showInfoBySnackBar(context,
+                                        "본인 게시글이나 댓글에는 좋아요를 누를 수 없습니다.");
                                     return;
                                   } else {
                                     CommentController(

@@ -43,28 +43,30 @@ class AttachPopupMenuButton extends StatelessWidget {
             .download()
             .then((res) {
           debugPrint(res ? "파일 다운로드 성공" : "파일 다운로드 실패");
-          ScaffoldMessenger.of(context).showSnackBar(buildAraSnackBar(
-            context,
-            content: Row(
-              children: [
-                SvgPicture.asset(
-                  'assets/icons/close-1.svg',
-                  colorFilter:
-                      const ColorFilter.mode(Colors.black, BlendMode.srcIn),
-                  width: 32,
-                  height: 32,
+          hideOldsAndShowAraSnackBar(
+              context,
+              buildAraSnackBar(
+                context,
+                content: Row(
+                  children: [
+                    SvgPicture.asset(
+                      'assets/icons/close-1.svg',
+                      colorFilter:
+                          const ColorFilter.mode(Colors.black, BlendMode.srcIn),
+                      width: 32,
+                      height: 32,
+                    ),
+                    Text(
+                      res ? "파일 다운로드에 성공했습니다" : "파일 다운로드에 실패했습니다.",
+                      style: const TextStyle(
+                        color: Colors.black,
+                        fontWeight: FontWeight.w400,
+                        fontSize: 15,
+                      ),
+                    ),
+                  ],
                 ),
-                Text(
-                  res ? "파일 다운로드에 성공했습니다" : "파일 다운로드에 실패했습니다.",
-                  style: const TextStyle(
-                    color: Colors.black,
-                    fontWeight: FontWeight.w400,
-                    fontSize: 15,
-                  ),
-                ),
-              ],
-            ),
-          ));
+              ));
         });
       },
       child: Text(

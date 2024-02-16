@@ -162,7 +162,7 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
           ],
         ),
     );
-    ScaffoldMessenger.of(context).showSnackBar(araSnackBar);
+    hideOldsAndShowAraSnackBar(context, araSnackBar);
   }
 
   @override
