@@ -28,6 +28,8 @@ import 'package:new_ara_app/utils/profile_image.dart';
 import 'package:new_ara_app/utils/handle_hidden.dart';
 import 'package:new_ara_app/widgets/snackbar_noti.dart';
 
+// TODO: Dio 사용방식 createDioWithHeaders~ 로 변경하기
+
 /// 하나의 post에 대한 내용 뷰, 이벤트 처리를 모두 담당하는 StatefulWidget.
 class PostViewPage extends StatefulWidget {
   /// 보여주고 싶은 대상 post의 id.
