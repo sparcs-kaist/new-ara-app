@@ -753,6 +753,7 @@ class _PostViewPageState extends State<PostViewPage> {
         // 좋아요 버튼
         InkWell(
           onTap: () async {
+            // API 요청 이전에 먼저 state를 변경한 뒤에 요청 결과에 따라 처리하기
             ArticleController(model: _article, userProvider: userProvider).setVote(true);
             _updateState();
             bool res = await ArticleController(
@@ -780,13 +781,19 @@ class _PostViewPageState extends State<PostViewPage> {
         const SizedBox(width: 20),
         // 싫어요 버튼
         InkWell(
-          onTap: () {
-            ArticleController(
+          onTap: () async {
+            // API 요청 이전에 먼저 state를 변경한 뒤에 요청 결과에 따라 처리하기
+            ArticleController(model: _article, userProvider: userProvider).setVote(false);
+            _updateState();
+            bool res = await ArticleController(
               model: _article,
               userProvider: userProvider,
-            ).negVote().then((result) {
-              if (result) _updateState();
-            });
+            ).negVote();
+            debugPrint('싫어요 결과 ${res}');
+            if (!res) {
+              ArticleController(model: _article, userProvider: userProvider).setVote(false);
+              _updateState();
+            }
           },
           child: _buildVoteIcons(
               false, _article.my_vote, ColorsInfo.negVote, 20.17, 22),

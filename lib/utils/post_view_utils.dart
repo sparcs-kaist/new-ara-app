@@ -40,7 +40,7 @@ class ArticleController {
       var postRes = await userProvider.postApiRes(
         "articles/$id/vote_positive/",
       );
-      if (postRes.statusCode != 200) return false;
+      if (postRes == null || postRes.statusCode != 200) return false;
     }
     return true;
   }
@@ -54,12 +54,12 @@ class ArticleController {
       var cancelRes = await userProvider.postApiRes(
         "articles/$id/vote_cancel/",
       );
-      if (cancelRes.statusCode != 200) return false;
+      if (cancelRes == null || cancelRes.statusCode != 200) return false;
     } else {
       var postRes = await userProvider.postApiRes(
         "articles/$id/vote_negative/",
       );
-      if (postRes.statusCode != 200) return false;
+      if (postRes == null || postRes.statusCode != 200) return false;
     }
     return true;
   }
