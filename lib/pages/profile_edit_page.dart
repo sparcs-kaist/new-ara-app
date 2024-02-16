@@ -145,7 +145,7 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
           children: [
             SvgPicture.asset(
               'assets/icons/information.svg',
-              colorFilter: const ColorFilter.mode(Colors.red, BlendMode.srcIn),
+              colorFilter: const ColorFilter.mode(ColorsInfo.newara, BlendMode.srcIn),
               width: 32,
               height: 32,
             ),
@@ -160,7 +160,8 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
               ),
             )),
           ],
-        ));
+        ),
+    );
     ScaffoldMessenger.of(context).showSnackBar(araSnackBar);
   }
 
