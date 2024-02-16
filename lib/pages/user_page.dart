@@ -413,7 +413,9 @@ class _UserPageState extends State<UserPage>
                 curPage[tabType.index] = newMaxPage;
                 setCurCount(tabType);
               },
-              child: SizedBox(height: 62, child: PostPreview(model: curPost)));
+              child: Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 11),
+                  child: PostPreview(model: curPost)));
         },
         separatorBuilder: (context, index) {
           return Container(
