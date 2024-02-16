@@ -211,36 +211,36 @@ class SettingPageState extends State<SettingPage> {
                   ),
                 ),
                 const SizedBox(height: 24),
-                // 알림 아이콘 및 '알림' 텍스트
-                SizedBox(
-                  width: MediaQuery.of(context).size.width - 50,
-                  child: Row(
-                    children: [
-                      SvgPicture.asset(
-                        'assets/icons/notification.svg',
-                        width: 34,
-                        height: 34,
-                      ),
-                      Text(
-                        'setting_page.noti'.tr(),
-                        style: const TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.w700,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 7),
-                // 댓글, 대댓글 설정 UI의 border 설정
-                BorderBoxes(94, switchItems[1]),
-                const SizedBox(height: 10),
-                // 인기글 관련 설정 UI의 border 설정
-                BorderBoxes(94, switchItems[2]),
-                const SizedBox(height: 5),
-                // 인기 공지글 제공 시간 문구
-                TextInfo('setting_page.hot_info'.tr()),
-                const SizedBox(height: 10),
+                // // 알림 아이콘 및 '알림' 텍스트
+                // SizedBox(
+                //   width: MediaQuery.of(context).size.width - 50,
+                //   child: Row(
+                //     children: [
+                //       SvgPicture.asset(
+                //         'assets/icons/notification.svg',
+                //         width: 34,
+                //         height: 34,
+                //       ),
+                //       Text(
+                //         'setting_page.noti'.tr(),
+                //         style: const TextStyle(
+                //           fontSize: 18,
+                //           fontWeight: FontWeight.w700,
+                //         ),
+                //       ),
+                //     ],
+                //   ),
+                // ),
+                // const SizedBox(height: 7),
+                // // 댓글, 대댓글 설정 UI의 border 설정
+                // BorderBoxes(94, switchItems[1]),
+                // const SizedBox(height: 10),
+                // // 인기글 관련 설정 UI의 border 설정
+                // BorderBoxes(94, switchItems[2]),
+                // const SizedBox(height: 5),
+                // // 인기 공지글 제공 시간 문구
+                // TextInfo('setting_page.hot_info'.tr()),
+                // const SizedBox(height: 10),
                 // 차단 아이콘, '차단' 텍스트
                 SizedBox(
                   width: MediaQuery.of(context).size.width - 50,
