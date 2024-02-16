@@ -28,6 +28,8 @@ import 'package:new_ara_app/utils/profile_image.dart';
 import 'package:new_ara_app/utils/handle_hidden.dart';
 import 'package:new_ara_app/widgets/snackbar_noti.dart';
 
+// TODO: Dio 사용방식 createDioWithHeaders~ 로 변경하기
+
 /// 하나의 post에 대한 내용 뷰, 이벤트 처리를 모두 담당하는 StatefulWidget.
 class PostViewPage extends StatefulWidget {
   /// 보여주고 싶은 대상 post의 id.
@@ -752,12 +754,23 @@ class _PostViewPageState extends State<PostViewPage> {
       children: [
         // 좋아요 버튼
         InkWell(
+          // API 요청 이전에 먼저 state를 변경한 뒤에 요청 결과에 따라 처리하기
           onTap: () async {
+            // 원래의 상태를 보관하기 위해 임시 모델 생성
+            ArticleModel tmpArticle = ArticleModel.fromJson(_article.toJson());
+            ArticleController(model: _article, userProvider: userProvider)
+                .setVote(true);
+            _updateState();
             bool res = await ArticleController(
-              model: _article,
+              model: tmpArticle,
               userProvider: userProvider,
             ).posVote();
-            if (res) _updateState();
+            debugPrint('좋아요 결과 ${res}');
+            if (!res) {
+              ArticleController(model: _article, userProvider: userProvider)
+                  .setVote(true);
+              _updateState();
+            }
           },
           child: _buildVoteIcons(
               true, _article.my_vote, ColorsInfo.posVote, 20.17, 22),
@@ -774,13 +787,23 @@ class _PostViewPageState extends State<PostViewPage> {
         const SizedBox(width: 20),
         // 싫어요 버튼
         InkWell(
-          onTap: () {
-            ArticleController(
-              model: _article,
+          // API 요청 이전에 먼저 state를 변경한 뒤에 요청 결과에 따라 처리하기
+          onTap: () async {
+            // 원래의 상태를 보관하기 위해 임시 모델 생성
+            ArticleModel tmpArticle = ArticleModel.fromJson(_article.toJson());
+            ArticleController(model: _article, userProvider: userProvider)
+                .setVote(false);
+            _updateState();
+            bool res = await ArticleController(
+              model: tmpArticle,
               userProvider: userProvider,
-            ).negVote().then((result) {
-              if (result) _updateState();
-            });
+            ).negVote();
+            debugPrint('싫어요 결과 ${res}');
+            if (!res) {
+              ArticleController(model: _article, userProvider: userProvider)
+                  .setVote(false);
+              _updateState();
+            }
           },
           child: _buildVoteIcons(
               false, _article.my_vote, ColorsInfo.negVote, 20.17, 22),
@@ -1332,13 +1355,30 @@ class _PostViewPageState extends State<PostViewPage> {
                           child: Row(
                             children: [
                               InkWell(
-                                onTap: () {
+                                // API 요청 이전에 먼저 state를 변경한 뒤에 요청 결과에 따라 처리하기
+                                onTap: () async {
+                                  // 원래 모델값을 저장하기 위해 임시 모델 생성
+                                  CommentNestedCommentListActionModel
+                                      tmpCurComment =
+                                      CommentNestedCommentListActionModel
+                                          .fromJson(curComment.toJson());
                                   CommentController(
-                                    model: curComment,
+                                          model: curComment,
+                                          userProvider: userProvider)
+                                      .setVote(true);
+                                  _updateState();
+                                  bool res = await CommentController(
+                                    model: tmpCurComment,
                                     userProvider: userProvider,
-                                  ).posVote().then((result) {
-                                    if (result) _updateState();
-                                  });
+                                  ).posVote();
+                                  debugPrint('좋아요 결과 ${res}');
+                                  if (!res) {
+                                    CommentController(
+                                            model: curComment,
+                                            userProvider: userProvider)
+                                        .setVote(true);
+                                    _updateState();
+                                  }
                                 },
                                 child: _buildVoteIcons(true, curComment.my_vote,
                                     ColorsInfo.posVote, 11.52, 12.57),
@@ -1356,13 +1396,30 @@ class _PostViewPageState extends State<PostViewPage> {
                               ),
                               const SizedBox(width: 12),
                               InkWell(
+                                // API 요청 이전에 먼저 state를 변경한 뒤에 요청 결과에 따라 처리하기
                                 onTap: () async {
+                                  // 원래 모델값을 저장하기 위해 임시 모델 생성
+                                  CommentNestedCommentListActionModel
+                                      tmpCurComment =
+                                      CommentNestedCommentListActionModel
+                                          .fromJson(curComment.toJson());
                                   CommentController(
-                                    model: curComment,
+                                          model: curComment,
+                                          userProvider: userProvider)
+                                      .setVote(false);
+                                  _updateState();
+                                  bool res = await CommentController(
+                                    model: tmpCurComment,
                                     userProvider: userProvider,
-                                  ).negVote().then((result) {
-                                    if (result) _updateState();
-                                  });
+                                  ).negVote();
+                                  debugPrint('좋아요 결과 ${res}');
+                                  if (!res) {
+                                    CommentController(
+                                            model: curComment,
+                                            userProvider: userProvider)
+                                        .setVote(false);
+                                    _updateState();
+                                  }
                                 },
                                 child: _buildVoteIcons(
                                     false,
