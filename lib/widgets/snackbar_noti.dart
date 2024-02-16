@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 const Duration _araSnackBarDisplayDuration = Duration(seconds: 3);
 
@@ -35,17 +36,17 @@ const Duration _araSnackBarDisplayDuration = Duration(seconds: 3);
 SnackBar buildAraSnackBar(context,
     {Key? key,
     required Widget content,
-    Color? backgroundColor = Colors.white,  // ara specific
+    Color? backgroundColor = Colors.white, // ara specific
     double? elevation,
     EdgeInsetsGeometry? margin =
-        const EdgeInsets.only(left: 16, right: 16, bottom: 20),  // ara specific
+        const EdgeInsets.only(left: 16, right: 16, bottom: 20), // ara specific
     EdgeInsetsGeometry? padding =
-        const EdgeInsets.only(top: 15, bottom: 15, left: 12),  // ara specific
+        const EdgeInsets.only(top: 15, bottom: 15, left: 12), // ara specific
     double? width,
     ShapeBorder? shape = const RoundedRectangleBorder(
-        side: BorderSide(color: Color(0xFFF0F0F0), width: 0.5),  // ara specific
+        side: BorderSide(color: Color(0xFFF0F0F0), width: 0.5), // ara specific
         borderRadius: BorderRadius.all(Radius.circular(16))),
-    SnackBarBehavior? behavior = SnackBarBehavior.floating,  // ara specific
+    SnackBarBehavior? behavior = SnackBarBehavior.floating, // ara specific
     SnackBarAction? action,
     double? actionOverflowThreshold,
     bool? showCloseIcon,
@@ -77,4 +78,32 @@ SnackBar buildAraSnackBar(context,
     dismissDirection: dismissDirection,
     clipBehavior: clipBehavior,
   );
+}
+
+/// information.svg를 사용하는 SnackBar가 자주 쓰여서 함수화함.
+void showInfoBySnackBar(BuildContext context, String infoText) {
+  ScaffoldMessenger.of(context).showSnackBar(buildAraSnackBar(context,
+      content: Row(
+        children: [
+          SvgPicture.asset(
+            'assets/icons/information.svg',
+            colorFilter: const ColorFilter.mode(Colors.red, BlendMode.srcIn),
+            width: 32,
+            height: 32,
+          ),
+          const SizedBox(width: 8),
+          Flexible(
+            child: Text(
+              infoText,
+              // 오버플로우 나면 다음줄로 넘어가도록 하기 위해
+              overflow: TextOverflow.visible,
+              style: const TextStyle(
+                color: Colors.black,
+                fontWeight: FontWeight.w400,
+                fontSize: 15,
+              ),
+            ),
+          ),
+        ],
+      )));
 }
