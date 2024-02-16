@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:new_ara_app/constants/board_type.dart';
@@ -225,8 +227,11 @@ class _BulletinSearchPageState extends State<BulletinSearchPage> {
                             refreshPostList(text);
                           },
                           onChanged: (String text) {
-                            debugPrint("onChanged : $text");
-                            refreshPostList(text);
+                            _debouncer.run(() {
+                              debugPrint(
+                                  "bulletin_search_page: onChanged(${DateTime.now().toString()}) : $text");
+                              refreshPostList(text);
+                            });
                           },
                           style: const TextStyle(
                             //height * fontSize = line height(커서 크기)
@@ -305,7 +310,6 @@ class _BulletinSearchPageState extends State<BulletinSearchPage> {
                   width: MediaQuery.of(context).size.width - 18,
                   child: Column(
                     children: [
-                      
                       // 검색어가 없을 때와 검색 결과가 없을 때의 처리
                       if (_textEdtingController.text == "" &&
                           postPreviewList.isEmpty)
@@ -387,3 +391,20 @@ class _BulletinSearchPageState extends State<BulletinSearchPage> {
     );
   }
 }
+
+class Debouncer {
+  final int milliseconds;
+  VoidCallback? action;
+  Timer? _timer;
+
+  Debouncer({required this.milliseconds});
+
+  run(VoidCallback action) {
+    if (_timer != null) {
+      _timer!.cancel();
+    }
+    _timer = Timer(Duration(milliseconds: milliseconds), action);
+  }
+}
+
+final _debouncer = Debouncer(milliseconds: 5);
