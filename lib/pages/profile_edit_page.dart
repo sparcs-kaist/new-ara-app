@@ -15,6 +15,7 @@ import 'package:new_ara_app/models/user_profile_model.dart';
 import 'package:new_ara_app/widgets/loading_indicator.dart';
 import 'package:new_ara_app/providers/notification_provider.dart';
 import 'package:new_ara_app/utils/profile_image.dart';
+import 'package:new_ara_app/widgets/snackbar_noti.dart';
 
 class ProfileEditPage extends StatefulWidget {
   const ProfileEditPage({super.key});
@@ -75,6 +76,9 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
     }
   }
 
+  /// 수정된 프로필을 반영하기 api 요청을 보내는 함수
+  /// API 요청이 성공하면 true를 반환
+  /// 실패하면 false를 반환하며 [noticeUserBySnackBar]를 이용해 스낵바 알림을 생성함
   Future<bool> _updateProfile(UserProvider userProvider) async {
     UserProfileModel userProfileModel = userProvider.naUser!;
     FormState? formState = _formKey.currentState;
@@ -106,11 +110,59 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
         data: formData,
       );
       if (response.statusCode != 200) return false;
-    } catch (error) {
-      debugPrint("Error: $error");
+    } on DioException catch (e) {
+      debugPrint("updateProfile failed with DioException: $e");
+      // 서버에서 response를 보냈지만 invalid한 statusCode일 때
+      String infoText = '설정 변경 중 문제가 발생했습니다.';
+      if (e.response != null) {
+        debugPrint("${e.response!.data['nickname'][0]}");
+        debugPrint("${e.response!.headers}");
+        debugPrint("${e.response!.requestOptions}");
+        // 인터넷 문제가 아닌 경우 닉네임 관련 규정 설명을 추가함.
+        infoText += ' ${e.response!.data['nickname'][0]}';
+      }
+      // request의 setting, sending에서 문제 발생
+      // requestOption, message를 출력.
+      else {
+        debugPrint("${e.requestOptions}");
+        debugPrint("${e.message}");
+      }
+      // 유저에게 스낵바 알림
+      noticeUserBySnackBar(infoText);
+      return false;
+    } catch (e) {
+      debugPrint("updateProfile failed with error: $e");
       return false;
     }
     return true;
+  }
+
+  /// infoText 매개변수를 전달받아 스낵바 메시지를 띄워주는 함수
+  /// 프로필 설정 변경 시에 문제가 생겼을 때 알려주는 용도로 사용.
+  void noticeUserBySnackBar(String infoText) {
+    SnackBar araSnackBar = buildAraSnackBar(context,
+        content: Row(
+          children: [
+            SvgPicture.asset(
+              'assets/icons/information.svg',
+              colorFilter: const ColorFilter.mode(ColorsInfo.newara, BlendMode.srcIn),
+              width: 32,
+              height: 32,
+            ),
+            const SizedBox(width: 8),
+            Flexible(
+                child: Text(
+              infoText,
+              style: const TextStyle(
+                color: Colors.black,
+                fontWeight: FontWeight.w400,
+                fontSize: 15,
+              ),
+            )),
+          ],
+        ),
+    );
+    hideOldsAndShowAraSnackBar(context, araSnackBar);
   }
 
   @override

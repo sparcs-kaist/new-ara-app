@@ -291,41 +291,8 @@ class _PostViewPageState extends State<PostViewPage> {
                                                     _article.url.toString())
                                                 .then((launchRes) {
                                               if (launchRes == false) {
-                                                ScaffoldMessenger.of(context)
-                                                    .showSnackBar(
-                                                        buildAraSnackBar(
-                                                            context,
-                                                            content: Row(
-                                                              children: [
-                                                                SvgPicture
-                                                                    .asset(
-                                                                  'assets/icons/information.svg',
-                                                                  colorFilter: const ColorFilter
-                                                                      .mode(
-                                                                      Colors
-                                                                          .red,
-                                                                      BlendMode
-                                                                          .srcIn),
-                                                                  width: 32,
-                                                                  height: 32,
-                                                                ),
-                                                                const SizedBox(
-                                                                    width: 8),
-                                                                const Text(
-                                                                  "브라우저로 URL을 열 수 없습니다.",
-                                                                  style:
-                                                                      TextStyle(
-                                                                    color: Colors
-                                                                        .black,
-                                                                    fontWeight:
-                                                                        FontWeight
-                                                                            .w400,
-                                                                    fontSize:
-                                                                        15,
-                                                                  ),
-                                                                ),
-                                                              ],
-                                                            )));
+                                                showInfoBySnackBar(context,
+                                                    '브라우저로 URL을 열 수 없습니다.');
                                               }
                                             });
                                           },
@@ -754,22 +721,31 @@ class _PostViewPageState extends State<PostViewPage> {
       children: [
         // 좋아요 버튼
         InkWell(
-          // API 요청 이전에 먼저 state를 변경한 뒤에 요청 결과에 따라 처리하기
+          // TODO: onTap 메서드 함수로 빼놓기
           onTap: () async {
-            // 원래의 상태를 보관하기 위해 임시 모델 생성
-            ArticleModel tmpArticle = ArticleModel.fromJson(_article.toJson());
-            ArticleController(model: _article, userProvider: userProvider)
-                .setVote(true);
-            _updateState();
-            bool res = await ArticleController(
-              model: tmpArticle,
-              userProvider: userProvider,
-            ).posVote();
-            debugPrint('좋아요 결과 ${res}');
-            if (!res) {
+            // 자신의 글에는 요청을 보내지 않고 미리 차단하기
+            if (_article.is_mine) {
+              showInfoBySnackBar(context, "본인 게시글이나 댓글에는 좋아요를 누를 수 없습니다.");
+              return;
+            }
+            // 다른 사람의 글인 경우
+            else {
+              // 원래의 상태를 보관하기 위해 임시 모델 생성
+              ArticleModel tmpArticle =
+                  ArticleModel.fromJson(_article.toJson());
               ArticleController(model: _article, userProvider: userProvider)
                   .setVote(true);
               _updateState();
+              bool res = await ArticleController(
+                model: tmpArticle,
+                userProvider: userProvider,
+              ).posVote();
+              debugPrint('좋아요 결과 ${res}');
+              if (!res) {
+                ArticleController(model: _article, userProvider: userProvider)
+                    .setVote(true);
+                _updateState();
+              }
             }
           },
           child: _buildVoteIcons(
@@ -787,22 +763,27 @@ class _PostViewPageState extends State<PostViewPage> {
         const SizedBox(width: 20),
         // 싫어요 버튼
         InkWell(
-          // API 요청 이전에 먼저 state를 변경한 뒤에 요청 결과에 따라 처리하기
+          // TODO: onTap 메서드 함수화하기
           onTap: () async {
-            // 원래의 상태를 보관하기 위해 임시 모델 생성
-            ArticleModel tmpArticle = ArticleModel.fromJson(_article.toJson());
-            ArticleController(model: _article, userProvider: userProvider)
-                .setVote(false);
-            _updateState();
-            bool res = await ArticleController(
-              model: tmpArticle,
-              userProvider: userProvider,
-            ).negVote();
-            debugPrint('싫어요 결과 ${res}');
-            if (!res) {
+            if (_article.is_mine) {
+              showInfoBySnackBar(context, "본인 게시글이나 댓글에는 좋아요를 누를 수 없습니다.");
+              return;
+            } else {
+              ArticleModel tmpArticle =
+                  ArticleModel.fromJson(_article.toJson());
               ArticleController(model: _article, userProvider: userProvider)
                   .setVote(false);
               _updateState();
+              bool res = await ArticleController(
+                model: tmpArticle,
+                userProvider: userProvider,
+              ).negVote();
+              debugPrint('싫어요 결과 ${res}');
+              if (!res) {
+                ArticleController(model: _article, userProvider: userProvider)
+                    .setVote(false);
+                _updateState();
+              }
             }
           },
           child: _buildVoteIcons(
@@ -913,11 +894,41 @@ class _PostViewPageState extends State<PostViewPage> {
             ),
             const SizedBox(width: 10),
             InkWell(
-              onTap: () async {
-                await ArticleController(
+              // TODO: onTap 함수화하기
+              onTap: () {
+                ArticleController(
                   model: _article,
                   userProvider: userProvider,
-                ).share();
+                ).share().then((_) {
+                  hideOldsAndShowAraSnackBar(
+                      context,
+                      buildAraSnackBar(context,
+                          duration: const Duration(seconds: 1),
+                          content: Row(
+                            children: [
+                              SvgPicture.asset(
+                                'assets/icons/close-1.svg',
+                                colorFilter: const ColorFilter.mode(
+                                    Colors.red, BlendMode.srcIn),
+                                width: 32,
+                                height: 32,
+                              ),
+                              const SizedBox(width: 8),
+                              const Flexible(
+                                child: Text(
+                                  "URL을 클립 보드에 복사했습니다.",
+                                  // 오버플로우 나면 다음줄로 넘어가도록 하기 위해
+                                  overflow: TextOverflow.visible,
+                                  style: TextStyle(
+                                    color: Colors.black,
+                                    fontWeight: FontWeight.w400,
+                                    fontSize: 15,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          )));
+                });
               },
               child: Container(
                 width: 64,
@@ -980,10 +991,11 @@ class _PostViewPageState extends State<PostViewPage> {
                                 Navigator.pop(context);
                               });
                             }
-                            // 차단에 실패할 경우 오류 메시지 출력
+                            // 차단에 실패할 경우 오류 메시지, 스낵바 출력
                             else {
-                              // TODO: 사용자 메시지 구현 필요
                               debugPrint("failed to block");
+                              Navigator.pop(context);
+                              showInfoBySnackBar(context, "차단에 실패했습니다.");
                             }
                           });
                         },
@@ -1355,29 +1367,34 @@ class _PostViewPageState extends State<PostViewPage> {
                           child: Row(
                             children: [
                               InkWell(
-                                // API 요청 이전에 먼저 state를 변경한 뒤에 요청 결과에 따라 처리하기
+                                // onTap 메서드 함수화하기
                                 onTap: () async {
-                                  // 원래 모델값을 저장하기 위해 임시 모델 생성
-                                  CommentNestedCommentListActionModel
-                                      tmpCurComment =
-                                      CommentNestedCommentListActionModel
-                                          .fromJson(curComment.toJson());
-                                  CommentController(
-                                          model: curComment,
-                                          userProvider: userProvider)
-                                      .setVote(true);
-                                  _updateState();
-                                  bool res = await CommentController(
-                                    model: tmpCurComment,
-                                    userProvider: userProvider,
-                                  ).posVote();
-                                  debugPrint('좋아요 결과 ${res}');
-                                  if (!res) {
+                                  if (curComment.is_mine) {
+                                    showInfoBySnackBar(context,
+                                        "본인 게시글이나 댓글에는 좋아요를 누를 수 없습니다.");
+                                    return;
+                                  } else {
+                                    CommentNestedCommentListActionModel
+                                        tmpCurComment =
+                                        CommentNestedCommentListActionModel
+                                            .fromJson(curComment.toJson());
                                     CommentController(
                                             model: curComment,
                                             userProvider: userProvider)
                                         .setVote(true);
                                     _updateState();
+                                    bool res = await CommentController(
+                                      model: tmpCurComment,
+                                      userProvider: userProvider,
+                                    ).posVote();
+                                    debugPrint('좋아요 결과 ${res}');
+                                    if (!res) {
+                                      CommentController(
+                                              model: curComment,
+                                              userProvider: userProvider)
+                                          .setVote(true);
+                                      _updateState();
+                                    }
                                   }
                                 },
                                 child: _buildVoteIcons(true, curComment.my_vote,
@@ -1398,27 +1415,34 @@ class _PostViewPageState extends State<PostViewPage> {
                               InkWell(
                                 // API 요청 이전에 먼저 state를 변경한 뒤에 요청 결과에 따라 처리하기
                                 onTap: () async {
-                                  // 원래 모델값을 저장하기 위해 임시 모델 생성
-                                  CommentNestedCommentListActionModel
-                                      tmpCurComment =
-                                      CommentNestedCommentListActionModel
-                                          .fromJson(curComment.toJson());
-                                  CommentController(
-                                          model: curComment,
-                                          userProvider: userProvider)
-                                      .setVote(false);
-                                  _updateState();
-                                  bool res = await CommentController(
-                                    model: tmpCurComment,
-                                    userProvider: userProvider,
-                                  ).negVote();
-                                  debugPrint('좋아요 결과 ${res}');
-                                  if (!res) {
+                                  // onTap 메서드 함수화하기
+                                  if (curComment.is_mine) {
+                                    showInfoBySnackBar(context,
+                                        "본인 게시글이나 댓글에는 좋아요를 누를 수 없습니다.");
+                                    return;
+                                  } else {
+                                    // 원래 모델값을 저장하기 위해 임시 모델 생성
+                                    CommentNestedCommentListActionModel
+                                        tmpCurComment =
+                                        CommentNestedCommentListActionModel
+                                            .fromJson(curComment.toJson());
                                     CommentController(
                                             model: curComment,
                                             userProvider: userProvider)
                                         .setVote(false);
                                     _updateState();
+                                    bool res = await CommentController(
+                                      model: tmpCurComment,
+                                      userProvider: userProvider,
+                                    ).negVote();
+                                    debugPrint('좋아요 결과 ${res}');
+                                    if (!res) {
+                                      CommentController(
+                                              model: curComment,
+                                              userProvider: userProvider)
+                                          .setVote(false);
+                                      _updateState();
+                                    }
                                   }
                                 },
                                 child: _buildVoteIcons(
@@ -1803,7 +1827,6 @@ class _PostViewPageState extends State<PostViewPage> {
       Uri.parse(url),
       mode: LaunchMode.externalApplication,
     )) {
-      // TODO: debugPrint 및 Toast message로 수정하기
       debugPrint('Could not launch $url');
       return false;
     }
