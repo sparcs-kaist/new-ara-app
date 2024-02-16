@@ -31,7 +31,6 @@ class _BulletinSearchPageState extends State<BulletinSearchPage> {
   bool _isLoadingNextPage = false;
   String _apiUrl = "";
   String _hintText = "";
-  String _searchWord = "";
   final ScrollController _scrollController = ScrollController();
   final FocusNode _focusNode = FocusNode();
   final TextEditingController _textEdtingController = TextEditingController();
@@ -102,8 +101,6 @@ class _BulletinSearchPageState extends State<BulletinSearchPage> {
     final UserProvider userProvider = context.read<UserProvider>();
     final Map<String, dynamic>? myMap = await userProvider
         .getApiRes("${_apiUrl}1&main_search__contains=$targetWord");
-    debugPrint(
-        "refreshPostList : myMap : ${myMap?["results"].length} {$targetWord}");
     if (mounted && targetWord == _textEdtingController.text) {
       setState(() {
         postPreviewList.clear();
@@ -126,7 +123,7 @@ class _BulletinSearchPageState extends State<BulletinSearchPage> {
   void _scrollListener() async {
     //스크롤 시 포커스 해제
     FocusScope.of(context).unfocus();
-    if (_searchWord == "") {
+    if (_textEdtingController.text == "") {
       if (mounted) {
         setState(() {
           postPreviewList.clear();
@@ -148,7 +145,7 @@ class _BulletinSearchPageState extends State<BulletinSearchPage> {
         _currentPage = _currentPage + 1;
         //TODO: 더 이상 불러올 게시물이 없을 때의 처리
         Map<String, dynamic>? myMap = await userProvider.getApiRes(
-            "$_apiUrl$_currentPage&main_search__contains=$_searchWord");
+            "$_apiUrl$_currentPage&main_search__contains=${_textEdtingController.text}");
         if (mounted) {
           setState(() {
             for (int i = 0; i < (myMap!["results"].length ?? 0); i++) {
@@ -223,15 +220,12 @@ class _BulletinSearchPageState extends State<BulletinSearchPage> {
                           controller: _textEdtingController,
                           onSubmitted: (String text) {
                             setState(() {
-                              _searchWord = text;
                               _isLoading = true;
                             });
                             refreshPostList(text);
                           },
                           onChanged: (String text) {
-                            setState(() {
-                              _searchWord = text;
-                            });
+                            debugPrint("onChanged : $text");
                             refreshPostList(text);
                           },
                           style: const TextStyle(
