@@ -5,10 +5,10 @@ const Duration _araSnackBarDisplayDuration = Duration(milliseconds: 2500);
 
 /// Ara 디자인에 맞는 SnackBar 위젯을 리턴하는 함수
 /// Ara 디자인에 맞게 커스텀되어야 하는 파라미터는 기본값으로 지정되어 있음. 상황에 따라 변경하여 적용도 가능.
-/// Overflow를 방지하기 위해 Flexible 활용하여 작성하는 것 추천
+/// Overflow를 방지하기 위해 Flexible 활용하여 작성하는 것 추천.
+/// 또한 여러 스낵바가 queued 되는 것을 방지하기 위해 기본 showSnackBar 대신 [hideOldsAndShowAraSnackBar] 사용 추천.
 /// ```
-/// ScaffoldMessenger.of(context)
-///                   .showSnackBar(buildAraSnackBar(context,
+/// hideOldsAndShowAraSnackBar(buildAraSnackBar(context,
 ///                       content: Row(
 ///                         children: [
 ///                           SvgPicture.asset(
