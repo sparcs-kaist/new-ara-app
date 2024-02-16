@@ -267,41 +267,7 @@ class _PostViewPageState extends State<PostViewPage> {
                                                     _article.url.toString())
                                                 .then((launchRes) {
                                               if (launchRes == false) {
-                                                ScaffoldMessenger.of(context)
-                                                    .showSnackBar(
-                                                        buildAraSnackBar(
-                                                            context,
-                                                            content: Row(
-                                                              children: [
-                                                                SvgPicture
-                                                                    .asset(
-                                                                  'assets/icons/information.svg',
-                                                                  colorFilter: const ColorFilter
-                                                                      .mode(
-                                                                      Colors
-                                                                          .red,
-                                                                      BlendMode
-                                                                          .srcIn),
-                                                                  width: 32,
-                                                                  height: 32,
-                                                                ),
-                                                                const SizedBox(
-                                                                    width: 8),
-                                                                const Text(
-                                                                  "브라우저로 URL을 열 수 없습니다.",
-                                                                  style:
-                                                                      TextStyle(
-                                                                    color: Colors
-                                                                        .black,
-                                                                    fontWeight:
-                                                                        FontWeight
-                                                                            .w400,
-                                                                    fontSize:
-                                                                        15,
-                                                                  ),
-                                                                ),
-                                                              ],
-                                                            )));
+                                                _showInfoBySnackBar('브라우저로 URL을 열 수 없습니다.');
                                               }
                                             });
                                           },
@@ -717,7 +683,7 @@ class _PostViewPageState extends State<PostViewPage> {
           onTap: () async {
             // 자신의 글에는 요청을 보내지 않고 미리 차단하기
             if (_article.is_mine) {
-              _showAraSnackBar();
+              _showInfoBySnackBar("본인 게시글이나 댓글에는 좋아요를 누를 수 없습니다.");
               return;
             }
             // 다른 사람의 글인 경우
@@ -747,7 +713,7 @@ class _PostViewPageState extends State<PostViewPage> {
           // TODO: onTap 메서드 함수화하기
           onTap: () {
             if (_article.is_mine) {
-              _showAraSnackBar();
+              _showInfoBySnackBar("본인 게시글이나 댓글에는 좋아요를 누를 수 없습니다.");
               return;
             } else {
               ArticleController(
@@ -962,10 +928,11 @@ class _PostViewPageState extends State<PostViewPage> {
                                 Navigator.pop(context);
                               });
                             }
-                            // 차단에 실패할 경우 오류 메시지 출력
+                            // 차단에 실패할 경우 오류 메시지, 스낵바 출력
                             else {
-                              // TODO: 사용자 메시지 구현 필요
                               debugPrint("failed to block");
+                              Navigator.pop(context);
+                              _showInfoBySnackBar("차단에 실패했습니다.");
                             }
                           });
                         },
@@ -1340,7 +1307,7 @@ class _PostViewPageState extends State<PostViewPage> {
                                 // onTap 메서드 함수화하기
                                 onTap: () {
                                   if (curComment.is_mine) {
-                                    _showAraSnackBar();
+                                    _showInfoBySnackBar("본인 게시글이나 댓글에는 좋아요를 누를 수 없습니다.");
                                     return;
                                   } else {
                                     CommentController(
@@ -1370,7 +1337,7 @@ class _PostViewPageState extends State<PostViewPage> {
                                 onTap: () async {
                                   // onTap 메서드 함수화하기
                                   if (curComment.is_mine) {
-                                    _showAraSnackBar();
+                                    _showInfoBySnackBar("본인 게시글이나 댓글에는 좋아요를 누를 수 없습니다.");
                                     return;
                                   } else {
                                     CommentController(
@@ -1634,8 +1601,8 @@ class _PostViewPageState extends State<PostViewPage> {
     );
   }
 
-  /// showSnackBar 함수가 자주 쓰여서 함수로 분리함.
-  void _showAraSnackBar() {
+  /// information.svg를 사용하는 SnackBar가 자주 쓰여서 함수화함.
+  void _showInfoBySnackBar(String infoText) {
     ScaffoldMessenger.of(context).showSnackBar(buildAraSnackBar(context,
         content: Row(
           children: [
@@ -1646,12 +1613,12 @@ class _PostViewPageState extends State<PostViewPage> {
               height: 32,
             ),
             const SizedBox(width: 8),
-            const Flexible(
+            Flexible(
               child: Text(
-                "본인 게시글이나 댓글에는 좋아요를 누를 수 없습니다!",
+                infoText,
                 // 오버플로우 나면 다음줄로 넘어가도록 하기 위해
                 overflow: TextOverflow.visible,
-                style: TextStyle(
+                style: const TextStyle(
                   color: Colors.black,
                   fontWeight: FontWeight.w400,
                   fontSize: 15,
