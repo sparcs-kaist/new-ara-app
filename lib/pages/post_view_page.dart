@@ -1434,7 +1434,8 @@ class _PostViewPageState extends State<PostViewPage> {
   /// _buildCommentListView에서 사용함.
   Widget _buildCommentContent(String content) {
     // HTML 태그가 존재하는지 검사 (완벽한 방법은 아님)
-    if (!content.contains('<')) {
+    // 아라 서버에 '<', '>'가 html 인코딩된 상태로 저장되어 <, > 대신 &lt, &gt 사용함
+    if (!(content.contains('&lt') && content.contains('&gt'))) {
       return Text(
         content,
         style: const TextStyle(
