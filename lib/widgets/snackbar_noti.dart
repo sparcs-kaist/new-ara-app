@@ -80,9 +80,18 @@ SnackBar buildAraSnackBar(context,
   );
 }
 
+/// 기존에 존재하는 스낵바로 인해 새로 호출한 스낵바가 queued되었다가 나중에 표시되는 현상을 방지하기 위해 사용.
+/// 새로운 스낵바 표시 전에 기존의 스낵바를 모두 숨김처리함.
+ScaffoldFeatureController<SnackBar, SnackBarClosedReason> hideOldsAndShowAraSnackBar(context, SnackBar araSnackBar) {
+  ScaffoldMessenger.of(context).hideCurrentSnackBar();
+  return ScaffoldMessenger.of(context).showSnackBar(araSnackBar);
+}
+
 /// information.svg와 함께 동일한 위젯 구성을 가진 SnackBar가 자주 사용되어
 /// infoText만 전달하면 반복적으로 생성이 가능하도록 함수화함.
 void showInfoBySnackBar(BuildContext context, String infoText) {
+  // 이전에 존재하던 스낵바 제거
+  ScaffoldMessenger.of(context).hideCurrentSnackBar();
   ScaffoldMessenger.of(context).showSnackBar(buildAraSnackBar(context,
       content: Row(
         children: [
