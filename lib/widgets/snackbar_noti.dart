@@ -80,7 +80,8 @@ SnackBar buildAraSnackBar(context,
   );
 }
 
-/// information.svg를 사용하는 SnackBar가 자주 쓰여서 함수화함.
+/// information.svg와 함께 동일한 위젯 구성을 가진 SnackBar가 자주 사용되어
+/// infoText만 전달하면 반복적으로 생성이 가능하도록 함수화함.
 void showInfoBySnackBar(BuildContext context, String infoText) {
   ScaffoldMessenger.of(context).showSnackBar(buildAraSnackBar(context,
       content: Row(
