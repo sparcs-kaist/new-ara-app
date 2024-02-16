@@ -309,45 +309,83 @@ class _BulletinSearchPageState extends State<BulletinSearchPage> {
               child: Center(
                 child: SizedBox(
                   width: MediaQuery.of(context).size.width - 18,
-                  child: ListView.builder(
-                    controller: _scrollController,
-                    itemCount: postPreviewList.length +
-                        (_isLoadingNextPage ? 1 : 0), // 아이템 개수
-                    itemBuilder: (BuildContext context, int index) {
-                      // 각 아이템을 위한 위젯 생성
-
-                      // 숨겨진 게시물이면 일단 표현 안하는 걸로 함.
-                      if (_isLoadingNextPage &&
-                          index == postPreviewList.length) {
-                        return const SizedBox(
-                          height: 63,
+                  child: Column(
+                    children: [
+                      
+                      // 검색어가 없을 때와 검색 결과가 없을 때의 처리
+                      if (_textEdtingController.text == "" &&
+                          postPreviewList.isEmpty)
+                        const SizedBox(
+                          height: 100,
                           child: Center(
-                            child: LoadingIndicator(),
+                            child: Text(
+                              "검색어를 입력해주세요.",
+                              style: TextStyle(
+                                  color: Colors.black,
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w500),
+                            ),
                           ),
-                        );
-                      }
-                      return postPreviewList[index].is_hidden
-                          ? Container()
-                          : InkWell(
-                              onTap: () {
-                                Navigator.of(context).push(slideRoute(
-                                    PostViewPage(
-                                        id: postPreviewList[index].id)));
-                              },
-                              child: Column(
-                                children: [
-                                  Padding(
-                                    padding: const EdgeInsets.all(11.0),
-                                    child: PostPreview(
-                                        model: postPreviewList[index]),
-                                  ),
-                                  Container(
-                                    height: 1,
-                                    color: const Color(0xFFF0F0F0),
-                                  ),
-                                ],
-                              ));
-                    },
+                        ),
+                      // 검색어가 있는데 검색 결과가 없을 때의 처리
+                      if (_textEdtingController.text != "" &&
+                          postPreviewList.isEmpty)
+                        const SizedBox(
+                          height: 100,
+                          child: Center(
+                            child: Text(
+                              "검색 결과가 없습니다.",
+                              style: TextStyle(
+                                  color: ColorsInfo.newara,
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w500),
+                            ),
+                          ),
+                        ),
+
+                      Expanded(
+                        child: ListView.builder(
+                          controller: _scrollController,
+                          itemCount: postPreviewList.length +
+                              (_isLoadingNextPage ? 1 : 0), // 아이템 개수
+                          itemBuilder: (BuildContext context, int index) {
+                            // 각 아이템을 위한 위젯 생성
+
+                            // 숨겨진 게시물이면 일단 표현 안하는 걸로 함.
+                            if (_isLoadingNextPage &&
+                                index == postPreviewList.length) {
+                              return const SizedBox(
+                                height: 63,
+                                child: Center(
+                                  child: LoadingIndicator(),
+                                ),
+                              );
+                            }
+                            return postPreviewList[index].is_hidden
+                                ? Container()
+                                : InkWell(
+                                    onTap: () {
+                                      Navigator.of(context).push(slideRoute(
+                                          PostViewPage(
+                                              id: postPreviewList[index].id)));
+                                    },
+                                    child: Column(
+                                      children: [
+                                        Padding(
+                                          padding: const EdgeInsets.all(11.0),
+                                          child: PostPreview(
+                                              model: postPreviewList[index]),
+                                        ),
+                                        Container(
+                                          height: 1,
+                                          color: const Color(0xFFF0F0F0),
+                                        ),
+                                      ],
+                                    ));
+                          },
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ),
