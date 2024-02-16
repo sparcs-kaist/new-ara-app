@@ -3,6 +3,7 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:new_ara_app/widgets/snackbar_noti.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
@@ -442,7 +443,11 @@ class _ReportDialogWidgetState extends State<ReportDialogWidget> {
                   onTap: () async {
                     postReport().then((res) {
                       debugPrint("신고가 ${res ? '성공' : '실패'}하였습니다.");
-                      if (res) Navigator.pop(context);
+                      Navigator.pop(context);
+                      // TODO: postApiRes의 response를 가져와서 신고에 실패한 경우
+                      // e.response가 null이 아닐 경우에는 실패 사유도 출력하도록 변경하기
+                      // 우선은 신고가 실패하면 무조건 '이미 신고한 게시물입니다'로 나오도록 함. (2023.02.16)
+                      showInfoBySnackBar(context, res ? '해당 게시글을 신고했습니다.' : '이미 신고한 게시물입니다.');
                     });
                   },
                   child: Container(
