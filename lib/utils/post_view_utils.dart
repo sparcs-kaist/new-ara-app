@@ -42,7 +42,6 @@ class ArticleController {
       );
       if (postRes.statusCode != 200) return false;
     }
-    setVote(true);
     return true;
   }
 
@@ -62,7 +61,6 @@ class ArticleController {
       );
       if (postRes.statusCode != 200) return false;
     }
-    setVote(false);
     return true;
   }
 
