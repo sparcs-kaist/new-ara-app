@@ -189,27 +189,28 @@ class OthersPopupMenuButton extends StatelessWidget {
         height: 20,
       ),
       itemBuilder: (BuildContext context) => [
-        PopupMenuItem<String>(
-          value: 'Chat',
-          child: Row(
-            children: [
-              SvgPicture.asset(
-                'assets/icons/chat.svg',
-                width: 20,
-                height: 20,
-                color: const Color.fromRGBO(51, 51, 51, 1),
-              ),
-              const SizedBox(width: 10),
-              const Text(
-                '채팅',
-                style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w700,
-                    color: Color.fromRGBO(51, 51, 51, 1)),
-              ),
-            ],
-          ),
-        ),
+        // TODO: 채팅 기능 지원될 시에 사용하기
+        // PopupMenuItem<String>(
+        //   value: 'Chat',
+        //   child: Row(
+        //     children: [
+        //       SvgPicture.asset(
+        //         'assets/icons/chat.svg',
+        //         width: 20,
+        //         height: 20,
+        //         color: const Color.fromRGBO(51, 51, 51, 1),
+        //       ),
+        //       const SizedBox(width: 10),
+        //       const Text(
+        //         '채팅',
+        //         style: TextStyle(
+        //             fontSize: 16,
+        //             fontWeight: FontWeight.w700,
+        //             color: Color.fromRGBO(51, 51, 51, 1)),
+        //       ),
+        //     ],
+        //   ),
+        // ),
         PopupMenuItem<String>(
           value: 'Report',
           child: Row(
@@ -235,9 +236,9 @@ class OthersPopupMenuButton extends StatelessWidget {
       ],
       onSelected: (String result) {
         switch (result) {
-          case 'Chat':
-            // (2023.08.01) 채팅 기능은 추후에 구현 예정이기 때문에 아직은 Placeholder
-            break;
+          // case 'Chat':
+          //   // (2023.08.01) 채팅 기능은 추후에 구현 예정이기 때문에 아직은 Placeholder
+          //   break;
           case 'Report':
             showDialog(
                 context: context,

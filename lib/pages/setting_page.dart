@@ -52,7 +52,7 @@ class SettingPageState extends State<SettingPage> {
   Widget build(BuildContext context) {
     var userProvider = context.watch<UserProvider>();
 
-    Dio dio = userProvider.createDioWithHeaders();
+    Dio dio = userProvider.createDioWithHeadersForNonget();
 
     return Scaffold(
       appBar: AppBar(
@@ -211,36 +211,36 @@ class SettingPageState extends State<SettingPage> {
                   ),
                 ),
                 const SizedBox(height: 24),
-                // 알림 아이콘 및 '알림' 텍스트
-                SizedBox(
-                  width: MediaQuery.of(context).size.width - 50,
-                  child: Row(
-                    children: [
-                      SvgPicture.asset(
-                        'assets/icons/notification.svg',
-                        width: 34,
-                        height: 34,
-                      ),
-                      Text(
-                        'setting_page.noti'.tr(),
-                        style: const TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.w700,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 7),
-                // 댓글, 대댓글 설정 UI의 border 설정
-                BorderBoxes(94, switchItems[1]),
-                const SizedBox(height: 10),
-                // 인기글 관련 설정 UI의 border 설정
-                BorderBoxes(94, switchItems[2]),
-                const SizedBox(height: 5),
-                // 인기 공지글 제공 시간 문구
-                TextInfo('setting_page.hot_info'.tr()),
-                const SizedBox(height: 10),
+                // // 알림 아이콘 및 '알림' 텍스트
+                // SizedBox(
+                //   width: MediaQuery.of(context).size.width - 50,
+                //   child: Row(
+                //     children: [
+                //       SvgPicture.asset(
+                //         'assets/icons/notification.svg',
+                //         width: 34,
+                //         height: 34,
+                //       ),
+                //       Text(
+                //         'setting_page.noti'.tr(),
+                //         style: const TextStyle(
+                //           fontSize: 18,
+                //           fontWeight: FontWeight.w700,
+                //         ),
+                //       ),
+                //     ],
+                //   ),
+                // ),
+                // const SizedBox(height: 7),
+                // // 댓글, 대댓글 설정 UI의 border 설정
+                // BorderBoxes(94, switchItems[1]),
+                // const SizedBox(height: 10),
+                // // 인기글 관련 설정 UI의 border 설정
+                // BorderBoxes(94, switchItems[2]),
+                // const SizedBox(height: 5),
+                // // 인기 공지글 제공 시간 문구
+                // TextInfo('setting_page.hot_info'.tr()),
+                // const SizedBox(height: 10),
                 // 차단 아이콘, '차단' 텍스트
                 SizedBox(
                   width: MediaQuery.of(context).size.width - 50,
@@ -301,7 +301,7 @@ class SettingPageState extends State<SettingPage> {
                 ),
                 const SizedBox(height: 5),
                 // 유저 차단 기능 설명 문구
-                TextInfo('setting_page.block_howto'.tr()),
+                TextInfo('유저 차단은 게시글의 더보기 기능에서 하실 수 있습니다.\n하루에 최대 10번만 변경 가능합니다.'),
                 const SizedBox(height: 20),
                 // 로그아웃 버튼 UI (border도 포함)
                 Container(
@@ -315,7 +315,7 @@ class SettingPageState extends State<SettingPage> {
                   ),
                   child: SizedBox(
                     width: MediaQuery.of(context).size.width - 60,
-                    child: GestureDetector(
+                    child: InkWell(
                       onTap: () => _logout(),
                       child: const Center(
                         child: Text(

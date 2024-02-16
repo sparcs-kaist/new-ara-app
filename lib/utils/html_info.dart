@@ -17,6 +17,7 @@ String getContentHtml(String content, {double? width}) {
       .replaceAll('</h8>', '</u>');
 
   return '''
+  <!DOCTYPE html>
   <html>
     <head>
       <meta name="viewport" content="width=device-width initial-scale=1.0">

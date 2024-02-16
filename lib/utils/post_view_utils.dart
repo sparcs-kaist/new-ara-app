@@ -36,14 +36,13 @@ class ArticleController {
       var cancelRes = await userProvider.postApiRes(
         "articles/$id/vote_cancel/",
       );
-      if (cancelRes.statusCode != 200) return false;
+      if (cancelRes == null || cancelRes.statusCode != 200) return false;
     } else {
       var postRes = await userProvider.postApiRes(
         "articles/$id/vote_positive/",
       );
-      if (postRes.statusCode != 200) return false;
+      if (postRes == null || postRes.statusCode != 200) return false;
     }
-    _setVote(true);
     return true;
   }
 
@@ -56,21 +55,20 @@ class ArticleController {
       var cancelRes = await userProvider.postApiRes(
         "articles/$id/vote_cancel/",
       );
-      if (cancelRes.statusCode != 200) return false;
+      if (cancelRes == null || cancelRes.statusCode != 200) return false;
     } else {
       var postRes = await userProvider.postApiRes(
         "articles/$id/vote_negative/",
       );
-      if (postRes.statusCode != 200) return false;
+      if (postRes == null || postRes.statusCode != 200) return false;
     }
-    _setVote(false);
     return true;
   }
 
   /// 멤버 변수 model 내부의
   /// 좋아요, 싫어요 상태를 [value]에 맞게 한번에 업데이트.
   /// value: true = 좋아요, false = 싫어요
-  void _setVote(bool value) {
+  void setVote(bool value) {
     /* positive_vote_count, negative_vote_count 모두 int?
        타입이므로 null일 경우 0으로 초기화함. */
     model.positive_vote_count ??= 0;
@@ -125,7 +123,7 @@ class ArticleController {
   Future<bool> delete() async {
     String apiUrl = "$newAraDefaultUrl/api/articles/${model.id}/";
     try {
-      await userProvider.createDioWithHeaders().delete(apiUrl);
+      await userProvider.createDioWithHeadersForNonget().delete(apiUrl);
       return true;
     } on DioException catch (e) {
       debugPrint("DioException occurred");
@@ -157,7 +155,7 @@ class ArticleController {
     int userID = model.created_by.id;
 
     try {
-      await userProvider.createDioWithHeaders().post(
+      await userProvider.createDioWithHeadersForNonget().post(
         apiUrl,
         data: block ? {'user': userID} : {'blocked': userID}
       );
@@ -244,7 +242,7 @@ class FileController {
   /// 다운로드가 성공하면 true, 그렇지 않으면 false 리턴.
   Future<bool> _downloadFile(String uri, String totalPath) async {
     try {
-      await userProvider.createDioWithHeaders().download(uri, totalPath);
+      await userProvider.createDioWithHeadersForNonget().download(uri, totalPath);
     } catch (error) {
       return false;
     }
@@ -269,14 +267,13 @@ class CommentController {
       var cancelRes = await userProvider.postApiRes(
         "comments/$id/vote_cancel/",
       );
-      if (cancelRes.statusCode != 200) return false;
+      if (cancelRes == null || cancelRes.statusCode != 200) return false;
     } else {
       var postRes = await userProvider.postApiRes(
         "comments/$id/vote_positive/",
       );
-      if (postRes.statusCode != 200) return false;
+      if (postRes == null || postRes.statusCode != 200) return false;
     }
-    setVote(true);
     return true;
   }
 
@@ -288,14 +285,13 @@ class CommentController {
       var cancelRes = await userProvider.postApiRes(
         "comments/$id/vote_cancel/",
       );
-      if (cancelRes.statusCode != 200) return false;
+      if (cancelRes == null || cancelRes.statusCode != 200) return false;
     } else {
       var postRes = await userProvider.postApiRes(
         "comments/$id/vote_negative/",
       );
-      if (postRes.statusCode != 200) return false;
+      if (postRes == null || postRes.statusCode != 200) return false;
     }
-    setVote(false);
     return true;
   }
 

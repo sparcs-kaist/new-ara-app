@@ -28,6 +28,8 @@ import 'package:new_ara_app/utils/profile_image.dart';
 import 'package:new_ara_app/utils/handle_hidden.dart';
 import 'package:new_ara_app/widgets/snackbar_noti.dart';
 
+// TODO: Dio 사용방식 createDioWithHeaders~ 로 변경하기
+
 /// 하나의 post에 대한 내용 뷰, 이벤트 처리를 모두 담당하는 StatefulWidget.
 class PostViewPage extends StatefulWidget {
   /// 보여주고 싶은 대상 post의 id.
@@ -131,7 +133,8 @@ class _PostViewPageState extends State<PostViewPage> {
     if (override_hidden) apiUrl += "/?override_hidden=true";
 
     try {
-      var response = await userProvider.createDioWithHeaders().get(apiUrl);
+      var response =
+          await userProvider.createDioWithHeadersForGet().get(apiUrl);
       articleJson = response.data;
     } on DioException catch (e) {
       debugPrint("DioException occurred");
@@ -211,14 +214,35 @@ class _PostViewPageState extends State<PostViewPage> {
         Scaffold(
             backgroundColor: Colors.white,
             appBar: AppBar(
-              leading: IconButton(
-                color: ColorsInfo.newara,
-                icon: SvgPicture.asset('assets/icons/left_chevron.svg',
-                    colorFilter: const ColorFilter.mode(
-                        ColorsInfo.newara, BlendMode.srcIn),
-                    width: 35,
-                    height: 35),
-                onPressed: () => Navigator.pop(context),
+              centerTitle: true,
+              leadingWidth: 200,
+              leading: GestureDetector(
+                behavior: HitTestBehavior.translucent,
+                onTap: () => Navigator.pop(context),
+                child: Stack(
+                  alignment: Alignment.centerLeft,
+                  children: [
+                    SvgPicture.asset(
+                      'assets/icons/left_chevron.svg',
+                      colorFilter: const ColorFilter.mode(
+                          ColorsInfo.newara, BlendMode.srcATop),
+                      fit: BoxFit.fill,
+                      width: 35,
+                      height: 35,
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.only(left: 29),
+                      child: Text(
+                        _isPageLoaded ? _article.parent_board.ko_name : "",
+                        style: const TextStyle(
+                          color: Color(0xFFED3A3A),
+                          fontSize: 17,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
             body: _isPageLoaded
@@ -517,13 +541,30 @@ class _PostViewPageState extends State<PostViewPage> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          getTitle(_article.title, _article.is_hidden, _article.why_hidden),
-          style: const TextStyle(
-            fontSize: 18,
-            fontWeight: FontWeight.w700,
+        Text.rich(
+          TextSpan(
+            children: [
+              if (_article.parent_topic != null)
+                TextSpan(
+                  text: "[${_article.parent_topic!.ko_name}] ",
+                  style: const TextStyle(
+                    color: Color(0xFFED3A3A),
+                    fontWeight: FontWeight.w700,
+                    fontSize: 18,
+                  ),
+                ),
+              TextSpan(
+                text: getTitle(
+                    _article.title, _article.is_hidden, _article.why_hidden),
+                style: const TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+            ],
           ),
         ),
+
         const SizedBox(height: 5),
         // 날짜, 조회수, 좋아요, 싫어요, 댓글 수를 표시하는 Row
         Row(
@@ -689,11 +730,22 @@ class _PostViewPageState extends State<PostViewPage> {
             }
             // 다른 사람의 글인 경우
             else {
+              // 원래의 상태를 보관하기 위해 임시 모델 생성
+              ArticleModel tmpArticle =
+                  ArticleModel.fromJson(_article.toJson());
+              ArticleController(model: _article, userProvider: userProvider)
+                  .setVote(true);
+              _updateState();
               bool res = await ArticleController(
-                model: _article,
+                model: tmpArticle,
                 userProvider: userProvider,
               ).posVote();
-              if (res) _updateState();
+              debugPrint('좋아요 결과 ${res}');
+              if (!res) {
+                ArticleController(model: _article, userProvider: userProvider)
+                    .setVote(true);
+                _updateState();
+              }
             }
           },
           child: _buildVoteIcons(
@@ -712,17 +764,26 @@ class _PostViewPageState extends State<PostViewPage> {
         // 싫어요 버튼
         InkWell(
           // TODO: onTap 메서드 함수화하기
-          onTap: () {
+          onTap: () async {
             if (_article.is_mine) {
               showInfoBySnackBar(context, "본인 게시글이나 댓글에는 좋아요를 누를 수 없습니다.");
               return;
             } else {
-              ArticleController(
-                model: _article,
+              ArticleModel tmpArticle =
+                  ArticleModel.fromJson(_article.toJson());
+              ArticleController(model: _article, userProvider: userProvider)
+                  .setVote(false);
+              _updateState();
+              bool res = await ArticleController(
+                model: tmpArticle,
                 userProvider: userProvider,
-              ).negVote().then((result) {
-                if (result) _updateState();
-              });
+              ).negVote();
+              debugPrint('싫어요 결과 ${res}');
+              if (!res) {
+                ArticleController(model: _article, userProvider: userProvider)
+                    .setVote(false);
+                _updateState();
+              }
             }
           },
           child: _buildVoteIcons(
@@ -1307,18 +1368,33 @@ class _PostViewPageState extends State<PostViewPage> {
                             children: [
                               InkWell(
                                 // onTap 메서드 함수화하기
-                                onTap: () {
+                                onTap: () async {
                                   if (curComment.is_mine) {
                                     showInfoBySnackBar(context,
                                         "본인 게시글이나 댓글에는 좋아요를 누를 수 없습니다.");
                                     return;
                                   } else {
+                                    CommentNestedCommentListActionModel
+                                        tmpCurComment =
+                                        CommentNestedCommentListActionModel
+                                            .fromJson(curComment.toJson());
                                     CommentController(
-                                      model: curComment,
+                                            model: curComment,
+                                            userProvider: userProvider)
+                                        .setVote(true);
+                                    _updateState();
+                                    bool res = await CommentController(
+                                      model: tmpCurComment,
                                       userProvider: userProvider,
-                                    ).posVote().then((result) {
-                                      if (result) _updateState();
-                                    });
+                                    ).posVote();
+                                    debugPrint('좋아요 결과 ${res}');
+                                    if (!res) {
+                                      CommentController(
+                                              model: curComment,
+                                              userProvider: userProvider)
+                                          .setVote(true);
+                                      _updateState();
+                                    }
                                   }
                                 },
                                 child: _buildVoteIcons(true, curComment.my_vote,
@@ -1337,6 +1413,7 @@ class _PostViewPageState extends State<PostViewPage> {
                               ),
                               const SizedBox(width: 12),
                               InkWell(
+                                // API 요청 이전에 먼저 state를 변경한 뒤에 요청 결과에 따라 처리하기
                                 onTap: () async {
                                   // onTap 메서드 함수화하기
                                   if (curComment.is_mine) {
@@ -1344,12 +1421,28 @@ class _PostViewPageState extends State<PostViewPage> {
                                         "본인 게시글이나 댓글에는 좋아요를 누를 수 없습니다.");
                                     return;
                                   } else {
+                                    // 원래 모델값을 저장하기 위해 임시 모델 생성
+                                    CommentNestedCommentListActionModel
+                                        tmpCurComment =
+                                        CommentNestedCommentListActionModel
+                                            .fromJson(curComment.toJson());
                                     CommentController(
-                                      model: curComment,
+                                            model: curComment,
+                                            userProvider: userProvider)
+                                        .setVote(false);
+                                    _updateState();
+                                    bool res = await CommentController(
+                                      model: tmpCurComment,
                                       userProvider: userProvider,
-                                    ).negVote().then((result) {
-                                      if (result) _updateState();
-                                    });
+                                    ).negVote();
+                                    debugPrint('좋아요 결과 ${res}');
+                                    if (!res) {
+                                      CommentController(
+                                              model: curComment,
+                                              userProvider: userProvider)
+                                          .setVote(false);
+                                      _updateState();
+                                    }
                                   }
                                 },
                                 child: _buildVoteIcons(

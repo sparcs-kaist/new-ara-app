@@ -15,7 +15,7 @@ import 'package:new_ara_app/pages/post_view_page.dart';
 import 'package:new_ara_app/utils/slide_routing.dart';
 import 'package:new_ara_app/providers/notification_provider.dart';
 
-/// PostListShowPage는 게시판 목록를 나타내는 위젯.
+/// PostListShowPage는 게시물 목록를 나타내는 위젯.
 /// boardType에 따라 게시판의 종류를 판별하고, 특성화 된 위젯들을 활성화 비활성화 되도록 설계.
 /// 모든 게시물 목록 형태가 유사하기에 최대한 코드를 재할용.
 class PostListShowPage extends StatefulWidget {
@@ -167,9 +167,11 @@ class _PostListShowPageState extends State<PostListShowPage> {
       appBar: AppBar(
         centerTitle: true,
         leadingWidth: 100,
-        leading: InkWell(
+        leading: GestureDetector(
+          behavior: HitTestBehavior.translucent,
           onTap: () => Navigator.pop(context),
-          child: Row(
+          child: Stack(
+            alignment: Alignment.centerLeft,
             children: [
               SvgPicture.asset(
                 'assets/icons/left_chevron.svg',
@@ -179,12 +181,15 @@ class _PostListShowPageState extends State<PostListShowPage> {
                 width: 35,
                 height: 35,
               ),
-              const Text(
-                "게시판",
-                style: TextStyle(
-                  color: Color(0xFFED3A3A),
-                  fontSize: 17,
-                  fontWeight: FontWeight.w500,
+              const Padding(
+                padding: EdgeInsets.only(left: 29),
+                child: Text(
+                  "게시판",
+                  style: TextStyle(
+                    color: Color(0xFFED3A3A),
+                    fontSize: 17,
+                    fontWeight: FontWeight.w500,
+                  ),
                 ),
               ),
             ],
@@ -228,8 +233,9 @@ class _PostListShowPageState extends State<PostListShowPage> {
           children: [
             FloatingActionButton(
               onPressed: () async {
-                await Navigator.of(context)
-                    .push(slideRoute(PostWritePage(previousBoard: widget.boardInfo,)));
+                await Navigator.of(context).push(slideRoute(PostWritePage(
+                  previousBoard: widget.boardInfo,
+                )));
                 updateAllBulletinList();
                 debugPrint('FloatingActionButton pressed');
               },
@@ -257,46 +263,52 @@ class _PostListShowPageState extends State<PostListShowPage> {
               child: Center(
                 child: SizedBox(
                   width: MediaQuery.of(context).size.width - 18,
-                  child: ListView.separated(
-                    controller: _scrollController,
-                    itemCount: postPreviewList.length +
-                        (_isLoadingNextPage ? 1 : 0), // 아이템 개수
-                    itemBuilder: (BuildContext context, int index) {
-                      // 각 아이템을 위한 위젯 생성
-                      if (_isLoadingNextPage &&
-                          index == postPreviewList.length) {
-                        return const SizedBox(
-                          height: 50,
-                          child: Center(
-                            child: LoadingIndicator(),
-                          ),
-                        );
-                      } else {
-                        // 숨겨진 게시물이면 일단 표현 안하는 걸로 함.
-                        return InkWell(
-                          onTap: () async {
-                            await Navigator.of(context).push(slideRoute(
-                                PostViewPage(id: postPreviewList[index].id)));
-                            updateAllBulletinList();
-                          },
-                          child: Column(
-                            children: [
-                              Padding(
-                                padding: const EdgeInsets.all(11.0),
-                                child:
-                                    PostPreview(model: postPreviewList[index]),
-                              ),
-                            ],
-                          ),
-                        );
-                      }
+                  child: RefreshIndicator.adaptive(
+                    color: ColorsInfo.newara,
+                    onRefresh: () async {
+                      setState((() => isLoading = true));
+                      await updateAllBulletinList();
                     },
-                    separatorBuilder: (BuildContext context, int index) {
-                      return Container(
-                        height: 1,
-                        color: const Color(0xFFF0F0F0),
-                      );
-                    },
+                    child: ListView.separated(
+                      controller: _scrollController,
+                      itemCount: postPreviewList.length +
+                          (_isLoadingNextPage ? 1 : 0), // 아이템 개수
+                      itemBuilder: (BuildContext context, int index) {
+                        // 각 아이템을 위한 위젯 생성
+                        if (_isLoadingNextPage &&
+                            index == postPreviewList.length) {
+                          return const SizedBox(
+                            height: 50,
+                            child: Center(
+                              child: LoadingIndicator(),
+                            ),
+                          );
+                        } else {
+                          return InkWell(
+                            onTap: () async {
+                              await Navigator.of(context).push(slideRoute(
+                                  PostViewPage(id: postPreviewList[index].id)));
+                              updateAllBulletinList();
+                            },
+                            child: Column(
+                              children: [
+                                Padding(
+                                  padding: const EdgeInsets.all(11.0),
+                                  child: PostPreview(
+                                      model: postPreviewList[index]),
+                                ),
+                              ],
+                            ),
+                          );
+                        }
+                      },
+                      separatorBuilder: (BuildContext context, int index) {
+                        return Container(
+                          height: 1,
+                          color: const Color(0xFFF0F0F0),
+                        );
+                      },
+                    ),
                   ),
                 ),
               ),

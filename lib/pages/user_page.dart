@@ -323,6 +323,7 @@ class _UserPageState extends State<UserPage>
             width: 26,
             height: 21,
             child: GestureDetector(
+              behavior: HitTestBehavior.translucent,
               onTap: () async {
                 await Navigator.push(
                   context,
@@ -412,7 +413,9 @@ class _UserPageState extends State<UserPage>
                 curPage[tabType.index] = newMaxPage;
                 setCurCount(tabType);
               },
-              child: SizedBox(height: 62, child: PostPreview(model: curPost)));
+              child: Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 11),
+                  child: PostPreview(model: curPost)));
         },
         separatorBuilder: (context, index) {
           return Container(
@@ -529,7 +532,7 @@ class _UserPageState extends State<UserPage>
 
     try {
       var response = await userProvider
-          .createDioWithHeaders()
+          .createDioWithHeadersForGet()
           .get('$newAraDefaultUrl$apiUrl');
 
       List<dynamic> rawPostList = response.data['results'];
