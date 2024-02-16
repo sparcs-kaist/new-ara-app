@@ -457,7 +457,7 @@ class _BlockedUserDialogState extends State<BlockedUserDialog> {
                                     size: const Size.fromRadius(20),
                                     child: Image.network(
                                       fit: BoxFit.cover,
-                                      blockedUser.user.profile.nickname ??
+                                      blockedUser.user.profile.picture ??
                                           "null",
                                       // 정상적인 이미지 로드에 실패했을 경우
                                       // warning 아이콘 표시하기
