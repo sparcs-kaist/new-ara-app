@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
-const Duration _araSnackBarDisplayDuration = Duration(seconds: 3);
+const Duration _araSnackBarDisplayDuration = Duration(milliseconds: 2500);
 
 /// Ara 디자인에 맞는 SnackBar 위젯을 리턴하는 함수
 /// Ara 디자인에 맞게 커스텀되어야 하는 파라미터는 기본값으로 지정되어 있음. 상황에 따라 변경하여 적용도 가능.
