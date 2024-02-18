@@ -387,7 +387,9 @@ class _BulletinSearchPageState extends State<BulletinSearchPage> {
     );
   }
 }
-
+/// 디바운싱 기능을 구현한 클래스
+/// 
+/// 검색창에 글씨 입력과 같이 빠르게 연속되는 이벤트들 사이에서 중복 반응을 방지하기 위해 사용되었음
 class Debouncer {
   final int milliseconds;
   VoidCallback? action;
