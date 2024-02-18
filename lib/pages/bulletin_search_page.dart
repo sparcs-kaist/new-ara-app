@@ -347,9 +347,6 @@ class _BulletinSearchPageState extends State<BulletinSearchPage> {
                           itemCount: postPreviewList.length +
                               (_isLoadingNextPage ? 1 : 0), // 아이템 개수
                           itemBuilder: (BuildContext context, int index) {
-                            // 각 아이템을 위한 위젯 생성
-
-                            // 숨겨진 게시물이면 일단 표현 안하는 걸로 함.
                             if (_isLoadingNextPage &&
                                 index == postPreviewList.length) {
                               return const SizedBox(
@@ -359,27 +356,26 @@ class _BulletinSearchPageState extends State<BulletinSearchPage> {
                                 ),
                               );
                             }
-                            return postPreviewList[index].is_hidden
-                                ? Container()
-                                : InkWell(
-                                    onTap: () {
-                                      Navigator.of(context).push(slideRoute(
-                                          PostViewPage(
-                                              id: postPreviewList[index].id)));
-                                    },
-                                    child: Column(
-                                      children: [
-                                        Padding(
-                                          padding: const EdgeInsets.all(11.0),
-                                          child: PostPreview(
-                                              model: postPreviewList[index]),
-                                        ),
-                                        Container(
-                                          height: 1,
-                                          color: const Color(0xFFF0F0F0),
-                                        ),
-                                      ],
-                                    ));
+                            return InkWell(
+                              onTap: () {
+                                Navigator.of(context).push(slideRoute(
+                                    PostViewPage(
+                                        id: postPreviewList[index].id)));
+                              },
+                              child: Column(
+                                children: [
+                                  Padding(
+                                    padding: const EdgeInsets.all(11.0),
+                                    child: PostPreview(
+                                        model: postPreviewList[index]),
+                                  ),
+                                  Container(
+                                    height: 1,
+                                    color: const Color(0xFFF0F0F0),
+                                  ),
+                                ],
+                              ),
+                            );
                           },
                         ),
                       ),
