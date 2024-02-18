@@ -704,7 +704,7 @@ class _MainPageState extends State<MainPage> {
                 child: Row(
                   children: [
                     const Text(
-                      "뉴아라",
+                      "Ara 운영진",
                       style: TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.w700,
