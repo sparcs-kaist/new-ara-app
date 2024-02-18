@@ -715,25 +715,32 @@ class _PostWritePageState extends State<PostWritePage>
             child: Row(
               children: [
                 const SizedBox(
-                  width: 7,
+                  width: 15,
                 ),
-                InkWell(
-                  onTap: () async {
-                    FocusScope.of(context).unfocus();
-                    bool picktf = await _pickFile();
-                    if (!mounted) return;
-                    if (picktf) {
+                Builder(
+                  builder: (BuildContext context) {
+                    if (_chosenBoardValue == _defaultBoardDetailActionModel) {
+                      return const Text(
+                        "게시판을 선택해주세요.",
+                        style: TextStyle(
+                          fontSize: 16,
+                          height: 24 / 16,
+                          fontWeight: FontWeight.w500,
+                          color: Color(0xFFBBBBBB),
+                        ),
+                      );
                     } else {
-                      _editorFocusNode.requestFocus();
+                      return Text(
+                        "${_chosenBoardValue!.ko_name}에 글 쓰는 중...",
+                        style: const TextStyle(
+                          fontSize: 16,
+                          height: 24 / 16,
+                          fontWeight: FontWeight.w500,
+                          color: Color(0xFFBBBBBB),
+                        ),
+                      );
                     }
                   },
-                  child: SizedBox(
-                    width: 36,
-                    height: 36,
-                    child: SvgPicture.asset(
-                      'assets/icons/clip.svg',
-                    ),
-                  ),
                 ),
                 const Spacer(),
                 Container(
