@@ -1450,7 +1450,7 @@ class _PostViewPageState extends State<PostViewPage> {
       style: const TextStyle(
         fontSize: 14,
         fontWeight: FontWeight.w400,
-        color: Colors.black,
+        color: Color(0xFF4A4A4A),
       ),
     );
   }
