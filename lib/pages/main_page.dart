@@ -374,23 +374,30 @@ class _MainPageState extends State<MainPage> {
                 _isLoading[10] ||
                 _isLoading[11]
             ? const LoadingIndicator()
-            : SingleChildScrollView(
-                child: SizedBox(
-                  width: MediaQuery.of(context).size.width,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      _buildTopContents(),
-                      const SizedBox(height: 20),
-                      _buildTalkContents(),
-                      const SizedBox(height: 20),
-                      _buildNoticeContents(),
-                      const SizedBox(height: 20),
-                      _buildTradeContents(),
-                      const SizedBox(height: 20),
-                      _buildStuCommunityContents(),
-                      const SizedBox(height: 20),
-                    ],
+            : RefreshIndicator.adaptive(
+                color: ColorsInfo.newara,
+                onRefresh: () async {
+                  await _refreshBoardList(
+                      Provider.of<UserProvider>(context, listen: false));
+                },
+                child: SingleChildScrollView(
+                  child: SizedBox(
+                    width: MediaQuery.of(context).size.width,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        _buildTopContents(),
+                        const SizedBox(height: 20),
+                        _buildTalkContents(),
+                        const SizedBox(height: 20),
+                        _buildNoticeContents(),
+                        const SizedBox(height: 20),
+                        _buildTradeContents(),
+                        const SizedBox(height: 20),
+                        _buildStuCommunityContents(),
+                        const SizedBox(height: 20),
+                      ],
+                    ),
                   ),
                 ),
               ),
