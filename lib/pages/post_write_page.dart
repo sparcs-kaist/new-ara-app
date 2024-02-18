@@ -17,6 +17,7 @@ import 'package:new_ara_app/models/attachment_model.dart';
 import 'package:new_ara_app/models/board_detail_action_model.dart';
 import 'package:new_ara_app/models/simple_board_model.dart';
 import 'package:new_ara_app/models/topic_model.dart';
+import 'package:new_ara_app/pages/bulletin_search_page.dart';
 import 'package:new_ara_app/pages/post_view_page.dart';
 import 'package:new_ara_app/providers/user_provider.dart';
 import 'package:new_ara_app/utils/create_dio_with_config.dart';
@@ -171,7 +172,6 @@ class _PostWritePageState extends State<PostWritePage>
   late FocusNode _editorFocusNode;
 
   bool _isKeyboardClosed = true;
-
   @override
   void initState() {
     super.initState();
@@ -224,7 +224,11 @@ class _PostWritePageState extends State<PostWritePage>
   }
 
   @override
-  void didChangeMetrics() {
+  void didChangeMetrics() async {
+    // 기기의 키보드가 올라가거나 내려가는 애니메이션 길이가 다르다.
+    // 기기의 애니메이션이 끝나고 확인하기 위해 50ms의 딜레이를 준다.
+    await Future.delayed(const Duration(milliseconds: 50));
+    if (!mounted) return;
     final value = MediaQuery.of(context).viewInsets.bottom;
     if (value > 0) {
       if (_isKeyboardClosed) {
@@ -238,11 +242,12 @@ class _PostWritePageState extends State<PostWritePage>
   }
 
   _onKeyboardChanged(bool isVisible) {
+    var now = DateTime.now();
+    debugPrint("now: $now");
     if (isVisible) {
       debugPrint("키보드가 내려갔습니다.(애니메이션 종료)");
     } else {
       debugPrint("키보드가 올라갔습니다.(애니메이션 종료)");
-      setState(() {});
     }
     setState(() {
       _isKeyboardClosed = isVisible;
@@ -1113,7 +1118,6 @@ class _PostWritePageState extends State<PostWritePage>
             ],
           ),
 
-        
         GestureDetector(
           behavior: HitTestBehavior.translucent,
           onTap: () {
