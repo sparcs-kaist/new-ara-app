@@ -791,7 +791,7 @@ class _MainPageState extends State<MainPage> {
                       style: TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.w700,
-                        color: Color(0xFF1F4899),
+                        color: Color(0xFF4A90E2),
                       ),
                     ),
                     const SizedBox(
@@ -800,7 +800,7 @@ class _MainPageState extends State<MainPage> {
                     SvgPicture.asset(
                       'assets/icons/right_chevron.svg',
                       colorFilter: const ColorFilter.mode(
-                        Color(0xFF1F4899),
+                        Color(0xFF4A90E2),
                         BlendMode.srcIn,
                       ),
                       fit: BoxFit.fill,
