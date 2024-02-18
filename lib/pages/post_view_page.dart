@@ -1398,7 +1398,7 @@ class _PostViewPageState extends State<PostViewPage> {
                                   }
                                 },
                                 child: _buildVoteIcons(true, curComment.my_vote,
-                                    ColorsInfo.posVote, 11.52, 12.57),
+                                    ColorsInfo.posVote, 16, 17),
                               ),
                               const SizedBox(width: 2.19),
                               Text(
@@ -1449,8 +1449,8 @@ class _PostViewPageState extends State<PostViewPage> {
                                     false,
                                     curComment.my_vote,
                                     ColorsInfo.negVote,
-                                    11.52,
-                                    12.57),
+                                    16,
+                                    17),
                               ),
                               const SizedBox(width: 2.19),
                               Text(
