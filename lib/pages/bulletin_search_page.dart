@@ -313,72 +313,100 @@ class _BulletinSearchPageState extends State<BulletinSearchPage> {
                       // 검색어가 없을 때와 검색 결과가 없을 때의 처리
                       if (_textEdtingController.text == "" &&
                           postPreviewList.isEmpty)
-                        const SizedBox(
-                          height: 100,
+                        Expanded(
                           child: Center(
-                            child: Text(
-                              "검색어를 입력해주세요.",
-                              style: TextStyle(
-                                  color: Colors.black,
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w500),
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                SvgPicture.asset(
+                                  'assets/icons/keyboard.svg',
+                                  width: 50,
+                                  height: 50,
+                                  colorFilter: const ColorFilter.mode(
+                                    Color(0xFFBBBBBB),
+                                    BlendMode.srcIn,
+                                  ),
+                                ),
+                                const Text(
+                                  '검색어를 입력해주세요.',
+                                  style: TextStyle(
+                                    color: Color(0xFFBBBBBB),
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                )
+                              ],
                             ),
                           ),
                         ),
                       // 검색어가 있는데 검색 결과가 없을 때의 처리
                       if (_textEdtingController.text != "" &&
                           postPreviewList.isEmpty)
-                        const SizedBox(
-                          height: 100,
+                        Expanded(
                           child: Center(
-                            child: Text(
-                              "검색 결과가 없습니다.",
-                              style: TextStyle(
-                                  color: ColorsInfo.newara,
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w500),
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                SvgPicture.asset(
+                                  'assets/icons/information.svg',
+                                  width: 50,
+                                  height: 50,
+                                  colorFilter: const ColorFilter.mode(
+                                    Color(0xFFBBBBBB),
+                                    BlendMode.srcIn,
+                                  ),
+                                ),
+                                const Text(
+                                  '검색 결과가 없습니다.',
+                                  style: TextStyle(
+                                    color: Color(0xFFBBBBBB),
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                )
+                              ],
                             ),
                           ),
                         ),
-
-                      Expanded(
-                        child: ListView.builder(
-                          controller: _scrollController,
-                          itemCount: postPreviewList.length +
-                              (_isLoadingNextPage ? 1 : 0), // 아이템 개수
-                          itemBuilder: (BuildContext context, int index) {
-                            if (_isLoadingNextPage &&
-                                index == postPreviewList.length) {
-                              return const SizedBox(
-                                height: 63,
-                                child: Center(
-                                  child: LoadingIndicator(),
+                      if (postPreviewList.isNotEmpty)
+                        Expanded(
+                          child: ListView.builder(
+                            controller: _scrollController,
+                            itemCount: postPreviewList.length +
+                                (_isLoadingNextPage ? 1 : 0), // 아이템 개수
+                            itemBuilder: (BuildContext context, int index) {
+                              if (_isLoadingNextPage &&
+                                  index == postPreviewList.length) {
+                                return const SizedBox(
+                                  height: 63,
+                                  child: Center(
+                                    child: LoadingIndicator(),
+                                  ),
+                                );
+                              }
+                              return InkWell(
+                                onTap: () {
+                                  Navigator.of(context).push(slideRoute(
+                                      PostViewPage(
+                                          id: postPreviewList[index].id)));
+                                },
+                                child: Column(
+                                  children: [
+                                    Padding(
+                                      padding: const EdgeInsets.all(11.0),
+                                      child: PostPreview(
+                                          model: postPreviewList[index]),
+                                    ),
+                                    Container(
+                                      height: 1,
+                                      color: const Color(0xFFF0F0F0),
+                                    ),
+                                  ],
                                 ),
                               );
-                            }
-                            return InkWell(
-                              onTap: () {
-                                Navigator.of(context).push(slideRoute(
-                                    PostViewPage(
-                                        id: postPreviewList[index].id)));
-                              },
-                              child: Column(
-                                children: [
-                                  Padding(
-                                    padding: const EdgeInsets.all(11.0),
-                                    child: PostPreview(
-                                        model: postPreviewList[index]),
-                                  ),
-                                  Container(
-                                    height: 1,
-                                    color: const Color(0xFFF0F0F0),
-                                  ),
-                                ],
-                              ),
-                            );
-                          },
+                            },
+                          ),
                         ),
-                      ),
                     ],
                   ),
                 ),
@@ -387,8 +415,9 @@ class _BulletinSearchPageState extends State<BulletinSearchPage> {
     );
   }
 }
+
 /// 디바운싱 기능을 구현한 클래스
-/// 
+///
 /// 검색창에 글씨 입력과 같이 빠르게 연속되는 이벤트들 사이에서 중복 반응을 방지하기 위해 사용되었음
 class Debouncer {
   final int milliseconds;
