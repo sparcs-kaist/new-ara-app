@@ -1433,22 +1433,25 @@ class _PostViewPageState extends State<PostViewPage> {
   /// 웹뷰로 로드, 나머지는 텍스트로 댓글을 로드하도록 함.
   /// _buildCommentListView에서 사용함.
   Widget _buildCommentContent(String content) {
-    // HTML 태그가 존재하는지 검사 (완벽한 방법은 아님)
-    // 아라 서버에 '<', '>'가 html 인코딩된 상태로 저장되어 <, > 대신 &lt, &gt 사용함
-    if (!(content.contains('&lt') && content.contains('&gt'))) {
-      return Text(
-        content,
-        style: const TextStyle(
-          fontSize: 14,
-          fontWeight: FontWeight.w400,
-          color: Colors.black,
-        ),
+    // html 태그에서 사용하는 '<', '>'의 경우 형태가 그대로 저장됨
+    // html 태그가 아닌 '<', '>'의 경우 '&lt;', '&gt;'로 인코딩되어 저장됨
+    // 따라서 위 두 가지 경우에 대해서는 웹뷰로 로드하고 나머지는 Text 위젲 사용.
+    if ((content.contains('<') && content.contains('>')) ||
+        content.contains('&lt;') ||
+        content.contains('&gt;')) {
+      return InArticleWebView(
+        content: getContentHtml(content),
+        initialHeight: 10,
+        isComment: true,
       );
     }
-    return InArticleWebView(
-      content: getContentHtml(content),
-      initialHeight: 10,
-      isComment: true,
+    return Text(
+      content,
+      style: const TextStyle(
+        fontSize: 14,
+        fontWeight: FontWeight.w400,
+        color: Colors.black,
+      ),
     );
   }
 
