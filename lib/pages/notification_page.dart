@@ -209,7 +209,8 @@ class _NotificationPageState extends State<NotificationPage> {
                     },
                     child: _isLoadingTotal
                         ? const LoadingIndicator()
-                        : _modelList.length == 0
+                        // 알림이 없는 경우 ListView 대신 '알림이 없습니다' 문구 표시
+                        : _modelList.isEmpty
                             ? Center(
                               child: Column(
                                 mainAxisAlignment: MainAxisAlignment.center,
