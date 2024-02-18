@@ -704,8 +704,8 @@ class _PostViewPageState extends State<PostViewPage> {
               'assets/icons/right_chevron.svg',
               colorFilter:
                   const ColorFilter.mode(Colors.black, BlendMode.srcIn),
-              width: 5,
-              height: 9,
+              width: 6,
+              height: 15,
             ),
           ),
         ],
