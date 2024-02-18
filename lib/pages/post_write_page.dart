@@ -172,6 +172,8 @@ class _PostWritePageState extends State<PostWritePage>
   late FocusNode _editorFocusNode;
 
   bool _isKeyboardClosed = true;
+
+  var _editorScrollController = ScrollController();
   @override
   void initState() {
     super.initState();
@@ -1364,7 +1366,8 @@ class _PostWritePageState extends State<PostWritePage>
         embedBuilders: FlutterQuillEmbeds.builders(),
         readOnly: false, // The editor is editable
 
-        scrollController: ScrollController(),
+        scrollController: _editorScrollController,
+
         padding: EdgeInsets.zero,
         scrollable: true,
         autoFocus: false,
