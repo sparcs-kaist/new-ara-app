@@ -432,9 +432,9 @@ class _PostWritePageState extends State<PostWritePage>
             body: SafeArea(
               child: Column(
                 children: [
-                  _buildMenubar(),
+                  if (_isKeyboardClosed) _buildMenubar(),
                   const SizedBox(
-                    height: 20,
+                    height: 15,
                   ),
                   _buildTitle(),
                   const SizedBox(height: 15),
@@ -446,7 +446,7 @@ class _PostWritePageState extends State<PostWritePage>
                     ),
                   ),
                   const SizedBox(
-                    height: 20,
+                    height: 15,
                   ),
                   _buildToolbar(),
                   const SizedBox(
@@ -652,54 +652,51 @@ class _PostWritePageState extends State<PostWritePage>
   }
 
   Widget _buildTitle() {
-    return SizedBox(
-      height: 39,
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 20),
-        child: TextField(
-          controller: _titleController,
-          focusNode: _titleFocusNode,
-          minLines: 1,
-          maxLines: 1,
-          maxLength: 255,
-          style: const TextStyle(
-            height: 32.56 / 22,
-            fontSize: 22,
-            fontWeight: FontWeight.w700,
-          ),
-          onChanged: (String s) {
-            // build 함수를 다시 실행하여 올릴 수 있는 게시물인지 유효성 검사
-            setState(() {});
-          },
-          decoration: const InputDecoration(
-            hintText: "제목을 입력해주세요.",
-            hintStyle: TextStyle(
-                height: 32.56 / 22,
-                fontSize: 22,
-                color: Color(0xFFBBBBBB),
-                fontWeight: FontWeight.w700),
-            // counterStyle: TextStyle(
-            //   height: double.minPositive,
-            // ),
-            counterText: "",
-            filled: true,
-            fillColor: Colors.white,
-            isDense: true,
-            isCollapsed: true,
-            contentPadding: EdgeInsets.fromLTRB(0, 0, 0, 0),
-            enabledBorder: OutlineInputBorder(
-              borderSide: BorderSide(
-                color: Colors.transparent, // 테두리 색상 설정
-              ), // 모서리를 둥글게 설정
-            ),
-            focusedBorder: OutlineInputBorder(
-              borderSide: BorderSide(
-                color: Colors.transparent, // 테두리 색상 설정
-              ), // 모서리를 둥글게 설정
-            ),
-          ),
-          cursorColor: Colors.transparent,
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 20),
+      child: TextField(
+        controller: _titleController,
+        focusNode: _titleFocusNode,
+        minLines: 1,
+        maxLines: 1,
+        maxLength: 255,
+        style: const TextStyle(
+          height: 27 / 22,
+          fontSize: 22,
+          fontWeight: FontWeight.w700,
         ),
+        onChanged: (String s) {
+          // build 함수를 다시 실행하여 올릴 수 있는 게시물인지 유효성 검사
+          setState(() {});
+        },
+        decoration: const InputDecoration(
+          hintText: "제목을 입력해주세요.",
+          hintStyle: TextStyle(
+              height: 27 / 22,
+              fontSize: 22,
+              color: Color(0xFFBBBBBB),
+              fontWeight: FontWeight.w700),
+          // counterStyle: TextStyle(
+          //   height: double.minPositive,
+          // ),
+          counterText: "",
+          filled: true,
+          fillColor: Colors.white,
+          isDense: true,
+          isCollapsed: true,
+          contentPadding: EdgeInsets.fromLTRB(0, 0, 0, 0),
+          enabledBorder: OutlineInputBorder(
+            borderSide: BorderSide(
+              color: Colors.transparent, // 테두리 색상 설정
+            ), // 모서리를 둥글게 설정
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderSide: BorderSide(
+              color: Colors.transparent, // 테두리 색상 설정
+            ), // 모서리를 둥글게 설정
+          ),
+        ),
+        cursorColor: Colors.transparent,
       ),
     );
   }
