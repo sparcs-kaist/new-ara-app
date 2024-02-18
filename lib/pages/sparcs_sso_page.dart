@@ -81,6 +81,12 @@ class _SparcsSSOPageState extends State<SparcsSSOPage> {
 
             await userProvider.setCookiesFromUrl(url);
             await userProvider.apiMeUserInfo(message: "sparscssso");
+
+            //userProvider.setHasData(true)를 실행하기 전에 현재 SSO 로그인 창을 닫음.
+            //현재 창을 닫지 않으면 로그인 성공 후에도 SSO 로그인 창이 계속 열려있음.
+            if (mounted) {
+              Navigator.of(context).pop();
+            }
             userProvider.setHasData(true);
 
             String cookieString = userProvider.getCookiesToString();
