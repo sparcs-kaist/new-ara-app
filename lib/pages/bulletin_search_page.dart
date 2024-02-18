@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:new_ara_app/constants/board_type.dart';
@@ -31,7 +33,6 @@ class _BulletinSearchPageState extends State<BulletinSearchPage> {
   bool _isLoadingNextPage = false;
   String _apiUrl = "";
   String _hintText = "";
-  String _searchWord = "";
   final ScrollController _scrollController = ScrollController();
   final FocusNode _focusNode = FocusNode();
   final TextEditingController _textEdtingController = TextEditingController();
@@ -102,8 +103,6 @@ class _BulletinSearchPageState extends State<BulletinSearchPage> {
     final UserProvider userProvider = context.read<UserProvider>();
     final Map<String, dynamic>? myMap = await userProvider
         .getApiRes("${_apiUrl}1&main_search__contains=$targetWord");
-    debugPrint(
-        "refreshPostList : myMap : ${myMap?["results"].length} {$targetWord}");
     if (mounted && targetWord == _textEdtingController.text) {
       setState(() {
         postPreviewList.clear();
@@ -126,7 +125,7 @@ class _BulletinSearchPageState extends State<BulletinSearchPage> {
   void _scrollListener() async {
     //스크롤 시 포커스 해제
     FocusScope.of(context).unfocus();
-    if (_searchWord == "") {
+    if (_textEdtingController.text == "") {
       if (mounted) {
         setState(() {
           postPreviewList.clear();
@@ -148,7 +147,7 @@ class _BulletinSearchPageState extends State<BulletinSearchPage> {
         _currentPage = _currentPage + 1;
         //TODO: 더 이상 불러올 게시물이 없을 때의 처리
         Map<String, dynamic>? myMap = await userProvider.getApiRes(
-            "$_apiUrl$_currentPage&main_search__contains=$_searchWord");
+            "$_apiUrl$_currentPage&main_search__contains=${_textEdtingController.text}");
         if (mounted) {
           setState(() {
             for (int i = 0; i < (myMap!["results"].length ?? 0); i++) {
@@ -223,18 +222,16 @@ class _BulletinSearchPageState extends State<BulletinSearchPage> {
                           controller: _textEdtingController,
                           onSubmitted: (String text) {
                             setState(() {
-                              _textEdtingController.text = text;
-                              _searchWord = text;
                               _isLoading = true;
                             });
                             refreshPostList(text);
                           },
                           onChanged: (String text) {
-                            setState(() {
-                              _textEdtingController.text = text;
-                              _searchWord = text;
+                            _debouncer.run(() {
+                              debugPrint(
+                                  "bulletin_search_page: onChanged(${DateTime.now().toString()}) : $text");
+                              refreshPostList(text);
                             });
-                            refreshPostList(text);
                           },
                           style: const TextStyle(
                             //height * fontSize = line height(커서 크기)
@@ -311,45 +308,106 @@ class _BulletinSearchPageState extends State<BulletinSearchPage> {
               child: Center(
                 child: SizedBox(
                   width: MediaQuery.of(context).size.width - 18,
-                  child: ListView.builder(
-                    controller: _scrollController,
-                    itemCount: postPreviewList.length +
-                        (_isLoadingNextPage ? 1 : 0), // 아이템 개수
-                    itemBuilder: (BuildContext context, int index) {
-                      // 각 아이템을 위한 위젯 생성
-
-                      // 숨겨진 게시물이면 일단 표현 안하는 걸로 함.
-                      if (_isLoadingNextPage &&
-                          index == postPreviewList.length) {
-                        return const SizedBox(
-                          height: 63,
+                  child: Column(
+                    children: [
+                      // 검색어가 없을 때와 검색 결과가 없을 때의 처리
+                      if (_textEdtingController.text == "" &&
+                          postPreviewList.isEmpty)
+                        Expanded(
                           child: Center(
-                            child: LoadingIndicator(),
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                SvgPicture.asset(
+                                  'assets/icons/keyboard.svg',
+                                  width: 50,
+                                  height: 50,
+                                  colorFilter: const ColorFilter.mode(
+                                    Color(0xFFBBBBBB),
+                                    BlendMode.srcIn,
+                                  ),
+                                ),
+                                const Text(
+                                  '검색어를 입력해주세요.',
+                                  style: TextStyle(
+                                    color: Color(0xFFBBBBBB),
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                )
+                              ],
+                            ),
                           ),
-                        );
-                      }
-                      return postPreviewList[index].is_hidden
-                          ? Container()
-                          : InkWell(
-                              onTap: () {
-                                Navigator.of(context).push(slideRoute(
-                                    PostViewPage(
-                                        id: postPreviewList[index].id)));
-                              },
-                              child: Column(
-                                children: [
-                                  Padding(
-                                    padding: const EdgeInsets.all(11.0),
-                                    child: PostPreview(
-                                        model: postPreviewList[index]),
+                        ),
+                      // 검색어가 있는데 검색 결과가 없을 때의 처리
+                      if (_textEdtingController.text != "" &&
+                          postPreviewList.isEmpty)
+                        Expanded(
+                          child: Center(
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                SvgPicture.asset(
+                                  'assets/icons/information.svg',
+                                  width: 50,
+                                  height: 50,
+                                  colorFilter: const ColorFilter.mode(
+                                    Color(0xFFBBBBBB),
+                                    BlendMode.srcIn,
                                   ),
-                                  Container(
-                                    height: 1,
-                                    color: const Color(0xFFF0F0F0),
+                                ),
+                                const Text(
+                                  '검색 결과가 없습니다.',
+                                  style: TextStyle(
+                                    color: Color(0xFFBBBBBB),
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w500,
                                   ),
-                                ],
-                              ));
-                    },
+                                )
+                              ],
+                            ),
+                          ),
+                        ),
+                      if (postPreviewList.isNotEmpty)
+                        Expanded(
+                          child: ListView.builder(
+                            controller: _scrollController,
+                            itemCount: postPreviewList.length +
+                                (_isLoadingNextPage ? 1 : 0), // 아이템 개수
+                            itemBuilder: (BuildContext context, int index) {
+                              if (_isLoadingNextPage &&
+                                  index == postPreviewList.length) {
+                                return const SizedBox(
+                                  height: 63,
+                                  child: Center(
+                                    child: LoadingIndicator(),
+                                  ),
+                                );
+                              }
+                              return InkWell(
+                                onTap: () {
+                                  Navigator.of(context).push(slideRoute(
+                                      PostViewPage(
+                                          id: postPreviewList[index].id)));
+                                },
+                                child: Column(
+                                  children: [
+                                    Padding(
+                                      padding: const EdgeInsets.all(11.0),
+                                      child: PostPreview(
+                                          model: postPreviewList[index]),
+                                    ),
+                                    Container(
+                                      height: 1,
+                                      color: const Color(0xFFF0F0F0),
+                                    ),
+                                  ],
+                                ),
+                              );
+                            },
+                          ),
+                        ),
+                    ],
                   ),
                 ),
               ),
@@ -357,3 +415,23 @@ class _BulletinSearchPageState extends State<BulletinSearchPage> {
     );
   }
 }
+
+/// 디바운싱 기능을 구현한 클래스
+///
+/// 검색창에 글씨 입력과 같이 빠르게 연속되는 이벤트들 사이에서 중복 반응을 방지하기 위해 사용되었음
+class Debouncer {
+  final int milliseconds;
+  VoidCallback? action;
+  Timer? _timer;
+
+  Debouncer({required this.milliseconds});
+
+  run(VoidCallback action) {
+    if (_timer != null) {
+      _timer!.cancel();
+    }
+    _timer = Timer(Duration(milliseconds: milliseconds), action);
+  }
+}
+
+final _debouncer = Debouncer(milliseconds: 5);
