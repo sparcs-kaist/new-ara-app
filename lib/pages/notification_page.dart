@@ -193,7 +193,6 @@ class _NotificationPageState extends State<NotificationPage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              const SizedBox(height: 15),
               Expanded(
                 child: SizedBox(
                   width: MediaQuery.of(context).size.width - 40,
