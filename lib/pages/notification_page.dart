@@ -193,7 +193,6 @@ class _NotificationPageState extends State<NotificationPage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              const SizedBox(height: 15),
               Expanded(
                 child: SizedBox(
                   width: MediaQuery.of(context).size.width - 40,
@@ -204,192 +203,224 @@ class _NotificationPageState extends State<NotificationPage> {
                     onRefresh: () async {
                       // 새로고침 시 첫 페이지만 다시 불러옴.
                       await _initNotificationPage(userProvider);
-                      await notificationProvider.checkIsNotReadExist(userProvider);
+                      await notificationProvider
+                          .checkIsNotReadExist(userProvider);
                       updateState();
                     },
                     child: _isLoadingTotal
                         ? const LoadingIndicator()
-                        : ListView.separated(
-                            controller: _listViewController,
-                            itemCount: _modelList.length + 1,
-                            itemBuilder: (context, idx) {
-                              if (idx == _modelList.length) {
-                                return Visibility(
-                                  visible: _isLoadingNewPage,
-                                  child: const SizedBox(
-                                    height: 45,
-                                    child: LoadingIndicator(),
-                                  ),
-                                );
-                              }
-                              NotificationModel targetNoti = _modelList[idx];
-                              // 개별 알림을 리턴함.
-                              return Column(
+                        // 알림이 없는 경우 ListView 대신 '알림이 없습니다' 문구 표시
+                        : _modelList.isEmpty
+                            ? Center(
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
-                                  idx != 0
-                                      ? _buildDateInfo(
-                                          _modelList[idx - 1].created_at,
-                                          _modelList[idx].created_at)
-                                      : const SizedBox(
-                                          height: 35,
-                                          child: Text(
-                                            '오늘',
-                                            style: TextStyle(
-                                              fontSize: 14,
-                                              fontWeight: FontWeight.w500,
-                                              color: Color.fromRGBO(
-                                                  177, 177, 177, 1),
+                                  SvgPicture.asset(
+                                    'assets/icons/information.svg',
+                                    width: 50,
+                                    height: 50,
+                                    colorFilter: const ColorFilter.mode(
+                                      Color(0xFFBBBBBB), BlendMode.srcIn,
+                                    ),
+                                  ),
+                                  const Text(
+                                    '알림이 없습니다.',
+                                    style: TextStyle(
+                                      color: Color(0xFFBBBBBB),
+                                      fontSize: 15,
+                                    ),
+                                  )
+                                ],
+                              ),
+                            )
+                            : ListView.separated(
+                                controller: _listViewController,
+                                itemCount: _modelList.length + 1,
+                                itemBuilder: (context, idx) {
+                                  if (idx == _modelList.length) {
+                                    return Visibility(
+                                      visible: _isLoadingNewPage,
+                                      child: const SizedBox(
+                                        height: 45,
+                                        child: LoadingIndicator(),
+                                      ),
+                                    );
+                                  }
+                                  NotificationModel targetNoti =
+                                      _modelList[idx];
+                                  // 개별 알림을 리턴함.
+                                  return Column(
+                                    children: [
+                                      idx != 0
+                                          ? _buildDateInfo(
+                                              _modelList[idx - 1].created_at,
+                                              _modelList[idx].created_at)
+                                          : const SizedBox(
+                                              height: 35,
+                                              child: Text(
+                                                '오늘',
+                                                style: TextStyle(
+                                                  fontSize: 14,
+                                                  fontWeight: FontWeight.w500,
+                                                  color: Color.fromRGBO(
+                                                      177, 177, 177, 1),
+                                                ),
+                                              ),
                                             ),
-                                          ),
-                                        ),
-                                  InkWell(
-                                      onTap: () async {
-                                        // 알림 클릭 시에 해당하는 글로 이동.
-                                        await Navigator.of(context)
-                                            .push(slideRoute(PostViewPage(
-                                          id: targetNoti.related_article.id,
-                                        )));
-                                        if (mounted) {
-                                          setState(
-                                              () => targetNoti.is_read = true);
-                                        }
-                                        bool res = await _readNotification(
-                                            userProvider, targetNoti.id);
-                                        if (!res && mounted) {
-                                          setState(
-                                              () => targetNoti.is_read = false);
-                                        }
-                                        await notificationProvider
-                                            .checkIsNotReadExist(userProvider);
-                                        List<NotificationModel> newList = [];
-                                        for (int page = 1;
-                                            page <= _curPage;
-                                            page++) {
-                                          newList += await _fetchEachPage(
-                                              userProvider, page);
-                                        }
-                                        if (mounted) {
-                                          setState(() => _modelList = newList);
-                                        }
-                                      },
-                                      child: Container(
-                                        constraints:
-                                            const BoxConstraints(minHeight: 92),
-                                        padding: const EdgeInsets.only(
-                                            left: 10,
-                                            right: 10,
-                                            top: 14,
-                                            bottom: 14),
-                                        decoration: BoxDecoration(
-                                          border: Border.all(
-                                            width: 1,
-                                            color: Color(0xfff0f0f0),
-                                          ),
-                                          borderRadius: const BorderRadius.all(
-                                            Radius.circular(15),
-                                          ),
-                                          boxShadow: const [
-                                            BoxShadow(
-                                              color: Color(0x0A000000),
-                                              blurRadius: 6,
-                                              offset: Offset(0, 2),
+                                      InkWell(
+                                          onTap: () async {
+                                            // 알림 클릭 시에 해당하는 글로 이동.
+                                            await Navigator.of(context)
+                                                .push(slideRoute(PostViewPage(
+                                              id: targetNoti.related_article.id,
+                                            )));
+                                            if (mounted) {
+                                              setState(() =>
+                                                  targetNoti.is_read = true);
+                                            }
+                                            bool res = await _readNotification(
+                                                userProvider, targetNoti.id);
+                                            if (!res && mounted) {
+                                              setState(() =>
+                                                  targetNoti.is_read = false);
+                                            }
+                                            await notificationProvider
+                                                .checkIsNotReadExist(
+                                                    userProvider);
+                                            List<NotificationModel> newList =
+                                                [];
+                                            for (int page = 1;
+                                                page <= _curPage;
+                                                page++) {
+                                              newList += await _fetchEachPage(
+                                                  userProvider, page);
+                                            }
+                                            if (mounted) {
+                                              setState(
+                                                  () => _modelList = newList);
+                                            }
+                                          },
+                                          child: Container(
+                                            constraints: const BoxConstraints(
+                                                minHeight: 92),
+                                            padding: const EdgeInsets.only(
+                                                left: 10,
+                                                right: 10,
+                                                top: 14,
+                                                bottom: 14),
+                                            decoration: BoxDecoration(
+                                              border: Border.all(
+                                                width: 1,
+                                                color: Color(0xfff0f0f0),
+                                              ),
+                                              borderRadius:
+                                                  const BorderRadius.all(
+                                                Radius.circular(15),
+                                              ),
+                                              boxShadow: const [
+                                                BoxShadow(
+                                                  color: Color(0x0A000000),
+                                                  blurRadius: 6,
+                                                  offset: Offset(0, 2),
+                                                ),
+                                              ],
+                                              color: Colors.white,
                                             ),
-                                          ],
-                                          color: Colors.white,
-                                        ),
-                                        child: Row(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            Column(
+                                            child: Row(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
                                               children: [
-                                                const SizedBox(height: 5),
-                                                Container(
-                                                  width: 40,
-                                                  height: 40,
-                                                  decoration: BoxDecoration(
-                                                    shape: BoxShape.circle,
-                                                    color:
-                                                        (targetNoti.is_read ??
+                                                Column(
+                                                  children: [
+                                                    const SizedBox(height: 5),
+                                                    Container(
+                                                      width: 40,
+                                                      height: 40,
+                                                      decoration: BoxDecoration(
+                                                        shape: BoxShape.circle,
+                                                        color: (targetNoti
+                                                                    .is_read ??
                                                                 false)
                                                             ? Color(0xffbbbbbb)
                                                             : ColorsInfo.newara,
-                                                  ),
-                                                  child: Center(
-                                                    child: SvgPicture.asset(
-                                                      width: 30,
-                                                      height: 28,
-                                                      targetNoti.type ==
-                                                              "default"
-                                                          ? "assets/icons/notification.svg"
-                                                          : "assets/icons/comment.svg",
-                                                      colorFilter:
-                                                          const ColorFilter
-                                                              .mode(
-                                                              Colors.white,
-                                                              BlendMode.srcIn),
+                                                      ),
+                                                      child: Center(
+                                                        child: SvgPicture.asset(
+                                                          width: 30,
+                                                          height: 28,
+                                                          targetNoti.type ==
+                                                                  "default"
+                                                              ? "assets/icons/notification.svg"
+                                                              : "assets/icons/comment.svg",
+                                                          colorFilter:
+                                                              const ColorFilter
+                                                                  .mode(
+                                                                  Colors.white,
+                                                                  BlendMode
+                                                                      .srcIn),
+                                                        ),
+                                                      ),
                                                     ),
+                                                  ],
+                                                ),
+                                                const SizedBox(width: 10),
+                                                Flexible(
+                                                  child: Column(
+                                                    crossAxisAlignment:
+                                                        CrossAxisAlignment
+                                                            .start,
+                                                    children: [
+                                                      Text(
+                                                        targetNoti.title,
+                                                        maxLines: 1,
+                                                        overflow: TextOverflow
+                                                            .ellipsis,
+                                                        style: TextStyle(
+                                                          fontSize: 16,
+                                                          fontWeight:
+                                                              FontWeight.w700,
+                                                          color: (targetNoti
+                                                                      .is_read ??
+                                                                  false)
+                                                              ? Colors.grey
+                                                              : Colors.black,
+                                                        ),
+                                                      ),
+                                                      Text(
+                                                        targetNoti.content,
+                                                        maxLines: 1,
+                                                        overflow: TextOverflow
+                                                            .ellipsis,
+                                                        style: const TextStyle(
+                                                          fontSize: 14,
+                                                          fontWeight:
+                                                              FontWeight.w500,
+                                                        ),
+                                                      ),
+                                                      Text(
+                                                        "| 게시글: ${targetNoti.related_article.title}",
+                                                        maxLines: 1,
+                                                        overflow: TextOverflow
+                                                            .ellipsis,
+                                                        style: const TextStyle(
+                                                          fontSize: 12,
+                                                          fontWeight:
+                                                              FontWeight.w500,
+                                                        ),
+                                                      ),
+                                                    ],
                                                   ),
                                                 ),
                                               ],
                                             ),
-                                            const SizedBox(width: 10),
-                                            Flexible(
-                                              child: Column(
-                                                crossAxisAlignment:
-                                                    CrossAxisAlignment.start,
-                                                children: [
-                                                  Text(
-                                                    targetNoti.title,
-                                                    maxLines: 1,
-                                                    overflow:
-                                                        TextOverflow.ellipsis,
-                                                    style: TextStyle(
-                                                      fontSize: 16,
-                                                      fontWeight:
-                                                          FontWeight.w700,
-                                                      color:
-                                                          (targetNoti.is_read ??
-                                                                  false)
-                                                              ? Colors.grey
-                                                              : Colors.black,
-                                                    ),
-                                                  ),
-                                                  Text(
-                                                    targetNoti.content,
-                                                    maxLines: 1,
-                                                    overflow:
-                                                        TextOverflow.ellipsis,
-                                                    style: const TextStyle(
-                                                      fontSize: 14,
-                                                      fontWeight:
-                                                          FontWeight.w500,
-                                                    ),
-                                                  ),
-                                                  Text(
-                                                    "| 게시글: ${targetNoti.related_article.title}",
-                                                    maxLines: 1,
-                                                    overflow:
-                                                        TextOverflow.ellipsis,
-                                                    style: const TextStyle(
-                                                      fontSize: 12,
-                                                      fontWeight:
-                                                          FontWeight.w500,
-                                                    ),
-                                                  ),
-                                                ],
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      )),
-                                ],
-                              );
-                            },
-                            separatorBuilder: (context, idx) {
-                              return const SizedBox(height: 10);
-                            },
-                          ),
+                                          )),
+                                    ],
+                                  );
+                                },
+                                separatorBuilder: (context, idx) {
+                                  return const SizedBox(height: 10);
+                                },
+                              ),
                   ),
                 ),
               ),
