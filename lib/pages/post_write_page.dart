@@ -1600,6 +1600,7 @@ class _PostWritePageState extends State<PostWritePage>
 
   /// 사진 추가 시 실행되는 함수
   Future<void> _pickImage() async {
+    FocusScope.of(context).unfocus();
     final ImagePicker imagePicker = ImagePicker();
     final XFile? image =
         await imagePicker.pickImage(source: ImageSource.gallery);
@@ -1635,6 +1636,7 @@ class _PostWritePageState extends State<PostWritePage>
         ));
       });
     }
+    _editorFocusNode.requestFocus();
   }
 
   /// 첨부파일 추가 시 실행되는 함수
