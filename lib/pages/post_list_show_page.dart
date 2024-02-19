@@ -14,6 +14,7 @@ import 'package:new_ara_app/models/article_list_action_model.dart';
 import 'package:new_ara_app/pages/post_view_page.dart';
 import 'package:new_ara_app/utils/slide_routing.dart';
 import 'package:new_ara_app/providers/notification_provider.dart';
+import 'package:new_ara_app/widgets/pop_up_menu_buttons.dart';
 
 /// PostListShowPage는 게시물 목록를 나타내는 위젯.
 /// boardType에 따라 게시판의 종류를 판별하고, 특성화 된 위젯들을 활성화 비활성화 되도록 설계.
@@ -160,7 +161,7 @@ class _PostListShowPageState extends State<PostListShowPage> {
   }
 
   /// 스크롤 리스너 함수
-  /// 
+  ///
   /// 스크롤이 끝에 도달하면 추가 데이터를 로드하기 위해 _loadNextPage 함수를 호출합니다.
   void _scrollListener() async {
     if (_scrollController.position.pixels >=
@@ -215,6 +216,13 @@ class _PostListShowPageState extends State<PostListShowPage> {
           ),
         ),
         actions: [
+          Visibility(
+            visible: _boardName == '학교에게 전합니다',
+            child: const Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [WithSchoolPopupMenuButton()],
+            ),
+          ),
           IconButton(
             icon: SvgPicture.asset(
               'assets/icons/search.svg',
@@ -278,45 +286,63 @@ class _PostListShowPageState extends State<PostListShowPage> {
                       setState((() => isLoading = true));
                       await updateAllBulletinList();
                     },
-                    child: ListView.separated(
-                      controller: _scrollController,
-                      itemCount: postPreviewList.length +
-                          (_isLoadingNextPage ? 1 : 0), // 아이템 개수
-                      itemBuilder: (BuildContext context, int index) {
-                        // 각 아이템을 위한 위젯 생성
-                        if (_isLoadingNextPage &&
-                            index == postPreviewList.length) {
-                          return const SizedBox(
-                            height: 50,
-                            child: Center(
-                              child: LoadingIndicator(),
+                    child: SizedBox(
+                      height: MediaQuery.of(context).size.height,
+                      child: Column(
+                        children: [
+                          // Visibility(
+                          //   visible: _boardName == '학교에게 전합니다',
+                          //   child: const Row(
+                          //     mainAxisAlignment: MainAxisAlignment.end,
+                          //     children: [WithSchoolPopupMenuButton()],
+                          //   ),
+                          // ),
+                          Expanded(
+                            child: ListView.separated(
+                              controller: _scrollController,
+                              itemCount: postPreviewList.length +
+                                  (_isLoadingNextPage ? 1 : 0), // 아이템 개수
+                              itemBuilder: (BuildContext context, int index) {
+                                // 각 아이템을 위한 위젯 생성
+                                if (_isLoadingNextPage &&
+                                    index == postPreviewList.length) {
+                                  return const SizedBox(
+                                    height: 50,
+                                    child: Center(
+                                      child: LoadingIndicator(),
+                                    ),
+                                  );
+                                } else {
+                                  return InkWell(
+                                    onTap: () async {
+                                      await Navigator.of(context).push(
+                                          slideRoute(PostViewPage(
+                                              id: postPreviewList[index].id)));
+                                      updateAllBulletinList();
+                                    },
+                                    child: Column(
+                                      children: [
+                                        Padding(
+                                          padding: const EdgeInsets.all(11.0),
+                                          child: PostPreview(
+                                              model: postPreviewList[index]),
+                                        ),
+                                      ],
+                                    ),
+                                  );
+                                }
+                              },
+                              separatorBuilder:
+                                  (BuildContext context, int index) {
+                                return Container(
+                                  height: 1,
+                                  color: const Color(0xFFF0F0F0),
+                                );
+                              },
                             ),
-                          );
-                        } else {
-                          return InkWell(
-                            onTap: () async {
-                              await Navigator.of(context).push(slideRoute(
-                                  PostViewPage(id: postPreviewList[index].id)));
-                              updateAllBulletinList();
-                            },
-                            child: Column(
-                              children: [
-                                Padding(
-                                  padding: const EdgeInsets.all(11.0),
-                                  child: PostPreview(
-                                      model: postPreviewList[index]),
-                                ),
-                              ],
-                            ),
-                          );
-                        }
-                      },
-                      separatorBuilder: (BuildContext context, int index) {
-                        return Container(
-                          height: 1,
-                          color: const Color(0xFFF0F0F0),
-                        );
-                      },
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 ),
