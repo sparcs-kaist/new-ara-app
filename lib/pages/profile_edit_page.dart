@@ -16,6 +16,7 @@ import 'package:new_ara_app/widgets/loading_indicator.dart';
 import 'package:new_ara_app/providers/notification_provider.dart';
 import 'package:new_ara_app/utils/profile_image.dart';
 import 'package:new_ara_app/widgets/snackbar_noti.dart';
+import 'package:new_ara_app/widgets/text_info.dart';
 
 class ProfileEditPage extends StatefulWidget {
   const ProfileEditPage({super.key});
@@ -313,6 +314,18 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
                                 ),
                               ),
                             ],
+                          ),
+                        ),
+                        // 닉네임 정책 안내 문구
+                        const Padding(
+                          padding: EdgeInsets.only(left: 80),
+                          child: Text(
+                            '닉네임은 한번 변경할 시 3개월간 변경이 불가합니다.',
+                            style: TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w600,
+                              color: Color.fromRGBO(191, 191, 191, 1),
+                            ),
                           ),
                         ),
                         const SizedBox(height: 30),
