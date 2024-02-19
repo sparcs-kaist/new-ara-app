@@ -227,6 +227,8 @@ class _PostWritePageState extends State<PostWritePage>
 
   @override
   void didChangeMetrics() async {
+    var now = DateTime.now();
+    debugPrint("now: $now, ${MediaQuery.of(context).viewInsets.bottom}");
     // 기기의 키보드가 올라가거나 내려가는 애니메이션 길이가 다르다.
     // 기기의 애니메이션이 끝나고 확인하기 위해 50ms의 딜레이를 준다.
     await Future.delayed(const Duration(milliseconds: 50));
@@ -244,8 +246,6 @@ class _PostWritePageState extends State<PostWritePage>
   }
 
   _onKeyboardChanged(bool isVisible) {
-    var now = DateTime.now();
-    debugPrint("now: $now");
     if (isVisible) {
       debugPrint("키보드가 내려갔습니다.(애니메이션 종료)");
     } else {
@@ -785,7 +785,10 @@ class _PostWritePageState extends State<PostWritePage>
                       width: 10,
                     ),
                     InkWell(
-                      onTap: _pickFile,
+                      onTap: () async {
+                        _isFileMenuBarSelected = true;
+                        await _pickFile();
+                      },
                       child: Row(
                         children: [
                           SvgPicture.asset(
