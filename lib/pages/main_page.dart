@@ -90,7 +90,7 @@ class _MainPageState extends State<MainPage> {
     //2. api 호출 후 새로운 response shared_preferences에 저장 후 UI 업데이트
     // api 호출과 Provider 정보 동기화.
 
-    getApiResCacheSetState(
+    updateStateWithCachedOrFetchedApiData(
         apiUrl: 'articles/top/',
         userProvider: userProvider,
         callback: (response) {
@@ -108,7 +108,7 @@ class _MainPageState extends State<MainPage> {
 
   /// 게시판 목록 안의 게시물들을 새로 고침
   Future<void> _refreshBoardList(UserProvider userProvider) async {
-    getApiResCacheSetState(
+    updateStateWithCachedOrFetchedApiData(
       apiUrl: 'boards/',
       userProvider: userProvider,
       callback: (response) async {
@@ -219,7 +219,7 @@ class _MainPageState extends State<MainPage> {
         ? "articles/?parent_board=$boardID"
         : "articles/?parent_board=$boardID&parent_topic=$topicID";
 
-    getApiResCacheSetState(
+    updateStateWithCachedOrFetchedApiData(
         apiUrl: apiUrl,
         userProvider: userProvider,
         callback: (response) async {
