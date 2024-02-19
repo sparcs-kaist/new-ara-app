@@ -99,12 +99,31 @@ class _MainPageState extends State<MainPage> {
     context.read<NotificationProvider>().checkIsNotReadExist(userProvider);
   }
 
+  Future<void> _getApiResCacheSetState(
+      String apiUrl, Function callback, UserProvider userProvider) async {
+    try {
+      final dynamic recentJson = await _loadApiDataFromCache(apiUrl);
+      if (recentJson != null) {
+        await callback(recentJson);
+      }
+      final dynamic response = await userProvider.getApiRes(apiUrl);
+      if (response != null) {
+        await _saveApiDataToCache(apiUrl, response);
+        await callback(response);
+      }
+    } catch (error) {
+      debugPrint("_getApiResCacheSetstate error: $error");
+      // 적절한 에러 처리 로직 추가
+    }
+  }
+
   /// 일일 베스트 컨텐츠 데이터를 새로고침
   Future<void> _refreshDailyBest(UserProvider userProvider) async {
     //1. Shared_Preferences 값이 있으면(if not null) 그 값으로 UI 업데이트.
     //2. api 호출 후 새로운 response shared_preferences에 저장 후 UI 업데이트
 
     // api 호출과 Provider 정보 동기화.
+
     try {
       Map<String, dynamic>? recentJson =
           await _loadApiDataFromCache('articles/top/');
