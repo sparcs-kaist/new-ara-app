@@ -25,6 +25,9 @@ class _LoginPageState extends State<LoginPage> {
   void initState() {
     // TODO: implement initState
     super.initState();
+
+    //위젯 렌더링을 모두 마치고 나서 실행되는 콜백함수
+     WidgetsBinding.instance.addPostFrameCallback((_) {
     if (widget.showTermsAndConditions == true) {
       Navigator.of(context).push(
         slideRoute(
@@ -32,6 +35,7 @@ class _LoginPageState extends State<LoginPage> {
         ),
       );
     }
+  });
   }
 
   @override
