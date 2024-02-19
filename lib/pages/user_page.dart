@@ -325,10 +325,9 @@ class _UserPageState extends State<UserPage>
             child: GestureDetector(
               behavior: HitTestBehavior.translucent,
               onTap: () async {
-                await Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => ProfileEditPage(),
+                await Navigator.of(context).push(
+                  slideRoute(
+                    const ProfileEditPage(),
                   ),
                 );
               },
