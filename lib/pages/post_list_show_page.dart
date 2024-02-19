@@ -72,7 +72,11 @@ class _PostListShowPageState extends State<PostListShowPage> {
     }
 
     _scrollController.addListener(_scrollListener);
-    updateAllBulletinList();
+    updateAllBulletinList().then(
+      (value) {
+        _loadNextPage();
+      },
+    );
     context.read<NotificationProvider>().checkIsNotReadExist(userProvider);
   }
 
@@ -117,7 +121,7 @@ class _PostListShowPageState extends State<PostListShowPage> {
     }
   }
 
-  // 스크롤 리스너 함수. 스크롤이 끝에 도달하면 추가 데이터를 로드
+  /// 다음 페이지를 로드하는 함수
   Future<void> _loadNextPage() async {
     var userProvider = context.read<UserProvider>();
     setState(() {
@@ -155,6 +159,9 @@ class _PostListShowPageState extends State<PostListShowPage> {
     }
   }
 
+  /// 스크롤 리스너 함수
+  /// 
+  /// 스크롤이 끝에 도달하면 추가 데이터를 로드하기 위해 _loadNextPage 함수를 호출합니다.
   void _scrollListener() async {
     if (_scrollController.position.pixels >=
             _scrollController.position.maxScrollExtent &&
