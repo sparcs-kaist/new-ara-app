@@ -30,7 +30,7 @@ class WithSchoolPopupMenuButton extends StatelessWidget {
       onSelected: (int result) {},
       child: SvgPicture.asset(
         'assets/icons/information.svg',
-        colorFilter: const ColorFilter.mode(ColorsInfo.newara, BlendMode.srcIn),
+        colorFilter: const ColorFilter.mode(Color(0xFFBBBBBB), BlendMode.srcIn),
         width: 35,
         height: 35,
       ),
