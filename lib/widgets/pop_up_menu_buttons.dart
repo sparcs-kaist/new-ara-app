@@ -11,6 +11,52 @@ import 'package:new_ara_app/utils/post_view_utils.dart';
 import 'package:new_ara_app/constants/colors_info.dart';
 import 'package:new_ara_app/widgets/snackbar_noti.dart';
 
+class WithSchoolPopupMenuButton extends StatelessWidget {
+  const WithSchoolPopupMenuButton({
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return PopupMenuButton<int>(
+      shadowColor: const Color.fromRGBO(0, 0, 0, 0.2),
+      splashRadius: 5,
+      shape: const RoundedRectangleBorder(
+        side: BorderSide(color: Color.fromRGBO(217, 217, 217, 1), width: 0.5),
+        borderRadius: BorderRadius.all(Radius.circular(12.0)),
+      ),
+      padding: const EdgeInsets.all(2.0),
+      itemBuilder: _buildItems,
+      onSelected: (int result) {},
+      child: SvgPicture.asset(
+        'assets/icons/information.svg',
+        colorFilter: const ColorFilter.mode(ColorsInfo.newara, BlendMode.srcIn),
+        width: 35,
+        height: 35,
+      ),
+    );
+  }
+
+  /// PopupMenuButton에 들어가는 각각의 Entry를 생성.
+  /// Entry의 List 형태로 리턴함.
+  /// PopupMenuButton의 itemBuilder로 사용됨.
+  List<PopupMenuEntry<int>> _buildItems(BuildContext context) {
+    return const [
+      PopupMenuItem<int>(
+        child: Text(
+          '본 게시판은 교내 구성원들이 실명으로 학교에 의견을 제시하는 게시판이며, 좋아요 수가 30개 이상인 모든 글에 대해 학교 측 공식 답변을 받으실 수 있습니다. 투명하고 책임감 있는 의견 공유를 위해 댓글 작성 시 실명으로 공개됩니다.',
+          style: TextStyle(
+            color: ColorsInfo.newara,
+            fontSize: 13,
+            fontWeight: FontWeight.w500,
+          ),
+        ),
+      ),
+    ];
+  }
+}
+
+
 /// PostViewPage에서 첨부파일 표시에 쓰이는 PopupMenuButton
 class AttachPopupMenuButton extends StatelessWidget {
   /// 첨부파일의 개수
