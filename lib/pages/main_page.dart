@@ -374,23 +374,30 @@ class _MainPageState extends State<MainPage> {
                 _isLoading[10] ||
                 _isLoading[11]
             ? const LoadingIndicator()
-            : SingleChildScrollView(
-                child: SizedBox(
-                  width: MediaQuery.of(context).size.width,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      _buildTopContents(),
-                      const SizedBox(height: 20),
-                      _buildTalkContents(),
-                      const SizedBox(height: 20),
-                      _buildNoticeContents(),
-                      const SizedBox(height: 20),
-                      _buildTradeContents(),
-                      const SizedBox(height: 20),
-                      _buildStuCommunityContents(),
-                      const SizedBox(height: 20),
-                    ],
+            : RefreshIndicator.adaptive(
+                color: ColorsInfo.newara,
+                onRefresh: () async {
+                  await _refreshBoardList(
+                      Provider.of<UserProvider>(context, listen: false));
+                },
+                child: SingleChildScrollView(
+                  child: SizedBox(
+                    width: MediaQuery.of(context).size.width,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        _buildTopContents(),
+                        const SizedBox(height: 20),
+                        _buildTalkContents(),
+                        const SizedBox(height: 20),
+                        _buildNoticeContents(),
+                        const SizedBox(height: 20),
+                        _buildTradeContents(),
+                        const SizedBox(height: 20),
+                        _buildStuCommunityContents(),
+                        const SizedBox(height: 20),
+                      ],
+                    ),
                   ),
                 ),
               ),
@@ -595,19 +602,8 @@ class _MainPageState extends State<MainPage> {
                         Navigator.of(context).push(slideRoute(
                             PostViewPage(id: _portalContents[0].id)));
                       },
-                      child: Text(
-                        getTitle(
-                            _portalContents[0].title,
-                            _portalContents[0].is_hidden,
-                            _portalContents[0].why_hidden),
-                        style: TextStyle(
-                            color: _portalContents[0].is_hidden
-                                ? const Color(0xFFBBBBBB)
-                                : Colors.black,
-                            fontSize: 14,
-                            fontWeight: FontWeight.w400),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
+                      child: LittleText(
+                        content: _portalContents[0],
                       ),
                     )
                   : Container(),
@@ -620,20 +616,10 @@ class _MainPageState extends State<MainPage> {
                         Navigator.of(context).push(slideRoute(
                             PostViewPage(id: _portalContents[1].id)));
                       },
-                      child: Text(
-                        getTitle(
-                            _portalContents[1].title,
-                            _portalContents[1].is_hidden,
-                            _portalContents[1].why_hidden),
-                        style: TextStyle(
-                            color: _portalContents[1].is_hidden
-                                ? const Color(0xFFBBBBBB)
-                                : Colors.black,
-                            fontSize: 14,
-                            fontWeight: FontWeight.w400),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ))
+                      child: LittleText(
+                        content: _portalContents[1],
+                      ),
+                    )
                   : Container(),
               const SizedBox(
                 height: 10,
@@ -644,20 +630,10 @@ class _MainPageState extends State<MainPage> {
                         Navigator.of(context).push(slideRoute(
                             PostViewPage(id: _portalContents[2].id)));
                       },
-                      child: Text(
-                        getTitle(
-                            _portalContents[2].title,
-                            _portalContents[2].is_hidden,
-                            _portalContents[2].why_hidden),
-                        style: TextStyle(
-                            color: _portalContents[2].is_hidden
-                                ? const Color(0xFFBBBBBB)
-                                : Colors.black,
-                            fontSize: 14,
-                            fontWeight: FontWeight.w400),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ))
+                      child: LittleText(
+                        content: _portalContents[2],
+                      ),
+                    )
                   : Container(),
               const SizedBox(
                 height: 14,
@@ -706,20 +682,10 @@ class _MainPageState extends State<MainPage> {
                                 Navigator.of(context).push(slideRoute(
                                     PostViewPage(id: _facilityContents[0].id)));
                               },
-                              child: Text(
-                                getTitle(
-                                    _facilityContents[0].title,
-                                    _facilityContents[0].is_hidden,
-                                    _facilityContents[0].why_hidden),
-                                style: TextStyle(
-                                    color: _facilityContents[0].is_hidden
-                                        ? const Color(0xFFBBBBBB)
-                                        : Colors.black,
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.w400),
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                              ))
+                              child: LittleText(
+                                content: _facilityContents[0],
+                              ),
+                            )
                           : Container(),
                     )
                   ],
@@ -738,7 +704,7 @@ class _MainPageState extends State<MainPage> {
                 child: Row(
                   children: [
                     const Text(
-                      "뉴아라",
+                      "Ara 운영진",
                       style: TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.w700,
@@ -766,19 +732,8 @@ class _MainPageState extends State<MainPage> {
                                 Navigator.of(context).push(slideRoute(
                                     PostViewPage(id: _newAraContents[0].id)));
                               },
-                              child: Text(
-                                getTitle(
-                                    _newAraContents[0].title,
-                                    _newAraContents[0].is_hidden,
-                                    _newAraContents[0].why_hidden),
-                                style: TextStyle(
-                                    color: _newAraContents[0].is_hidden
-                                        ? const Color(0xFFBBBBBB)
-                                        : Colors.black,
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.w400),
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
+                              child: LittleText(
+                                content: _newAraContents[0],
                               ),
                             )
                           : Container(),
@@ -836,7 +791,7 @@ class _MainPageState extends State<MainPage> {
                       style: TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.w700,
-                        color: Color(0xFF1F4899),
+                        color: Color(0xFF4A90E2),
                       ),
                     ),
                     const SizedBox(
@@ -845,7 +800,9 @@ class _MainPageState extends State<MainPage> {
                     SvgPicture.asset(
                       'assets/icons/right_chevron.svg',
                       colorFilter: const ColorFilter.mode(
-                          Color(0xFF1F4899), BlendMode.srcIn),
+                        Color(0xFF4A90E2),
+                        BlendMode.srcIn,
+                      ),
                       fit: BoxFit.fill,
                       width: 17,
                       height: 17,
@@ -861,19 +818,9 @@ class _MainPageState extends State<MainPage> {
                                     PostViewPage(
                                         id: _realEstateContents[0].id)));
                               },
-                              child: Text(
-                                getTitle(
-                                    _realEstateContents[0].title,
-                                    _realEstateContents[0].is_hidden,
-                                    _realEstateContents[0].why_hidden),
-                                style: TextStyle(
-                                    color: _realEstateContents[0].is_hidden
-                                        ? const Color(0xFFBBBBBB)
-                                        : Colors.black,
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.w400),
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
+                              child: LittleText(
+                                content: _realEstateContents[0],
+                                showTopic: true,
                               ),
                             )
                           : Container(),
@@ -921,20 +868,11 @@ class _MainPageState extends State<MainPage> {
                                 Navigator.of(context).push(slideRoute(
                                     PostViewPage(id: _marketContents[0].id)));
                               },
-                              child: Text(
-                                getTitle(
-                                    _marketContents[0].title,
-                                    _marketContents[0].is_hidden,
-                                    _marketContents[0].why_hidden),
-                                style: TextStyle(
-                                    color: _marketContents[0].is_hidden
-                                        ? const Color(0xFFBBBBBB)
-                                        : Colors.black,
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.w400),
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                              ))
+                              child: LittleText(
+                                content: _marketContents[0],
+                                showTopic: true,
+                              ),
+                            )
                           : Container(),
                     )
                   ],
@@ -981,19 +919,9 @@ class _MainPageState extends State<MainPage> {
                                 Navigator.of(context).push(slideRoute(
                                     PostViewPage(id: _wantedContents[0].id)));
                               },
-                              child: Text(
-                                getTitle(
-                                    _wantedContents[0].title,
-                                    _wantedContents[0].is_hidden,
-                                    _wantedContents[0].why_hidden),
-                                style: TextStyle(
-                                    color: _wantedContents[0].is_hidden
-                                        ? const Color(0xFFBBBBBB)
-                                        : Colors.black,
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.w400),
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
+                              child: LittleText(
+                                content: _wantedContents[0],
+                                showTopic: true,
                               ),
                             )
                           : Container(),
@@ -1052,20 +980,10 @@ class _MainPageState extends State<MainPage> {
                               Navigator.of(context).push(slideRoute(
                                   PostViewPage(id: _gradContents[0].id)));
                             },
-                            child: Text(
-                              getTitle(
-                                  _gradContents[0].title,
-                                  _gradContents[0].is_hidden,
-                                  _gradContents[0].why_hidden),
-                              style: TextStyle(
-                                  color: _gradContents[0].is_hidden
-                                      ? const Color(0xFFBBBBBB)
-                                      : Colors.black,
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w400),
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                            ))
+                            child: LittleText(
+                              content: _gradContents[0],
+                            ),
+                          )
                         : Container(),
                   ),
                 ],
@@ -1093,20 +1011,10 @@ class _MainPageState extends State<MainPage> {
                               Navigator.of(context).push(slideRoute(
                                   PostViewPage(id: _underGradContents[0].id)));
                             },
-                            child: Text(
-                              getTitle(
-                                  _underGradContents[0].title,
-                                  _underGradContents[0].is_hidden,
-                                  _underGradContents[0].why_hidden),
-                              style: TextStyle(
-                                  color: _underGradContents[0].is_hidden
-                                      ? const Color(0xFFBBBBBB)
-                                      : Colors.black,
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w400),
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                            ))
+                            child: LittleText(
+                              content: _underGradContents[0],
+                            ),
+                          )
                         : Container(),
                   ),
                 ],
@@ -1134,20 +1042,10 @@ class _MainPageState extends State<MainPage> {
                               Navigator.of(context).push(slideRoute(
                                   PostViewPage(id: _freshmanContents[0].id)));
                             },
-                            child: Text(
-                              getTitle(
-                                  _freshmanContents[0].title,
-                                  _freshmanContents[0].is_hidden,
-                                  _freshmanContents[0].why_hidden),
-                              style: TextStyle(
-                                  color: _freshmanContents[0].is_hidden
-                                      ? const Color(0xFFBBBBBB)
-                                      : Colors.black,
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w400),
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                            ))
+                            child: LittleText(
+                              content: _freshmanContents[0],
+                            ),
+                          )
                         : Container(),
                   ),
                 ],
@@ -1257,6 +1155,51 @@ class MainPageTextButton extends StatelessWidget {
           ),
           const Expanded(
             child: SizedBox(),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// 게시물 타이틀 텍스트를 표시하는 위젯.
+///
+/// [content] 는 ArticleListActionModel 형식으로 데이터를 받아온다.
+///
+/// [showTopic] 은 게시물의 부모 토픽을 표시할지 말지 결정한다.
+class LittleText extends StatelessWidget {
+  final ArticleListActionModel content;
+  final bool showTopic;
+  const LittleText({
+    super.key,
+    required this.content,
+    this.showTopic = false,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Text.rich(
+      maxLines: 1,
+      overflow: TextOverflow.ellipsis,
+      TextSpan(
+        children: [
+          if (content.parent_topic != null && showTopic)
+            TextSpan(
+              text: "[${content.parent_topic!.ko_name}] ",
+              style: const TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.w400,
+                color: Color(0xFFED3A3A),
+              ),
+            ),
+          TextSpan(
+            text:
+                getTitle(content.title, content.is_hidden, content.why_hidden),
+            style: TextStyle(
+              color: content.is_hidden ? const Color(0xFFBBBBBB) : Colors.black,
+              fontSize: 14,
+              fontWeight: FontWeight.w400,
+            ),
           ),
         ],
       ),
