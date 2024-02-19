@@ -116,6 +116,10 @@ class UserProvider with ChangeNotifier {
     }
   }
 
+  void debugCode1() {
+    _naUser!.agree_terms_of_service_at = null;
+  }
+
   /// 주어진 쿠키 설정으로 Dio 객체를 초기화하고 반환합니다.
   /// get 요청과 non-get 요청에 따라 다른 헤더 설정이 필요할 것을 대비하여 분리하여 설계하였음.
   Dio createDioWithHeadersForGet() {
@@ -230,14 +234,14 @@ class UserProvider with ChangeNotifier {
     return response;
   }
 
-  Future<bool> patchApiRes(String apiUrl, {dynamic payload}) async {
+  Future<Response?> patchApiRes(String apiUrl, {dynamic payload}) async {
     String totUrl = "$newAraDefaultUrl/api/$apiUrl";
 
     Dio dio = createDioWithHeadersForNonget();
     dio.options.headers['Cookie'] = getCookiesToString();
     dio.options.headers['X-Csrftoken'] = getCsrftokenToString();
 
-    late dynamic response;
+    late Response response;
     try {
       response = await dio.patch(totUrl, data: payload);
     } on DioException catch (e) {
@@ -247,19 +251,18 @@ class UserProvider with ChangeNotifier {
         debugPrint("${e.response!.data}");
         debugPrint("${e.response!.headers}");
         debugPrint("${e.response!.requestOptions}");
-        return false;
       }
       // request의 setting, sending에서 문제 발생
       // requestOption, message를 출력.
       else {
         debugPrint("${e.requestOptions}");
         debugPrint("${e.message}");
-        return false;
       }
+      return e.response;
     } catch (e) {
       debugPrint("_fetchUser failed with error: $e");
-      return false;
+      return null;
     }
-    return true;
+    return response;
   }
 }

@@ -235,10 +235,10 @@ class _TermsAndConditionsPageState extends State<TermsAndConditionsPage> {
                                 setState(() {
                                   _isLoading = true;
                                 });
-                                bool res = await userProvider.patchApiRes(
+                                Response? res = await userProvider.patchApiRes(
                                     'user_profiles/${userProvider.naUser!.user}/agree_terms_of_service/',
                                     payload: {});
-                                if (res) {
+                                if (res!=null && (res.statusCode == 200 || res.statusCode == 400)) {
                                   await userProvider.apiMeUserInfo();
                                   if (mounted) {
                                     Navigator.pop(context);
