@@ -100,7 +100,9 @@ class _MainPageState extends State<MainPage> {
   }
 
   Future<void> _getApiResCacheSetState(
-      String apiUrl, Function callback, UserProvider userProvider) async {
+      {required String apiUrl,
+      required UserProvider userProvider,
+      required Function callback}) async {
     try {
       final dynamic recentJson = await _loadApiDataFromCache(apiUrl);
       if (recentJson != null) {
@@ -121,81 +123,58 @@ class _MainPageState extends State<MainPage> {
   Future<void> _refreshDailyBest(UserProvider userProvider) async {
     //1. Shared_Preferences 값이 있으면(if not null) 그 값으로 UI 업데이트.
     //2. api 호출 후 새로운 response shared_preferences에 저장 후 UI 업데이트
-
     // api 호출과 Provider 정보 동기화.
 
-    try {
-      Map<String, dynamic>? recentJson =
-          await _loadApiDataFromCache('articles/top/');
-
-      if (recentJson != null) {
-        if (mounted) {
-          setState(() {
-            _dailyBestContents.clear();
-            for (Map<String, dynamic> json in recentJson['results']) {
-              _dailyBestContents.add(ArticleListActionModel.fromJson(json));
-            }
-            _isLoading[0] = false;
-          });
-        }
-      }
-      dynamic response = await userProvider.getApiRes("articles/top/");
-      await _saveApiDataToCache('articles/top/', response);
-      if (mounted) {
-        setState(() {
-          _dailyBestContents.clear();
-          for (Map<String, dynamic> json in response!['results']) {
-            _dailyBestContents.add(ArticleListActionModel.fromJson(json));
+    _getApiResCacheSetState(
+        apiUrl: 'articles/top/',
+        userProvider: userProvider,
+        callback: (response) {
+          if (mounted) {
+            setState(() {
+              _dailyBestContents.clear();
+              for (Map<String, dynamic> json in response['results']) {
+                _dailyBestContents.add(ArticleListActionModel.fromJson(json));
+              }
+              _isLoading[0] = false;
+            });
           }
-          _isLoading[0] = false;
         });
-      }
-    } catch (error) {
-      debugPrint("refreshDailyBest error: $error");
-      // 적절한 에러 처리 로직 추가
-    }
   }
 
   /// 게시판 목록 안의 게시물들을 새로 고침
   Future<void> _refreshBoardList(UserProvider userProvider) async {
-    List<dynamic>? boardJson = await _loadApiDataFromCache('boards/');
-    if (boardJson == null) {
-      boardJson = await userProvider.getApiRes("boards/", sendText: "here");
-      await _saveApiDataToCache('boards/', boardJson);
-
-      // 게시판 목록 로드 후 각 게시판의 공지사항들을 새로고침
-    } else {
-      userProvider
-          .getApiRes("boards/", sendText: "There")
-          .then((value) async => {await _saveApiDataToCache('boards/', value)});
-      // 게시판 목록 로드 후 각 게시판의 공지사항들을 새로고침
-    }
-    if (mounted) {
-      setState(() {
-        _boards.clear();
-        for (Map<String, dynamic> json in boardJson!) {
-          try {
-            _boards.add(BoardDetailActionModel.fromJson(json));
-          } catch (error) {
-            debugPrint(
-                "refreshBoardList BoardDetailActionModel.fromJson failed: $error");
-          }
+    _getApiResCacheSetState(
+      apiUrl: 'boards/',
+      userProvider: userProvider,
+      callback: (response) async {
+        if (mounted) {
+          setState(() {
+            _boards.clear();
+            for (Map<String, dynamic> json in response!) {
+              try {
+                _boards.add(BoardDetailActionModel.fromJson(json));
+              } catch (error) {
+                debugPrint(
+                    "refreshBoardList BoardDetailActionModel.fromJson failed: $error");
+              }
+            }
+            _isLoading[7] = false;
+          });
+          await Future.wait([
+            _refreshPortalNotice(userProvider),
+            _refreshFacilityNotice(userProvider),
+            _refreshNewAraNotice(userProvider),
+            _refreshGradAssocNotice(userProvider),
+            _refreshUndergradAssocNotice(userProvider),
+            _refreshFreshmanCouncil(userProvider),
+            _refreshTalks(userProvider),
+            _refreshMarket(userProvider),
+            _refreshWanted(userProvider),
+            _refreshRealEstate(userProvider)
+          ]);
         }
-        _isLoading[7] = false;
-      });
-      await Future.wait([
-        _refreshPortalNotice(userProvider),
-        _refreshFacilityNotice(userProvider),
-        _refreshNewAraNotice(userProvider),
-        _refreshGradAssocNotice(userProvider),
-        _refreshUndergradAssocNotice(userProvider),
-        _refreshFreshmanCouncil(userProvider),
-        _refreshTalks(userProvider),
-        _refreshMarket(userProvider),
-        _refreshWanted(userProvider),
-        _refreshRealEstate(userProvider)
-      ]);
-    }
+      },
+    );
   }
 
   ///포탈 게시물 글 불러오기.
@@ -275,42 +254,26 @@ class _MainPageState extends State<MainPage> {
         ? "articles/?parent_board=$boardID"
         : "articles/?parent_board=$boardID&parent_topic=$topicID";
 
-    final Map<String, dynamic>? recentJson =
-        await _loadApiDataFromCache(apiUrl);
-    if (recentJson != null) {
-      if (mounted) {
-        setState(() {
-          contentList.clear();
+    _getApiResCacheSetState(
+        apiUrl: apiUrl,
+        userProvider: userProvider,
+        callback: (response) async {
+          if (mounted) {
+            setState(() {
+              contentList.clear();
 
-          for (Map<String, dynamic> json in recentJson['results']) {
-            try {
-              contentList.add(ArticleListActionModel.fromJson(json));
-            } catch (error) {
-              debugPrint(
-                  "refreshBoardContent ArticleListActionModel.fromJson failed: $error");
-            }
+              for (Map<String, dynamic> json in response['results']) {
+                try {
+                  contentList.add(ArticleListActionModel.fromJson(json));
+                } catch (error) {
+                  debugPrint(
+                      "refreshBoardContent ArticleListActionModel.fromJson failed: $error");
+                }
+              }
+              _isLoading[isLoadingIndex] = false;
+            });
           }
-          _isLoading[isLoadingIndex] = false;
         });
-      }
-    }
-
-    final dynamic response = await userProvider.getApiRes(apiUrl);
-    await _saveApiDataToCache(apiUrl, response);
-    if (mounted) {
-      setState(() {
-        contentList.clear();
-        for (Map<String, dynamic> json in response!['results']) {
-          try {
-            contentList.add(ArticleListActionModel.fromJson(json));
-          } catch (error) {
-            debugPrint(
-                "refreshBoardContent ArticleListActionModel.fromJson failed: $error");
-          }
-        }
-        _isLoading[isLoadingIndex] = false;
-      });
-    }
   }
 
   /// 주어진 slug 값을 통해 게시판과 토픽의 ID를 찾음. topic 이 없는 경우 slug2로 ""을 넘겨주면 된다.
