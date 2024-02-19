@@ -116,10 +116,6 @@ class UserProvider with ChangeNotifier {
     }
   }
 
-  void debugCode1() {
-    _naUser!.agree_terms_of_service_at = null;
-  }
-
   /// 주어진 쿠키 설정으로 Dio 객체를 초기화하고 반환합니다.
   /// get 요청과 non-get 요청에 따라 다른 헤더 설정이 필요할 것을 대비하여 분리하여 설계하였음.
   Dio createDioWithHeadersForGet() {
