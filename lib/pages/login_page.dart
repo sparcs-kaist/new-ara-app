@@ -4,12 +4,16 @@ import 'package:easy_localization/easy_localization.dart';
 
 import 'package:new_ara_app/constants/colors_info.dart';
 import 'package:new_ara_app/pages/sparcs_sso_page.dart';
+import 'package:new_ara_app/pages/terms_and_conditions_page.dart';
 import 'package:new_ara_app/utils/slide_routing.dart';
 
 /// `LoginPage` 위젯은 사용자에게 로그인 페이지를 표시.
 class LoginPage extends StatefulWidget {
+  final bool? showTermsAndConditions;
+
   /// 기본 생성자입니다.
-  const LoginPage({Key? key}) : super(key: key);
+  const LoginPage({Key? key, this.showTermsAndConditions = false})
+      : super(key: key);
 
   @override
   State<LoginPage> createState() => _LoginPageState();
@@ -17,6 +21,19 @@ class LoginPage extends StatefulWidget {
 
 /// `_LoginPageState` 클래스는 `LoginPage` 위젯의 상태를 관리.
 class _LoginPageState extends State<LoginPage> {
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    if (widget.showTermsAndConditions == true) {
+      Navigator.of(context).push(
+        slideRoute(
+          const TermsAndConditionsPage(),
+        ),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
