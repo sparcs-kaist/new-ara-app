@@ -317,14 +317,17 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
                           ),
                         ),
                         // 닉네임 정책 안내 문구
-                        const Padding(
-                          padding: EdgeInsets.only(left: 80),
-                          child: Text(
-                            '닉네임은 한번 변경할 시 3개월간 변경이 불가합니다.',
-                            style: TextStyle(
-                              fontSize: 12,
-                              fontWeight: FontWeight.w600,
-                              color: Color.fromRGBO(191, 191, 191, 1),
+                        SizedBox(
+                          width: mediaQueryData.size.width - 60,
+                          child: const Padding(
+                            padding: EdgeInsets.only(left: 80),
+                            child: Text(
+                              '닉네임은 한번 변경할 시 3개월간 변경이 불가합니다.',
+                              style: TextStyle(
+                                fontSize: 12,
+                                fontWeight: FontWeight.w600,
+                                color: Color.fromRGBO(191, 191, 191, 1),
+                              ),
                             ),
                           ),
                         ),
