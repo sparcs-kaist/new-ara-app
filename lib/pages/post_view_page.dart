@@ -1805,7 +1805,7 @@ class _PostViewPageState extends State<PostViewPage> {
         "comments/${targetComment!.id}/",
         payload: defaultPayload,
       );
-      if (patchRes.statusCode != 200) {
+      if (patchRes == true) {
         debugPrint("PATCH /api/comments/${targetComment!.id}/ failed");
         return false;
       }
