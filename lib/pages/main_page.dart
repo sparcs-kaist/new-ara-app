@@ -1,4 +1,3 @@
-import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:easy_localization/easy_localization.dart';
@@ -19,24 +18,8 @@ import 'package:new_ara_app/pages/post_view_page.dart';
 import 'package:new_ara_app/utils/slide_routing.dart';
 import 'package:new_ara_app/providers/notification_provider.dart';
 import 'package:new_ara_app/utils/handle_hidden.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:new_ara_app/utils/cache_function.dart';
 
-///SharedPreferences를 이용해 데이터 저장( 키: api url, 값: api response)
-Future<void> _saveApiDataToCache(String key, dynamic data) async {
-  final prefs = await SharedPreferences.getInstance();
-  String jsonString = jsonEncode(data);
-  await prefs.setString(key, jsonString);
-}
-
-///SharedPreferences를 이용해 데이터 불러오기( 키: api url, 값: api response)
-Future<dynamic> _loadApiDataFromCache(String key) async {
-  final prefs = await SharedPreferences.getInstance();
-  String? jsonString = prefs.getString(key);
-  if (jsonString != null) {
-    return jsonDecode(jsonString);
-  }
-  return null;
-}
 
 class MainPage extends StatefulWidget {
   const MainPage({Key? key}) : super(key: key);
@@ -99,25 +82,7 @@ class _MainPageState extends State<MainPage> {
     context.read<NotificationProvider>().checkIsNotReadExist(userProvider);
   }
 
-  Future<void> _getApiResCacheSetState(
-      {required String apiUrl,
-      required UserProvider userProvider,
-      required Function callback}) async {
-    try {
-      final dynamic recentJson = await _loadApiDataFromCache(apiUrl);
-      if (recentJson != null) {
-        await callback(recentJson);
-      }
-      final dynamic response = await userProvider.getApiRes(apiUrl);
-      if (response != null) {
-        await _saveApiDataToCache(apiUrl, response);
-        await callback(response);
-      }
-    } catch (error) {
-      debugPrint("_getApiResCacheSetstate error: $error");
-      // 적절한 에러 처리 로직 추가
-    }
-  }
+  
 
   /// 일일 베스트 컨텐츠 데이터를 새로고침
   Future<void> _refreshDailyBest(UserProvider userProvider) async {
@@ -125,7 +90,7 @@ class _MainPageState extends State<MainPage> {
     //2. api 호출 후 새로운 response shared_preferences에 저장 후 UI 업데이트
     // api 호출과 Provider 정보 동기화.
 
-    _getApiResCacheSetState(
+    getApiResCacheSetState(
         apiUrl: 'articles/top/',
         userProvider: userProvider,
         callback: (response) {
@@ -143,7 +108,7 @@ class _MainPageState extends State<MainPage> {
 
   /// 게시판 목록 안의 게시물들을 새로 고침
   Future<void> _refreshBoardList(UserProvider userProvider) async {
-    _getApiResCacheSetState(
+    getApiResCacheSetState(
       apiUrl: 'boards/',
       userProvider: userProvider,
       callback: (response) async {
@@ -254,7 +219,7 @@ class _MainPageState extends State<MainPage> {
         ? "articles/?parent_board=$boardID"
         : "articles/?parent_board=$boardID&parent_topic=$topicID";
 
-    _getApiResCacheSetState(
+    getApiResCacheSetState(
         apiUrl: apiUrl,
         userProvider: userProvider,
         callback: (response) async {
