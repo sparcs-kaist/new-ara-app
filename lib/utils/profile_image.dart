@@ -39,8 +39,9 @@ Widget buildProfileImage(String? profileUri, double width, double height) {
           ),
         )
       : Image.network(
-          fit: BoxFit.cover,
           profileUri.toString(),
+          fit: BoxFit.cover,
+
           // 정상적인 이미지 로드에 실패했을 경우
           // warning 아이콘 표시하기
           errorBuilder:
