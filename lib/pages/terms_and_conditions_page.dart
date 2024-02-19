@@ -1,8 +1,13 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:new_ara_app/constants/colors_info.dart';
+import 'package:new_ara_app/constants/url_info.dart';
+import 'package:new_ara_app/providers/user_provider.dart';
+import 'package:new_ara_app/utils/create_dio_with_config.dart';
+import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class TermsAndConditionsPage extends StatefulWidget {
@@ -17,6 +22,7 @@ class _TermsAndConditionsPageState extends State<TermsAndConditionsPage> {
 
   @override
   Widget build(BuildContext context) {
+    UserProvider userProvider = context.watch<UserProvider>();
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -171,14 +177,17 @@ class _TermsAndConditionsPageState extends State<TermsAndConditionsPage> {
                       children: [
                         _buildNormalText(
                             "1. 아라에 대한 건의사항 또는 버그에 대한 사항은 구글폼을 통해 문의 및 제보할 수 있습니다."),
-                         Text.rich(
-                TextSpan(
-                  text: 'https://sparcs.page.link/newara-feedback',
-                  style: const TextStyle(color: Colors.blue),
-                  recognizer: TapGestureRecognizer()
-                    ..onTap = () async{ await launchUrl(Uri.parse('https://sparcs.page.link/newara-feedback'));
-                  },
-                ),),
+                        Text.rich(
+                          TextSpan(
+                            text: 'https://sparcs.page.link/newara-feedback',
+                            style: const TextStyle(color: Colors.blue),
+                            recognizer: TapGestureRecognizer()
+                              ..onTap = () async {
+                                await launchUrl(Uri.parse(
+                                    'https://sparcs.page.link/newara-feedback'));
+                              },
+                          ),
+                        ),
                         _buildNormalText(
                             "2. 6조 1항의 구글폼이 작동하지 않거나, 기타 사항의 경우 new-ara@sparcs.org 를 통해 문의 및 제보할 수 있습니다.\n"),
                       ],
@@ -206,8 +215,38 @@ class _TermsAndConditionsPageState extends State<TermsAndConditionsPage> {
                     ),
                   ),
 
-                  _buildNormalText(
-                      "본 약관은 2020-09-26부터 적용됩니다."), // 제 3조 이후의 내용도 같은 방식으로 추가...
+                  _buildNormalText("본 약관은 2020-09-26부터 적용됩니다."),
+
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Expanded(
+                        child: Center(
+                          child: InkWell(
+
+                              // 로직 설명
+                              // 1. 동의하면 agree_terms_of_service patch 요청
+                              // 2. userProvider.apiMe 함수 호출하여
+                              // 3. userProvider.naUser 값을 갱신
+                              // 4. main.dart에서 context.watch<UserProvider>().naUser!.agree_terms_of_service_at 또한 변경되어 MainNavigationTabPage로 진입
+                              onTap: () async {
+                                bool res = await userProvider.patchApiRes(
+                                    'user_profiles/${userProvider.naUser!.user}/agree_terms_of_service/',
+                                    payload: {
+                                      "user": userProvider.naUser!.user,
+                                      "agree_terms_of_service_at":
+                                          "2024-02-19T17:32:50.499Z"
+                                    });
+                                if (res) {
+                                  await userProvider.apiMeUserInfo();
+                                  Navigator.pop(context);
+                                }
+                              },
+                              child: Text("동의 하기")),
+                        ),
+                      )
+                    ],
+                  ), // 제 3조 이후의 내용도 같은 방식으로 추가...
                 ],
               ),
             ),
@@ -226,7 +265,6 @@ class _TermsAndConditionsPageState extends State<TermsAndConditionsPage> {
         fontFamily: 'NotoSansKR',
         height: 1.6,
         fontSize: 16,
-
       ),
     );
   }
