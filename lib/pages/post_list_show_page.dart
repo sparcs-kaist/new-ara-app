@@ -118,46 +118,48 @@ class _PostListShowPageState extends State<PostListShowPage> {
   }
 
   // 스크롤 리스너 함수. 스크롤이 끝에 도달하면 추가 데이터를 로드
-  void _scrollListener() async {
+  Future<void> _loadNextPage() async {
     var userProvider = context.read<UserProvider>();
+    setState(() {
+      _isLoadingNextPage = true;
+    });
 
+    // api 호출과 Provider 정보 동기화.
+    // await Future.delayed(Duration(seconds: 1));
+    try {
+      currentPage = currentPage + 1;
+      Map<String, dynamic>? myMap =
+          await userProvider.getApiRes("$apiUrl$currentPage");
+      if (mounted) {
+        setState(() {
+          for (int i = 0; i < (myMap!["results"].length ?? 0); i++) {
+            if (myMap["results"][i]["created_by"]["profile"] != null) {
+              postPreviewList.add(
+                  ArticleListActionModel.fromJson(myMap["results"][i] ?? {}));
+            } else if (widget.boardType == BoardType.scraps) {
+              // 스크랩 게시물이면
+              postPreviewList.add(ArticleListActionModel.fromJson(
+                  myMap["results"][i]["parent_article"] ?? {}));
+            }
+          }
+        });
+      }
+    } catch (error) {
+      currentPage = currentPage - 1;
+      debugPrint("scrollListener error : $error");
+    }
+    if (mounted) {
+      setState(() {
+        _isLoadingNextPage = false;
+      });
+    }
+  }
+
+  void _scrollListener() async {
     if (_scrollController.position.pixels >=
             _scrollController.position.maxScrollExtent &&
         _isLoadingNextPage == false) {
-      setState(() {
-        _isLoadingNextPage = true;
-      });
-
-      // api 호출과 Provider 정보 동기화.
-      // await Future.delayed(Duration(seconds: 1));
-      try {
-        currentPage = currentPage + 1;
-        Map<String, dynamic>? myMap =
-            await userProvider.getApiRes("$apiUrl$currentPage");
-        if (mounted) {
-          setState(() {
-            for (int i = 0; i < (myMap!["results"].length ?? 0); i++) {
-              if (myMap["results"][i]["created_by"]["profile"] != null) {
-                postPreviewList.add(
-                    ArticleListActionModel.fromJson(myMap["results"][i] ?? {}));
-              } else if (widget.boardType == BoardType.scraps) {
-                // 스크랩 게시물이면
-                postPreviewList.add(ArticleListActionModel.fromJson(
-                    myMap["results"][i]["parent_article"] ?? {}));
-              }
-            }
-          });
-        }
-      } catch (error) {
-        currentPage = currentPage - 1;
-        debugPrint("scrollListener error : $error");
-      }
-      if (mounted) {
-        setState(() {
-          isLoading = false;
-          _isLoadingNextPage = false;
-        });
-      }
+      _loadNextPage();
     }
   }
 
