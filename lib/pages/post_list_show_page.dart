@@ -286,63 +286,45 @@ class _PostListShowPageState extends State<PostListShowPage> {
                       setState((() => isLoading = true));
                       await updateAllBulletinList();
                     },
-                    child: SizedBox(
-                      height: MediaQuery.of(context).size.height,
-                      child: Column(
-                        children: [
-                          // Visibility(
-                          //   visible: _boardName == '학교에게 전합니다',
-                          //   child: const Row(
-                          //     mainAxisAlignment: MainAxisAlignment.end,
-                          //     children: [WithSchoolPopupMenuButton()],
-                          //   ),
-                          // ),
-                          Expanded(
-                            child: ListView.separated(
-                              controller: _scrollController,
-                              itemCount: postPreviewList.length +
-                                  (_isLoadingNextPage ? 1 : 0), // 아이템 개수
-                              itemBuilder: (BuildContext context, int index) {
-                                // 각 아이템을 위한 위젯 생성
-                                if (_isLoadingNextPage &&
-                                    index == postPreviewList.length) {
-                                  return const SizedBox(
-                                    height: 50,
-                                    child: Center(
-                                      child: LoadingIndicator(),
-                                    ),
-                                  );
-                                } else {
-                                  return InkWell(
-                                    onTap: () async {
-                                      await Navigator.of(context).push(
-                                          slideRoute(PostViewPage(
-                                              id: postPreviewList[index].id)));
-                                      updateAllBulletinList();
-                                    },
-                                    child: Column(
-                                      children: [
-                                        Padding(
-                                          padding: const EdgeInsets.all(11.0),
-                                          child: PostPreview(
-                                              model: postPreviewList[index]),
-                                        ),
-                                      ],
-                                    ),
-                                  );
-                                }
-                              },
-                              separatorBuilder:
-                                  (BuildContext context, int index) {
-                                return Container(
-                                  height: 1,
-                                  color: const Color(0xFFF0F0F0),
-                                );
-                              },
+                    child: ListView.separated(
+                      controller: _scrollController,
+                      itemCount: postPreviewList.length +
+                          (_isLoadingNextPage ? 1 : 0), // 아이템 개수
+                      itemBuilder: (BuildContext context, int index) {
+                        // 각 아이템을 위한 위젯 생성
+                        if (_isLoadingNextPage &&
+                            index == postPreviewList.length) {
+                          return const SizedBox(
+                            height: 50,
+                            child: Center(
+                              child: LoadingIndicator(),
                             ),
-                          ),
-                        ],
-                      ),
+                          );
+                        } else {
+                          return InkWell(
+                            onTap: () async {
+                              await Navigator.of(context).push(slideRoute(
+                                  PostViewPage(id: postPreviewList[index].id)));
+                              updateAllBulletinList();
+                            },
+                            child: Column(
+                              children: [
+                                Padding(
+                                  padding: const EdgeInsets.all(11.0),
+                                  child: PostPreview(
+                                      model: postPreviewList[index]),
+                                ),
+                              ],
+                            ),
+                          );
+                        }
+                      },
+                      separatorBuilder: (BuildContext context, int index) {
+                        return Container(
+                          height: 1,
+                          color: const Color(0xFFF0F0F0),
+                        );
+                      },
                     ),
                   ),
                 ),
