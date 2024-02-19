@@ -7,6 +7,7 @@ import 'package:new_ara_app/constants/colors_info.dart';
 import 'package:new_ara_app/constants/url_info.dart';
 import 'package:new_ara_app/providers/user_provider.dart';
 import 'package:new_ara_app/utils/create_dio_with_config.dart';
+import 'package:new_ara_app/widgets/loading_indicator.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -19,6 +20,7 @@ class TermsAndConditionsPage extends StatefulWidget {
 
 class _TermsAndConditionsPageState extends State<TermsAndConditionsPage> {
   final _controller = ScrollController();
+  bool _isLoading = false;
 
   @override
   Widget build(BuildContext context) {
@@ -57,7 +59,7 @@ class _TermsAndConditionsPageState extends State<TermsAndConditionsPage> {
         ),
       ),
       body: SafeArea(
-        child: CupertinoScrollbar(
+        child: _isLoading? const LoadingIndicator():CupertinoScrollbar(
           thumbVisibility: true,
           controller: _controller,
           child: SingleChildScrollView(
@@ -230,17 +232,21 @@ class _TermsAndConditionsPageState extends State<TermsAndConditionsPage> {
                               // 3. userProvider.naUser 값을 갱신
                               // 4. main.dart에서 context.watch<UserProvider>().naUser!.agree_terms_of_service_at 또한 변경되어 MainNavigationTabPage로 진입
                               onTap: () async {
+                                setState(() {
+                                  _isLoading = true;
+                                });
                                 bool res = await userProvider.patchApiRes(
                                     'user_profiles/${userProvider.naUser!.user}/agree_terms_of_service/',
-                                    payload: {
-                                      "user": userProvider.naUser!.user,
-                                      "agree_terms_of_service_at":
-                                          "2024-02-19T17:32:50.499Z"
-                                    });
+                                    payload: {});
                                 if (res) {
                                   await userProvider.apiMeUserInfo();
-                                  Navigator.pop(context);
+                                  if (mounted) {
+                                    Navigator.pop(context);
+                                  }
                                 }
+                                setState(() {
+                                  _isLoading = false;
+                                });
                               },
                               child: Text("동의 하기")),
                         ),
