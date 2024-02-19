@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:webview_flutter/webview_flutter.dart';
+// Import for Android features.
+import 'package:webview_flutter_android/webview_flutter_android.dart';
+// Import for iOS features.
+import 'package:webview_flutter_wkwebview/webview_flutter_wkwebview.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter/foundation.dart';
@@ -133,7 +137,21 @@ class _InArticleWebViewState extends State<InArticleWebView> {
     super.initState();
     isFitted = false;
     webViewHeight = widget.initialHeight;
-    _webViewController = WebViewController()
+
+    late final PlatformWebViewControllerCreationParams params;
+    if (WebViewPlatform.instance is WebKitWebViewPlatform) {
+      params = WebKitWebViewControllerCreationParams(
+        allowsInlineMediaPlayback: true,
+        mediaTypesRequiringUserAction: const <PlaybackMediaTypes>{},
+      );
+    } else {
+      params = const PlatformWebViewControllerCreationParams();
+    }
+
+    final WebViewController controller =
+        WebViewController.fromPlatformCreationParams(params);
+
+    controller
       ..setJavaScriptMode(JavaScriptMode.unrestricted)
       ..setBackgroundColor(const Color(0x00000000))
       ..setNavigationDelegate(NavigationDelegate(
@@ -175,15 +193,40 @@ class _InArticleWebViewState extends State<InArticleWebView> {
         },
       ))
       ..loadHtmlString(getContentHtml(widget.content));
+
+    _webViewController = controller;
   }
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      height: webViewHeight,
-      child: WebViewWidget(
+    late WebViewWidget webViewWidget;
+
+    // 안드로이드 플랫폼의 경우 displayHybridComposition: true로 설정한다
+    // 안드로이드의 경우 이렇게 하지않으면 웹뷰 crash 문제가 발생
+    // Related issue: https://github.com/flutter/flutter/issues/104889
+    if (WebViewPlatform.instance is AndroidWebViewPlatform) {
+      debugPrint("android detected for webview");
+      webViewWidget = WebViewWidget.fromPlatformCreationParams(
+        params: AndroidWebViewWidgetCreationParams(
+          controller: _webViewController.platform,
+          displayWithHybridComposition: true,
+          gestureRecognizers: {
+          Factory<OneSequenceGestureRecognizer>(() {
+            TapGestureRecognizer tabGestureRecognizer = TapGestureRecognizer();
+            tabGestureRecognizer.onTapDown = (_) {
+              FocusScope.of(context).unfocus();
+            };
+            return tabGestureRecognizer;
+          }),
+          // pinch-to-zoom 기능을 위해서
+          Factory<ScaleGestureRecognizer>(() => ScaleGestureRecognizer()),
+        },
+        ),
+      );
+    } else {
+      debugPrint("Not android detected for webview");
+      webViewWidget = WebViewWidget(
         controller: _webViewController,
-        // 웹뷰를 클릭하였을 때 키보드를 비활성화.
         gestureRecognizers: {
           Factory<OneSequenceGestureRecognizer>(() {
             TapGestureRecognizer tabGestureRecognizer = TapGestureRecognizer();
@@ -195,7 +238,12 @@ class _InArticleWebViewState extends State<InArticleWebView> {
           // pinch-to-zoom 기능을 위해서
           Factory<ScaleGestureRecognizer>(() => ScaleGestureRecognizer()),
         },
-      ),
+      );
+    }
+
+    return SizedBox(
+      height: webViewHeight,
+      child: webViewWidget,
     );
   }
 }
