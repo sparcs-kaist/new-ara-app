@@ -141,27 +141,29 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
   /// infoText 매개변수를 전달받아 스낵바 메시지를 띄워주는 함수
   /// 프로필 설정 변경 시에 문제가 생겼을 때 알려주는 용도로 사용.
   void noticeUserBySnackBar(String infoText) {
-    SnackBar araSnackBar = buildAraSnackBar(context,
-        content: Row(
-          children: [
-            SvgPicture.asset(
-              'assets/icons/information.svg',
-              colorFilter: const ColorFilter.mode(ColorsInfo.newara, BlendMode.srcIn),
-              width: 32,
-              height: 32,
+    SnackBar araSnackBar = buildAraSnackBar(
+      context,
+      content: Row(
+        children: [
+          SvgPicture.asset(
+            'assets/icons/information.svg',
+            colorFilter:
+                const ColorFilter.mode(ColorsInfo.newara, BlendMode.srcIn),
+            width: 32,
+            height: 32,
+          ),
+          const SizedBox(width: 8),
+          Flexible(
+              child: Text(
+            infoText,
+            style: const TextStyle(
+              color: Colors.black,
+              fontWeight: FontWeight.w400,
+              fontSize: 15,
             ),
-            const SizedBox(width: 8),
-            Flexible(
-                child: Text(
-              infoText,
-              style: const TextStyle(
-                color: Colors.black,
-                fontWeight: FontWeight.w400,
-                fontSize: 15,
-              ),
-            )),
-          ],
-        ),
+          )),
+        ],
+      ),
     );
     hideOldsAndShowAraSnackBar(context, araSnackBar);
   }
@@ -179,12 +181,23 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
         : Scaffold(
             appBar: AppBar(
               centerTitle: true,
-              leading: IconButton(
-                icon: SvgPicture.asset(
-                  "assets/icons/close-2.svg",
-                  color: ColorsInfo.newara,
+              leadingWidth: 100,
+              leading: GestureDetector(
+                behavior: HitTestBehavior.translucent,
+                onTap: () => Navigator.pop(context),
+                child: Stack(
+                  alignment: Alignment.centerLeft,
+                  children: [
+                    SvgPicture.asset(
+                      'assets/icons/left_chevron.svg',
+                      colorFilter: const ColorFilter.mode(
+                          ColorsInfo.newara, BlendMode.srcATop),
+                      fit: BoxFit.fill,
+                      width: 35,
+                      height: 35,
+                    ),
+                  ],
                 ),
-                onPressed: () => Navigator.pop(context),
               ),
               title: const Text(
                 "프로필 수정",
