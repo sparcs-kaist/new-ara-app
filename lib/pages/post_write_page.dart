@@ -17,6 +17,7 @@ import 'package:new_ara_app/models/attachment_model.dart';
 import 'package:new_ara_app/models/board_detail_action_model.dart';
 import 'package:new_ara_app/models/simple_board_model.dart';
 import 'package:new_ara_app/models/topic_model.dart';
+import 'package:new_ara_app/pages/bulletin_search_page.dart';
 import 'package:new_ara_app/pages/post_view_page.dart';
 import 'package:new_ara_app/pages/terms_and_conditions_page.dart';
 import 'package:new_ara_app/providers/user_provider.dart';
@@ -173,6 +174,7 @@ class _PostWritePageState extends State<PostWritePage>
 
   bool _isKeyboardClosed = true;
 
+  var _editorScrollController = ScrollController();
   @override
   void initState() {
     super.initState();
@@ -225,7 +227,13 @@ class _PostWritePageState extends State<PostWritePage>
   }
 
   @override
-  void didChangeMetrics() {
+  void didChangeMetrics() async {
+    var now = DateTime.now();
+    debugPrint("now: $now, ${MediaQuery.of(context).viewInsets.bottom}");
+    // 기기의 키보드가 올라가거나 내려가는 애니메이션 길이가 다르다.
+    // 기기의 애니메이션이 끝나고 확인하기 위해 50ms의 딜레이를 준다.
+    await Future.delayed(const Duration(milliseconds: 50));
+    if (!mounted) return;
     final value = MediaQuery.of(context).viewInsets.bottom;
     if (value > 0) {
       if (_isKeyboardClosed) {
@@ -243,7 +251,6 @@ class _PostWritePageState extends State<PostWritePage>
       debugPrint("키보드가 내려갔습니다.(애니메이션 종료)");
     } else {
       debugPrint("키보드가 올라갔습니다.(애니메이션 종료)");
-      setState(() {});
     }
     setState(() {
       _isKeyboardClosed = isVisible;
@@ -428,9 +435,9 @@ class _PostWritePageState extends State<PostWritePage>
             body: SafeArea(
               child: Column(
                 children: [
-                  _buildMenubar(),
+                  if (_isKeyboardClosed) _buildMenubar(),
                   const SizedBox(
-                    height: 20,
+                    height: 15,
                   ),
                   _buildTitle(),
                   const SizedBox(height: 15),
@@ -442,7 +449,7 @@ class _PostWritePageState extends State<PostWritePage>
                     ),
                   ),
                   const SizedBox(
-                    height: 20,
+                    height: 15,
                   ),
                   _buildToolbar(),
                   const SizedBox(
@@ -648,54 +655,51 @@ class _PostWritePageState extends State<PostWritePage>
   }
 
   Widget _buildTitle() {
-    return SizedBox(
-      height: 39,
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 20),
-        child: TextField(
-          controller: _titleController,
-          focusNode: _titleFocusNode,
-          minLines: 1,
-          maxLines: 1,
-          maxLength: 255,
-          style: const TextStyle(
-            height: 32.56 / 22,
-            fontSize: 22,
-            fontWeight: FontWeight.w700,
-          ),
-          onChanged: (String s) {
-            // build 함수를 다시 실행하여 올릴 수 있는 게시물인지 유효성 검사
-            setState(() {});
-          },
-          decoration: const InputDecoration(
-            hintText: "제목을 입력해주세요.",
-            hintStyle: TextStyle(
-                height: 32.56 / 22,
-                fontSize: 22,
-                color: Color(0xFFBBBBBB),
-                fontWeight: FontWeight.w700),
-            // counterStyle: TextStyle(
-            //   height: double.minPositive,
-            // ),
-            counterText: "",
-            filled: true,
-            fillColor: Colors.white,
-            isDense: true,
-            isCollapsed: true,
-            contentPadding: EdgeInsets.fromLTRB(0, 0, 0, 0),
-            enabledBorder: OutlineInputBorder(
-              borderSide: BorderSide(
-                color: Colors.transparent, // 테두리 색상 설정
-              ), // 모서리를 둥글게 설정
-            ),
-            focusedBorder: OutlineInputBorder(
-              borderSide: BorderSide(
-                color: Colors.transparent, // 테두리 색상 설정
-              ), // 모서리를 둥글게 설정
-            ),
-          ),
-          cursorColor: Colors.transparent,
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 20),
+      child: TextField(
+        controller: _titleController,
+        focusNode: _titleFocusNode,
+        minLines: 1,
+        maxLines: 1,
+        maxLength: 255,
+        style: const TextStyle(
+          height: 27 / 22,
+          fontSize: 22,
+          fontWeight: FontWeight.w700,
         ),
+        onChanged: (String s) {
+          // build 함수를 다시 실행하여 올릴 수 있는 게시물인지 유효성 검사
+          setState(() {});
+        },
+        decoration: const InputDecoration(
+          hintText: "제목을 입력해주세요.",
+          hintStyle: TextStyle(
+              height: 27 / 22,
+              fontSize: 22,
+              color: Color(0xFFBBBBBB),
+              fontWeight: FontWeight.w700),
+          // counterStyle: TextStyle(
+          //   height: double.minPositive,
+          // ),
+          counterText: "",
+          filled: true,
+          fillColor: Colors.white,
+          isDense: true,
+          isCollapsed: true,
+          contentPadding: EdgeInsets.fromLTRB(0, 0, 0, 0),
+          enabledBorder: OutlineInputBorder(
+            borderSide: BorderSide(
+              color: Colors.transparent, // 테두리 색상 설정
+            ), // 모서리를 둥글게 설정
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderSide: BorderSide(
+              color: Colors.transparent, // 테두리 색상 설정
+            ), // 모서리를 둥글게 설정
+          ),
+        ),
+        cursorColor: Colors.transparent,
       ),
     );
   }
@@ -714,25 +718,32 @@ class _PostWritePageState extends State<PostWritePage>
             child: Row(
               children: [
                 const SizedBox(
-                  width: 7,
+                  width: 15,
                 ),
-                InkWell(
-                  onTap: () async {
-                    FocusScope.of(context).unfocus();
-                    bool picktf = await _pickFile();
-                    if (!mounted) return;
-                    if (picktf) {
+                Builder(
+                  builder: (BuildContext context) {
+                    if (_chosenBoardValue == _defaultBoardDetailActionModel) {
+                      return const Text(
+                        "게시판을 선택해주세요.",
+                        style: TextStyle(
+                          fontSize: 16,
+                          height: 24 / 16,
+                          fontWeight: FontWeight.w500,
+                          color: Color(0xFFBBBBBB),
+                        ),
+                      );
                     } else {
-                      _editorFocusNode.requestFocus();
+                      return Text(
+                        "${_chosenBoardValue!.ko_name}에 글 쓰는 중...",
+                        style: const TextStyle(
+                          fontSize: 16,
+                          height: 24 / 16,
+                          fontWeight: FontWeight.w500,
+                          color: Color(0xFFBBBBBB),
+                        ),
+                      );
                     }
                   },
-                  child: SizedBox(
-                    width: 36,
-                    height: 36,
-                    child: SvgPicture.asset(
-                      'assets/icons/clip.svg',
-                    ),
-                  ),
                 ),
                 const Spacer(),
                 Container(
@@ -775,7 +786,10 @@ class _PostWritePageState extends State<PostWritePage>
                       width: 10,
                     ),
                     InkWell(
-                      onTap: _pickFile,
+                      onTap: () async {
+                        _isFileMenuBarSelected = true;
+                        await _pickFile();
+                      },
                       child: Row(
                         children: [
                           SvgPicture.asset(
@@ -1363,7 +1377,8 @@ class _PostWritePageState extends State<PostWritePage>
         embedBuilders: FlutterQuillEmbeds.builders(),
         readOnly: false, // The editor is editable
 
-        scrollController: ScrollController(),
+        scrollController: _editorScrollController,
+
         padding: EdgeInsets.zero,
         scrollable: true,
         autoFocus: false,
@@ -1599,6 +1614,7 @@ class _PostWritePageState extends State<PostWritePage>
 
   /// 사진 추가 시 실행되는 함수
   Future<void> _pickImage() async {
+    FocusScope.of(context).unfocus();
     final ImagePicker imagePicker = ImagePicker();
     final XFile? image =
         await imagePicker.pickImage(source: ImageSource.gallery);
@@ -1634,6 +1650,7 @@ class _PostWritePageState extends State<PostWritePage>
         ));
       });
     }
+    _editorFocusNode.requestFocus();
   }
 
   /// 첨부파일 추가 시 실행되는 함수
