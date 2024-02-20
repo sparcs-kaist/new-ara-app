@@ -1232,33 +1232,40 @@ class _PostWritePageState extends State<PostWritePage>
   }
 
   Widget _buildToolbar() {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20),
-      child: quill.QuillToolbar.basic(
-        controller: _quillController,
-        multiRowsDisplay: true,
-        showUndo: false,
-        showRedo: false,
-        showColorButton: false,
-        showBackgroundColorButton: false,
-        showFontFamily: false,
-        showFontSize: false,
-        showDividers: false,
-        showListCheck: false,
-        showSearchButton: false,
-        showSubscript: false,
-        showSuperscript: false,
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.start,
+      children: [
+        Expanded(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20),
+            child: quill.QuillToolbar.basic(
+              controller: _quillController,
+              multiRowsDisplay: true,
+              showUndo: false,
+              showRedo: false,
+              showColorButton: false,
+              showBackgroundColorButton: false,
+              showFontFamily: false,
+              showFontSize: false,
+              showDividers: false,
+              showListCheck: false,
+              showSearchButton: false,
+              showSubscript: false,
+              showSuperscript: false,
 
-        toolbarIconAlignment: WrapAlignment.start,
-        toolbarIconCrossAlignment: WrapCrossAlignment.start,
-        customButtons: [
-          quill.QuillCustomButton(
-            icon: Icons.camera_alt,
-            onTap: _pickImage,
+              toolbarIconAlignment: WrapAlignment.start,
+              toolbarIconCrossAlignment: WrapCrossAlignment.start,
+              customButtons: [
+                quill.QuillCustomButton(
+                  icon: Icons.camera_alt,
+                  onTap: _pickImage,
+                ),
+              ],
+              // embedButtons: FlutterQuillEmbeds.buttons(),
+            ),
           ),
-        ],
-        // embedButtons: FlutterQuillEmbeds.buttons(),
-      ),
+        ),
+      ],
     );
   }
 
