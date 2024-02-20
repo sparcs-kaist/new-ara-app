@@ -127,7 +127,7 @@ class _PostWritePageState extends State<PostWritePage>
   );
 
   /// 익명, 성인, 정치 체크 박스가 선택되어 있는지 판별을 위한 리스트
-  final List<bool?> _selectedCheckboxes = [false, false, false];
+  final List<bool?> _selectedCheckboxes = [true, false, false];
 
   /// 첨부파일 메뉴바가 펼쳐져 있는 지 판별을 위한 변수
   bool _isFileMenuBarSelected = false;
@@ -1232,33 +1232,40 @@ class _PostWritePageState extends State<PostWritePage>
   }
 
   Widget _buildToolbar() {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20),
-      child: quill.QuillToolbar.basic(
-        controller: _quillController,
-        multiRowsDisplay: true,
-        showUndo: false,
-        showRedo: false,
-        showColorButton: false,
-        showBackgroundColorButton: false,
-        showFontFamily: false,
-        showFontSize: false,
-        showDividers: false,
-        showListCheck: false,
-        showSearchButton: false,
-        showSubscript: false,
-        showSuperscript: false,
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.start,
+      children: [
+        Expanded(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20),
+            child: quill.QuillToolbar.basic(
+              controller: _quillController,
+              multiRowsDisplay: true,
+              showUndo: false,
+              showRedo: false,
+              showColorButton: false,
+              showBackgroundColorButton: false,
+              showFontFamily: false,
+              showFontSize: false,
+              showDividers: false,
+              showListCheck: false,
+              showSearchButton: false,
+              showSubscript: false,
+              showSuperscript: false,
 
-        toolbarIconAlignment: WrapAlignment.start,
-        toolbarIconCrossAlignment: WrapCrossAlignment.start,
-        customButtons: [
-          quill.QuillCustomButton(
-            icon: Icons.camera_alt,
-            onTap: _pickImage,
+              toolbarIconAlignment: WrapAlignment.start,
+              toolbarIconCrossAlignment: WrapCrossAlignment.start,
+              customButtons: [
+                quill.QuillCustomButton(
+                  icon: Icons.camera_alt,
+                  onTap: _pickImage,
+                ),
+              ],
+              // embedButtons: FlutterQuillEmbeds.buttons(),
+            ),
           ),
-        ],
-        // embedButtons: FlutterQuillEmbeds.buttons(),
-      ),
+        ),
+      ],
     );
   }
 
@@ -1565,7 +1572,8 @@ class _PostWritePageState extends State<PostWritePage>
           // TODO: 명명 규칙 다름
           'name_type': _chosenBoardValue!.slug == 'with-school'
               ? 'REALNAME'
-              : _chosenBoardValue!.slug == "talk"
+              : _chosenBoardValue!.slug == "talk" &&
+                      _selectedCheckboxes[0]! == true
                   ? 'ANONYMOUS'
                   : 'REGULAR',
         };
