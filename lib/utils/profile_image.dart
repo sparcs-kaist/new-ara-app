@@ -42,6 +42,14 @@ Widget buildProfileImage(String? profileUri, double width, double height) {
           profileUri.toString(),
           fit: BoxFit.cover,
 
+          //이미지를 네트워크에서 불러올 동안 보여줄 위젯이 필요함.
+          loadingBuilder: (BuildContext context, Widget child,
+              ImageChunkEvent? loadingProgress) {
+            if (loadingProgress == null) {
+              return child;
+            }
+            return Container();
+          },
           // 정상적인 이미지 로드에 실패했을 경우
           // warning 아이콘 표시하기
           errorBuilder:
