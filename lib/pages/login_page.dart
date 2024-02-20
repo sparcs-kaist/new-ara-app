@@ -4,6 +4,7 @@ import 'package:easy_localization/easy_localization.dart';
 
 import 'package:new_ara_app/constants/colors_info.dart';
 import 'package:new_ara_app/pages/sparcs_sso_page.dart';
+import 'package:new_ara_app/pages/terms_and_conditions_page.dart';
 import 'package:new_ara_app/utils/slide_routing.dart';
 
 /// `LoginPage` 위젯은 사용자에게 로그인 페이지를 표시.
@@ -17,6 +18,14 @@ class LoginPage extends StatefulWidget {
 
 /// `_LoginPageState` 클래스는 `LoginPage` 위젯의 상태를 관리.
 class _LoginPageState extends State<LoginPage> {
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+
+    //위젯 렌더링을 모두 마치고 나서 실행되는 콜백함수
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -49,8 +58,8 @@ class _LoginPageState extends State<LoginPage> {
                       fontWeight: FontWeight.w500,
                     ),
                   ),
-                  onPressed: () {
-                    Navigator.of(context).push(
+                  onPressed: () async {
+                    await Navigator.of(context).push(
                       slideRoute(
                         const SparcsSSOPage(),
                       ),

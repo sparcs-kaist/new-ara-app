@@ -1801,11 +1801,12 @@ class _PostViewPageState extends State<PostViewPage> {
         "is_mine": true,
         "name_type": _article.name_type,
       };
-      var patchRes = await userProvider.patchApiRes(
+      Response? patchRes = await userProvider.patchApiRes(
+        
         "comments/${targetComment!.id}/",
         payload: defaultPayload,
       );
-      if (patchRes.statusCode != 200) {
+      if (patchRes!=null && patchRes.statusCode != 200) {
         debugPrint("PATCH /api/comments/${targetComment!.id}/ failed");
         return false;
       }

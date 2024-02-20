@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:new_ara_app/pages/terms_and_conditions_page.dart';
 import 'package:new_ara_app/widgets/loading_indicator.dart';
 import 'package:provider/provider.dart';
 
@@ -117,7 +118,13 @@ class _MyAppState extends State<MyApp> {
         home: isLoading == true
             ? const LoadingIndicator() // 로그인 중에는 로딩 인디케이터 표시
             : context.watch<UserProvider>().hasData
-                ? const MainNavigationTabPage()
+                ? (context
+                            .watch<UserProvider>()
+                            .naUser!
+                            .agree_terms_of_service_at !=
+                        null
+                    ? const MainNavigationTabPage()
+                    : const LoginPage())
                 : const LoginPage());
   }
 
