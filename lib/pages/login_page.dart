@@ -9,11 +9,8 @@ import 'package:new_ara_app/utils/slide_routing.dart';
 
 /// `LoginPage` 위젯은 사용자에게 로그인 페이지를 표시.
 class LoginPage extends StatefulWidget {
-  final bool? showTermsAndConditions;
-
   /// 기본 생성자입니다.
-  const LoginPage({Key? key, this.showTermsAndConditions = false})
-      : super(key: key);
+  const LoginPage({Key? key}) : super(key: key);
 
   @override
   State<LoginPage> createState() => _LoginPageState();
@@ -27,15 +24,6 @@ class _LoginPageState extends State<LoginPage> {
     super.initState();
 
     //위젯 렌더링을 모두 마치고 나서 실행되는 콜백함수
-     WidgetsBinding.instance.addPostFrameCallback((_) {
-    if (widget.showTermsAndConditions == true) {
-      Navigator.of(context).push(
-        slideRoute(
-          const TermsAndConditionsPage(),
-        ),
-      );
-    }
-  });
   }
 
   @override
@@ -70,8 +58,8 @@ class _LoginPageState extends State<LoginPage> {
                       fontWeight: FontWeight.w500,
                     ),
                   ),
-                  onPressed: () {
-                    Navigator.of(context).push(
+                  onPressed: () async {
+                    await Navigator.of(context).push(
                       slideRoute(
                         const SparcsSSOPage(),
                       ),
