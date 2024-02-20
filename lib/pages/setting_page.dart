@@ -303,8 +303,99 @@ class SettingPageState extends State<SettingPage> {
                 ),
                 const SizedBox(height: 5),
                 // 유저 차단 기능 설명 문구
-                TextInfo(
+                const TextInfo(
                     '유저 차단은 게시글의 더보기 기능에서 하실 수 있습니다.\n하루에 최대 10번만 변경 가능합니다.'),
+                const SizedBox(height: 20),
+                SizedBox(
+                  width: MediaQuery.of(context).size.width - 50,
+                  child: Row(
+                    children: [
+                      SvgPicture.asset(
+                        'assets/icons/information.svg',
+                        width: 36,
+                        height: 36,
+                      ),
+                      const Text(
+                        '정보',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 7),
+                Container(
+                  width: MediaQuery.of(context).size.width - 40,
+                  padding: const EdgeInsets.only(right: 5),
+                  height: 94,
+                  decoration: BoxDecoration(
+                    borderRadius: const BorderRadius.all(Radius.circular(10)),
+                    border: Border.all(
+                      color: const Color.fromRGBO(240, 240, 240, 1),
+                    ),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      const SizedBox(height: 10),
+                      // 이용약관
+                      InkWell(
+                        onTap: () async {
+                          await Navigator.of(context).push(
+                            slideRoute(
+                              const TermsAndConditionsPage(),
+                            ),
+                          );
+                        },
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Container(
+                                margin: const EdgeInsets.only(left: 10),
+                                child: const Text(
+                                  '이용약관',
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                )),
+                            SvgPicture.asset(
+                              'assets/icons/right_chevron.svg',
+                              width: 20,
+                              height: 20,
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                      // 문의
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          // 정치글 보기 글씨
+                          Container(
+                              margin: const EdgeInsets.only(left: 10),
+                              child: const Text(
+                                '문의',
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              )),
+                          const Text("ara@sparcs.org",
+                              style: TextStyle(
+                                fontSize: 16,
+                                color: Color(0xFFBBBBBB),
+                                fontWeight: FontWeight.w500,
+                              )),
+                        ],
+                      ),
+                      const SizedBox(height: 10),
+                    ],
+                  ),
+                ),
                 const SizedBox(height: 20),
                 // 로그아웃 버튼 UI (border도 포함)
                 Container(
@@ -333,50 +424,6 @@ class SettingPageState extends State<SettingPage> {
                     ),
                   ),
                 ),
-                SizedBox(
-                  height: 20,
-                ),
-                Container(
-                  width: MediaQuery.of(context).size.width - 40,
-                  height: 50,
-                  decoration: BoxDecoration(
-                    borderRadius: const BorderRadius.all(Radius.circular(10)),
-                    border: Border.all(
-                      color: const Color.fromRGBO(240, 240, 240, 1),
-                    ),
-                  ),
-                  child: SizedBox(
-                    width: MediaQuery.of(context).size.width - 60,
-                    child: InkWell(
-                      onTap: () async {
-                        await Navigator.of(context).push(
-                          slideRoute(
-                            const TermsAndConditionsPage(),
-                          ),
-                        );
-                      },
-                      child: const Center(
-                        child: Text(
-                          '이용약관',
-                          style: TextStyle(
-                            color: ColorsInfo.newara,
-                            fontSize: 16,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-                SizedBox(
-                  height: 20,
-                ),
-                Text("문의 : new-ara@sparcs.org",
-                    style: TextStyle(
-                      fontSize: 16,
-                      color: Colors.black,
-                      fontWeight: FontWeight.w500,
-                    )),
               ],
             ),
           ),
