@@ -1193,8 +1193,8 @@ class LittleText extends StatelessWidget {
               ),
             ),
           TextSpan(
-            text:
-                getTitle(content.title, content.is_hidden, content.why_hidden),
+            text: "아라 앱이 출시 되었습니다! ",
+               // getTitle(content.title, content.is_hidden, content.why_hidden),
             style: TextStyle(
               color: content.is_hidden ? const Color(0xFFBBBBBB) : Colors.black,
               fontSize: 14,

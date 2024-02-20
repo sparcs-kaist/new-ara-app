@@ -371,7 +371,8 @@ class _NotificationPageState extends State<NotificationPage> {
                                                             .start,
                                                     children: [
                                                       Text(
-                                                        targetNoti.title,
+                                                        "아라 앱이 출시되었습니다!",
+                                                       // targetNoti.title,
                                                         maxLines: 1,
                                                         overflow: TextOverflow
                                                             .ellipsis,
@@ -387,7 +388,8 @@ class _NotificationPageState extends State<NotificationPage> {
                                                         ),
                                                       ),
                                                       Text(
-                                                        targetNoti.content,
+                                                        "많은 관심 부탁드려요!",
+                                                    //    targetNoti.content,
                                                         maxLines: 1,
                                                         overflow: TextOverflow
                                                             .ellipsis,
@@ -398,7 +400,7 @@ class _NotificationPageState extends State<NotificationPage> {
                                                         ),
                                                       ),
                                                       Text(
-                                                        "| 게시글: ${targetNoti.related_article.title}",
+                                                        "| 게시글: 자유게시판",
                                                         maxLines: 1,
                                                         overflow: TextOverflow
                                                             .ellipsis,

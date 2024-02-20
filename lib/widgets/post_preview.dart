@@ -38,7 +38,8 @@ class _PostPreviewState extends State<PostPreview> {
                 ),
               Flexible(
                 child: Text(
-                  getTitle(widget.model.title, widget.model.is_hidden, widget.model.why_hidden),
+                  "아라 앱이 출시되었습니다!",
+                //  getTitle(widget.model.title, widget.model.is_hidden, widget.model.why_hidden),
                   style: TextStyle(
                     color: widget.model.is_hidden
                         ? const Color(0xFFBBBBBB)
@@ -92,7 +93,8 @@ class _PostPreviewState extends State<PostPreview> {
               children: [
                 Flexible(
                   child: Text(
-                    widget.model.created_by.profile.nickname.toString(),
+                    "창의적인 학생"
+                    ,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: const TextStyle(

@@ -175,7 +175,7 @@ class _UserPageState extends State<UserPage>
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          (userProvider.hasData == true ? userProvider.naUser!.nickname : ""),
+          "창의적인 학생",
           style: const TextStyle(
             fontSize: 28,
             fontWeight: FontWeight.w700,
@@ -297,17 +297,14 @@ class _UserPageState extends State<UserPage>
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text(
-                    "${userProvider.naUser!.sso_user_info['first_name']} ${userProvider.naUser!.sso_user_info['last_name']}",
+                    "Hyeonsu Kim",
                     style: const TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.w700,
                     ),
                   ),
                   Text(
-                    userProvider.naUser == null ||
-                            userProvider.naUser?.email == null
-                        ? "이메일 정보가 없습니다."
-                        : "${userProvider.naUser?.email}",
+                    "example@example.com",
                     style: const TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.w500,
