@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:new_ara_app/widgetclasses/loading_indicator.dart';
+import 'package:new_ara_app/pages/terms_and_conditions_page.dart';
+import 'package:new_ara_app/widgets/loading_indicator.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter_native_splash/flutter_native_splash.dart';
 
 import 'package:new_ara_app/pages/main_navigation_tab_page.dart';
 import 'package:new_ara_app/pages/login_page.dart';
@@ -16,7 +18,8 @@ final supportedLocales = [
 ];
 
 void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
+  WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
+  FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
   await EasyLocalization.ensureInitialized();
 
   // 앱 시작점. 다국어 지원 및 여러 데이터 제공자를 포함한 구조로 설정
@@ -76,13 +79,15 @@ class _MyAppState extends State<MyApp> {
     FlutterSecureStorage secureStorage = const FlutterSecureStorage();
     var cookiesBySecureStorage = await secureStorage.read(key: 'cookie');
 
-    debugPrint("main.dart : $cookiesBySecureStorage");
+    debugPrint("main.dart : $cookiesBySecureStorage.toString()");
     if (cookiesBySecureStorage != null) {
       setState(() {
         isLoading = true;
       });
+      debugPrint("main.dart s");
       bool tf = await userProvider.apiMeUserInfo(
           initCookieString: cookiesBySecureStorage);
+      debugPrint("main.dart : tf: $tf");
       if (tf) {
         userProvider.setHasData(true);
         userProvider.setCookieToList(cookiesBySecureStorage);
@@ -102,16 +107,26 @@ class _MyAppState extends State<MyApp> {
         theme: _setThemeData(),
         // TODO: CustionScrollBehavior의 역할은?
         builder: (context, child) {
-          return ScrollConfiguration(
-            behavior: CustomScrollBehavior(),
-            child: child!,
-          );
+          final MediaQueryData data = MediaQuery.of(context);
+          return MediaQuery(
+              // 시스템 폰트 사이즈에 영향을 받지 않도록 textScaleFactor 지정함
+              data: data.copyWith(textScaleFactor: 1.0),
+              child: ScrollConfiguration(
+                behavior: CustomScrollBehavior(),
+                child: child!,
+              ));
         },
         // 로그인 상태에 따라서 다른 홈페이지 표시
         home: isLoading == true
             ? const LoadingIndicator() // 로그인 중에는 로딩 인디케이터 표시
             : context.watch<UserProvider>().hasData
-                ? const MainNavigationTabPage()
+                ? (context
+                            .watch<UserProvider>()
+                            .naUser!
+                            .agree_terms_of_service_at !=
+                        null
+                    ? const MainNavigationTabPage()
+                    : const LoginPage())
                 : const LoginPage());
   }
 
@@ -123,6 +138,9 @@ class _MyAppState extends State<MyApp> {
       fontFamily: 'NotoSansKR',
       scaffoldBackgroundColor: Colors.white,
       splashColor: Colors.transparent,
+      textSelectionTheme: const TextSelectionThemeData(
+        cursorColor: Colors.transparent,
+      ),
     );
   }
 }

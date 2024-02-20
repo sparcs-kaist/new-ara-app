@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:new_ara_app/providers/user_provider.dart';
+import 'package:new_ara_app/utils/slide_routing.dart';
 import 'package:provider/provider.dart';
 
 import 'package:new_ara_app/constants/colors_info.dart';
@@ -20,7 +22,8 @@ class _ChatListPageState extends State<ChatListPage> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    context.read<NotificationProvider>().checkIsNotReadExist();
+    UserProvider userProvider = context.read<UserProvider>();
+    context.read<NotificationProvider>().checkIsNotReadExist(userProvider);
 
     //totest: 채팅창 하나는 미리 추가해놓은 로직
     chatPreviewList.add(
@@ -28,16 +31,12 @@ class _ChatListPageState extends State<ChatListPage> {
         children: [
           InkWell(
             onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => const ChatWindowPage()),
-              );
+              Navigator.of(context).push(slideRoute(const ChatWindowPage()));
             },
             child: const SizedBox(
               height: 70,
               child: Padding(
-                padding:
-                    EdgeInsets.symmetric(vertical: 12, horizontal: 3),
+                padding: EdgeInsets.symmetric(vertical: 12, horizontal: 3),
                 child: ChatPreview(),
               ),
             ),
@@ -82,11 +81,8 @@ class _ChatListPageState extends State<ChatListPage> {
                     children: [
                       InkWell(
                         onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => const ChatWindowPage()),
-                          );
+                          Navigator.of(context)
+                              .push(slideRoute(const ChatWindowPage()));
                         },
                         child: const SizedBox(
                           height: 70,
@@ -179,8 +175,7 @@ class _ChatPreviewState extends State<ChatPreview> {
                     Text(
                       "20:22",
                       maxLines: 1,
-                      style: TextStyle(
-                          fontSize: 12, color: Color(0xFFB1B1B1)),
+                      style: TextStyle(fontSize: 12, color: Color(0xFFB1B1B1)),
                     ),
                   ],
                   //attachment_type

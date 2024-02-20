@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter_native_splash/flutter_native_splash.dart';
 
 import 'package:new_ara_app/pages/main_page.dart';
 import 'package:new_ara_app/pages/bulletin_list_page.dart';
@@ -25,21 +26,21 @@ class _MainNavigationTabPageState extends State<MainNavigationTabPage> {
   final List<Widget> _widgetOptions = <Widget>[
     const MainPage(),
     const BulletinListPage(),
-    const ChatListPage(),
+    //const ChatListPage(),
     const NotificationPage(),
     const UserPage(),
   ];
 
   // 탭을 클릭할 때 실행될 함수
-  void _onItemTapped(int index) {
-    setState(() {
-      _selectedIndex = index;
-    });
-  }
 
   @override
   void initState() {
     super.initState();
+    try {
+      FlutterNativeSplash.remove();
+    } catch (e) {
+      debugPrint('SPLASH ERROR: $e');
+    }
   }
 
   @override
@@ -47,88 +48,151 @@ class _MainNavigationTabPageState extends State<MainNavigationTabPage> {
     return Scaffold(
       body: SafeArea(
         // 현재 선택된 탭에 맞는 페이지 출력
-        child: _widgetOptions.elementAt(_selectedIndex),
+        child: Column(
+          children: [
+            Expanded(child: _widgetOptions.elementAt(_selectedIndex)),
+            Container(
+              width: MediaQuery.of(context).size.width,
+              height: 1,
+              color: const Color(0xFFF0F0F0),
+            ),
+            _buildBottomNavigationBar(),
+          ],
+        ),
       ),
-      bottomNavigationBar: _buildBottomNavigationBar(),
     );
   }
 
+  void _onItemTapped(int index) {
+    if (mounted) {
+      setState(() {
+        _selectedIndex = index;
+      });
+    }
+  }
+
   /// 하단의 네비게이션 바를 구성하는 함수.
-  BottomNavigationBar _buildBottomNavigationBar() {
-    return BottomNavigationBar(
-      backgroundColor: Colors.white, // 바탕색을 하얀색으로 설정 함.
-      currentIndex: _selectedIndex, // 현재 선택된 탭의 인덱스를 나타냄.
-      showSelectedLabels: false, // 선택된 탭의 라벨(텍스트)를 보이지 않게 함.
-      showUnselectedLabels: false, // 선택되지 않은 탭의 라벨(텍스트)를 보이지 않게 함.
-      type: BottomNavigationBarType.fixed, // 탭바의 타입을 고정된 것으로 설정 함.
-      onTap: _onItemTapped, // 탭을 클릭하면 _onItemTapped 함수를 실행 함.
-      elevation: 10,
-      items: [
-        BottomNavigationBarItem(
-          icon: SvgPicture.asset(
-            'assets/icons/home.svg',
-            color: _selectedIndex == 0 ? Colors.black : Colors.grey,
-            width: 36,
-            height: 36,
+  Widget _buildBottomNavigationBar() {
+    double gapHalfWidth = (MediaQuery.of(context).size.width - 36 * 4) / 10;
+    double iconWidth = gapHalfWidth * 2 + 36;
+    return SizedBox(
+      height: 50,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        children: [
+          SizedBox(
+            width: gapHalfWidth,
           ),
-          label: 'Home',
-        ),
-        BottomNavigationBarItem(
-          icon: SvgPicture.asset(
-            'assets/icons/post_list.svg',
-            color: _selectedIndex == 1 ? Colors.black : Colors.grey,
-            width: 36,
-            height: 36,
-          ),
-          label: 'Bulletin',
-        ),
-        BottomNavigationBarItem(
-          icon: SvgPicture.asset(
-            'assets/icons/chat.svg',
-            color: _selectedIndex == 2 ? Colors.black : Colors.grey,
-            width: 36,
-            height: 36,
-          ),
-          label: 'Chatting',
-        ),
-        BottomNavigationBarItem(
-          icon: Stack(
-            children: [
-              SvgPicture.asset(
-                'assets/icons/notification.svg',
-                color: _selectedIndex == 3 ? Colors.black : Colors.grey,
-                width: 36,
-                height: 36,
-              ),
-              Visibility(
-                visible: context.watch<NotificationProvider>().isNotReadExist,
-                child: Positioned(
-                  top: 0,
-                  right: 5,
-                  child: Container(
-                    width: 7,
-                    height: 7,
-                    decoration: const BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: ColorsInfo.newara,
-                    ),
+          GestureDetector(
+            behavior: HitTestBehavior.translucent,
+            onTap: (() => _onItemTapped(0)),
+            child: SizedBox(
+              width: iconWidth,
+              height: 50,
+              child: Center(
+                child: SizedBox(
+                  width: 36,
+                  height: 36,
+                  child: SvgPicture.asset(
+                    'assets/icons/home.svg',
+                    colorFilter: ColorFilter.mode(
+                        _selectedIndex == 0 ? Colors.black : Colors.grey,
+                        BlendMode.srcIn),
                   ),
                 ),
               ),
-            ],
+            ),
           ),
-          label: 'Notification',
-        ),
-        BottomNavigationBarItem(
-          icon: SvgPicture.asset(
-            'assets/icons/member.svg',
-            color: _selectedIndex == 4 ? Colors.black : Colors.grey,
-            width: 36,
-            height: 36,
+          GestureDetector(
+            behavior: HitTestBehavior.translucent,
+            onTap: (() => _onItemTapped(1)),
+            child: SizedBox(
+              width: iconWidth,
+              height: 50,
+              child: Center(
+                child: SizedBox(
+                  width: 36,
+                  height: 36,
+                  child: SvgPicture.asset(
+                    'assets/icons/post_list.svg',
+                    colorFilter: ColorFilter.mode(
+                        _selectedIndex == 1 ? Colors.black : Colors.grey,
+                        BlendMode.srcIn),
+                    width: 36,
+                    height: 36,
+                  ),
+                ),
+              ),
+            ),
           ),
-          label: 'MyPage',
-        ),
-      ],
+          GestureDetector(
+            behavior: HitTestBehavior.translucent,
+            onTap: (() => _onItemTapped(2)),
+            child: SizedBox(
+              width: iconWidth,
+              height: 50,
+              child: Center(
+                child: SizedBox(
+                  width: 36,
+                  height: 36,
+                  child: Stack(
+                    children: [
+                      SvgPicture.asset(
+                        'assets/icons/notification.svg',
+                        colorFilter: ColorFilter.mode(
+                            _selectedIndex == 2 ? Colors.black : Colors.grey,
+                            BlendMode.srcIn),
+                      ),
+                      Visibility(
+                        visible: context
+                            .watch<NotificationProvider>()
+                            .isNotReadExist,
+                        child: Positioned(
+                          top: 0,
+                          right: 5,
+                          child: Container(
+                            width: 7,
+                            height: 7,
+                            decoration: const BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: ColorsInfo.newara,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ),
+          GestureDetector(
+            behavior: HitTestBehavior.translucent,
+            onTap: () => _onItemTapped(3),
+            child: SizedBox(
+              width: iconWidth,
+              height: 50,
+              child: Center(
+                child: SizedBox(
+                  width: 36,
+                  height: 36,
+                  child: SvgPicture.asset(
+                    'assets/icons/member.svg',
+                    colorFilter: ColorFilter.mode(
+                        _selectedIndex == 3 ? Colors.black : Colors.grey,
+                        BlendMode.srcIn),
+                    width: 36,
+                    height: 36,
+                  ),
+                ),
+              ),
+            ),
+          ),
+          SizedBox(
+            width: gapHalfWidth,
+          ),
+        ],
+      ),
     );
   }
 }

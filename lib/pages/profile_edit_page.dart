@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:http_parser/http_parser.dart';
 import 'package:flutter/material.dart';
 import 'package:new_ara_app/constants/url_info.dart';
+import 'package:new_ara_app/utils/create_dio_with_config.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:image_picker/image_picker.dart';
@@ -11,8 +12,11 @@ import 'package:mime/mime.dart';
 import 'package:new_ara_app/providers/user_provider.dart';
 import 'package:new_ara_app/constants/colors_info.dart';
 import 'package:new_ara_app/models/user_profile_model.dart';
-import 'package:new_ara_app/widgetclasses/loading_indicator.dart';
+import 'package:new_ara_app/widgets/loading_indicator.dart';
 import 'package:new_ara_app/providers/notification_provider.dart';
+import 'package:new_ara_app/utils/profile_image.dart';
+import 'package:new_ara_app/widgets/snackbar_noti.dart';
+import 'package:new_ara_app/widgets/text_info.dart';
 
 class ProfileEditPage extends StatefulWidget {
   const ProfileEditPage({super.key});
@@ -31,7 +35,8 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
   @override
   void initState() {
     super.initState();
-    context.read<NotificationProvider>().checkIsNotReadExist();
+    UserProvider userProvider = context.read<UserProvider>();
+    context.read<NotificationProvider>().checkIsNotReadExist(userProvider);
   }
 
   void setIsCamClicked(bool tf) {
@@ -65,13 +70,16 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
       source: ImageSource.gallery,
       maxWidth: diameter,
       maxHeight: diameter,
-      imageQuality: 100,  // (2023.08.21) default 값으로 설정함. 추후 논의 필요
+      imageQuality: 100, // (2023.08.21) default 값으로 설정함. 추후 논의 필요
     );
     if (tmpImage != null) {
       setState(() => _selectedImage = tmpImage);
     }
   }
 
+  /// 수정된 프로필을 반영하기 api 요청을 보내는 함수
+  /// API 요청이 성공하면 true를 반환
+  /// 실패하면 false를 반환하며 [noticeUserBySnackBar]를 이용해 스낵바 알림을 생성함
   Future<bool> _updateProfile(UserProvider userProvider) async {
     UserProfileModel userProfileModel = userProvider.naUser!;
     FormState? formState = _formKey.currentState;
@@ -96,19 +104,68 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
       );
     }
     var formData = FormData.fromMap(payload);
-    var dio = Dio();
-    dio.options.headers['Cookie'] = userProvider.getCookiesToString();
+    Dio dio = userProvider.createDioWithHeadersForNonget();
     try {
       var response = await dio.patch(
         "$newAraDefaultUrl/api/user_profiles/${userProfileModel.user}/",
         data: formData,
       );
       if (response.statusCode != 200) return false;
-    } catch (error) {
-      debugPrint("Error: $error");
+    } on DioException catch (e) {
+      debugPrint("updateProfile failed with DioException: $e");
+      // 서버에서 response를 보냈지만 invalid한 statusCode일 때
+      String infoText = '설정 변경 중 문제가 발생했습니다.';
+      if (e.response != null) {
+        debugPrint("${e.response!.data['nickname'][0]}");
+        debugPrint("${e.response!.headers}");
+        debugPrint("${e.response!.requestOptions}");
+        // 인터넷 문제가 아닌 경우 닉네임 관련 규정 설명을 추가함.
+        infoText += ' ${e.response!.data['nickname'][0]}';
+      }
+      // request의 setting, sending에서 문제 발생
+      // requestOption, message를 출력.
+      else {
+        debugPrint("${e.requestOptions}");
+        debugPrint("${e.message}");
+      }
+      // 유저에게 스낵바 알림
+      noticeUserBySnackBar(infoText);
+      return false;
+    } catch (e) {
+      debugPrint("updateProfile failed with error: $e");
       return false;
     }
     return true;
+  }
+
+  /// infoText 매개변수를 전달받아 스낵바 메시지를 띄워주는 함수
+  /// 프로필 설정 변경 시에 문제가 생겼을 때 알려주는 용도로 사용.
+  void noticeUserBySnackBar(String infoText) {
+    SnackBar araSnackBar = buildAraSnackBar(
+      context,
+      content: Row(
+        children: [
+          SvgPicture.asset(
+            'assets/icons/information.svg',
+            colorFilter:
+                const ColorFilter.mode(ColorsInfo.newara, BlendMode.srcIn),
+            width: 32,
+            height: 32,
+          ),
+          const SizedBox(width: 8),
+          Flexible(
+              child: Text(
+            infoText,
+            style: const TextStyle(
+              color: Colors.black,
+              fontWeight: FontWeight.w400,
+              fontSize: 15,
+            ),
+          )),
+        ],
+      ),
+    );
+    hideOldsAndShowAraSnackBar(context, araSnackBar);
   }
 
   @override
@@ -119,204 +176,231 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
     MediaQueryData mediaQueryData = MediaQuery.of(context);
     double profileDiameter = mediaQueryData.size.width - 70;
 
-    return _isLoading ? const LoadingIndicator() : Scaffold(
-      appBar: AppBar(
-        centerTitle: true,
-        leading: IconButton(
-          icon: SvgPicture.asset(
-            "assets/icons/close-2.svg",
-            color: ColorsInfo.newara,
-          ),
-          onPressed: () => Navigator.pop(context),
-        ),
-        title: const Text(
-          "프로필 수정",
-          style: TextStyle(
-            fontWeight: FontWeight.w700,
-            fontSize: 18,
-            color: ColorsInfo.newara,
-          ),
-        ),
-        actions: [
-          IconButton(
-            onPressed: () async {
-              _setIsLoading(true);
-              bool updateRes = await _updateProfile(userProvider);
-              debugPrint("updateRes: $updateRes");
-              _changedNick = null;
-              _selectedImage = null;
-              if (updateRes) {
-                await userProvider.apiMeUserInfo().then((getRes) {
-                  if (getRes) Navigator.pop(context);
-                });
-              } else {
-                _setIsLoading(false);
-              }
-            },
-            icon: const Text(
-              '완료',
-              style: TextStyle(
-                color: ColorsInfo.newara,
-                fontWeight: FontWeight.w500,
-                fontSize: 17,
+    return _isLoading
+        ? const LoadingIndicator()
+        : Scaffold(
+            appBar: AppBar(
+              centerTitle: true,
+              leadingWidth: 100,
+              leading: GestureDetector(
+                behavior: HitTestBehavior.translucent,
+                onTap: () => Navigator.pop(context),
+                child: Stack(
+                  alignment: Alignment.centerLeft,
+                  children: [
+                    SvgPicture.asset(
+                      'assets/icons/left_chevron.svg',
+                      colorFilter: const ColorFilter.mode(
+                          ColorsInfo.newara, BlendMode.srcATop),
+                      fit: BoxFit.fill,
+                      width: 35,
+                      height: 35,
+                    ),
+                  ],
+                ),
               ),
+              title: const Text(
+                "프로필 수정",
+                style: TextStyle(
+                  fontWeight: FontWeight.w700,
+                  fontSize: 18,
+                  color: ColorsInfo.newara,
+                ),
+              ),
+              actions: [
+                IconButton(
+                  onPressed: () async {
+                    _setIsLoading(true);
+                    bool updateRes = await _updateProfile(userProvider);
+                    debugPrint("updateRes: $updateRes");
+                    _changedNick = null;
+                    _selectedImage = null;
+                    if (updateRes) {
+                      await userProvider.apiMeUserInfo().then((getRes) {
+                        if (getRes) Navigator.pop(context);
+                      });
+                    } else {
+                      _setIsLoading(false);
+                    }
+                  },
+                  icon: const Text(
+                    '완료',
+                    style: TextStyle(
+                      color: ColorsInfo.newara,
+                      fontWeight: FontWeight.w500,
+                      fontSize: 17,
+                    ),
+                  ),
+                ),
+              ],
             ),
-          ),
-        ],
-      ),
-      body: SafeArea(
-        child: GestureDetector(
-          onTap: () => FocusScope.of(context).unfocus(),
-          child: SingleChildScrollView(
-            child: SizedBox(
-              width: mediaQueryData.size.width,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  const SizedBox(height: 10),
-                  Stack(
-                    children: [
-                      Container(
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          border: Border.all(
-                            color: Colors.grey,
-                          ),
-                        ),
-                        width: profileDiameter,
-                        height: profileDiameter,
-                        child: !(Platform.isAndroid) ? _buildClippedImage(userProviderData) :
-                            FutureBuilder<void>(
-                              future: _retrieveLostData(),
-                              builder: (context, snapshot) {
-                                switch (snapshot.connectionState) {
-                                  case ConnectionState.none:
-                                  case ConnectionState.waiting:
-                                  case ConnectionState.active:
-                                  case ConnectionState.done:
-                                    return _buildClippedImage(userProviderData);
-                                }
-                              }
-                            ),
-                      ),
-                      Positioned(
-                        bottom: 0,
-                        right: 50,
-                        child: AbsorbPointer(
-                          absorbing: _isCamClicked,
-                          child: InkWell(
-                            onTap: () async {
-                              if (_isCamClicked) return;
-                              setIsCamClicked(true);
-                              await _pickImage(context);
-                              setIsCamClicked(false);
-                            },  // (2023.08.19)프로필 사진 수정 기능 추후 구현 예정
-                            child: Container(
-                              width: 40,
-                              height: 40,
-                              decoration: const BoxDecoration(
+            body: SafeArea(
+              child: GestureDetector(
+                onTap: () => FocusScope.of(context).unfocus(),
+                child: SingleChildScrollView(
+                  child: SizedBox(
+                    width: mediaQueryData.size.width,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        const SizedBox(height: 10),
+                        Stack(
+                          children: [
+                            Container(
+                              decoration: BoxDecoration(
                                 shape: BoxShape.circle,
-                                color: Color.fromRGBO(51, 51, 51, 1),
+                                border: Border.all(
+                                  color: Colors.grey,
+                                ),
                               ),
-                              child: SvgPicture.asset(
-                                "assets/icons/camera.svg",
-                                color: Colors.white,
+                              width: profileDiameter,
+                              height: profileDiameter,
+                              child: !(Platform.isAndroid)
+                                  ? _buildClippedImage(
+                                      userProviderData, profileDiameter)
+                                  : FutureBuilder<void>(
+                                      future: _retrieveLostData(),
+                                      builder: (context, snapshot) {
+                                        switch (snapshot.connectionState) {
+                                          case ConnectionState.none:
+                                          case ConnectionState.waiting:
+                                          case ConnectionState.active:
+                                          case ConnectionState.done:
+                                            return _buildClippedImage(
+                                                userProviderData,
+                                                profileDiameter);
+                                        }
+                                      }),
+                            ),
+                            Positioned(
+                              bottom: 0,
+                              right: 50,
+                              child: AbsorbPointer(
+                                absorbing: _isCamClicked,
+                                child: InkWell(
+                                  onTap: () async {
+                                    if (_isCamClicked) return;
+                                    setIsCamClicked(true);
+                                    await _pickImage(context);
+                                    setIsCamClicked(false);
+                                  }, // (2023.08.19)프로필 사진 수정 기능 추후 구현 예정
+                                  child: Container(
+                                    width: 40,
+                                    height: 40,
+                                    decoration: const BoxDecoration(
+                                      shape: BoxShape.circle,
+                                      color: Color.fromRGBO(51, 51, 51, 1),
+                                    ),
+                                    child: SvgPicture.asset(
+                                      "assets/icons/camera.svg",
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 40),
+                        SizedBox(
+                          width: mediaQueryData.size.width - 60,
+                          child: Row(
+                            children: [
+                              const Text(
+                                '닉네임',
+                                style: TextStyle(
+                                  fontWeight: FontWeight.w700,
+                                  fontSize: 17,
+                                  color: Color.fromRGBO(99, 99, 99, 1),
+                                ),
+                              ),
+                              const SizedBox(width: 30),
+                              Expanded(
+                                child: Container(
+                                  decoration: const BoxDecoration(
+                                    color: Color.fromRGBO(235, 235, 235, 1),
+                                    borderRadius:
+                                        BorderRadius.all(Radius.circular(10)),
+                                  ),
+                                  child: _buildForm(
+                                      userProviderData.naUser!.nickname),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        // 닉네임 정책 안내 문구
+                        SizedBox(
+                          width: mediaQueryData.size.width - 60,
+                          child: const Padding(
+                            padding: EdgeInsets.only(left: 80),
+                            child: Text(
+                              '닉네임은 한번 변경할 시 3개월간 변경이 불가합니다.',
+                              style: TextStyle(
+                                fontSize: 12,
+                                fontWeight: FontWeight.w600,
+                                color: Color.fromRGBO(191, 191, 191, 1),
                               ),
                             ),
                           ),
                         ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 40),
-                  SizedBox(
-                    width: mediaQueryData.size.width - 60,
-                    child: Row(
-                      children: [
-                        const Text(
-                          '닉네임',
-                          style: TextStyle(
-                            fontWeight: FontWeight.w700,
-                            fontSize: 17,
-                            color: Color.fromRGBO(99, 99, 99, 1),
-                          ),
-                        ),
-                        const SizedBox(width: 30),
-                        Expanded(
-                          child: Container(
-                            decoration: const BoxDecoration(
-                              color: Color.fromRGBO(235, 235, 235, 1),
-                              borderRadius:
-                              BorderRadius.all(Radius.circular(10)),
-                            ),
-                            child: _buildForm(userProviderData.naUser!.nickname),
+                        const SizedBox(height: 30),
+                        SizedBox(
+                          width: mediaQueryData.size.width - 60,
+                          child: Row(
+                            children: [
+                              const Text(
+                                '이메일',
+                                style: TextStyle(
+                                  fontWeight: FontWeight.w700,
+                                  fontSize: 17,
+                                  color: Color.fromRGBO(99, 99, 99, 1),
+                                ),
+                              ),
+                              const SizedBox(width: 45),
+                              Expanded(
+                                child: Text(
+                                  userProviderData.naUser!.email ??
+                                      "이메일 정보가 없습니다.",
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.w500,
+                                    fontSize: 15,
+                                    color: Color.fromRGBO(177, 177, 177, 1),
+                                  ),
+                                ),
+                              ),
+                            ],
                           ),
                         ),
                       ],
                     ),
                   ),
-                  const SizedBox(height: 30),
-                  SizedBox(
-                    width: mediaQueryData.size.width - 60,
-                    child: Row(
-                      children: [
-                        const Text(
-                          '이메일',
-                          style: TextStyle(
-                            fontWeight: FontWeight.w700,
-                            fontSize: 17,
-                            color: Color.fromRGBO(99, 99, 99, 1),
-                          ),
-                        ),
-                        const SizedBox(width: 45),
-                        Expanded(
-                          child: Text(
-                            userProviderData.naUser!.email,
-                            style: const TextStyle(
-                              fontWeight: FontWeight.w500,
-                              fontSize: 15,
-                              color: Color.fromRGBO(177, 177, 177, 1),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
+                ),
               ),
             ),
-          ),
-        ),
-      ),
-    );
+          );
   }
 
-  ClipOval _buildClippedImage(UserProvider userProviderData) {
+  /// 선택된 이미지 또는 기존의 프로필 이미지 위젯을 빌드하는 함수
+  ClipOval _buildClippedImage(
+      UserProvider userProviderData, double profileDiameter) {
     return ClipOval(
-      child: _selectedImage != null ? Image.file(
-        fit: BoxFit.cover,
-        File(_selectedImage!.path),
-        errorBuilder: (BuildContext context, Object error,
-            StackTrace? stackTrace) {
-          return const Center(
-              child:
-              Text('This image type is not supported'));
-        },
-      ) : userProviderData.naUser?.picture == null
-          ? Container()
-          : Image.network(
-        fit: BoxFit.cover,
-        userProviderData.naUser!.picture.toString(),
-        errorBuilder: (BuildContext context, Object error,
-            StackTrace? stackTrace) {
-          return const Center(
-              child:
-              Text('Fail to load image'));
-        },
-      ),
-    );
+        child: _selectedImage != null
+            ? Image.file(
+                fit: BoxFit.cover,
+                File(_selectedImage!.path),
+                errorBuilder: (BuildContext context, Object error,
+                    StackTrace? stackTrace) {
+                  return const Center(
+                      child: Text('This image type is not supported'));
+                },
+              )
+            // 이미지 링크를 확인한 후 null인 이미지는 warning.svg를 빌드
+            : buildProfileImage(userProviderData.naUser!.picture,
+                profileDiameter - 5, profileDiameter - 5));
   }
 
+  /// 닉네임 변경 필드를 빌드하는 함수
   Form _buildForm(String initialNick) {
     return Form(
       key: _formKey,
@@ -339,7 +423,7 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
               return null;
             },
             onChanged: (value) => _changedNick = value,
-            onSaved: (value) =>  _changedNick = value ?? '',
+            onSaved: (value) => _changedNick = value ?? '',
           )),
     );
   }

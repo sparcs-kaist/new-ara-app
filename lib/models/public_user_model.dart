@@ -4,7 +4,7 @@ class PublicUserModel {
   final dynamic id;
   final String username;
   final PublicUserProfileModel profile;
-  final bool? is_blocked;
+  final bool? is_blocked;  // 항상 존재하는 필드는 아니어서 
 
   PublicUserModel({
     required this.id,
@@ -18,7 +18,8 @@ class PublicUserModel {
         id: json['id'],
         username: json['username'],
         profile: PublicUserProfileModel.fromJson(json['profile']),
-        is_blocked: json['is_blocked']);
+        is_blocked: json['is_blocked'],
+    );
   }
 
   Map<String, dynamic> toJson() {

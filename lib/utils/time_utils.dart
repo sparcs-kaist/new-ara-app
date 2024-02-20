@@ -1,5 +1,13 @@
 import 'package:easy_localization/easy_localization.dart';
 
+/// parameter로 전달받은 rawTime을
+/// {}년 {}월 {}일 {}:{} 형식으로 변환하여 리턴.
+String specificTime(String rawTime) {
+  DateTime date = DateTime.parse(rawTime).toLocal();
+  String time = '${DateFormat('yyyy').format(date)}년 ${DateFormat('MM').format(date)}월 ${DateFormat('dd').format(date)}일 ${DateFormat('HH').format(date)}:${DateFormat('mm').format(date)}';
+  return time;
+}
+
 String getTime(String rawTime) {
   DateTime now = DateTime.now();
 
