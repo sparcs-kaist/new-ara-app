@@ -6,8 +6,10 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:new_ara_app/constants/url_info.dart';
+import 'package:new_ara_app/pages/terms_and_conditions_page.dart';
 import 'package:new_ara_app/providers/user_provider.dart';
 import 'package:new_ara_app/utils/create_dio_with_config.dart';
+import 'package:new_ara_app/utils/slide_routing.dart';
 import 'package:new_ara_app/widgets/loading_indicator.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter/cupertino.dart';
@@ -301,7 +303,8 @@ class SettingPageState extends State<SettingPage> {
                 ),
                 const SizedBox(height: 5),
                 // 유저 차단 기능 설명 문구
-                TextInfo('유저 차단은 게시글의 더보기 기능에서 하실 수 있습니다.\n하루에 최대 10번만 변경 가능합니다.'),
+                TextInfo(
+                    '유저 차단은 게시글의 더보기 기능에서 하실 수 있습니다.\n하루에 최대 10번만 변경 가능합니다.'),
                 const SizedBox(height: 20),
                 // 로그아웃 버튼 UI (border도 포함)
                 Container(
@@ -330,6 +333,50 @@ class SettingPageState extends State<SettingPage> {
                     ),
                   ),
                 ),
+                SizedBox(
+                  height: 20,
+                ),
+                Container(
+                  width: MediaQuery.of(context).size.width - 40,
+                  height: 50,
+                  decoration: BoxDecoration(
+                    borderRadius: const BorderRadius.all(Radius.circular(10)),
+                    border: Border.all(
+                      color: const Color.fromRGBO(240, 240, 240, 1),
+                    ),
+                  ),
+                  child: SizedBox(
+                    width: MediaQuery.of(context).size.width - 60,
+                    child: InkWell(
+                      onTap: () async {
+                        await Navigator.of(context).push(
+                          slideRoute(
+                            const TermsAndConditionsPage(),
+                          ),
+                        );
+                      },
+                      child: const Center(
+                        child: Text(
+                          '이용약관',
+                          style: TextStyle(
+                            color: ColorsInfo.newara,
+                            fontSize: 16,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+                SizedBox(
+                  height: 20,
+                ),
+                Text("문의 : new-ara@sparcs.org",
+                    style: TextStyle(
+                      fontSize: 16,
+                      color: Colors.black,
+                      fontWeight: FontWeight.w500,
+                    )),
               ],
             ),
           ),
