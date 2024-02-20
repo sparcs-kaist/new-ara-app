@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:easy_localization/easy_localization.dart';
+import 'package:flutter_native_splash/flutter_native_splash.dart';
 
 import 'package:new_ara_app/constants/colors_info.dart';
 import 'package:new_ara_app/pages/sparcs_sso_page.dart';
@@ -17,6 +18,16 @@ class LoginPage extends StatefulWidget {
 
 /// `_LoginPageState` 클래스는 `LoginPage` 위젯의 상태를 관리.
 class _LoginPageState extends State<LoginPage> {
+  @override
+  void initState() {
+    super.initState();
+    try {
+      FlutterNativeSplash.remove();
+    } catch (e) {
+      debugPrint('SPLASH ERROR: $e');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
