@@ -230,14 +230,14 @@ class UserProvider with ChangeNotifier {
     return response;
   }
 
-  Future<dynamic> patchApiRes(String apiUrl, {dynamic payload}) async {
+  Future<Response?> patchApiRes(String apiUrl, {dynamic payload}) async {
     String totUrl = "$newAraDefaultUrl/api/$apiUrl";
 
     Dio dio = createDioWithHeadersForNonget();
     dio.options.headers['Cookie'] = getCookiesToString();
     dio.options.headers['X-Csrftoken'] = getCsrftokenToString();
 
-    late dynamic response;
+    late Response response;
     try {
       response = await dio.patch(totUrl, data: payload);
     } on DioException catch (e) {
@@ -247,15 +247,14 @@ class UserProvider with ChangeNotifier {
         debugPrint("${e.response!.data}");
         debugPrint("${e.response!.headers}");
         debugPrint("${e.response!.requestOptions}");
-        return e.response;
       }
       // request의 setting, sending에서 문제 발생
       // requestOption, message를 출력.
       else {
         debugPrint("${e.requestOptions}");
         debugPrint("${e.message}");
-        return null;
       }
+      return e.response;
     } catch (e) {
       debugPrint("_fetchUser failed with error: $e");
       return null;

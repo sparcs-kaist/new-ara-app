@@ -5,6 +5,7 @@ import 'package:flutter_native_splash/flutter_native_splash.dart';
 
 import 'package:new_ara_app/constants/colors_info.dart';
 import 'package:new_ara_app/pages/sparcs_sso_page.dart';
+import 'package:new_ara_app/pages/terms_and_conditions_page.dart';
 import 'package:new_ara_app/utils/slide_routing.dart';
 
 /// `LoginPage` 위젯은 사용자에게 로그인 페이지를 표시.
@@ -60,8 +61,8 @@ class _LoginPageState extends State<LoginPage> {
                       fontWeight: FontWeight.w500,
                     ),
                   ),
-                  onPressed: () {
-                    Navigator.of(context).push(
+                  onPressed: () async {
+                    await Navigator.of(context).push(
                       slideRoute(
                         const SparcsSSOPage(),
                       ),

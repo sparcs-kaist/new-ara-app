@@ -39,8 +39,8 @@ Widget buildProfileImage(String? profileUri, double width, double height) {
           ),
         )
       : Image.network(
-          fit: BoxFit.cover,
           profileUri.toString(),
+          fit: BoxFit.cover,
           //이미지를 네트워크에서 불러올 동안 보여줄 위젯이 필요함.
           loadingBuilder: (BuildContext context, Widget child,
               ImageChunkEvent? loadingProgress) {

@@ -2,7 +2,10 @@ import 'dart:io';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:new_ara_app/constants/url_info.dart';
+import 'package:new_ara_app/pages/terms_and_conditions_page.dart';
 import 'package:new_ara_app/providers/user_provider.dart';
+import 'package:new_ara_app/utils/slide_routing.dart';
+import 'package:webview_cookie_manager/webview_cookie_manager.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 import 'package:new_ara_app/widgets/loading_indicator.dart';
 import 'package:provider/provider.dart';
@@ -70,8 +73,14 @@ class _SparcsSSOPageState extends State<SparcsSSOPage> {
         // 페이지 로딩 완료 시
         onPageFinished: (String url) async {
           debugPrint("Finish loading url: $url");
-          // 특정 URL로 끝나면 로그인 성공으로 판단
-          if (url.endsWith('$newAraDefaultUrl/') && mounted) {
+          var tloginCookie = await WebviewCookieManager().getCookies(url);
+          debugPrint("tloginCookie: $tloginCookie.toString()");
+          // [$newAraDefaultUrl/] 로 끝나면 로그인 성공(이용약관 이미 동의)
+          // [$newAraDefaultUrlapi/users/sso_login_callback/:///tos] 로 끝나면 로그인 성공(이용약관 동의 전)
+          if ((url.endsWith('$newAraDefaultUrl/') ||
+                  url.endsWith(
+                      '$newAraDefaultUrl/api/users/sso_login_callback/:///tos')) &&
+              mounted) {
             var userProvider = context.read<UserProvider>();
             debugPrint("main.dart:로그인 성공");
 
@@ -85,9 +94,20 @@ class _SparcsSSOPageState extends State<SparcsSSOPage> {
             //userProvider.setHasData(true)를 실행하기 전에 현재 SSO 로그인 창을 닫음.
             //현재 창을 닫지 않으면 로그인 성공 후에도 SSO 로그인 창이 계속 열려있음.
             if (mounted) {
-              Navigator.of(context).pop();
+              // 이용약관 동의 시 현재 sso 로그인 창을 닫음
+              if (url.endsWith('$newAraDefaultUrl/') == true) {
+                Navigator.of(context).pop();
+              } else {
+                //이용약관 전이라면 현재 sso 로그인 창을 닫고 이용약관 페이지로 이동
+                Navigator.of(context).pushReplacement(
+                  slideRoute(const TermsAndConditionsPage()),
+                );
+              }
             }
+            // userProvider의 hasData를 true로 설정
+            // main.dart 에서 hasData를 확인하여 home에 띄워주는 위젯 변경
             userProvider.setHasData(true);
+            debugPrint("setHasData(true) 실행 완료");
 
             String cookieString = userProvider.getCookiesToString();
             await secureStorage.write(key: 'cookie', value: cookieString);
