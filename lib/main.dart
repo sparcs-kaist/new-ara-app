@@ -98,13 +98,6 @@ class _MyAppState extends State<MyApp> {
 
   @override
   Widget build(BuildContext context) {
-    debugPrint("main.dart(hasData) : ${context.watch<UserProvider>().hasData.toString()}");
-    if (context.watch<UserProvider>().naUser == null) {
-      debugPrint("main.dart(term) : null");
-    } else {
-      debugPrint(
-          "main.dart(term) : ${context.watch<UserProvider>().naUser!.agree_terms_of_service_at}");
-    }
     return MaterialApp(
         localizationsDelegates: context.localizationDelegates,
         supportedLocales: context.supportedLocales,
