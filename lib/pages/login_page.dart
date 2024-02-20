@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:easy_localization/easy_localization.dart';
+import 'package:flutter_native_splash/flutter_native_splash.dart';
 
 import 'package:new_ara_app/constants/colors_info.dart';
 import 'package:new_ara_app/pages/sparcs_sso_page.dart';
@@ -20,10 +21,12 @@ class LoginPage extends StatefulWidget {
 class _LoginPageState extends State<LoginPage> {
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
-
-    //위젯 렌더링을 모두 마치고 나서 실행되는 콜백함수
+    try {
+      FlutterNativeSplash.remove();
+    } catch (e) {
+      debugPrint('SPLASH ERROR: $e');
+    }
   }
 
   @override

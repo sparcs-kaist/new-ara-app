@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter_native_splash/flutter_native_splash.dart';
 
 import 'package:new_ara_app/pages/main_page.dart';
 import 'package:new_ara_app/pages/bulletin_list_page.dart';
@@ -35,6 +36,11 @@ class _MainNavigationTabPageState extends State<MainNavigationTabPage> {
   @override
   void initState() {
     super.initState();
+    try {
+      FlutterNativeSplash.remove();
+    } catch (e) {
+      debugPrint('SPLASH ERROR: $e');
+    }
   }
 
   @override
@@ -67,8 +73,8 @@ class _MainNavigationTabPageState extends State<MainNavigationTabPage> {
 
   /// 하단의 네비게이션 바를 구성하는 함수.
   Widget _buildBottomNavigationBar() {
-    double gapHalfWidth= (MediaQuery.of(context).size.width-36*4)/10;
-    double iconWidth = gapHalfWidth*2+36;
+    double gapHalfWidth = (MediaQuery.of(context).size.width - 36 * 4) / 10;
+    double iconWidth = gapHalfWidth * 2 + 36;
     return SizedBox(
       height: 50,
       child: Row(

@@ -67,6 +67,7 @@ dependencies:
   markdown: ^7.1.1
   shared_preferences: ^2.2.2
   file_icon: ^1.0.0
+  flutter_native_splash: ^2.3.7
 
 dev_dependencies:
   flutter_test:
