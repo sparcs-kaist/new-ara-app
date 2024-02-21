@@ -15,6 +15,7 @@ import 'package:provider/provider.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:dio/dio.dart';
 import 'package:webview_cookie_manager/webview_cookie_manager.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import 'package:new_ara_app/constants/colors_info.dart';
 import 'package:new_ara_app/widgets/text_info.dart';
@@ -424,6 +425,33 @@ class SettingPageState extends State<SettingPage> {
                     ),
                   ),
                 ),
+                const SizedBox(height: 10),
+                Container(
+                  width: MediaQuery.of(context).size.width - 40,
+                  height: 50,
+                  decoration: BoxDecoration(
+                    borderRadius: const BorderRadius.all(Radius.circular(10)),
+                    border: Border.all(
+                      color: const Color.fromRGBO(240, 240, 240, 1),
+                    ),
+                  ),
+                  child: SizedBox(
+                    width: MediaQuery.of(context).size.width - 60,
+                    child: InkWell(
+                      onTap: () => launchInBrowser('mailto:ara@sparcs.org'),
+                      child: const Center(
+                        child: Text(
+                          '회원탈퇴',
+                          style: TextStyle(
+                            color: ColorsInfo.newara,
+                            fontSize: 16,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
               ],
             ),
           ),
@@ -444,5 +472,28 @@ class SettingPageState extends State<SettingPage> {
     await WebviewCookieManager().clearCookies();
 
     debugPrint("log out success");
+  }
+
+  /// 회원탈퇴 기능을 위해 mailto scheme이 필요해서 사용함.
+  /// 브라우저로 url 열기에 성공하면 true, 아니면 false를 반환함.
+  Future<bool> launchInBrowser(String url) async {
+    final Uri emailLaunchUri = Uri(
+     scheme: 'mailto',
+     path: 'new-ara@sparcs.org',
+    );
+    final Uri targetUrl = Uri.parse(url);
+    // if (!await canLaunchUrl(targetUrl)) {
+    //   debugPrint("$url을 열 수 없습니다.");
+    //   return false;
+    // }
+    if (!await launchUrl(
+      emailLaunchUri,
+      // mode: LaunchMode.externalApplication,
+    )) {
+      debugPrint('Could not launch $url');
+      return false;
+    }
+
+    return true;
   }
 }
