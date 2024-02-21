@@ -1,6 +1,9 @@
 /// 유저 설정 관리, 차단한 유저 목록, 로그아웃을 관리하는 파일.
 /// Author: 김상오(alvin)
 
+import 'dart:io';
+
+import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
@@ -509,18 +512,47 @@ class SettingPageState extends State<SettingPage> {
     int? userID = userProvider.naUser!.user;
     String? email = userProvider.naUser?.email;
     String? nickname = userProvider.naUser?.nickname;
-    final String body =
-        """유저 번호: $userID\n닉네임: $nickname\n이메일: $email\n 탈퇴 요청드립니다(Ara 관리자가 확인 후 처리해드리며 조금의 시간이 소요될 수 있습니다)""";
+
     late final Uri emailLaunchUri;
+
+    DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
+    String deviceData;
+
+    try {
+      if (Platform.isAndroid) {
+        AndroidDeviceInfo androidInfo = await deviceInfo.androidInfo;
+        deviceData = 'Android Device: ${androidInfo.model}\n'
+            'OS Version: ${androidInfo.version.release}\n'
+            'SDK Number: ${androidInfo.version.sdkInt}\n\n';
+      } else if (Platform.isIOS) {
+        IosDeviceInfo iosInfo = await deviceInfo.iosInfo;
+        deviceData = '내부 모델 식별자: ${iosInfo.utsname.machine}\n'
+            'OS Version: ${iosInfo.systemVersion}\n'
+            'Model: ${iosInfo.model}\n\n';
+      } else {
+        deviceData = 'Unsupported platform';
+      }
+    } catch (e) {
+      deviceData = 'Failed to get device info: ${e.toString()}';
+    }
+
     // 문의하기에 사용되는 경우
     if (mode == MailForm.inquiry) {
+      final String body =
+          """여기에 문의 사항을 적어주세요.\n\n※ Ara 관리자가 확인 후 처리해드리며 조금의 시간이 소요될 수 있습니다 ※\n\n유저 번호: $userID\n닉네임: $nickname\n이메일: $email\n플랫폼: App\n$deviceData""";
       emailLaunchUri = Uri(
         scheme: 'mailto',
         path: 'ara@sparcs.org',
+        query: encodeQueryParameters(<String, String>{
+          'subject': 'Ara에 문의합니다',
+          'body': body,
+        }),
       );
     }
     // 탈퇴에 사용되는 경우
     else if (mode == MailForm.membershipWithdrawal) {
+      final String body =
+          """탈퇴 요청드립니다\n(추가 내용이 있으시면 여기 아래에 적어주세요)\n\n※ Ara 관리자가 확인 후 처리해드리며 조금의 시간이 소요될 수 있습니다 ※\n\n유저 번호: $userID\n닉네임: $nickname\n이메일: $email\n플랫폼: App\n $deviceData""";
       emailLaunchUri = Uri(
         scheme: 'mailto',
         path: 'ara@sparcs.org',
