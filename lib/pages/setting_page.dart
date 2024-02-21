@@ -154,9 +154,12 @@ class SettingPageState extends State<SettingPage> {
                                       await userProvider.apiMeUserInfo();
                                       debugPrint(
                                           "Change of 'see_sexual' succeed!");
+                                      requestSnackBar("설정이 저장되었습니다.");
                                     } catch (error) {
                                       debugPrint(
                                           "Change of 'see_sexual' failed: $error");
+                                      requestSnackBar(
+                                          "에러가 발생하여 설정 반영에 실패했습니다. 다시 시도해주십시오.");
                                       setState(() => see_sexual = !value);
                                     }
                                   }),
@@ -200,9 +203,12 @@ class SettingPageState extends State<SettingPage> {
                                       await userProvider.apiMeUserInfo();
                                       debugPrint(
                                           "Change of 'see_social' succeed!");
+                                      requestSnackBar("설정이 저장되었습니다.");
                                     } catch (error) {
                                       debugPrint(
                                           "Change of 'see_social' failed: $error");
+                                      requestSnackBar(
+                                          "에러가 발생하여 설정 반영에 실패했습니다. 다시 시도해주십시오.");
                                       setState(() => see_social = !value);
                                     }
                                   }),
@@ -373,26 +379,28 @@ class SettingPageState extends State<SettingPage> {
                       ),
                       const SizedBox(height: 16),
                       // 문의
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          // 정치글 보기 글씨
-                          Container(
-                              margin: const EdgeInsets.only(left: 10),
-                              child: const Text(
-                                '문의',
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w500,
-                                ),
-                              )),
-                          const Text("ara@sparcs.org",
-                              style: TextStyle(
-                                fontSize: 16,
-                                color: Color(0xFFBBBBBB),
-                                fontWeight: FontWeight.w500,
-                              )),
-                        ],
+                      InkWell(
+                        onTap: () => launchInBrowser(0),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            // 정치글 보기 글씨
+                            Container(
+                                margin: const EdgeInsets.only(left: 10),
+                                child: const Text(
+                                  '운영진에게 문의하기',
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                )),
+                            SvgPicture.asset(
+                              'assets/icons/right_chevron.svg',
+                              width: 20,
+                              height: 20,
+                            ),
+                          ],
+                        ),
                       ),
                       const SizedBox(height: 10),
                     ],
@@ -439,7 +447,7 @@ class SettingPageState extends State<SettingPage> {
                   child: SizedBox(
                     width: MediaQuery.of(context).size.width - 60,
                     child: InkWell(
-                      onTap: () => launchInBrowser(),
+                      onTap: () => launchInBrowser(1),
                       child: const Center(
                         child: Text(
                           '회원탈퇴',
@@ -487,35 +495,45 @@ class SettingPageState extends State<SettingPage> {
 
   /// 회원탈퇴 기능을 위해 mailto scheme이 필요해서 사용함.
   /// 브라우저로 url 열기에 성공하면 true, 아니면 false를 반환함.
-  Future<bool> launchInBrowser() async {
+  Future<bool> launchInBrowser(int mode) async {
     UserProvider userProvider = context.read<UserProvider>();
     int? userID = userProvider.naUser!.user;
     String? email = userProvider.naUser?.email;
     String? nickname = userProvider.naUser?.nickname;
     final String body =
         """유저 번호: $userID\n닉네임: $nickname\n이메일: $email\n 탈퇴 요청드립니다(Ara 관리자가 확인 후 처리해드리며 조금의 시간이 소요될 수 있습니다)""";
-    final Uri emailLaunchUri = Uri(
-      scheme: 'mailto',
-      path: 'ara@sparcs.org',
-      query: encodeQueryParameters(<String, String>{
-        'subject': 'Ara 회원 탈퇴 요청',
-        'body': body,
-      }),
-    );
+    late final Uri emailLaunchUri;
+    // 문의하기에 사용되는 경우
+    if (mode == 0) {
+      emailLaunchUri = Uri(
+        scheme: 'mailto',
+        path: 'ara@sparcs.org',
+      );
+    }
+    // 탈퇴에 사용되는 경우
+    else if (mode == 1) {
+      emailLaunchUri = Uri(
+        scheme: 'mailto',
+        path: 'ara@sparcs.org',
+        query: encodeQueryParameters(<String, String>{
+          'subject': 'Ara 회원 탈퇴 요청',
+          'body': body,
+        }),
+      );
+    }
     if (!await launchUrl(
       emailLaunchUri,
     )) {
       debugPrint('Could not launch mail');
       debugPrint("기본 메일앱을 열 수 없습니다.");
-      requestSnackBar();
+      requestSnackBar("기본 메일 어플리케이션을 열 수 없습니다. ara@sparcs.org로 문의 부탁드립니다.");
       return false;
     }
 
     return true;
   }
 
-  void requestSnackBar() {
-    showInfoBySnackBar(
-        context, "기본 메일 어플리케이션을 열 수 없습니다. ara@sparcs.org로 문의 부탁드립니다.");
+  void requestSnackBar(String msg) {
+    showInfoBySnackBar(context, msg);
   }
 }

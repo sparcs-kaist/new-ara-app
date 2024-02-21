@@ -36,6 +36,7 @@ import 'package:flutter_quill_extensions/flutter_quill_extensions.dart';
 import 'package:html2md/html2md.dart' as html2md;
 import 'package:markdown_quill/markdown_quill.dart';
 import 'package:markdown/markdown.dart' as md;
+import 'package:new_ara_app/widgets/snackbar_noti.dart';
 
 /// 사용자가 게시물을 작성하거나 편집할 수 있는 페이지를 나타내는 StatefulWidget입니다.
 class PostWritePage extends StatefulWidget {
@@ -496,7 +497,7 @@ class _PostWritePageState extends State<PostWritePage>
                       isUpdate: true,
                       previousArticleId: widget.previousArticle!.id)
                   : _managePost())
-              : null,
+              : () => showInfoBySnackBar(context, "게시판을 선택해주시고 제목, 내용을 입력해주세요."),
           // 버튼이 클릭되었을 때 수행할 동작
           padding: EdgeInsets.zero, // 패딩 제거
           child: canIupload
