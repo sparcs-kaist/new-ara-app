@@ -426,7 +426,7 @@ class SettingPageState extends State<SettingPage> {
                     ),
                   ),
                 ),
-                const SizedBox(height: 10),
+                const SizedBox(height: 20),
                 Container(
                   width: MediaQuery.of(context).size.width - 40,
                   height: 50,
