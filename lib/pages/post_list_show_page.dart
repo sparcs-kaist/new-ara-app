@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:new_ara_app/pages/bulletin_search_page.dart';
@@ -88,12 +90,16 @@ class _PostListShowPageState extends State<PostListShowPage> {
   }
 
   /// 게시물 update(게시판의 current페이지까지에 있는 게시물들을 불러옴)
-  Future<void> updateAllBulletinList() async {
+  ///
+  /// [maxPage] : 새로 로딩할 최대 페이지 수
+  Future<void> updateAllBulletinList({int? maxPage}) async {
     List<ArticleListActionModel> newList = [];
     UserProvider userProvider = context.read<UserProvider>();
 
     // 모든 페이지를 순회하며 게시물 목록을 업데이트합니다.
-    for (int page = 1; page <= currentPage; page++) {
+    for (int page = 1;
+        page <= (maxPage != null ? min(maxPage, currentPage) : currentPage);
+        page++) {
       Map<String, dynamic>? json = await userProvider.getApiRes("$apiUrl$page");
 
       if (json != null && json.containsKey("results")) {
@@ -160,7 +166,7 @@ class _PostListShowPageState extends State<PostListShowPage> {
   }
 
   /// 스크롤 리스너 함수
-  /// 
+  ///
   /// 스크롤이 끝에 도달하면 추가 데이터를 로드하기 위해 _loadNextPage 함수를 호출합니다.
   void _scrollListener() async {
     if (_scrollController.position.pixels >=
@@ -276,7 +282,7 @@ class _PostListShowPageState extends State<PostListShowPage> {
                     color: ColorsInfo.newara,
                     onRefresh: () async {
                       setState((() => isLoading = true));
-                      await updateAllBulletinList();
+                      await updateAllBulletinList(maxPage: 1);
                     },
                     child: ListView.separated(
                       controller: _scrollController,
