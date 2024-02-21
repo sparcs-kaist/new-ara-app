@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:new_ara_app/pages/bulletin_search_page.dart';
+import 'package:new_ara_app/utils/cache_function.dart';
 import 'package:provider/provider.dart';
 
 import 'package:new_ara_app/constants/board_type.dart';
@@ -44,21 +45,35 @@ class _BulletinListPageState extends State<BulletinListPage> {
   /// 게시판 목록을 새로고침하는 함수
   /// API를 호출하여 게시판 데이터를 가져온 후, 상태를 업데이트.
   void refreshBoardList(UserProvider userProvider) async {
-    List<dynamic> jsonBoards = await userProvider.getApiRes("boards/") ?? [];
-    List<BoardDetailActionModel> boardModels = [];
-    for (dynamic jsonBoard in jsonBoards) {
-      boardModels.add(BoardDetailActionModel.fromJson(jsonBoard));
-    }
-
-    if (mounted) {
-      setState(() {
-        for (BoardDetailActionModel model in boardModels) {
-          boardsByGroup[model.group.id].add(model);
+    updateStateWithCachedOrFetchedApiData(
+      apiUrl: "boards/", // API URL을 지정합니다. 이 예에서는 "boards/"를 대상으로 합니다.
+      userProvider: userProvider, // API 요청을 담당할 userProvider 인스턴스를 전달합니다.
+      // API 요청이 성공적으로 완료되었을 때 실행될 콜백 함수입니다.
+      callback: (response) {
+        // 현재 위젯이 마운트된 상태인지 확인합니다. 이는 setState를 안전하게 호출하기 위함입니다.
+        if (mounted) {
+          // 위젯의 상태를 업데이트합니다.
+          setState(() {
+            // 게시판 그룹 별로 게시판 목록을 저장하는 변수를 초기화합니다.
+            boardsByGroup = List.generate(boardsByGroupLength + 1, (_) => []);
+            // BoardDetailActionModel 객체를 저장할 리스트를 초기화합니다.
+            List<BoardDetailActionModel> boardModels = [];
+            // API 응답으로 받은 데이터를 반복하여 처리합니다.
+            for (dynamic jsonBoard in response) {
+              boardModels.add(BoardDetailActionModel.fromJson(
+                  jsonBoard)); // JSON 데이터를 BoardDetailActionModel 객체로 변환하여 리스트에 추가합니다.
+            }
+            // 변환된 모델 객체들을 반복 처리합니다.
+            for (BoardDetailActionModel model in boardModels) {
+              // 각 모델을 해당하는 그룹 ID에 따라 분류하여 저장합니다.
+              boardsByGroup[model.group.id].add(model);
+            }
+            // 데이터 로딩 상태를 false로 설정하여 로딩이 완료되었음을 나타냅니다.
+            isLoading = false;
+          });
         }
-        isLoading = false;
-      });
-    }
-    // debugPrint(myMap.toString());
+      },
+    );
   }
 
   @override
@@ -141,7 +156,7 @@ class _BulletinListPageState extends State<BulletinListPage> {
                                 height: null,
                                 fontWeight: FontWeight.w500,
                               ),
-                            
+
                               // 모서리를 둥글게 설정
                               enabledBorder: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(10.0),
