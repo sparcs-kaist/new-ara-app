@@ -134,7 +134,10 @@ class _BulletinSearchPageState extends State<BulletinSearchPage> {
       }
       return;
     }
+    _loadNextPage();
+  }
 
+  Future<void> _loadNextPage() async {
     try {
       if (mounted) {
         setState(() {
