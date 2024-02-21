@@ -24,6 +24,7 @@ import 'package:new_ara_app/widgets/text_and_switch.dart';
 import 'package:new_ara_app/providers/notification_provider.dart';
 import 'package:new_ara_app/models/block_model.dart';
 import 'package:new_ara_app/widgets/dialogs.dart';
+import 'package:new_ara_app/widgets/snackbar_noti.dart';
 
 /// 설정 페이지 빌드 및 이벤트 처리를 담당하는 StatefulWidget.
 class SettingPage extends StatefulWidget {
@@ -438,7 +439,7 @@ class SettingPageState extends State<SettingPage> {
                   child: SizedBox(
                     width: MediaQuery.of(context).size.width - 60,
                     child: InkWell(
-                      onTap: () => launchInBrowser('mailto:ara@sparcs.org'),
+                      onTap: () => launchInBrowser(),
                       child: const Center(
                         child: Text(
                           '회원탈퇴',
@@ -451,6 +452,10 @@ class SettingPageState extends State<SettingPage> {
                       ),
                     ),
                   ),
+                ),
+                const SizedBox(height: 5),
+                const TextInfo(
+                  '회원탈퇴는 위 버튼을 클릭하셔서 메일로 이메일, 닉네임 등 유저 정보와 함께 탈퇴를 요청해주시면 가능합니다.'
                 ),
               ],
             ),
@@ -476,24 +481,24 @@ class SettingPageState extends State<SettingPage> {
 
   /// 회원탈퇴 기능을 위해 mailto scheme이 필요해서 사용함.
   /// 브라우저로 url 열기에 성공하면 true, 아니면 false를 반환함.
-  Future<bool> launchInBrowser(String url) async {
+  Future<bool> launchInBrowser() async {
     final Uri emailLaunchUri = Uri(
      scheme: 'mailto',
-     path: 'new-ara@sparcs.org',
+     path: 'ara@sparcs.org',
     );
-    final Uri targetUrl = Uri.parse(url);
-    // if (!await canLaunchUrl(targetUrl)) {
-    //   debugPrint("$url을 열 수 없습니다.");
-    //   return false;
-    // }
     if (!await launchUrl(
       emailLaunchUri,
-      // mode: LaunchMode.externalApplication,
     )) {
-      debugPrint('Could not launch $url');
+      debugPrint('Could not launch mail');
+      debugPrint("기본 메일앱을 열 수 없습니다.");
+      requestSnackBar();
       return false;
     }
 
     return true;
+  }
+
+  void requestSnackBar() {
+    showInfoBySnackBar(context, "기본 메일 어플리케이션을 열 수 없습니다. ara@sparcs.org로 문의 부탁드립니다.");
   }
 }
