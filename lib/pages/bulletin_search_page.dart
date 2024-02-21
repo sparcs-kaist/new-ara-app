@@ -162,7 +162,6 @@ class _BulletinSearchPageState extends State<BulletinSearchPage> {
             }
           });
           setState(() {
-            _isLoading = false;
             _isLoadingNextPage = false;
           });
         }
@@ -170,7 +169,6 @@ class _BulletinSearchPageState extends State<BulletinSearchPage> {
     } catch (error) {
       _currentPage = _currentPage - 1;
       setState(() {
-        _isLoading = false;
         _isLoadingNextPage = false;
       });
       debugPrint("scrollListener error : $error");
