@@ -15,6 +15,7 @@ import 'package:new_ara_app/models/notification_model.dart';
 import 'package:new_ara_app/pages/post_view_page.dart';
 import 'package:new_ara_app/utils/slide_routing.dart';
 import 'package:new_ara_app/providers/notification_provider.dart';
+import 'package:new_ara_app/widgets/snackbar_noti.dart';
 
 /// 알림페이지의 빌드 및 이벤트 처리를 담당하는 위젯.
 class NotificationPage extends StatefulWidget {
@@ -212,27 +213,28 @@ class _NotificationPageState extends State<NotificationPage> {
                         // 알림이 없는 경우 ListView 대신 '알림이 없습니다' 문구 표시
                         : _modelList.isEmpty
                             ? Center(
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  SvgPicture.asset(
-                                    'assets/icons/information.svg',
-                                    width: 50,
-                                    height: 50,
-                                    colorFilter: const ColorFilter.mode(
-                                      Color(0xFFBBBBBB), BlendMode.srcIn,
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    SvgPicture.asset(
+                                      'assets/icons/information.svg',
+                                      width: 50,
+                                      height: 50,
+                                      colorFilter: const ColorFilter.mode(
+                                        Color(0xFFBBBBBB),
+                                        BlendMode.srcIn,
+                                      ),
                                     ),
-                                  ),
-                                  const Text(
-                                    '알림이 없습니다.',
-                                    style: TextStyle(
-                                      color: Color(0xFFBBBBBB),
-                                      fontSize: 15,
-                                    ),
-                                  )
-                                ],
-                              ),
-                            )
+                                    const Text(
+                                      '알림이 없습니다.',
+                                      style: TextStyle(
+                                        color: Color(0xFFBBBBBB),
+                                        fontSize: 15,
+                                      ),
+                                    )
+                                  ],
+                                ),
+                              )
                             : ListView.separated(
                                 controller: _listViewController,
                                 itemCount: _modelList.length + 1,
@@ -449,6 +451,8 @@ class _NotificationPageState extends State<NotificationPage> {
               debugPrint("모두 읽기 요청 실패");
               _setIsLoadingTotal(false);
             }
+          } else {
+            requestInfoSnackBar("이미 알림을 모두 읽으셨습니다.");
           }
         },
         backgroundColor: Colors.white,
@@ -456,7 +460,11 @@ class _NotificationPageState extends State<NotificationPage> {
           child: SvgPicture.asset(
             'assets/icons/verified.svg',
             fit: BoxFit.cover,
-            color: ColorsInfo.newara,
+            colorFilter: ColorFilter.mode(
+                notificationProvider.isNotReadExist
+                    ? ColorsInfo.newara
+                    : const Color(0xFFBBBBBB),
+                BlendMode.srcIn),
             width: 40,
             height: 40,
           ),
@@ -488,5 +496,9 @@ class _NotificationPageState extends State<NotificationPage> {
         ),
       ),
     );
+  }
+
+  void requestInfoSnackBar(String msg) {
+    showInfoBySnackBar(context, msg);
   }
 }
