@@ -493,7 +493,7 @@ class SettingPageState extends State<SettingPage> {
     String? email = userProvider.naUser?.email;
     String? nickname = userProvider.naUser?.nickname;
     final String body =
-        """유저 번호: $userID\n닉네임: $nickname\n이메일: $email\n탈퇴는 검토 후 1~3일이 소요됩니다. 검토 후 메일 보내드리겠습니다.\n탈퇴를 원하시는 이유를 적어주세요.""";
+        """유저 번호: $userID\n닉네임: $nickname\n이메일: $email\n 탈퇴 요청드립니다(Ara 관리자가 확인 후 처리해드리며 조금의 시간이 소요될 수 있습니다)""";
     final Uri emailLaunchUri = Uri(
       scheme: 'mailto',
       path: 'ara@sparcs.org',
