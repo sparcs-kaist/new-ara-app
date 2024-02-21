@@ -313,22 +313,13 @@ class _BulletinSearchPageState extends State<BulletinSearchPage> {
                       // 검색어가 없을 때와 검색 결과가 없을 때의 처리
                       if (_textEdtingController.text == "" &&
                           postPreviewList.isEmpty)
-                        Expanded(
+                        const Expanded(
                           child: Center(
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               crossAxisAlignment: CrossAxisAlignment.center,
                               children: [
-                                SvgPicture.asset(
-                                  'assets/icons/information.svg',
-                                  width: 30,
-                                  height: 30,
-                                  colorFilter: const ColorFilter.mode(
-                                    Color(0xFFBBBBBB),
-                                    BlendMode.srcIn,
-                                  ),
-                                ),
-                                const Text(
+                                Text(
                                   '검색어를 입력해주세요.',
                                   style: TextStyle(
                                     color: Color(0xFFBBBBBB),
@@ -343,21 +334,13 @@ class _BulletinSearchPageState extends State<BulletinSearchPage> {
                       // 검색어가 있는데 검색 결과가 없을 때의 처리
                       if (_textEdtingController.text != "" &&
                           postPreviewList.isEmpty)
-                        Expanded(
+                        const Expanded(
                           child: Center(
-                            child: Column(
+                            child: Row(
                               mainAxisAlignment: MainAxisAlignment.center,
+                              crossAxisAlignment: CrossAxisAlignment.center,
                               children: [
-                                SvgPicture.asset(
-                                  'assets/icons/information.svg',
-                                  width: 50,
-                                  height: 50,
-                                  colorFilter: const ColorFilter.mode(
-                                    Color(0xFFBBBBBB),
-                                    BlendMode.srcIn,
-                                  ),
-                                ),
-                                const Text(
+                                Text(
                                   '검색 결과가 없습니다.',
                                   style: TextStyle(
                                     color: Color(0xFFBBBBBB),
