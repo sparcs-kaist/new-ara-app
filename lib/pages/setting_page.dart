@@ -26,6 +26,14 @@ import 'package:new_ara_app/models/block_model.dart';
 import 'package:new_ara_app/widgets/dialogs.dart';
 import 'package:new_ara_app/widgets/snackbar_noti.dart';
 
+// 메일 보낼 때 사용하는 enum
+enum MailForm {
+  //문의하기
+  inquiry,
+  //회원탈퇴
+  membershipWithdrawal,
+}
+
 /// 설정 페이지 빌드 및 이벤트 처리를 담당하는 StatefulWidget.
 class SettingPage extends StatefulWidget {
   const SettingPage({Key? key}) : super(key: key);
@@ -380,7 +388,7 @@ class SettingPageState extends State<SettingPage> {
                       const SizedBox(height: 16),
                       // 문의
                       InkWell(
-                        onTap: () => launchInBrowser(0),
+                        onTap: () => launchInBrowser(MailForm.inquiry),
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
@@ -447,7 +455,8 @@ class SettingPageState extends State<SettingPage> {
                   child: SizedBox(
                     width: MediaQuery.of(context).size.width - 60,
                     child: InkWell(
-                      onTap: () => launchInBrowser(1),
+                      onTap: () =>
+                          launchInBrowser(MailForm.membershipWithdrawal),
                       child: const Center(
                         child: Text(
                           '회원탈퇴',
@@ -495,7 +504,7 @@ class SettingPageState extends State<SettingPage> {
 
   /// 회원탈퇴 기능을 위해 mailto scheme이 필요해서 사용함.
   /// 브라우저로 url 열기에 성공하면 true, 아니면 false를 반환함.
-  Future<bool> launchInBrowser(int mode) async {
+  Future<bool> launchInBrowser(MailForm mode) async {
     UserProvider userProvider = context.read<UserProvider>();
     int? userID = userProvider.naUser!.user;
     String? email = userProvider.naUser?.email;
@@ -504,14 +513,14 @@ class SettingPageState extends State<SettingPage> {
         """유저 번호: $userID\n닉네임: $nickname\n이메일: $email\n 탈퇴 요청드립니다(Ara 관리자가 확인 후 처리해드리며 조금의 시간이 소요될 수 있습니다)""";
     late final Uri emailLaunchUri;
     // 문의하기에 사용되는 경우
-    if (mode == 0) {
+    if (mode == MailForm.inquiry) {
       emailLaunchUri = Uri(
         scheme: 'mailto',
         path: 'ara@sparcs.org',
       );
     }
     // 탈퇴에 사용되는 경우
-    else if (mode == 1) {
+    else if (mode == MailForm.membershipWithdrawal) {
       emailLaunchUri = Uri(
         scheme: 'mailto',
         path: 'ara@sparcs.org',
