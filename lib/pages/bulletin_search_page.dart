@@ -126,51 +126,58 @@ class _BulletinSearchPageState extends State<BulletinSearchPage> {
   void _scrollListener() async {
     //스크롤 시 포커스 해제
     FocusScope.of(context).unfocus();
-    if (_textEdtingController.text == "") {
-      if (mounted) {
-        setState(() {
-          postPreviewList.clear();
-          _isLoading = false;
-        });
-      }
-      return;
-    }
 
+    if (_scrollController.position.pixels >=
+        _scrollController.position.maxScrollExtent) {
+      _loadNextPage(_textEdtingController.text);
+    }
+  }
+
+  /// 다음 페이지의 게시물을 불러옴
+  /// 
+  /// [targetWord] : api로 요청된 검색어
+  /// 
+  /// [_textEdtingController.text] : 현재 검색창에 입력된 검색어
+  /// 
+  /// 두 값을 비교해서 같을 경우에만 다음 페이지의 게시물을 빌드함.
+  Future<void> _loadNextPage(String targetWord) async {
+    setState(() {
+      _isLoadingNextPage = true;
+    });
     try {
-      if (mounted) {
-        setState(() {
-          _isLoadingNextPage = true;
-        });
-      }
-      UserProvider userProvider = context.read<UserProvider>();
-      if (_scrollController.position.pixels ==
-          _scrollController.position.maxScrollExtent) {
-        _currentPage = _currentPage + 1;
-        //TODO: 더 이상 불러올 게시물이 없을 때의 처리
-        Map<String, dynamic>? myMap = await userProvider.getApiRes(
-            "$_apiUrl$_currentPage&main_search__contains=${_textEdtingController.text}");
+      if (_textEdtingController.text == "") {
         if (mounted) {
           setState(() {
-            for (int i = 0; i < (myMap!["results"].length ?? 0); i++) {
-              //???/
-              if (myMap["results"][i]["created_by"]["profile"] != null) {
-                postPreviewList.add(
-                    ArticleListActionModel.fromJson(myMap["results"][i] ?? {}));
-              }
-            }
-          });
-          setState(() {
+            postPreviewList.clear();
             _isLoadingNextPage = false;
           });
         }
+        return;
+      }
+      UserProvider userProvider = context.read<UserProvider>();
+      _currentPage = _currentPage + 1;
+      //TODO: 더 이상 불러올 게시물이 없을 때의 처리
+      Map<String, dynamic>? myMap = await userProvider.getApiRes(
+          "$_apiUrl$_currentPage&main_search__contains=${_textEdtingController.text}");
+
+      //비동기 함수 이후에 검색창의 검색어가 바뀌었을 경우에는 하지 않음
+      if (mounted && _textEdtingController.text == targetWord) {
+        setState(() {
+          for (int i = 0; i < (myMap!["results"].length ?? 0); i++) {
+            //???/
+            if (myMap["results"][i]["created_by"]["profile"] != null) {
+              postPreviewList.add(
+                  ArticleListActionModel.fromJson(myMap["results"][i] ?? {}));
+            }
+          }
+        });
       }
     } catch (error) {
       _currentPage = _currentPage - 1;
-      setState(() {
-        _isLoadingNextPage = false;
-      });
-      debugPrint("scrollListener error : $error");
     }
+    setState(() {
+      _isLoadingNextPage = false;
+    });
   }
 
   @override
@@ -225,9 +232,7 @@ class _BulletinSearchPageState extends State<BulletinSearchPage> {
                             });
                             // 1페이지만 불러오면 한 페이지의 검색 결과의 게시물들로 태블릿의 화면을 채울 수가 없어 2페이지도 자동으로 불러오게 함
                             refreshPostList(text).then((value) {
-                              setState(() {
-                                _isLoading = false;
-                              });
+                              _loadNextPage(text);
                             });
                           },
                           onChanged: (String text) {
@@ -236,7 +241,7 @@ class _BulletinSearchPageState extends State<BulletinSearchPage> {
                                   "bulletin_search_page: onChanged(${DateTime.now().toString()}) : $text");
                               // 1페이지만 불러오면 한 페이지의 검색 결과의 게시물들로 태블릿의 화면을 채울 수가 없어 2페이지도 자동으로 불러오게 함
                               refreshPostList(text).then((value) {
-                                _loadNextPage();
+                                _loadNextPage(text);
                               });
                             });
                           },
