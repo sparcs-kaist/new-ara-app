@@ -90,7 +90,7 @@ class _BulletinSearchPageState extends State<BulletinSearchPage> {
   }
 
   /// 사용자가 입력한 검색어를 기반으로 게시물 새로 고침.
-  void refreshPostList(String targetWord) async {
+  Future<void> refreshPostList(String targetWord) async {
     if (targetWord == "") {
       if (mounted) {
         setState(() {
@@ -101,6 +101,7 @@ class _BulletinSearchPageState extends State<BulletinSearchPage> {
       return;
     }
     final UserProvider userProvider = context.read<UserProvider>();
+    // 타겟 단어의 1페이지 검색 결과만 불러옴.
     final Map<String, dynamic>? myMap = await userProvider
         .getApiRes("${_apiUrl}1&main_search__contains=$targetWord");
     if (mounted && targetWord == _textEdtingController.text) {
@@ -225,13 +226,21 @@ class _BulletinSearchPageState extends State<BulletinSearchPage> {
                             setState(() {
                               _isLoading = true;
                             });
-                            refreshPostList(text);
+                            // 1페이지만 불러오면 한 페이지의 검색 결과의 게시물들로 태블릿의 화면을 채울 수가 없어 2페이지도 자동으로 불러오게 함
+                            refreshPostList(text).then((value) {
+                              setState(() {
+                                _isLoading = false;
+                              });
+                            });
                           },
                           onChanged: (String text) {
                             _debouncer.run(() {
                               debugPrint(
                                   "bulletin_search_page: onChanged(${DateTime.now().toString()}) : $text");
-                              refreshPostList(text);
+                              // 1페이지만 불러오면 한 페이지의 검색 결과의 게시물들로 태블릿의 화면을 채울 수가 없어 2페이지도 자동으로 불러오게 함
+                              refreshPostList(text).then((value) {
+                                _loadNextPage();
+                              });
                             });
                           },
                           style: const TextStyle(
