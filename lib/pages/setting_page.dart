@@ -455,8 +455,7 @@ class SettingPageState extends State<SettingPage> {
                 ),
                 const SizedBox(height: 5),
                 const TextInfo(
-                  '회원탈퇴는 위 버튼을 클릭하셔서 메일로 이메일, 닉네임 등 유저 정보와 함께 탈퇴를 요청해주시면 가능합니다.'
-                ),
+                    '회원탈퇴는 위 버튼을 클릭하셔서 메일로 이메일, 닉네임 등 유저 정보와 함께 탈퇴를 요청해주시면 가능합니다.'),
               ],
             ),
           ),
@@ -479,12 +478,29 @@ class SettingPageState extends State<SettingPage> {
     debugPrint("log out success");
   }
 
+  String? encodeQueryParameters(Map<String, String> params) {
+    return params.entries
+        .map((MapEntry<String, String> e) =>
+            '${Uri.encodeComponent(e.key)}=${Uri.encodeComponent(e.value)}')
+        .join('&');
+  }
+
   /// 회원탈퇴 기능을 위해 mailto scheme이 필요해서 사용함.
   /// 브라우저로 url 열기에 성공하면 true, 아니면 false를 반환함.
   Future<bool> launchInBrowser() async {
+    UserProvider userProvider = context.read<UserProvider>();
+    int? userID = userProvider.naUser!.user;
+    String? email = userProvider.naUser?.email;
+    String? nickname = userProvider.naUser?.nickname;
+    final String body =
+        """유저 번호: $userID\n닉네임: $nickname\n이메일: $email\n탈퇴는 검토 후 1~3일이 소요됩니다. 검토 후 메일 보내드리겠습니다.\n탈퇴를 원하시는 이유를 적어주세요.""";
     final Uri emailLaunchUri = Uri(
-     scheme: 'mailto',
-     path: 'ara@sparcs.org',
+      scheme: 'mailto',
+      path: 'ara@sparcs.org',
+      query: encodeQueryParameters(<String, String>{
+        'subject': 'Ara 회원 탈퇴 요청',
+        'body': body,
+      }),
     );
     if (!await launchUrl(
       emailLaunchUri,
@@ -499,6 +515,7 @@ class SettingPageState extends State<SettingPage> {
   }
 
   void requestSnackBar() {
-    showInfoBySnackBar(context, "기본 메일 어플리케이션을 열 수 없습니다. ara@sparcs.org로 문의 부탁드립니다.");
+    showInfoBySnackBar(
+        context, "기본 메일 어플리케이션을 열 수 없습니다. ara@sparcs.org로 문의 부탁드립니다.");
   }
 }
