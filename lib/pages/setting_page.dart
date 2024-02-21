@@ -551,8 +551,9 @@ class SettingPageState extends State<SettingPage> {
     }
     // 탈퇴에 사용되는 경우
     else if (mode == MailForm.membershipWithdrawal) {
+      // 요청 번호는 sparcs sso login의 세션 번호로, sid는 sso_user_info "api/me"의 응답의 sso_user_info항목에 있음.
       final String body =
-          """탈퇴 요청드립니다\n(추가 내용이 있으시면 여기 아래에 적어주세요)\n\n※ Ara 관리자가 확인 후 처리해드리며 조금의 시간이 소요될 수 있습니다 ※\n\n유저 번호: $userID\n닉네임: $nickname\n이메일: $email\n플랫폼: App\n $deviceData""";
+          """탈퇴 요청드립니다\n(추가 내용이 있으시면 여기 아래에 적어주세요)\n\n※ Ara 관리자가 확인 후 처리해드리며 조금의 시간이 소요될 수 있습니다 ※\n\n요청 번호: ${userProvider.naUser!.sso_user_info["sid"]}\n유저 번호: $userID\n닉네임: $nickname\n이메일: $email\n플랫폼: App\n""";
       emailLaunchUri = Uri(
         scheme: 'mailto',
         path: 'ara@sparcs.org',
