@@ -15,6 +15,7 @@ import 'package:provider/provider.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:dio/dio.dart';
 import 'package:webview_cookie_manager/webview_cookie_manager.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import 'package:new_ara_app/constants/colors_info.dart';
 import 'package:new_ara_app/widgets/text_info.dart';
@@ -23,6 +24,7 @@ import 'package:new_ara_app/widgets/text_and_switch.dart';
 import 'package:new_ara_app/providers/notification_provider.dart';
 import 'package:new_ara_app/models/block_model.dart';
 import 'package:new_ara_app/widgets/dialogs.dart';
+import 'package:new_ara_app/widgets/snackbar_noti.dart';
 
 /// 설정 페이지 빌드 및 이벤트 처리를 담당하는 StatefulWidget.
 class SettingPage extends StatefulWidget {
@@ -424,6 +426,36 @@ class SettingPageState extends State<SettingPage> {
                     ),
                   ),
                 ),
+                const SizedBox(height: 20),
+                Container(
+                  width: MediaQuery.of(context).size.width - 40,
+                  height: 50,
+                  decoration: BoxDecoration(
+                    borderRadius: const BorderRadius.all(Radius.circular(10)),
+                    border: Border.all(
+                      color: const Color.fromRGBO(240, 240, 240, 1),
+                    ),
+                  ),
+                  child: SizedBox(
+                    width: MediaQuery.of(context).size.width - 60,
+                    child: InkWell(
+                      onTap: () => launchInBrowser(),
+                      child: const Center(
+                        child: Text(
+                          '회원탈퇴',
+                          style: TextStyle(
+                            color: ColorsInfo.newara,
+                            fontSize: 16,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 5),
+                const TextInfo(
+                    '회원탈퇴는 위 버튼을 클릭하셔서 메일로 이메일, 닉네임 등 유저 정보와 함께 탈퇴를 요청해주시면 가능합니다.'),
               ],
             ),
           ),
@@ -444,5 +476,46 @@ class SettingPageState extends State<SettingPage> {
     await WebviewCookieManager().clearCookies();
 
     debugPrint("log out success");
+  }
+
+  String? encodeQueryParameters(Map<String, String> params) {
+    return params.entries
+        .map((MapEntry<String, String> e) =>
+            '${Uri.encodeComponent(e.key)}=${Uri.encodeComponent(e.value)}')
+        .join('&');
+  }
+
+  /// 회원탈퇴 기능을 위해 mailto scheme이 필요해서 사용함.
+  /// 브라우저로 url 열기에 성공하면 true, 아니면 false를 반환함.
+  Future<bool> launchInBrowser() async {
+    UserProvider userProvider = context.read<UserProvider>();
+    int? userID = userProvider.naUser!.user;
+    String? email = userProvider.naUser?.email;
+    String? nickname = userProvider.naUser?.nickname;
+    final String body =
+        """유저 번호: $userID\n닉네임: $nickname\n이메일: $email\n 탈퇴 요청드립니다(Ara 관리자가 확인 후 처리해드리며 조금의 시간이 소요될 수 있습니다)""";
+    final Uri emailLaunchUri = Uri(
+      scheme: 'mailto',
+      path: 'ara@sparcs.org',
+      query: encodeQueryParameters(<String, String>{
+        'subject': 'Ara 회원 탈퇴 요청',
+        'body': body,
+      }),
+    );
+    if (!await launchUrl(
+      emailLaunchUri,
+    )) {
+      debugPrint('Could not launch mail');
+      debugPrint("기본 메일앱을 열 수 없습니다.");
+      requestSnackBar();
+      return false;
+    }
+
+    return true;
+  }
+
+  void requestSnackBar() {
+    showInfoBySnackBar(
+        context, "기본 메일 어플리케이션을 열 수 없습니다. ara@sparcs.org로 문의 부탁드립니다.");
   }
 }
