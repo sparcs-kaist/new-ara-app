@@ -355,6 +355,7 @@ class _BulletinSearchPageState extends State<BulletinSearchPage> {
                       if (postPreviewList.isNotEmpty)
                         Expanded(
                           child: ListView.builder(
+                            physics: const AlwaysScrollableScrollPhysics(),
                             controller: _scrollController,
                             itemCount: postPreviewList.length +
                                 (_isLoadingNextPage ? 1 : 0), // 아이템 개수
