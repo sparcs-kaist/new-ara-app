@@ -1641,6 +1641,12 @@ class _PostViewPageState extends State<PostViewPage> {
                     bool sendRes = await _sendComment(userProvider);
                     if (sendRes) {
                       _setIsPageLoaded(await _fetchArticle(userProvider));
+                      // 댓글은 페이지 최하단에 추가되므로 댓글 위치로 이동함.
+                      _scrollController.animateTo(
+                        _scrollController.position.maxScrollExtent + 30,
+                        duration: const Duration(milliseconds: 500),
+                        curve: Curves.easeOut,
+                      );
                       debugPrint("Send Complete!");
                     } else {
                       debugPrint("Send Comment Failed");
@@ -1802,11 +1808,10 @@ class _PostViewPageState extends State<PostViewPage> {
         "name_type": _article.name_type,
       };
       Response? patchRes = await userProvider.patchApiRes(
-        
         "comments/${targetComment!.id}/",
         payload: defaultPayload,
       );
-      if (patchRes!=null && patchRes.statusCode != 200) {
+      if (patchRes != null && patchRes.statusCode != 200) {
         debugPrint("PATCH /api/comments/${targetComment!.id}/ failed");
         return false;
       }
