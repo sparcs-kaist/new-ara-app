@@ -35,11 +35,11 @@
 		<key>LSSupportsOpeningDocumentsInPlace</key>
 		<true/>
 		<key>NNSCameraUsageDescription</key>
-		<string>This is used for image_picker 0.8.7+5</string>
+		<string>This is used for uploading a photo to a post and change your profile picture</string>
 		<key>NSMicrophoneUsageDescription</key>
-		<string>This is used for image_picker 0.8.7+5</string>
+		<string>This is used for recording and uploading your voice to a post</string>
 		<key>NSPhotoLibraryUsageDescription</key>
-		<string>This is used for image_picker 0.8.7+5</string>
+		<string>This is used for uploading a photo to a post and change your profile picture</string>
 		<key>UIApplicationSupportsIndirectInputEvents</key>
 		<true/>
 		<key>UIFileSharingEnabled</key>
