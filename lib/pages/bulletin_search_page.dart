@@ -315,13 +315,14 @@ class _BulletinSearchPageState extends State<BulletinSearchPage> {
                           postPreviewList.isEmpty)
                         Expanded(
                           child: Center(
-                            child: Column(
+                            child: Row(
                               mainAxisAlignment: MainAxisAlignment.center,
+                              crossAxisAlignment: CrossAxisAlignment.center,
                               children: [
                                 SvgPicture.asset(
-                                  'assets/icons/keyboard.svg',
-                                  width: 50,
-                                  height: 50,
+                                  'assets/icons/information.svg',
+                                  width: 30,
+                                  height: 30,
                                   colorFilter: const ColorFilter.mode(
                                     Color(0xFFBBBBBB),
                                     BlendMode.srcIn,
