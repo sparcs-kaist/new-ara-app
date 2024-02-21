@@ -42,6 +42,8 @@ class SettingPageState extends State<SettingPage> {
   /// 정치글 보기 설정. true이면 정치글을 보여줌.
   late bool see_social;
 
+  bool _isLoading = false;
+
   @override
   void initState() {
     super.initState();
@@ -79,7 +81,7 @@ class SettingPageState extends State<SettingPage> {
         ),
       ),
       body: SafeArea(
-        child: SingleChildScrollView(
+        child: _isLoading ? const LoadingIndicator():SingleChildScrollView(
           child: SizedBox(
             width: MediaQuery.of(context).size.width,
             child: Column(
@@ -420,7 +422,18 @@ class SettingPageState extends State<SettingPage> {
                   child: SizedBox(
                     width: MediaQuery.of(context).size.width - 60,
                     child: InkWell(
-                      onTap: () => _logout(),
+                      onTap: () async {
+                        await showDialog(
+                          context: context,
+                          builder: (context) => SignoutConfirmDialog(
+                            onTap: () async {
+                              await _logout();
+                            },
+                            userProvider: userProvider,
+                            targetContext: context,
+                          ),
+                        );
+                      },
                       child: const Center(
                         child: Text(
                           '로그아웃',
@@ -447,7 +460,33 @@ class SettingPageState extends State<SettingPage> {
                   child: SizedBox(
                     width: MediaQuery.of(context).size.width - 60,
                     child: InkWell(
-                      onTap: () => launchInBrowser(1),
+                      onTap: () async {
+                        await showDialog(
+                          context: context,
+                          builder: (context) => UnregisterConfirmDialog(
+                            onTap: () async {
+                              Navigator.pop(context);
+                              setState(() {
+                                _isLoading = true;
+                              });
+                              Map<String, dynamic>? responseResult =
+                                  await userProvider.getApiRes('unregister');
+                              //TODO: 회원탈퇴 로직 보강 필요
+                              // if(responseResult == null){
+                              //   ///회원탈퇴 실패
+                              // }
+                              if(mounted){
+                                setState(() {
+                                  _isLoading = false;
+                                });
+                              }
+                              await _logout();
+                            },
+                            userProvider: userProvider,
+                            targetContext: context,
+                          ),
+                        );
+                      },
                       child: const Center(
                         child: Text(
                           '회원탈퇴',
@@ -463,7 +502,7 @@ class SettingPageState extends State<SettingPage> {
                 ),
                 const SizedBox(height: 5),
                 const TextInfo(
-                    '회원탈퇴는 위 버튼을 클릭하셔서 메일로 이메일, 닉네임 등 유저 정보와 함께 탈퇴를 요청해주시면 가능합니다.'),
+                    '회원 탈퇴는 Ara 관리자가 확인 후 처리해드리며, 조금 시간이 소요될 수 있습니다'),
               ],
             ),
           ),
