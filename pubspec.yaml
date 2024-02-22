@@ -2,7 +2,7 @@
 name: new_ara_app
 description: A new Flutter project.
 publish_to: none
-version: 1.0.0+102212113
+version: 1.0.1+102212113
 environment:
   sdk: ">=2.18.0 <3.0.0"
 dependencies:
