@@ -244,6 +244,56 @@ class _MainPageState extends State<MainPage> {
         });
   }
 
+  /// 일일 베스트 컨텐츠 데이터를 api로 불러와 화면에 재빌드
+  Future<void> _onRefreshIndicatorForTop(UserProvider userProvider,
+      List<ArticleListActionModel> contentList) async {
+    String apiUrl = 'articles/top/';
+    final dynamic response = await userProvider.getApiRes(apiUrl);
+    if (mounted && response != null) {
+      setState(() {
+        contentList.clear();
+
+        for (Map<String, dynamic> json in response['results']) {
+          try {
+            contentList.add(ArticleListActionModel.fromJson(json));
+          } catch (error) {
+            debugPrint(
+                "refreshBoardContent ArticleListActionModel.fromJson failed: $error");
+          }
+        }
+      });
+    }
+  }
+
+  /// 일일 베스트 컨텐츠 이외의 데이터를 api로 불러와 화면에 재빌드
+  Future<void> _onRefreshIndicatorForOther(
+    UserProvider userProvider,
+    String slug1,
+    String slug2,
+    List<ArticleListActionModel> contentList,
+  ) async {
+    List<int> ids = _searchBoardID(slug1, slug2);
+    int boardID = ids[0], topicID = ids[1];
+    String apiUrl = topicID == -1
+        ? "articles/?parent_board=$boardID"
+        : "articles/?parent_board=$boardID&parent_topic=$topicID";
+    final dynamic response = await userProvider.getApiRes(apiUrl);
+    if (mounted && response != null) {
+      setState(() {
+        contentList.clear();
+
+        for (Map<String, dynamic> json in response['results']) {
+          try {
+            contentList.add(ArticleListActionModel.fromJson(json));
+          } catch (error) {
+            debugPrint(
+                "refreshBoardContent ArticleListActionModel.fromJson failed: $error");
+          }
+        }
+      });
+    }
+  }
+
   /// 주어진 slug 값을 통해 게시판과 토픽의 ID를 찾음. topic 이 없는 경우 slug2로 ""을 넘겨주면 된다.
   List<int> _searchBoardID(String slug1, String slug2) {
     List<int> returnValue = [-1, -1];
@@ -273,6 +323,7 @@ class _MainPageState extends State<MainPage> {
 
   @override
   Widget build(BuildContext context) {
+    UserProvider userProvider = context.watch<UserProvider>();
     return Scaffold(
       appBar: AppBar(
         elevation: 0,
@@ -327,8 +378,30 @@ class _MainPageState extends State<MainPage> {
             : RefreshIndicator.adaptive(
                 color: ColorsInfo.newara,
                 onRefresh: () async {
-                  await _refreshBoardList(
-                      Provider.of<UserProvider>(context, listen: false));
+                  //api를 호출 후 최신 데이터로 갱신
+                  await Future.wait([
+                    _onRefreshIndicatorForTop(userProvider, _dailyBestContents),
+                    _onRefreshIndicatorForOther(
+                        userProvider, "portal-notice", "", _portalContents),
+                    _onRefreshIndicatorForOther(
+                        userProvider, "facility-notice", "", _facilityContents),
+                    _onRefreshIndicatorForOther(
+                        userProvider, "ara-notice", "", _newAraContents),
+                    _onRefreshIndicatorForOther(userProvider, "students-group",
+                        "grad-assoc", _gradContents),
+                    _onRefreshIndicatorForOther(userProvider, "students-group",
+                        "undergrad-assoc", _underGradContents),
+                    _onRefreshIndicatorForOther(userProvider, "students-group",
+                        "freshman-council", _freshmanContents),
+                    _onRefreshIndicatorForOther(
+                        userProvider, "talk", "", _talksContents),
+                    _onRefreshIndicatorForOther(
+                        userProvider, "wanted", "", _wantedContents),
+                    _onRefreshIndicatorForOther(
+                        userProvider, "market", "", _marketContents),
+                    _onRefreshIndicatorForOther(
+                        userProvider, "real-estate", "", _realEstateContents),
+                  ]);
                 },
                 child: SingleChildScrollView(
                   child: SizedBox(
