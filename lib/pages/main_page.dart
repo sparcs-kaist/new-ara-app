@@ -245,7 +245,7 @@ class _MainPageState extends State<MainPage> {
   }
 
   /// 일일 베스트 컨텐츠 데이터를 api로 불러와 화면에 재빌드
-  Future<void> _onRefreshIndicatorForTop(UserProvider userProvider,
+  Future<void> _refreshIndicatorForTop(UserProvider userProvider,
       List<ArticleListActionModel> contentList) async {
     String apiUrl = 'articles/top/';
     final dynamic response = await userProvider.getApiRes(apiUrl);
@@ -266,7 +266,7 @@ class _MainPageState extends State<MainPage> {
   }
 
   /// 일일 베스트 컨텐츠 이외의 데이터를 api로 불러와 화면에 재빌드
-  Future<void> _onRefreshIndicatorForOther(
+  Future<void> _refreshIndicatorForOther(
     UserProvider userProvider,
     String slug1,
     String slug2,
@@ -380,26 +380,26 @@ class _MainPageState extends State<MainPage> {
                 onRefresh: () async {
                   //api를 호출 후 최신 데이터로 갱신
                   await Future.wait([
-                    _onRefreshIndicatorForTop(userProvider, _dailyBestContents),
-                    _onRefreshIndicatorForOther(
+                    _refreshIndicatorForTop(userProvider, _dailyBestContents),
+                    _refreshIndicatorForOther(
                         userProvider, "portal-notice", "", _portalContents),
-                    _onRefreshIndicatorForOther(
+                    _refreshIndicatorForOther(
                         userProvider, "facility-notice", "", _facilityContents),
-                    _onRefreshIndicatorForOther(
+                    _refreshIndicatorForOther(
                         userProvider, "ara-notice", "", _newAraContents),
-                    _onRefreshIndicatorForOther(userProvider, "students-group",
+                    _refreshIndicatorForOther(userProvider, "students-group",
                         "grad-assoc", _gradContents),
-                    _onRefreshIndicatorForOther(userProvider, "students-group",
+                    _refreshIndicatorForOther(userProvider, "students-group",
                         "undergrad-assoc", _underGradContents),
-                    _onRefreshIndicatorForOther(userProvider, "students-group",
+                    _refreshIndicatorForOther(userProvider, "students-group",
                         "freshman-council", _freshmanContents),
-                    _onRefreshIndicatorForOther(
+                    _refreshIndicatorForOther(
                         userProvider, "talk", "", _talksContents),
-                    _onRefreshIndicatorForOther(
+                    _refreshIndicatorForOther(
                         userProvider, "wanted", "", _wantedContents),
-                    _onRefreshIndicatorForOther(
+                    _refreshIndicatorForOther(
                         userProvider, "market", "", _marketContents),
-                    _onRefreshIndicatorForOther(
+                    _refreshIndicatorForOther(
                         userProvider, "real-estate", "", _realEstateContents),
                   ]);
                 },
