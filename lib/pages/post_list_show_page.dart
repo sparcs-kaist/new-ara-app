@@ -285,6 +285,7 @@ class _PostListShowPageState extends State<PostListShowPage> {
                       await updateAllBulletinList(maxPage: 1);
                     },
                     child: ListView.separated(
+                      physics: const AlwaysScrollableScrollPhysics(),
                       controller: _scrollController,
                       itemCount: postPreviewList.length +
                           (_isLoadingNextPage ? 1 : 0), // 아이템 개수
