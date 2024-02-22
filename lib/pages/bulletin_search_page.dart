@@ -142,7 +142,7 @@ class _BulletinSearchPageState extends State<BulletinSearchPage> {
         });
       }
       UserProvider userProvider = context.read<UserProvider>();
-      if (_scrollController.position.pixels ==
+      if (_scrollController.position.pixels >=
           _scrollController.position.maxScrollExtent) {
         _currentPage = _currentPage + 1;
         //TODO: 더 이상 불러올 게시물이 없을 때의 처리
@@ -355,6 +355,7 @@ class _BulletinSearchPageState extends State<BulletinSearchPage> {
                       if (postPreviewList.isNotEmpty)
                         Expanded(
                           child: ListView.builder(
+                            physics: const AlwaysScrollableScrollPhysics(),
                             controller: _scrollController,
                             itemCount: postPreviewList.length +
                                 (_isLoadingNextPage ? 1 : 0), // 아이템 개수

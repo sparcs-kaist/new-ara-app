@@ -1,9 +1,8 @@
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:new_ara_app/pages/bulletin_search_page.dart';
+import 'package:new_ara_app/pages/inquiry_page.dart';
 import 'package:provider/provider.dart';
 
 import 'package:new_ara_app/constants/board_type.dart';
@@ -19,24 +18,7 @@ import 'package:new_ara_app/pages/post_view_page.dart';
 import 'package:new_ara_app/utils/slide_routing.dart';
 import 'package:new_ara_app/providers/notification_provider.dart';
 import 'package:new_ara_app/utils/handle_hidden.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-
-///SharedPreferences를 이용해 데이터 저장( 키: api url, 값: api response)
-Future<void> _saveApiDataToCache(String key, dynamic data) async {
-  final prefs = await SharedPreferences.getInstance();
-  String jsonString = jsonEncode(data);
-  await prefs.setString(key, jsonString);
-}
-
-///SharedPreferences를 이용해 데이터 불러오기( 키: api url, 값: api response)
-Future<dynamic> _loadApiDataFromCache(String key) async {
-  final prefs = await SharedPreferences.getInstance();
-  String? jsonString = prefs.getString(key);
-  if (jsonString != null) {
-    return jsonDecode(jsonString);
-  }
-  return null;
-}
+import 'package:new_ara_app/utils/cache_function.dart';
 
 class MainPage extends StatefulWidget {
   const MainPage({Key? key}) : super(key: key);
@@ -87,8 +69,8 @@ class _MainPageState extends State<MainPage> {
 
     //측정하고자 하는 코드 블록
     Future.wait([
-      _refreshBoardList(userProvider),
-      _refreshDailyBest(userProvider),
+      _initBoardList(userProvider),
+      _initDailyBest(userProvider),
     ]).then((results) {
       DateTime endTime = DateTime.now(); // 종료 시간 기록
 
@@ -96,107 +78,91 @@ class _MainPageState extends State<MainPage> {
       debugPrint("소요 시간: ${duration.inMilliseconds} 밀리초");
     });
 
+    //유닛 테스트를 위한 코드 ------------
+    // WidgetsBinding.instance!.addPostFrameCallback((_) {
+    //   Navigator.of(context).push(slideRoute(const InQuiryPage()));
+    // });
+    //------------------------
+
     context.read<NotificationProvider>().checkIsNotReadExist(userProvider);
   }
 
   /// 일일 베스트 컨텐츠 데이터를 새로고침
-  Future<void> _refreshDailyBest(UserProvider userProvider) async {
+  Future<void> _initDailyBest(UserProvider userProvider) async {
     //1. Shared_Preferences 값이 있으면(if not null) 그 값으로 UI 업데이트.
     //2. api 호출 후 새로운 response shared_preferences에 저장 후 UI 업데이트
-
     // api 호출과 Provider 정보 동기화.
-    try {
-      Map<String, dynamic>? recentJson =
-          await _loadApiDataFromCache('articles/top/');
 
-      if (recentJson != null) {
-        if (mounted) {
-          setState(() {
-            _dailyBestContents.clear();
-            for (Map<String, dynamic> json in recentJson['results']) {
-              _dailyBestContents.add(ArticleListActionModel.fromJson(json));
-            }
-            _isLoading[0] = false;
-          });
-        }
-      }
-      dynamic response = await userProvider.getApiRes("articles/top/");
-      await _saveApiDataToCache('articles/top/', response);
-      if (mounted) {
-        setState(() {
-          _dailyBestContents.clear();
-          for (Map<String, dynamic> json in response!['results']) {
-            _dailyBestContents.add(ArticleListActionModel.fromJson(json));
+    updateStateWithCachedOrFetchedApiData(
+        apiUrl: 'articles/top/',
+        userProvider: userProvider,
+        callback: (response) {
+          if (mounted) {
+            setState(() {
+              _dailyBestContents.clear();
+              for (Map<String, dynamic> json in response['results']) {
+                _dailyBestContents.add(ArticleListActionModel.fromJson(json));
+              }
+              _isLoading[0] = false;
+            });
           }
-          _isLoading[0] = false;
         });
-      }
-    } catch (error) {
-      debugPrint("refreshDailyBest error: $error");
-      // 적절한 에러 처리 로직 추가
-    }
   }
 
   /// 게시판 목록 안의 게시물들을 새로 고침
-  Future<void> _refreshBoardList(UserProvider userProvider) async {
-    List<dynamic>? boardJson = await _loadApiDataFromCache('boards/');
-    if (boardJson == null) {
-      boardJson = await userProvider.getApiRes("boards/", sendText: "here");
-      await _saveApiDataToCache('boards/', boardJson);
-
-      // 게시판 목록 로드 후 각 게시판의 공지사항들을 새로고침
-    } else {
-      userProvider
-          .getApiRes("boards/", sendText: "There")
-          .then((value) async => {await _saveApiDataToCache('boards/', value)});
-      // 게시판 목록 로드 후 각 게시판의 공지사항들을 새로고침
-    }
-    if (mounted) {
-      setState(() {
-        _boards.clear();
-        for (Map<String, dynamic> json in boardJson!) {
-          try {
-            _boards.add(BoardDetailActionModel.fromJson(json));
-          } catch (error) {
-            debugPrint(
-                "refreshBoardList BoardDetailActionModel.fromJson failed: $error");
-          }
+  Future<void> _initBoardList(UserProvider userProvider) async {
+    updateStateWithCachedOrFetchedApiData(
+      apiUrl: 'boards/',
+      userProvider: userProvider,
+      callback: (response) async {
+        if (mounted) {
+          setState(() {
+            _boards.clear();
+            for (Map<String, dynamic> json in response!) {
+              try {
+                _boards.add(BoardDetailActionModel.fromJson(json));
+              } catch (error) {
+                debugPrint(
+                    "refreshBoardList BoardDetailActionModel.fromJson failed: $error");
+              }
+            }
+            _isLoading[7] = false;
+          });
+          await Future.wait([
+            _initPortalNotice(userProvider),
+            _initFacilityNotice(userProvider),
+            _initNewAraNotice(userProvider),
+            _initGradAssocNotice(userProvider),
+            _initUndergradAssocNotice(userProvider),
+            _initFreshmanCouncil(userProvider),
+            _initTalks(userProvider),
+            _initMarket(userProvider),
+            _initWanted(userProvider),
+            _initRealEstate(userProvider)
+          ]);
         }
-        _isLoading[7] = false;
-      });
-      await Future.wait([
-        _refreshPortalNotice(userProvider),
-        _refreshFacilityNotice(userProvider),
-        _refreshNewAraNotice(userProvider),
-        _refreshGradAssocNotice(userProvider),
-        _refreshUndergradAssocNotice(userProvider),
-        _refreshFreshmanCouncil(userProvider),
-        _refreshTalks(userProvider),
-        _refreshMarket(userProvider),
-        _refreshWanted(userProvider),
-        _refreshRealEstate(userProvider)
-      ]);
-    }
+      },
+    );
   }
 
   ///포탈 게시물 글 불러오기.
-  Future<void> _refreshPortalNotice(UserProvider userProvider) async {
+  Future<void> _initPortalNotice(UserProvider userProvider) async {
     await _refreshBoardContent(
         userProvider, "portal-notice", "", _portalContents, 1);
   }
 
   ///입주 업체 게시물 글 불러오기.
-  Future<void> _refreshFacilityNotice(UserProvider userProvider) async {
+  Future<void> _initFacilityNotice(UserProvider userProvider) async {
     await _refreshBoardContent(
         userProvider, "facility-notice", "", _facilityContents, 2);
   }
 
-  Future<void> _refreshNewAraNotice(UserProvider userProvider) async {
+  Future<void> _initNewAraNotice(UserProvider userProvider) async {
     await _refreshBoardContent(
         userProvider, "ara-notice", "", _newAraContents, 3);
   }
 
-  Future<void> _refreshGradAssocNotice(UserProvider userProvider) async {
+  Future<void> _initGradAssocNotice(UserProvider userProvider) async {
     //원총
     // "slug": "students-group",
     // "slug": "grad-assoc",
@@ -206,7 +172,7 @@ class _MainPageState extends State<MainPage> {
         userProvider, "students-group", "grad-assoc", _gradContents, 4);
   }
 
-  Future<void> _refreshUndergradAssocNotice(UserProvider userProvider) async {
+  Future<void> _initUndergradAssocNotice(UserProvider userProvider) async {
     // 총학
     // "slug": "students-group",
     // "slug": "undergrad-assoc",
@@ -214,7 +180,7 @@ class _MainPageState extends State<MainPage> {
         "undergrad-assoc", _underGradContents, 5);
   }
 
-  Future<void> _refreshFreshmanCouncil(UserProvider userProvider) async {
+  Future<void> _initFreshmanCouncil(UserProvider userProvider) async {
     //새학
     // "slug": "students-group",
     // "slug": "freshman-council",
@@ -222,22 +188,22 @@ class _MainPageState extends State<MainPage> {
         "freshman-council", _freshmanContents, 6);
   }
 
-  Future<void> _refreshTalks(UserProvider userProvider) async {
+  Future<void> _initTalks(UserProvider userProvider) async {
     //자유게시판
     await _refreshBoardContent(userProvider, "talk", "", _talksContents, 8);
   }
 
-  Future<void> _refreshWanted(UserProvider userProvider) async {
+  Future<void> _initWanted(UserProvider userProvider) async {
     //구인구직
     await _refreshBoardContent(userProvider, "wanted", "", _wantedContents, 9);
   }
 
-  Future<void> _refreshMarket(UserProvider userProvider) async {
+  Future<void> _initMarket(UserProvider userProvider) async {
     //중고거래
     await _refreshBoardContent(userProvider, "market", "", _marketContents, 10);
   }
 
-  Future<void> _refreshRealEstate(UserProvider userProvider) async {
+  Future<void> _initRealEstate(UserProvider userProvider) async {
     //부동산
     await _refreshBoardContent(
         userProvider, "real-estate", "", _realEstateContents, 11);
@@ -256,32 +222,38 @@ class _MainPageState extends State<MainPage> {
         ? "articles/?parent_board=$boardID"
         : "articles/?parent_board=$boardID&parent_topic=$topicID";
 
-    final Map<String, dynamic>? recentJson =
-        await _loadApiDataFromCache(apiUrl);
-    if (recentJson != null) {
-      if (mounted) {
-        setState(() {
-          contentList.clear();
+    updateStateWithCachedOrFetchedApiData(
+        apiUrl: apiUrl,
+        userProvider: userProvider,
+        callback: (response) async {
+          if (mounted) {
+            setState(() {
+              contentList.clear();
 
-          for (Map<String, dynamic> json in recentJson['results']) {
-            try {
-              contentList.add(ArticleListActionModel.fromJson(json));
-            } catch (error) {
-              debugPrint(
-                  "refreshBoardContent ArticleListActionModel.fromJson failed: $error");
-            }
+              for (Map<String, dynamic> json in response['results']) {
+                try {
+                  contentList.add(ArticleListActionModel.fromJson(json));
+                } catch (error) {
+                  debugPrint(
+                      "refreshBoardContent ArticleListActionModel.fromJson failed: $error");
+                }
+              }
+              _isLoading[isLoadingIndex] = false;
+            });
           }
-          _isLoading[isLoadingIndex] = false;
         });
-      }
-    }
+  }
 
+  /// 일일 베스트 컨텐츠 데이터를 api로 불러와 화면에 재빌드
+  Future<void> _refreshIndicatorForTop(UserProvider userProvider,
+      List<ArticleListActionModel> contentList) async {
+    String apiUrl = 'articles/top/';
     final dynamic response = await userProvider.getApiRes(apiUrl);
-    await _saveApiDataToCache(apiUrl, response);
-    if (mounted) {
+    if (mounted && response != null) {
       setState(() {
         contentList.clear();
-        for (Map<String, dynamic> json in response!['results']) {
+
+        for (Map<String, dynamic> json in response['results']) {
           try {
             contentList.add(ArticleListActionModel.fromJson(json));
           } catch (error) {
@@ -289,7 +261,35 @@ class _MainPageState extends State<MainPage> {
                 "refreshBoardContent ArticleListActionModel.fromJson failed: $error");
           }
         }
-        _isLoading[isLoadingIndex] = false;
+      });
+    }
+  }
+
+  /// 일일 베스트 컨텐츠 이외의 데이터를 api로 불러와 화면에 재빌드
+  Future<void> _refreshIndicatorForOther(
+    UserProvider userProvider,
+    String slug1,
+    String slug2,
+    List<ArticleListActionModel> contentList,
+  ) async {
+    List<int> ids = _searchBoardID(slug1, slug2);
+    int boardID = ids[0], topicID = ids[1];
+    String apiUrl = topicID == -1
+        ? "articles/?parent_board=$boardID"
+        : "articles/?parent_board=$boardID&parent_topic=$topicID";
+    final dynamic response = await userProvider.getApiRes(apiUrl);
+    if (mounted && response != null) {
+      setState(() {
+        contentList.clear();
+
+        for (Map<String, dynamic> json in response['results']) {
+          try {
+            contentList.add(ArticleListActionModel.fromJson(json));
+          } catch (error) {
+            debugPrint(
+                "refreshBoardContent ArticleListActionModel.fromJson failed: $error");
+          }
+        }
       });
     }
   }
@@ -323,6 +323,7 @@ class _MainPageState extends State<MainPage> {
 
   @override
   Widget build(BuildContext context) {
+    UserProvider userProvider = context.watch<UserProvider>();
     return Scaffold(
       appBar: AppBar(
         elevation: 0,
@@ -377,8 +378,30 @@ class _MainPageState extends State<MainPage> {
             : RefreshIndicator.adaptive(
                 color: ColorsInfo.newara,
                 onRefresh: () async {
-                  await _refreshBoardList(
-                      Provider.of<UserProvider>(context, listen: false));
+                  //api를 호출 후 최신 데이터로 갱신
+                  await Future.wait([
+                    _refreshIndicatorForTop(userProvider, _dailyBestContents),
+                    _refreshIndicatorForOther(
+                        userProvider, "portal-notice", "", _portalContents),
+                    _refreshIndicatorForOther(
+                        userProvider, "facility-notice", "", _facilityContents),
+                    _refreshIndicatorForOther(
+                        userProvider, "ara-notice", "", _newAraContents),
+                    _refreshIndicatorForOther(userProvider, "students-group",
+                        "grad-assoc", _gradContents),
+                    _refreshIndicatorForOther(userProvider, "students-group",
+                        "undergrad-assoc", _underGradContents),
+                    _refreshIndicatorForOther(userProvider, "students-group",
+                        "freshman-council", _freshmanContents),
+                    _refreshIndicatorForOther(
+                        userProvider, "talk", "", _talksContents),
+                    _refreshIndicatorForOther(
+                        userProvider, "wanted", "", _wantedContents),
+                    _refreshIndicatorForOther(
+                        userProvider, "market", "", _marketContents),
+                    _refreshIndicatorForOther(
+                        userProvider, "real-estate", "", _realEstateContents),
+                  ]);
                 },
                 child: SingleChildScrollView(
                   child: SizedBox(

@@ -132,8 +132,12 @@ class UserProvider with ChangeNotifier {
   }
 
   /// 지정된 API URL로 GET 요청을 전송하고 응답의 data를 반환합니다.
+  /// 
   /// 실패 시 null을 반환합니다.
+  /// 
   /// sendText는 개발자가 디버깅을 위한 문자열입니다.
+  /// 
+  /// 사용 예시: await getApiRes('unregister', sendText: '디버깅용 테스트 문자열 입니다.');
   Future<dynamic> getApiRes(String apiUrl, {String? sendText}) async {
     var totUrl = "$newAraDefaultUrl/api/$apiUrl";
 
