@@ -59,7 +59,7 @@ class _InQuiryPageState extends State<InQuiryPage> {
             children: [
               Text.rich(
                 TextSpan(
-                  text: '메일로 문의하세요!\n여기를 클릭하세요.',
+                  text: '이미 탈퇴 했던 계정입니다.\n여기를 이메일로 문의하세요.',
                   style: const TextStyle(
                     decoration: TextDecoration.underline,
                     color: Colors.blue, fontSize: 20),
