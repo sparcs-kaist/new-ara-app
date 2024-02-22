@@ -30,10 +30,20 @@ gem install bundler
 bundle install
 ```
 
-### Credentials
+### Credentials(Android)
 
-- `android/fastlane/otlplus-fastlane.json` : Google Play 서비스 계정 JSON 파일
+- `android/fastlane/newara-fastlane.json` : Google Play 서비스 계정 JSON 파일
+
 - `android/fastlane/upload-keystore.jks` : Android App Signing Key for Upload Google Play
+
+- `android/fastlane/.env` : 아래와 같이 각자 개인이 발급 받은 GITHUB_API_TOKEN을 추가합니다. 
+
+```env
+GITHUB_API_TOKEN=************************
+```
+GITHUB_API_TOKEN 발급 받는 법: https://lifefun.tistory.com/161
+
+
 - `android/key.properties` : 아래와 같이 Signing Key 정보를 입력합니다.
 
 ```env
@@ -43,7 +53,8 @@ keyPassword=********
 keyAlias=upload
 ```
 
-- `ios/fastlane/.env.default` : 아래와 같이 Apple ID 계정 정보를 입력합니다.
+### Credentials(iOS)
+- `ios/fastlane/.env.default` : 아래와 같이 본인의 Apple ID 계정 정보를 입력합니다.
 
 ```env
 FASTLANE_USER=****@****.***
@@ -59,6 +70,7 @@ apple_id("****@****.***") # Your Apple Developer Portal username
 itc_team_name("SPARCS") # App Store Connect Team Name
 team_id("N5V8W52U3U") # Developer Portal Team ID
 ```
+
 
 ### 알파 버전 배포
 
