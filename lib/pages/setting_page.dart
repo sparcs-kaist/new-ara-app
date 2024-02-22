@@ -502,7 +502,7 @@ class SettingPageState extends State<SettingPage> {
                 ),
                 const SizedBox(height: 5),
                 const TextInfo(
-                    '회원 탈퇴는 Ara 관리자가 확인 후 처리해드리며, 조금 시간이 소요될 수 있습니다'),
+                    '회원 탈퇴는 Ara 관리자가 확인 후 처리해드리며, 최대 24시간이 소요될 수 있습니다'),
               ],
             ),
           ),

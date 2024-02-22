@@ -841,9 +841,9 @@ class UnregisterConfirmDialog extends StatelessWidget {
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 50),
               child: const Text(
-                '회원 탈퇴는 Ara 관리자가 확인 후 처리해드리며, 시간이 소요될 수 있습니다.',
+                '회원 탈퇴는 Ara 관리자가 확인 후 처리해드리며, 최대 24시간이 소요될 수 있습니다.',
                 style: TextStyle(
-                  fontSize: 14,
+                  fontSize: 12,
                   fontWeight: FontWeight.w700,
                   color: Color(0xFFBBBBBB),
                 ),
