@@ -69,8 +69,8 @@ class _MainPageState extends State<MainPage> {
 
     //측정하고자 하는 코드 블록
     Future.wait([
-      _refreshBoardList(userProvider),
-      _refreshDailyBest(userProvider),
+      _initBoardList(userProvider),
+      _initDailyBest(userProvider),
     ]).then((results) {
       DateTime endTime = DateTime.now(); // 종료 시간 기록
 
@@ -88,7 +88,7 @@ class _MainPageState extends State<MainPage> {
   }
 
   /// 일일 베스트 컨텐츠 데이터를 새로고침
-  Future<void> _refreshDailyBest(UserProvider userProvider) async {
+  Future<void> _initDailyBest(UserProvider userProvider) async {
     //1. Shared_Preferences 값이 있으면(if not null) 그 값으로 UI 업데이트.
     //2. api 호출 후 새로운 response shared_preferences에 저장 후 UI 업데이트
     // api 호출과 Provider 정보 동기화.
@@ -110,7 +110,7 @@ class _MainPageState extends State<MainPage> {
   }
 
   /// 게시판 목록 안의 게시물들을 새로 고침
-  Future<void> _refreshBoardList(UserProvider userProvider) async {
+  Future<void> _initBoardList(UserProvider userProvider) async {
     updateStateWithCachedOrFetchedApiData(
       apiUrl: 'boards/',
       userProvider: userProvider,
@@ -129,16 +129,16 @@ class _MainPageState extends State<MainPage> {
             _isLoading[7] = false;
           });
           await Future.wait([
-            _refreshPortalNotice(userProvider),
-            _refreshFacilityNotice(userProvider),
-            _refreshNewAraNotice(userProvider),
-            _refreshGradAssocNotice(userProvider),
-            _refreshUndergradAssocNotice(userProvider),
-            _refreshFreshmanCouncil(userProvider),
-            _refreshTalks(userProvider),
-            _refreshMarket(userProvider),
-            _refreshWanted(userProvider),
-            _refreshRealEstate(userProvider)
+            _initPortalNotice(userProvider),
+            _initFacilityNotice(userProvider),
+            _initNewAraNotice(userProvider),
+            _initGradAssocNotice(userProvider),
+            _initUndergradAssocNotice(userProvider),
+            _initFreshmanCouncil(userProvider),
+            _initTalks(userProvider),
+            _initMarket(userProvider),
+            _initWanted(userProvider),
+            _initRealEstate(userProvider)
           ]);
         }
       },
@@ -146,23 +146,23 @@ class _MainPageState extends State<MainPage> {
   }
 
   ///포탈 게시물 글 불러오기.
-  Future<void> _refreshPortalNotice(UserProvider userProvider) async {
+  Future<void> _initPortalNotice(UserProvider userProvider) async {
     await _refreshBoardContent(
         userProvider, "portal-notice", "", _portalContents, 1);
   }
 
   ///입주 업체 게시물 글 불러오기.
-  Future<void> _refreshFacilityNotice(UserProvider userProvider) async {
+  Future<void> _initFacilityNotice(UserProvider userProvider) async {
     await _refreshBoardContent(
         userProvider, "facility-notice", "", _facilityContents, 2);
   }
 
-  Future<void> _refreshNewAraNotice(UserProvider userProvider) async {
+  Future<void> _initNewAraNotice(UserProvider userProvider) async {
     await _refreshBoardContent(
         userProvider, "ara-notice", "", _newAraContents, 3);
   }
 
-  Future<void> _refreshGradAssocNotice(UserProvider userProvider) async {
+  Future<void> _initGradAssocNotice(UserProvider userProvider) async {
     //원총
     // "slug": "students-group",
     // "slug": "grad-assoc",
@@ -172,7 +172,7 @@ class _MainPageState extends State<MainPage> {
         userProvider, "students-group", "grad-assoc", _gradContents, 4);
   }
 
-  Future<void> _refreshUndergradAssocNotice(UserProvider userProvider) async {
+  Future<void> _initUndergradAssocNotice(UserProvider userProvider) async {
     // 총학
     // "slug": "students-group",
     // "slug": "undergrad-assoc",
@@ -180,7 +180,7 @@ class _MainPageState extends State<MainPage> {
         "undergrad-assoc", _underGradContents, 5);
   }
 
-  Future<void> _refreshFreshmanCouncil(UserProvider userProvider) async {
+  Future<void> _initFreshmanCouncil(UserProvider userProvider) async {
     //새학
     // "slug": "students-group",
     // "slug": "freshman-council",
@@ -188,22 +188,22 @@ class _MainPageState extends State<MainPage> {
         "freshman-council", _freshmanContents, 6);
   }
 
-  Future<void> _refreshTalks(UserProvider userProvider) async {
+  Future<void> _initTalks(UserProvider userProvider) async {
     //자유게시판
     await _refreshBoardContent(userProvider, "talk", "", _talksContents, 8);
   }
 
-  Future<void> _refreshWanted(UserProvider userProvider) async {
+  Future<void> _initWanted(UserProvider userProvider) async {
     //구인구직
     await _refreshBoardContent(userProvider, "wanted", "", _wantedContents, 9);
   }
 
-  Future<void> _refreshMarket(UserProvider userProvider) async {
+  Future<void> _initMarket(UserProvider userProvider) async {
     //중고거래
     await _refreshBoardContent(userProvider, "market", "", _marketContents, 10);
   }
 
-  Future<void> _refreshRealEstate(UserProvider userProvider) async {
+  Future<void> _initRealEstate(UserProvider userProvider) async {
     //부동산
     await _refreshBoardContent(
         userProvider, "real-estate", "", _realEstateContents, 11);
