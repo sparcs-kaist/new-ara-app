@@ -1,8 +1,8 @@
-
 import 'package:flutter/material.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:new_ara_app/pages/bulletin_search_page.dart';
+import 'package:new_ara_app/pages/inquiry_page.dart';
 import 'package:provider/provider.dart';
 
 import 'package:new_ara_app/constants/board_type.dart';
@@ -19,7 +19,6 @@ import 'package:new_ara_app/utils/slide_routing.dart';
 import 'package:new_ara_app/providers/notification_provider.dart';
 import 'package:new_ara_app/utils/handle_hidden.dart';
 import 'package:new_ara_app/utils/cache_function.dart';
-
 
 class MainPage extends StatefulWidget {
   const MainPage({Key? key}) : super(key: key);
@@ -79,10 +78,14 @@ class _MainPageState extends State<MainPage> {
       debugPrint("소요 시간: ${duration.inMilliseconds} 밀리초");
     });
 
+    //유닛 테스트를 위한 코드 ------------
+    // WidgetsBinding.instance!.addPostFrameCallback((_) {
+    //   Navigator.of(context).push(slideRoute(const InQuiryPage()));
+    // });
+    //------------------------
+
     context.read<NotificationProvider>().checkIsNotReadExist(userProvider);
   }
-
-  
 
   /// 일일 베스트 컨텐츠 데이터를 새로고침
   Future<void> _refreshDailyBest(UserProvider userProvider) async {
