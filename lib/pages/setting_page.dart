@@ -1,6 +1,8 @@
 /// 유저 설정 관리, 차단한 유저 목록, 로그아웃을 관리하는 파일.
 /// Author: 김상오(alvin)
 
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
@@ -14,6 +16,7 @@ import 'package:new_ara_app/widgets/loading_indicator.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:dio/dio.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:webview_cookie_manager/webview_cookie_manager.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -81,432 +84,449 @@ class SettingPageState extends State<SettingPage> {
         ),
       ),
       body: SafeArea(
-        child: _isLoading ? const LoadingIndicator():SingleChildScrollView(
-          child: SizedBox(
-            width: MediaQuery.of(context).size.width,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                const SizedBox(height: 23),
-                // 게시글 아이콘 및 '게시글' 텍스트
-                SizedBox(
-                  width: MediaQuery.of(context).size.width - 50,
-                  child: Row(
-                    children: [
-                      SvgPicture.asset(
-                        'assets/icons/post_list.svg',
-                        width: 34,
-                        height: 34,
-                      ),
-                      Text(
-                        'setting_page.bulletin'.tr(),
-                        style: const TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.w700,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 7),
-                // 성인글 보기, 정치글 보기 스위치 버튼
-                Container(
-                  width: MediaQuery.of(context).size.width - 40,
-                  height: 94,
-                  decoration: BoxDecoration(
-                    borderRadius: const BorderRadius.all(Radius.circular(10)),
-                    border: Border.all(
-                      color: const Color.fromRGBO(240, 240, 240, 1),
-                    ),
-                  ),
+        child: _isLoading
+            ? const LoadingIndicator()
+            : SingleChildScrollView(
+                child: SizedBox(
+                  width: MediaQuery.of(context).size.width,
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
-                      const SizedBox(height: 10),
-                      // 성인글 보기
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          // 성인글 보기 글씨
-                          Container(
-                              margin: const EdgeInsets.only(left: 10),
-                              child: Text(
-                                "setting_page.adult".tr(),
-                                style: const TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w500,
-                                ),
-                              )),
-                          // 성인글 보기 CupertinoSwitch
-                          Container(
-                            margin: const EdgeInsets.only(right: 10),
-                            width: 43,
-                            height: 27,
-                            child: FittedBox(
-                              fit: BoxFit.fill,
-                              child: CupertinoSwitch(
-                                  activeColor: ColorsInfo.newara,
-                                  value: see_sexual,
-                                  onChanged: (value) async {
-                                    setState(() => see_sexual = value);
-                                    try {
-                                      await dio.patch(
-                                          '$newAraDefaultUrl/api/user_profiles/${userProvider.naUser!.user}/',
-                                          data: {'see_sexual': value});
-                                      await userProvider.apiMeUserInfo();
-                                      debugPrint(
-                                          "Change of 'see_sexual' succeed!");
-                                      requestSnackBar("설정이 저장되었습니다.");
-                                    } catch (error) {
-                                      debugPrint(
-                                          "Change of 'see_sexual' failed: $error");
-                                      requestSnackBar(
-                                          "에러가 발생하여 설정 반영에 실패했습니다. 다시 시도해주십시오.");
-                                      setState(() => see_sexual = !value);
-                                    }
-                                  }),
+                      const SizedBox(height: 23),
+                      // 게시글 아이콘 및 '게시글' 텍스트
+                      SizedBox(
+                        width: MediaQuery.of(context).size.width - 50,
+                        child: Row(
+                          children: [
+                            SvgPicture.asset(
+                              'assets/icons/post_list.svg',
+                              width: 34,
+                              height: 34,
                             ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 16),
-                      // 정치글 보기
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          // 정치글 보기 글씨
-                          Container(
-                              margin: const EdgeInsets.only(left: 10),
-                              child: Text(
-                                "setting_page.politics".tr(),
-                                style: const TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w500,
-                                ),
-                              )),
-                          // 정치글 보기 CupertinoSwitch
-                          Container(
-                            margin: const EdgeInsets.only(right: 10),
-                            width: 43,
-                            height: 27,
-                            child: FittedBox(
-                              fit: BoxFit.fill,
-                              child: CupertinoSwitch(
-                                  activeColor: ColorsInfo.newara,
-                                  value: see_social,
-                                  onChanged: (value) async {
-                                    setState(() {
-                                      see_social = value;
-                                    });
-                                    try {
-                                      await dio.patch(
-                                          '$newAraDefaultUrl/api/user_profiles/${userProvider.naUser!.user}/',
-                                          data: {'see_social': value});
-                                      await userProvider.apiMeUserInfo();
-                                      debugPrint(
-                                          "Change of 'see_social' succeed!");
-                                      requestSnackBar("설정이 저장되었습니다.");
-                                    } catch (error) {
-                                      debugPrint(
-                                          "Change of 'see_social' failed: $error");
-                                      requestSnackBar(
-                                          "에러가 발생하여 설정 반영에 실패했습니다. 다시 시도해주십시오.");
-                                      setState(() => see_social = !value);
-                                    }
-                                  }),
+                            Text(
+                              'setting_page.bulletin'.tr(),
+                              style: const TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.w700,
+                              ),
                             ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 10),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 24),
-                // // 알림 아이콘 및 '알림' 텍스트
-                // SizedBox(
-                //   width: MediaQuery.of(context).size.width - 50,
-                //   child: Row(
-                //     children: [
-                //       SvgPicture.asset(
-                //         'assets/icons/notification.svg',
-                //         width: 34,
-                //         height: 34,
-                //       ),
-                //       Text(
-                //         'setting_page.noti'.tr(),
-                //         style: const TextStyle(
-                //           fontSize: 18,
-                //           fontWeight: FontWeight.w700,
-                //         ),
-                //       ),
-                //     ],
-                //   ),
-                // ),
-                // const SizedBox(height: 7),
-                // // 댓글, 대댓글 설정 UI의 border 설정
-                // BorderBoxes(94, switchItems[1]),
-                // const SizedBox(height: 10),
-                // // 인기글 관련 설정 UI의 border 설정
-                // BorderBoxes(94, switchItems[2]),
-                // const SizedBox(height: 5),
-                // // 인기 공지글 제공 시간 문구
-                // TextInfo('setting_page.hot_info'.tr()),
-                // const SizedBox(height: 10),
-                // 차단 아이콘, '차단' 텍스트
-                SizedBox(
-                  width: MediaQuery.of(context).size.width - 50,
-                  child: Row(
-                    children: [
-                      SvgPicture.asset(
-                        'assets/icons/barrior.svg',
-                        width: 34,
-                        height: 34,
-                      ),
-                      Text(
-                        'setting_page.block'.tr(),
-                        style: const TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.w700,
+                          ],
                         ),
                       ),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 7),
-                // 차단한 유저 목록 버튼
-                Container(
-                  width: MediaQuery.of(context).size.width - 40,
-                  height: 50,
-                  decoration: BoxDecoration(
-                    borderRadius: const BorderRadius.all(Radius.circular(10)),
-                    border: Border.all(
-                      color: const Color.fromRGBO(240, 240, 240, 1),
-                    ),
-                  ),
-                  child: InkWell(
-                    onTap: () {
-                      showDialog(
-                          context: context,
-                          builder: (context) => const BlockedUserDialog());
-                    },
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        const SizedBox(height: 13),
-                        SizedBox(
-                          width: MediaQuery.of(context).size.width - 60,
-                          child: Center(
-                            child: Text(
-                              'setting_page.blocked_users'.tr(),
+                      const SizedBox(height: 7),
+                      // 성인글 보기, 정치글 보기 스위치 버튼
+                      Container(
+                        width: MediaQuery.of(context).size.width - 40,
+                        height: 94,
+                        decoration: BoxDecoration(
+                          borderRadius:
+                              const BorderRadius.all(Radius.circular(10)),
+                          border: Border.all(
+                            color: const Color.fromRGBO(240, 240, 240, 1),
+                          ),
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            const SizedBox(height: 10),
+                            // 성인글 보기
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                // 성인글 보기 글씨
+                                Container(
+                                    margin: const EdgeInsets.only(left: 10),
+                                    child: Text(
+                                      "setting_page.adult".tr(),
+                                      style: const TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                    )),
+                                // 성인글 보기 CupertinoSwitch
+                                Container(
+                                  margin: const EdgeInsets.only(right: 10),
+                                  width: 43,
+                                  height: 27,
+                                  child: FittedBox(
+                                    fit: BoxFit.fill,
+                                    child: CupertinoSwitch(
+                                        activeColor: ColorsInfo.newara,
+                                        value: see_sexual,
+                                        onChanged: (value) async {
+                                          setState(() => see_sexual = value);
+                                          try {
+                                            await dio.patch(
+                                                '$newAraDefaultUrl/api/user_profiles/${userProvider.naUser!.user}/',
+                                                data: {'see_sexual': value});
+                                            await userProvider.apiMeUserInfo();
+                                            debugPrint(
+                                                "Change of 'see_sexual' succeed!");
+                                            requestSnackBar("설정이 저장되었습니다.");
+                                          } catch (error) {
+                                            debugPrint(
+                                                "Change of 'see_sexual' failed: $error");
+                                            requestSnackBar(
+                                                "에러가 발생하여 설정 반영에 실패했습니다. 다시 시도해주십시오.");
+                                            setState(() => see_sexual = !value);
+                                          }
+                                        }),
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 16),
+                            // 정치글 보기
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                // 정치글 보기 글씨
+                                Container(
+                                    margin: const EdgeInsets.only(left: 10),
+                                    child: Text(
+                                      "setting_page.politics".tr(),
+                                      style: const TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                    )),
+                                // 정치글 보기 CupertinoSwitch
+                                Container(
+                                  margin: const EdgeInsets.only(right: 10),
+                                  width: 43,
+                                  height: 27,
+                                  child: FittedBox(
+                                    fit: BoxFit.fill,
+                                    child: CupertinoSwitch(
+                                        activeColor: ColorsInfo.newara,
+                                        value: see_social,
+                                        onChanged: (value) async {
+                                          setState(() {
+                                            see_social = value;
+                                          });
+                                          try {
+                                            await dio.patch(
+                                                '$newAraDefaultUrl/api/user_profiles/${userProvider.naUser!.user}/',
+                                                data: {'see_social': value});
+                                            await userProvider.apiMeUserInfo();
+                                            debugPrint(
+                                                "Change of 'see_social' succeed!");
+                                            requestSnackBar("설정이 저장되었습니다.");
+                                          } catch (error) {
+                                            debugPrint(
+                                                "Change of 'see_social' failed: $error");
+                                            requestSnackBar(
+                                                "에러가 발생하여 설정 반영에 실패했습니다. 다시 시도해주십시오.");
+                                            setState(() => see_social = !value);
+                                          }
+                                        }),
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 10),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 24),
+                      // // 알림 아이콘 및 '알림' 텍스트
+                      // SizedBox(
+                      //   width: MediaQuery.of(context).size.width - 50,
+                      //   child: Row(
+                      //     children: [
+                      //       SvgPicture.asset(
+                      //         'assets/icons/notification.svg',
+                      //         width: 34,
+                      //         height: 34,
+                      //       ),
+                      //       Text(
+                      //         'setting_page.noti'.tr(),
+                      //         style: const TextStyle(
+                      //           fontSize: 18,
+                      //           fontWeight: FontWeight.w700,
+                      //         ),
+                      //       ),
+                      //     ],
+                      //   ),
+                      // ),
+                      // const SizedBox(height: 7),
+                      // // 댓글, 대댓글 설정 UI의 border 설정
+                      // BorderBoxes(94, switchItems[1]),
+                      // const SizedBox(height: 10),
+                      // // 인기글 관련 설정 UI의 border 설정
+                      // BorderBoxes(94, switchItems[2]),
+                      // const SizedBox(height: 5),
+                      // // 인기 공지글 제공 시간 문구
+                      // TextInfo('setting_page.hot_info'.tr()),
+                      // const SizedBox(height: 10),
+                      // 차단 아이콘, '차단' 텍스트
+                      SizedBox(
+                        width: MediaQuery.of(context).size.width - 50,
+                        child: Row(
+                          children: [
+                            SvgPicture.asset(
+                              'assets/icons/barrior.svg',
+                              width: 34,
+                              height: 34,
+                            ),
+                            Text(
+                              'setting_page.block'.tr(),
                               style: const TextStyle(
-                                color: ColorsInfo.newara,
-                                fontSize: 16,
-                                fontWeight: FontWeight.w500,
+                                fontSize: 18,
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 7),
+                      // 차단한 유저 목록 버튼
+                      Container(
+                        width: MediaQuery.of(context).size.width - 40,
+                        height: 50,
+                        decoration: BoxDecoration(
+                          borderRadius:
+                              const BorderRadius.all(Radius.circular(10)),
+                          border: Border.all(
+                            color: const Color.fromRGBO(240, 240, 240, 1),
+                          ),
+                        ),
+                        child: InkWell(
+                          onTap: () {
+                            showDialog(
+                                context: context,
+                                builder: (context) =>
+                                    const BlockedUserDialog());
+                          },
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              const SizedBox(height: 13),
+                              SizedBox(
+                                width: MediaQuery.of(context).size.width - 60,
+                                child: Center(
+                                  child: Text(
+                                    'setting_page.blocked_users'.tr(),
+                                    style: const TextStyle(
+                                      color: ColorsInfo.newara,
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 5),
+                      // 유저 차단 기능 설명 문구
+                      const TextInfo(
+                          '유저 차단은 게시글의 더보기 기능에서 하실 수 있습니다.\n하루에 최대 10번만 변경 가능합니다.'),
+                      const SizedBox(height: 20),
+                      SizedBox(
+                        width: MediaQuery.of(context).size.width - 50,
+                        child: Row(
+                          children: [
+                            SvgPicture.asset(
+                              'assets/icons/information.svg',
+                              width: 36,
+                              height: 36,
+                            ),
+                            const Text(
+                              '정보',
+                              style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 7),
+                      Container(
+                        width: MediaQuery.of(context).size.width - 40,
+                        padding: const EdgeInsets.only(right: 5),
+                        height: 94,
+                        decoration: BoxDecoration(
+                          borderRadius:
+                              const BorderRadius.all(Radius.circular(10)),
+                          border: Border.all(
+                            color: const Color.fromRGBO(240, 240, 240, 1),
+                          ),
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            const SizedBox(height: 10),
+                            // 이용약관
+                            InkWell(
+                              onTap: () async {
+                                await Navigator.of(context).push(
+                                  slideRoute(
+                                    const TermsAndConditionsPage(),
+                                  ),
+                                );
+                              },
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Container(
+                                      margin: const EdgeInsets.only(left: 10),
+                                      child: const Text(
+                                        '이용약관',
+                                        style: TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.w500,
+                                        ),
+                                      )),
+                                  SvgPicture.asset(
+                                    'assets/icons/right_chevron.svg',
+                                    width: 20,
+                                    height: 20,
+                                  ),
+                                ],
+                              ),
+                            ),
+                            const SizedBox(height: 16),
+                            // 문의
+                            InkWell(
+                              onTap: () => launchInBrowser(0),
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  // 정치글 보기 글씨
+                                  Container(
+                                      margin: const EdgeInsets.only(left: 10),
+                                      child: const Text(
+                                        '운영진에게 문의하기',
+                                        style: TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.w500,
+                                        ),
+                                      )),
+                                  SvgPicture.asset(
+                                    'assets/icons/right_chevron.svg',
+                                    width: 20,
+                                    height: 20,
+                                  ),
+                                ],
+                              ),
+                            ),
+                            const SizedBox(height: 10),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 20),
+                      // 로그아웃 버튼 UI (border도 포함)
+                      Container(
+                        width: MediaQuery.of(context).size.width - 40,
+                        height: 50,
+                        decoration: BoxDecoration(
+                          borderRadius:
+                              const BorderRadius.all(Radius.circular(10)),
+                          border: Border.all(
+                            color: const Color.fromRGBO(240, 240, 240, 1),
+                          ),
+                        ),
+                        child: SizedBox(
+                          width: MediaQuery.of(context).size.width - 60,
+                          child: InkWell(
+                            onTap: () async {
+                              await showDialog(
+                                context: context,
+                                builder: (context) => SignoutConfirmDialog(
+                                  onTap: () async {
+                                    await _logout();
+                                  },
+                                  userProvider: userProvider,
+                                  targetContext: context,
+                                ),
+                              );
+                            },
+                            child: const Center(
+                              child: Text(
+                                '로그아웃',
+                                style: TextStyle(
+                                  color: ColorsInfo.newara,
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w500,
+                                ),
                               ),
                             ),
                           ),
                         ),
-                      ],
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 5),
-                // 유저 차단 기능 설명 문구
-                const TextInfo(
-                    '유저 차단은 게시글의 더보기 기능에서 하실 수 있습니다.\n하루에 최대 10번만 변경 가능합니다.'),
-                const SizedBox(height: 20),
-                SizedBox(
-                  width: MediaQuery.of(context).size.width - 50,
-                  child: Row(
-                    children: [
-                      SvgPicture.asset(
-                        'assets/icons/information.svg',
-                        width: 36,
-                        height: 36,
                       ),
-                      const Text(
-                        '정보',
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.w700,
+                      const SizedBox(height: 20),
+                      Container(
+                        width: MediaQuery.of(context).size.width - 40,
+                        height: 50,
+                        decoration: BoxDecoration(
+                          borderRadius:
+                              const BorderRadius.all(Radius.circular(10)),
+                          border: Border.all(
+                            color: const Color.fromRGBO(240, 240, 240, 1),
+                          ),
+                        ),
+                        child: SizedBox(
+                          width: MediaQuery.of(context).size.width - 60,
+                          child: InkWell(
+                            onTap: () async {
+                              await showDialog(
+                                context: context,
+                                builder: (context) => UnregisterConfirmDialog(
+                                  onTap: () async {
+                                    Navigator.pop(context);
+                                    setState(() {
+                                      _isLoading = true;
+                                    });
+                                    Map<String, dynamic>? responseResult =
+                                        await userProvider
+                                            .getApiRes('unregister');
+                                    //TODO: 회원탈퇴 로직 보강 필요
+                                    // if(responseResult == null){
+                                    //   ///회원탈퇴 실패
+                                    // }
+                                    final prefs =
+                                        await SharedPreferences.getInstance();
+                                    String jsonString=userProvider.naUser!.user.toString(); // 데이터를 JSON 문자열로 인코딩
+                                    await prefs.setString(
+                                        '심사통과를위한탈퇴탈퇴한유저', jsonString);
+
+                                    if (mounted) {
+                                      setState(() {
+                                        _isLoading = false;
+                                      });
+                                    }
+                                    await _logout();
+                                  },
+                                  userProvider: userProvider,
+                                  targetContext: context,
+                                ),
+                              );
+                            },
+                            child: const Center(
+                              child: Text(
+                                '회원탈퇴',
+                                style: TextStyle(
+                                  color: ColorsInfo.newara,
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                            ),
+                          ),
                         ),
                       ),
+                      const SizedBox(height: 5),
+                      const TextInfo(
+                          '회원 탈퇴는 Ara 관리자가 확인 후 처리해드리며, 최대 24시간이 소요될 수 있습니다'),
                     ],
                   ),
                 ),
-                const SizedBox(height: 7),
-                Container(
-                  width: MediaQuery.of(context).size.width - 40,
-                  padding: const EdgeInsets.only(right: 5),
-                  height: 94,
-                  decoration: BoxDecoration(
-                    borderRadius: const BorderRadius.all(Radius.circular(10)),
-                    border: Border.all(
-                      color: const Color.fromRGBO(240, 240, 240, 1),
-                    ),
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      const SizedBox(height: 10),
-                      // 이용약관
-                      InkWell(
-                        onTap: () async {
-                          await Navigator.of(context).push(
-                            slideRoute(
-                              const TermsAndConditionsPage(),
-                            ),
-                          );
-                        },
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Container(
-                                margin: const EdgeInsets.only(left: 10),
-                                child: const Text(
-                                  '이용약관',
-                                  style: TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.w500,
-                                  ),
-                                )),
-                            SvgPicture.asset(
-                              'assets/icons/right_chevron.svg',
-                              width: 20,
-                              height: 20,
-                            ),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(height: 16),
-                      // 문의
-                      InkWell(
-                        onTap: () => launchInBrowser(0),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            // 정치글 보기 글씨
-                            Container(
-                                margin: const EdgeInsets.only(left: 10),
-                                child: const Text(
-                                  '운영진에게 문의하기',
-                                  style: TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.w500,
-                                  ),
-                                )),
-                            SvgPicture.asset(
-                              'assets/icons/right_chevron.svg',
-                              width: 20,
-                              height: 20,
-                            ),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(height: 10),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 20),
-                // 로그아웃 버튼 UI (border도 포함)
-                Container(
-                  width: MediaQuery.of(context).size.width - 40,
-                  height: 50,
-                  decoration: BoxDecoration(
-                    borderRadius: const BorderRadius.all(Radius.circular(10)),
-                    border: Border.all(
-                      color: const Color.fromRGBO(240, 240, 240, 1),
-                    ),
-                  ),
-                  child: SizedBox(
-                    width: MediaQuery.of(context).size.width - 60,
-                    child: InkWell(
-                      onTap: () async {
-                        await showDialog(
-                          context: context,
-                          builder: (context) => SignoutConfirmDialog(
-                            onTap: () async {
-                              await _logout();
-                            },
-                            userProvider: userProvider,
-                            targetContext: context,
-                          ),
-                        );
-                      },
-                      child: const Center(
-                        child: Text(
-                          '로그아웃',
-                          style: TextStyle(
-                            color: ColorsInfo.newara,
-                            fontSize: 16,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 20),
-                Container(
-                  width: MediaQuery.of(context).size.width - 40,
-                  height: 50,
-                  decoration: BoxDecoration(
-                    borderRadius: const BorderRadius.all(Radius.circular(10)),
-                    border: Border.all(
-                      color: const Color.fromRGBO(240, 240, 240, 1),
-                    ),
-                  ),
-                  child: SizedBox(
-                    width: MediaQuery.of(context).size.width - 60,
-                    child: InkWell(
-                      onTap: () async {
-                        await showDialog(
-                          context: context,
-                          builder: (context) => UnregisterConfirmDialog(
-                            onTap: () async {
-                              Navigator.pop(context);
-                              setState(() {
-                                _isLoading = true;
-                              });
-                              Map<String, dynamic>? responseResult =
-                                  await userProvider.getApiRes('unregister');
-                              //TODO: 회원탈퇴 로직 보강 필요
-                              // if(responseResult == null){
-                              //   ///회원탈퇴 실패
-                              // }
-                              if(mounted){
-                                setState(() {
-                                  _isLoading = false;
-                                });
-                              }
-                              await _logout();
-                            },
-                            userProvider: userProvider,
-                            targetContext: context,
-                          ),
-                        );
-                      },
-                      child: const Center(
-                        child: Text(
-                          '회원탈퇴',
-                          style: TextStyle(
-                            color: ColorsInfo.newara,
-                            fontSize: 16,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 5),
-                const TextInfo(
-                    '회원 탈퇴는 Ara 관리자가 확인 후 처리해드리며, 최대 24시간이 소요될 수 있습니다'),
-              ],
-            ),
-          ),
-        ),
+              ),
       ),
     );
   }

@@ -6,6 +6,7 @@ import 'package:new_ara_app/pages/terms_and_conditions_page.dart';
 import 'package:new_ara_app/pages/inquiry_page.dart';
 import 'package:new_ara_app/providers/user_provider.dart';
 import 'package:new_ara_app/utils/slide_routing.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:webview_cookie_manager/webview_cookie_manager.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 import 'package:new_ara_app/widgets/loading_indicator.dart';
@@ -95,19 +96,35 @@ class _SparcsSSOPageState extends State<SparcsSSOPage> {
             //userProvider.setHasData(true)를 실행하기 전에 현재 SSO 로그인 창을 닫음.
             //현재 창을 닫지 않으면 로그인 성공 후에도 SSO 로그인 창이 계속 열려있음.
             if (mounted) {
+              debugPrint("22현재 URL2은 $url 입니다");
               // 이용약관 동의 시 현재 sso 로그인 창을 닫음
               if (url.endsWith('$newAraDefaultUrl/') == true) {
                 try {
+                  final prefs = await SharedPreferences.getInstance();
+                  String? jsonString = prefs.getString(
+                      '심사통과를위한탈퇴탈퇴한유저'); // SharedPreferences에서 JSON 문자열 불러오기
+                  debugPrint(
+                      "jsonString: $jsonString// ${userProvider.naUser!.user.toString()}");
+                  if (jsonString != null &&
+                      jsonString == userProvider.naUser!.user.toString()) {
+                    // 탈퇴했던 유저 아이디를 로컬에 저장하고 이를 로그인 할 때 확인하여 탈퇴한 유저임을 확인
+                    if (!mounted) return;
+                    Navigator.of(context)
+                        .pushReplacement(slideRoute(const InQuiryPage()));
+                    return;
+                  }
+
                   DateTime dateTime =
                       DateTime.parse(userProvider.naUser!.deleted_at);
                   // 1900년 1월 1일을 나타내는 DateTime 객체 생성
                   DateTime year1900 = DateTime(1900);
-
-                  // 회원 탈퇴일이 1900년 1월 1일 이전이라면 탈퇴를 하지 않은 유저
                   if (dateTime.isBefore(year1900)) {
+                    // 회원 탈퇴일이 1900년 1월 1일 이전이라면 탈퇴를 하지 않은 유저
+                    if (!mounted) return;
                     Navigator.of(context).pop();
                   } else {
                     // 회원 탈퇴일이 1900년 1월 1일 이후라면 탈퇴한 유저
+                    if (!mounted) return;
                     Navigator.of(context)
                         .pushReplacement(slideRoute(const InQuiryPage()));
                     return;
