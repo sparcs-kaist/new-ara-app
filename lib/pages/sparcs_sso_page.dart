@@ -3,6 +3,7 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:new_ara_app/constants/url_info.dart';
 import 'package:new_ara_app/pages/terms_and_conditions_page.dart';
+import 'package:new_ara_app/pages/inquiry_page.dart';
 import 'package:new_ara_app/providers/user_provider.dart';
 import 'package:new_ara_app/utils/slide_routing.dart';
 import 'package:webview_cookie_manager/webview_cookie_manager.dart';
@@ -96,7 +97,20 @@ class _SparcsSSOPageState extends State<SparcsSSOPage> {
             if (mounted) {
               // 이용약관 동의 시 현재 sso 로그인 창을 닫음
               if (url.endsWith('$newAraDefaultUrl/') == true) {
-                Navigator.of(context).pop();
+                DateTime dateTime =
+                    DateTime.parse(userProvider.naUser!.deleted_at);
+                // 1900년 1월 1일을 나타내는 DateTime 객체 생성
+                DateTime year1900 = DateTime(1900);
+
+                // 회원 탈퇴일이 1900년 1월 1일 이전이라면 탈퇴를 하지 않은 유저
+                if (dateTime.isBefore(year1900)) {
+
+                  Navigator.of(context).pushReplacement(slideRoute(const InQuiryPage()));
+                } else {
+                  // 회원 탈퇴일이 1900년 1월 1일 이후라면 탈퇴한 유저
+                  Navigator.of(context).pop();
+                  return;
+                }
               } else {
                 //이용약관 전이라면 현재 sso 로그인 창을 닫고 이용약관 페이지로 이동
                 Navigator.of(context).pushReplacement(
