@@ -183,19 +183,18 @@ class _MainPageState extends State<MainPage> with WidgetsBindingObserver {
 
   ///포탈 게시물 글 불러오기.
   Future<void> _initPortalNotice(UserProvider userProvider) async {
-    await _refreshBoardContent(
+    await _initBoardContent(
         userProvider, "portal-notice", "", _portalContents, 1);
   }
 
   ///입주 업체 게시물 글 불러오기.
   Future<void> _initFacilityNotice(UserProvider userProvider) async {
-    await _refreshBoardContent(
+    await _initBoardContent(
         userProvider, "facility-notice", "", _facilityContents, 2);
   }
 
   Future<void> _initNewAraNotice(UserProvider userProvider) async {
-    await _refreshBoardContent(
-        userProvider, "ara-notice", "", _newAraContents, 3);
+    await _initBoardContent(userProvider, "ara-notice", "", _newAraContents, 3);
   }
 
   Future<void> _initGradAssocNotice(UserProvider userProvider) async {
@@ -204,7 +203,7 @@ class _MainPageState extends State<MainPage> with WidgetsBindingObserver {
     // "slug": "grad-assoc",
     //dev 서버랑 실제 서버 parent_topic 이 다름을 유의하기.
     //https://newara.sparcs.org/api/articles/?parent_board=2&parent_topic=24
-    await _refreshBoardContent(
+    await _initBoardContent(
         userProvider, "students-group", "grad-assoc", _gradContents, 4);
   }
 
@@ -212,41 +211,41 @@ class _MainPageState extends State<MainPage> with WidgetsBindingObserver {
     // 총학
     // "slug": "students-group",
     // "slug": "undergrad-assoc",
-    await _refreshBoardContent(userProvider, "students-group",
-        "undergrad-assoc", _underGradContents, 5);
+    await _initBoardContent(userProvider, "students-group", "undergrad-assoc",
+        _underGradContents, 5);
   }
 
   Future<void> _initFreshmanCouncil(UserProvider userProvider) async {
     //새학
     // "slug": "students-group",
     // "slug": "freshman-council",
-    await _refreshBoardContent(userProvider, "students-group",
-        "freshman-council", _freshmanContents, 6);
+    await _initBoardContent(userProvider, "students-group", "freshman-council",
+        _freshmanContents, 6);
   }
 
   Future<void> _initTalks(UserProvider userProvider) async {
     //자유게시판
-    await _refreshBoardContent(userProvider, "talk", "", _talksContents, 8);
+    await _initBoardContent(userProvider, "talk", "", _talksContents, 8);
   }
 
   Future<void> _initWanted(UserProvider userProvider) async {
     //구인구직
-    await _refreshBoardContent(userProvider, "wanted", "", _wantedContents, 9);
+    await _initBoardContent(userProvider, "wanted", "", _wantedContents, 9);
   }
 
   Future<void> _initMarket(UserProvider userProvider) async {
     //중고거래
-    await _refreshBoardContent(userProvider, "market", "", _marketContents, 10);
+    await _initBoardContent(userProvider, "market", "", _marketContents, 10);
   }
 
   Future<void> _initRealEstate(UserProvider userProvider) async {
     //부동산
-    await _refreshBoardContent(
+    await _initBoardContent(
         userProvider, "real-estate", "", _realEstateContents, 11);
   }
 
   /// 게시판의 게시물들을 불러옴. 코드 중복을 줄이기 위해 사용.
-  Future<void> _refreshBoardContent(
+  Future<void> _initBoardContent(
       UserProvider userProvider,
       String slug1,
       String slug2,
