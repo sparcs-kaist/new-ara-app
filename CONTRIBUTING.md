@@ -83,5 +83,7 @@ team_id("N5V8W52U3U") # Developer Portal Team ID
 cd android && bundle exec fastlane alpha && cd ../ios && bundle exec fastlane alpha
 ```
 
-배포 후, `pubspec.yaml`과 iOS Xcode 프로젝트 관련 파일들( `ios/Runner.xcodeproj/project.pbxproj`, `ios/Runner/Info.plist` )의 변경사항을 Discard 합니다.
+### 배포 후 작업
+- `pubspec.yaml` 변경 사항을 Discard 합니다.
+- iOS Xcode 프로젝트 관련 파일들( `ios/Runner.xcodeproj/project.pbxproj`, `ios/Runner/Info.plist` )의 변경사항을 Discard 합니다.
 

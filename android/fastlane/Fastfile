@@ -46,9 +46,9 @@ platform :android do
       http_method: "POST",
       path: "/repos/sparcs-kaist/new-ara-app/releases",
       body: {
-        tag_name: "Android-v#{version_number}-#{version_code})",
+        tag_name: "Android-v#{version_number}-#{version_code}",
         target_commitish: current_commit_hash,
-        name: "Android-v#{version_number}-#{version_code})",
+        name: "Android-v#{version_number}-#{version_code}",
         body: "Write here the content of release notes...",
         draft: false,
         prerelease: false
