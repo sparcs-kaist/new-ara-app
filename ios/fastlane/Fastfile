@@ -16,6 +16,37 @@
 default_platform(:ios)
 
 platform :ios do
+
+  desc "Create a release note on GitHub."
+  lane :create_release_note do
+    # YAML 파일에서 버전 정보를 로드
+    yaml_file_path = "../../pubspec.yaml"
+    data = YAML.load_file(yaml_file_path)
+    version = data["version"]
+    version_number = version.split("+")[0]
+
+    # increment_build_number에서 설정된 버전 코드를 가져옴
+    version_code = get_build_number(xcodeproj: "Runner.xcodeproj")
+
+    # 현재 커밋 해시를 추출
+    current_commit_hash = `git rev-parse HEAD`.strip
+
+    # GitHub API를 사용하여 릴리즈 노트를 생성
+    github_api(
+      http_method: "POST",
+      path: "/repos/sparcs-kaist/new-ara-app/releases",
+      body: {
+        tag_name: "iOS-v#{version_number}-#{version_code}",
+        target_commitish: current_commit_hash,
+        name: "iOS-v#{version_number}-#{version_code}",
+        body: "Write here the content of release notes...",
+        draft: false,
+        prerelease: false
+      }.to_json,
+      api_token: ENV["GITHUB_API_TOKEN"]
+    )
+  end
+
   desc "Push a new beta build to TestFlight"
   lane :alpha do
     increment_build_number(
@@ -41,5 +72,6 @@ platform :ios do
     upload_to_testflight(
       skip_waiting_for_build_processing: true,
     )
+    create_release_note
   end
 end

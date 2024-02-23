@@ -8,6 +8,7 @@ platform :android do
     gradle(task: "test")
   end
 
+  
   desc "Set timestamp version from pubspec.yaml"
   lane :set_timestamp_version do
       yaml_file_path = "../../pubspec.yaml"
@@ -20,6 +21,40 @@ platform :android do
 
       data["version"] = new_version
       File.open(yaml_file_path, 'w') { |f| YAML.dump(data, f) }
+
+      # 새로운 버전 정보를 반환
+      {version: new_version, version_number: version_number, version_code: version_code}
+  end
+
+  desc "Create a release note on GitHub."
+  lane :create_release_note do
+
+
+    # YAML에서 버전 정보를 추출
+    yaml_file_path = "../../pubspec.yaml"
+    data = YAML.load_file(yaml_file_path)
+    version = data["version"]
+    version_number = data["version"].split("+")[0]
+    version_code = data["version"].split("+")[1]
+
+    # 현재 커밋 해시를 추출
+    current_commit_hash = `git rev-parse HEAD`.strip
+
+    # GitHub API를 사용하여 릴리즈 노트를 생성
+    # 릴리즈 노트에 태그 이름을 버전 정보로 설정
+    github_api(
+      http_method: "POST",
+      path: "/repos/sparcs-kaist/new-ara-app/releases",
+      body: {
+        tag_name: "Android-v#{version_number}-#{version_code}",
+        target_commitish: current_commit_hash,
+        name: "Android-v#{version_number}-#{version_code}",
+        body: "Write here the content of release notes...",
+        draft: false,
+        prerelease: false
+      }.to_json,
+      api_token: ENV["GITHUB_API_TOKEN"]
+    )
   end
 
   desc "Deploy a alpha version to the Google Play"
@@ -30,5 +65,6 @@ platform :android do
       aab: "../build/app/outputs/bundle/release/app-release.aab",
       track: "alpha",
     )
+    create_release_note
   end
 end
