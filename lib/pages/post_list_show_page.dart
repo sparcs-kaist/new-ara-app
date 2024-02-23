@@ -30,7 +30,8 @@ class PostListShowPage extends StatefulWidget {
   State<PostListShowPage> createState() => _PostListShowPageState();
 }
 
-class _PostListShowPageState extends State<PostListShowPage> {
+class _PostListShowPageState extends State<PostListShowPage>
+    with WidgetsBindingObserver {
   List<ArticleListActionModel> postPreviewList = [];
   int currentPage = 1;
   bool isLoading = true;
@@ -74,6 +75,7 @@ class _PostListShowPageState extends State<PostListShowPage> {
     }
 
     _scrollController.addListener(_scrollListener);
+    WidgetsBinding.instance.addObserver(this);
     updateAllBulletinList().then(
       (value) {
         _loadNextPage();
@@ -84,9 +86,18 @@ class _PostListShowPageState extends State<PostListShowPage> {
 
   @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
     _scrollController.removeListener(_scrollListener);
     _scrollController.dispose();
     super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      // 앱이 백그라운드에서 포그라운드로 전환될 때 게시물 목록을 업데이트합니다.
+      updateAllBulletinList();
+    }
   }
 
   /// 게시물 update(게시판의 current페이지까지에 있는 게시물들을 불러옴)

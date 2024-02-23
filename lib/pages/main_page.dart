@@ -27,7 +27,7 @@ class MainPage extends StatefulWidget {
 }
 
 /// 네이게이션 페이지에서 제일 먼저 보이는 메인 페이지.
-class _MainPageState extends State<MainPage> {
+class _MainPageState extends State<MainPage> with WidgetsBindingObserver {
   //각 컨텐츠 로딩을 확인하기 위한 변수
   final List<bool> _isLoading = [
     true, //_dailyBestContents
@@ -84,7 +84,43 @@ class _MainPageState extends State<MainPage> {
     // });
     //------------------------
 
+    WidgetsBinding.instance.addObserver(this); // 옵저버 등록
     context.read<NotificationProvider>().checkIsNotReadExist(userProvider);
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this); // 옵저버 해제
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) async {
+    UserProvider userProvider = context.read<UserProvider>();
+    // 앱이 포그라운드로 전환될 때 실행할 함수
+    if (state == AppLifecycleState.resumed) {
+      //api를 호출 후 최신 데이터로 갱신
+      await Future.wait([
+        _refreshIndicatorForTop(userProvider, _dailyBestContents),
+        _refreshIndicatorForOther(
+            userProvider, "portal-notice", "", _portalContents),
+        _refreshIndicatorForOther(
+            userProvider, "facility-notice", "", _facilityContents),
+        _refreshIndicatorForOther(
+            userProvider, "ara-notice", "", _newAraContents),
+        _refreshIndicatorForOther(
+            userProvider, "students-group", "grad-assoc", _gradContents),
+        _refreshIndicatorForOther(userProvider, "students-group",
+            "undergrad-assoc", _underGradContents),
+        _refreshIndicatorForOther(userProvider, "students-group",
+            "freshman-council", _freshmanContents),
+        _refreshIndicatorForOther(userProvider, "talk", "", _talksContents),
+        _refreshIndicatorForOther(userProvider, "wanted", "", _wantedContents),
+        _refreshIndicatorForOther(userProvider, "market", "", _marketContents),
+        _refreshIndicatorForOther(
+            userProvider, "real-estate", "", _realEstateContents),
+      ]);
+    }
   }
 
   /// 일일 베스트 컨텐츠 데이터를 새로고침
@@ -147,19 +183,18 @@ class _MainPageState extends State<MainPage> {
 
   ///포탈 게시물 글 불러오기.
   Future<void> _initPortalNotice(UserProvider userProvider) async {
-    await _refreshBoardContent(
+    await _initBoardContent(
         userProvider, "portal-notice", "", _portalContents, 1);
   }
 
   ///입주 업체 게시물 글 불러오기.
   Future<void> _initFacilityNotice(UserProvider userProvider) async {
-    await _refreshBoardContent(
+    await _initBoardContent(
         userProvider, "facility-notice", "", _facilityContents, 2);
   }
 
   Future<void> _initNewAraNotice(UserProvider userProvider) async {
-    await _refreshBoardContent(
-        userProvider, "ara-notice", "", _newAraContents, 3);
+    await _initBoardContent(userProvider, "ara-notice", "", _newAraContents, 3);
   }
 
   Future<void> _initGradAssocNotice(UserProvider userProvider) async {
@@ -168,7 +203,7 @@ class _MainPageState extends State<MainPage> {
     // "slug": "grad-assoc",
     //dev 서버랑 실제 서버 parent_topic 이 다름을 유의하기.
     //https://newara.sparcs.org/api/articles/?parent_board=2&parent_topic=24
-    await _refreshBoardContent(
+    await _initBoardContent(
         userProvider, "students-group", "grad-assoc", _gradContents, 4);
   }
 
@@ -176,41 +211,41 @@ class _MainPageState extends State<MainPage> {
     // 총학
     // "slug": "students-group",
     // "slug": "undergrad-assoc",
-    await _refreshBoardContent(userProvider, "students-group",
-        "undergrad-assoc", _underGradContents, 5);
+    await _initBoardContent(userProvider, "students-group", "undergrad-assoc",
+        _underGradContents, 5);
   }
 
   Future<void> _initFreshmanCouncil(UserProvider userProvider) async {
     //새학
     // "slug": "students-group",
     // "slug": "freshman-council",
-    await _refreshBoardContent(userProvider, "students-group",
-        "freshman-council", _freshmanContents, 6);
+    await _initBoardContent(userProvider, "students-group", "freshman-council",
+        _freshmanContents, 6);
   }
 
   Future<void> _initTalks(UserProvider userProvider) async {
     //자유게시판
-    await _refreshBoardContent(userProvider, "talk", "", _talksContents, 8);
+    await _initBoardContent(userProvider, "talk", "", _talksContents, 8);
   }
 
   Future<void> _initWanted(UserProvider userProvider) async {
     //구인구직
-    await _refreshBoardContent(userProvider, "wanted", "", _wantedContents, 9);
+    await _initBoardContent(userProvider, "wanted", "", _wantedContents, 9);
   }
 
   Future<void> _initMarket(UserProvider userProvider) async {
     //중고거래
-    await _refreshBoardContent(userProvider, "market", "", _marketContents, 10);
+    await _initBoardContent(userProvider, "market", "", _marketContents, 10);
   }
 
   Future<void> _initRealEstate(UserProvider userProvider) async {
     //부동산
-    await _refreshBoardContent(
+    await _initBoardContent(
         userProvider, "real-estate", "", _realEstateContents, 11);
   }
 
   /// 게시판의 게시물들을 불러옴. 코드 중복을 줄이기 위해 사용.
-  Future<void> _refreshBoardContent(
+  Future<void> _initBoardContent(
       UserProvider userProvider,
       String slug1,
       String slug2,
