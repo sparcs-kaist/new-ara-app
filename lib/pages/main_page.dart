@@ -27,7 +27,7 @@ class MainPage extends StatefulWidget {
 }
 
 /// 네이게이션 페이지에서 제일 먼저 보이는 메인 페이지.
-class _MainPageState extends State<MainPage> {
+class _MainPageState extends State<MainPage> with WidgetsBindingObserver {
   //각 컨텐츠 로딩을 확인하기 위한 변수
   final List<bool> _isLoading = [
     true, //_dailyBestContents
@@ -84,7 +84,43 @@ class _MainPageState extends State<MainPage> {
     // });
     //------------------------
 
+    WidgetsBinding.instance.addObserver(this); // 옵저버 등록
     context.read<NotificationProvider>().checkIsNotReadExist(userProvider);
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this); // 옵저버 해제
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) async {
+    UserProvider userProvider = context.read<UserProvider>();
+    // 앱이 포그라운드로 전환될 때 실행할 함수
+    if (state == AppLifecycleState.resumed) {
+      //api를 호출 후 최신 데이터로 갱신
+      await Future.wait([
+        _refreshIndicatorForTop(userProvider, _dailyBestContents),
+        _refreshIndicatorForOther(
+            userProvider, "portal-notice", "", _portalContents),
+        _refreshIndicatorForOther(
+            userProvider, "facility-notice", "", _facilityContents),
+        _refreshIndicatorForOther(
+            userProvider, "ara-notice", "", _newAraContents),
+        _refreshIndicatorForOther(
+            userProvider, "students-group", "grad-assoc", _gradContents),
+        _refreshIndicatorForOther(userProvider, "students-group",
+            "undergrad-assoc", _underGradContents),
+        _refreshIndicatorForOther(userProvider, "students-group",
+            "freshman-council", _freshmanContents),
+        _refreshIndicatorForOther(userProvider, "talk", "", _talksContents),
+        _refreshIndicatorForOther(userProvider, "wanted", "", _wantedContents),
+        _refreshIndicatorForOther(userProvider, "market", "", _marketContents),
+        _refreshIndicatorForOther(
+            userProvider, "real-estate", "", _realEstateContents),
+      ]);
+    }
   }
 
   /// 일일 베스트 컨텐츠 데이터를 새로고침
