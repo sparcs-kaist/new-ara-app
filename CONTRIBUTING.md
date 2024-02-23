@@ -1,6 +1,6 @@
 # 기여하기
 
-## Release 절차
+## Release 절차(~ 2024.02.24 )
 
 1. [Releases](https://github.com/sparcs-kaist/new-ara-app/releases)에 갑니다.
 2. 이번 버전에서 변경된 사항을 Changes에 작성합니다.드래프트로 올립니다.
@@ -10,6 +10,12 @@
 
 ~~버전을 하나 올린 후 `flutter build ios`를 반드시 실행해 주도록 합니다~~
 ios FastFile에 `sh "flutter build ios --release --no-codesign --no-tree-shake-icons"` 추가해서 fastlane시 항상 자동으로 빌드하도록 수정했습니다.
+
+## Release 절차( 2024.02.25 ~)
+릴리즈 노트를 자동으로 작성하는 cd 코드를 main 브랜치에 추가했습니다.
+1. `pubspec.yaml`의 버전을 하나 올리는 커밋을 원격 저장소에 Pull Request하고 Merge 합니다.
+2. fastlane으로 Android와 iOS에 deploy를 합니다.
+3. [Releases](https://github.com/sparcs-kaist/new-ara-app/releases) 페이지에서 자동으로 등록된 릴리즈 노트의 내용을 수정합니다.
 
 ## How to deploy
 
