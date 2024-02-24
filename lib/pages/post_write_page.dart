@@ -497,7 +497,8 @@ class _PostWritePageState extends State<PostWritePage>
                       isUpdate: true,
                       previousArticleId: widget.previousArticle!.id)
                   : _managePost())
-              : () => showInfoBySnackBar(context, "게시판을 선택해주시고 제목, 내용을 입력해주세요."),
+              : () =>
+                  showInfoBySnackBar(context, "게시판을 선택해주시고 제목, 내용을 입력해주세요."),
           // 버튼이 클릭되었을 때 수행할 동작
           padding: EdgeInsets.zero, // 패딩 제거
           child: canIupload
@@ -1259,7 +1260,10 @@ class _PostWritePageState extends State<PostWritePage>
               customButtons: [
                 quill.QuillCustomButton(
                   icon: Icons.camera_alt,
-                  onTap: _pickImage,
+                  onTap: () async {
+                    await _pickImage();
+                    _onTextChanged();
+                  },
                 ),
               ],
               // embedButtons: FlutterQuillEmbeds.buttons(),
