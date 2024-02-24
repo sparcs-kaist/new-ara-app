@@ -264,29 +264,29 @@ class _MainPageState extends State<MainPage> with WidgetsBindingObserver {
   Future<void> _refreshAllPosts() async {
     UserProvider userProvider = context.read<UserProvider>();
     await Future.wait([
-      _refreshIndicatorForTop(userProvider, _dailyBestContents),
-      _refreshIndicatorForOther(
+      _refreshTopContents(userProvider, _dailyBestContents),
+      _refreshOtherContents(
           userProvider, "portal-notice", "", _portalContents),
-      _refreshIndicatorForOther(
+      _refreshOtherContents(
           userProvider, "facility-notice", "", _facilityContents),
-      _refreshIndicatorForOther(
+      _refreshOtherContents(
           userProvider, "ara-notice", "", _newAraContents),
-      _refreshIndicatorForOther(
+      _refreshOtherContents(
           userProvider, "students-group", "grad-assoc", _gradContents),
-      _refreshIndicatorForOther(userProvider, "students-group",
+      _refreshOtherContents(userProvider, "students-group",
           "undergrad-assoc", _underGradContents),
-      _refreshIndicatorForOther(userProvider, "students-group",
+      _refreshOtherContents(userProvider, "students-group",
           "freshman-council", _freshmanContents),
-      _refreshIndicatorForOther(userProvider, "talk", "", _talksContents),
-      _refreshIndicatorForOther(userProvider, "wanted", "", _wantedContents),
-      _refreshIndicatorForOther(userProvider, "market", "", _marketContents),
-      _refreshIndicatorForOther(
+      _refreshOtherContents(userProvider, "talk", "", _talksContents),
+      _refreshOtherContents(userProvider, "wanted", "", _wantedContents),
+      _refreshOtherContents(userProvider, "market", "", _marketContents),
+      _refreshOtherContents(
           userProvider, "real-estate", "", _realEstateContents),
     ]);
   }
 
   /// 일일 베스트 컨텐츠 데이터를 api로 불러와 화면에 재빌드
-  Future<void> _refreshIndicatorForTop(UserProvider userProvider,
+  Future<void> _refreshTopContents(UserProvider userProvider,
       List<ArticleListActionModel> contentList) async {
     String apiUrl = 'articles/top/';
     final dynamic response = await userProvider.getApiRes(apiUrl);
@@ -307,7 +307,7 @@ class _MainPageState extends State<MainPage> with WidgetsBindingObserver {
   }
 
   /// 일일 베스트 컨텐츠 이외의 데이터를 api로 불러와 화면에 재빌드
-  Future<void> _refreshIndicatorForOther(
+  Future<void> _refreshOtherContents(
     UserProvider userProvider,
     String slug1,
     String slug2,
