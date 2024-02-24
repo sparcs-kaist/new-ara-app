@@ -110,7 +110,10 @@ class _PostListShowPageState extends State<PostListShowPage>
 
     // 모든 페이지를 순회하며 게시물 목록을 업데이트합니다.
     for (int page = 1;
-        page <= (pageLimitToReload != null ? min(pageLimitToReload, currentPage) : currentPage);
+        page <=
+            (pageLimitToReload != null
+                ? min(pageLimitToReload, currentPage)
+                : currentPage);
         page++) {
       Map<String, dynamic>? json = await userProvider.getApiRes("$apiUrl$page");
 
@@ -133,7 +136,9 @@ class _PostListShowPageState extends State<PostListShowPage>
     if (mounted) {
       setState(() {
         /// 현재 어디까지 로딩됐는 지 기록하는 변수 [currentPage]를 업데이트합니다.
-        currentPage = pageLimitToReload ?? currentPage;
+        currentPage = (pageLimitToReload != null
+            ? min(pageLimitToReload, currentPage)
+            : currentPage);
         postPreviewList.clear();
         postPreviewList.addAll(newList);
         isLoading = false; // 로딩 상태 업데이트
