@@ -100,26 +100,7 @@ class _MainPageState extends State<MainPage> with WidgetsBindingObserver {
     // 앱이 포그라운드로 전환될 때 실행할 함수
     if (state == AppLifecycleState.resumed) {
       //api를 호출 후 최신 데이터로 갱신
-      await Future.wait([
-        _refreshIndicatorForTop(userProvider, _dailyBestContents),
-        _refreshIndicatorForOther(
-            userProvider, "portal-notice", "", _portalContents),
-        _refreshIndicatorForOther(
-            userProvider, "facility-notice", "", _facilityContents),
-        _refreshIndicatorForOther(
-            userProvider, "ara-notice", "", _newAraContents),
-        _refreshIndicatorForOther(
-            userProvider, "students-group", "grad-assoc", _gradContents),
-        _refreshIndicatorForOther(userProvider, "students-group",
-            "undergrad-assoc", _underGradContents),
-        _refreshIndicatorForOther(userProvider, "students-group",
-            "freshman-council", _freshmanContents),
-        _refreshIndicatorForOther(userProvider, "talk", "", _talksContents),
-        _refreshIndicatorForOther(userProvider, "wanted", "", _wantedContents),
-        _refreshIndicatorForOther(userProvider, "market", "", _marketContents),
-        _refreshIndicatorForOther(
-            userProvider, "real-estate", "", _realEstateContents),
-      ]);
+      await _refreshAllPosts();
     }
   }
 
@@ -279,6 +260,31 @@ class _MainPageState extends State<MainPage> with WidgetsBindingObserver {
         });
   }
 
+  // 모든 컨텐츠를 데이터로 불러와 화면에 재빌드
+  Future<void> _refreshAllPosts() async {
+    UserProvider userProvider = context.read<UserProvider>();
+    await Future.wait([
+      _refreshIndicatorForTop(userProvider, _dailyBestContents),
+      _refreshIndicatorForOther(
+          userProvider, "portal-notice", "", _portalContents),
+      _refreshIndicatorForOther(
+          userProvider, "facility-notice", "", _facilityContents),
+      _refreshIndicatorForOther(
+          userProvider, "ara-notice", "", _newAraContents),
+      _refreshIndicatorForOther(
+          userProvider, "students-group", "grad-assoc", _gradContents),
+      _refreshIndicatorForOther(userProvider, "students-group",
+          "undergrad-assoc", _underGradContents),
+      _refreshIndicatorForOther(userProvider, "students-group",
+          "freshman-council", _freshmanContents),
+      _refreshIndicatorForOther(userProvider, "talk", "", _talksContents),
+      _refreshIndicatorForOther(userProvider, "wanted", "", _wantedContents),
+      _refreshIndicatorForOther(userProvider, "market", "", _marketContents),
+      _refreshIndicatorForOther(
+          userProvider, "real-estate", "", _realEstateContents),
+    ]);
+  }
+
   /// 일일 베스트 컨텐츠 데이터를 api로 불러와 화면에 재빌드
   Future<void> _refreshIndicatorForTop(UserProvider userProvider,
       List<ArticleListActionModel> contentList) async {
@@ -414,29 +420,7 @@ class _MainPageState extends State<MainPage> with WidgetsBindingObserver {
                 color: ColorsInfo.newara,
                 onRefresh: () async {
                   //api를 호출 후 최신 데이터로 갱신
-                  await Future.wait([
-                    _refreshIndicatorForTop(userProvider, _dailyBestContents),
-                    _refreshIndicatorForOther(
-                        userProvider, "portal-notice", "", _portalContents),
-                    _refreshIndicatorForOther(
-                        userProvider, "facility-notice", "", _facilityContents),
-                    _refreshIndicatorForOther(
-                        userProvider, "ara-notice", "", _newAraContents),
-                    _refreshIndicatorForOther(userProvider, "students-group",
-                        "grad-assoc", _gradContents),
-                    _refreshIndicatorForOther(userProvider, "students-group",
-                        "undergrad-assoc", _underGradContents),
-                    _refreshIndicatorForOther(userProvider, "students-group",
-                        "freshman-council", _freshmanContents),
-                    _refreshIndicatorForOther(
-                        userProvider, "talk", "", _talksContents),
-                    _refreshIndicatorForOther(
-                        userProvider, "wanted", "", _wantedContents),
-                    _refreshIndicatorForOther(
-                        userProvider, "market", "", _marketContents),
-                    _refreshIndicatorForOther(
-                        userProvider, "real-estate", "", _realEstateContents),
-                  ]);
+                  await _refreshAllPosts();
                 },
                 child: SingleChildScrollView(
                   child: SizedBox(
