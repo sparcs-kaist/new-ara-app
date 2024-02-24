@@ -1260,7 +1260,10 @@ class _PostWritePageState extends State<PostWritePage>
               customButtons: [
                 quill.QuillCustomButton(
                   icon: Icons.camera_alt,
-                  onTap: _pickImage,
+                  onTap: () async {
+                    await _pickImage();
+                    _onTextChanged();
+                  },
                 ),
               ],
               // embedButtons: FlutterQuillEmbeds.buttons(),
