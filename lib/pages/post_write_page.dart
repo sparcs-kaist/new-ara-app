@@ -497,7 +497,8 @@ class _PostWritePageState extends State<PostWritePage>
                       isUpdate: true,
                       previousArticleId: widget.previousArticle!.id)
                   : _managePost())
-              : () => showInfoBySnackBar(context, "게시판을 선택해주시고 제목, 내용을 입력해주세요."),
+              : () =>
+                  showInfoBySnackBar(context, "게시판을 선택해주시고 제목, 내용을 입력해주세요."),
           // 버튼이 클릭되었을 때 수행할 동작
           padding: EdgeInsets.zero, // 패딩 제거
           child: canIupload
@@ -1504,9 +1505,14 @@ class _PostWritePageState extends State<PostWritePage>
   void Function() _managePost({bool isUpdate = false, int? previousArticleId}) {
     UserProvider userProvider = context.read<UserProvider>();
     return () async {
+      // 아래의 변수들로 api POST, PATCH를 보낸다.
+      // 게시물의 제목
       String titleValue;
+      // 게시물의 내용
       String contentValue;
+      // 게시물에 첨부된 파일의 ID
       List<int> attachmentIds = [];
+
       try {
         titleValue = _titleController.text;
         contentValue = DeltaToHTML.encodeJson(
