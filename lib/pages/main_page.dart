@@ -100,26 +100,7 @@ class _MainPageState extends State<MainPage> with WidgetsBindingObserver {
     // 앱이 포그라운드로 전환될 때 실행할 함수
     if (state == AppLifecycleState.resumed) {
       //api를 호출 후 최신 데이터로 갱신
-      await Future.wait([
-        _refreshIndicatorForTop(userProvider, _dailyBestContents),
-        _refreshIndicatorForOther(
-            userProvider, "portal-notice", "", _portalContents),
-        _refreshIndicatorForOther(
-            userProvider, "facility-notice", "", _facilityContents),
-        _refreshIndicatorForOther(
-            userProvider, "ara-notice", "", _newAraContents),
-        _refreshIndicatorForOther(
-            userProvider, "students-group", "grad-assoc", _gradContents),
-        _refreshIndicatorForOther(userProvider, "students-group",
-            "undergrad-assoc", _underGradContents),
-        _refreshIndicatorForOther(userProvider, "students-group",
-            "freshman-council", _freshmanContents),
-        _refreshIndicatorForOther(userProvider, "talk", "", _talksContents),
-        _refreshIndicatorForOther(userProvider, "wanted", "", _wantedContents),
-        _refreshIndicatorForOther(userProvider, "market", "", _marketContents),
-        _refreshIndicatorForOther(
-            userProvider, "real-estate", "", _realEstateContents),
-      ]);
+      await _refreshAllPosts();
     }
   }
 
@@ -279,8 +260,32 @@ class _MainPageState extends State<MainPage> with WidgetsBindingObserver {
         });
   }
 
+  // 모든 컨텐츠를 데이터로 불러와 화면에 재빌드
+  Future<void> _refreshAllPosts() async {
+    debugPrint("main_page.dart: _refreshAllPosts() called.");
+    UserProvider userProvider = context.read<UserProvider>();
+    await Future.wait([
+      _refreshTopContents(userProvider, _dailyBestContents),
+      _refreshOtherContents(userProvider, "portal-notice", "", _portalContents),
+      _refreshOtherContents(
+          userProvider, "facility-notice", "", _facilityContents),
+      _refreshOtherContents(userProvider, "ara-notice", "", _newAraContents),
+      _refreshOtherContents(
+          userProvider, "students-group", "grad-assoc", _gradContents),
+      _refreshOtherContents(userProvider, "students-group", "undergrad-assoc",
+          _underGradContents),
+      _refreshOtherContents(userProvider, "students-group", "freshman-council",
+          _freshmanContents),
+      _refreshOtherContents(userProvider, "talk", "", _talksContents),
+      _refreshOtherContents(userProvider, "wanted", "", _wantedContents),
+      _refreshOtherContents(userProvider, "market", "", _marketContents),
+      _refreshOtherContents(
+          userProvider, "real-estate", "", _realEstateContents),
+    ]);
+  }
+
   /// 일일 베스트 컨텐츠 데이터를 api로 불러와 화면에 재빌드
-  Future<void> _refreshIndicatorForTop(UserProvider userProvider,
+  Future<void> _refreshTopContents(UserProvider userProvider,
       List<ArticleListActionModel> contentList) async {
     String apiUrl = 'articles/top/';
     final dynamic response = await userProvider.getApiRes(apiUrl);
@@ -301,7 +306,7 @@ class _MainPageState extends State<MainPage> with WidgetsBindingObserver {
   }
 
   /// 일일 베스트 컨텐츠 이외의 데이터를 api로 불러와 화면에 재빌드
-  Future<void> _refreshIndicatorForOther(
+  Future<void> _refreshOtherContents(
     UserProvider userProvider,
     String slug1,
     String slug2,
@@ -378,6 +383,7 @@ class _MainPageState extends State<MainPage> with WidgetsBindingObserver {
             onPressed: () async {
               await Navigator.of(context)
                   .push(slideRoute(const PostWritePage()));
+              await _refreshAllPosts();
             },
           ),
           IconButton(
@@ -392,6 +398,7 @@ class _MainPageState extends State<MainPage> with WidgetsBindingObserver {
               await Navigator.of(context).push(slideRoute(
                   const BulletinSearchPage(
                       boardType: BoardType.all, boardInfo: null)));
+              await _refreshAllPosts();
             },
           ),
         ],
@@ -414,29 +421,7 @@ class _MainPageState extends State<MainPage> with WidgetsBindingObserver {
                 color: ColorsInfo.newara,
                 onRefresh: () async {
                   //api를 호출 후 최신 데이터로 갱신
-                  await Future.wait([
-                    _refreshIndicatorForTop(userProvider, _dailyBestContents),
-                    _refreshIndicatorForOther(
-                        userProvider, "portal-notice", "", _portalContents),
-                    _refreshIndicatorForOther(
-                        userProvider, "facility-notice", "", _facilityContents),
-                    _refreshIndicatorForOther(
-                        userProvider, "ara-notice", "", _newAraContents),
-                    _refreshIndicatorForOther(userProvider, "students-group",
-                        "grad-assoc", _gradContents),
-                    _refreshIndicatorForOther(userProvider, "students-group",
-                        "undergrad-assoc", _underGradContents),
-                    _refreshIndicatorForOther(userProvider, "students-group",
-                        "freshman-council", _freshmanContents),
-                    _refreshIndicatorForOther(
-                        userProvider, "talk", "", _talksContents),
-                    _refreshIndicatorForOther(
-                        userProvider, "wanted", "", _wantedContents),
-                    _refreshIndicatorForOther(
-                        userProvider, "market", "", _marketContents),
-                    _refreshIndicatorForOther(
-                        userProvider, "real-estate", "", _realEstateContents),
-                  ]);
+                  await _refreshAllPosts();
                 },
                 child: SingleChildScrollView(
                   child: SizedBox(
@@ -468,11 +453,12 @@ class _MainPageState extends State<MainPage> with WidgetsBindingObserver {
       children: [
         MainPageTextButton(
           'main_page.realtime',
-          () {
-            Navigator.of(context).push(slideRoute(const PostListShowPage(
+          () async {
+            await Navigator.of(context).push(slideRoute(const PostListShowPage(
               boardType: BoardType.top,
               boardInfo: null,
             )));
+            await _refreshAllPosts();
           },
         ),
         const SizedBox(height: 0),
@@ -482,6 +468,7 @@ class _MainPageState extends State<MainPage> with WidgetsBindingObserver {
             children: [
               PopularBoard(
                 model: _dailyBestContents[0],
+                refreshAllPosts: _refreshAllPosts,
                 boardNum: 1,
               ),
               Row(
@@ -499,6 +486,7 @@ class _MainPageState extends State<MainPage> with WidgetsBindingObserver {
               ),
               PopularBoard(
                 model: _dailyBestContents[1],
+                refreshAllPosts: _refreshAllPosts,
                 boardNum: 2,
               ),
               Row(
@@ -516,6 +504,7 @@ class _MainPageState extends State<MainPage> with WidgetsBindingObserver {
               ),
               PopularBoard(
                 model: _dailyBestContents[2],
+                refreshAllPosts: _refreshAllPosts,
                 boardNum: 3,
               ),
             ],
@@ -530,11 +519,12 @@ class _MainPageState extends State<MainPage> with WidgetsBindingObserver {
       children: [
         MainPageTextButton(
           '자유게시판',
-          () {
-            Navigator.of(context).push(slideRoute(PostListShowPage(
+          () async {
+            await Navigator.of(context).push(slideRoute(PostListShowPage(
               boardType: BoardType.free,
               boardInfo: _searchBoard("talk"),
             )));
+            await _refreshAllPosts();
           },
         ),
         SizedBox(
@@ -544,6 +534,7 @@ class _MainPageState extends State<MainPage> with WidgetsBindingObserver {
               PopularBoard(
                 model: _talksContents[0],
                 showBoardNumber: false,
+                refreshAllPosts: _refreshAllPosts,
               ),
               Row(
                 children: [
@@ -557,6 +548,7 @@ class _MainPageState extends State<MainPage> with WidgetsBindingObserver {
               ),
               PopularBoard(
                 model: _talksContents[1],
+                refreshAllPosts: _refreshAllPosts,
                 showBoardNumber: false,
               ),
               Row(
@@ -571,6 +563,7 @@ class _MainPageState extends State<MainPage> with WidgetsBindingObserver {
               ),
               PopularBoard(
                 model: _talksContents[2],
+                refreshAllPosts: _refreshAllPosts,
                 showBoardNumber: false,
               ),
             ],
@@ -610,11 +603,12 @@ class _MainPageState extends State<MainPage> with WidgetsBindingObserver {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               InkWell(
-                onTap: () {
-                  Navigator.of(context).push(slideRoute(PostListShowPage(
+                onTap: () async {
+                  await Navigator.of(context).push(slideRoute(PostListShowPage(
                     boardType: BoardType.free,
                     boardInfo: _searchBoard("portal-notice"),
                   )));
+                  await _refreshAllPosts();
                 },
                 child: Row(
                   children: [
@@ -656,9 +650,10 @@ class _MainPageState extends State<MainPage> with WidgetsBindingObserver {
               ),
               _portalContents.isNotEmpty
                   ? InkWell(
-                      onTap: () {
-                        Navigator.of(context).push(slideRoute(
+                      onTap: () async {
+                        await Navigator.of(context).push(slideRoute(
                             PostViewPage(id: _portalContents[0].id)));
+                        await _refreshAllPosts();
                       },
                       child: LittleText(
                         content: _portalContents[0],
@@ -670,9 +665,10 @@ class _MainPageState extends State<MainPage> with WidgetsBindingObserver {
               ),
               _portalContents.length > 1
                   ? InkWell(
-                      onTap: () {
-                        Navigator.of(context).push(slideRoute(
+                      onTap: () async {
+                        await Navigator.of(context).push(slideRoute(
                             PostViewPage(id: _portalContents[1].id)));
+                        await _refreshAllPosts();
                       },
                       child: LittleText(
                         content: _portalContents[1],
@@ -684,9 +680,10 @@ class _MainPageState extends State<MainPage> with WidgetsBindingObserver {
               ),
               _portalContents.length > 2
                   ? InkWell(
-                      onTap: () {
-                        Navigator.of(context).push(slideRoute(
+                      onTap: () async {
+                        await Navigator.of(context).push(slideRoute(
                             PostViewPage(id: _portalContents[2].id)));
+                        await _refreshAllPosts();
                       },
                       child: LittleText(
                         content: _portalContents[2],
@@ -704,10 +701,11 @@ class _MainPageState extends State<MainPage> with WidgetsBindingObserver {
                 height: 14,
               ),
               InkWell(
-                onTap: () {
-                  Navigator.of(context).push(slideRoute(PostListShowPage(
+                onTap: () async {
+                  await Navigator.of(context).push(slideRoute(PostListShowPage(
                       boardType: BoardType.free,
                       boardInfo: _searchBoard("facility-notice"))));
+                  await _refreshAllPosts();
                 },
                 child: Row(
                   children: [
@@ -736,9 +734,10 @@ class _MainPageState extends State<MainPage> with WidgetsBindingObserver {
                     Expanded(
                       child: _facilityContents.isNotEmpty
                           ? InkWell(
-                              onTap: () {
-                                Navigator.of(context).push(slideRoute(
+                              onTap: () async {
+                                await Navigator.of(context).push(slideRoute(
                                     PostViewPage(id: _facilityContents[0].id)));
+                                await _refreshAllPosts();
                               },
                               child: LittleText(
                                 content: _facilityContents[0],
@@ -753,11 +752,12 @@ class _MainPageState extends State<MainPage> with WidgetsBindingObserver {
                 height: 10,
               ),
               InkWell(
-                onTap: () {
-                  Navigator.of(context).push(slideRoute(PostListShowPage(
+                onTap: () async {
+                  await Navigator.of(context).push(slideRoute(PostListShowPage(
                     boardType: BoardType.free,
                     boardInfo: _searchBoard("ara-notice"),
                   )));
+                  await _refreshAllPosts();
                 },
                 child: Row(
                   children: [
@@ -786,9 +786,10 @@ class _MainPageState extends State<MainPage> with WidgetsBindingObserver {
                     Expanded(
                       child: _newAraContents.isNotEmpty
                           ? InkWell(
-                              onTap: () {
-                                Navigator.of(context).push(slideRoute(
+                              onTap: () async {
+                                await Navigator.of(context).push(slideRoute(
                                     PostViewPage(id: _newAraContents[0].id)));
+                                await _refreshAllPosts();
                               },
                               child: LittleText(
                                 content: _newAraContents[0],
@@ -836,11 +837,12 @@ class _MainPageState extends State<MainPage> with WidgetsBindingObserver {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               InkWell(
-                onTap: () {
-                  Navigator.of(context).push(slideRoute(PostListShowPage(
+                onTap: () async {
+                  await Navigator.of(context).push(slideRoute(PostListShowPage(
                     boardType: BoardType.free,
                     boardInfo: _searchBoard("real-estate"),
                   )));
+                  await _refreshAllPosts();
                 },
                 child: Row(
                   children: [
@@ -871,10 +873,11 @@ class _MainPageState extends State<MainPage> with WidgetsBindingObserver {
                     Expanded(
                       child: _realEstateContents.isNotEmpty
                           ? InkWell(
-                              onTap: () {
-                                Navigator.of(context).push(slideRoute(
+                              onTap: () async {
+                                await Navigator.of(context).push(slideRoute(
                                     PostViewPage(
                                         id: _realEstateContents[0].id)));
+                                await _refreshAllPosts();
                               },
                               child: LittleText(
                                 content: _realEstateContents[0],
@@ -890,10 +893,11 @@ class _MainPageState extends State<MainPage> with WidgetsBindingObserver {
                 height: 10,
               ),
               InkWell(
-                onTap: () {
-                  Navigator.of(context).push(slideRoute(PostListShowPage(
+                onTap: () async {
+                  await Navigator.of(context).push(slideRoute(PostListShowPage(
                       boardType: BoardType.free,
                       boardInfo: _searchBoard("market"))));
+                  await _refreshAllPosts();
                 },
                 child: Row(
                   children: [
@@ -922,9 +926,10 @@ class _MainPageState extends State<MainPage> with WidgetsBindingObserver {
                     Expanded(
                       child: _marketContents.isNotEmpty
                           ? InkWell(
-                              onTap: () {
-                                Navigator.of(context).push(slideRoute(
+                              onTap: () async {
+                                await Navigator.of(context).push(slideRoute(
                                     PostViewPage(id: _marketContents[0].id)));
+                                await _refreshAllPosts();
                               },
                               child: LittleText(
                                 content: _marketContents[0],
@@ -940,11 +945,12 @@ class _MainPageState extends State<MainPage> with WidgetsBindingObserver {
                 height: 10,
               ),
               InkWell(
-                onTap: () {
-                  Navigator.of(context).push(slideRoute(PostListShowPage(
+                onTap: () async {
+                  await Navigator.of(context).push(slideRoute(PostListShowPage(
                     boardType: BoardType.free,
                     boardInfo: _searchBoard("wanted"),
                   )));
+                  await _refreshAllPosts();
                 },
                 child: Row(
                   children: [
@@ -973,9 +979,10 @@ class _MainPageState extends State<MainPage> with WidgetsBindingObserver {
                     Expanded(
                       child: _wantedContents.isNotEmpty
                           ? InkWell(
-                              onTap: () {
-                                Navigator.of(context).push(slideRoute(
+                              onTap: () async {
+                                await Navigator.of(context).push(slideRoute(
                                     PostViewPage(id: _wantedContents[0].id)));
+                                await _refreshAllPosts();
                               },
                               child: LittleText(
                                 content: _wantedContents[0],
@@ -997,10 +1004,11 @@ class _MainPageState extends State<MainPage> with WidgetsBindingObserver {
   Widget _buildStuCommunityContents() {
     return Column(
       children: [
-        MainPageTextButton('main_page.stu_community', () {
-          Navigator.of(context).push(slideRoute(PostListShowPage(
+        MainPageTextButton('main_page.stu_community', () async {
+          await Navigator.of(context).push(slideRoute(PostListShowPage(
               boardType: BoardType.free,
               boardInfo: _searchBoard("students-group"))));
+          await _refreshAllPosts();
         }),
         const SizedBox(height: 9),
         Container(
@@ -1034,9 +1042,10 @@ class _MainPageState extends State<MainPage> with WidgetsBindingObserver {
                   Expanded(
                     child: _gradContents.isNotEmpty
                         ? InkWell(
-                            onTap: () {
-                              Navigator.of(context).push(slideRoute(
+                            onTap: () async {
+                              await Navigator.of(context).push(slideRoute(
                                   PostViewPage(id: _gradContents[0].id)));
+                              await _refreshAllPosts();
                             },
                             child: LittleText(
                               content: _gradContents[0],
@@ -1065,9 +1074,10 @@ class _MainPageState extends State<MainPage> with WidgetsBindingObserver {
                   Expanded(
                     child: _underGradContents.isNotEmpty
                         ? InkWell(
-                            onTap: () {
-                              Navigator.of(context).push(slideRoute(
+                            onTap: () async {
+                              await Navigator.of(context).push(slideRoute(
                                   PostViewPage(id: _underGradContents[0].id)));
+                              await _refreshAllPosts();
                             },
                             child: LittleText(
                               content: _underGradContents[0],
@@ -1096,9 +1106,10 @@ class _MainPageState extends State<MainPage> with WidgetsBindingObserver {
                   Expanded(
                     child: _freshmanContents.isNotEmpty
                         ? InkWell(
-                            onTap: () {
-                              Navigator.of(context).push(slideRoute(
+                            onTap: () async {
+                              await Navigator.of(context).push(slideRoute(
                                   PostViewPage(id: _freshmanContents[0].id)));
+                              await _refreshAllPosts();
                             },
                             child: LittleText(
                               content: _freshmanContents[0],
@@ -1124,18 +1135,22 @@ class PopularBoard extends StatelessWidget {
   final ArticleListActionModel model;
   final int? boardNum;
   final bool? showBoardNumber;
+  final Function refreshAllPosts;
 
   const PopularBoard(
       {super.key,
       required this.model,
+      required this.refreshAllPosts,
       this.boardNum = 1,
       this.showBoardNumber = true});
 
   @override
   Widget build(BuildContext context) {
     return InkWell(
-        onTap: () {
-          Navigator.of(context).push(slideRoute(PostViewPage(id: model.id)));
+        onTap: () async {
+          await Navigator.of(context)
+              .push(slideRoute(PostViewPage(id: model.id)));
+          await refreshAllPosts();
         },
         child: Container(
           // height: 100,
