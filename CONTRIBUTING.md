@@ -86,6 +86,8 @@ team_id("N5V8W52U3U") # Developer Portal Team ID
 
 아래 명령어 시 `pubspec.yaml`에 있는 버젼 정보와 현재 시각으로 지정된 빌드 정보 기준으로 업로드 됩니다.
 
+**앱에서 백엔드 대상이 prod가 맞는지 배포 전 꼭 확인 하세요!**
+
 ```bash
 cd android && bundle exec fastlane alpha && cd ../ios && bundle exec fastlane alpha
 ```

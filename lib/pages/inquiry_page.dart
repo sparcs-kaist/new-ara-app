@@ -8,6 +8,11 @@ import 'package:new_ara_app/providers/user_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+///회원 탈퇴 후 로그인을 시도할 때 표시되는 실패 페이지
+///
+///TODO: class 명과 파일명은 변경 필요
+///
+///TODO: 디자인 변경 필요
 class InQuiryPage extends StatefulWidget {
   const InQuiryPage({super.key});
 
