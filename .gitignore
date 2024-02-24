@@ -50,6 +50,7 @@ app.*.map.json
 android/fastlane/report.xml
 android/fastlane/README.md
 android/fastlane/newara-fastlane.json
+android/fastlane/.env
 ios/fastlane/report.xml
 ios/fastlane/README.md
 ios/fastlane/.env.default
