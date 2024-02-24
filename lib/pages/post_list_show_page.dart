@@ -33,7 +33,8 @@ class PostListShowPage extends StatefulWidget {
 class _PostListShowPageState extends State<PostListShowPage>
     with WidgetsBindingObserver {
   List<ArticleListActionModel> postPreviewList = [];
-  // 현재 어디까지 페이지가 로딩됐는 지 기록하는 변수
+
+  /// 현재 어디까지 페이지가 로딩됐는 지 기록하는 변수
   int currentPage = 1;
   bool isLoading = true;
   String apiUrl = "";
@@ -103,7 +104,8 @@ class _PostListShowPageState extends State<PostListShowPage>
 
   /// 게시물 update(게시판의 current페이지까지에 있는 게시물들을 불러옴)
   ///
-  /// [pageLimitToReload] : 새로 로딩할 최대 페이지 수
+  /// [pageLimitToReload] : 새로 로딩할 최대 페이지 수.
+  /// [currentPage] 값보다 [pageLimitToReload] 값이 큰 지 코딩할 때 주의 바랍니다.
   Future<void> updateAllBulletinList({int? pageLimitToReload}) async {
     List<ArticleListActionModel> newList = [];
     UserProvider userProvider = context.read<UserProvider>();
@@ -111,9 +113,8 @@ class _PostListShowPageState extends State<PostListShowPage>
     // 모든 페이지를 순회하며 게시물 목록을 업데이트합니다.
     for (int page = 1;
         page <=
-            (pageLimitToReload != null
-                ? min(pageLimitToReload, currentPage)
-                : currentPage);
+            // pageLimitToReload가 null이 아니면(파라미터가 존재하면) currentPage보다 우선시 합니다.
+            (pageLimitToReload ?? currentPage);
         page++) {
       Map<String, dynamic>? json = await userProvider.getApiRes("$apiUrl$page");
 
@@ -136,9 +137,7 @@ class _PostListShowPageState extends State<PostListShowPage>
     if (mounted) {
       setState(() {
         /// 현재 어디까지 로딩됐는 지 기록하는 변수 [currentPage]를 업데이트합니다.
-        currentPage = (pageLimitToReload != null
-            ? min(pageLimitToReload, currentPage)
-            : currentPage);
+        currentPage = (pageLimitToReload ?? currentPage);
         postPreviewList.clear();
         postPreviewList.addAll(newList);
         isLoading = false; // 로딩 상태 업데이트
