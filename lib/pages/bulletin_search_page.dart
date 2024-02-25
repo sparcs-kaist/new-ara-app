@@ -117,6 +117,8 @@ class _BulletinSearchPageState extends State<BulletinSearchPage> {
                 "refreshPostList error at $i : $error"); // invalid json 걸러내기
           }
         }
+        // 타겟 단어 1페이지 검색 결과만 불러오므로 현재 페이지를 1로 설정
+        _currentPage = 1;
         _isLoading = false;
       });
     }
