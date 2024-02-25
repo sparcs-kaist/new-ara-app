@@ -30,8 +30,11 @@ class PostListShowPage extends StatefulWidget {
   State<PostListShowPage> createState() => _PostListShowPageState();
 }
 
-class _PostListShowPageState extends State<PostListShowPage> {
+class _PostListShowPageState extends State<PostListShowPage>
+    with WidgetsBindingObserver {
   List<ArticleListActionModel> postPreviewList = [];
+
+  /// 현재 어디까지 페이지가 로딩됐는 지 기록하는 변수
   int currentPage = 1;
   bool isLoading = true;
   String apiUrl = "";
@@ -74,6 +77,7 @@ class _PostListShowPageState extends State<PostListShowPage> {
     }
 
     _scrollController.addListener(_scrollListener);
+    WidgetsBinding.instance.addObserver(this);
     updateAllBulletinList().then(
       (value) {
         _loadNextPage();
@@ -84,21 +88,33 @@ class _PostListShowPageState extends State<PostListShowPage> {
 
   @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
     _scrollController.removeListener(_scrollListener);
     _scrollController.dispose();
     super.dispose();
   }
 
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      // 앱이 백그라운드에서 포그라운드로 전환될 때 게시물 목록을 업데이트합니다.
+      updateAllBulletinList();
+    }
+  }
+
   /// 게시물 update(게시판의 current페이지까지에 있는 게시물들을 불러옴)
   ///
-  /// [maxPage] : 새로 로딩할 최대 페이지 수
-  Future<void> updateAllBulletinList({int? maxPage}) async {
+  /// [pageLimitToReload] : 새로 로딩할 최대 페이지 수.
+  /// [currentPage] 값보다 [pageLimitToReload] 값이 큰 지 코딩할 때 주의 바랍니다.
+  Future<void> updateAllBulletinList({int? pageLimitToReload}) async {
     List<ArticleListActionModel> newList = [];
     UserProvider userProvider = context.read<UserProvider>();
 
     // 모든 페이지를 순회하며 게시물 목록을 업데이트합니다.
     for (int page = 1;
-        page <= (maxPage != null ? min(maxPage, currentPage) : currentPage);
+        page <=
+            // pageLimitToReload가 null이 아니면(파라미터가 존재하면) currentPage보다 우선시 합니다.
+            (pageLimitToReload ?? currentPage);
         page++) {
       Map<String, dynamic>? json = await userProvider.getApiRes("$apiUrl$page");
 
@@ -120,6 +136,8 @@ class _PostListShowPageState extends State<PostListShowPage> {
     // 위젯이 마운트 상태인 경우 상태를 업데이트합니다.
     if (mounted) {
       setState(() {
+        /// 현재 어디까지 로딩됐는 지 기록하는 변수 [currentPage]를 업데이트합니다.
+        currentPage = (pageLimitToReload ?? currentPage);
         postPreviewList.clear();
         postPreviewList.addAll(newList);
         isLoading = false; // 로딩 상태 업데이트
@@ -285,7 +303,7 @@ class _PostListShowPageState extends State<PostListShowPage> {
                       // 리프레쉬시 게시물 목록을 업데이트합니다.
                       // 1페이지만 로드하도록 설정하여 최신 게시물을 불러옵니다.
                       // 1페이지만 로드하면 태블릿에서 게시물로 화면을 꽉채우지 못하므로 다음 페이지도 로드합니다.
-                      await updateAllBulletinList(maxPage: 1).then(
+                      await updateAllBulletinList(pageLimitToReload: 1).then(
                         (value) {
                           _loadNextPage();
                         },

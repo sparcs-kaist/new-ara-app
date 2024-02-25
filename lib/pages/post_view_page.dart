@@ -1645,7 +1645,7 @@ class _PostViewPageState extends State<PostViewPage> {
                       // 댓글 수정, 대댓글은 제외
                       if (!_isNestedComment && !_isModify) {
                         _scrollController.animateTo(
-                          _scrollController.position.maxScrollExtent + 30,
+                          _scrollController.position.maxScrollExtent + 72,
                           duration: const Duration(milliseconds: 500),
                           curve: Curves.easeOut,
                         );

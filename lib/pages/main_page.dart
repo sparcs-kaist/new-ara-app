@@ -1,8 +1,8 @@
-
 import 'package:flutter/material.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:new_ara_app/pages/bulletin_search_page.dart';
+import 'package:new_ara_app/pages/inquiry_page.dart';
 import 'package:provider/provider.dart';
 
 import 'package:new_ara_app/constants/board_type.dart';
@@ -20,7 +20,6 @@ import 'package:new_ara_app/providers/notification_provider.dart';
 import 'package:new_ara_app/utils/handle_hidden.dart';
 import 'package:new_ara_app/utils/cache_function.dart';
 
-
 class MainPage extends StatefulWidget {
   const MainPage({Key? key}) : super(key: key);
   @override
@@ -28,7 +27,7 @@ class MainPage extends StatefulWidget {
 }
 
 /// 네이게이션 페이지에서 제일 먼저 보이는 메인 페이지.
-class _MainPageState extends State<MainPage> {
+class _MainPageState extends State<MainPage> with WidgetsBindingObserver {
   //각 컨텐츠 로딩을 확인하기 위한 변수
   final List<bool> _isLoading = [
     true, //_dailyBestContents
@@ -70,8 +69,8 @@ class _MainPageState extends State<MainPage> {
 
     //측정하고자 하는 코드 블록
     Future.wait([
-      _refreshBoardList(userProvider),
-      _refreshDailyBest(userProvider),
+      _initBoardList(userProvider),
+      _initDailyBest(userProvider),
     ]).then((results) {
       DateTime endTime = DateTime.now(); // 종료 시간 기록
 
@@ -79,13 +78,34 @@ class _MainPageState extends State<MainPage> {
       debugPrint("소요 시간: ${duration.inMilliseconds} 밀리초");
     });
 
+    //유닛 테스트를 위한 코드 ------------
+    // WidgetsBinding.instance!.addPostFrameCallback((_) {
+    //   Navigator.of(context).push(slideRoute(const InQuiryPage()));
+    // });
+    //------------------------
+
+    WidgetsBinding.instance.addObserver(this); // 옵저버 등록
     context.read<NotificationProvider>().checkIsNotReadExist(userProvider);
   }
 
-  
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this); // 옵저버 해제
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) async {
+    UserProvider userProvider = context.read<UserProvider>();
+    // 앱이 포그라운드로 전환될 때 실행할 함수
+    if (state == AppLifecycleState.resumed) {
+      //api를 호출 후 최신 데이터로 갱신
+      await _refreshAllPosts();
+    }
+  }
 
   /// 일일 베스트 컨텐츠 데이터를 새로고침
-  Future<void> _refreshDailyBest(UserProvider userProvider) async {
+  Future<void> _initDailyBest(UserProvider userProvider) async {
     //1. Shared_Preferences 값이 있으면(if not null) 그 값으로 UI 업데이트.
     //2. api 호출 후 새로운 response shared_preferences에 저장 후 UI 업데이트
     // api 호출과 Provider 정보 동기화.
@@ -107,7 +127,7 @@ class _MainPageState extends State<MainPage> {
   }
 
   /// 게시판 목록 안의 게시물들을 새로 고침
-  Future<void> _refreshBoardList(UserProvider userProvider) async {
+  Future<void> _initBoardList(UserProvider userProvider) async {
     updateStateWithCachedOrFetchedApiData(
       apiUrl: 'boards/',
       userProvider: userProvider,
@@ -126,16 +146,16 @@ class _MainPageState extends State<MainPage> {
             _isLoading[7] = false;
           });
           await Future.wait([
-            _refreshPortalNotice(userProvider),
-            _refreshFacilityNotice(userProvider),
-            _refreshNewAraNotice(userProvider),
-            _refreshGradAssocNotice(userProvider),
-            _refreshUndergradAssocNotice(userProvider),
-            _refreshFreshmanCouncil(userProvider),
-            _refreshTalks(userProvider),
-            _refreshMarket(userProvider),
-            _refreshWanted(userProvider),
-            _refreshRealEstate(userProvider)
+            _initPortalNotice(userProvider),
+            _initFacilityNotice(userProvider),
+            _initNewAraNotice(userProvider),
+            _initGradAssocNotice(userProvider),
+            _initUndergradAssocNotice(userProvider),
+            _initFreshmanCouncil(userProvider),
+            _initTalks(userProvider),
+            _initMarket(userProvider),
+            _initWanted(userProvider),
+            _initRealEstate(userProvider)
           ]);
         }
       },
@@ -143,71 +163,70 @@ class _MainPageState extends State<MainPage> {
   }
 
   ///포탈 게시물 글 불러오기.
-  Future<void> _refreshPortalNotice(UserProvider userProvider) async {
-    await _refreshBoardContent(
+  Future<void> _initPortalNotice(UserProvider userProvider) async {
+    await _initBoardContent(
         userProvider, "portal-notice", "", _portalContents, 1);
   }
 
   ///입주 업체 게시물 글 불러오기.
-  Future<void> _refreshFacilityNotice(UserProvider userProvider) async {
-    await _refreshBoardContent(
+  Future<void> _initFacilityNotice(UserProvider userProvider) async {
+    await _initBoardContent(
         userProvider, "facility-notice", "", _facilityContents, 2);
   }
 
-  Future<void> _refreshNewAraNotice(UserProvider userProvider) async {
-    await _refreshBoardContent(
-        userProvider, "ara-notice", "", _newAraContents, 3);
+  Future<void> _initNewAraNotice(UserProvider userProvider) async {
+    await _initBoardContent(userProvider, "ara-notice", "", _newAraContents, 3);
   }
 
-  Future<void> _refreshGradAssocNotice(UserProvider userProvider) async {
+  Future<void> _initGradAssocNotice(UserProvider userProvider) async {
     //원총
     // "slug": "students-group",
     // "slug": "grad-assoc",
     //dev 서버랑 실제 서버 parent_topic 이 다름을 유의하기.
     //https://newara.sparcs.org/api/articles/?parent_board=2&parent_topic=24
-    await _refreshBoardContent(
+    await _initBoardContent(
         userProvider, "students-group", "grad-assoc", _gradContents, 4);
   }
 
-  Future<void> _refreshUndergradAssocNotice(UserProvider userProvider) async {
+  Future<void> _initUndergradAssocNotice(UserProvider userProvider) async {
     // 총학
     // "slug": "students-group",
     // "slug": "undergrad-assoc",
-    await _refreshBoardContent(userProvider, "students-group",
-        "undergrad-assoc", _underGradContents, 5);
+    await _initBoardContent(userProvider, "students-group", "undergrad-assoc",
+        _underGradContents, 5);
   }
 
-  Future<void> _refreshFreshmanCouncil(UserProvider userProvider) async {
+  Future<void> _initFreshmanCouncil(UserProvider userProvider) async {
     //새학
     // "slug": "students-group",
     // "slug": "freshman-council",
-    await _refreshBoardContent(userProvider, "students-group",
-        "freshman-council", _freshmanContents, 6);
+    await _initBoardContent(userProvider, "students-group", "freshman-council",
+        _freshmanContents, 6);
   }
 
-  Future<void> _refreshTalks(UserProvider userProvider) async {
+  Future<void> _initTalks(UserProvider userProvider) async {
     //자유게시판
-    await _refreshBoardContent(userProvider, "talk", "", _talksContents, 8);
+    await _initBoardContent(userProvider, "talk", "", _talksContents, 8);
   }
 
-  Future<void> _refreshWanted(UserProvider userProvider) async {
+  Future<void> _initWanted(UserProvider userProvider) async {
     //구인구직
-    await _refreshBoardContent(userProvider, "wanted", "", _wantedContents, 9);
+    await _initBoardContent(userProvider, "wanted", "", _wantedContents, 9);
   }
 
-  Future<void> _refreshMarket(UserProvider userProvider) async {
+  Future<void> _initMarket(UserProvider userProvider) async {
     //중고거래
-    await _refreshBoardContent(userProvider, "market", "", _marketContents, 10);
+    await _initBoardContent(userProvider, "market", "", _marketContents, 10);
   }
 
-  Future<void> _refreshRealEstate(UserProvider userProvider) async {
+  Future<void> _initRealEstate(UserProvider userProvider) async {
     //부동산
-    await _refreshBoardContent(
+    await _initBoardContent(
         userProvider, "real-estate", "", _realEstateContents, 11);
   }
 
   /// 게시판의 게시물들을 불러옴. 코드 중복을 줄이기 위해 사용.
-  Future<void> _refreshBoardContent(
+  Future<void> _initBoardContent(
       UserProvider userProvider,
       String slug1,
       String slug2,
@@ -241,6 +260,80 @@ class _MainPageState extends State<MainPage> {
         });
   }
 
+  // 모든 컨텐츠를 데이터로 불러와 화면에 재빌드
+  Future<void> _refreshAllPosts() async {
+    debugPrint("main_page.dart: _refreshAllPosts() called.");
+    UserProvider userProvider = context.read<UserProvider>();
+    await Future.wait([
+      _refreshTopContents(userProvider, _dailyBestContents),
+      _refreshOtherContents(userProvider, "portal-notice", "", _portalContents),
+      _refreshOtherContents(
+          userProvider, "facility-notice", "", _facilityContents),
+      _refreshOtherContents(userProvider, "ara-notice", "", _newAraContents),
+      _refreshOtherContents(
+          userProvider, "students-group", "grad-assoc", _gradContents),
+      _refreshOtherContents(userProvider, "students-group", "undergrad-assoc",
+          _underGradContents),
+      _refreshOtherContents(userProvider, "students-group", "freshman-council",
+          _freshmanContents),
+      _refreshOtherContents(userProvider, "talk", "", _talksContents),
+      _refreshOtherContents(userProvider, "wanted", "", _wantedContents),
+      _refreshOtherContents(userProvider, "market", "", _marketContents),
+      _refreshOtherContents(
+          userProvider, "real-estate", "", _realEstateContents),
+    ]);
+  }
+
+  /// 일일 베스트 컨텐츠 데이터를 api로 불러와 화면에 재빌드
+  Future<void> _refreshTopContents(UserProvider userProvider,
+      List<ArticleListActionModel> contentList) async {
+    String apiUrl = 'articles/top/';
+    final dynamic response = await userProvider.getApiRes(apiUrl);
+    if (mounted && response != null) {
+      setState(() {
+        contentList.clear();
+
+        for (Map<String, dynamic> json in response['results']) {
+          try {
+            contentList.add(ArticleListActionModel.fromJson(json));
+          } catch (error) {
+            debugPrint(
+                "refreshBoardContent ArticleListActionModel.fromJson failed: $error");
+          }
+        }
+      });
+    }
+  }
+
+  /// 일일 베스트 컨텐츠 이외의 데이터를 api로 불러와 화면에 재빌드
+  Future<void> _refreshOtherContents(
+    UserProvider userProvider,
+    String slug1,
+    String slug2,
+    List<ArticleListActionModel> contentList,
+  ) async {
+    List<int> ids = _searchBoardID(slug1, slug2);
+    int boardID = ids[0], topicID = ids[1];
+    String apiUrl = topicID == -1
+        ? "articles/?parent_board=$boardID"
+        : "articles/?parent_board=$boardID&parent_topic=$topicID";
+    final dynamic response = await userProvider.getApiRes(apiUrl);
+    if (mounted && response != null) {
+      setState(() {
+        contentList.clear();
+
+        for (Map<String, dynamic> json in response['results']) {
+          try {
+            contentList.add(ArticleListActionModel.fromJson(json));
+          } catch (error) {
+            debugPrint(
+                "refreshBoardContent ArticleListActionModel.fromJson failed: $error");
+          }
+        }
+      });
+    }
+  }
+
   /// 주어진 slug 값을 통해 게시판과 토픽의 ID를 찾음. topic 이 없는 경우 slug2로 ""을 넘겨주면 된다.
   List<int> _searchBoardID(String slug1, String slug2) {
     List<int> returnValue = [-1, -1];
@@ -270,6 +363,7 @@ class _MainPageState extends State<MainPage> {
 
   @override
   Widget build(BuildContext context) {
+    UserProvider userProvider = context.watch<UserProvider>();
     return Scaffold(
       appBar: AppBar(
         elevation: 0,
@@ -289,6 +383,7 @@ class _MainPageState extends State<MainPage> {
             onPressed: () async {
               await Navigator.of(context)
                   .push(slideRoute(const PostWritePage()));
+              await _refreshAllPosts();
             },
           ),
           IconButton(
@@ -303,6 +398,7 @@ class _MainPageState extends State<MainPage> {
               await Navigator.of(context).push(slideRoute(
                   const BulletinSearchPage(
                       boardType: BoardType.all, boardInfo: null)));
+              await _refreshAllPosts();
             },
           ),
         ],
@@ -324,8 +420,8 @@ class _MainPageState extends State<MainPage> {
             : RefreshIndicator.adaptive(
                 color: ColorsInfo.newara,
                 onRefresh: () async {
-                  await _refreshBoardList(
-                      Provider.of<UserProvider>(context, listen: false));
+                  //api를 호출 후 최신 데이터로 갱신
+                  await _refreshAllPosts();
                 },
                 child: SingleChildScrollView(
                   child: SizedBox(
@@ -357,11 +453,12 @@ class _MainPageState extends State<MainPage> {
       children: [
         MainPageTextButton(
           'main_page.realtime',
-          () {
-            Navigator.of(context).push(slideRoute(const PostListShowPage(
+          () async {
+            await Navigator.of(context).push(slideRoute(const PostListShowPage(
               boardType: BoardType.top,
               boardInfo: null,
             )));
+            await _refreshAllPosts();
           },
         ),
         const SizedBox(height: 0),
@@ -371,6 +468,7 @@ class _MainPageState extends State<MainPage> {
             children: [
               PopularBoard(
                 model: _dailyBestContents[0],
+                refreshAllPosts: _refreshAllPosts,
                 boardNum: 1,
               ),
               Row(
@@ -388,6 +486,7 @@ class _MainPageState extends State<MainPage> {
               ),
               PopularBoard(
                 model: _dailyBestContents[1],
+                refreshAllPosts: _refreshAllPosts,
                 boardNum: 2,
               ),
               Row(
@@ -405,6 +504,7 @@ class _MainPageState extends State<MainPage> {
               ),
               PopularBoard(
                 model: _dailyBestContents[2],
+                refreshAllPosts: _refreshAllPosts,
                 boardNum: 3,
               ),
             ],
@@ -419,11 +519,12 @@ class _MainPageState extends State<MainPage> {
       children: [
         MainPageTextButton(
           '자유게시판',
-          () {
-            Navigator.of(context).push(slideRoute(PostListShowPage(
+          () async {
+            await Navigator.of(context).push(slideRoute(PostListShowPage(
               boardType: BoardType.free,
               boardInfo: _searchBoard("talk"),
             )));
+            await _refreshAllPosts();
           },
         ),
         SizedBox(
@@ -433,6 +534,7 @@ class _MainPageState extends State<MainPage> {
               PopularBoard(
                 model: _talksContents[0],
                 showBoardNumber: false,
+                refreshAllPosts: _refreshAllPosts,
               ),
               Row(
                 children: [
@@ -446,6 +548,7 @@ class _MainPageState extends State<MainPage> {
               ),
               PopularBoard(
                 model: _talksContents[1],
+                refreshAllPosts: _refreshAllPosts,
                 showBoardNumber: false,
               ),
               Row(
@@ -460,6 +563,7 @@ class _MainPageState extends State<MainPage> {
               ),
               PopularBoard(
                 model: _talksContents[2],
+                refreshAllPosts: _refreshAllPosts,
                 showBoardNumber: false,
               ),
             ],
@@ -499,11 +603,12 @@ class _MainPageState extends State<MainPage> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               InkWell(
-                onTap: () {
-                  Navigator.of(context).push(slideRoute(PostListShowPage(
+                onTap: () async {
+                  await Navigator.of(context).push(slideRoute(PostListShowPage(
                     boardType: BoardType.free,
                     boardInfo: _searchBoard("portal-notice"),
                   )));
+                  await _refreshAllPosts();
                 },
                 child: Row(
                   children: [
@@ -545,9 +650,10 @@ class _MainPageState extends State<MainPage> {
               ),
               _portalContents.isNotEmpty
                   ? InkWell(
-                      onTap: () {
-                        Navigator.of(context).push(slideRoute(
+                      onTap: () async {
+                        await Navigator.of(context).push(slideRoute(
                             PostViewPage(id: _portalContents[0].id)));
+                        await _refreshAllPosts();
                       },
                       child: LittleText(
                         content: _portalContents[0],
@@ -559,9 +665,10 @@ class _MainPageState extends State<MainPage> {
               ),
               _portalContents.length > 1
                   ? InkWell(
-                      onTap: () {
-                        Navigator.of(context).push(slideRoute(
+                      onTap: () async {
+                        await Navigator.of(context).push(slideRoute(
                             PostViewPage(id: _portalContents[1].id)));
+                        await _refreshAllPosts();
                       },
                       child: LittleText(
                         content: _portalContents[1],
@@ -573,9 +680,10 @@ class _MainPageState extends State<MainPage> {
               ),
               _portalContents.length > 2
                   ? InkWell(
-                      onTap: () {
-                        Navigator.of(context).push(slideRoute(
+                      onTap: () async {
+                        await Navigator.of(context).push(slideRoute(
                             PostViewPage(id: _portalContents[2].id)));
+                        await _refreshAllPosts();
                       },
                       child: LittleText(
                         content: _portalContents[2],
@@ -593,10 +701,11 @@ class _MainPageState extends State<MainPage> {
                 height: 14,
               ),
               InkWell(
-                onTap: () {
-                  Navigator.of(context).push(slideRoute(PostListShowPage(
+                onTap: () async {
+                  await Navigator.of(context).push(slideRoute(PostListShowPage(
                       boardType: BoardType.free,
                       boardInfo: _searchBoard("facility-notice"))));
+                  await _refreshAllPosts();
                 },
                 child: Row(
                   children: [
@@ -625,9 +734,10 @@ class _MainPageState extends State<MainPage> {
                     Expanded(
                       child: _facilityContents.isNotEmpty
                           ? InkWell(
-                              onTap: () {
-                                Navigator.of(context).push(slideRoute(
+                              onTap: () async {
+                                await Navigator.of(context).push(slideRoute(
                                     PostViewPage(id: _facilityContents[0].id)));
+                                await _refreshAllPosts();
                               },
                               child: LittleText(
                                 content: _facilityContents[0],
@@ -642,11 +752,12 @@ class _MainPageState extends State<MainPage> {
                 height: 10,
               ),
               InkWell(
-                onTap: () {
-                  Navigator.of(context).push(slideRoute(PostListShowPage(
+                onTap: () async {
+                  await Navigator.of(context).push(slideRoute(PostListShowPage(
                     boardType: BoardType.free,
                     boardInfo: _searchBoard("ara-notice"),
                   )));
+                  await _refreshAllPosts();
                 },
                 child: Row(
                   children: [
@@ -675,9 +786,10 @@ class _MainPageState extends State<MainPage> {
                     Expanded(
                       child: _newAraContents.isNotEmpty
                           ? InkWell(
-                              onTap: () {
-                                Navigator.of(context).push(slideRoute(
+                              onTap: () async {
+                                await Navigator.of(context).push(slideRoute(
                                     PostViewPage(id: _newAraContents[0].id)));
+                                await _refreshAllPosts();
                               },
                               child: LittleText(
                                 content: _newAraContents[0],
@@ -725,11 +837,12 @@ class _MainPageState extends State<MainPage> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               InkWell(
-                onTap: () {
-                  Navigator.of(context).push(slideRoute(PostListShowPage(
+                onTap: () async {
+                  await Navigator.of(context).push(slideRoute(PostListShowPage(
                     boardType: BoardType.free,
                     boardInfo: _searchBoard("real-estate"),
                   )));
+                  await _refreshAllPosts();
                 },
                 child: Row(
                   children: [
@@ -760,10 +873,11 @@ class _MainPageState extends State<MainPage> {
                     Expanded(
                       child: _realEstateContents.isNotEmpty
                           ? InkWell(
-                              onTap: () {
-                                Navigator.of(context).push(slideRoute(
+                              onTap: () async {
+                                await Navigator.of(context).push(slideRoute(
                                     PostViewPage(
                                         id: _realEstateContents[0].id)));
+                                await _refreshAllPosts();
                               },
                               child: LittleText(
                                 content: _realEstateContents[0],
@@ -779,10 +893,11 @@ class _MainPageState extends State<MainPage> {
                 height: 10,
               ),
               InkWell(
-                onTap: () {
-                  Navigator.of(context).push(slideRoute(PostListShowPage(
+                onTap: () async {
+                  await Navigator.of(context).push(slideRoute(PostListShowPage(
                       boardType: BoardType.free,
                       boardInfo: _searchBoard("market"))));
+                  await _refreshAllPosts();
                 },
                 child: Row(
                   children: [
@@ -811,9 +926,10 @@ class _MainPageState extends State<MainPage> {
                     Expanded(
                       child: _marketContents.isNotEmpty
                           ? InkWell(
-                              onTap: () {
-                                Navigator.of(context).push(slideRoute(
+                              onTap: () async {
+                                await Navigator.of(context).push(slideRoute(
                                     PostViewPage(id: _marketContents[0].id)));
+                                await _refreshAllPosts();
                               },
                               child: LittleText(
                                 content: _marketContents[0],
@@ -829,11 +945,12 @@ class _MainPageState extends State<MainPage> {
                 height: 10,
               ),
               InkWell(
-                onTap: () {
-                  Navigator.of(context).push(slideRoute(PostListShowPage(
+                onTap: () async {
+                  await Navigator.of(context).push(slideRoute(PostListShowPage(
                     boardType: BoardType.free,
                     boardInfo: _searchBoard("wanted"),
                   )));
+                  await _refreshAllPosts();
                 },
                 child: Row(
                   children: [
@@ -862,9 +979,10 @@ class _MainPageState extends State<MainPage> {
                     Expanded(
                       child: _wantedContents.isNotEmpty
                           ? InkWell(
-                              onTap: () {
-                                Navigator.of(context).push(slideRoute(
+                              onTap: () async {
+                                await Navigator.of(context).push(slideRoute(
                                     PostViewPage(id: _wantedContents[0].id)));
+                                await _refreshAllPosts();
                               },
                               child: LittleText(
                                 content: _wantedContents[0],
@@ -886,10 +1004,11 @@ class _MainPageState extends State<MainPage> {
   Widget _buildStuCommunityContents() {
     return Column(
       children: [
-        MainPageTextButton('main_page.stu_community', () {
-          Navigator.of(context).push(slideRoute(PostListShowPage(
+        MainPageTextButton('main_page.stu_community', () async {
+          await Navigator.of(context).push(slideRoute(PostListShowPage(
               boardType: BoardType.free,
               boardInfo: _searchBoard("students-group"))));
+          await _refreshAllPosts();
         }),
         const SizedBox(height: 9),
         Container(
@@ -923,9 +1042,10 @@ class _MainPageState extends State<MainPage> {
                   Expanded(
                     child: _gradContents.isNotEmpty
                         ? InkWell(
-                            onTap: () {
-                              Navigator.of(context).push(slideRoute(
+                            onTap: () async {
+                              await Navigator.of(context).push(slideRoute(
                                   PostViewPage(id: _gradContents[0].id)));
+                              await _refreshAllPosts();
                             },
                             child: LittleText(
                               content: _gradContents[0],
@@ -954,9 +1074,10 @@ class _MainPageState extends State<MainPage> {
                   Expanded(
                     child: _underGradContents.isNotEmpty
                         ? InkWell(
-                            onTap: () {
-                              Navigator.of(context).push(slideRoute(
+                            onTap: () async {
+                              await Navigator.of(context).push(slideRoute(
                                   PostViewPage(id: _underGradContents[0].id)));
+                              await _refreshAllPosts();
                             },
                             child: LittleText(
                               content: _underGradContents[0],
@@ -985,9 +1106,10 @@ class _MainPageState extends State<MainPage> {
                   Expanded(
                     child: _freshmanContents.isNotEmpty
                         ? InkWell(
-                            onTap: () {
-                              Navigator.of(context).push(slideRoute(
+                            onTap: () async {
+                              await Navigator.of(context).push(slideRoute(
                                   PostViewPage(id: _freshmanContents[0].id)));
+                              await _refreshAllPosts();
                             },
                             child: LittleText(
                               content: _freshmanContents[0],
@@ -1013,18 +1135,22 @@ class PopularBoard extends StatelessWidget {
   final ArticleListActionModel model;
   final int? boardNum;
   final bool? showBoardNumber;
+  final Function refreshAllPosts;
 
   const PopularBoard(
       {super.key,
       required this.model,
+      required this.refreshAllPosts,
       this.boardNum = 1,
       this.showBoardNumber = true});
 
   @override
   Widget build(BuildContext context) {
     return InkWell(
-        onTap: () {
-          Navigator.of(context).push(slideRoute(PostViewPage(id: model.id)));
+        onTap: () async {
+          await Navigator.of(context)
+              .push(slideRoute(PostViewPage(id: model.id)));
+          await refreshAllPosts();
         },
         child: Container(
           // height: 100,
