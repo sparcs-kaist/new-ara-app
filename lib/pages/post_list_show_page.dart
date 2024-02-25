@@ -170,6 +170,7 @@ class _PostListShowPageState extends State<PostListShowPage>
                   myMap["results"][i]["parent_article"] ?? {}));
             }
           }
+          postPreviewList.sort((a, b) => b.created_at.compareTo(a.created_at));
         });
       }
     } catch (error) {
