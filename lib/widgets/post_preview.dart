@@ -41,11 +41,8 @@ class _PostPreviewState extends State<PostPreview> {
                 ),
               Flexible(
                 child: Text(
-                  blockedProvider.blockedAnonymousPostIDs
-                          .contains(widget.model.id)
-                      ? "차단한 익명 게시물입니다"
-                      : getTitle(widget.model.title, widget.model.is_hidden,
-                          widget.model.why_hidden),
+                  getTitle(widget.model.title, widget.model.is_hidden,
+                      widget.model.why_hidden),
                   style: TextStyle(
                     color: (widget.model.is_hidden ||
                             blockedProvider.blockedAnonymousPostIDs
