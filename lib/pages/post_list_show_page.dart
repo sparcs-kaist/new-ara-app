@@ -323,7 +323,9 @@ class _PostListShowPageState extends State<PostListShowPage>
                         } else {
                           return InkWell(
                             onTap: () async {
-                              if (Platform.isIOS && postPreviewList[index].name_type == 2) {
+                              if (Platform.isIOS &&
+                                  blockedProvider.blockedAnonymousPostIDs
+                                      .contains(postPreviewList[index].id)) {
                                 return;
                               }
                               await Navigator.of(context).push(slideRoute(
