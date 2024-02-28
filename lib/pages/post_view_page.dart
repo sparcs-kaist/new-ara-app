@@ -1,6 +1,7 @@
 /// post의 내용을 보여주는 페이지 전체를 관리하는 파일.
 /// 뷰, 이벤트 처리 모두를 관리하고 있음.
 import 'dart:core';
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:new_ara_app/constants/url_info.dart';
@@ -1126,7 +1127,7 @@ class _PostViewPageState extends State<PostViewPage> {
                       }).then((_) {
                     // 익명인 경우 BlockedProvider에 추가하고 pop
                     // TODO: 웹에서 익명 차단 구현되면 수정하기 (아래 코드는 iOS 리젝때문에 추가된 것)
-                    if (_article.name_type == 2) {
+                    if (_article.name_type == 2 && Platform.isIOS) {
                       blockedProvider.addBlockedAnonymousPostID(_article.id);
                       Navigator.pop(context);
                     }
