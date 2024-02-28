@@ -43,7 +43,7 @@ class _PostPreviewState extends State<PostPreview> {
                 child: Text(
                   blockedProvider.blockedAnonymousPostIDs
                           .contains(widget.model.id)
-                      ? "신고한 익명 게시물입니다"
+                      ? "차단한 익명 게시물입니다"
                       : getTitle(widget.model.title, widget.model.is_hidden,
                           widget.model.why_hidden),
                   style: TextStyle(

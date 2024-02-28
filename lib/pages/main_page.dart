@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -313,6 +314,7 @@ class _MainPageState extends State<MainPage> with WidgetsBindingObserver {
     String slug2,
     List<ArticleListActionModel> contentList,
   ) async {
+    BlockedProvider blockedProvider = context.read<BlockedProvider>();
     List<int> ids = _searchBoardID(slug1, slug2);
     int boardID = ids[0], topicID = ids[1];
     String apiUrl = topicID == -1
@@ -325,6 +327,13 @@ class _MainPageState extends State<MainPage> with WidgetsBindingObserver {
 
         for (Map<String, dynamic> json in response['results']) {
           try {
+            // TODO: 익명 차단 기능 정식 구현되면 제거하기
+            // 아래 코드는 iOS 심사 리젝을 피하기 위한 것
+            ArticleListActionModel model = ArticleListActionModel.fromJson(json);
+            // 차단된 익명글인 경우 contentList에 저장하지 않음
+            if (Platform.isIOS && model.name_type == 2 && blockedProvider.blockedAnonymousPostIDs.contains(model.id)) {
+              continue;
+            }
             contentList.add(ArticleListActionModel.fromJson(json));
           } catch (error) {
             debugPrint(
