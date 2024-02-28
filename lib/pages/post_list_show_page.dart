@@ -1,4 +1,5 @@
 import 'dart:math';
+import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -16,6 +17,7 @@ import 'package:new_ara_app/models/article_list_action_model.dart';
 import 'package:new_ara_app/pages/post_view_page.dart';
 import 'package:new_ara_app/utils/slide_routing.dart';
 import 'package:new_ara_app/providers/notification_provider.dart';
+import 'package:new_ara_app/providers/blocked_provider.dart';
 
 /// PostListShowPage는 게시물 목록를 나타내는 위젯.
 /// boardType에 따라 게시판의 종류를 판별하고, 특성화 된 위젯들을 활성화 비활성화 되도록 설계.
@@ -196,6 +198,7 @@ class _PostListShowPageState extends State<PostListShowPage>
 
   @override
   Widget build(BuildContext context) {
+    BlockedProvider blockedProvider = context.read<BlockedProvider>();
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
@@ -318,6 +321,13 @@ class _PostListShowPageState extends State<PostListShowPage>
                             ),
                           );
                         } else {
+                          // TODO: 익명 차단 기능 정식 구현 시에 없애기(지금은 iOS 리젝 회피용)
+                          // 신고당한 익명 글은 표시하지 않음
+                          if (Platform.isIOS &&
+                              blockedProvider.blockedAnonymousPostIDs
+                                  .contains(postPreviewList[index].id)) {
+                            return Container(height: 0);
+                          }
                           return InkWell(
                             onTap: () async {
                               await Navigator.of(context).push(slideRoute(
@@ -338,8 +348,16 @@ class _PostListShowPageState extends State<PostListShowPage>
                       },
                       separatorBuilder: (BuildContext context, int index) {
                         return Container(
-                          height: 1,
-                          color: const Color(0xFFF0F0F0),
+                          height: Platform.isIOS &&
+                                  blockedProvider.blockedAnonymousPostIDs
+                                      .contains(postPreviewList[index].id)
+                              ? 0
+                              : 1,
+                          color: Platform.isIOS &&
+                                  blockedProvider.blockedAnonymousPostIDs
+                                      .contains(postPreviewList[index].id)
+                              ? Colors.white
+                              : const Color(0xFFF0F0F0),
                         );
                       },
                     ),

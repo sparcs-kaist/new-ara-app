@@ -1123,15 +1123,10 @@ class _PostViewPageState extends State<PostViewPage> {
                   showDialog(
                       context: context,
                       builder: (context) {
-                        return ReportDialogWidget(articleID: _article.id);
-                      }).then((_) {
-                    // 익명인 경우 BlockedProvider에 추가하고 pop
-                    // TODO: 웹에서 익명 차단 구현되면 수정하기 (아래 코드는 iOS 리젝때문에 추가된 것)
-                    if (_article.name_type == 2 && Platform.isIOS) {
-                      blockedProvider.addBlockedAnonymousPostID(_article.id);
-                      Navigator.pop(context);
-                    }
-                  });
+                        return ReportDialogWidget(
+                            articleID: _article.id,
+                            nameType: _article.name_type);
+                      });
                 },
                 child: Container(
                   width: 65,

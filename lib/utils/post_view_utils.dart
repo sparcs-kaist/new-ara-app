@@ -3,6 +3,7 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:new_ara_app/providers/blocked_provider.dart';
 import 'package:new_ara_app/widgets/snackbar_noti.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -328,7 +329,8 @@ class ReportDialogWidget extends StatefulWidget {
 
   /// 댓글에 대한 신고일 경우 null이 아님.
   final int? commentID;
-  const ReportDialogWidget({super.key, this.articleID, this.commentID});
+  final int? nameType;
+  const ReportDialogWidget({super.key, this.articleID, this.commentID, this.nameType});
 
   @override
   State<ReportDialogWidget> createState() => _ReportDialogWidgetState();
@@ -440,6 +442,12 @@ class _ReportDialogWidgetState extends State<ReportDialogWidget> {
                     postReport().then((res) {
                       debugPrint("신고가 ${res ? '성공' : '실패'}하였습니다.");
                       Navigator.pop(context);
+                      // iOS에서 익명 게시글을 신고하는 경우 BlockedProvider에 추가(iOS 리젝 회피용)
+                      // TODO: 익명 차단 기능이 정식으로 나오는 경우 없애기
+                      if (Platform.isIOS && widget.nameType == 2 && widget.articleID != null) {
+                        context.read<BlockedProvider>().addBlockedAnonymousPostID(widget.articleID!);
+                        Navigator.pop(context);
+                      }
                       // TODO: postApiRes의 response를 가져와서 신고에 실패한 경우
                       // e.response가 null이 아닐 경우에는 실패 사유도 출력하도록 변경하기
                       // 우선은 신고가 실패하면 무조건 '이미 신고한 게시물입니다'로 나오도록 함. (2023.02.16)
