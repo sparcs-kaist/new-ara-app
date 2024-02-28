@@ -983,7 +983,8 @@ class _PostViewPageState extends State<PostViewPage> {
                       context: context,
                       builder: (context) => BlockConfirmDialog(
                         onTap: () {
-                          blockedProvider.addBlockedAnonymousPostID(_article.id);
+                          blockedProvider
+                              .addBlockedAnonymousPostID(_article.id);
                           Navigator.pop(context);
                           Navigator.pop(context);
                         },
@@ -1361,7 +1362,9 @@ class _PostViewPageState extends State<PostViewPage> {
                                       }
                                     })
                                 : OthersPopupMenuButton(
-                                    commentID: curComment.id))),
+                                    commentID: curComment.id,
+                                    nameType: curComment.name_type,
+                                  ))),
                       ),
                     ],
                   ),

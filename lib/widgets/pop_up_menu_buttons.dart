@@ -167,10 +167,12 @@ class AttachPopupMenuButton extends StatelessWidget {
 class OthersPopupMenuButton extends StatelessWidget {
   /// 대상이 되는 comment의 id
   final int commentID;
+  final int? nameType;
 
   const OthersPopupMenuButton({
     super.key,
     required this.commentID,
+    this.nameType,
   });
 
   @override
@@ -211,6 +213,28 @@ class OthersPopupMenuButton extends StatelessWidget {
         //     ],
         //   ),
         // ),
+        if (nameType == 2)
+          PopupMenuItem<String>(
+            value: 'Block',
+            child: Row(
+              children: [
+                SvgPicture.asset(
+                  'assets/icons/barrior.svg',
+                  width: 20,
+                  height: 20,
+                  color: const Color.fromRGBO(51, 51, 51, 1),
+                ),
+                const SizedBox(width: 10),
+                const Text(
+                  '차단',
+                  style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w700,
+                      color: Color.fromRGBO(51, 51, 51, 1)),
+                ),
+              ],
+            ),
+          ),
         PopupMenuItem<String>(
           value: 'Report',
           child: Row(
