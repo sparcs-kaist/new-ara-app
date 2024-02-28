@@ -321,15 +321,11 @@ class _PostListShowPageState extends State<PostListShowPage>
                             ),
                           );
                         } else {
-                          // TODO: 익명 차단 기능 정식 구현 시에 없애기(지금은 iOS 리젝 회피용)
-                          // 신고당한 익명 글은 표시하지 않음
-                          if (Platform.isIOS &&
-                              blockedProvider.blockedAnonymousPostIDs
-                                  .contains(postPreviewList[index].id)) {
-                            return Container(height: 0);
-                          }
                           return InkWell(
                             onTap: () async {
+                              if (Platform.isIOS && postPreviewList[index].name_type == 2) {
+                                return;
+                              }
                               await Navigator.of(context).push(slideRoute(
                                   PostViewPage(id: postPreviewList[index].id)));
                               updateAllBulletinList();
@@ -348,16 +344,8 @@ class _PostListShowPageState extends State<PostListShowPage>
                       },
                       separatorBuilder: (BuildContext context, int index) {
                         return Container(
-                          height: Platform.isIOS &&
-                                  blockedProvider.blockedAnonymousPostIDs
-                                      .contains(postPreviewList[index].id)
-                              ? 0
-                              : 1,
-                          color: Platform.isIOS &&
-                                  blockedProvider.blockedAnonymousPostIDs
-                                      .contains(postPreviewList[index].id)
-                              ? Colors.white
-                              : const Color(0xFFF0F0F0),
+                          height: 1,
+                          color: const Color(0xFFF0F0F0),
                         );
                       },
                     ),
