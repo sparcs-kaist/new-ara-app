@@ -10,6 +10,7 @@ import 'package:new_ara_app/pages/main_navigation_tab_page.dart';
 import 'package:new_ara_app/pages/login_page.dart';
 import 'package:new_ara_app/providers/user_provider.dart';
 import 'package:new_ara_app/providers/notification_provider.dart';
+import 'package:new_ara_app/providers/blocked_provider.dart';
 
 /// 앱에서 지원하는 언어 설정
 final supportedLocales = [
@@ -39,6 +40,7 @@ void main() async {
                 return notificationProvider!
                   ..updateCookie(userProvider.getCookiesToString());
               }),
+          ChangeNotifierProvider(create: (_) => BlockedProvider()),
         ],
         child: const MyApp(),
       ),
@@ -71,6 +73,12 @@ class _MyAppState extends State<MyApp> {
     super.initState();
     // 자동 로그인을 위한 초기 설정
     autoLoginByGetCookie(Provider.of<UserProvider>(context, listen: false));
+
+    // 앱이 시작될 때 shared preferences에서 차단한 글 목록 조회하기
+    BlockedProvider blockedProvider = context.read<BlockedProvider>();
+    blockedProvider.fetchBlockedAnonymousPostID().then((_) {
+      debugPrint("차단한 글 postid 목록: ${blockedProvider.blockedAnonymousPostIDs}");
+    });
   }
 
   /// 자동 로그인을 위한 메서드

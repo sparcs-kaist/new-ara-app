@@ -4,6 +4,7 @@ import 'dart:core';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:new_ara_app/constants/url_info.dart';
+import 'package:new_ara_app/providers/blocked_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:dio/dio.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -27,6 +28,7 @@ import 'package:new_ara_app/widgets/pop_up_menu_buttons.dart';
 import 'package:new_ara_app/utils/profile_image.dart';
 import 'package:new_ara_app/utils/handle_hidden.dart';
 import 'package:new_ara_app/widgets/snackbar_noti.dart';
+import 'package:new_ara_app/utils/cache_function.dart';
 
 // TODO: Dio 사용방식 createDioWithHeaders~ 로 변경하기
 
@@ -836,6 +838,7 @@ class _PostViewPageState extends State<PostViewPage> {
   /// 담아두기, 공유, 신고 버튼 빌드를 담당하며 빌드된 위젯을 리턴.
   /// _article 클래스 전역변수를 사용함.
   Widget _buildUtilityButtons(UserProvider userProvider) {
+    BlockedProvider blockedProvider = context.read<BlockedProvider>();
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
@@ -969,9 +972,8 @@ class _PostViewPageState extends State<PostViewPage> {
         Row(
           children: [
             // 자신의 글일 경우 삭제 버튼, 타인의 글일 경우 차단 버튼
-            // 익명인 경우 자신의 글이 아니면 버튼이 표시되지 않음.
-            // TODO: 웹과 차단 기능 통일하기 (iOS 앱 심사로 인해 불가피하게 앱에서만 익명 차단 구현)
-            if (_article.is_mine == false)
+            // 익명, 실명 등 name_type == 2가 아닌 경우 차단 버튼이 표시되지 않음
+            if (_article.is_mine == false && _article.name_type == 1)
               InkWell(
                 onTap: () async {
                   bool isAuthorBlocked = _isAuthorBlocked();
@@ -1121,7 +1123,14 @@ class _PostViewPageState extends State<PostViewPage> {
                       context: context,
                       builder: (context) {
                         return ReportDialogWidget(articleID: _article.id);
-                      });
+                      }).then((_) {
+                    // 익명인 경우 BlockedProvider에 추가하고 pop
+                    // TODO: 웹에서 익명 차단 구현되면 수정하기 (아래 코드는 iOS 리젝때문에 추가된 것)
+                    if (_article.name_type == 2) {
+                      blockedProvider.addBlockedAnonymousPostID(_article.id);
+                      Navigator.pop(context);
+                    }
+                  });
                 },
                 child: Container(
                   width: 65,
