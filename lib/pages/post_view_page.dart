@@ -983,8 +983,8 @@ class _PostViewPageState extends State<PostViewPage> {
                       context: context,
                       builder: (context) => BlockConfirmDialog(
                         onTap: () {
-                          blockedProvider.addBlockedAnonymousPostID(
-                              _article.id, true);
+                          blockedProvider
+                              .addBlockedAnonymousPostID(_article.id);
                           Navigator.pop(context);
                           Navigator.pop(context);
                         },
@@ -1228,7 +1228,7 @@ class _PostViewPageState extends State<PostViewPage> {
   /// 댓글 리스트 빌드를 담당하며 빌드된 위젯을 리턴.
   /// _commentList 클래스 전역변수를 사용함.
   Widget _buildCommentListView(UserProvider userProvider) {
-    BlockedProvider blockedProvider = context.read<BlockedProvider>();
+    BlockedProvider blockedProvider = context.watch<BlockedProvider>();
     return ListView.builder(
       padding: const EdgeInsets.only(bottom: 15),
       shrinkWrap: true, // 모든 댓글을 보여주는 선에서 크기를 최소화
@@ -1365,6 +1365,7 @@ class _PostViewPageState extends State<PostViewPage> {
                                 : OthersPopupMenuButton(
                                     commentID: curComment.id,
                                     nameType: curComment.name_type,
+                                    commentAuthorID: curComment.created_by.id,
                                   ))),
                       ),
                     ],
@@ -1375,7 +1376,7 @@ class _PostViewPageState extends State<PostViewPage> {
                         ? ((Platform.isIOS &&
                                 curComment.name_type == 2 &&
                                 blockedProvider.blockedAnonymousCommentIDs
-                                    .contains(curComment.id))
+                                    .contains(curComment.created_by.id.toString()))
                             ? const Text(
                                 '숨겨진 댓글입니다.',
                                 style: TextStyle(
@@ -1400,8 +1401,13 @@ class _PostViewPageState extends State<PostViewPage> {
                     child: Row(
                       children: [
                         // 삭제된 댓글의 경우 좋아요, 싫어요 버튼이 안보이게함.
+                        // TODO: 익명 차단 기능이 정식으로 구현되면 아래 조건을 그에 맞게 변경해야함
+                        // 현재 iOS 심사를 위해 임시 방편으로 익명 댓글 차단 기능을 구현한 상태 (2023.02.29)
                         Visibility(
-                          visible: curComment.is_hidden == false,
+                          visible: curComment.is_hidden == false && !((Platform.isIOS &&
+                                curComment.name_type == 2 &&
+                                blockedProvider.blockedAnonymousCommentIDs
+                                    .contains(curComment.created_by.id.toString()))),
                           child: Row(
                             children: [
                               InkWell(

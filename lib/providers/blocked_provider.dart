@@ -9,14 +9,30 @@ class BlockedProvider with ChangeNotifier {
   Set<int> _blockedAnonymousPostIDs = {};
   Set<int> get blockedAnonymousPostIDs => _blockedAnonymousPostIDs;
 
-  Set<int> _blockedAnonymousCommentIDs = {};
-  Set<int> get blockedAnonymousCommentIDs => _blockedAnonymousCommentIDs;
+  Set<String> _blockedAnonymousCommentIDs = {};
+  Set<String> get blockedAnonymousCommentIDs => _blockedAnonymousCommentIDs;
 
-  Future<void> addBlockedAnonymousPostID(int postID, bool isPost) async {
+  Future<void> addBlockedAnonymousPostID(int postID) async {
     _blockedAnonymousPostIDs.add(postID);
     notifyListeners();
     debugPrint("Caching start");
     cacheApiData(blockedPostAnonymousKey, _blockedAnonymousPostIDs.toList());
+    debugPrint("Caching end");
+  }
+
+  Future<void> addBlockedAnonymousCommentID(String commentID) async {
+    _blockedAnonymousCommentIDs.add(commentID);
+    notifyListeners();
+    debugPrint("Caching start");
+    cacheApiData(blockedCommentAnonymousKey, _blockedAnonymousCommentIDs.toList());
+    debugPrint("Caching end");
+  }
+
+  Future<void> removeBlockedAnonymousCommentID(String commentID) async {
+    _blockedAnonymousCommentIDs.remove(commentID);
+    notifyListeners();
+    debugPrint("Caching start");
+    cacheApiData(blockedCommentAnonymousKey, _blockedAnonymousCommentIDs.toList());
     debugPrint("Caching end");
   }
 

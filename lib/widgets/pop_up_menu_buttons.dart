@@ -10,6 +10,7 @@ import 'package:new_ara_app/constants/file_type.dart';
 import 'package:new_ara_app/utils/post_view_utils.dart';
 import 'package:new_ara_app/constants/colors_info.dart';
 import 'package:new_ara_app/widgets/snackbar_noti.dart';
+import 'package:new_ara_app/providers/blocked_provider.dart';
 
 /// PostViewPage에서 첨부파일 표시에 쓰이는 PopupMenuButton
 class AttachPopupMenuButton extends StatelessWidget {
@@ -168,15 +169,18 @@ class OthersPopupMenuButton extends StatelessWidget {
   /// 대상이 되는 comment의 id
   final int commentID;
   final int? nameType;
+  final String? commentAuthorID;
 
   const OthersPopupMenuButton({
     super.key,
     required this.commentID,
     this.nameType,
+    this.commentAuthorID,
   });
 
   @override
   Widget build(BuildContext context) {
+    BlockedProvider blockedProvider = context.read<BlockedProvider>();
     return PopupMenuButton<String>(
       shadowColor: const Color.fromRGBO(0, 0, 0, 0.2),
       splashRadius: 5,
@@ -225,9 +229,9 @@ class OthersPopupMenuButton extends StatelessWidget {
                   color: const Color.fromRGBO(51, 51, 51, 1),
                 ),
                 const SizedBox(width: 10),
-                const Text(
-                  '차단',
-                  style: TextStyle(
+                Text(
+                  blockedProvider.blockedAnonymousCommentIDs.contains(commentAuthorID) ? '차단 해제' : "차단",
+                  style: const TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w700,
                       color: Color.fromRGBO(51, 51, 51, 1)),
@@ -263,6 +267,13 @@ class OthersPopupMenuButton extends StatelessWidget {
           // case 'Chat':
           //   // (2023.08.01) 채팅 기능은 추후에 구현 예정이기 때문에 아직은 Placeholder
           //   break;
+          case 'Block':
+            if (blockedProvider.blockedAnonymousCommentIDs.contains(commentAuthorID)) {
+              blockedProvider.removeBlockedAnonymousCommentID(commentAuthorID.toString());
+            } else {
+              blockedProvider.addBlockedAnonymousCommentID(commentAuthorID.toString());
+            }
+            break;
           case 'Report':
             showDialog(
                 context: context,
