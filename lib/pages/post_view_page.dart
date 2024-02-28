@@ -970,7 +970,8 @@ class _PostViewPageState extends State<PostViewPage> {
           children: [
             // 자신의 글일 경우 삭제 버튼, 타인의 글일 경우 차단 버튼
             // 익명인 경우 자신의 글이 아니면 버튼이 표시되지 않음.
-            if (_article.is_mine == false && _article.name_type != 2)
+            // TODO: 웹과 차단 기능 통일하기 (iOS 앱 심사로 인해 불가피하게 앱에서만 익명 차단 구현)
+            if (_article.is_mine == false)
               InkWell(
                 onTap: () async {
                   bool isAuthorBlocked = _isAuthorBlocked();
