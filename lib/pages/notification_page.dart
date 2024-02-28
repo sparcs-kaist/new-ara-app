@@ -1,4 +1,5 @@
 /// 사용자에 대한 이때까지의 알림을 보여주는 페이지 관리 파일
+import 'dart:io';
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:easy_localization/easy_localization.dart';
@@ -16,6 +17,7 @@ import 'package:new_ara_app/pages/post_view_page.dart';
 import 'package:new_ara_app/utils/slide_routing.dart';
 import 'package:new_ara_app/providers/notification_provider.dart';
 import 'package:new_ara_app/widgets/snackbar_noti.dart';
+import 'package:new_ara_app/providers/blocked_provider.dart';
 
 /// 알림페이지의 빌드 및 이벤트 처리를 담당하는 위젯.
 class NotificationPage extends StatefulWidget {

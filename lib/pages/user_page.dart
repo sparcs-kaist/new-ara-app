@@ -351,7 +351,6 @@ class _UserPageState extends State<UserPage>
   /// tabIndex에 해당하는 ListView를 생성하여 리턴함.
   /// 각각의 ListView 구현에 동일한 부분이 많아 메서드화하게 됨.
   Widget _buildPostList(TabType tabType, UserProvider userProvider) {
-    BlockedProvider blockedProvider = context.watch<BlockedProvider>();
     // build 대상 tab의 article 개수 조회
     int itemCount = getItemCount(tabType);
     return RefreshIndicator.adaptive(
@@ -401,11 +400,6 @@ class _UserPageState extends State<UserPage>
             case TabType.recent:
               curPost = recentArticleList[index];
           }
-          // TODO: 정식 익명 차단이 구현되면 없애야함
-          // 아래 코드는 iOS 앱 심사를 위해 임시 방편으로 추가된 것 (2024.02.29)
-          if (Platform.isIOS && blockedProvider.blockedAnonymousPostIDs.contains(curPost.id)) {
-            return Container();
-          }
           return InkWell(
               onTap: () async {
                 // 사용자가 글을 보고난 이후 article list를 다시 조회.
@@ -425,24 +419,6 @@ class _UserPageState extends State<UserPage>
                   child: PostPreview(model: curPost)));
         },
         separatorBuilder: (context, index) {
-          // TODO: 익명 차단 기능이 정식으로 구현되면 제거해야함
-          // 아래 코드는 iOS 앱 심사를 위한 임시 방편(2024.02.29)
-          late ArticleListActionModel curPost;
-          ScrapModel? scrapInfo;
-          switch (tabType) {
-            case TabType.created:
-              curPost = createdArticleList[index];
-              break;
-            case TabType.scrap:
-              scrapInfo = scrappedArticleList[index];
-              curPost = scrapInfo.parent_article;
-              break;
-            case TabType.recent:
-              curPost = recentArticleList[index];
-          }
-          if (Platform.isIOS && blockedProvider.blockedAnonymousPostIDs.contains(curPost.id)) {
-            return Container();
-          }
           return Container(
             height: 1,
             color: const Color(0xFFF0F0F0),

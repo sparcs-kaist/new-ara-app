@@ -198,7 +198,6 @@ class _PostListShowPageState extends State<PostListShowPage>
 
   @override
   Widget build(BuildContext context) {
-    BlockedProvider blockedProvider = context.read<BlockedProvider>();
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
@@ -321,22 +320,8 @@ class _PostListShowPageState extends State<PostListShowPage>
                             ),
                           );
                         } else {
-                          // TODO: 익명 차단 기능이 나오면 없애기
-                          // 아래 코드는 iOS 리젝을 해결하기 위한 임시 방편 (2024.02.29)
-                          if (Platform.isIOS &&
-                              blockedProvider.blockedAnonymousPostIDs
-                                  .contains(postPreviewList[index].id)) {
-                            return Container();
-                          }
                           return InkWell(
                             onTap: () async {
-                              // TODO: 익명 차단 기능이 나오면 없애기
-                              // 아래 코드는 iOS 리젝을 해결하기 위한 임시 방편 (2024.02.29)
-                              if (Platform.isIOS &&
-                                  blockedProvider.blockedAnonymousPostIDs
-                                      .contains(postPreviewList[index].id)) {
-                                return;
-                              }
                               await Navigator.of(context).push(slideRoute(
                                   PostViewPage(id: postPreviewList[index].id)));
                               updateAllBulletinList();
@@ -354,13 +339,6 @@ class _PostListShowPageState extends State<PostListShowPage>
                         }
                       },
                       separatorBuilder: (BuildContext context, int index) {
-                        // TODO: 익명 차단 기능이 나오면 없애기
-                        // 아래 코드는 iOS 리젝을 해결하기 위한 임시 방편 (2024.02.29)
-                        if (Platform.isIOS &&
-                            blockedProvider.blockedAnonymousPostIDs
-                                .contains(postPreviewList[index].id)) {
-                          return Container();
-                        }
                         return Container(
                           height: 1,
                           color: const Color(0xFFF0F0F0),

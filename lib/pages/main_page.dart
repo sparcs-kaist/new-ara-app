@@ -244,7 +244,6 @@ class _MainPageState extends State<MainPage> with WidgetsBindingObserver {
         apiUrl: apiUrl,
         userProvider: userProvider,
         callback: (response) async {
-          BlockedProvider blockedProvider = context.read<BlockedProvider>();
           if (mounted) {
             setState(() {
               contentList.clear();
@@ -253,13 +252,6 @@ class _MainPageState extends State<MainPage> with WidgetsBindingObserver {
                 try {
                   ArticleListActionModel model =
                       ArticleListActionModel.fromJson(json);
-                  // TODO: 정식 익명 차단 기능이 나오면 변경해야함
-                  // 아래 코드는 iOS 심사 리젝을 피하기 위한 임시 방편 (2024.02.29)
-                  if (Platform.isIOS &&
-                      blockedProvider.blockedAnonymousPostIDs
-                          .contains(model.id)) {
-                    continue;
-                  }
                   contentList.add(ArticleListActionModel.fromJson(json));
                 } catch (error) {
                   debugPrint(
@@ -324,7 +316,6 @@ class _MainPageState extends State<MainPage> with WidgetsBindingObserver {
     String slug2,
     List<ArticleListActionModel> contentList,
   ) async {
-    BlockedProvider blockedProvider = context.read<BlockedProvider>();
     List<int> ids = _searchBoardID(slug1, slug2);
     int boardID = ids[0], topicID = ids[1];
     String apiUrl = topicID == -1
@@ -337,16 +328,6 @@ class _MainPageState extends State<MainPage> with WidgetsBindingObserver {
 
         for (Map<String, dynamic> json in response['results']) {
           try {
-            // TODO: 익명 차단 기능 정식 구현되면 제거하기
-            // 아래 코드는 iOS 심사 리젝을 피하기 위한 것 (2024.02.29)
-            ArticleListActionModel model =
-                ArticleListActionModel.fromJson(json);
-            // 차단된 익명글인 경우 contentList에 저장하지 않음
-            if (Platform.isIOS &&
-                model.name_type == 2 &&
-                blockedProvider.blockedAnonymousPostIDs.contains(model.id)) {
-              continue;
-            }
             contentList.add(ArticleListActionModel.fromJson(json));
           } catch (error) {
             debugPrint(
