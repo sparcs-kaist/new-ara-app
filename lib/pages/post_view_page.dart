@@ -983,8 +983,8 @@ class _PostViewPageState extends State<PostViewPage> {
                       context: context,
                       builder: (context) => BlockConfirmDialog(
                         onTap: () {
-                          blockedProvider
-                              .addBlockedAnonymousPostID(_article.id);
+                          blockedProvider.addBlockedAnonymousPostID(
+                              _article.id, true);
                           Navigator.pop(context);
                           Navigator.pop(context);
                         },
@@ -1228,6 +1228,7 @@ class _PostViewPageState extends State<PostViewPage> {
   /// 댓글 리스트 빌드를 담당하며 빌드된 위젯을 리턴.
   /// _commentList 클래스 전역변수를 사용함.
   Widget _buildCommentListView(UserProvider userProvider) {
+    BlockedProvider blockedProvider = context.read<BlockedProvider>();
     return ListView.builder(
       padding: const EdgeInsets.only(bottom: 15),
       shrinkWrap: true, // 모든 댓글을 보여주는 선에서 크기를 최소화
@@ -1371,7 +1372,19 @@ class _PostViewPageState extends State<PostViewPage> {
                   Container(
                     margin: const EdgeInsets.only(left: 30, right: 0),
                     child: curComment.is_hidden == false
-                        ? _buildCommentContent(curComment.content ?? "")
+                        ? ((Platform.isIOS &&
+                                curComment.name_type == 2 &&
+                                blockedProvider.blockedAnonymousCommentIDs
+                                    .contains(curComment.id))
+                            ? const Text(
+                                '숨겨진 댓글입니다.',
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w400,
+                                  color: Colors.grey,
+                                ),
+                              )
+                            : _buildCommentContent(curComment.content ?? ""))
                         : Text(
                             getHiddenCommentReasons(curComment.why_hidden),
                             style: const TextStyle(

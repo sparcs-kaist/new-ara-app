@@ -79,6 +79,9 @@ class _MyAppState extends State<MyApp> {
     blockedProvider.fetchBlockedAnonymousPostID().then((_) {
       debugPrint("차단한 글 postid 목록: ${blockedProvider.blockedAnonymousPostIDs}");
     });
+    blockedProvider.fetchBlockedAnonymousCommentID().then((_) {
+      debugPrint("차단한 댓글 commentid 목록: ${blockedProvider.blockedAnonymousCommentIDs}");
+    });
   }
 
   /// 자동 로그인을 위한 메서드
