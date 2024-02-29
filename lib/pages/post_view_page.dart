@@ -552,7 +552,8 @@ class _PostViewPageState extends State<PostViewPage> {
                                       ),
                                       const SizedBox(height: 15),
                                       // 댓글을 보여주는 ListView.
-                                      _buildCommentListView(userProvider, blockedProvider),
+                                      _buildCommentListView(
+                                          userProvider, blockedProvider),
                                     ],
                                   ),
                                 ),
@@ -1039,55 +1040,54 @@ class _PostViewPageState extends State<PostViewPage> {
                         ),
                       );
                     }
+                    return;
                   }
                   // name_type == 1인 경우
-                  else {
-                    bool isAuthorBlocked = _isAuthorBlocked();
-                    // 차단되지 않은 경우
-                    if (!isAuthorBlocked) {
-                      await showDialog(
-                        context: context,
-                        builder: (context) => BlockConfirmDialog(
-                          onTap: () {
-                            ArticleController(
-                                    model: _article, userProvider: userProvider)
-                                .handleBlock(true)
-                                .then((blockRes) {
-                              // 차단이 성공한 경우
-                              if (blockRes) {
-                                _fetchArticle(userProvider).then((_) {
-                                  _updateState();
-                                  Navigator.pop(context);
-                                });
-                              }
-                              // 차단에 실패할 경우 오류 메시지, 스낵바 출력
-                              else {
-                                debugPrint("failed to block");
+                  bool isAuthorBlocked = _isAuthorBlocked();
+                  // 차단되지 않은 경우
+                  if (!isAuthorBlocked) {
+                    await showDialog(
+                      context: context,
+                      builder: (context) => BlockConfirmDialog(
+                        onTap: () {
+                          ArticleController(
+                                  model: _article, userProvider: userProvider)
+                              .handleBlock(true)
+                              .then((blockRes) {
+                            // 차단이 성공한 경우
+                            if (blockRes) {
+                              _fetchArticle(userProvider).then((_) {
+                                _updateState();
                                 Navigator.pop(context);
-                                showInfoBySnackBar(context, "차단에 실패했습니다.");
-                              }
-                            });
-                          },
-                          userProvider: userProvider,
-                          targetContext: context,
-                        ),
-                      );
+                              });
+                            }
+                            // 차단에 실패할 경우 오류 메시지, 스낵바 출력
+                            else {
+                              debugPrint("failed to block");
+                              Navigator.pop(context);
+                              showInfoBySnackBar(context, "차단에 실패했습니다.");
+                            }
+                          });
+                        },
+                        userProvider: userProvider,
+                        targetContext: context,
+                      ),
+                    );
+                  }
+                  // 이미 차단 되어있는 경우
+                  else {
+                    bool unblockRes = await ArticleController(
+                            model: _article, userProvider: userProvider)
+                        .handleBlock(false);
+                    // 차단 해제에 성공한 경우 다시 글을 fetch함.
+                    if (unblockRes) {
+                      await _fetchArticle(userProvider);
+                      _updateState();
                     }
-                    // 이미 차단 되어있는 경우
+                    // 차단 해제에 실패한 경우 오류 메시지를 출력함.
                     else {
-                      bool unblockRes = await ArticleController(
-                              model: _article, userProvider: userProvider)
-                          .handleBlock(false);
-                      // 차단 해제에 성공한 경우 다시 글을 fetch함.
-                      if (unblockRes) {
-                        await _fetchArticle(userProvider);
-                        _updateState();
-                      }
-                      // 차단 해제에 실패한 경우 오류 메시지를 출력함.
-                      else {
-                        // TODO: 사용자 메시지 구현 필요
-                        debugPrint("Failed to unblock");
-                      }
+                      // TODO: 사용자 메시지 구현 필요
+                      debugPrint("Failed to unblock");
                     }
                   }
                 },
