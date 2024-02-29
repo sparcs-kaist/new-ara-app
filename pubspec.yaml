@@ -41,6 +41,7 @@ dependencies:
   shared_preferences: "^2.2.2"
   file_icon: "^1.0.0"
   flutter_native_splash: "^2.3.7"
+  flutter_dotenv: ^5.1.0
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -54,6 +55,8 @@ flutter:
   - assets/translations/
   - assets/images/
   - assets/icons/
+  - .env.development
+  - .env.production
   fonts:
   - family: NotoSansKR
     fonts:

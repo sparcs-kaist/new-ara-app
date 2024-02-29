@@ -56,3 +56,7 @@ ios/fastlane/README.md
 ios/fastlane/.env.default
 ios/Runner.app.dSYM.zip
 ios/Runner.ipa
+
+.env
+.env.development
+.env.production
