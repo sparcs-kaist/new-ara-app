@@ -400,7 +400,7 @@ class _PostViewPageState extends State<PostViewPage> {
                                                         .can_override_hidden ==
                                                     true &&
                                                 _article.is_hidden == true) ||
-                                            (isAnonymousIOS(_article) &&
+                                            (_isAnonymousIOS(_article) &&
                                                 blockedProvider
                                                     .blockedAnonymousPostIDs
                                                     .contains(_article
@@ -430,7 +430,7 @@ class _PostViewPageState extends State<PostViewPage> {
                                                 ),
                                                 Text(
                                                   // TODO: 아래 코드는 iOS 심사 통과를 위한 임시 방편. 익명 차단이 BE에서 구현되면 제거해야함 (2023.02.29)
-                                                  (isAnonymousIOS(_article) &&
+                                                  (_isAnonymousIOS(_article) &&
                                                           blockedProvider
                                                               .blockedAnonymousPostIDs
                                                               .contains(_article
@@ -450,7 +450,7 @@ class _PostViewPageState extends State<PostViewPage> {
                                                 ),
                                                 Text(
                                                   // TODO: 아래 코드는 iOS 심사 통과를 위한 임시 방편. 익명 차단이 BE에서 구현되면 제거해야함 (2023.02.29)
-                                                  (isAnonymousIOS(_article) &&
+                                                  (_isAnonymousIOS(_article) &&
                                                           blockedProvider
                                                               .blockedAnonymousPostIDs
                                                               .contains(_article
@@ -515,7 +515,7 @@ class _PostViewPageState extends State<PostViewPage> {
                                         // 차단이 되지 않았을 때 또는 사용자가 '숨긴내용 보기'를 눌렀을 때
                                         // TODO: 아래 코드는 iOS 심사 통과를 위한 임시 방편. 익명 차단이 BE에서 구현되면 제거해야함 (2023.02.29)
                                         visible: (_article.is_hidden == false &&
-                                            !(isAnonymousIOS(_article) &&
+                                            !(_isAnonymousIOS(_article) &&
                                                 blockedProvider
                                                     .blockedAnonymousPostIDs
                                                     .contains(_article
@@ -592,7 +592,7 @@ class _PostViewPageState extends State<PostViewPage> {
                 ),
               TextSpan(
                 // TODO: 아래 코드는 iOS 심사 통과를 위한 임시 방편. 익명 차단이 BE에서 구현되면 제거해야함 (2023.02.29)
-                text: (isAnonymousIOS(_article) &&
+                text: (_isAnonymousIOS(_article) &&
                         blockedProvider.blockedAnonymousPostIDs
                             .contains(_article.created_by.id.toString()))
                     ? "차단한 사용자의 게시물입니다."
@@ -1015,11 +1015,11 @@ class _PostViewPageState extends State<PostViewPage> {
             // 익명인 경우 자신의 글이 아니면 버튼이 표시되지 않음.
             // TODO: 아래 코드는 iOS 심사 통과를 위한 임시 방편. 익명 차단이 BE에서 구현되면 제거해야함 (2023.02.29)
             if (_article.is_mine == false &&
-                (_article.name_type == 1 || isAnonymousIOS(_article)))
+                (_article.name_type == 1 || _isAnonymousIOS(_article)))
               InkWell(
                 onTap: () async {
                   // TODO: 아래 코드는 iOS 심사 통과를 위한 임시 방편. 익명 차단이 BE에서 구현되면 제거해야함 (2023.02.29)
-                  if (isAnonymousIOS(_article)) {
+                  if (_isAnonymousIOS(_article)) {
                     // 이미 차단한 경우
                     if (blockedProvider.blockedAnonymousPostIDs
                         .contains(_article.created_by.id.toString())) {
@@ -1429,7 +1429,7 @@ class _PostViewPageState extends State<PostViewPage> {
                   ),
                   Container(
                     margin: const EdgeInsets.only(left: 30, right: 0),
-                    child: (isAnonymousIOS(_article) &&
+                    child: (_isAnonymousIOS(_article) &&
                             blockedProvider.blockedAnonymousPostIDs
                                 .contains(curComment.created_by.id.toString()))
                         ? const Text(
@@ -1949,7 +1949,8 @@ class _PostViewPageState extends State<PostViewPage> {
   }
 
   // TODO: 아래 코드는 iOS 심사 통과를 위한 임시 방편. 익명 차단이 BE에서 구현되면 제거해야함 (2023.02.29)
-  bool isAnonymousIOS(_article) {
+  /// 익명게시글에 차단 버튼을 표시해야하는지 여부를 나타냄(iOS 리젝을 피하기 위해 iOS 환경에서 익명 게시글일 때만 true 반환)
+  bool _isAnonymousIOS(_article) {
     return (Platform.isIOS && _article.name_type == 2);
   }
 }
