@@ -1,6 +1,7 @@
 /// post의 내용을 보여주는 페이지 전체를 관리하는 파일.
 /// 뷰, 이벤트 처리 모두를 관리하고 있음.
 import 'dart:core';
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:new_ara_app/constants/url_info.dart';
@@ -27,6 +28,7 @@ import 'package:new_ara_app/widgets/pop_up_menu_buttons.dart';
 import 'package:new_ara_app/utils/profile_image.dart';
 import 'package:new_ara_app/utils/handle_hidden.dart';
 import 'package:new_ara_app/widgets/snackbar_noti.dart';
+import 'package:new_ara_app/providers/blocked_provider.dart';
 
 // TODO: Dio 사용방식 createDioWithHeaders~ 로 변경하기
 
@@ -204,6 +206,7 @@ class _PostViewPageState extends State<PostViewPage> {
   @override
   Widget build(BuildContext context) {
     UserProvider userProvider = context.read<UserProvider>();
+    BlockedProvider blockedProvider = context.watch<BlockedProvider>();
 
     // _fetchArticle이 진행중일 때는 Stack을 이용해 가림.
     // _fetchArticle이 끝났지만 웹뷰 로드가 끝나지 않았을 때는 조건문으로 가림.
@@ -275,7 +278,7 @@ class _PostViewPageState extends State<PostViewPage> {
                                     crossAxisAlignment:
                                         CrossAxisAlignment.start,
                                     children: [
-                                      _buildTitle(),
+                                      _buildTitle(blockedProvider),
                                       const SizedBox(height: 10),
                                       // 유저 정보 (프로필 이미지, 닉네임)
                                       _buildAuthorInfo(userProvider),
@@ -392,9 +395,17 @@ class _PostViewPageState extends State<PostViewPage> {
                                       // 차단된 유저의 글에 대한 내용
                                       Visibility(
                                         // 차단이 되었고 사용자가 '숨긴내용 보기'를 누르지 않았을 때
-                                        visible: _article.can_override_hidden ==
-                                                true &&
-                                            _article.is_hidden == true,
+                                        // TODO: 아래 코드는 iOS 심사 통과를 위한 임시 방편. 익명 차단이 BE에서 구현되면 제거해야함 (2023.02.29)
+                                        visible: (_article
+                                                        .can_override_hidden ==
+                                                    true &&
+                                                _article.is_hidden == true) ||
+                                            (_isAnonymousIOS(_article) &&
+                                                blockedProvider
+                                                    .blockedAnonymousPostIDs
+                                                    .contains(_article
+                                                        .created_by.id
+                                                        .toString())),
                                         child: Container(
                                             decoration: const BoxDecoration(
                                               borderRadius: BorderRadius.all(
@@ -418,9 +429,18 @@ class _PostViewPageState extends State<PostViewPage> {
                                                   height: 40,
                                                 ),
                                                 Text(
-                                                  getAllHiddenReasons(
-                                                          _article.why_hidden)
-                                                      .join('\n'),
+                                                  // TODO: 아래 코드는 iOS 심사 통과를 위한 임시 방편. 익명 차단이 BE에서 구현되면 제거해야함 (2023.02.29)
+                                                  (_isAnonymousIOS(_article) &&
+                                                          blockedProvider
+                                                              .blockedAnonymousPostIDs
+                                                              .contains(_article
+                                                                  .created_by.id
+                                                                  .toString()))
+                                                      ? "차단한 사용자의 게시물입니다.\n"
+                                                      : getAllHiddenReasons(
+                                                              _article
+                                                                  .why_hidden)
+                                                          .join('\n'),
                                                   textAlign: TextAlign.center,
                                                   style: const TextStyle(
                                                     color: Color(0xFF4A4A4A),
@@ -429,7 +449,15 @@ class _PostViewPageState extends State<PostViewPage> {
                                                   ),
                                                 ),
                                                 Text(
-                                                  "(${getHiddenInfo(_article.why_hidden)})",
+                                                  // TODO: 아래 코드는 iOS 심사 통과를 위한 임시 방편. 익명 차단이 BE에서 구현되면 제거해야함 (2023.02.29)
+                                                  (_isAnonymousIOS(_article) &&
+                                                          blockedProvider
+                                                              .blockedAnonymousPostIDs
+                                                              .contains(_article
+                                                                  .created_by.id
+                                                                  .toString()))
+                                                      ? ""
+                                                      : "(${getHiddenInfo(_article.why_hidden)})",
                                                   style: const TextStyle(
                                                     fontWeight: FontWeight.w400,
                                                     fontSize: 14,
@@ -485,7 +513,14 @@ class _PostViewPageState extends State<PostViewPage> {
                                       ),
                                       Visibility(
                                         // 차단이 되지 않았을 때 또는 사용자가 '숨긴내용 보기'를 눌렀을 때
-                                        visible: _article.is_hidden == false,
+                                        // TODO: 아래 코드는 iOS 심사 통과를 위한 임시 방편. 익명 차단이 BE에서 구현되면 제거해야함 (2023.02.29)
+                                        visible: (_article.is_hidden == false &&
+                                            !(_isAnonymousIOS(_article) &&
+                                                blockedProvider
+                                                    .blockedAnonymousPostIDs
+                                                    .contains(_article
+                                                        .created_by.id
+                                                        .toString()))),
                                         child: InArticleWebView(
                                           content: _article.content ?? "",
                                           initialHeight: 150,
@@ -496,7 +531,8 @@ class _PostViewPageState extends State<PostViewPage> {
                                       _buildVoteButtons(userProvider),
                                       const SizedBox(height: 10),
                                       // 담아두기, 공유, 신고 버튼
-                                      _buildUtilityButtons(userProvider),
+                                      _buildUtilityButtons(
+                                          userProvider, blockedProvider),
                                       const SizedBox(height: 15),
                                       const Divider(
                                           thickness: 1,
@@ -516,7 +552,8 @@ class _PostViewPageState extends State<PostViewPage> {
                                       ),
                                       const SizedBox(height: 15),
                                       // 댓글을 보여주는 ListView.
-                                      _buildCommentListView(userProvider),
+                                      _buildCommentListView(
+                                          userProvider, blockedProvider),
                                     ],
                                   ),
                                 ),
@@ -537,7 +574,7 @@ class _PostViewPageState extends State<PostViewPage> {
   /// 제목, 날짜, 조회수, 좋아요, 싫어요, 댓글 표시
   /// 작성자 정보 상단까지의 빌드를 담당하며 빌드된 위젯을 리턴.
   /// _article 클래스 전역변수를 사용함.
-  Widget _buildTitle() {
+  Widget _buildTitle(BlockedProvider blockedProvider) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -554,8 +591,13 @@ class _PostViewPageState extends State<PostViewPage> {
                   ),
                 ),
               TextSpan(
-                text: getTitle(
-                    _article.title, _article.is_hidden, _article.why_hidden),
+                // TODO: 아래 코드는 iOS 심사 통과를 위한 임시 방편. 익명 차단이 BE에서 구현되면 제거해야함 (2023.02.29)
+                text: (_isAnonymousIOS(_article) &&
+                        blockedProvider.blockedAnonymousPostIDs
+                            .contains(_article.created_by.id.toString()))
+                    ? "차단한 사용자의 게시물입니다."
+                    : getTitle(_article.title, _article.is_hidden,
+                        _article.why_hidden),
                 style: const TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.w700,
@@ -835,7 +877,8 @@ class _PostViewPageState extends State<PostViewPage> {
 
   /// 담아두기, 공유, 신고 버튼 빌드를 담당하며 빌드된 위젯을 리턴.
   /// _article 클래스 전역변수를 사용함.
-  Widget _buildUtilityButtons(UserProvider userProvider) {
+  Widget _buildUtilityButtons(
+      UserProvider userProvider, BlockedProvider blockedProvider) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
@@ -970,9 +1013,36 @@ class _PostViewPageState extends State<PostViewPage> {
           children: [
             // 자신의 글일 경우 삭제 버튼, 타인의 글일 경우 차단 버튼
             // 익명인 경우 자신의 글이 아니면 버튼이 표시되지 않음.
-            if (_article.is_mine == false && _article.name_type != 2)
+            // TODO: 아래 코드는 iOS 심사 통과를 위한 임시 방편. 익명 차단이 BE에서 구현되면 제거해야함 (2023.02.29)
+            if (_article.is_mine == false &&
+                (_article.name_type == 1 || _isAnonymousIOS(_article)))
               InkWell(
                 onTap: () async {
+                  // TODO: 아래 코드는 iOS 심사 통과를 위한 임시 방편. 익명 차단이 BE에서 구현되면 제거해야함 (2023.02.29)
+                  if (_isAnonymousIOS(_article)) {
+                    // 이미 차단한 경우
+                    if (blockedProvider.blockedAnonymousPostIDs
+                        .contains(_article.created_by.id.toString())) {
+                      await blockedProvider.removeBlockedAnonymousPostID(
+                          _article.created_by.id.toString());
+                    } else {
+                      await showDialog(
+                        context: context,
+                        builder: (context) => BlockConfirmDialog(
+                          onTap: () {
+                            blockedProvider
+                                .addBlockedAnonymousPostID(
+                                    _article.created_by.id.toString())
+                                .then((_) => Navigator.pop(context));
+                          },
+                          userProvider: userProvider,
+                          targetContext: context,
+                        ),
+                      );
+                    }
+                    return;
+                  }
+                  // name_type == 1인 경우
                   bool isAuthorBlocked = _isAuthorBlocked();
                   // 차단되지 않은 경우
                   if (!isAuthorBlocked) {
@@ -1022,7 +1092,13 @@ class _PostViewPageState extends State<PostViewPage> {
                   }
                 },
                 child: Container(
-                  width: _isAuthorBlocked() ? 85 : 65,
+                  // TODO: 아래 코드는 iOS 심사 통과를 위한 임시 방편. 익명 차단이 BE에서 구현되면 제거해야함 (2023.02.29)
+                  width: (_isAuthorBlocked() ||
+                          (Platform.isIOS &&
+                              blockedProvider.blockedAnonymousPostIDs
+                                  .contains(_article.created_by.id.toString())))
+                      ? 85
+                      : 65,
                   height: 35,
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(8),
@@ -1041,7 +1117,14 @@ class _PostViewPageState extends State<PostViewPage> {
                                 Color(0xFF646464), BlendMode.srcIn)),
                         const SizedBox(width: 3),
                         Text(
-                          _isAuthorBlocked() ? '차단 해제' : '차단',
+                          // TODO: 아래 코드는 iOS 심사 통과를 위한 임시 방편. 익명 차단이 BE에서 구현되면 제거해야함 (2023.02.29)
+                          (_isAuthorBlocked() ||
+                                  (Platform.isIOS &&
+                                      blockedProvider.blockedAnonymousPostIDs
+                                          .contains(_article.created_by.id
+                                              .toString())))
+                              ? '차단 해제'
+                              : '차단',
                           style: const TextStyle(
                               fontSize: 13,
                               fontWeight: FontWeight.w500,
@@ -1204,7 +1287,8 @@ class _PostViewPageState extends State<PostViewPage> {
 
   /// 댓글 리스트 빌드를 담당하며 빌드된 위젯을 리턴.
   /// _commentList 클래스 전역변수를 사용함.
-  Widget _buildCommentListView(UserProvider userProvider) {
+  Widget _buildCommentListView(
+      UserProvider userProvider, BlockedProvider blockedProvider) {
     return ListView.builder(
       padding: const EdgeInsets.only(bottom: 15),
       shrinkWrap: true, // 모든 댓글을 보여주는 선에서 크기를 최소화
@@ -1345,16 +1429,27 @@ class _PostViewPageState extends State<PostViewPage> {
                   ),
                   Container(
                     margin: const EdgeInsets.only(left: 30, right: 0),
-                    child: curComment.is_hidden == false
-                        ? _buildCommentContent(curComment.content ?? "")
-                        : Text(
-                            getHiddenCommentReasons(curComment.why_hidden),
-                            style: const TextStyle(
+                    child: (_isAnonymousIOS(_article) &&
+                            blockedProvider.blockedAnonymousPostIDs
+                                .contains(curComment.created_by.id.toString()))
+                        ? const Text(
+                            "차단한 사용자의 댓글입니다.",
+                            style: TextStyle(
                               fontSize: 14,
                               fontWeight: FontWeight.w400,
                               color: Colors.grey,
                             ),
-                          ),
+                          )
+                        : (curComment.is_hidden == false
+                            ? _buildCommentContent(curComment.content ?? "")
+                            : Text(
+                                getHiddenCommentReasons(curComment.why_hidden),
+                                style: const TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w400,
+                                  color: Colors.grey,
+                                ),
+                              )),
                   ),
                   const SizedBox(height: 8),
                   Container(
@@ -1851,5 +1946,11 @@ class _PostViewPageState extends State<PostViewPage> {
   /// PostViewPage에서 UserViewPage로 리다이렉트 될 수 있는지 여부를 나타냄.
   bool isRegular(int? nameType) {
     return nameType == 1;
+  }
+
+  // TODO: 아래 코드는 iOS 심사 통과를 위한 임시 방편. 익명 차단이 BE에서 구현되면 제거해야함 (2023.02.29)
+  /// 익명게시글에 차단 버튼을 표시해야하는지 여부를 나타냄(iOS 리젝을 피하기 위해 iOS 환경에서 익명 게시글일 때만 true 반환)
+  bool _isAnonymousIOS(_article) {
+    return (Platform.isIOS && _article.name_type == 2);
   }
 }
