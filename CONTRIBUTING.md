@@ -1,6 +1,6 @@
 # 기여하기
 
-## Release 절차
+## Release 절차(~ 2024.02.24 )
 
 1. [Releases](https://github.com/sparcs-kaist/new-ara-app/releases)에 갑니다.
 2. 이번 버전에서 변경된 사항을 Changes에 작성합니다.드래프트로 올립니다.
@@ -10,6 +10,12 @@
 
 ~~버전을 하나 올린 후 `flutter build ios`를 반드시 실행해 주도록 합니다~~
 ios FastFile에 `sh "flutter build ios --release --no-codesign --no-tree-shake-icons"` 추가해서 fastlane시 항상 자동으로 빌드하도록 수정했습니다.
+
+## Release 절차( 2024.02.25 ~)
+릴리즈 노트를 자동으로 작성하는 cd 코드를 main 브랜치에 추가했습니다.
+1. `pubspec.yaml`의 버전을 하나 올리는 커밋을 원격 저장소에 Pull Request하고 Merge 합니다.
+2. fastlane으로 Android와 iOS에 deploy를 합니다.
+3. [Releases](https://github.com/sparcs-kaist/new-ara-app/releases) 페이지에서 자동으로 등록된 릴리즈 노트의 내용을 수정합니다.
 
 ## How to deploy
 
@@ -30,10 +36,20 @@ gem install bundler
 bundle install
 ```
 
-### Credentials
+### Credentials(Android)
 
-- `android/fastlane/otlplus-fastlane.json` : Google Play 서비스 계정 JSON 파일
+- `android/fastlane/newara-fastlane.json` : Google Play 서비스 계정 JSON 파일
+
 - `android/fastlane/upload-keystore.jks` : Android App Signing Key for Upload Google Play
+
+- `android/fastlane/.env` : 아래와 같이 각자 개인이 발급 받은 GITHUB_API_TOKEN을 추가합니다. 
+
+```env
+GITHUB_API_TOKEN=****************************************
+```
+GITHUB_API_TOKEN 발급 받는 법: https://lifefun.tistory.com/161
+
+
 - `android/key.properties` : 아래와 같이 Signing Key 정보를 입력합니다.
 
 ```env
@@ -43,12 +59,14 @@ keyPassword=********
 keyAlias=upload
 ```
 
-- `ios/fastlane/.env.default` : 아래와 같이 Apple ID 계정 정보를 입력합니다.
+### Credentials(iOS)
+- `ios/fastlane/.env.default` : 아래와 같이 본인의 Apple ID 계정 정보와 개인이 발급 받은 GITHUB_API_TOKEN를 입력합니다.
 
 ```env
 FASTLANE_USER=****@****.***
 FASTLANE_PASSWORD=********
 FASTLANE_APPLE_APPLICATION_SPECIFIC_PASSWORD=****-****-****-****
+GITHUB_API_TOKEN=****************************************
 ```
 
 - `ios/fastlane/Appfile` : 아래와 같이 Apple ID 계정 정보를 입력합니다.
@@ -59,6 +77,7 @@ apple_id("****@****.***") # Your Apple Developer Portal username
 itc_team_name("SPARCS") # App Store Connect Team Name
 team_id("N5V8W52U3U") # Developer Portal Team ID
 ```
+
 
 ### 알파 버전 배포
 
@@ -73,5 +92,14 @@ team_id("N5V8W52U3U") # Developer Portal Team ID
 cd android && bundle exec fastlane alpha && cd ../ios && bundle exec fastlane alpha
 ```
 
-배포 후, `pubspec.yaml`과 iOS Xcode 프로젝트 관련 파일들( `ios/Runner.xcodeproj/project.pbxproj`, `ios/Runner/Info.plist` )의 변경사항을 Discard 합니다.
+
+아래 예시처럼 하나의 플랫폼에도 배포가 가능합니다.
+
+```bash
+cd ios && bundle exec fastlane alpha
+```
+
+### 배포 후 작업
+- `pubspec.yaml` 변경 사항을 Discard 합니다.
+- iOS Xcode 프로젝트 관련 파일들( `ios/Runner.xcodeproj/project.pbxproj`, `ios/Runner/Info.plist` )의 변경사항을 Discard 합니다.
 
