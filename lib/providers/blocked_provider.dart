@@ -5,14 +5,14 @@ const String blockedPostAnonymousKey = 'ara_blocked_anonymous_data';
 const String blockedCommentAnonymousKey = 'ara_blocked_anonymous_data_comment';
 
 class BlockedProvider with ChangeNotifier {
-  Set<int> _blockedAnonymousPostIDs = {};
-  Set<int> get blockedAnonymousPostIDs => _blockedAnonymousPostIDs;
+  Set<String> _blockedAnonymousPostIDs = {};
+  Set<String> get blockedAnonymousPostIDs => _blockedAnonymousPostIDs;
 
   Set<String> _blockedAnonymousCommentIDs = {};
   Set<String> get blockedAnonymousCommentIDs => _blockedAnonymousCommentIDs;
 
-  Future<void> addBlockedAnonymousPostID(int postID) async {
-    _blockedAnonymousPostIDs.add(postID);
+  Future<void> addBlockedAnonymousPostID(String userID) async {
+    _blockedAnonymousPostIDs.add(userID);
     notifyListeners();
     debugPrint("Caching start");
     cacheApiData(blockedPostAnonymousKey, _blockedAnonymousPostIDs.toList());
@@ -28,8 +28,8 @@ class BlockedProvider with ChangeNotifier {
     debugPrint("Caching end");
   }
 
-  Future<void> removeBlockedAnonymousPostID(int postID) async {
-    _blockedAnonymousPostIDs.remove(postID);
+  Future<void> removeBlockedAnonymousPostID(String userID) async {
+    _blockedAnonymousPostIDs.remove(userID);
     notifyListeners();
     debugPrint("Caching start");
     cacheApiData(
@@ -53,7 +53,7 @@ class BlockedProvider with ChangeNotifier {
       _blockedAnonymousPostIDs = {};
     } else {
       for (int i = 0; i < fetchedList.length; i++) {
-        _blockedAnonymousPostIDs.add(fetchedList[i]);
+        _blockedAnonymousPostIDs.add(fetchedList[i].toString());
       }
     }
     notifyListeners();
@@ -71,4 +71,6 @@ class BlockedProvider with ChangeNotifier {
     }
     notifyListeners();
   }
+
+  
 }

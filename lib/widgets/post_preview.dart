@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
@@ -43,16 +44,18 @@ class _PostPreviewState extends State<PostPreview> {
               Flexible(
                 child: Text(
                   // TODO: 아래 코드는 iOS 심사 통과를 위한 임시 방편. 익명 차단이 BE에서 구현되면 제거해야함 (2023.02.29)
-                  blockedProvider.blockedAnonymousPostIDs
-                          .contains(widget.model.id)
+                  (isAnonymousIOS(widget.model) &&
+                          blockedProvider.blockedAnonymousPostIDs
+                              .contains(widget.model.created_by.id))
                       ? "차단한 사용자의 게시물입니다."
                       : getTitle(widget.model.title, widget.model.is_hidden,
                           widget.model.why_hidden),
                   style: TextStyle(
                     // TODO: 아래 코드는 iOS 심사 통과를 위한 임시 방편. 익명 차단이 BE에서 구현되면 제거해야함 (2023.02.29)
                     color: (widget.model.is_hidden ||
-                            blockedProvider.blockedAnonymousPostIDs
-                                .contains(widget.model.id))
+                            (isAnonymousIOS(widget.model) &&
+                                blockedProvider.blockedAnonymousPostIDs
+                                    .contains(widget.model.created_by.id)))
                         ? const Color(0xFFBBBBBB)
                         : Colors.black,
                     fontWeight: FontWeight.w500,
@@ -221,5 +224,10 @@ class _PostPreviewState extends State<PostPreview> {
         ...widgets,
       ],
     );
+  }
+
+  // TODO: 아래 코드는 iOS 심사 통과를 위한 임시 방편. 익명 차단이 BE에서 구현되면 제거해야함 (2023.02.29)
+  bool isAnonymousIOS(ArticleListActionModel model) {
+    return (Platform.isIOS && model.name_type == 2);
   }
 }

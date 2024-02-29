@@ -1,6 +1,7 @@
 /// post의 내용을 보여주는 페이지 전체를 관리하는 파일.
 /// 뷰, 이벤트 처리 모두를 관리하고 있음.
 import 'dart:core';
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:new_ara_app/constants/url_info.dart';
@@ -27,6 +28,7 @@ import 'package:new_ara_app/widgets/pop_up_menu_buttons.dart';
 import 'package:new_ara_app/utils/profile_image.dart';
 import 'package:new_ara_app/utils/handle_hidden.dart';
 import 'package:new_ara_app/widgets/snackbar_noti.dart';
+import 'package:new_ara_app/providers/blocked_provider.dart';
 
 // TODO: Dio 사용방식 createDioWithHeaders~ 로 변경하기
 
@@ -204,6 +206,7 @@ class _PostViewPageState extends State<PostViewPage> {
   @override
   Widget build(BuildContext context) {
     UserProvider userProvider = context.read<UserProvider>();
+    BlockedProvider blockedProvider = context.watch<BlockedProvider>();
 
     // _fetchArticle이 진행중일 때는 Stack을 이용해 가림.
     // _fetchArticle이 끝났지만 웹뷰 로드가 끝나지 않았을 때는 조건문으로 가림.
@@ -496,7 +499,8 @@ class _PostViewPageState extends State<PostViewPage> {
                                       _buildVoteButtons(userProvider),
                                       const SizedBox(height: 10),
                                       // 담아두기, 공유, 신고 버튼
-                                      _buildUtilityButtons(userProvider),
+                                      _buildUtilityButtons(
+                                          userProvider, blockedProvider),
                                       const SizedBox(height: 15),
                                       const Divider(
                                           thickness: 1,
@@ -835,7 +839,8 @@ class _PostViewPageState extends State<PostViewPage> {
 
   /// 담아두기, 공유, 신고 버튼 빌드를 담당하며 빌드된 위젯을 리턴.
   /// _article 클래스 전역변수를 사용함.
-  Widget _buildUtilityButtons(UserProvider userProvider) {
+  Widget _buildUtilityButtons(
+      UserProvider userProvider, BlockedProvider blockedProvider) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
@@ -970,59 +975,91 @@ class _PostViewPageState extends State<PostViewPage> {
           children: [
             // 자신의 글일 경우 삭제 버튼, 타인의 글일 경우 차단 버튼
             // 익명인 경우 자신의 글이 아니면 버튼이 표시되지 않음.
-            if (_article.is_mine == false && _article.name_type != 2)
+            // TODO: 아래 코드는 iOS 심사 통과를 위한 임시 방편. 익명 차단이 BE에서 구현되면 제거해야함 (2023.02.29)
+            if (_article.is_mine == false &&
+                (_article.name_type == 1 || isAnonymousIOS(_article)))
               InkWell(
                 onTap: () async {
-                  bool isAuthorBlocked = _isAuthorBlocked();
-                  // 차단되지 않은 경우
-                  if (!isAuthorBlocked) {
-                    await showDialog(
-                      context: context,
-                      builder: (context) => BlockConfirmDialog(
-                        onTap: () {
-                          ArticleController(
-                                  model: _article, userProvider: userProvider)
-                              .handleBlock(true)
-                              .then((blockRes) {
-                            // 차단이 성공한 경우
-                            if (blockRes) {
-                              _fetchArticle(userProvider).then((_) {
-                                _updateState();
-                                Navigator.pop(context);
-                              });
-                            }
-                            // 차단에 실패할 경우 오류 메시지, 스낵바 출력
-                            else {
-                              debugPrint("failed to block");
-                              Navigator.pop(context);
-                              showInfoBySnackBar(context, "차단에 실패했습니다.");
-                            }
-                          });
-                        },
-                        userProvider: userProvider,
-                        targetContext: context,
-                      ),
-                    );
-                  }
-                  // 이미 차단 되어있는 경우
-                  else {
-                    bool unblockRes = await ArticleController(
-                            model: _article, userProvider: userProvider)
-                        .handleBlock(false);
-                    // 차단 해제에 성공한 경우 다시 글을 fetch함.
-                    if (unblockRes) {
-                      await _fetchArticle(userProvider);
-                      _updateState();
+                  // TODO: 아래 코드는 iOS 심사 통과를 위한 임시 방편. 익명 차단이 BE에서 구현되면 제거해야함 (2023.02.29)
+                  if (isAnonymousIOS(_article)) {
+                    // 이미 차단한 경우
+                    if (blockedProvider.blockedAnonymousPostIDs
+                        .contains(_article.created_by.id.toString())) {
+                      await blockedProvider.removeBlockedAnonymousPostID(
+                          _article.created_by.id.toString());
+                    } else {
+                      await showDialog(
+                        context: context,
+                        builder: (context) => BlockConfirmDialog(
+                          onTap: () {
+                            blockedProvider
+                                .addBlockedAnonymousPostID(
+                                    _article.created_by.id.toString())
+                                .then((_) => Navigator.pop(context));
+                          },
+                          userProvider: userProvider,
+                          targetContext: context,
+                        ),
+                      );
                     }
-                    // 차단 해제에 실패한 경우 오류 메시지를 출력함.
+                  }
+                  // name_type == 1인 경우
+                  else {
+                    bool isAuthorBlocked = _isAuthorBlocked();
+                    // 차단되지 않은 경우
+                    if (!isAuthorBlocked) {
+                      await showDialog(
+                        context: context,
+                        builder: (context) => BlockConfirmDialog(
+                          onTap: () {
+                            ArticleController(
+                                    model: _article, userProvider: userProvider)
+                                .handleBlock(true)
+                                .then((blockRes) {
+                              // 차단이 성공한 경우
+                              if (blockRes) {
+                                _fetchArticle(userProvider).then((_) {
+                                  _updateState();
+                                  Navigator.pop(context);
+                                });
+                              }
+                              // 차단에 실패할 경우 오류 메시지, 스낵바 출력
+                              else {
+                                debugPrint("failed to block");
+                                Navigator.pop(context);
+                                showInfoBySnackBar(context, "차단에 실패했습니다.");
+                              }
+                            });
+                          },
+                          userProvider: userProvider,
+                          targetContext: context,
+                        ),
+                      );
+                    }
+                    // 이미 차단 되어있는 경우
                     else {
-                      // TODO: 사용자 메시지 구현 필요
-                      debugPrint("Failed to unblock");
+                      bool unblockRes = await ArticleController(
+                              model: _article, userProvider: userProvider)
+                          .handleBlock(false);
+                      // 차단 해제에 성공한 경우 다시 글을 fetch함.
+                      if (unblockRes) {
+                        await _fetchArticle(userProvider);
+                        _updateState();
+                      }
+                      // 차단 해제에 실패한 경우 오류 메시지를 출력함.
+                      else {
+                        // TODO: 사용자 메시지 구현 필요
+                        debugPrint("Failed to unblock");
+                      }
                     }
                   }
                 },
                 child: Container(
-                  width: _isAuthorBlocked() ? 85 : 65,
+                  width: (_isAuthorBlocked() ||
+                          blockedProvider.blockedAnonymousPostIDs
+                              .contains(_article.created_by.id.toString()))
+                      ? 85
+                      : 65,
                   height: 35,
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(8),
@@ -1851,5 +1888,10 @@ class _PostViewPageState extends State<PostViewPage> {
   /// PostViewPage에서 UserViewPage로 리다이렉트 될 수 있는지 여부를 나타냄.
   bool isRegular(int? nameType) {
     return nameType == 1;
+  }
+
+  // TODO: 아래 코드는 iOS 심사 통과를 위한 임시 방편. 익명 차단이 BE에서 구현되면 제거해야함 (2023.02.29)
+  bool isAnonymousIOS(_article) {
+    return (Platform.isIOS && _article.name_type == 2);
   }
 }
