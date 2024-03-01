@@ -1,5 +1,7 @@
 # 기여하기
 
+아래 내용은 추후 README.md로 옮겨야함.
+
 ## Release 절차(~ 2024.02.24 )
 
 1. [Releases](https://github.com/sparcs-kaist/new-ara-app/releases)에 갑니다.
@@ -72,7 +74,7 @@ GITHUB_API_TOKEN=****************************************
 - `ios/fastlane/Appfile` : 아래와 같이 Apple ID 계정 정보를 입력합니다.
 ```env
 app_identifier("org.sparcs.new-ara-app") # The bundle identifier of your app
-apple_id("****@****.***") # Your Apple Developer Portal username
+apple_id(ENV["FASTLANE_USER"]) # It automatically references .env.deault file
 
 itc_team_name("SPARCS") # App Store Connect Team Name
 team_id("N5V8W52U3U") # Developer Portal Team ID
@@ -84,19 +86,25 @@ team_id("N5V8W52U3U") # Developer Portal Team ID
 - Android: Google Play 스토어 `비공개 테스트 - Alpha` 트랙으로 업로드
 - iOS: TestFlight로 업로드
 
-아래 명령어 시 `pubspec.yaml`에 있는 버젼 정보와 현재 시각으로 지정된 빌드 정보 기준으로 업로드 됩니다.
 
-**앱에서 백엔드 대상이 prod가 맞는지 배포 전 꼭 확인 하세요!**
+**앱에서 배포 서버는 production을 기본으로 합니다**
+프로젝트 루트 디렉토리에서 아래 명령어 시 `pubspec.yaml`에 있는 버젼 정보와 현재 시각으로 지정된 빌드 정보 기준으로 업로드 됩니다.
 
 ```bash
-cd android && bundle exec fastlane alpha && cd ../ios && bundle exec fastlane alpha
+cd android && bundle exec fastlane alpha env:production && cd ../ios && bundle exec fastlane alpha env:production
 ```
 
 
 아래 예시처럼 하나의 플랫폼에도 배포가 가능합니다.
 
 ```bash
-cd ios && bundle exec fastlane alpha
+cd ios && bundle exec fastlane alpha env:production
+```
+
+아래 예시처럼 dev 서버와 연결된 앱 배포도 가능합니다.
+
+```bash
+cd ios && bundle exec fastlane alpha env:development
 ```
 
 ### 배포 후 작업
