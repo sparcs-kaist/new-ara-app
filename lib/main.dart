@@ -144,7 +144,7 @@ class _MyAppState extends State<MyApp> {
     return ThemeData(
       appBarTheme:
           const AppBarTheme(elevation: 0, backgroundColor: Colors.white),
-      fontFamily: 'NotoSansKR',
+      fontFamily: 'Pretendard',
       scaffoldBackgroundColor: Colors.white,
       splashColor: Colors.transparent,
       textSelectionTheme: const TextSelectionThemeData(

@@ -1641,6 +1641,7 @@ class _PostViewPageState extends State<PostViewPage> {
               width: 1.0, color: Color(0xFFF0F0F0)), // 원하는 색상과 두께로 설정
         ),
       ),
+      padding: const EdgeInsets.only(top: 7),
       child: Column(
         key: _textFieldKey,
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -1715,7 +1716,6 @@ class _PostViewPageState extends State<PostViewPage> {
               // TextFormField
               Expanded(
                 child: Container(
-                  margin: const EdgeInsets.only(top: 7),
                   constraints: const BoxConstraints(
                     minHeight: 36,
                   ),
@@ -1774,9 +1774,9 @@ class _PostViewPageState extends State<PostViewPage> {
     return Form(
       key: _formKey,
       child: Container(
-          margin: const EdgeInsets.only(left: 15),
+          margin: const EdgeInsets.only(left: 13),
           child: TextFormField(
-            style: TextStyle(
+            style: const TextStyle(
               fontSize: 14,
             ),
             cursorColor: ColorsInfo.newara,
