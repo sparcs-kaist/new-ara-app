@@ -4,7 +4,7 @@ on:
   push:
     branches: [dev, main]
   pull_request:
-    branches: [dev]
+    branches: [dev, main]
 
 env:
   FLUTTER_VERSION: "3.13"
@@ -12,6 +12,7 @@ env:
 
 jobs:
   build-android:
+    needs: setup-env
     name: Build Android
     runs-on: macos-latest
     steps:
@@ -34,10 +35,15 @@ jobs:
           echo "keyAlias=ci" >> android/key.properties
       - name: Install dependencies
         run: flutter pub get
+      - name: Create .env files
+        run: |
+          echo "${{ secrets.ENV_PRODUCTION_FILE_CONTENT }}" > .env.production
+          echo "${{ secrets.ENV_DEVELOPMENT_FILE_CONTENT }}" > .env.development
       - name: Build APK
         run: flutter build apk --release --no-tree-shake-icons
 
   build-ios:
+    needs: setup-env
     name: Build iOS
     runs-on: macos-13
     steps:
@@ -57,5 +63,9 @@ jobs:
             ${{ runner.os }}-pods-
       - name: Install dependencies
         run: flutter pub get
+      - name: Create .env files
+        run: |
+          echo "${{ secrets.ENV_PRODUCTION_FILE_CONTENT }}" > .env.production
+          echo "${{ secrets.ENV_DEVELOPMENT_FILE_CONTENT }}" > .env.development
       - name: Build iOS
         run: flutter build ios --release --no-codesign --no-tree-shake-icons
