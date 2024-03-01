@@ -12,7 +12,6 @@ env:
 
 jobs:
   build-android:
-    needs: setup-env
     name: Build Android
     runs-on: macos-latest
     steps:
@@ -43,7 +42,6 @@ jobs:
         run: flutter build apk --release --no-tree-shake-icons
 
   build-ios:
-    needs: setup-env
     name: Build iOS
     runs-on: macos-13
     steps:
