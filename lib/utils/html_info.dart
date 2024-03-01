@@ -129,7 +129,7 @@ String getContentHtml(String content, {double? width}) {
       }
 
       body,button,input,select,textarea {
-        font-family: "Noto Sans KR",sans-serif
+        font-family: "Pretendard",sans-serif
       }
 
       code,pre {
