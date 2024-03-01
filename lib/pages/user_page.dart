@@ -408,7 +408,7 @@ class _UserPageState extends State<UserPage>
                   bool res = await fetchArticles(userProvider, page, tabType);
                   if (!res) break;
                   newMaxPage = page;
-                }
+                } 
                 curPage[tabType.index] = newMaxPage;
                 setCurCount(tabType);
               },
