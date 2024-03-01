@@ -1278,7 +1278,7 @@ class _PostWritePageState extends State<PostWritePage>
     TextStyle h1h2h3h4h5h6CommonStyle = const TextStyle(
       color: Colors.black,
       fontWeight: FontWeight.w600,
-      fontFamily: 'NotoSansKR',
+      fontFamily: 'Pretendard',
       height: 1.15,
     );
     return quill.DefaultStyles(
@@ -1312,7 +1312,7 @@ class _PostWritePageState extends State<PostWritePage>
         const TextStyle(
           color: Color(0xFF4a4a4a),
           fontWeight: FontWeight.w500,
-          fontFamily: 'NotoSansKR',
+          fontFamily: 'Pretendard',
           height: 1.5,
           fontSize: 16,
         ),
@@ -1323,14 +1323,14 @@ class _PostWritePageState extends State<PostWritePage>
 
       bold: const TextStyle(
           color: Color(0xff363636),
-          fontFamily: 'NotoSansKR',
+          fontFamily: 'Pretendard',
           fontWeight: FontWeight.w700),
       italic: const TextStyle(
-        fontFamily: 'NotoSansKR',
+        fontFamily: 'Pretendard',
         fontStyle: FontStyle.italic,
       ),
       underline: const TextStyle(
-        fontFamily: 'NatoSansKR',
+        fontFamily: 'Pretendard',
         decoration: TextDecoration.underline,
       ),
       //<code> 태그
@@ -1338,7 +1338,7 @@ class _PostWritePageState extends State<PostWritePage>
         style: const TextStyle(
           color: Color(0xffff3860),
           fontWeight: FontWeight.w400,
-          fontFamily: 'NotoSansKR',
+          fontFamily: 'Pretendard',
           height: 1.5,
           fontSize: 14,
         ),
@@ -1350,7 +1350,7 @@ class _PostWritePageState extends State<PostWritePage>
         const TextStyle(
           color: Color(0xffBBBBBB),
           fontWeight: FontWeight.w500,
-          fontFamily: 'NotoSansKR',
+          fontFamily: 'Pretendard',
           height: 1.5,
           fontSize: 16,
         ),
@@ -1364,7 +1364,7 @@ class _PostWritePageState extends State<PostWritePage>
           //  backgroundColor: Colors.grey,
           color: Color(0xFF4a4a4a),
           fontWeight: FontWeight.w400,
-          fontFamily: 'NotoSansKR',
+          fontFamily: 'Pretendard',
           height: 1.5,
           fontSize: 16,
         ),

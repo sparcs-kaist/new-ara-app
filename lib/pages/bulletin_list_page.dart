@@ -152,7 +152,7 @@ class _BulletinListPageState extends State<BulletinListPage> {
                               hintStyle: const TextStyle(
                                 color: Color(0xFFBBBBBB),
                                 fontSize: 16,
-                                fontFamily: 'NotoSansKR',
+                                fontFamily: 'Pretendard',
                                 height: null,
                                 fontWeight: FontWeight.w500,
                               ),
@@ -341,7 +341,7 @@ class _BulletinListPageState extends State<BulletinListPage> {
                                     style: const TextStyle(
                                       color: Color(0xFF333333),
                                       fontSize: 20,
-                                      fontFamily: 'NotoSansKR',
+                                      fontFamily: 'Pretendard',
                                       fontWeight: FontWeight.w700,
                                     ),
                                   ),

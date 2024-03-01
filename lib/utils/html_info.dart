@@ -91,7 +91,7 @@ String getContentHtml(String content, {double? width}) {
       html {
           -webkit-box-sizing: border-box;
           box-sizing: border-box
-          font-family: "Noto Sans KR",sans-serif;
+          font-family: "Pretendard",sans-serif;
       }
 
       audio,img,video {

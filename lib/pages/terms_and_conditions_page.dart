@@ -348,7 +348,7 @@ class _TermsAndConditionsPageState extends State<TermsAndConditionsPage> {
       style: const TextStyle(
         color: Color(0xFF4a4a4a),
         fontWeight: FontWeight.w500,
-        fontFamily: 'NotoSansKR',
+        fontFamily: 'Pretendard',
         height: 1.6,
         fontSize: 16,
       ),
@@ -360,7 +360,7 @@ class _TermsAndConditionsPageState extends State<TermsAndConditionsPage> {
       text,
       style: const TextStyle(
         color: Color(0xff363636),
-        fontFamily: 'NotoSansKR',
+        fontFamily: 'Pretendard',
         fontWeight: FontWeight.w700,
         height: 1.6,
         fontSize: 16,
