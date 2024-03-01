@@ -18,7 +18,7 @@ default_platform(:ios)
 platform :ios do
 
   desc "Create a release note on GitHub."
-  lane :create_release_note do
+  lane :create_release_note do |options|
     # YAML 파일에서 버전 정보를 로드
     yaml_file_path = "../../pubspec.yaml"
     data = YAML.load_file(yaml_file_path)
@@ -36,9 +36,9 @@ platform :ios do
       http_method: "POST",
       path: "/repos/sparcs-kaist/new-ara-app/releases",
       body: {
-        tag_name: "iOS-v#{version_number}-#{version_code}",
+        tag_name: "iOS-v#{version_number}-#{version_code}-#{options[:short_name]}",
         target_commitish: current_commit_hash,
-        name: "iOS-v#{version_number}-#{version_code}",
+        name: "iOS-v#{version_number}-#{version_code}-#{options[:short_name]}",
         body: "Write here the content of release notes...",
         draft: false,
         prerelease: false
@@ -48,7 +48,24 @@ platform :ios do
   end
 
   desc "Push a new beta build to TestFlight"
-  lane :alpha do
+  lane :alpha do |options|
+    unless ["production", "development"].include?(options[:env])
+      UI.user_error!("Invalid env given, pass using `env: 'production'` or `env: 'development'`")
+    end
+
+    short_name = ""
+    long_name = ""
+
+    if(options[:env] == "production")
+      # 배포용
+      short_name = "prod"
+      long_name = "production"
+    else
+      # 개발용
+      short_name = "dev"
+      long_name = "development"
+    end
+
     increment_build_number(
       build_number: Time.now.strftime("%y%m%d.%H%M"),
       xcodeproj: "Runner.xcodeproj",
@@ -61,7 +78,7 @@ platform :ios do
     )
 
     #버젼 변경할 때마다 빌드해야하는 번거로움을 줄이기 위해서 코드 추가
-    sh "flutter build ios --release --no-codesign --no-tree-shake-icons"
+    sh "flutter build ios --release --no-codesign --no-tree-shake-icons --dart-define=ENV=#{long_name}"
 
     build_app(
       workspace: "Runner.xcworkspace",
@@ -72,6 +89,6 @@ platform :ios do
     upload_to_testflight(
       skip_waiting_for_build_processing: true,
     )
-    create_release_note
+    create_release_note(short_name: short_name)
   end
 end
