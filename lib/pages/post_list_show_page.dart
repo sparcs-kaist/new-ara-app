@@ -272,7 +272,7 @@ class _PostListShowPageState extends State<PostListShowPage>
                 updateAllBulletinList();
                 debugPrint('FloatingActionButton pressed');
               },
-              backgroundColor: Colors.white,
+              backgroundColor: ColorsInfo.newara,
               child: SizedBox(
                 width: 42,
                 height: 42,
@@ -280,7 +280,7 @@ class _PostListShowPageState extends State<PostListShowPage>
                   'assets/icons/modify.svg',
                   fit: BoxFit.fill,
                   colorFilter: const ColorFilter.mode(
-                      ColorsInfo.newara, BlendMode.srcIn), // 글쓰기 아이콘 색상 변경
+                      Colors.white, BlendMode.srcIn), // 글쓰기 아이콘 색상 변경
                 ),
               ),
             ),
