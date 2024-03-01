@@ -45,8 +45,7 @@ class PostWritePage extends StatefulWidget {
   final BoardDetailActionModel? previousBoard;
 
   /// 생성자에서 이전 게시물의 데이터를 선택적으로 받을 수 있습니다.
-  const PostWritePage({Key? key, this.previousArticle, this.previousBoard})
-      : super(key: key);
+  const PostWritePage({super.key, this.previousArticle, this.previousBoard});
 
   @override
   State<PostWritePage> createState() => _PostWritePageState();

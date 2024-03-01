@@ -1,5 +1,5 @@
-/// 유저 설정 관리, 차단한 유저 목록, 로그아웃을 관리하는 파일.
-/// Author: 김상오(alvin)
+// 유저 설정 관리, 차단한 유저 목록, 로그아웃을 관리하는 파일.
+// Author: 김상오(alvin)
 
 import 'package:flutter/material.dart';
 import 'package:easy_localization/easy_localization.dart';
@@ -25,7 +25,7 @@ import 'package:new_ara_app/widgets/snackbar_noti.dart';
 
 /// 설정 페이지 빌드 및 이벤트 처리를 담당하는 StatefulWidget.
 class SettingPage extends StatefulWidget {
-  const SettingPage({Key? key}) : super(key: key);
+  const SettingPage({super.key});
   @override
   State<SettingPage> createState() => SettingPageState();
 }

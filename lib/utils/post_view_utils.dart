@@ -1,4 +1,4 @@
-/// PostViewPage 내부에서 사용되는 메서드가 많아 별도의 파일로 분류함.
+// PostViewPage 내부에서 사용되는 메서드가 많아 별도의 파일로 분류함.
 
 import 'dart:io';
 import 'package:flutter/material.dart';

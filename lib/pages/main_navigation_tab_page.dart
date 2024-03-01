@@ -13,7 +13,7 @@ import 'package:new_ara_app/constants/colors_info.dart';
 /// MainNavigationTabPage
 /// 메인 화면 하단에 위치하는 탭바를 포함한 메인 페이지.
 class MainNavigationTabPage extends StatefulWidget {
-  const MainNavigationTabPage({Key? key}) : super(key: key);
+  const MainNavigationTabPage({super.key});
   @override
   State<StatefulWidget> createState() => _MainNavigationTabPageState();
 }

@@ -1,5 +1,5 @@
-/// PostViewPage에 쓰이는 PopupMenuButton 위젯 일부를 클래스화한 파일
-/// 첨부파일, 타인의 댓글에 사용되는 PopupMenuButton을 클래스화함.
+// PostViewPage에 쓰이는 PopupMenuButton 위젯 일부를 클래스화한 파일
+// 첨부파일, 타인의 댓글에 사용되는 PopupMenuButton을 클래스화함.
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_svg/flutter_svg.dart';

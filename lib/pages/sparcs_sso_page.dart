@@ -15,7 +15,7 @@ import 'package:provider/provider.dart';
 /// SparcsSSOPage
 /// Sparcs SSO(단일 서명 인증) 처리를 담당하는 Flutter 페이지 위젯입니다.
 class SparcsSSOPage extends StatefulWidget {
-  const SparcsSSOPage({Key? key}) : super(key: key);
+  const SparcsSSOPage({super.key});
 
   @override
   State<SparcsSSOPage> createState() => _SparcsSSOPageState();

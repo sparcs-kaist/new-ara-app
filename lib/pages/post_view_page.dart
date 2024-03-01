@@ -1,5 +1,5 @@
-/// post의 내용을 보여주는 페이지 전체를 관리하는 파일.
-/// 뷰, 이벤트 처리 모두를 관리하고 있음.
+// post의 내용을 보여주는 페이지 전체를 관리하는 파일.
+// 뷰, 이벤트 처리 모두를 관리하고 있음.
 import 'dart:core';
 import 'dart:io';
 import 'package:flutter/material.dart';

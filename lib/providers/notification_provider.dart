@@ -1,8 +1,8 @@
-/// 'notification_provider.dart'
-/// [NotificationProvider]를 정의함.
-/// 새로운 알림이 생성되었는지 확인하고 구독 중인 리스너에게 알려주는 기능.
-///
-/// Author: 김상오(alvin)
+// 'notification_provider.dart'
+// [NotificationProvider]를 정의함.
+// 새로운 알림이 생성되었는지 확인하고 구독 중인 리스너에게 알려주는 기능.
+//
+// Author: 김상오(alvin)
 
 import 'dart:async';
 import 'package:flutter/material.dart';

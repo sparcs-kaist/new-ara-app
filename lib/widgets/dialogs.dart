@@ -1,4 +1,4 @@
-/// PostViewPage의 글/댓글 신고, 댓글 수정에 사용되는 Dialog 위젯 파일.
+// PostViewPage의 글/댓글 신고, 댓글 수정에 사용되는 Dialog 위젯 파일.
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';

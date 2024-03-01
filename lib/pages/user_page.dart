@@ -1,4 +1,4 @@
-/// 사용자 본인 정보 표시 페이지를 관리하는 파일
+// 사용자 본인 정보 표시 페이지를 관리하는 파일
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -24,7 +24,7 @@ enum TabType { created, scrap, recent }
 
 /// 사용자 본인 정보 페이지의 빌드 및 이벤트 처리를 담당하는 위젯
 class UserPage extends StatefulWidget {
-  const UserPage({Key? key}) : super(key: key);
+  const UserPage({super.key});
   @override
   State<StatefulWidget> createState() => _UserPageState();
 }

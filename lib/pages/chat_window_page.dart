@@ -3,7 +3,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:new_ara_app/constants/colors_info.dart';
 
 class ChatWindowPage extends StatefulWidget {
-  const ChatWindowPage({Key? key}) : super(key: key);
+  const ChatWindowPage({super.key});
 
   @override
   State<ChatWindowPage> createState() => _ChatWindowPageState();
@@ -269,7 +269,7 @@ class MyChatBubble extends StatelessWidget {
 }
 
 class OtherChatBubble extends StatefulWidget {
-  const OtherChatBubble({Key? key}) : super(key: key);
+  const OtherChatBubble({super.key});
 
   @override
   State<OtherChatBubble> createState() => _OtherChatBubbleState();
@@ -351,7 +351,7 @@ class _OtherChatBubbleState extends State<OtherChatBubble> {
 }
 
 class TimeChatBubble extends StatefulWidget {
-  const TimeChatBubble({Key? key}) : super(key: key);
+  const TimeChatBubble({super.key});
 
   @override
   State<TimeChatBubble> createState() => _TimeChatBubbleState();

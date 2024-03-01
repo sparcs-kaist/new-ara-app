@@ -1,5 +1,5 @@
-/// 임의의 유저에 대한 닉네임, 프로필, 작성한 글 등을 보여주는 페이지 관리 파일.
-/// article, comment에서 작성자의 정보를 확인하는 기능을 위해 만들어짐.
+// 임의의 유저에 대한 닉네임, 프로필, 작성한 글 등을 보여주는 페이지 관리 파일.
+// article, comment에서 작성자의 정보를 확인하는 기능을 위해 만들어짐.
 
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';

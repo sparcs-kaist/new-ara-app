@@ -10,7 +10,7 @@ import 'package:new_ara_app/utils/slide_routing.dart';
 /// `LoginPage` 위젯은 사용자에게 로그인 페이지를 표시.
 class LoginPage extends StatefulWidget {
   /// 기본 생성자입니다.
-  const LoginPage({Key? key}) : super(key: key);
+  const LoginPage({super.key});
 
   @override
   State<LoginPage> createState() => _LoginPageState();

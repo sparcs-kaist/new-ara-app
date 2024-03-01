@@ -18,7 +18,7 @@ const boardsByGroupLength = 5;
 
 /// `BulletinListPage`는 사용자가 이 페이지에서 다양한 게시판을 탐색하고 선택함..
 class BulletinListPage extends StatefulWidget {
-  const BulletinListPage({Key? key}) : super(key: key);
+  const BulletinListPage({super.key});
   @override
   State<StatefulWidget> createState() => _BulletinListPageState();
 }

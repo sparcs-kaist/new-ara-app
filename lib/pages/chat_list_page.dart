@@ -10,7 +10,7 @@ import 'package:new_ara_app/pages/chat_window_page.dart';
 import 'package:new_ara_app/providers/notification_provider.dart';
 
 class ChatListPage extends StatefulWidget {
-  const ChatListPage({Key? key}) : super(key: key);
+  const ChatListPage({super.key});
   @override
   State<StatefulWidget> createState() => _ChatListPageState();
 }
