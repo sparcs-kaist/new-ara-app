@@ -4,9 +4,7 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:new_ara_app/constants/colors_info.dart';
-import 'package:new_ara_app/constants/url_info.dart';
 import 'package:new_ara_app/providers/user_provider.dart';
-import 'package:new_ara_app/utils/create_dio_with_config.dart';
 import 'package:new_ara_app/widgets/loading_indicator.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -29,10 +27,10 @@ class _TermsAndConditionsPageState extends State<TermsAndConditionsPage> {
       backgroundColor: Colors.white,
       appBar: AppBar(
         centerTitle: true,
-        title: SizedBox(
+        title: const SizedBox(
           child: Text(
             "이용약관",
-            style: const TextStyle(
+            style: TextStyle(
               color: ColorsInfo.newara,
               fontSize: 18,
               fontWeight: FontWeight.w700,
@@ -264,7 +262,7 @@ class _TermsAndConditionsPageState extends State<TermsAndConditionsPage> {
                       ),
                     ),
                   ),
-                  SizedBox(
+                  const SizedBox(
                     height: 0,
                   ),
                   Row(
@@ -321,7 +319,7 @@ class _TermsAndConditionsPageState extends State<TermsAndConditionsPage> {
                                     ),
                                   ),
                                 )
-                              : Text(
+                              : const Text(
                                   "이미 동의하셨습니다.",
                                   style: TextStyle(
                                     color: ColorsInfo.newara,
@@ -333,7 +331,7 @@ class _TermsAndConditionsPageState extends State<TermsAndConditionsPage> {
                       )
                     ],
                   ),
-                  SizedBox(
+                  const SizedBox(
                     height: 30,
                   ),
                 ],

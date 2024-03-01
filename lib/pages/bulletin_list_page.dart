@@ -35,7 +35,6 @@ class _BulletinListPageState extends State<BulletinListPage> {
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     var userProvider = Provider.of<UserProvider>(context, listen: false);
     refreshBoardList(userProvider);

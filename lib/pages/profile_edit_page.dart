@@ -2,7 +2,7 @@ import 'dart:io';
 import 'package:http_parser/http_parser.dart';
 import 'package:flutter/material.dart';
 import 'package:new_ara_app/constants/url_info.dart';
-import 'package:new_ara_app/utils/create_dio_with_config.dart';
+
 import 'package:provider/provider.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:image_picker/image_picker.dart';
@@ -16,7 +16,6 @@ import 'package:new_ara_app/widgets/loading_indicator.dart';
 import 'package:new_ara_app/providers/notification_provider.dart';
 import 'package:new_ara_app/utils/profile_image.dart';
 import 'package:new_ara_app/widgets/snackbar_noti.dart';
-import 'package:new_ara_app/widgets/text_info.dart';
 
 class ProfileEditPage extends StatefulWidget {
   const ProfileEditPage({super.key});
@@ -30,7 +29,10 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
   final ImagePicker _imagePicker = ImagePicker();
   bool _isLoading = false, _isCamClicked = false;
   XFile? _selectedImage;
-  String? _changedNick, _retrieveDataError;
+  String? _changedNick;
+  
+  // ignore: unused_field
+  String? _retrieveDataError;
 
   @override
   void initState() {
@@ -293,7 +295,8 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
                                     ),
                                     child: SvgPicture.asset(
                                       "assets/icons/camera.svg",
-                                      color: Colors.white,
+                                      colorFilter: const ColorFilter.mode(
+                                          Colors.white, BlendMode.srcIn),
                                     ),
                                   ),
                                 ),

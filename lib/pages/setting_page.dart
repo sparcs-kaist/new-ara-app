@@ -1,8 +1,6 @@
 /// 유저 설정 관리, 차단한 유저 목록, 로그아웃을 관리하는 파일.
 /// Author: 김상오(alvin)
 
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
@@ -10,7 +8,6 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:new_ara_app/constants/url_info.dart';
 import 'package:new_ara_app/pages/terms_and_conditions_page.dart';
 import 'package:new_ara_app/providers/user_provider.dart';
-import 'package:new_ara_app/utils/create_dio_with_config.dart';
 import 'package:new_ara_app/utils/slide_routing.dart';
 import 'package:new_ara_app/widgets/loading_indicator.dart';
 import 'package:provider/provider.dart';
@@ -22,10 +19,7 @@ import 'package:url_launcher/url_launcher.dart';
 
 import 'package:new_ara_app/constants/colors_info.dart';
 import 'package:new_ara_app/widgets/text_info.dart';
-import 'package:new_ara_app/widgets/border_boxes.dart';
-import 'package:new_ara_app/widgets/text_and_switch.dart';
 import 'package:new_ara_app/providers/notification_provider.dart';
-import 'package:new_ara_app/models/block_model.dart';
 import 'package:new_ara_app/widgets/dialogs.dart';
 import 'package:new_ara_app/widgets/snackbar_noti.dart';
 
@@ -40,10 +34,10 @@ class SettingPageState extends State<SettingPage> {
   // 백엔드 모델과 동일한 변수명을 사용하기 위해 snake case 사용함.
 
   /// 성인글 보기 설정. true이면 성인글을 보여줌.
-  late bool see_sexual;
+  late bool seeSexual;
 
   /// 정치글 보기 설정. true이면 정치글을 보여줌.
-  late bool see_social;
+  late bool seeSocial;
 
   bool _isLoading = false;
 
@@ -51,8 +45,8 @@ class SettingPageState extends State<SettingPage> {
   void initState() {
     super.initState();
     var userProvider = context.read<UserProvider>();
-    see_sexual = userProvider.naUser?.see_sexual ?? true;
-    see_social = userProvider.naUser?.see_social ?? true;
+    seeSexual = userProvider.naUser?.see_sexual ?? true;
+    seeSocial = userProvider.naUser?.see_social ?? true;
     // 페이지 전환 과정에서 새로운 알림을 확인하기 위한 호출.
     context.read<NotificationProvider>().checkIsNotReadExist(userProvider);
   }
@@ -68,8 +62,12 @@ class SettingPageState extends State<SettingPage> {
         centerTitle: true,
         leading: IconButton(
           color: ColorsInfo.newara,
-          icon: SvgPicture.asset('assets/icons/left_chevron.svg',
-              color: ColorsInfo.newara, width: 35, height: 35),
+          icon: SvgPicture.asset(
+            'assets/icons/left_chevron.svg',
+            colorFilter: const ColorFilter.mode(ColorsInfo.newara, BlendMode.srcIn),
+            width: 35,
+            height: 35,
+          ),
           onPressed: () => Navigator.pop(context),
         ),
         title: SizedBox(
@@ -152,9 +150,9 @@ class SettingPageState extends State<SettingPage> {
                                     fit: BoxFit.fill,
                                     child: CupertinoSwitch(
                                         activeColor: ColorsInfo.newara,
-                                        value: see_sexual,
+                                        value: seeSexual,
                                         onChanged: (value) async {
-                                          setState(() => see_sexual = value);
+                                          setState(() => seeSexual = value);
                                           try {
                                             await dio.patch(
                                                 '$newAraDefaultUrl/api/user_profiles/${userProvider.naUser!.user}/',
@@ -168,7 +166,7 @@ class SettingPageState extends State<SettingPage> {
                                                 "Change of 'see_sexual' failed: $error");
                                             requestSnackBar(
                                                 "에러가 발생하여 설정 반영에 실패했습니다. 다시 시도해주십시오.");
-                                            setState(() => see_sexual = !value);
+                                            setState(() => seeSexual = !value);
                                           }
                                         }),
                                   ),
@@ -199,10 +197,10 @@ class SettingPageState extends State<SettingPage> {
                                     fit: BoxFit.fill,
                                     child: CupertinoSwitch(
                                         activeColor: ColorsInfo.newara,
-                                        value: see_social,
+                                        value: seeSocial,
                                         onChanged: (value) async {
                                           setState(() {
-                                            see_social = value;
+                                            seeSocial = value;
                                           });
                                           try {
                                             await dio.patch(
@@ -217,7 +215,7 @@ class SettingPageState extends State<SettingPage> {
                                                 "Change of 'see_social' failed: $error");
                                             requestSnackBar(
                                                 "에러가 발생하여 설정 반영에 실패했습니다. 다시 시도해주십시오.");
-                                            setState(() => see_social = !value);
+                                            setState(() => seeSocial = !value);
                                           }
                                         }),
                                   ),
@@ -482,6 +480,7 @@ class SettingPageState extends State<SettingPage> {
                                     setState(() {
                                       _isLoading = true;
                                     });
+                                    // ignore: unused_local_variable
                                     Map<String, dynamic>? responseResult =
                                         await userProvider
                                             .getApiRes('unregister');
@@ -491,7 +490,9 @@ class SettingPageState extends State<SettingPage> {
                                     // }
                                     final prefs =
                                         await SharedPreferences.getInstance();
-                                    String jsonString=userProvider.naUser!.user.toString(); // 데이터를 JSON 문자열로 인코딩
+                                    String jsonString = userProvider
+                                        .naUser!.user
+                                        .toString(); // 데이터를 JSON 문자열로 인코딩
                                     await prefs.setString(
                                         '심사통과를위한탈퇴탈퇴한유저', jsonString);
 

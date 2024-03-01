@@ -17,11 +17,9 @@ import 'package:new_ara_app/models/attachment_model.dart';
 import 'package:new_ara_app/models/board_detail_action_model.dart';
 import 'package:new_ara_app/models/simple_board_model.dart';
 import 'package:new_ara_app/models/topic_model.dart';
-import 'package:new_ara_app/pages/bulletin_search_page.dart';
 import 'package:new_ara_app/pages/post_view_page.dart';
 import 'package:new_ara_app/pages/terms_and_conditions_page.dart';
 import 'package:new_ara_app/providers/user_provider.dart';
-import 'package:new_ara_app/utils/create_dio_with_config.dart';
 import 'package:new_ara_app/utils/slide_routing.dart';
 import 'package:new_ara_app/widgets/loading_indicator.dart';
 import 'package:provider/provider.dart';
@@ -175,7 +173,7 @@ class _PostWritePageState extends State<PostWritePage>
 
   bool _isKeyboardClosed = true;
 
-  var _editorScrollController = ScrollController();
+  final _editorScrollController = ScrollController();
   @override
   void initState() {
     super.initState();

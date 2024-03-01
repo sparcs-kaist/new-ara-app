@@ -5,7 +5,6 @@ import 'package:flutter_native_splash/flutter_native_splash.dart';
 
 import 'package:new_ara_app/pages/main_page.dart';
 import 'package:new_ara_app/pages/bulletin_list_page.dart';
-import 'package:new_ara_app/pages/chat_list_page.dart';
 import 'package:new_ara_app/pages/notification_page.dart';
 import 'package:new_ara_app/pages/user_page.dart';
 import 'package:new_ara_app/providers/notification_provider.dart';

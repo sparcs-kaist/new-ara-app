@@ -20,7 +20,6 @@ class _ChatListPageState extends State<ChatListPage> {
   // int count=0;
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     UserProvider userProvider = context.read<UserProvider>();
     context.read<NotificationProvider>().checkIsNotReadExist(userProvider);
@@ -68,7 +67,10 @@ class _ChatListPageState extends State<ChatListPage> {
             splashColor: Colors.white,
             icon: SvgPicture.asset(
               'assets/icons/search.svg',
-              color: ColorsInfo.newara,
+              colorFilter: const ColorFilter.mode(
+                ColorsInfo.newara,
+                BlendMode.srcIn,
+              ),
               width: 45,
               height: 45,
             ),
@@ -152,12 +154,12 @@ class _ChatPreviewState extends State<ChatPreview> {
             mainAxisAlignment: MainAxisAlignment.start,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              SizedBox(
+              const SizedBox(
                 height: 24,
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.start,
                   crossAxisAlignment: CrossAxisAlignment.start,
-                  children: const [
+                  children: [
                     Expanded(
                       child: Text(
                         "카이스트 익명 밝 123 익명 123 익명 123 익명 123",

@@ -3,7 +3,6 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:new_ara_app/utils/create_dio_with_config.dart';
 import 'package:provider/provider.dart';
 import 'package:dio/dio.dart';
 
@@ -313,7 +312,7 @@ class _NotificationPageState extends State<NotificationPage> {
                                             decoration: BoxDecoration(
                                               border: Border.all(
                                                 width: 1,
-                                                color: Color(0xfff0f0f0),
+                                                color: const Color(0xfff0f0f0),
                                               ),
                                               borderRadius:
                                                   const BorderRadius.all(
@@ -343,7 +342,7 @@ class _NotificationPageState extends State<NotificationPage> {
                                                         color: (targetNoti
                                                                     .is_read ??
                                                                 false)
-                                                            ? Color(0xffbbbbbb)
+                                                            ? const Color(0xffbbbbbb)
                                                             : ColorsInfo.newara,
                                                       ),
                                                       child: Center(

@@ -94,7 +94,9 @@ class _SpecificBulletinBoardPageState extends State<SpecificBulletinBoardPage> {
                   height: 21.87,
                   child: SvgPicture.asset(
                     'assets/icons/left_chevron.svg',
-                    color: ColorsInfo.newara,
+                    colorFilter: const ColorFilter.mode(
+                        ColorsInfo.newara, BlendMode.srcIn),
+              
                     fit: BoxFit.fill,
                   ),
                 ),
@@ -117,7 +119,8 @@ class _SpecificBulletinBoardPageState extends State<SpecificBulletinBoardPage> {
           IconButton(
             icon: SvgPicture.asset(
               'assets/icons/search.svg',
-              color: ColorsInfo.newara,
+              colorFilter: const ColorFilter.mode(
+                  ColorsInfo.newara, BlendMode.srcIn),
               width: 35,
               height: 35,
             ),

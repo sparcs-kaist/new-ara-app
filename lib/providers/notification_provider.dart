@@ -10,8 +10,6 @@ import 'package:dio/dio.dart';
 
 import 'package:new_ara_app/constants/url_info.dart';
 import 'package:new_ara_app/providers/user_provider.dart';
-import 'package:provider/provider.dart';
-
 /// 새로운 알림 여부를 알려주는 ChangeNotifier.
 /// 알림 생성 여부가 필요한 다양한 위젯에 활용하기 위해 ChangeNotifier로 구현함.
 /// 알림 생성 여부 조회를 위해 [checkIsNotReadExist] 메서드를 제공함.
@@ -19,6 +17,8 @@ class NotificationProvider with ChangeNotifier {
   bool _isNotReadExist = false;
   bool get isNotReadExist => _isNotReadExist;
 
+
+  // ignore: unused_field
   String _cookieString = "";
 
   /// [checkIsNotReadExist] 속의 dio를 위한 쿠키를 설정해줌.

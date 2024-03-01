@@ -12,12 +12,10 @@ import 'package:new_ara_app/models/article_list_action_model.dart';
 import 'package:new_ara_app/providers/user_provider.dart';
 import 'package:new_ara_app/widgets/loading_indicator.dart';
 import 'package:new_ara_app/constants/url_info.dart';
-import 'package:new_ara_app/utils/time_utils.dart';
 import 'package:new_ara_app/pages/post_view_page.dart';
 import 'package:new_ara_app/utils/slide_routing.dart';
 import 'package:new_ara_app/providers/notification_provider.dart';
 import 'package:new_ara_app/utils/profile_image.dart';
-import 'package:new_ara_app/utils/handle_hidden.dart';
 import 'package:new_ara_app/widgets/post_preview.dart';
 
 
@@ -55,7 +53,7 @@ class _UserViewPageState extends State<UserViewPage> {
   final ScrollController _listViewController = ScrollController();
 
   /// 사용자가 작성한 글 모델을 저장하는 리스트.
-  List<ArticleListActionModel> _articleList = [];
+  final List<ArticleListActionModel> _articleList = [];
 
   @override
   void initState() {
@@ -265,7 +263,9 @@ class _UserViewPageState extends State<UserViewPage> {
     );
   }
 
+  
   /// 글에 첨부된 파일의 타입에 따른 위젯을 리턴하는 함수.
+  // ignore: unused_element
   Widget _buildAttachImage(String attachmentType) {
     return Row(
       children: [

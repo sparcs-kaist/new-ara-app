@@ -156,7 +156,7 @@ class AttachPopupMenuButton extends StatelessWidget {
     debugPrint(ext);
     return SvgPicture.asset(
       assetPath,
-      color: Colors.black,
+      colorFilter: const ColorFilter.mode(Colors.black, BlendMode.srcIn),
       width: 30,
       height: 30,
     );
@@ -184,7 +184,7 @@ class OthersPopupMenuButton extends StatelessWidget {
       padding: const EdgeInsets.all(2.0),
       child: SvgPicture.asset(
         'assets/icons/menu_2.svg',
-        color: Colors.grey,
+        colorFilter: const ColorFilter.mode(Colors.grey, BlendMode.srcIn),
         width: 50,
         height: 20,
       ),
@@ -215,12 +215,11 @@ class OthersPopupMenuButton extends StatelessWidget {
           value: 'Report',
           child: Row(
             children: [
-              SvgPicture.asset(
-                'assets/icons/warning.svg',
-                width: 20,
-                height: 20,
-                color: ColorsInfo.newara,
-              ),
+              SvgPicture.asset('assets/icons/warning.svg',
+                  width: 20,
+                  height: 20,
+                  colorFilter: const ColorFilter.mode(
+                      ColorsInfo.newara, BlendMode.srcIn)),
               const SizedBox(width: 10),
               const Text(
                 '신고',
@@ -294,7 +293,10 @@ class MyPopupMenuButton extends StatelessWidget {
                 'assets/icons/modify.svg',
                 width: 25,
                 height: 25,
-                color: const Color.fromRGBO(51, 51, 51, 1),
+                colorFilter: const ColorFilter.mode(
+                  Color.fromRGBO(51, 51, 51, 1),
+                  BlendMode.srcIn,
+                ),
               ),
               const SizedBox(width: 10),
               const Text(
@@ -311,12 +313,11 @@ class MyPopupMenuButton extends StatelessWidget {
           value: 'Delete',
           child: Row(
             children: [
-              SvgPicture.asset(
-                'assets/icons/delete.svg',
-                width: 25,
-                height: 25,
-                color: ColorsInfo.newara,
-              ),
+              SvgPicture.asset('assets/icons/delete.svg',
+                  width: 25,
+                  height: 25,
+                  colorFilter: const ColorFilter.mode(
+                      ColorsInfo.newara, BlendMode.srcIn)),
               const SizedBox(width: 10),
               const Text(
                 '삭제',
@@ -333,7 +334,7 @@ class MyPopupMenuButton extends StatelessWidget {
       onSelected: onSelected,
       child: SvgPicture.asset(
         'assets/icons/menu_2.svg',
-        color: Colors.grey,
+        colorFilter: const ColorFilter.mode(Colors.grey, BlendMode.srcIn),
         width: 50,
         height: 20,
       ),

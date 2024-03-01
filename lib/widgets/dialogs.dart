@@ -77,7 +77,11 @@ class _ReportDialogState extends State<ReportDialog> {
               "assets/icons/information.svg",
               width: 45,
               height: 45,
-              color: ColorsInfo.newara,
+              colorFilter: const ColorFilter.mode(
+                ColorsInfo.newara,
+                BlendMode.srcIn,
+              )
+        
             ),
             const SizedBox(height: 5),
             Text(
@@ -276,7 +280,10 @@ class DeleteDialog extends StatelessWidget {
               'assets/icons/information.svg',
               width: 55,
               height: 55,
-              color: ColorsInfo.newara,
+              colorFilter: const ColorFilter.mode(
+                ColorsInfo.newara,
+                BlendMode.srcIn,
+              ),
             ),
             const Text(
               '정말로 삭제하시겠습니까?',
@@ -611,7 +618,10 @@ class BlockConfirmDialog extends StatelessWidget {
               'assets/icons/information.svg',
               width: 55,
               height: 55,
-              color: ColorsInfo.newara,
+              colorFilter: const ColorFilter.mode(
+                ColorsInfo.newara,
+                BlendMode.srcIn,
+              ),
             ),
             const Text(
               '정말로 차단하시겠습니까?',
@@ -719,7 +729,10 @@ class SignoutConfirmDialog extends StatelessWidget {
               'assets/icons/information.svg',
               width: 55,
               height: 55,
-              color: ColorsInfo.newara,
+              colorFilter: const ColorFilter.mode(
+                ColorsInfo.newara,
+                BlendMode.srcIn,
+              ),
             ),
             const Text(
               '정말로 로그아웃 하시겠습니까?',
@@ -828,7 +841,10 @@ class UnregisterConfirmDialog extends StatelessWidget {
               'assets/icons/information.svg',
               width: 55,
               height: 55,
-              color: ColorsInfo.newara,
+              colorFilter: const ColorFilter.mode(
+                ColorsInfo.newara,
+                BlendMode.srcIn,
+              ),
             ),
             const Text(
               '정말로 회원탈퇴 하시겠습니까?',
@@ -838,9 +854,9 @@ class UnregisterConfirmDialog extends StatelessWidget {
                 color: Colors.black,
               ),
             ),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 50),
-              child: const Text(
+            const Padding(
+              padding: EdgeInsets.symmetric(horizontal: 50),
+              child: Text(
                 '회원탈퇴하시면 지금 쓰시는 이메일로는 재가입이 불가능합니다',
                 style: TextStyle(
                   fontSize: 12,

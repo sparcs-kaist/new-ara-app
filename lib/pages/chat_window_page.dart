@@ -14,7 +14,6 @@ class _ChatWindowPageState extends State<ChatWindowPage> {
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     for (int i = 0; i <= 3; i++) {
       chatBubbleList.add(const OtherChatBubble());
@@ -49,7 +48,11 @@ class _ChatWindowPageState extends State<ChatWindowPage> {
                   height: 21.87,
                   child: SvgPicture.asset(
                     'assets/icons/left_chevron.svg',
-                    color: ColorsInfo.newara,
+                   
+                    colorFilter: const ColorFilter.mode(
+                      ColorsInfo.newara,
+                      BlendMode.srcIn,
+                    ),
                     fit: BoxFit.fill,
                   ),
                 ),
@@ -129,7 +132,6 @@ class DefaultInputArea extends StatefulWidget {
 class _DefaultInputAreaState extends State<DefaultInputArea> {
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     setState(() {});
   }
@@ -158,7 +160,10 @@ class _DefaultInputAreaState extends State<DefaultInputArea> {
                   'assets/icons/add.svg',
                   width: 36,
                   height: 36,
-                  color: const Color(0xFFED3A3A),
+                  colorFilter: const ColorFilter.mode(
+                    Color(0xFFED3A3A),
+                    BlendMode.srcIn,
+                  ),
                 ),
                 const SizedBox(
                   width: 7,
@@ -366,11 +371,11 @@ class _TimeChatBubbleState extends State<TimeChatBubble> {
           borderRadius: const BorderRadius.all(Radius.circular(12.0)),
         ),
         height: 24,
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 9),
+        child: const Padding(
+          padding: EdgeInsets.symmetric(horizontal: 9),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
-            children: const [
+            children: [
               Text(
                 "2022년 11월 24일",
                 style: TextStyle(
