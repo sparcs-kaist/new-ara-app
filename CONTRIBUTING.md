@@ -1,6 +1,4 @@
 # 기여하기
-
----
 ## How to release( ~ 2024.02.24 )
 
 1. [Releases](https://github.com/sparcs-kaist/new-ara-app/releases)에 갑니다.
@@ -10,12 +8,13 @@
 5. github release 페이지에서 드래프트를 풉니다.
 
 ~~버전을 하나 올린 후 `flutter build ios`를 반드시 실행해 주도록 합니다~~
+
 ios FastFile에 `sh "flutter build ios --release --no-codesign --no-tree-shake-icons"` 추가해서 fastlane시 항상 자동으로 빌드하도록 수정했습니다.
 
 ## How to release( 2024.02.25 ~ )
 릴리즈 노트를 자동으로 작성하는 cd 코드를 추가했습니다.
 1. `pubspec.yaml`의 버전을 하나 올리는 커밋을 원격 저장소에 Pull Request하고 Merge 합니다.
-2. 아래 How to deploy 항목을 보고 Android와 iOS에 deploy를 합니다.
+2. 아래 **How to deploy** 항목을 보고 Android와 iOS에 deploy를 합니다.
 3. [Releases](https://github.com/sparcs-kaist/new-ara-app/releases) 페이지에서 자동으로 등록된 릴리즈 노트의 내용을 수정합니다.
 
 ---
@@ -43,14 +42,14 @@ bundle install
 - `android/fastlane/newara-fastlane.json` : Google Play 서비스 계정 JSON 파일
 
 - `android/fastlane/upload-keystore.jks` : Android App Signing Key for Upload Google Play
-
+<br>
 - `android/fastlane/.env` : 아래와 같이 각자 개인이 발급 받은 GITHUB_API_TOKEN을 추가합니다. 
 
 ```env
 GITHUB_API_TOKEN=****************************************
 ```
-[GITHUB_API_TOKEN 발급 받는 법](https://lifefun.tistory.com/161)
-
+[GITHUB_API_TOKEN 발급 받는 법](https://docs.github.com/ko/enterprise-server@3.9/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens) 상단 우측에 한국어 버젼 선택 가능
+<br>
 
 - `android/key.properties` : 아래와 같이 Signing Key 정보를 입력합니다.
 
@@ -70,6 +69,9 @@ FASTLANE_PASSWORD=********
 FASTLANE_APPLE_APPLICATION_SPECIFIC_PASSWORD=****-****-****-****
 GITHUB_API_TOKEN=****************************************
 ```
+[APPLE application specific password(앱 암호) 발급 받는 법](https://support.apple.com/ko-kr/102654)
+
+<br>
 
 - `ios/fastlane/Appfile` : 아래와 같이 Applefile이 되어있나 확인합니다.
 ```env
@@ -81,13 +83,14 @@ team_id("N5V8W52U3U") # Developer Portal Team ID
 ```
 
 
-### 알파 버전 배포
+### 알파 버전 배포 명령어
 
 - Android: Google Play 스토어 `비공개 테스트 - Alpha` 트랙으로 업로드
 - iOS: `TestFlight`로 업로드
 
 
 **앱에서 배포 서버는 production을 기본으로 합니다**
+
 프로젝트 루트 디렉토리에서 아래 명령어 시 `pubspec.yaml`에 있는 버젼 정보와 현재 시각으로 지정된 빌드 정보 기준으로 업로드 됩니다.
 
 ```bash

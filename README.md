@@ -5,7 +5,7 @@
     <img
       src="https://raw.githubusercontent.com/sparcs-kaist/new-ara-app/dev/assets/images/logo.svg"
       alt="Ara Logo"
-      height="150"
+      height="100"
     >
   </a>
 </p>
@@ -19,6 +19,7 @@
       alt="Release version"
     />
   </a>
+  </a>
   <a href="#">
     <img
       src="https://img.shields.io/github/license/sparcs-kaist/new-ara-app"
@@ -26,6 +27,23 @@
     />
   </a>
 </p>
+
+## How to Download
+The SPARCS NewAra App is available for both Android and iOS. Follow the instructions below to download and install the app on your device.
+
+### Android
+1. Visit the Google Play Store on your Android device.
+2. Search for "Ara for KAIST".
+3. Tap "Install" to download and install the app.
+
+[Play Store Link: Ara for KAIST](https://play.google.com/store/apps/details?id=org.sparcs.newara)
+
+### iOS
+1. Open the App Store on your iOS device.
+Search for "Ara for KAIST".
+2. Tap "Get" to download and install the app.
+
+[App Store Link: Ara for KAIST](https://apps.apple.com/kr/app/ara-for-kaist/id6457209147)
 
 ## How to develop
 ### run
@@ -51,5 +69,9 @@ SPARCS_SSO_DEFAULT_URL=https://sparcssso.kaist.ac.kr
 <br>
 
 - `development`와 `production` 둘 중 하나를 선택해서 실행합니다.
+- 지정하지 않을 시 `development`로 자동 실행됩니다.
 ex) `flutter run --dart-define=ENV=development`
 ex) `flutter run --dart-define=ENV=production`
+
+##How to Deploy
+- [CONTRIBUTING.md](https://github.com/sparcs-kaist/new-ara-app/blob/dev/CONTRIBUTING.md) 참조
