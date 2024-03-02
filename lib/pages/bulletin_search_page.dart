@@ -39,7 +39,6 @@ class _BulletinSearchPageState extends State<BulletinSearchPage> {
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
 
     // 게시판 유형에 따라 API URL 및 힌트 텍스트를 다르게 설정
@@ -71,8 +70,6 @@ class _BulletinSearchPageState extends State<BulletinSearchPage> {
         _hintText = "검색";
         break;
     }
-
-    UserProvider userProvider = context.read<UserProvider>();
     // 위젯이 빌드된 후에 포커스를 줍니다.
     WidgetsBinding.instance
         .addPostFrameCallback((_) => _focusNode.requestFocus());

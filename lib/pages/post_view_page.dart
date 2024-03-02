@@ -1,5 +1,5 @@
-/// post의 내용을 보여주는 페이지 전체를 관리하는 파일.
-/// 뷰, 이벤트 처리 모두를 관리하고 있음.
+// post의 내용을 보여주는 페이지 전체를 관리하는 파일.
+// 뷰, 이벤트 처리 모두를 관리하고 있음.
 import 'dart:core';
 import 'dart:io';
 import 'package:flutter/material.dart';
@@ -128,11 +128,11 @@ class _PostViewPageState extends State<PostViewPage> {
   /// 기존에 차단된 글에서는 title, content 등이 null이지만 override_hidden이 true이면 원래 내용이 로드됨.
   /// _article, _commentList, _commentKeys의 값이 모두 설정되면 true, 아닌 경우 false 반환.
   Future<bool> _fetchArticle(UserProvider userProvider,
-      {override_hidden = false}) async {
+      {overrideHidden = false}) async {
     dynamic articleJson;
     String apiUrl = "$newAraDefaultUrl/api/articles/${widget.articleID}";
     // 차단된 유저의 글에 대한 내용을 로드하는 경우 주소를 수정함.
-    if (override_hidden) apiUrl += "/?override_hidden=true";
+    if (overrideHidden) apiUrl += "/?override_hidden=true";
 
     try {
       var response =
@@ -311,7 +311,7 @@ class _PostViewPageState extends State<PostViewPage> {
                                                   const BorderRadius.all(
                                                       Radius.circular(10)),
                                               border: Border.all(
-                                                  color: Color(0xFFDBDBDB),
+                                                  color: const Color(0xFFDBDBDB),
                                                   width: 1),
                                               boxShadow: const [
                                                 BoxShadow(
@@ -491,7 +491,7 @@ class _PostViewPageState extends State<PostViewPage> {
                                                           onTap: () async {
                                                             await _fetchArticle(
                                                                 userProvider,
-                                                                override_hidden:
+                                                                overrideHidden:
                                                                     true);
                                                             _updateState();
                                                           },
@@ -782,7 +782,7 @@ class _PostViewPageState extends State<PostViewPage> {
                 model: tmpArticle,
                 userProvider: userProvider,
               ).posVote();
-              debugPrint('좋아요 결과 ${res}');
+              debugPrint('좋아요 결과 $res');
               if (!res) {
                 ArticleController(model: _article, userProvider: userProvider)
                     .setVote(true);
@@ -820,7 +820,7 @@ class _PostViewPageState extends State<PostViewPage> {
                 model: tmpArticle,
                 userProvider: userProvider,
               ).negVote();
-              debugPrint('싫어요 결과 ${res}');
+              debugPrint('싫어요 결과 $res');
               if (!res) {
                 ArticleController(model: _article, userProvider: userProvider)
                     .setVote(false);
@@ -1482,7 +1482,7 @@ class _PostViewPageState extends State<PostViewPage> {
                                       model: tmpCurComment,
                                       userProvider: userProvider,
                                     ).posVote();
-                                    debugPrint('좋아요 결과 ${res}');
+                                    debugPrint('좋아요 결과 $res');
                                     if (!res) {
                                       CommentController(
                                               model: curComment,
@@ -1530,7 +1530,7 @@ class _PostViewPageState extends State<PostViewPage> {
                                       model: tmpCurComment,
                                       userProvider: userProvider,
                                     ).negVote();
-                                    debugPrint('좋아요 결과 ${res}');
+                                    debugPrint('좋아요 결과 $res');
                                     if (!res) {
                                       CommentController(
                                               model: curComment,
@@ -1950,7 +1950,7 @@ class _PostViewPageState extends State<PostViewPage> {
 
   // TODO: 아래 코드는 iOS 심사 통과를 위한 임시 방편. 익명 차단이 BE에서 구현되면 제거해야함 (2023.02.29)
   /// 익명게시글에 차단 버튼을 표시해야하는지 여부를 나타냄(iOS 리젝을 피하기 위해 iOS 환경에서 익명 게시글일 때만 true 반환)
-  bool _isAnonymousIOS(_article) {
-    return (Platform.isIOS && _article.name_type == 2);
+  bool _isAnonymousIOS(ArticleModel article) {
+    return (Platform.isIOS && article.name_type == 2);
   }
 }

@@ -1,5 +1,4 @@
 import 'package:sanitize_html/sanitize_html.dart' show sanitizeHtml;
-import 'package:flutter/material.dart';
 
 String getContentHtml(String content, {double? width}) {
   /* sanitize_html 패키지에서는 <u> 태그를 제거해버림

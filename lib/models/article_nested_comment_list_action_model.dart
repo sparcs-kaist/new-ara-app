@@ -1,3 +1,5 @@
+// ignore_for_file: non_constant_identifier_names
+
 import 'package:flutter/material.dart';
 import 'package:new_ara_app/models/public_user_model.dart';
 import 'package:new_ara_app/models/comment_nested_comment_list_action_model.dart';

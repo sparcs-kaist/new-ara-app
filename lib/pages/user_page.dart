@@ -1,4 +1,4 @@
-/// 사용자 본인 정보 표시 페이지를 관리하는 파일
+// 사용자 본인 정보 표시 페이지를 관리하는 파일
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -13,12 +13,10 @@ import 'package:new_ara_app/widgets/loading_indicator.dart';
 import 'package:new_ara_app/models/article_list_action_model.dart';
 import 'package:new_ara_app/models/scrap_model.dart';
 import 'package:new_ara_app/pages/post_view_page.dart';
-import 'package:new_ara_app/utils/time_utils.dart';
 import 'package:new_ara_app/utils/slide_routing.dart';
 import 'package:new_ara_app/pages/profile_edit_page.dart';
 import 'package:new_ara_app/providers/notification_provider.dart';
 import 'package:new_ara_app/utils/profile_image.dart';
-import 'package:new_ara_app/utils/handle_hidden.dart';
 import 'package:new_ara_app/widgets/post_preview.dart';
 
 /// 작성한 글, 담아둔 글, 최근 본 글을 나타내기 위해 사용
@@ -26,7 +24,7 @@ enum TabType { created, scrap, recent }
 
 /// 사용자 본인 정보 페이지의 빌드 및 이벤트 처리를 담당하는 위젯
 class UserPage extends StatefulWidget {
-  const UserPage({Key? key}) : super(key: key);
+  const UserPage({super.key});
   @override
   State<StatefulWidget> createState() => _UserPageState();
 }
@@ -188,7 +186,9 @@ class _UserPageState extends State<UserPage>
             splashColor: Colors.white,
             icon: SvgPicture.asset(
               'assets/icons/setting.svg',
-              color: ColorsInfo.newara,
+             
+              colorFilter: const ColorFilter.mode(
+                  ColorsInfo.newara, BlendMode.srcIn),
               width: 35,
               height: 35,
             ),
