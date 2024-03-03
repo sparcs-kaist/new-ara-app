@@ -5,7 +5,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:new_ara_app/constants/colors_info.dart';
 
 class LoadingIndicator extends StatelessWidget {
-  const LoadingIndicator({Key? key}) : super(key: key);
+  const LoadingIndicator({super.key});
   @override
   Widget build(BuildContext context) {
     return Scaffold(

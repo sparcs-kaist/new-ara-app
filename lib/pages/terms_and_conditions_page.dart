@@ -4,9 +4,7 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:new_ara_app/constants/colors_info.dart';
-import 'package:new_ara_app/constants/url_info.dart';
 import 'package:new_ara_app/providers/user_provider.dart';
-import 'package:new_ara_app/utils/create_dio_with_config.dart';
 import 'package:new_ara_app/widgets/loading_indicator.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -29,10 +27,10 @@ class _TermsAndConditionsPageState extends State<TermsAndConditionsPage> {
       backgroundColor: Colors.white,
       appBar: AppBar(
         centerTitle: true,
-        title: SizedBox(
+        title: const SizedBox(
           child: Text(
             "이용약관",
-            style: const TextStyle(
+            style: TextStyle(
               color: ColorsInfo.newara,
               fontSize: 18,
               fontWeight: FontWeight.w700,
@@ -156,7 +154,7 @@ class _TermsAndConditionsPageState extends State<TermsAndConditionsPage> {
                                       ],
                                     ),
                                   ),
-                              
+
                                   _buildBoldText("제 4조. 게시물에 대한 권리"),
                                   Padding(
                                     padding: const EdgeInsets.only(left: 20.0),
@@ -173,7 +171,7 @@ class _TermsAndConditionsPageState extends State<TermsAndConditionsPage> {
                                       ],
                                     ),
                                   ),
-                              
+
                                   _buildBoldText("제 5조. 책임의 제한"),
                                   Padding(
                                     padding: const EdgeInsets.only(left: 20.0),
@@ -202,7 +200,7 @@ class _TermsAndConditionsPageState extends State<TermsAndConditionsPage> {
                                       ],
                                     ),
                                   ),
-                              
+
                                   _buildBoldText("제 6조. 문의 및 제보"),
                                   Padding(
                                     padding: const EdgeInsets.only(left: 20.0),
@@ -252,9 +250,9 @@ class _TermsAndConditionsPageState extends State<TermsAndConditionsPage> {
                                       ],
                                     ),
                                   ),
-                              
+
                                   _buildNormalText("본 약관은 2020-09-26부터 적용됩니다."),
-                              
+
                                   // 제 3조 이후의 내용도 같은 방식으로 추가...
                                 ],
                               ),
@@ -264,7 +262,7 @@ class _TermsAndConditionsPageState extends State<TermsAndConditionsPage> {
                       ),
                     ),
                   ),
-                  SizedBox(
+                  const SizedBox(
                     height: 0,
                   ),
                   Row(
@@ -321,7 +319,7 @@ class _TermsAndConditionsPageState extends State<TermsAndConditionsPage> {
                                     ),
                                   ),
                                 )
-                              : Text(
+                              : const Text(
                                   "이미 동의하셨습니다.",
                                   style: TextStyle(
                                     color: ColorsInfo.newara,
@@ -333,7 +331,7 @@ class _TermsAndConditionsPageState extends State<TermsAndConditionsPage> {
                       )
                     ],
                   ),
-                  SizedBox(
+                  const SizedBox(
                     height: 30,
                   ),
                 ],
@@ -348,7 +346,6 @@ class _TermsAndConditionsPageState extends State<TermsAndConditionsPage> {
       style: const TextStyle(
         color: Color(0xFF4a4a4a),
         fontWeight: FontWeight.w500,
-        fontFamily: 'NotoSansKR',
         height: 1.6,
         fontSize: 16,
       ),
@@ -360,7 +357,6 @@ class _TermsAndConditionsPageState extends State<TermsAndConditionsPage> {
       text,
       style: const TextStyle(
         color: Color(0xff363636),
-        fontFamily: 'NotoSansKR',
         fontWeight: FontWeight.w700,
         height: 1.6,
         fontSize: 16,

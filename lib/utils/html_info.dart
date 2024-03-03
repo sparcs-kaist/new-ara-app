@@ -1,5 +1,4 @@
 import 'package:sanitize_html/sanitize_html.dart' show sanitizeHtml;
-import 'package:flutter/material.dart';
 
 String getContentHtml(String content, {double? width}) {
   /* sanitize_html 패키지에서는 <u> 태그를 제거해버림
@@ -91,7 +90,7 @@ String getContentHtml(String content, {double? width}) {
       html {
           -webkit-box-sizing: border-box;
           box-sizing: border-box
-          font-family: "Noto Sans KR",sans-serif;
+          font-family: "Pretendard",sans-serif;
       }
 
       audio,img,video {
@@ -129,7 +128,7 @@ String getContentHtml(String content, {double? width}) {
       }
 
       body,button,input,select,textarea {
-        font-family: "Noto Sans KR",sans-serif
+        font-family: "Pretendard",sans-serif
       }
 
       code,pre {

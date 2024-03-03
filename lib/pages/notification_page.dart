@@ -1,9 +1,8 @@
-/// 사용자에 대한 이때까지의 알림을 보여주는 페이지 관리 파일
+// 사용자에 대한 이때까지의 알림을 보여주는 페이지 관리 파일
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:new_ara_app/utils/create_dio_with_config.dart';
 import 'package:provider/provider.dart';
 import 'package:dio/dio.dart';
 
@@ -19,7 +18,7 @@ import 'package:new_ara_app/widgets/snackbar_noti.dart';
 
 /// 알림페이지의 빌드 및 이벤트 처리를 담당하는 위젯.
 class NotificationPage extends StatefulWidget {
-  const NotificationPage({Key? key}) : super(key: key);
+  const NotificationPage({super.key});
   @override
   State<StatefulWidget> createState() => _NotificationPageState();
 }
@@ -313,7 +312,7 @@ class _NotificationPageState extends State<NotificationPage> {
                                             decoration: BoxDecoration(
                                               border: Border.all(
                                                 width: 1,
-                                                color: Color(0xfff0f0f0),
+                                                color: const Color(0xfff0f0f0),
                                               ),
                                               borderRadius:
                                                   const BorderRadius.all(
@@ -343,7 +342,7 @@ class _NotificationPageState extends State<NotificationPage> {
                                                         color: (targetNoti
                                                                     .is_read ??
                                                                 false)
-                                                            ? Color(0xffbbbbbb)
+                                                            ? const Color(0xffbbbbbb)
                                                             : ColorsInfo.newara,
                                                       ),
                                                       child: Center(

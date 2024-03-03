@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:new_ara_app/pages/bulletin_search_page.dart';
-import 'package:new_ara_app/pages/inquiry_page.dart';
 import 'package:provider/provider.dart';
 
 import 'package:new_ara_app/constants/board_type.dart';
@@ -21,7 +20,7 @@ import 'package:new_ara_app/utils/handle_hidden.dart';
 import 'package:new_ara_app/utils/cache_function.dart';
 
 class MainPage extends StatefulWidget {
-  const MainPage({Key? key}) : super(key: key);
+  const MainPage({super.key});
   @override
   State<StatefulWidget> createState() => _MainPageState();
 }
@@ -96,7 +95,6 @@ class _MainPageState extends State<MainPage> with WidgetsBindingObserver {
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) async {
-    UserProvider userProvider = context.read<UserProvider>();
     // 앱이 포그라운드로 전환될 때 실행할 함수
     if (state == AppLifecycleState.resumed) {
       //api를 호출 후 최신 데이터로 갱신
@@ -363,7 +361,6 @@ class _MainPageState extends State<MainPage> with WidgetsBindingObserver {
 
   @override
   Widget build(BuildContext context) {
-    UserProvider userProvider = context.watch<UserProvider>();
     return Scaffold(
       appBar: AppBar(
         elevation: 0,

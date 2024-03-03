@@ -39,7 +39,6 @@ class _BulletinSearchPageState extends State<BulletinSearchPage> {
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
 
     // 게시판 유형에 따라 API URL 및 힌트 텍스트를 다르게 설정
@@ -71,13 +70,11 @@ class _BulletinSearchPageState extends State<BulletinSearchPage> {
         _hintText = "검색";
         break;
     }
-
-    UserProvider userProvider = context.read<UserProvider>();
     // 위젯이 빌드된 후에 포커스를 줍니다.
     WidgetsBinding.instance
         .addPostFrameCallback((_) => _focusNode.requestFocus());
     _scrollController.addListener(_scrollListener);
-    refreshPostList("");
+    _initPostList("");
   }
 
   @override
@@ -89,8 +86,8 @@ class _BulletinSearchPageState extends State<BulletinSearchPage> {
     super.dispose();
   }
 
-  /// 사용자가 입력한 검색어를 기반으로 게시물 새로 고침.
-  void refreshPostList(String targetWord) async {
+  /// 사용자가 입력한 검색어를 기반으로 게시물 목록 초기화
+  Future<void> _initPostList(String targetWord) async {
     if (targetWord == "") {
       if (mounted) {
         setState(() {
@@ -101,9 +98,10 @@ class _BulletinSearchPageState extends State<BulletinSearchPage> {
       return;
     }
     final UserProvider userProvider = context.read<UserProvider>();
+    // 타겟 단어의 1페이지 검색 결과만 불러옴.
     final Map<String, dynamic>? myMap = await userProvider
         .getApiRes("${_apiUrl}1&main_search__contains=$targetWord");
-    if (mounted && targetWord == _textEdtingController.text) {
+    if (mounted && myMap != null && targetWord == _textEdtingController.text) {
       setState(() {
         postPreviewList.clear();
         for (int i = 0; i < (myMap?["results"].length ?? 0); i++) {
@@ -116,6 +114,8 @@ class _BulletinSearchPageState extends State<BulletinSearchPage> {
                 "refreshPostList error at $i : $error"); // invalid json 걸러내기
           }
         }
+        // 타겟 단어 1페이지 검색 결과만 불러오므로 현재 페이지를 1로 설정
+        _currentPage = 1;
         _isLoading = false;
       });
     }
@@ -125,52 +125,63 @@ class _BulletinSearchPageState extends State<BulletinSearchPage> {
   void _scrollListener() async {
     //스크롤 시 포커스 해제
     FocusScope.of(context).unfocus();
-    if (_textEdtingController.text == "") {
-      if (mounted) {
-        setState(() {
-          postPreviewList.clear();
-          _isLoading = false;
-        });
-      }
-      return;
-    }
 
+    if (_scrollController.position.pixels >=
+        _scrollController.position.maxScrollExtent) {
+      _loadNextPage(_textEdtingController.text);
+    }
+  }
+
+  /// 다음 페이지의 게시물을 불러옴
+  ///
+  /// [targetWord] : api로 요청된 검색어
+  ///
+  /// [_textEdtingController.text] : 현재 검색창에 입력된 검색어
+  ///
+  /// 두 값을 비교해서 같을 경우에만 다음 페이지의 게시물을 빌드함.
+  Future<void> _loadNextPage(String targetWord) async {
+    setState(() {
+      _isLoadingNextPage = true;
+    });
     try {
-      if (mounted) {
-        setState(() {
-          _isLoadingNextPage = true;
-        });
-      }
-      UserProvider userProvider = context.read<UserProvider>();
-      if (_scrollController.position.pixels >=
-          _scrollController.position.maxScrollExtent) {
-        _currentPage = _currentPage + 1;
-        //TODO: 더 이상 불러올 게시물이 없을 때의 처리
-        Map<String, dynamic>? myMap = await userProvider.getApiRes(
-            "$_apiUrl$_currentPage&main_search__contains=${_textEdtingController.text}");
+      if (_textEdtingController.text == "") {
         if (mounted) {
           setState(() {
-            for (int i = 0; i < (myMap!["results"].length ?? 0); i++) {
-              //???/
-              if (myMap["results"][i]["created_by"]["profile"] != null) {
-                postPreviewList.add(
-                    ArticleListActionModel.fromJson(myMap["results"][i] ?? {}));
-              }
-            }
-          });
-          setState(() {
-            _isLoading = false;
+            postPreviewList.clear();
             _isLoadingNextPage = false;
           });
         }
+        return;
+      }
+      UserProvider userProvider = context.read<UserProvider>();
+      _currentPage = _currentPage + 1;
+      //TODO: 더 이상 불러올 게시물이 없을 때의 처리
+      Map<String, dynamic>? myMap = await userProvider.getApiRes(
+          "$_apiUrl$_currentPage&main_search__contains=${_textEdtingController.text}");
+
+      //비동기 함수 이후에 검색창의 검색어가 바뀌었을 경우에는 하지 않음
+      if (mounted &&
+          myMap != null &&
+          _textEdtingController.text == targetWord) {
+        setState(() {
+          for (int i = 0; i < (myMap!["results"].length ?? 0); i++) {
+            //???/
+            if (myMap["results"][i]["created_by"]["profile"] != null) {
+              postPreviewList.add(
+                  ArticleListActionModel.fromJson(myMap["results"][i] ?? {}));
+            }
+          }
+          // api별로 호출부터 응답 시간이 다르므로, _loadNextPage 함수 호출이 연속으로 일어나는 경우에는 게시물을 정렬해주어야함.
+          postPreviewList.sort((a, b) => b.created_at.compareTo(a.created_at));
+        });
       }
     } catch (error) {
       _currentPage = _currentPage - 1;
+    }
+    if (mounted) {
       setState(() {
-        _isLoading = false;
         _isLoadingNextPage = false;
       });
-      debugPrint("scrollListener error : $error");
     }
   }
 
@@ -224,13 +235,19 @@ class _BulletinSearchPageState extends State<BulletinSearchPage> {
                             setState(() {
                               _isLoading = true;
                             });
-                            refreshPostList(text);
+                            // 1페이지만 불러오면 한 페이지의 검색 결과의 게시물들로 태블릿의 화면을 채울 수가 없어 2페이지도 자동으로 불러오게 함
+                            _initPostList(text).then((value) {
+                              _loadNextPage(text);
+                            });
                           },
                           onChanged: (String text) {
                             _debouncer.run(() {
                               debugPrint(
                                   "bulletin_search_page: onChanged(${DateTime.now().toString()}) : $text");
-                              refreshPostList(text);
+                              // 1페이지만 불러오면 한 페이지의 검색 결과의 게시물들로 태블릿의 화면을 채울 수가 없어 2페이지도 자동으로 불러오게 함
+                              _initPostList(text).then((value) {
+                                _loadNextPage(text);
+                              });
                             });
                           },
                           style: const TextStyle(

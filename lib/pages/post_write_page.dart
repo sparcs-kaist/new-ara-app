@@ -17,11 +17,9 @@ import 'package:new_ara_app/models/attachment_model.dart';
 import 'package:new_ara_app/models/board_detail_action_model.dart';
 import 'package:new_ara_app/models/simple_board_model.dart';
 import 'package:new_ara_app/models/topic_model.dart';
-import 'package:new_ara_app/pages/bulletin_search_page.dart';
 import 'package:new_ara_app/pages/post_view_page.dart';
 import 'package:new_ara_app/pages/terms_and_conditions_page.dart';
 import 'package:new_ara_app/providers/user_provider.dart';
-import 'package:new_ara_app/utils/create_dio_with_config.dart';
 import 'package:new_ara_app/utils/slide_routing.dart';
 import 'package:new_ara_app/widgets/loading_indicator.dart';
 import 'package:provider/provider.dart';
@@ -47,8 +45,7 @@ class PostWritePage extends StatefulWidget {
   final BoardDetailActionModel? previousBoard;
 
   /// 생성자에서 이전 게시물의 데이터를 선택적으로 받을 수 있습니다.
-  const PostWritePage({Key? key, this.previousArticle, this.previousBoard})
-      : super(key: key);
+  const PostWritePage({super.key, this.previousArticle, this.previousBoard});
 
   @override
   State<PostWritePage> createState() => _PostWritePageState();
@@ -175,7 +172,7 @@ class _PostWritePageState extends State<PostWritePage>
 
   bool _isKeyboardClosed = true;
 
-  var _editorScrollController = ScrollController();
+  final _editorScrollController = ScrollController();
   @override
   void initState() {
     super.initState();
@@ -1278,7 +1275,6 @@ class _PostWritePageState extends State<PostWritePage>
     TextStyle h1h2h3h4h5h6CommonStyle = const TextStyle(
       color: Colors.black,
       fontWeight: FontWeight.w600,
-      fontFamily: 'NotoSansKR',
       height: 1.15,
     );
     return quill.DefaultStyles(
@@ -1312,7 +1308,6 @@ class _PostWritePageState extends State<PostWritePage>
         const TextStyle(
           color: Color(0xFF4a4a4a),
           fontWeight: FontWeight.w500,
-          fontFamily: 'NotoSansKR',
           height: 1.5,
           fontSize: 16,
         ),
@@ -1322,15 +1317,11 @@ class _PostWritePageState extends State<PostWritePage>
       ),
 
       bold: const TextStyle(
-          color: Color(0xff363636),
-          fontFamily: 'NotoSansKR',
-          fontWeight: FontWeight.w700),
+          color: Color(0xff363636), fontWeight: FontWeight.w700),
       italic: const TextStyle(
-        fontFamily: 'NotoSansKR',
         fontStyle: FontStyle.italic,
       ),
       underline: const TextStyle(
-        fontFamily: 'NatoSansKR',
         decoration: TextDecoration.underline,
       ),
       //<code> 태그
@@ -1338,7 +1329,6 @@ class _PostWritePageState extends State<PostWritePage>
         style: const TextStyle(
           color: Color(0xffff3860),
           fontWeight: FontWeight.w400,
-          fontFamily: 'NotoSansKR',
           height: 1.5,
           fontSize: 14,
         ),
@@ -1350,7 +1340,6 @@ class _PostWritePageState extends State<PostWritePage>
         const TextStyle(
           color: Color(0xffBBBBBB),
           fontWeight: FontWeight.w500,
-          fontFamily: 'NotoSansKR',
           height: 1.5,
           fontSize: 16,
         ),
@@ -1364,7 +1353,6 @@ class _PostWritePageState extends State<PostWritePage>
           //  backgroundColor: Colors.grey,
           color: Color(0xFF4a4a4a),
           fontWeight: FontWeight.w400,
-          fontFamily: 'NotoSansKR',
           height: 1.5,
           fontSize: 16,
         ),

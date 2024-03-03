@@ -5,7 +5,6 @@ import 'package:flutter_native_splash/flutter_native_splash.dart';
 
 import 'package:new_ara_app/pages/main_page.dart';
 import 'package:new_ara_app/pages/bulletin_list_page.dart';
-import 'package:new_ara_app/pages/chat_list_page.dart';
 import 'package:new_ara_app/pages/notification_page.dart';
 import 'package:new_ara_app/pages/user_page.dart';
 import 'package:new_ara_app/providers/notification_provider.dart';
@@ -14,7 +13,7 @@ import 'package:new_ara_app/constants/colors_info.dart';
 /// MainNavigationTabPage
 /// 메인 화면 하단에 위치하는 탭바를 포함한 메인 페이지.
 class MainNavigationTabPage extends StatefulWidget {
-  const MainNavigationTabPage({Key? key}) : super(key: key);
+  const MainNavigationTabPage({super.key});
   @override
   State<StatefulWidget> createState() => _MainNavigationTabPageState();
 }

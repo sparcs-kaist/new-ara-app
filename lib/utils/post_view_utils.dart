@@ -1,4 +1,4 @@
-/// PostViewPage 내부에서 사용되는 메서드가 많아 별도의 파일로 분류함.
+// PostViewPage 내부에서 사용되는 메서드가 많아 별도의 파일로 분류함.
 
 import 'dart:io';
 import 'package:flutter/material.dart';
@@ -16,7 +16,6 @@ import 'package:new_ara_app/models/scrap_create_action_model.dart';
 import 'package:new_ara_app/providers/user_provider.dart';
 import 'package:new_ara_app/constants/url_info.dart';
 import 'package:new_ara_app/constants/colors_info.dart';
-import 'package:new_ara_app/pages/post_view_page.dart';
 
 class ArticleController {
   ArticleModel model;
@@ -381,7 +380,11 @@ class _ReportDialogWidgetState extends State<ReportDialogWidget> {
               "assets/icons/information.svg",
               width: 45,
               height: 45,
-              color: ColorsInfo.newara,
+              colorFilter: const ColorFilter.mode(
+                ColorsInfo.newara,
+                BlendMode.srcIn,
+              )
+
             ),
             const SizedBox(height: 5),
             Text(

@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:new_ara_app/pages/bulletin_search_page.dart';
@@ -170,6 +168,7 @@ class _PostListShowPageState extends State<PostListShowPage>
                   myMap["results"][i]["parent_article"] ?? {}));
             }
           }
+          postPreviewList.sort((a, b) => b.created_at.compareTo(a.created_at));
         });
       }
     } catch (error) {
@@ -272,7 +271,7 @@ class _PostListShowPageState extends State<PostListShowPage>
                 updateAllBulletinList();
                 debugPrint('FloatingActionButton pressed');
               },
-              backgroundColor: Colors.white,
+              backgroundColor: ColorsInfo.newara,
               child: SizedBox(
                 width: 42,
                 height: 42,
@@ -280,7 +279,7 @@ class _PostListShowPageState extends State<PostListShowPage>
                   'assets/icons/modify.svg',
                   fit: BoxFit.fill,
                   colorFilter: const ColorFilter.mode(
-                      ColorsInfo.newara, BlendMode.srcIn), // 글쓰기 아이콘 색상 변경
+                      Colors.white, BlendMode.srcIn), // 글쓰기 아이콘 색상 변경
                 ),
               ),
             ),
@@ -300,7 +299,15 @@ class _PostListShowPageState extends State<PostListShowPage>
                     color: ColorsInfo.newara,
                     onRefresh: () async {
                       setState((() => isLoading = true));
-                      await updateAllBulletinList(pageLimitToReload: 1);
+                      // 리프레쉬시 게시물 목록을 업데이트합니다.
+                      // 1페이지만 로드하도록 설정하여 최신 게시물을 불러옵니다.
+                      // 1페이지만 로드하면 태블릿에서 게시물로 화면을 꽉채우지 못하므로 다음 페이지도 로드합니다.
+                      await updateAllBulletinList(pageLimitToReload: 1).then(
+                        (value) {
+                          _loadNextPage();
+                        },
+                      );
+                      ;
                     },
                     child: ListView.separated(
                       physics: const AlwaysScrollableScrollPhysics(),
