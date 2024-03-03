@@ -97,6 +97,7 @@ team_id("N5V8W52U3U") # Developer Portal Team ID
 cd android && bundle exec fastlane alpha env:production && cd ../ios && bundle exec fastlane alpha env:production
 ```
 
+<br>
 
 아래 예시처럼 하나의 플랫폼에도 배포가 가능합니다.
 
@@ -104,10 +105,18 @@ cd android && bundle exec fastlane alpha env:production && cd ../ios && bundle e
 cd ios && bundle exec fastlane alpha env:production
 ```
 
+<br>
+
 아래 예시처럼 dev 서버와 연결된 앱 배포도 가능합니다.
 
 ```bash
 cd ios && bundle exec fastlane alpha env:development
+```
+<br>
+
+아래 예시처럼 개별 fastlane 실행도 가능합니다. 아래는 깃허브 태그를 만드는 fastlane입니다.
+```base
+bundle exec fastlane create_release_note short_name:prod
 ```
 
 ### 배포 후 작업
