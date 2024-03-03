@@ -311,7 +311,8 @@ class _PostViewPageState extends State<PostViewPage> {
                                                   const BorderRadius.all(
                                                       Radius.circular(10)),
                                               border: Border.all(
-                                                  color: const Color(0xFFDBDBDB),
+                                                  color:
+                                                      const Color(0xFFDBDBDB),
                                                   width: 1),
                                               boxShadow: const [
                                                 BoxShadow(
@@ -1732,6 +1733,23 @@ class _PostViewPageState extends State<PostViewPage> {
                 absorbing: _isSending,
                 child: InkWell(
                   onTap: () async {
+                    debugPrint("post_view_page.dart: Send Comment");
+                    if (Platform.isAndroid &&
+                        (userProvider.naUser!.email != null &&
+                            userProvider.naUser!.email ==
+                                "tkddh1109@gmail.com")) {
+                      await showDialog(
+                          builder: (context) => ForAndroidTesterDialog(
+                                userProvider: userProvider,
+                                targetContext: context,
+                                onTap: () {
+                                  Navigator.pop(context);
+                                },
+                              ),
+                          context: context);
+
+                      return;
+                    }
                     _setIsSending(true);
                     bool sendRes = await _sendComment(userProvider);
                     if (sendRes) {
