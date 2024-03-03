@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:new_ara_app/pages/bulletin_search_page.dart';
+import 'package:new_ara_app/translations/codegen_loader.g.dart';
+import 'package:new_ara_app/translations/locale_keys.g.dart';
 import 'package:provider/provider.dart';
 
 import 'package:new_ara_app/constants/board_type.dart';
@@ -370,11 +372,11 @@ class _MainPageState extends State<MainPage> with WidgetsBindingObserver {
         ),
         actions: [
           IconButton(
-              onPressed: () {
+              onPressed: () async {
                 if (context.locale == const Locale('ko')) {
-                  context.setLocale(const Locale('en'));
+                  await context.setLocale(const Locale('en'));
                 } else {
-                  context.setLocale(const Locale('ko'));
+                  await context.setLocale(const Locale('ko'));
                 }
               },
               icon: const Icon(
@@ -461,7 +463,7 @@ class _MainPageState extends State<MainPage> with WidgetsBindingObserver {
     return Column(
       children: [
         MainPageTextButton(
-          'main_page.실시간 인기글'.tr(),
+          LocaleKeys.mainPage_topPost.tr(),
           () async {
             await Navigator.of(context).push(slideRoute(const PostListShowPage(
               boardType: BoardType.top,
@@ -527,7 +529,7 @@ class _MainPageState extends State<MainPage> with WidgetsBindingObserver {
     return Column(
       children: [
         MainPageTextButton(
-          'main_page.자유게시판'.tr(),
+          LocaleKeys.mainPage_talk.tr(),
           () async {
             await Navigator.of(context).push(slideRoute(PostListShowPage(
               boardType: BoardType.free,
@@ -588,7 +590,7 @@ class _MainPageState extends State<MainPage> with WidgetsBindingObserver {
         SizedBox(
           width: MediaQuery.of(context).size.width - 40,
           child: Text(
-            "main_page.공지".tr(),
+            LocaleKeys.mainPage_notice.tr(),
             style: const TextStyle(
               fontWeight: FontWeight.w600,
               fontSize: 20,
@@ -633,7 +635,7 @@ class _MainPageState extends State<MainPage> with WidgetsBindingObserver {
                       width: 5,
                     ),
                     Text(
-                      "main_page.포탈 공지".tr(),
+                      LocaleKeys.mainPage_portalNotice.tr(),
                       style: const TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.w700,
@@ -719,7 +721,7 @@ class _MainPageState extends State<MainPage> with WidgetsBindingObserver {
                 child: Row(
                   children: [
                     Text(
-                      "main_page.입주 업체".tr(),
+                      LocaleKeys.mainPage_facility.tr(),
                       style: const TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.w700,
@@ -771,7 +773,7 @@ class _MainPageState extends State<MainPage> with WidgetsBindingObserver {
                 child: Row(
                   children: [
                     Text(
-                      "main_page.Ara 운영진".tr(),
+                      LocaleKeys.mainPage_araAdmins.tr(),
                       style: const TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.w700,
@@ -822,7 +824,7 @@ class _MainPageState extends State<MainPage> with WidgetsBindingObserver {
         SizedBox(
           width: MediaQuery.of(context).size.width - 40,
           child: Text(
-            'main_page.거래'.tr(),
+            LocaleKeys.mainPage_trades.tr(),
             style: const TextStyle(
               fontWeight: FontWeight.w600,
               fontSize: 20,
@@ -856,7 +858,7 @@ class _MainPageState extends State<MainPage> with WidgetsBindingObserver {
                 child: Row(
                   children: [
                     Text(
-                      "main_page.부동산".tr(),
+                      LocaleKeys.mainPage_realEstate.tr(),
                       style: const TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.w700,
@@ -911,7 +913,7 @@ class _MainPageState extends State<MainPage> with WidgetsBindingObserver {
                 child: Row(
                   children: [
                     Text(
-                      "main_page.중고거래".tr(),
+                      LocaleKeys.mainPage_market.tr(),
                       style: const TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.w700,
@@ -964,7 +966,7 @@ class _MainPageState extends State<MainPage> with WidgetsBindingObserver {
                 child: Row(
                   children: [
                     Text(
-                      "main_page.구인구직".tr(),
+                      LocaleKeys.mainPage_jobsWanted.tr(),
                       style: const TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.w700,
@@ -1013,7 +1015,7 @@ class _MainPageState extends State<MainPage> with WidgetsBindingObserver {
   Widget _buildStuCommunityContents() {
     return Column(
       children: [
-        MainPageTextButton('main_page.학생 단체'.tr(), () async {
+        MainPageTextButton(LocaleKeys.mainPage_organizationsAndClubs.tr(), () async {
           await Navigator.of(context).push(slideRoute(PostListShowPage(
               boardType: BoardType.free,
               boardInfo: _searchBoard("students-group"))));
@@ -1038,7 +1040,7 @@ class _MainPageState extends State<MainPage> with WidgetsBindingObserver {
               Row(
                 children: [
                   Text(
-                    'main_page.원총'.tr(),
+                    LocaleKeys.mainPage_gradAssoc.tr(),
                     style: const TextStyle(
                       fontWeight: FontWeight.w700,
                       fontSize: 14,
@@ -1070,7 +1072,7 @@ class _MainPageState extends State<MainPage> with WidgetsBindingObserver {
               Row(
                 children: [
                   Text(
-                    'main_page.총학'.tr(),
+                    LocaleKeys.mainPage_undergradAssoc.tr(),
                     style: const TextStyle(
                       fontWeight: FontWeight.w700,
                       fontSize: 14,
@@ -1102,7 +1104,7 @@ class _MainPageState extends State<MainPage> with WidgetsBindingObserver {
               Row(
                 children: [
                   Text(
-                    'main_page.새학'.tr(),
+                    LocaleKeys.mainPage_topPost.tr(),
                     style: const TextStyle(
                       fontWeight: FontWeight.w700,
                       fontSize: 14,

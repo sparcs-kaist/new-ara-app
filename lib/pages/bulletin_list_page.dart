@@ -3,6 +3,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:new_ara_app/models/board_group_model.dart';
 import 'package:new_ara_app/pages/bulletin_search_page.dart';
+import 'package:new_ara_app/translations/locale_keys.g.dart';
 import 'package:new_ara_app/utils/cache_function.dart';
 import 'package:provider/provider.dart';
 
@@ -82,7 +83,7 @@ class _BulletinListPageState extends State<BulletinListPage> {
       appBar: AppBar(
         centerTitle: false,
         title: Text(
-          "board_list_page.게시판".tr(),
+          LocaleKeys.boardListPage_boards.tr(),
           style: const TextStyle(
             fontSize: 28,
             fontWeight: FontWeight.w700,
@@ -148,7 +149,9 @@ class _BulletinListPageState extends State<BulletinListPage> {
                                   ),
                                 ),
                               ),
-                              hintText: 'board_list_page.게시판, 게시글 및 댓글 검색'.tr(),
+                              hintText: LocaleKeys
+                                  .boardListPage_searchBoardsPostsComments
+                                  .tr(),
                               hintStyle: const TextStyle(
                                 color: Color(0xFFBBBBBB),
                                 fontSize: 16,
@@ -203,7 +206,7 @@ class _BulletinListPageState extends State<BulletinListPage> {
                                   width: 5,
                                 ),
                                 Text(
-                                  "board_list_page.전체보기".tr(),
+                                  LocaleKeys.boardListPage_viewAll.tr(),
                                   style: const TextStyle(
                                     color: Color(0xFF333333),
                                     fontSize: 17,
@@ -244,7 +247,7 @@ class _BulletinListPageState extends State<BulletinListPage> {
                                   width: 5,
                                 ),
                                 Text(
-                                  'board_list_page.인기글'.tr(),
+                                  LocaleKeys.boardListPage_topPosts.tr(),
                                   style: const TextStyle(
                                     color: Color(0xFF333333),
                                     fontSize: 17,
@@ -285,7 +288,7 @@ class _BulletinListPageState extends State<BulletinListPage> {
                                   width: 5,
                                 ),
                                 Text(
-                                  'board_list_page.담아둔 글'.tr(),
+                                  LocaleKeys.boardListPage_bookmarks.tr(),
                                   style: const TextStyle(
                                     color: Color(0xFF333333),
                                     fontSize: 17,

@@ -3,6 +3,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:new_ara_app/constants/url_info.dart';
+import 'package:new_ara_app/translations/locale_keys.g.dart';
 import 'package:provider/provider.dart';
 import 'package:easy_localization/easy_localization.dart';
 
@@ -69,9 +70,9 @@ class _UserPageState extends State<UserPage>
   List<int> curPage = [1, 1, 1];
 
   final List<String> _tabs = [
-    'user_page.my_post'.tr(),
-    'user_page.scrapped'.tr(),
-    'user_page.history'.tr()
+    LocaleKeys.userPage_myPosts.tr(),
+    LocaleKeys.userPage_bookmarks.tr(),
+    LocaleKeys.userPage_history.tr()
   ];
 
   @override
@@ -226,7 +227,7 @@ class _UserPageState extends State<UserPage>
                 width: MediaQuery.of(context).size.width - 40,
                 height: 24,
                 child: Text(
-                  'user_page.총 n개의 글'.tr(namedArgs: {'curCount':curCount.toString()}),
+                  LocaleKeys.userPage_totalNPosts.tr(namedArgs: {'curCount':curCount.toString()}),
                   style: const TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w700,
@@ -305,7 +306,7 @@ class _UserPageState extends State<UserPage>
                   Text(
                     userProvider.naUser == null ||
                             userProvider.naUser?.email == null
-                        ? "user_page.이메일 정보가 없습니다".tr()
+                        ? LocaleKeys.userPage_noEmailInfo.tr()
                         : "${userProvider.naUser?.email}",
                     style: const TextStyle(
                       fontSize: 14,
@@ -331,7 +332,7 @@ class _UserPageState extends State<UserPage>
                 );
               },
               child: Text(
-                'user_page.change'.tr(),
+                LocaleKeys.userPage_change.tr(),
                 style: const TextStyle(
                   color: Color.fromRGBO(100, 100, 100, 1),
                   fontSize: 14,

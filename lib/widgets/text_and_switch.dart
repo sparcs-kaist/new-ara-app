@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:easy_localization/easy_localization.dart';
 
 import 'package:new_ara_app/constants/colors_info.dart';
+import 'package:new_ara_app/translations/locale_keys.g.dart';
 
 List<bool> switchLights = [
   true,
@@ -15,23 +16,23 @@ List<bool> switchLights = [
 List<List<Widget>> switchItems = [
   [
     const SizedBox(height: 10),
-    TextAndSwitch('setting_page.adult'.tr(), 0),
+    TextAndSwitch(LocaleKeys.settingPage_adult.tr(), 0),
     const SizedBox(height: 16),
-    TextAndSwitch('setting_page.politics'.tr(), 1),
+    TextAndSwitch(LocaleKeys.settingPage_politics.tr(), 1),
     const SizedBox(height: 10),
   ],
   [
     const SizedBox(height: 10),
-    TextAndSwitch('setting_page.myreply'.tr(), 2),
+    TextAndSwitch(LocaleKeys.settingPage_myReplies.tr(), 2),
     const SizedBox(height: 16),
-    TextAndSwitch('setting_page.reply'.tr(), 3),
+    TextAndSwitch(LocaleKeys.settingPage_replies.tr(), 3),
     const SizedBox(height: 10),
   ],
   [
     const SizedBox(height: 10),
-    TextAndSwitch('setting_page.hot_noti'.tr(), 4),
+    TextAndSwitch(LocaleKeys.settingPage_hotPosts.tr(), 4),
     const SizedBox(height: 16),
-    TextAndSwitch('setting_page.hot_posts'.tr(), 5),
+    TextAndSwitch(LocaleKeys.settingPage_hotInfo.tr(), 5),
     const SizedBox(height: 10),
   ]
 ];

@@ -9,6 +9,7 @@ import 'package:new_ara_app/models/article_list_action_model.dart';
 import 'package:new_ara_app/models/board_detail_action_model.dart';
 import 'package:new_ara_app/pages/post_view_page.dart';
 import 'package:new_ara_app/providers/user_provider.dart';
+import 'package:new_ara_app/translations/locale_keys.g.dart';
 import 'package:new_ara_app/utils/slide_routing.dart';
 import 'package:new_ara_app/widgets/loading_indicator.dart';
 import 'package:new_ara_app/widgets/post_preview.dart';
@@ -48,30 +49,30 @@ class _BulletinSearchPageState extends State<BulletinSearchPage> {
       case BoardType.free:
         _apiUrl =
             "articles/?parent_board=${widget.boardInfo!.id.toInt()}&page=";
-        _hintText = tr("search_in", namedArgs: {
+        _hintText = LocaleKeys.bulletinSearchPage_searchIn.tr(namedArgs: {
           "en_name": widget.boardInfo!.en_name,
           "ko_name": widget.boardInfo!.ko_name
         });
         break;
       case BoardType.all:
         _apiUrl = "articles/?page=";
-        _hintText = "post_search_page.search_in_all_posts".tr();
+        _hintText = LocaleKeys.bulletinSearchPage_searchInAllPosts.tr();
         break;
       case BoardType.recent:
         _apiUrl = "articles/recent/?page=";
-        _hintText = "post_search_page.search_in_history".tr();
+        _hintText = LocaleKeys.bulletinSearchPage_searchInHistory.tr();
         break;
       case BoardType.top:
         _apiUrl = "articles/top/?page=";
-        _hintText = "post_search_page.search_in_top_posts".tr();
+        _hintText = LocaleKeys.bulletinSearchPage_searchInTopPosts.tr();
         break;
       case BoardType.scraps:
         _apiUrl = "scraps/?page=";
-        _hintText = "post_search_page.search_in_bookmarks";
+        _hintText = LocaleKeys.bulletinSearchPage_searchInBookmarks.tr();
         break;
       default:
         _apiUrl = "articles/recent/?page=";
-        _hintText = "post_search_page.search".tr();
+        _hintText = LocaleKeys.bulletinSearchPage_search.tr();
         break;
     }
     // 위젯이 빌드된 후에 포커스를 줍니다.
@@ -341,7 +342,8 @@ class _BulletinSearchPageState extends State<BulletinSearchPage> {
                               crossAxisAlignment: CrossAxisAlignment.center,
                               children: [
                                 Text(
-                                  'post_search_page.please_enter'.tr(),
+                                  LocaleKeys.bulletinSearchPage_pleaseEnter
+                                      .tr(),
                                   style: const TextStyle(
                                     color: Color(0xFFBBBBBB),
                                     fontSize: 16,
@@ -362,7 +364,7 @@ class _BulletinSearchPageState extends State<BulletinSearchPage> {
                               crossAxisAlignment: CrossAxisAlignment.center,
                               children: [
                                 Text(
-                                  'post_search_page.no_results'.tr(),
+                                  LocaleKeys.bulletinSearchPage_noResults.tr(),
                                   style: const TextStyle(
                                     color: Color(0xFFBBBBBB),
                                     fontSize: 16,

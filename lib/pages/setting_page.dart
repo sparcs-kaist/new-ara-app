@@ -8,6 +8,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:new_ara_app/constants/url_info.dart';
 import 'package:new_ara_app/pages/terms_and_conditions_page.dart';
 import 'package:new_ara_app/providers/user_provider.dart';
+import 'package:new_ara_app/translations/locale_keys.g.dart';
 import 'package:new_ara_app/utils/slide_routing.dart';
 import 'package:new_ara_app/widgets/loading_indicator.dart';
 import 'package:provider/provider.dart';
@@ -73,7 +74,7 @@ class SettingPageState extends State<SettingPage> {
         ),
         title: SizedBox(
           child: Text(
-            'setting_page.title'.tr(),
+            LocaleKeys.settingPage_title.tr(),
             style: const TextStyle(
               color: ColorsInfo.newara,
               fontSize: 18,
@@ -103,7 +104,7 @@ class SettingPageState extends State<SettingPage> {
                               height: 34,
                             ),
                             Text(
-                              'setting_page.bulletin'.tr(),
+                              LocaleKeys.settingPage_postSetting.tr(),
                               style: const TextStyle(
                                 fontSize: 18,
                                 fontWeight: FontWeight.w700,
@@ -136,7 +137,7 @@ class SettingPageState extends State<SettingPage> {
                                 Container(
                                     margin: const EdgeInsets.only(left: 10),
                                     child: Text(
-                                      "setting_page.adult".tr(),
+                                      LocaleKeys.settingPage_adult.tr(),
                                       style: const TextStyle(
                                         fontSize: 16,
                                         fontWeight: FontWeight.w500,
@@ -161,14 +162,15 @@ class SettingPageState extends State<SettingPage> {
                                             await userProvider.apiMeUserInfo();
                                             debugPrint(
                                                 "Change of 'see_sexual' succeed!");
-                                            requestSnackBar(
-                                                "setting_page.설정이 저장되었습니다."
-                                                    .tr());
+                                            requestSnackBar(LocaleKeys
+                                                .settingPage_settingsSaved
+                                                .tr());
                                           } catch (error) {
                                             debugPrint(
                                                 "Change of 'see_sexual' failed: $error");
-                                            requestSnackBar(
-                                                "setting_page.설정 중 에러 발생".tr());
+                                            requestSnackBar(LocaleKeys
+                                                .settingPage_errorSavingSettings
+                                                .tr());
                                             setState(() => seeSexual = !value);
                                           }
                                         }),
@@ -185,7 +187,7 @@ class SettingPageState extends State<SettingPage> {
                                 Container(
                                     margin: const EdgeInsets.only(left: 10),
                                     child: Text(
-                                      "setting_page.politics".tr(),
+                                      LocaleKeys.settingPage_politics.tr(),
                                       style: const TextStyle(
                                         fontSize: 16,
                                         fontWeight: FontWeight.w500,
@@ -212,14 +214,15 @@ class SettingPageState extends State<SettingPage> {
                                             await userProvider.apiMeUserInfo();
                                             debugPrint(
                                                 "Change of 'see_social' succeed!");
-                                            requestSnackBar(
-                                                "setting_page.설정이 저장되었습니다"
-                                                    .tr());
+                                            requestSnackBar(LocaleKeys
+                                                .settingPage_settingsSaved
+                                                .tr());
                                           } catch (error) {
                                             debugPrint(
                                                 "Change of 'see_social' failed: $error");
-                                            requestSnackBar(
-                                                "setting_page.설정 중 에러 발생".tr());
+                                            requestSnackBar(LocaleKeys
+                                                .settingPage_errorSavingSettings
+                                                .tr());
                                             setState(() => seeSocial = !value);
                                           }
                                         }),
@@ -273,7 +276,7 @@ class SettingPageState extends State<SettingPage> {
                               height: 34,
                             ),
                             Text(
-                              'setting_page.block'.tr(),
+                              LocaleKeys.settingPage_block.tr(),
                               style: const TextStyle(
                                 fontSize: 18,
                                 fontWeight: FontWeight.w700,
@@ -309,7 +312,8 @@ class SettingPageState extends State<SettingPage> {
                                 width: MediaQuery.of(context).size.width - 60,
                                 child: Center(
                                   child: Text(
-                                    'setting_page.blocked_users'.tr(),
+                                    LocaleKeys.settingPage_viewBlockedUsers
+                                        .tr(),
                                     style: const TextStyle(
                                       color: ColorsInfo.newara,
                                       fontSize: 16,
@@ -324,7 +328,7 @@ class SettingPageState extends State<SettingPage> {
                       ),
                       const SizedBox(height: 5),
                       // 유저 차단 기능 설명 문구
-                      TextInfo("setting_page.유저 차단 안내".tr()),
+                      TextInfo(LocaleKeys.settingPage_userBlockingGuide.tr()),
                       const SizedBox(height: 20),
                       SizedBox(
                         width: MediaQuery.of(context).size.width - 50,
@@ -336,7 +340,7 @@ class SettingPageState extends State<SettingPage> {
                               height: 36,
                             ),
                             Text(
-                              "setting_page.정보".tr(),
+                              LocaleKeys.settingPage_information.tr(),
                               style: const TextStyle(
                                 fontSize: 18,
                                 fontWeight: FontWeight.w700,
@@ -378,7 +382,9 @@ class SettingPageState extends State<SettingPage> {
                                   Container(
                                       margin: const EdgeInsets.only(left: 10),
                                       child: Text(
-                                        'setting_page.이용약관'.tr(),
+                                        LocaleKeys
+                                            .settingPage_termsAndConditions
+                                            .tr(),
                                         style: const TextStyle(
                                           fontSize: 16,
                                           fontWeight: FontWeight.w500,
@@ -404,7 +410,8 @@ class SettingPageState extends State<SettingPage> {
                                   Container(
                                       margin: const EdgeInsets.only(left: 10),
                                       child: Text(
-                                        'setting_page.운영진에게 문의하기'.tr(),
+                                        LocaleKeys.settingPage_contactAdmins
+                                            .tr(),
                                         style: TextStyle(
                                           fontSize: 16,
                                           fontWeight: FontWeight.w500,
@@ -451,7 +458,7 @@ class SettingPageState extends State<SettingPage> {
                             },
                             child: Center(
                               child: Text(
-                                'setting_page.로그아웃'.tr(),
+                                LocaleKeys.settingPage_signOut.tr(),
                                 style: TextStyle(
                                   color: ColorsInfo.newara,
                                   fontSize: 16,
@@ -515,7 +522,7 @@ class SettingPageState extends State<SettingPage> {
                             },
                             child: Center(
                               child: Text(
-                                'setting_page.회원탈퇴'.tr(),
+                                LocaleKeys.settingPage_withdrawal.tr(),
                                 style: TextStyle(
                                   color: ColorsInfo.newara,
                                   fontSize: 16,
@@ -527,7 +534,7 @@ class SettingPageState extends State<SettingPage> {
                         ),
                       ),
                       const SizedBox(height: 5),
-                      TextInfo("setting_page.회원 탈퇴 안내".tr()),
+                      TextInfo(LocaleKeys.settingPage_withdrawalGuide.tr()),
                     ],
                   ),
                 ),

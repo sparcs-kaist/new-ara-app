@@ -28,6 +28,7 @@
         "searchInHistory": "Search in recently viewed posts",
         "searchInTopPosts": "Search in real-time popular posts",
         "searchInBookmarks": "Search in saved posts",
+        "search": "Search",
         "pleaseEnter": "Please enter a search term",
         "noResults": "No results found."
     },
@@ -36,23 +37,25 @@
         "noNotifications": "No notifications.",
         "today": "Today",
         "post": "Post",
-        "newComment": "New    comment to your post.",
+        "newComment": "New comment to your post.",
         "allNotificationsChecked": "You've already check all the notifications."
     },
     "userPage": {
         "change": "Chg.",
         "myPosts": "My Posts",
-        "scrapped": "Scrapped",
+        "bookmarks": "Scrapped",
         "history": "History",
         "totalNPosts": "{curCount} posts",
         "noEmailInfo": "No email information"
     },
-    "loginPage": {},
+    "loginPage": {
+        "login": "SPARCS SSO로 로그인"
+    },
     "settingPage": {
         "title": "Setting",
         "postSetting": "Post Setting",
-        "adult": "Sexual Posts",
-        "politics": "Political Posts",
+        "adult": "Allow Access to Sexual Posts",
+        "politics": "Allow Access to Political Posts",
         "block": "Blocked Users",
         "viewBlockedUsers": "View Blocked Users",
         "howToBlock": "You can block accounts through the detail function in posts or comments.",
