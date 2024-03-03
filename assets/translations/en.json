@@ -18,7 +18,14 @@
         "원총": "Grad Assoc",
         "총학": "Undergrad Assoc",
         "새학": "Freshman Council",
-        "자유게시판": "Talks"
+        "자유게시판": "Talk"
+    },
+    "board_list_page": {
+        "게시판": "Boards",
+        "게시판, 게시글 및 댓글 검색": "Search boards, posts, and comments",
+        "전체보기": "View All",
+        "인기글": "Top Posts",
+        "담아둔 글": "Bookmarks"
     },
     "myPage": {
         "change": "change",
