@@ -87,5 +87,8 @@
         "history": "History",
         "totalNPosts": "{curCount} posts",
         "noEmailInfo": "No email information"
+    },
+    "postViewPage": {
+        "reply": "Reply"
     }
 }

@@ -8,6 +8,8 @@ import 'package:new_ara_app/constants/url_info.dart';
 import 'package:provider/provider.dart';
 import 'package:dio/dio.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:easy_localization/easy_localization.dart';
+import 'package:new_ara_app/translations/locale_keys.g.dart';
 
 import 'package:new_ara_app/constants/colors_info.dart';
 import 'package:new_ara_app/models/article_model.dart';
@@ -1580,9 +1582,9 @@ class _PostViewPageState extends State<PostViewPage> {
                                   width: 11,
                                   height: 19,
                                 ),
-                                const Text(
-                                  '답글 쓰기',
-                                  style: TextStyle(
+                                Text(
+                                  LocaleKeys.postViewPage_reply.tr(),
+                                  style: const TextStyle(
                                     fontSize: 13,
                                     fontWeight: FontWeight.w500,
                                   ),

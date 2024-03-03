@@ -87,5 +87,8 @@
         "history": "최근 본 글",
         "totalNPosts": "총 {curCount}개의 글",
         "noEmailInfo": "이메일 정보가 없습니다."
+    },
+    "postViewPage": {
+        "reply": "답글 쓰기"
     }
 }

@@ -81,5 +81,7 @@ abstract class  LocaleKeys {
   static const userPage_totalNPosts = 'userPage.totalNPosts';
   static const userPage_noEmailInfo = 'userPage.noEmailInfo';
   static const userPage = 'userPage';
+  static const postViewPage_reply = 'postViewPage.reply';
+  static const postViewPage = 'postViewPage';
 
 }

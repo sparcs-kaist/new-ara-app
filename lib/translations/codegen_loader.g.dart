@@ -103,6 +103,9 @@ class CodegenLoader extends AssetLoader{
     "history": "History",
     "totalNPosts": "{curCount} posts",
     "noEmailInfo": "No email information"
+  },
+  "postViewPage": {
+    "reply": "Reply"
   }
 };
 static const Map<String,dynamic> ko = {
@@ -194,6 +197,9 @@ static const Map<String,dynamic> ko = {
     "history": "최근 본 글",
     "totalNPosts": "총 {curCount}개의 글",
     "noEmailInfo": "이메일 정보가 없습니다."
+  },
+  "postViewPage": {
+    "reply": "답글 쓰기"
   }
 };
 static const Map<String, Map<String,dynamic>> mapLocales = {"en": en, "ko": ko};
