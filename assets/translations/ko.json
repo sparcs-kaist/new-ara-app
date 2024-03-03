@@ -1,4 +1,24 @@
 {
+    "boardListPage": {
+        "boards": "게시판",
+        "searchBoardsPostsComments": "게시판, 게시글 및 댓글 검색",
+        "viewAll": "전체보기",
+        "topPosts": "인기글",
+        "bookmarks": "담아둔 글"
+    },
+    "bulletinSearchPage": {
+        "searchIn": "{koName}에서 검색",
+        "searchInAllPosts": "전체 보기에서 검색",
+        "searchInHistory": "최근 본 글에서 검색",
+        "searchInTopPosts": "실시간 인기글에서 검색",
+        "searchInBookmarks": "담아둔 글에서 검색",
+        "pleaseEnter": "검색어를 입력하세요",
+        "search": "검색",
+        "noResults": "검색 결과가 없습니다."
+    },
+    "loginPage": {
+        "login": "SPARCS SSO로 로그인"
+    },
     "mainPage": {
         "topPost": "실시간 인기글",
         "notice": "공지",
@@ -14,24 +34,7 @@
         "undergradAssoc": "총학",
         "freshmanCouncil": "새학",
         "talk": "자유게시판"
-        },
-    "boardListPage": {
-        "boards": "게시판",
-        "searchBoardsPostsComments": "게시판, 게시글 및 댓글 검색",
-        "viewAll": "전체보기",
-        "topPosts": "인기글",
-        "bookmarks": "담아둔 글"
-        },
-    "bulletinSearchPage": {
-        "searchIn": "{koName}에서 검색",
-        "searchInAllPosts": "전체 보기에서 검색",
-        "searchInHistory": "최근 본 글에서 검색",
-        "searchInTopPosts": "실시간 인기글에서 검색",
-        "searchInBookmarks": "담아둔 글에서 검색",
-        "pleaseEnter": "검색어를 입력하세요",
-        "search": "검색",
-        "noResults": "검색 결과가 없습니다."
-        },
+    },
     "notificationPage": {
         "notifications": "알림",
         "noNotifications": "알림이 없습니다.",
@@ -39,7 +42,7 @@
         "post": "게시물",
         "newComment": "회원님의 게시물에 새로운 댓글이 작성되었습니다.",
         "allNotificationsChecked": "이미 알림을 모두 읽으셨습니다."
-        },
+    },
     "userPage": {
         "change": "수정",
         "myPosts": "작성한 글",
@@ -47,10 +50,7 @@
         "history": "최근 본 글",
         "totalNPosts": "총 {curCount}개의 글",
         "noEmailInfo": "이메일 정보가 없습니다."
-        },
-    "loginPage": {
-        "login": "SPARCS SSO로 로그인"
-        },
+    },
     "settingPage": {
         "title": "설정",
         "postSetting": "게시글 설정",
@@ -75,4 +75,3 @@
         "hotInfo": "인기 공지글 및 인기 글을 매일 오전 8시 30분에 전달해 드립니다."
     }
 }
-    

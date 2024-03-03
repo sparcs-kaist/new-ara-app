@@ -1,20 +1,4 @@
 {
-    "mainPage": {
-        "topPost": "Top Posts",
-        "notice": "Notice",
-        "portalNotice": "Portal Notice",
-        "facility": "Facility",
-        "araAdmins": "Ara Admins",
-        "trades": "Trades",
-        "realEstate": "Real Estate",
-        "market": "Market",
-        "jobsWanted": "Jobs Wanted",
-        "organizationsAndClubs": "Organizations and Clubs",
-        "gradAssoc": "Grad Assoc",
-        "undergradAssoc": "Undergrad Assoc",
-        "freshmanCouncil": "Freshman Council",
-        "talk": "Talk"
-    },
     "boardListPage": {
         "boards": "Boards",
         "searchBoardsPostsComments": "Search boards, posts, and comments",
@@ -32,6 +16,25 @@
         "pleaseEnter": "Please enter a search term",
         "noResults": "No results found."
     },
+    "loginPage": {
+        "login": "Sign in with SPARCS SSO"
+    },
+    "mainPage": {
+        "topPost": "Top Posts",
+        "notice": "Notice",
+        "portalNotice": "Portal Notice",
+        "facility": "Facility",
+        "araAdmins": "Ara Admins",
+        "trades": "Trades",
+        "realEstate": "Real Estate",
+        "market": "Market",
+        "jobsWanted": "Jobs Wanted",
+        "organizationsAndClubs": "Organizations and Clubs",
+        "gradAssoc": "Grad Assoc",
+        "undergradAssoc": "Undergrad Assoc",
+        "freshmanCouncil": "Freshman Council",
+        "talk": "Talk"
+    },
     "notificationPage": {
         "notifications": "Notifications",
         "noNotifications": "No notifications.",
@@ -39,17 +42,6 @@
         "post": "Post",
         "newComment": "New comment to your post.",
         "allNotificationsChecked": "You've already check all the notifications."
-    },
-    "userPage": {
-        "change": "Chg.",
-        "myPosts": "My Posts",
-        "bookmarks": "Scrapped",
-        "history": "History",
-        "totalNPosts": "{curCount} posts",
-        "noEmailInfo": "No email information"
-    },
-    "loginPage": {
-        "login": "SPARCS SSO로 로그인"
     },
     "settingPage": {
         "title": "Setting",
@@ -73,5 +65,13 @@
         "hotNotifications": "Hot Notifications",
         "hotPosts": "Hot Posts",
         "hotInfo": "We deliver hot announcements and posts every day at 8:30 a.m."
+    },
+    "userPage": {
+        "change": "Chg.",
+        "myPosts": "My Posts",
+        "bookmarks": "Scrapped",
+        "history": "History",
+        "totalNPosts": "{curCount} posts",
+        "noEmailInfo": "No email information"
     }
 }
