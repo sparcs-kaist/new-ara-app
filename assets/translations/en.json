@@ -16,6 +16,12 @@
         "pleaseEnter": "Please enter a search term",
         "noResults": "No results found."
     },
+    "inquiryPage": {
+        "title": "Inquiries and Suggestions",
+        "reLoginErrorWithWithdrawalGuide": "This account has already been withdrawn.\nIf you wish to re-register, please click this link to contact us via email.",
+        "reLoginErrorWithWithdrawalEmailTitle": "Re-registration Inquiry",
+        "reLoginErrorWithWithdrawalEmailContents": "If you have any additional comments, please write them below.\n\n※ An Ara administrator will respond within 48 hours.※\n\nUser ID: {userID}\nNickname: {nickname}\nEmail: {email}\nPlatform: App\n"
+    },
     "loginPage": {
         "login": "Sign in with SPARCS SSO"
     },

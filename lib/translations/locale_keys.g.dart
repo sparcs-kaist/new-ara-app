@@ -1,23 +1,6 @@
 // DO NOT EDIT. This is code generated via package:easy_localization/generate.dart
 
-// ignore_for_file: constant_identifier_names
-
 abstract class  LocaleKeys {
-  static const mainPage_topPost = 'mainPage.topPost';
-  static const mainPage_notice = 'mainPage.notice';
-  static const mainPage_portalNotice = 'mainPage.portalNotice';
-  static const mainPage_facility = 'mainPage.facility';
-  static const mainPage_araAdmins = 'mainPage.araAdmins';
-  static const mainPage_trades = 'mainPage.trades';
-  static const mainPage_realEstate = 'mainPage.realEstate';
-  static const mainPage_market = 'mainPage.market';
-  static const mainPage_jobsWanted = 'mainPage.jobsWanted';
-  static const mainPage_organizationsAndClubs = 'mainPage.organizationsAndClubs';
-  static const mainPage_gradAssoc = 'mainPage.gradAssoc';
-  static const mainPage_undergradAssoc = 'mainPage.undergradAssoc';
-  static const mainPage_freshmanCouncil = 'mainPage.freshmanCouncil';
-  static const mainPage_talk = 'mainPage.talk';
-  static const mainPage = 'mainPage';
   static const boardListPage_boards = 'boardListPage.boards';
   static const boardListPage_searchBoardsPostsComments = 'boardListPage.searchBoardsPostsComments';
   static const boardListPage_viewAll = 'boardListPage.viewAll';
@@ -33,6 +16,28 @@ abstract class  LocaleKeys {
   static const bulletinSearchPage_pleaseEnter = 'bulletinSearchPage.pleaseEnter';
   static const bulletinSearchPage_noResults = 'bulletinSearchPage.noResults';
   static const bulletinSearchPage = 'bulletinSearchPage';
+  static const inquiryPage_title = 'inquiryPage.title';
+  static const inquiryPage_reLoginErrorWithWithdrawalGuide = 'inquiryPage.reLoginErrorWithWithdrawalGuide';
+  static const inquiryPage_reLoginErrorWithWithdrawalEmailTitle = 'inquiryPage.reLoginErrorWithWithdrawalEmailTitle';
+  static const inquiryPage_reLoginErrorWithWithdrawalEmailContents = 'inquiryPage.reLoginErrorWithWithdrawalEmailContents';
+  static const inquiryPage = 'inquiryPage';
+  static const loginPage_login = 'loginPage.login';
+  static const loginPage = 'loginPage';
+  static const mainPage_topPost = 'mainPage.topPost';
+  static const mainPage_notice = 'mainPage.notice';
+  static const mainPage_portalNotice = 'mainPage.portalNotice';
+  static const mainPage_facility = 'mainPage.facility';
+  static const mainPage_araAdmins = 'mainPage.araAdmins';
+  static const mainPage_trades = 'mainPage.trades';
+  static const mainPage_realEstate = 'mainPage.realEstate';
+  static const mainPage_market = 'mainPage.market';
+  static const mainPage_jobsWanted = 'mainPage.jobsWanted';
+  static const mainPage_organizationsAndClubs = 'mainPage.organizationsAndClubs';
+  static const mainPage_gradAssoc = 'mainPage.gradAssoc';
+  static const mainPage_undergradAssoc = 'mainPage.undergradAssoc';
+  static const mainPage_freshmanCouncil = 'mainPage.freshmanCouncil';
+  static const mainPage_talk = 'mainPage.talk';
+  static const mainPage = 'mainPage';
   static const notificationPage_notifications = 'notificationPage.notifications';
   static const notificationPage_noNotifications = 'notificationPage.noNotifications';
   static const notificationPage_today = 'notificationPage.today';
@@ -40,15 +45,13 @@ abstract class  LocaleKeys {
   static const notificationPage_newComment = 'notificationPage.newComment';
   static const notificationPage_allNotificationsChecked = 'notificationPage.allNotificationsChecked';
   static const notificationPage = 'notificationPage';
-  static const userPage_change = 'userPage.change';
-  static const userPage_myPosts = 'userPage.myPosts';
-  static const userPage_bookmarks = 'userPage.bookmarks';
-  static const userPage_history = 'userPage.history';
-  static const userPage_totalNPosts = 'userPage.totalNPosts';
-  static const userPage_noEmailInfo = 'userPage.noEmailInfo';
-  static const userPage = 'userPage';
-  static const loginPage_login = 'loginPage.login';
-  static const loginPage = 'loginPage';
+  static const postListShowPage_boards = 'postListShowPage.boards';
+  static const postListShowPage_history = 'postListShowPage.history';
+  static const postListShowPage_topPosts = 'postListShowPage.topPosts';
+  static const postListShowPage_allPosts = 'postListShowPage.allPosts';
+  static const postListShowPage_bookmarks = 'postListShowPage.bookmarks';
+  static const postListShowPage_testBoard = 'postListShowPage.testBoard';
+  static const postListShowPage = 'postListShowPage';
   static const settingPage_title = 'settingPage.title';
   static const settingPage_postSetting = 'settingPage.postSetting';
   static const settingPage_adult = 'settingPage.adult';
@@ -71,5 +74,12 @@ abstract class  LocaleKeys {
   static const settingPage_hotPosts = 'settingPage.hotPosts';
   static const settingPage_hotInfo = 'settingPage.hotInfo';
   static const settingPage = 'settingPage';
+  static const userPage_change = 'userPage.change';
+  static const userPage_myPosts = 'userPage.myPosts';
+  static const userPage_bookmarks = 'userPage.bookmarks';
+  static const userPage_history = 'userPage.history';
+  static const userPage_totalNPosts = 'userPage.totalNPosts';
+  static const userPage_noEmailInfo = 'userPage.noEmailInfo';
+  static const userPage = 'userPage';
 
 }

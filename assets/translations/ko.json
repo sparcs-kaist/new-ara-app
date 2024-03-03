@@ -16,6 +16,12 @@
         "search": "검색",
         "noResults": "검색 결과가 없습니다."
     },
+    "inquiryPage": {
+        "title": "문의 및 건의",
+        "reLoginErrorWithWithdrawalGuide": "이미 탈퇴 했던 계정입니다.\n재가입을 하고 싶다면 이 링크를 눌러 이메일로 문의하세요.",
+        "reLoginErrorWithWithdrawalEmailTitle": "재가입 문의",
+        "reLoginErrorWithWithdrawalEmailContents": "추가로 말하실 말이 있다면 여기 아래에 적어주세요.\n\n※ Ara 관리자가 48시간 이내로 답변드립니다.※\n\n유저 번호: {userID}\n닉네임: {nickname}\n이메일: {email}\n플랫폼: App\n"
+    },
     "loginPage": {
         "login": "SPARCS SSO로 로그인"
     },
