@@ -377,7 +377,10 @@ class _MainPageState extends State<MainPage> with WidgetsBindingObserver {
                   context.setLocale(const Locale('ko'));
                 }
               },
-              icon: const Icon(Icons.language,color: ColorsInfo.newara,)),
+              icon: const Icon(
+                Icons.language,
+                color: ColorsInfo.newara,
+              )),
           IconButton(
             icon: SvgPicture.asset(
               'assets/icons/post.svg',
@@ -1264,7 +1267,9 @@ class LittleText extends StatelessWidget {
         children: [
           if (content.parent_topic != null && showTopic)
             TextSpan(
-              text: context.locale != const Locale('ko') ?   "[${content.parent_topic!.ko_name}] ": "[${content.parent_topic!.en_name}] ",
+              text: context.locale == const Locale('ko')
+                  ? "[${content.parent_topic!.ko_name}] "
+                  : "[${content.parent_topic!.en_name}] ",
               style: const TextStyle(
                 fontSize: 14,
                 fontWeight: FontWeight.w400,
