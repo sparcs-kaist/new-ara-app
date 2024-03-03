@@ -169,7 +169,7 @@ class _BulletinSearchPageState extends State<BulletinSearchPage> {
           myMap != null &&
           _textEdtingController.text == targetWord) {
         setState(() {
-          for (int i = 0; i < (myMap!["results"].length ?? 0); i++) {
+          for (int i = 0; i < (myMap["results"].length ?? 0); i++) {
             //???/
             if (myMap["results"][i]["created_by"]["profile"] != null) {
               postPreviewList.add(

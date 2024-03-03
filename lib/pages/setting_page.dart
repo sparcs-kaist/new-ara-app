@@ -412,7 +412,7 @@ class SettingPageState extends State<SettingPage> {
                                       child: Text(
                                         LocaleKeys.settingPage_contactAdmins
                                             .tr(),
-                                        style: TextStyle(
+                                        style: const TextStyle(
                                           fontSize: 16,
                                           fontWeight: FontWeight.w500,
                                         ),
@@ -459,7 +459,7 @@ class SettingPageState extends State<SettingPage> {
                             child: Center(
                               child: Text(
                                 LocaleKeys.settingPage_signOut.tr(),
-                                style: TextStyle(
+                                style: const TextStyle(
                                   color: ColorsInfo.newara,
                                   fontSize: 16,
                                   fontWeight: FontWeight.w500,
@@ -523,7 +523,7 @@ class SettingPageState extends State<SettingPage> {
                             child: Center(
                               child: Text(
                                 LocaleKeys.settingPage_withdrawal.tr(),
-                                style: TextStyle(
+                                style: const TextStyle(
                                   color: ColorsInfo.newara,
                                   fontSize: 16,
                                   fontWeight: FontWeight.w500,

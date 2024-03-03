@@ -53,7 +53,7 @@ class CodegenLoader extends AssetLoader{
     "noNotifications": "No notifications.",
     "today": "Today",
     "post": "Post",
-    "newComment": "New    comment to your post.",
+    "newComment": "New comment to your post.",
     "allNotificationsChecked": "You've already check all the notifications."
   },
   "userPage": {

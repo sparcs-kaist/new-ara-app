@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:new_ara_app/pages/bulletin_search_page.dart';
-import 'package:new_ara_app/translations/codegen_loader.g.dart';
 import 'package:new_ara_app/translations/locale_keys.g.dart';
 import 'package:provider/provider.dart';
 
