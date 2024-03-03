@@ -27,7 +27,7 @@ platform :android do
   end
 
   desc "Create a release note on GitHub."
-  lane :create_release_note do
+  lane :create_release_note do |options|
 
 
     # YAML에서 버전 정보를 추출
@@ -46,9 +46,9 @@ platform :android do
       http_method: "POST",
       path: "/repos/sparcs-kaist/new-ara-app/releases",
       body: {
-        tag_name: "Android-v#{version_number}-#{version_code}",
+        tag_name: "Android-v#{version_number}-#{version_code}-#{options[:short_name]}",
         target_commitish: current_commit_hash,
-        name: "Android-v#{version_number}-#{version_code}",
+        name: "Android-v#{version_number}-#{version_code}-#{options[:short_name]}",
         body: "Write here the content of release notes...",
         draft: false,
         prerelease: false
@@ -58,13 +58,30 @@ platform :android do
   end
 
   desc "Deploy a alpha version to the Google Play"
-  lane :alpha do
+  lane :alpha do |options|
+    unless ["production", "development"].include?(options[:env])
+      UI.user_error!("Invalid env given, pass using `env: 'production'` or `env: 'development'`")
+    end
+
+    short_name = ""
+    long_name = ""
+
+    if(options[:env] == "production")
+      # 배포용
+      short_name = "prod"
+      long_name = "production"
+    else
+      # 개발용
+      short_name = "dev"
+      long_name = "development"
+    end
+
     set_timestamp_version
-    sh "flutter build appbundle --no-tree-shake-icons"
+    sh "flutter build appbundle --no-tree-shake-icons --dart-define=ENV=#{long_name}"
     upload_to_play_store(
       aab: "../build/app/outputs/bundle/release/app-release.aab",
       track: "alpha",
     )
-    create_release_note
+    create_release_note(short_name: short_name)
   end
 end

@@ -104,10 +104,10 @@ class _BulletinSearchPageState extends State<BulletinSearchPage> {
     if (mounted && myMap != null && targetWord == _textEdtingController.text) {
       setState(() {
         postPreviewList.clear();
-        for (int i = 0; i < (myMap?["results"].length ?? 0); i++) {
+        for (int i = 0; i < (myMap["results"].length ?? 0); i++) {
           try {
             postPreviewList
-                .add(ArticleListActionModel.fromJson(myMap!["results"][i]));
+                .add(ArticleListActionModel.fromJson(myMap["results"][i]));
             //     debugPrint("refreshPostList : postPreviewList[$i] : ${_temp[i].title}");
           } catch (error) {
             debugPrint(

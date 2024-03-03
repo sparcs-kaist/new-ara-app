@@ -43,6 +43,7 @@ dependencies:
   flutter_native_splash: "^2.3.7"
   webview_flutter_android: ^3.15.0
   webview_flutter_wkwebview: ^3.10.2
+  flutter_dotenv: ^5.1.0
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -56,6 +57,8 @@ flutter:
   - assets/translations/
   - assets/images/
   - assets/icons/
+  - .env.development
+  - .env.production
   fonts:
   - family: Pretendard
     fonts:

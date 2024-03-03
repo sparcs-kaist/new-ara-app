@@ -307,7 +307,6 @@ class _PostListShowPageState extends State<PostListShowPage>
                           _loadNextPage();
                         },
                       );
-                      ;
                     },
                     child: ListView.separated(
                       physics: const AlwaysScrollableScrollPhysics(),
