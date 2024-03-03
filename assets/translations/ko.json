@@ -22,6 +22,16 @@
         "인기글": "인기글",
         "담아둔 글": "담아둔 글"
     },
+    "post_search_page":{
+        "search_in":"{ko_name}에서 검색",
+        "search_in_all_posts": "전체 보기에서 검색",
+        "search_in_history": "최근 본 글에서 검색",
+        "search_in_top_posts": "실시간 인기글에서 검색",
+        "search_in_bookmarks": "담아둔 글에서 검색",
+        "search": "검색",
+        "please_enter": "검색어를 입력하세요",
+        "no_results": "검색 결과가 없습니다."
+    },
     "notification_page": {
         "알림": "알림",
         "알림이 없습니다": "알림이 없습니다.",

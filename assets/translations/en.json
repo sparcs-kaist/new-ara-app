@@ -27,6 +27,15 @@
         "인기글": "Top Posts",
         "담아둔 글": "Bookmarks"
     },
+    "bulletin_search_page":{
+        "search_in":"Search in {en_name}",
+        "search_in_all_posts": "Search in all posts",
+        "search_in_history": "Search in recently viewed posts",
+        "search_in_top_posts": "Search in real-time popular posts",
+        "search_in_bookmarks": "Search in saved posts",
+        "please_enter": "Please enter a search term",
+        "no_results": "No results found."
+    },
     "notification_page": {
         "알림": "Notifications",
         "알림이 없습니다": "No notifications.",
