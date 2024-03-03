@@ -19,13 +19,13 @@ import 'package:new_ara_app/providers/notification_provider.dart';
 const boardsByGroupLength = 5;
 
 /// `BulletinListPage`는 사용자가 이 페이지에서 다양한 게시판을 탐색하고 선택함..
-class BulletinListPage extends StatefulWidget {
-  const BulletinListPage({super.key});
+class BoardListPage extends StatefulWidget {
+  const BoardListPage({super.key});
   @override
-  State<StatefulWidget> createState() => _BulletinListPageState();
+  State<StatefulWidget> createState() => _BoardListPageState();
 }
 
-class _BulletinListPageState extends State<BulletinListPage> {
+class _BoardListPageState extends State<BoardListPage> {
   /// 데이터 로딩 상태
   bool isLoading = true;
 
