@@ -454,7 +454,7 @@ class _NotificationPageState extends State<NotificationPage> {
               _setIsLoadingTotal(false);
             }
           } else {
-            requestInfoSnackBar("이미 알림을 모두 읽으셨습니다.");
+            requestInfoSnackBar("notification_page.이미 알림을 모두 읽으셨습니다".tr());
           }
         },
         backgroundColor: Colors.white,
