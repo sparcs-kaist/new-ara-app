@@ -27,6 +27,13 @@
         "인기글": "Top Posts",
         "담아둔 글": "Bookmarks"
     },
+    "notification_page": {
+        "알림": "Notifications",
+        "알림이 없습니다": "No notifications.",
+        "오늘": "Today",
+        "게시물": "Post",
+        "new_comment": "New comment to your post."
+    },
     "myPage": {
         "change": "change",
         "mypost": "My Posts",

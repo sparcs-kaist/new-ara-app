@@ -178,7 +178,7 @@ class _NotificationPageState extends State<NotificationPage> {
       appBar: AppBar(
         centerTitle: false,
         title: Text(
-          'appBar.notification'.tr(),
+          'notification_page.알림'.tr(),
           style: const TextStyle(
             fontSize: 28,
             fontWeight: FontWeight.w700,
@@ -224,9 +224,9 @@ class _NotificationPageState extends State<NotificationPage> {
                                         BlendMode.srcIn,
                                       ),
                                     ),
-                                    const Text(
-                                      '알림이 없습니다.',
-                                      style: TextStyle(
+                                    Text(
+                                      'notification_page.알림이 없습니다'.tr(),
+                                      style: const TextStyle(
                                         color: Color(0xFFBBBBBB),
                                         fontSize: 15,
                                       ),
@@ -256,11 +256,11 @@ class _NotificationPageState extends State<NotificationPage> {
                                           ? _buildDateInfo(
                                               _modelList[idx - 1].created_at,
                                               _modelList[idx].created_at)
-                                          : const SizedBox(
+                                          : SizedBox(
                                               height: 35,
                                               child: Text(
-                                                '오늘',
-                                                style: TextStyle(
+                                                'notification_page.오늘'.tr(),
+                                                style: const TextStyle(
                                                   fontSize: 14,
                                                   fontWeight: FontWeight.w500,
                                                   color: Color.fromRGBO(
@@ -342,7 +342,8 @@ class _NotificationPageState extends State<NotificationPage> {
                                                         color: (targetNoti
                                                                     .is_read ??
                                                                 false)
-                                                            ? const Color(0xffbbbbbb)
+                                                            ? const Color(
+                                                                0xffbbbbbb)
                                                             : ColorsInfo.newara,
                                                       ),
                                                       child: Center(
@@ -371,8 +372,10 @@ class _NotificationPageState extends State<NotificationPage> {
                                                         CrossAxisAlignment
                                                             .start,
                                                     children: [
+                                                      //TODO: 나중에 백엔드에서 보내주는 내용으로 보여줘야함.
                                                       Text(
-                                                        targetNoti.title,
+                                                        "notification_page.new_comment"
+                                                            .tr(),
                                                         maxLines: 1,
                                                         overflow: TextOverflow
                                                             .ellipsis,
@@ -399,7 +402,7 @@ class _NotificationPageState extends State<NotificationPage> {
                                                         ),
                                                       ),
                                                       Text(
-                                                        "| 게시글: ${targetNoti.related_article.title}",
+                                                        "| ${"notification_page.게시물".tr()}: ${targetNoti.related_article.title}",
                                                         maxLines: 1,
                                                         overflow: TextOverflow
                                                             .ellipsis,
@@ -480,13 +483,21 @@ class _NotificationPageState extends State<NotificationPage> {
     if (prevDate.year == curDate.year &&
         prevDate.month == curDate.month &&
         prevDate.day == curDate.day) return Container();
-    String dateText =
+
+    String dateTextInKorean =
         "${(curDate.year != now.year ? "${curDate.year}년 " : "")}${curDate.month}월 ${curDate.day}일";
+
+    String dateTextInEnglish =
+        DateFormat("MMMM d${curDate.year != now.year ? ", yyyy" : ""}", "en_US")
+            .format(curDate);
+
     return SizedBox(
       height: 60,
       child: Center(
         child: Text(
-          dateText,
+          context.locale.languageCode == "ko"
+              ? dateTextInKorean
+              : dateTextInEnglish,
           style: const TextStyle(
             fontSize: 14,
             fontWeight: FontWeight.w500,
