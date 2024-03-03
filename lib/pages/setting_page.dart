@@ -64,7 +64,8 @@ class SettingPageState extends State<SettingPage> {
           color: ColorsInfo.newara,
           icon: SvgPicture.asset(
             'assets/icons/left_chevron.svg',
-            colorFilter: const ColorFilter.mode(ColorsInfo.newara, BlendMode.srcIn),
+            colorFilter:
+                const ColorFilter.mode(ColorsInfo.newara, BlendMode.srcIn),
             width: 35,
             height: 35,
           ),
@@ -160,12 +161,14 @@ class SettingPageState extends State<SettingPage> {
                                             await userProvider.apiMeUserInfo();
                                             debugPrint(
                                                 "Change of 'see_sexual' succeed!");
-                                            requestSnackBar("설정이 저장되었습니다.");
+                                            requestSnackBar(
+                                                "setting_page.설정이 저장되었습니다."
+                                                    .tr());
                                           } catch (error) {
                                             debugPrint(
                                                 "Change of 'see_sexual' failed: $error");
                                             requestSnackBar(
-                                                "에러가 발생하여 설정 반영에 실패했습니다. 다시 시도해주십시오.");
+                                                "setting_page.설정 중 에러 발생".tr());
                                             setState(() => seeSexual = !value);
                                           }
                                         }),
@@ -209,12 +212,14 @@ class SettingPageState extends State<SettingPage> {
                                             await userProvider.apiMeUserInfo();
                                             debugPrint(
                                                 "Change of 'see_social' succeed!");
-                                            requestSnackBar("설정이 저장되었습니다.");
+                                            requestSnackBar(
+                                                "setting_page.설정이 저장되었습니다"
+                                                    .tr());
                                           } catch (error) {
                                             debugPrint(
                                                 "Change of 'see_social' failed: $error");
                                             requestSnackBar(
-                                                "에러가 발생하여 설정 반영에 실패했습니다. 다시 시도해주십시오.");
+                                                "setting_page.설정 중 에러 발생".tr());
                                             setState(() => seeSocial = !value);
                                           }
                                         }),
@@ -297,9 +302,9 @@ class SettingPageState extends State<SettingPage> {
                                     const BlockedUserDialog());
                           },
                           child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
                             crossAxisAlignment: CrossAxisAlignment.center,
                             children: [
-                              const SizedBox(height: 13),
                               SizedBox(
                                 width: MediaQuery.of(context).size.width - 60,
                                 child: Center(
@@ -319,8 +324,7 @@ class SettingPageState extends State<SettingPage> {
                       ),
                       const SizedBox(height: 5),
                       // 유저 차단 기능 설명 문구
-                      const TextInfo(
-                          '유저 차단은 게시글의 더보기 기능에서 하실 수 있습니다.\n하루에 최대 10번만 변경 가능합니다.'),
+                      TextInfo("setting_page.유저 차단 안내".tr()),
                       const SizedBox(height: 20),
                       SizedBox(
                         width: MediaQuery.of(context).size.width - 50,
@@ -331,9 +335,9 @@ class SettingPageState extends State<SettingPage> {
                               width: 36,
                               height: 36,
                             ),
-                            const Text(
-                              '정보',
-                              style: TextStyle(
+                            Text(
+                              "setting_page.정보".tr(),
+                              style: const TextStyle(
                                 fontSize: 18,
                                 fontWeight: FontWeight.w700,
                               ),
@@ -373,9 +377,9 @@ class SettingPageState extends State<SettingPage> {
                                 children: [
                                   Container(
                                       margin: const EdgeInsets.only(left: 10),
-                                      child: const Text(
-                                        '이용약관',
-                                        style: TextStyle(
+                                      child: Text(
+                                        'setting_page.이용약관'.tr(),
+                                        style: const TextStyle(
                                           fontSize: 16,
                                           fontWeight: FontWeight.w500,
                                         ),
@@ -399,8 +403,8 @@ class SettingPageState extends State<SettingPage> {
                                   // 정치글 보기 글씨
                                   Container(
                                       margin: const EdgeInsets.only(left: 10),
-                                      child: const Text(
-                                        '운영진에게 문의하기',
+                                      child: Text(
+                                        'setting_page.운영진에게 문의하기'.tr(),
                                         style: TextStyle(
                                           fontSize: 16,
                                           fontWeight: FontWeight.w500,
@@ -445,9 +449,9 @@ class SettingPageState extends State<SettingPage> {
                                 ),
                               );
                             },
-                            child: const Center(
+                            child: Center(
                               child: Text(
-                                '로그아웃',
+                                'setting_page.로그아웃'.tr(),
                                 style: TextStyle(
                                   color: ColorsInfo.newara,
                                   fontSize: 16,
@@ -509,9 +513,9 @@ class SettingPageState extends State<SettingPage> {
                                 ),
                               );
                             },
-                            child: const Center(
+                            child: Center(
                               child: Text(
-                                '회원탈퇴',
+                                'setting_page.회원탈퇴'.tr(),
                                 style: TextStyle(
                                   color: ColorsInfo.newara,
                                   fontSize: 16,
@@ -523,8 +527,7 @@ class SettingPageState extends State<SettingPage> {
                         ),
                       ),
                       const SizedBox(height: 5),
-                      const TextInfo(
-                          '회원 탈퇴는 Ara 관리자가 확인 후 처리해드리며, 최대 24시간이 소요될 수 있습니다'),
+                      TextInfo("setting_page.회원 탈퇴 안내".tr()),
                     ],
                   ),
                 ),
