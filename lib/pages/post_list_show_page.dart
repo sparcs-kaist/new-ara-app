@@ -1,7 +1,9 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:new_ara_app/pages/bulletin_search_page.dart';
 import 'package:new_ara_app/pages/post_write_page.dart';
+import 'package:new_ara_app/translations/locale_keys.g.dart';
 import 'package:provider/provider.dart';
 
 import 'package:new_ara_app/constants/board_type.dart';
@@ -45,35 +47,6 @@ class _PostListShowPageState extends State<PostListShowPage>
     super.initState();
 
     var userProvider = context.read<UserProvider>();
-
-    // 게시판 타입에 따라 API URL과 게시판 이름을 설정
-    switch (widget.boardType) {
-      case BoardType.free:
-        apiUrl = "articles/?parent_board=${widget.boardInfo!.id.toInt()}&page=";
-        _boardName = widget.boardInfo!.ko_name;
-        break;
-      case BoardType.recent:
-        apiUrl = "articles/recent/?page=";
-        _boardName = "최근 본 글";
-        break;
-      case BoardType.top:
-        apiUrl = "articles/top/?page=";
-        _boardName = "실시간 인기글";
-        break;
-      case BoardType.all:
-        apiUrl = "articles/?page=";
-        _boardName = "전체보기";
-        break;
-      case BoardType.scraps:
-        apiUrl = "scraps/?page=";
-        _boardName = "담아둔 글";
-        break;
-      default:
-        apiUrl = "articles/?page=";
-        _boardName = "테스트 게시판";
-        break;
-    }
-
     _scrollController.addListener(_scrollListener);
     WidgetsBinding.instance.addObserver(this);
     updateAllBulletinList().then(
@@ -82,6 +55,39 @@ class _PostListShowPageState extends State<PostListShowPage>
       },
     );
     context.read<NotificationProvider>().checkIsNotReadExist(userProvider);
+  }
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // 게시판 타입에 따라 API URL과 게시판 이름을 설정
+    switch (widget.boardType) {
+      case BoardType.free:
+        apiUrl = "articles/?parent_board=${widget.boardInfo!.id.toInt()}&page=";
+        _boardName = context.locale == const Locale("kr")
+            ? widget.boardInfo!.ko_name
+            : widget.boardInfo!.en_name;
+        break;
+      case BoardType.recent:
+        apiUrl = "articles/recent/?page=";
+        _boardName = LocaleKeys.postListShowPage_history.tr();
+        break;
+      case BoardType.top:
+        apiUrl = "articles/top/?page=";
+        _boardName = LocaleKeys.postListShowPage_topPosts.tr();
+        break;
+      case BoardType.all:
+        apiUrl = "articles/?page=";
+        _boardName = LocaleKeys.postListShowPage_allPosts.tr();
+        break;
+      case BoardType.scraps:
+        apiUrl = "scraps/?page=";
+        _boardName = LocaleKeys.postListShowPage_bookmarks.tr();
+        break;
+      default:
+        apiUrl = "articles/?page=";
+        _boardName = LocaleKeys.postListShowPage_testBoard.tr();
+        break;
+    }
   }
 
   @override
@@ -213,11 +219,11 @@ class _PostListShowPageState extends State<PostListShowPage>
                 width: 35,
                 height: 35,
               ),
-              const Padding(
-                padding: EdgeInsets.only(left: 29),
+              Padding(
+                padding: const EdgeInsets.only(left: 29),
                 child: Text(
-                  "게시판",
-                  style: TextStyle(
+                  LocaleKeys.postListShowPage_boards.tr(),
+                  style: const TextStyle(
                     color: Color(0xFFED3A3A),
                     fontSize: 17,
                     fontWeight: FontWeight.w500,

@@ -49,6 +49,14 @@
         "newComment": "New comment to your post.",
         "allNotificationsChecked": "You've already check all the notifications."
     },
+    "postListShowPage": {
+        "boards": "Boards",
+        "history": "History",
+        "topPosts":"Top Posts",
+        "allPosts":"All Posts",
+        "bookmarks":"Bookmarks",
+        "testBoard":"Test Board"
+    },
     "settingPage": {
         "title": "Setting",
         "postSetting": "Post Setting",
