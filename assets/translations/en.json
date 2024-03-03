@@ -1,81 +1,74 @@
 {
-    "appBar": {
-        "chatting": "Chatting",
-        "notification": "Notifications",
-        "bulletin": "Bulletins"
+    "mainPage": {
+        "topPost": "Top Posts",
+        "notice": "Notice",
+        "portalNotice": "Portal Notice",
+        "facility": "Facility",
+        "araAdmins": "Ara Admins",
+        "trades": "Trades",
+        "realEstate": "Real Estate",
+        "market": "Market",
+        "jobsWanted": "Jobs Wanted",
+        "organizationsAndClubs": "Organizations and Clubs",
+        "gradAssoc": "Grad Assoc",
+        "undergradAssoc": "Undergrad Assoc",
+        "freshmanCouncil": "Freshman Council",
+        "talk": "Talk"
     },
-    "main_page": {
-        "실시간 인기글": "Top Posts",
-        "공지": "Notice",
-        "포탈 공지": "Portal Notice",
-        "입주 업체": "Facility",
-        "Ara 운영진": "Ara Admins",
-        "거래": "Trades",
-        "부동산": "Real Estate",
-        "중고거래": "Market",
-        "구인구직": "Jobs Wanted",
-        "학생 단체": "Organizations and Clubs",
-        "원총": "Grad Assoc",
-        "총학": "Undergrad Assoc",
-        "새학": "Freshman Council",
-        "자유게시판": "Talk"
+    "boardListPage": {
+        "boards": "Boards",
+        "searchBoardsPostsComments": "Search boards, posts, and comments",
+        "viewAll": "View All",
+        "topPosts": "Top Posts",
+        "bookmarks": "Bookmarks"
     },
-    "board_list_page": {
-        "게시판": "Boards",
-        "게시판, 게시글 및 댓글 검색": "Search boards, posts, and comments",
-        "전체보기": "View All",
-        "인기글": "Top Posts",
-        "담아둔 글": "Bookmarks"
+    "bulletinSearchPage": {
+        "searchIn": "Search in {en_name}",
+        "searchInAllPosts": "Search in all posts",
+        "searchInHistory": "Search in recently viewed posts",
+        "searchInTopPosts": "Search in real-time popular posts",
+        "searchInBookmarks": "Search in saved posts",
+        "pleaseEnter": "Please enter a search term",
+        "noResults": "No results found."
     },
-    "bulletin_search_page":{
-        "search_in":"Search in {en_name}",
-        "search_in_all_posts": "Search in all posts",
-        "search_in_history": "Search in recently viewed posts",
-        "search_in_top_posts": "Search in real-time popular posts",
-        "search_in_bookmarks": "Search in saved posts",
-        "please_enter": "Please enter a search term",
-        "no_results": "No results found."
+    "notificationPage": {
+        "notifications": "Notifications",
+        "noNotifications": "No notifications.",
+        "today": "Today",
+        "post": "Post",
+        "newComment": "New    comment to your post.",
+        "allNotificationsChecked": "You've already check all the notifications."
     },
-    "notification_page": {
-        "알림": "Notifications",
-        "알림이 없습니다": "No notifications.",
-        "오늘": "Today",
-        "게시물": "Post",
-        "new_comment": "New comment to your post.",
-        "이미 알림을 모두 읽으셨습니다": "You've already check all the notifications."
-    },
-    "user_page": {
+    "userPage": {
         "change": "Chg.",
-        "my_post": "My Posts",
+        "myPosts": "My Posts",
         "scrapped": "Scrapped",
         "history": "History",
-        "총 n개의 글": "{curCount} posts",
-        "이메일 정보가 없습니다": "No email information"
+        "totalNPosts": "{curCount} posts",
+        "noEmailInfo": "No email information"
     },
-    "login_page": {
-        "login": "Sign in with SPARCS SSO"
-    },
-    "setting_page": {
+    "loginPage": {},
+    "settingPage": {
         "title": "Setting",
-        "bulletin": "Post Setting",
+        "postSetting": "Post Setting",
         "adult": "Sexual Posts",
         "politics": "Political Posts",
         "block": "Blocked Users",
-        "blocked_users": "View Blocked Users",
-        "how_to_block": "You can block accounts through the detail function in posts or comments.",
-        "정보": "Information",
-        "이용약관": "Terms and Conditions of Service",
-        "운영진에게 문의하기": "Contact the Admins",
-        "로그아웃": "Sign out",
-        "회원탈퇴": "Withdrawal",
-        "회원 탈퇴 안내": "Membership withdrawal will be processed after confirmation by the Ara administrator, and it may take up to 24 hours.",
-        "유저 차단 안내": "User blocking can be done through the 'More' option in posts. You can change it up to 10 times per day.",
-        "설정이 저장되었습니다": "The settings have been saved.",
-        "설정 중 에러 발생": "An error occurred, and the settings could not be applied. Please try again.",
-        "myreply": "Comments and Nested Comments of My Posts",
-        "reply": "Nested Comments",
-        "hot_noti": "Hot Notifications",
-        "hot_posts": "Hot Posts",
-        "hot_info": "We deliver hot announcements and posts every day at 8:30 a.m."
+        "viewBlockedUsers": "View Blocked Users",
+        "howToBlock": "You can block accounts through the detail function in posts or comments.",
+        "information": "Information",
+        "termsAndConditions": "Terms and Conditions of Service",
+        "contactAdmins": "Contact the Admins",
+        "signOut": "Sign out",
+        "withdrawal": "Withdrawal",
+        "withdrawalGuide": "Membership withdrawal will be processed after confirmation by the Ara administrator, and it may take up to 24 hours.",
+        "userBlockingGuide": "User blocking can be done through the 'More' option in posts. You can change it up to 10 times per day.",
+        "settingsSaved": "The settings have been saved.",
+        "errorSavingSettings": "An error occurred, and the settings could not be applied. Please try again.",
+        "myReplies": "Comments and Nested Comments of My Posts",
+        "replies": "Nested Comments",
+        "hotNotifications": "Hot Notifications",
+        "hotPosts": "Hot Posts",
+        "hotInfo": "We deliver hot announcements and posts every day at 8:30 a.m."
     }
 }

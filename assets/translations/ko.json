@@ -1,77 +1,77 @@
 {
-    "main_page": {
-        "실시간 인기글": "실시간 인기글",
-        "공지": "공지",
-        "포탈 공지": "포탈 공지",
-        "입주 업체": "입주 업체",
-        "Ara 운영진": "Ara 운영진",
-        "거래": "거래",
-        "부동산": "부동산",
-        "중고거래": "중고거래",
-        "구인구직": "구인구직",
-        "학생 단체": "학생 단체",
-        "원총": "원총",
-        "총학": "총학",
-        "새학": "새학",
-        "자유게시판": "자유게시판"
-    },
-    "board_list_page": {
-        "게시판": "게시판",
-        "게시판, 게시글 및 댓글 검색": "게시판, 게시글 및 댓글 검색",
-        "전체보기": "전체보기",
-        "인기글": "인기글",
-        "담아둔 글": "담아둔 글"
-    },
-    "post_search_page":{
-        "search_in":"{ko_name}에서 검색",
-        "search_in_all_posts": "전체 보기에서 검색",
-        "search_in_history": "최근 본 글에서 검색",
-        "search_in_top_posts": "실시간 인기글에서 검색",
-        "search_in_bookmarks": "담아둔 글에서 검색",
-        "search": "검색",
-        "please_enter": "검색어를 입력하세요",
-        "no_results": "검색 결과가 없습니다."
-    },
-    "notification_page": {
-        "알림": "알림",
-        "알림이 없습니다": "알림이 없습니다.",
-        "오늘": "오늘",
-        "게시물": "게시물",
-        "new_comment": "회원님의 게시물에 새로운 댓글이 작성되었습니다.",
-        "이미 알림을 모두 읽으셨습니다": "이미 알림을 모두 읽으셨습니다."
-    },
-    "user_page": {
+    "mainPage": {
+        "topPost": "실시간 인기글",
+        "notice": "공지",
+        "portalNotice": "포탈 공지",
+        "facility": "입주 업체",
+        "araAdmins": "Ara 운영진",
+        "trades": "거래",
+        "realEstate": "부동산",
+        "market": "중고거래",
+        "jobsWanted": "구인구직",
+        "organizationsAndClubs": "학생 단체",
+        "gradAssoc": "원총",
+        "undergradAssoc": "총학",
+        "freshmanCouncil": "새학",
+        "talk": "자유게시판"
+        },
+    "boardListPage": {
+        "boards": "게시판",
+        "searchBoardsPostsComments": "게시판, 게시글 및 댓글 검색",
+        "viewAll": "전체보기",
+        "topPosts": "인기글",
+        "bookmarks": "담아둔 글"
+        },
+    "bulletinSearchPage": {
+        "searchIn": "{koName}에서 검색",
+        "searchInAllPosts": "전체 보기에서 검색",
+        "searchInHistory": "최근 본 글에서 검색",
+        "searchInTopPosts": "실시간 인기글에서 검색",
+        "searchInBookmarks": "담아둔 글에서 검색",
+        "pleaseEnter": "검색어를 입력하세요",
+        "noResults": "검색 결과가 없습니다."
+        },
+    "notificationPage": {
+        "notifications": "알림",
+        "noNotifications": "알림이 없습니다.",
+        "today": "오늘",
+        "post": "게시물",
+        "newComment": "회원님의 게시물에 새로운 댓글이 작성되었습니다.",
+        "allNotificationsChecked": "이미 알림을 모두 읽으셨습니다."
+        },
+    "userPage": {
         "change": "수정",
-        "my_post": "작성한 글",
+        "myPosts": "작성한 글",
         "scrapped": "담아둔 글",
         "history": "최근 본 글",
-        "총 n개의 글": "총 {curCount}개의 글",
-        "이메일 정보가 없습니다": "이메일 정보가 없습니다."
-    },
-    "login_page": {
+        "totalNPosts": "총 {curCount}개의 글",
+        "noEmailInfo": "이메일 정보가 없습니다."
+        },
+    "loginPage": {
         "login": "SPARCS SSO로 로그인"
-    },
-    "setting_page": {
+        },
+    "settingPage": {
         "title": "설정",
-        "bulletin": "게시글",
+        "postSetting": "게시글",
         "adult": "성인글 보기",
         "politics": "정치글 보기",
         "block": "차단",
-        "blocked_users": "차단한 유저 목록",
-        "how_to_block": "유저 차단은 게시글이나 댓글에서 더보기 기능을 통해 가능합니다.",
-        "정보": "정보",
-        "이용약관": "이용약관",
-        "운영진에게 문의하기": "운영진에게 문의하기",
-        "로그아웃": "로그아웃",
-        "회원탈퇴": "회원탈퇴",
-        "회원 탈퇴 안내": "회원 탈퇴는 Ara 관리자가 확인 후 처리해드리며, 최대 24시간이 소요될 수 있습니다.",
-        "유저 차단 안내": "유저 차단은 게시글의 '더보기' 기능에서 하실 수 있습니다. 하루에 최대 10번만 변경 가능합니다.",
-        "설정이 저장되었습니다": "설정이 저장되었습니다.",
-        "설정 중 에러 발생": "에러가 발생하여 설정 반영에 실패했습니다. 다시 시도해주십시오.",
-        "myreply": "내 글에 달린 댓글 및 대댓글",
-        "reply": "댓글에 달린 대댓글",
-        "hot_noti": "인기 공지글",
-        "hot_posts": "인기글",
-        "hot_info": "인기 공지글 및 인기 글을 매일 오전 8시 30분에 전달해 드립니다."
+        "viewBlockedUsers": "차단한 유저 목록",
+        "howToBlock": "유저 차단은 게시글이나 댓글에서 더보기 기능을 통해 가능합니다.",
+        "information": "정보",
+        "termsAndConditions": "이용약관",
+        "contactAdmins": "운영진에게 문의하기",
+        "signOut": "로그아웃",
+        "withdrawal": "회원탈퇴",
+        "withdrawalGuide": "회원 탈퇴는 Ara 관리자가 확인 후 처리해드리며, 최대 24시간이 소요될 수 있습니다.",
+        "userBlockingGuide": "유저 차단은 게시글의 '더보기' 기능에서 하실 수 있습니다. 하루에 최대 10번만 변경 가능합니다.",
+        "settingsSaved": "설정이 저장되었습니다.",
+        "errorSavingSettings": "에러가 발생하여 설정 반영에 실패했습니다. 다시 시도해주십시오.",
+        "myReplies": "내 글에 달린 댓글 및 대댓글",
+        "replies": "댓글에 달린 대댓글",
+        "hotNotifications": "인기 공지글",
+        "hotPosts": "인기글",
+        "hotInfo": "인기 공지글 및 인기 글을 매일 오전 8시 30분에 전달해 드립니다."
     }
 }
+    
