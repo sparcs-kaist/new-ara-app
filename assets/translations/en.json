@@ -5,9 +5,20 @@
         "bulletin": "Bulletins"
     },
     "main_page": {
-        "realtime": "Hot posts",
-        "notice": "Notices",
-        "stu_community": "Student Community"
+        "실시간 인기글": "Top Posts",
+        "공지": "Notice",
+        "포탈 공지": "Portal Notice",
+        "입주 업체": "Facility",
+        "Ara 운영진": "Ara Admins",
+        "거래": "Trades",
+        "부동산": "Real Estate",
+        "중고거래": "Market",
+        "구인구직": "Jobs Wanted",
+        "학생 단체": "Organizations and Clubs",
+        "원총": "Grad Assoc",
+        "총학": "Undergrad Assoc",
+        "새학": "Freshman Council",
+        "자유게시판": "Talks"
     },
     "myPage": {
         "change": "change",

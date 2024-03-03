@@ -370,6 +370,15 @@ class _MainPageState extends State<MainPage> with WidgetsBindingObserver {
         ),
         actions: [
           IconButton(
+              onPressed: () {
+                if (context.locale == const Locale('ko')) {
+                  context.setLocale(const Locale('en'));
+                } else {
+                  context.setLocale(const Locale('ko'));
+                }
+              },
+              icon: const Icon(Icons.language,color: ColorsInfo.newara,)),
+          IconButton(
             icon: SvgPicture.asset(
               'assets/icons/post.svg',
               colorFilter:
@@ -449,7 +458,7 @@ class _MainPageState extends State<MainPage> with WidgetsBindingObserver {
     return Column(
       children: [
         MainPageTextButton(
-          'main_page.realtime',
+          'main_page.실시간 인기글'.tr(),
           () async {
             await Navigator.of(context).push(slideRoute(const PostListShowPage(
               boardType: BoardType.top,
@@ -515,7 +524,7 @@ class _MainPageState extends State<MainPage> with WidgetsBindingObserver {
     return Column(
       children: [
         MainPageTextButton(
-          '자유게시판',
+          'main_page.자유게시판'.tr(),
           () async {
             await Navigator.of(context).push(slideRoute(PostListShowPage(
               boardType: BoardType.free,
@@ -575,9 +584,9 @@ class _MainPageState extends State<MainPage> with WidgetsBindingObserver {
       children: [
         SizedBox(
           width: MediaQuery.of(context).size.width - 40,
-          child: const Text(
-            '공지',
-            style: TextStyle(
+          child: Text(
+            "main_page.공지".tr(),
+            style: const TextStyle(
               fontWeight: FontWeight.w600,
               fontSize: 20,
               color: Colors.black,
@@ -620,9 +629,9 @@ class _MainPageState extends State<MainPage> with WidgetsBindingObserver {
                     const SizedBox(
                       width: 5,
                     ),
-                    const Text(
-                      "포탈 공지",
-                      style: TextStyle(
+                    Text(
+                      "main_page.포탈 공지".tr(),
+                      style: const TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.w700,
                         color: Color(0xFF1F4899),
@@ -706,9 +715,9 @@ class _MainPageState extends State<MainPage> with WidgetsBindingObserver {
                 },
                 child: Row(
                   children: [
-                    const Text(
-                      "입주 업체",
-                      style: TextStyle(
+                    Text(
+                      "main_page.입주 업체".tr(),
+                      style: const TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.w700,
                         color: Color(0xFF646464),
@@ -758,9 +767,9 @@ class _MainPageState extends State<MainPage> with WidgetsBindingObserver {
                 },
                 child: Row(
                   children: [
-                    const Text(
-                      "Ara 운영진",
-                      style: TextStyle(
+                    Text(
+                      "main_page.Ara 운영진".tr(),
+                      style: const TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.w700,
                         color: Color(0xFFED3A3A),
@@ -809,9 +818,9 @@ class _MainPageState extends State<MainPage> with WidgetsBindingObserver {
       children: [
         SizedBox(
           width: MediaQuery.of(context).size.width - 40,
-          child: const Text(
-            '거래',
-            style: TextStyle(
+          child: Text(
+            'main_page.거래'.tr(),
+            style: const TextStyle(
               fontWeight: FontWeight.w600,
               fontSize: 20,
               color: Colors.black,
@@ -843,9 +852,9 @@ class _MainPageState extends State<MainPage> with WidgetsBindingObserver {
                 },
                 child: Row(
                   children: [
-                    const Text(
-                      "부동산",
-                      style: TextStyle(
+                    Text(
+                      "main_page.부동산".tr(),
+                      style: const TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.w700,
                         color: Color(0xFF4A90E2),
@@ -898,9 +907,9 @@ class _MainPageState extends State<MainPage> with WidgetsBindingObserver {
                 },
                 child: Row(
                   children: [
-                    const Text(
-                      "중고거래",
-                      style: TextStyle(
+                    Text(
+                      "main_page.중고거래".tr(),
+                      style: const TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.w700,
                         color: Color(0xFF646464),
@@ -951,9 +960,9 @@ class _MainPageState extends State<MainPage> with WidgetsBindingObserver {
                 },
                 child: Row(
                   children: [
-                    const Text(
-                      "구인구직",
-                      style: TextStyle(
+                    Text(
+                      "main_page.구인구직".tr(),
+                      style: const TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.w700,
                         color: Color(0xFFED3A3A),
@@ -1001,7 +1010,7 @@ class _MainPageState extends State<MainPage> with WidgetsBindingObserver {
   Widget _buildStuCommunityContents() {
     return Column(
       children: [
-        MainPageTextButton('main_page.stu_community', () async {
+        MainPageTextButton('main_page.학생 단체'.tr(), () async {
           await Navigator.of(context).push(slideRoute(PostListShowPage(
               boardType: BoardType.free,
               boardInfo: _searchBoard("students-group"))));
@@ -1025,9 +1034,9 @@ class _MainPageState extends State<MainPage> with WidgetsBindingObserver {
             children: [
               Row(
                 children: [
-                  const Text(
-                    '원총',
-                    style: TextStyle(
+                  Text(
+                    'main_page.원총'.tr(),
+                    style: const TextStyle(
                       fontWeight: FontWeight.w700,
                       fontSize: 14,
                       color: Color.fromRGBO(177, 177, 177, 1),
@@ -1057,9 +1066,9 @@ class _MainPageState extends State<MainPage> with WidgetsBindingObserver {
               ),
               Row(
                 children: [
-                  const Text(
-                    '총학',
-                    style: TextStyle(
+                  Text(
+                    'main_page.총학'.tr(),
+                    style: const TextStyle(
                       fontWeight: FontWeight.w700,
                       fontSize: 14,
                       color: Color.fromRGBO(177, 177, 177, 1),
@@ -1089,9 +1098,9 @@ class _MainPageState extends State<MainPage> with WidgetsBindingObserver {
               ),
               Row(
                 children: [
-                  const Text(
-                    '새학',
-                    style: TextStyle(
+                  Text(
+                    'main_page.새학'.tr(),
+                    style: const TextStyle(
                       fontWeight: FontWeight.w700,
                       fontSize: 14,
                       color: Color.fromRGBO(177, 177, 177, 1),
@@ -1203,7 +1212,7 @@ class MainPageTextButton extends StatelessWidget {
             child: Row(
               children: [
                 Text(
-                  buttonTitle.tr(),
+                  buttonTitle,
                   style: const TextStyle(
                     fontWeight: FontWeight.w600,
                     fontSize: 20,
@@ -1255,7 +1264,7 @@ class LittleText extends StatelessWidget {
         children: [
           if (content.parent_topic != null && showTopic)
             TextSpan(
-              text: "[${content.parent_topic!.ko_name}] ",
+              text: context.locale != const Locale('ko') ?   "[${content.parent_topic!.ko_name}] ": "[${content.parent_topic!.en_name}] ",
               style: const TextStyle(
                 fontSize: 14,
                 fontWeight: FontWeight.w400,

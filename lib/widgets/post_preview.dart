@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
@@ -33,7 +34,9 @@ class _PostPreviewState extends State<PostPreview> {
             children: [
               if (widget.model.parent_topic != null)
                 Text(
-                  "[${widget.model.parent_topic!.ko_name}] ",
+                  context.locale == const Locale('ko') ?
+                  "[${widget.model.parent_topic!.ko_name}] ":
+                  "[${widget.model.parent_topic!.en_name}] ",
                   style: const TextStyle(
                     color: Color(0xFFED3A3A),
                     fontWeight: FontWeight.w500,
