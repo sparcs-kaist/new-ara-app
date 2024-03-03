@@ -35,11 +35,13 @@
         "new_comment": "New comment to your post.",
         "이미 알림을 모두 읽으셨습니다": "You've already check all the notifications."
     },
-    "myPage": {
-        "change": "change",
-        "mypost": "My Posts",
-        "scrap": "Scrapped",
-        "recent": "Recent"
+    "user_page": {
+        "change": "Chg.",
+        "my_post": "My Posts",
+        "scrapped": "Scrapped",
+        "history": "History",
+        "총 n개의 글": "{curCount} posts",
+        "이메일 정보가 없습니다": "No email information"
     },
     "login_page": {
         "login": "Sign in with SPARCS SSO"

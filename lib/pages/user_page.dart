@@ -69,9 +69,9 @@ class _UserPageState extends State<UserPage>
   List<int> curPage = [1, 1, 1];
 
   final List<String> _tabs = [
-    'myPage.mypost'.tr(),
-    'myPage.scrap'.tr(),
-    'myPage.recent'.tr()
+    'user_page.my_post'.tr(),
+    'user_page.scrapped'.tr(),
+    'user_page.history'.tr()
   ];
 
   @override
@@ -186,9 +186,8 @@ class _UserPageState extends State<UserPage>
             splashColor: Colors.white,
             icon: SvgPicture.asset(
               'assets/icons/setting.svg',
-             
-              colorFilter: const ColorFilter.mode(
-                  ColorsInfo.newara, BlendMode.srcIn),
+              colorFilter:
+                  const ColorFilter.mode(ColorsInfo.newara, BlendMode.srcIn),
               width: 35,
               height: 35,
             ),
@@ -227,7 +226,7 @@ class _UserPageState extends State<UserPage>
                 width: MediaQuery.of(context).size.width - 40,
                 height: 24,
                 child: Text(
-                  '총 $curCount개의 글',
+                  'user_page.총 n개의 글'.tr(namedArgs: {'curCount':curCount.toString()}),
                   style: const TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w700,
@@ -306,7 +305,7 @@ class _UserPageState extends State<UserPage>
                   Text(
                     userProvider.naUser == null ||
                             userProvider.naUser?.email == null
-                        ? "이메일 정보가 없습니다."
+                        ? "user_page.이메일 정보가 없습니다".tr()
                         : "${userProvider.naUser?.email}",
                     style: const TextStyle(
                       fontSize: 14,
@@ -320,7 +319,7 @@ class _UserPageState extends State<UserPage>
           ),
           const SizedBox(width: 30),
           SizedBox(
-            width: 26,
+            width: 30,
             height: 21,
             child: GestureDetector(
               behavior: HitTestBehavior.translucent,
@@ -332,7 +331,7 @@ class _UserPageState extends State<UserPage>
                 );
               },
               child: Text(
-                'myPage.change'.tr(),
+                'user_page.change'.tr(),
                 style: const TextStyle(
                   color: Color.fromRGBO(100, 100, 100, 1),
                   fontSize: 14,
