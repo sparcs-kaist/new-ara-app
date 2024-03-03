@@ -991,19 +991,19 @@ class ForAndroidTesterDialog extends StatelessWidget {
                         controller: _scrollController,
                         children: const [
                           Text(
-                            '''I hope this message finds you well. I am writing to seek assistance regarding an issue we've encountered following the submission of our app to the Google Play Store, specifically on the public track for review.
-                            
-We have observed an unusual volume of comments within our app, which seems to be related to the review process. This has led to significant inconvenience for our users, particularly impacting the user experience for students who rely on our app for communication and educational purposes.,
-                          
-While we understand the importance of thorough app reviews and user feedback, we believe there might be a misunderstanding or a technical issue that has resulted in excessive commenting. This has not only affected the app's performance but also its reception among our target audience.
-                          
+                            '''I am writing to seek assistance regarding an issue we have encountered following the production review of our app on the Google Play Store.
+
+During our production review process, we observed an unusual volume of comments within our app, which appear to be related to the review process itself. These abnormal comments were made using an account provided exclusively to Google Play Store reviewers. This situation has caused significant inconvenience, especially for students who rely on our app for communication and educational purposes.
+
+While we understand the importance of thorough app reviews and user feedback, we suspect that a misunderstanding or a technical issue has led to the excessive commenting. This not only affects the app's performance but also its acceptance among our target audience.
+
 To resolve this issue, we would greatly appreciate it if you could provide guidelines on why comment posting is necessary during the review process and what features we should demonstrate. Our goal is to ensure a positive and constructive environment for our users while adhering to Google Play's policies and standards.
-                          
-We appreciate your understanding and assistance in this matter. Please let us know if there are specific steps we should follow or if additional information is required from our side.
-                          
-Thank you for your attention to this issue. We look forward to your prompt response and support.
-                          
-Best regards,
+
+We are thankful for your understanding and support on this matter. Please let us know if there are specific procedures we should follow or if additional information is required from our side.
+
+Thank you for your attention and support on this issue. We look forward to your prompt response.
+
+Sincerely,
 
 
 안녕하십니까? 구글 플레이 스토어의 프로덕션 심사 후 저희가 마주한 문제에 대해 도움을 요청하기 위해 이 메시지를 작성합니다.
