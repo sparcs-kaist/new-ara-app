@@ -634,7 +634,7 @@ class _PostViewPageState extends State<PostViewPage> {
             Row(
               children: [
                 Text(
-                  specificTime(_article.created_at),
+                  specificTime(_article.created_at, context.locale),
                   style: const TextStyle(
                     fontSize: 12,
                     fontWeight: FontWeight.w500,
