@@ -367,7 +367,7 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
                                   color: Color.fromRGBO(99, 99, 99, 1),
                                 ),
                               ),
-                              const SizedBox(width: 45),
+                              SizedBox(width: context.locale == const Locale('ko') ? 45 : 80),
                               Expanded(
                                 child: Text(
                                   userProviderData.naUser!.email ??
