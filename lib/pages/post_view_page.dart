@@ -238,7 +238,11 @@ class _PostViewPageState extends State<PostViewPage> {
                     Padding(
                       padding: const EdgeInsets.only(left: 29),
                       child: Text(
-                        _isPageLoaded ? _article.parent_board.ko_name : "",
+                        _isPageLoaded
+                            ? (context.locale == const Locale('ko')
+                                ? _article.parent_board.ko_name
+                                : _article.parent_board.en_name)
+                            : "",
                         style: const TextStyle(
                           color: Color(0xFFED3A3A),
                           fontSize: 17,
@@ -596,7 +600,8 @@ class _PostViewPageState extends State<PostViewPage> {
             children: [
               if (_article.parent_topic != null)
                 TextSpan(
-                  text: "[${context.locale == const Locale('ko') ? _article.parent_topic!.ko_name : _article.parent_topic!.en_name}] ",
+                  text:
+                      "[${context.locale == const Locale('ko') ? _article.parent_topic!.ko_name : _article.parent_topic!.en_name}] ",
                   style: const TextStyle(
                     color: Color(0xFFED3A3A),
                     fontWeight: FontWeight.w700,
