@@ -1672,7 +1672,7 @@ class _PostViewPageState extends State<PostViewPage> {
               children: [
                 const SizedBox(height: 3),
                 Text(
-                  '나의 댓글 "${targetComment?.content}" 수정 중',
+                  context.locale == const Locale('ko') ? '나의 댓글 "${targetComment?.content}" 수정 중' : 'Editing my comment "${targetComment?.content}"',
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: const TextStyle(
