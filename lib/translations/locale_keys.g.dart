@@ -82,6 +82,23 @@ abstract class  LocaleKeys {
   static const userPage_noEmailInfo = 'userPage.noEmailInfo';
   static const userPage = 'userPage';
   static const postViewPage_reply = 'postViewPage.reply';
+  static const postViewPage_scrap = 'postViewPage.scrap';
+  static const postViewPage_scrapped = 'postViewPage.scrapped';
+  static const postViewPage_share = 'postViewPage.share';
+  static const postViewPage_launchInBrowserNotAvailable = 'postViewPage.launchInBrowserNotAvailable';
+  static const postViewPage_blockedUsersPost = 'postViewPage.blockedUsersPost';
+  static const postViewPage_showHiddenPosts = 'postViewPage.showHiddenPosts';
+  static const postViewPage_hit = 'postViewPage.hit';
+  static const postViewPage_noSelfVotingInfo = 'postViewPage.noSelfVotingInfo';
+  static const postViewPage_failedToBlock = 'postViewPage.failedToBlock';
+  static const postViewPage_unblock = 'postViewPage.unblock';
+  static const postViewPage_block = 'postViewPage.block';
+  static const postViewPage_delete = 'postViewPage.delete';
+  static const postViewPage_report = 'postViewPage.report';
+  static const postViewPage_edit = 'postViewPage.edit';
+  static const postViewPage_blockedUsersComment = 'postViewPage.blockedUsersComment';
+  static const postViewPage_commentHintText = 'postViewPage.commentHintText';
+  static const postViewPage_noCommentWarning = 'postViewPage.noCommentWarning';
   static const postViewPage = 'postViewPage';
 
 }

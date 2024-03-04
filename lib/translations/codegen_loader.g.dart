@@ -105,7 +105,24 @@ class CodegenLoader extends AssetLoader{
     "noEmailInfo": "No email information"
   },
   "postViewPage": {
-    "reply": "Reply"
+    "reply": "Reply",
+    "scrap": "Scrap",
+    "scrapped": "Scrapped",
+    "share": "Share",
+    "launchInBrowserNotAvailable": "The URL could not be opened by browser.",
+    "blockedUsersPost": "This post was written by blocked user.",
+    "showHiddenPosts": "Show hidden posts",
+    "hit": "Hit",
+    "noSelfVotingInfo": "You cannot vote for your post or comment!",
+    "failedToBlock": "Failed to block.",
+    "unblock": "Unblock",
+    "block": "Block",
+    "delete": "Delete",
+    "report": "Report",
+    "edit": "Edit",
+    "blockedUsersComment": "This comment was written by blocked user.",
+    "commentHintText": "Type your comment here.",
+    "noCommentWarning": "No comment has been written!"
   }
 };
 static const Map<String,dynamic> ko = {
@@ -199,7 +216,24 @@ static const Map<String,dynamic> ko = {
     "noEmailInfo": "이메일 정보가 없습니다."
   },
   "postViewPage": {
-    "reply": "답글 쓰기"
+    "reply": "답글 쓰기",
+    "scrap": "담아두기",
+    "scrapped": "담아둔 글",
+    "share": "공유",
+    "launchInBrowserNotAvailable": "브라우저로 URL을 열 수 없습니다.",
+    "blockedUsersPost": "차단한 사용자의 게시물입니다.",
+    "showHiddenPosts": "숨긴내용 보기",
+    "hit": "조회",
+    "noSelfVotingInfo": "본인 게시글이나 댓글에는 좋아요를 누를 수 없습니다.",
+    "failedToBlock": "차단에 실패했습니다.",
+    "unblock": "차단 해제",
+    "block": "차단",
+    "delete": "삭제",
+    "report": "신고",
+    "edit": "수정",
+    "blockedUsersComment": "차단한 사용자의 댓글입니다.",
+    "commentHintText": "댓글을 입력해주세요.",
+    "noCommentWarning": "댓글이 작성되지 않았습니다!"
   }
 };
 static const Map<String, Map<String,dynamic>> mapLocales = {"en": en, "ko": ko};

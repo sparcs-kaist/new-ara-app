@@ -89,6 +89,23 @@
         "noEmailInfo": "No email information"
     },
     "postViewPage": {
-        "reply": "Reply"
+        "reply": "Reply",
+        "scrap": "Scrap",
+        "scrapped": "Scrapped",
+        "share": "Share",
+        "launchInBrowserNotAvailable": "The URL could not be opened by browser.",
+        "blockedUsersPost": "This post was written by blocked user.",
+        "showHiddenPosts": "Show hidden posts",
+        "hit": "Hit",
+        "noSelfVotingInfo": "You cannot vote for your post or comment!",
+        "failedToBlock": "Failed to block.",
+        "unblock": "Unblock",
+        "block": "Block",
+        "delete": "Delete",
+        "report": "Report",
+        "edit": "Edit",
+        "blockedUsersComment": "This comment was written by blocked user.",
+        "commentHintText": "Type your comment here.",
+        "noCommentWarning": "No comment has been written!"
     }
 }

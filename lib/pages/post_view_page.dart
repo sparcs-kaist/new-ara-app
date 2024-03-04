@@ -297,7 +297,7 @@ class _PostViewPageState extends State<PostViewPage> {
                                                 .then((launchRes) {
                                               if (launchRes == false) {
                                                 showInfoBySnackBar(context,
-                                                    '브라우저로 URL을 열 수 없습니다.');
+                                                    LocaleKeys.postViewPage_launchInBrowserNotAvailable.tr());
                                               }
                                             });
                                           },
@@ -438,7 +438,7 @@ class _PostViewPageState extends State<PostViewPage> {
                                                               .contains(_article
                                                                   .created_by.id
                                                                   .toString()))
-                                                      ? "차단한 사용자의 게시물입니다.\n"
+                                                      ? "${LocaleKeys.postViewPage_blockedUsersPost.tr()}\n"
                                                       : getAllHiddenReasons(
                                                               _article
                                                                   .why_hidden)
@@ -474,7 +474,7 @@ class _PostViewPageState extends State<PostViewPage> {
                                                             .can_override_hidden ==
                                                         true,
                                                     child: Container(
-                                                        width: 104,
+                                                        width: context.locale == const Locale('ko') ? 104 : 150,
                                                         height: 36,
                                                         decoration:
                                                             BoxDecoration(
@@ -497,10 +497,10 @@ class _PostViewPageState extends State<PostViewPage> {
                                                                     true);
                                                             _updateState();
                                                           },
-                                                          child: const Center(
+                                                          child: Center(
                                                             child: Text(
-                                                              '숨긴내용 보기',
-                                                              style: TextStyle(
+                                                              LocaleKeys.postViewPage_showHiddenPosts.tr(),
+                                                              style: const TextStyle(
                                                                 color: Color(
                                                                     0xff4a4a4a),
                                                                 fontWeight:
@@ -597,7 +597,7 @@ class _PostViewPageState extends State<PostViewPage> {
                 text: (_isAnonymousIOS(_article) &&
                         blockedProvider.blockedAnonymousPostIDs
                             .contains(_article.created_by.id.toString()))
-                    ? "차단한 사용자의 게시물입니다."
+                    ? LocaleKeys.postViewPage_blockedUsersPost.tr()
                     : getTitle(_article.title, _article.is_hidden,
                         _article.why_hidden),
                 style: const TextStyle(
@@ -627,7 +627,7 @@ class _PostViewPageState extends State<PostViewPage> {
                 ),
                 const SizedBox(width: 10),
                 Text(
-                  '조회 ${_article.hit_count}',
+                  '${LocaleKeys.postViewPage_hit.tr()} ${_article.hit_count}',
                   style: const TextStyle(
                     fontSize: 12,
                     fontWeight: FontWeight.w500,
@@ -769,7 +769,7 @@ class _PostViewPageState extends State<PostViewPage> {
           onTap: () async {
             // 자신의 글에는 요청을 보내지 않고 미리 차단하기
             if (_article.is_mine) {
-              showInfoBySnackBar(context, "본인 게시글이나 댓글에는 좋아요를 누를 수 없습니다.");
+              showInfoBySnackBar(context, LocaleKeys.postViewPage_noSelfVotingInfo.tr());
               return;
             }
             // 다른 사람의 글인 경우
@@ -810,7 +810,7 @@ class _PostViewPageState extends State<PostViewPage> {
           // TODO: onTap 메서드 함수화하기
           onTap: () async {
             if (_article.is_mine) {
-              showInfoBySnackBar(context, "본인 게시글이나 댓글에는 좋아요를 누를 수 없습니다.");
+              showInfoBySnackBar(context, LocaleKeys.postViewPage_noSelfVotingInfo.tr());
               return;
             } else {
               ArticleModel tmpArticle =
@@ -924,7 +924,7 @@ class _PostViewPageState extends State<PostViewPage> {
                     ),
                     //const SizedBox(width: 4),
                     Text(
-                      _article.my_scrap == null ? '담아두기' : '담아둔 글',
+                      _article.my_scrap == null ? LocaleKeys.postViewPage_scrap.tr() : LocaleKeys.postViewPage_scrapped.tr(),
                       style: TextStyle(
                         color: _article.my_scrap == null
                             ? const Color(0xFF646464)
@@ -997,9 +997,9 @@ class _PostViewPageState extends State<PostViewPage> {
                           Color.fromRGBO(100, 100, 100, 1), BlendMode.srcIn),
                     ),
                     //const SizedBox(width: 6),
-                    const Text(
-                      '공유',
-                      style: TextStyle(
+                    Text(
+                      LocaleKeys.postViewPage_share.tr(),
+                      style: const TextStyle(
                         fontSize: 13,
                         fontWeight: FontWeight.w500,
                         color: Color(0xFF646464),
@@ -1067,7 +1067,7 @@ class _PostViewPageState extends State<PostViewPage> {
                             else {
                               debugPrint("failed to block");
                               Navigator.pop(context);
-                              showInfoBySnackBar(context, "차단에 실패했습니다.");
+                              showInfoBySnackBar(context, LocaleKeys.postViewPage_failedToBlock.tr());
                             }
                           });
                         },
@@ -1125,8 +1125,8 @@ class _PostViewPageState extends State<PostViewPage> {
                                       blockedProvider.blockedAnonymousPostIDs
                                           .contains(_article.created_by.id
                                               .toString())))
-                              ? '차단 해제'
-                              : '차단',
+                              ? LocaleKeys.postViewPage_unblock.tr()
+                              : LocaleKeys.postViewPage_block.tr(),
                           style: const TextStyle(
                               fontSize: 13,
                               fontWeight: FontWeight.w500,
@@ -1185,9 +1185,9 @@ class _PostViewPageState extends State<PostViewPage> {
                           height: 22,
                           colorFilter: const ColorFilter.mode(
                               Color(0xFF646464), BlendMode.srcIn)),
-                      const Text(
-                        '삭제',
-                        style: TextStyle(
+                      Text(
+                        LocaleKeys.postViewPage_delete.tr(),
+                        style: const TextStyle(
                             fontSize: 13,
                             fontWeight: FontWeight.w500,
                             color: Color(0xFF646464)),
@@ -1227,9 +1227,9 @@ class _PostViewPageState extends State<PostViewPage> {
                         colorFilter: const ColorFilter.mode(
                             Color(0xFF646464), BlendMode.srcIn),
                       ),
-                      const Text(
-                        '신고',
-                        style: TextStyle(
+                      Text(
+                        LocaleKeys.postViewPage_report.tr(),
+                        style: const TextStyle(
                             fontSize: 13,
                             fontWeight: FontWeight.w500,
                             color: Color(0xFF646464)),
@@ -1270,9 +1270,9 @@ class _PostViewPageState extends State<PostViewPage> {
                           BlendMode.srcIn,
                         ),
                       ),
-                      const Text(
-                        '수정',
-                        style: TextStyle(
+                      Text(
+                        LocaleKeys.postViewPage_edit.tr(),
+                        style: const TextStyle(
                             fontSize: 13,
                             fontWeight: FontWeight.w500,
                             color: Color(0xFF646464)),
@@ -1434,9 +1434,9 @@ class _PostViewPageState extends State<PostViewPage> {
                     child: (_isAnonymousIOS(_article) &&
                             blockedProvider.blockedAnonymousPostIDs
                                 .contains(curComment.created_by.id.toString()))
-                        ? const Text(
-                            "차단한 사용자의 댓글입니다.",
-                            style: TextStyle(
+                        ? Text(
+                            LocaleKeys.postViewPage_blockedUsersComment.tr(),
+                            style: const TextStyle(
                               fontSize: 14,
                               fontWeight: FontWeight.w400,
                               color: Colors.grey,
@@ -1468,7 +1468,7 @@ class _PostViewPageState extends State<PostViewPage> {
                                 onTap: () async {
                                   if (curComment.is_mine) {
                                     showInfoBySnackBar(context,
-                                        "본인 게시글이나 댓글에는 좋아요를 누를 수 없습니다.");
+                                        LocaleKeys.postViewPage_noSelfVotingInfo.tr());
                                     return;
                                   } else {
                                     CommentNestedCommentListActionModel
@@ -1515,7 +1515,7 @@ class _PostViewPageState extends State<PostViewPage> {
                                   // onTap 메서드 함수화하기
                                   if (curComment.is_mine) {
                                     showInfoBySnackBar(context,
-                                        "본인 게시글이나 댓글에는 좋아요를 누를 수 없습니다.");
+                                        LocaleKeys.postViewPage_noSelfVotingInfo.tr());
                                     return;
                                   } else {
                                     // 원래 모델값을 저장하기 위해 임시 모델 생성
@@ -1787,10 +1787,10 @@ class _PostViewPageState extends State<PostViewPage> {
             minLines: 1,
             maxLines: 5,
             keyboardType: TextInputType.multiline,
-            decoration: const InputDecoration(
+            decoration: InputDecoration(
               border: InputBorder.none,
-              hintText: '댓글을 입력해주세요',
-              hintStyle: TextStyle(
+              hintText: LocaleKeys.postViewPage_commentHintText.tr(),
+              hintStyle: const TextStyle(
                 color: Color(0xFFBBBBBB),
                 fontSize: 14,
                 fontWeight: FontWeight.w500,
@@ -1798,7 +1798,7 @@ class _PostViewPageState extends State<PostViewPage> {
             ),
             validator: (value) {
               if (value == null || value.isEmpty) {
-                return '댓글이 작성되지 않았습니다!';
+                return LocaleKeys.postViewPage_noCommentWarning.tr();
               }
               return null;
             },
