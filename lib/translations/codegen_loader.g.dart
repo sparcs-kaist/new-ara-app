@@ -94,7 +94,8 @@ class CodegenLoader extends AssetLoader{
     "replies": "Nested Comments",
     "hotNotifications": "Hot Notifications",
     "hotPosts": "Hot Posts",
-    "hotInfo": "We deliver hot announcements and posts every day at 8:30 a.m."
+    "hotInfo": "We deliver hot announcements and posts every day at 8:30 a.m.",
+    "emailNotAvailable": "The default mail application cannot be opened, please contact ara@sparcs.org ."
   },
   "userPage": {
     "change": "Chg.",
@@ -152,6 +153,9 @@ class CodegenLoader extends AssetLoader{
     "report": "Report",
     "edit": "Edit",
     "delete": "Delete"
+  },
+  "postPreview": {
+    "blockedUsersPost": "This post was written by blocked user."
   }
 };
 static const Map<String,dynamic> ko = {
@@ -234,7 +238,8 @@ static const Map<String,dynamic> ko = {
     "replies": "댓글에 달린 대댓글",
     "hotNotifications": "인기 공지글",
     "hotPosts": "인기글",
-    "hotInfo": "인기 공지글 및 인기 글을 매일 오전 8시 30분에 전달해 드립니다."
+    "hotInfo": "인기 공지글 및 인기 글을 매일 오전 8시 30분에 전달해 드립니다.",
+    "emailNotAvailable": "기본 메일 어플리케이션을 열 수 없습니다. ara@sparcs.org로 문의 부탁드립니다."
   },
   "userPage": {
     "change": "수정",
@@ -292,6 +297,9 @@ static const Map<String,dynamic> ko = {
     "report": "신고",
     "edit": "수정",
     "delete": "삭제"
+  },
+  "postPreview": {
+    "blockedUsersPost": "차단한 사용자의 게시물입니다."
   }
 };
 static const Map<String, Map<String,dynamic>> mapLocales = {"en": en, "ko": ko};

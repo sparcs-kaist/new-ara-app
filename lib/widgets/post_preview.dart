@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:new_ara_app/translations/locale_keys.g.dart';
 
 import 'package:new_ara_app/models/article_list_action_model.dart';
 import 'package:new_ara_app/utils/time_utils.dart';
@@ -50,7 +51,7 @@ class _PostPreviewState extends State<PostPreview> {
                   (isAnonymousIOS(widget.model) &&
                           blockedProvider.blockedAnonymousPostIDs
                               .contains(widget.model.created_by.id))
-                      ? "차단한 사용자의 게시물입니다."
+                      ? LocaleKeys.postPreview_blockedUsersPost.tr()
                       : getTitle(widget.model.title, widget.model.is_hidden,
                           widget.model.why_hidden),
                   style: TextStyle(

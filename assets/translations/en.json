@@ -78,7 +78,8 @@
         "replies": "Nested Comments",
         "hotNotifications": "Hot Notifications",
         "hotPosts": "Hot Posts",
-        "hotInfo": "We deliver hot announcements and posts every day at 8:30 a.m."
+        "hotInfo": "We deliver hot announcements and posts every day at 8:30 a.m.",
+        "emailNotAvailable": "The default mail application cannot be opened, please contact ara@sparcs.org ."
     },
     "userPage": {
         "change": "Chg.",
@@ -136,5 +137,8 @@
         "report": "Report",
         "edit": "Edit",
         "delete": "Delete"
+    },
+    "postPreview": {
+        "blockedUsersPost": "This post was written by blocked user."
     }
 }

@@ -597,7 +597,7 @@ class SettingPageState extends State<SettingPage> {
     )) {
       debugPrint('Could not launch mail');
       debugPrint("기본 메일앱을 열 수 없습니다.");
-      requestSnackBar("기본 메일 어플리케이션을 열 수 없습니다. ara@sparcs.org로 문의 부탁드립니다.");
+      requestSnackBar(LocaleKeys.settingPage_emailNotAvailable.tr());
       return false;
     }
 
