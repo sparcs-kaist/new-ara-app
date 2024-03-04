@@ -2,7 +2,7 @@
 name: new_ara_app
 description: A new Flutter project.
 publish_to: none
-version: 1.1.0+102212113
+version: 1.1.0+103040304
 environment:
   sdk: ">=2.18.0 <3.0.0"
 dependencies:
@@ -41,13 +41,13 @@ dependencies:
   shared_preferences: "^2.2.2"
   file_icon: "^1.0.0"
   flutter_native_splash: "^2.3.7"
-  webview_flutter_android: ^3.15.0
-  webview_flutter_wkwebview: ^3.10.2
-  flutter_dotenv: ^5.1.0
+  webview_flutter_android: "^3.15.0"
+  webview_flutter_wkwebview: "^3.10.2"
+  flutter_dotenv: "^5.1.0"
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  flutter_lints: ^3.0.1
+  flutter_lints: "^3.0.1"
   flutter_driver:
     sdk: flutter
   test: any
@@ -57,8 +57,8 @@ flutter:
   - assets/translations/
   - assets/images/
   - assets/icons/
-  - .env.development
-  - .env.production
+  - ".env.development"
+  - ".env.production"
   fonts:
   - family: Pretendard
     fonts:
