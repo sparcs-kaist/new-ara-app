@@ -596,7 +596,7 @@ class _PostViewPageState extends State<PostViewPage> {
             children: [
               if (_article.parent_topic != null)
                 TextSpan(
-                  text: "[${_article.parent_topic!.ko_name}] ",
+                  text: "[${context.locale == const Locale('ko') ? _article.parent_topic!.ko_name : _article.parent_topic!.en_name}] ",
                   style: const TextStyle(
                     color: Color(0xFFED3A3A),
                     fontWeight: FontWeight.w700,
