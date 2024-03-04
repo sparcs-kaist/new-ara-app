@@ -139,5 +139,21 @@ abstract class  LocaleKeys {
   static const profileEditPage_nicknameHintText = 'profileEditPage.nicknameHintText';
   static const profileEditPage_nicknameEmptyInfo = 'profileEditPage.nicknameEmptyInfo';
   static const profileEditPage = 'profileEditPage';
+  static const postWritePage_write = 'postWritePage.write';
+  static const postWritePage_submit = 'postWritePage.submit';
+  static const postWritePage_titleHintText = 'postWritePage.titleHintText';
+  static const postWritePage_selectBoard = 'postWritePage.selectBoard';
+  static const postWritePage_addAttach = 'postWritePage.addAttach';
+  static const postWritePage_attachments = 'postWritePage.attachments';
+  static const postWritePage_terms = 'postWritePage.terms';
+  static const postWritePage_realNameNotice = 'postWritePage.realNameNotice';
+  static const postWritePage_anonymous = 'postWritePage.anonymous';
+  static const postWritePage_adult = 'postWritePage.adult';
+  static const postWritePage_politics = 'postWritePage.politics';
+  static const postWritePage_contentPlaceholder = 'postWritePage.contentPlaceholder';
+  static const postWritePage_conditionSnackBar = 'postWritePage.conditionSnackBar';
+  static const postWritePage_noCategory = 'postWritePage.noCategory';
+  static const postWritePage_selectCategory = 'postWritePage.selectCategory';
+  static const postWritePage = 'postWritePage';
 
 }

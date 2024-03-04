@@ -167,6 +167,23 @@ class CodegenLoader extends AssetLoader{
     "nicknameInfo": "Once you change your nickname, you can't change it for three months.",
     "nicknameHintText": "Please enter the nickname you want to change.",
     "nicknameEmptyInfo": "Nickname not written!"
+  },
+  "postWritePage": {
+    "write": "Write a post",
+    "submit": "Submit",
+    "titleHintText": "Type title here",
+    "selectBoard": "Select Board",
+    "addAttach": "Upload Attachments",
+    "attachments": "Attachments",
+    "terms": "Terms",
+    "realNameNotice": "This post will be posted under your real name.",
+    "anonymous": "Anonymous",
+    "adult": "Adult",
+    "politics": "Politics",
+    "contentPlaceholder": "Type content here",
+    "conditionSnackBar": "Please select a bulletin board and enter the title and contents.",
+    "noCategory": "No Topics",
+    "selectCategory": "Select Topic"
   }
 };
 static const Map<String,dynamic> ko = {
@@ -322,6 +339,23 @@ static const Map<String,dynamic> ko = {
     "nicknameInfo": "닉네임은 한번 변경할 시 3개월간 변경이 불가합니다.",
     "nicknameHintText": "변경하실 닉네임을 입력해주세요.",
     "nicknameEmptyInfo": "닉네임이 작성되지 않았습니다!"
+  },
+  "postWritePage": {
+    "write": "글 쓰기",
+    "submit": "올리기",
+    "titleHintText": "제목을 입력해주세요.",
+    "selectBoard": "게시판을 선택하세요",
+    "addAttach": "첨부파일 추가",
+    "attachments": "첨부파일",
+    "terms": "이용약관",
+    "realNameNotice": "이 게시물은 실명으로 게시됩니다.",
+    "anonymous": "익명",
+    "adult": "성인",
+    "politics": "정치",
+    "contentPlaceholder": "내용을 입력해주세요.",
+    "conditionSnackBar": "게시판을 선택해주시고 제목, 내용을 입력해주세요.",
+    "noCategory": "말머리 없음",
+    "selectCategory": "말머리를 선택하세요"
   }
 };
 static const Map<String, Map<String,dynamic>> mapLocales = {"en": en, "ko": ko};

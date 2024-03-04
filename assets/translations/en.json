@@ -151,5 +151,22 @@
         "nicknameInfo": "Once you change your nickname, you can't change it for three months.",
         "nicknameHintText": "Please enter the nickname you want to change.",
         "nicknameEmptyInfo": "Nickname not written!"
+    },
+    "postWritePage": {
+        "write": "Write a post",
+        "submit": "Submit",
+        "titleHintText": "Type title here",
+        "selectBoard": "Select Board",
+        "addAttach": "Upload Attachments",
+        "attachments": "Attachments",
+        "terms": "Terms",
+        "realNameNotice": "This post will be posted under your real name.",
+        "anonymous": "Anonymous",
+        "adult": "Adult",
+        "politics": "Politics",
+        "contentPlaceholder": "Type content here",
+        "conditionSnackBar": "Please select a bulletin board and enter the title and contents.",
+        "noCategory": "No Topics",
+        "selectCategory": "Select Topic"
     }
 }
