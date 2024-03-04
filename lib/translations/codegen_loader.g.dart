@@ -135,9 +135,15 @@ class CodegenLoader extends AssetLoader{
     "cancel": "Cancel"
   },
   "dialogs": {
-    "deleteConfirm": "Are you really want to delete this post?",
+    "deleteConfirm": "Do you really want to delete this post?",
+    "blockConfirm": "Do you really want to block this user?",
+    "logoutConfirm": "Do you really want to sign out?",
+    "withdrawalConfirm": "Do you really want to withdraw the membership?",
+    "withdrawalEmailInfo": "If you leave the membership, you can't re-sign up with the email you're using now",
     "cancel": "Cancel",
-    "confirm": "OK"
+    "confirm": "OK",
+    "noBlockedUsers": "There are no blocked users.",
+    "noNickname": "No nickname"
   }
 };
 static const Map<String,dynamic> ko = {
@@ -262,8 +268,14 @@ static const Map<String,dynamic> ko = {
   },
   "dialogs": {
     "deleteConfirm": "정말로 삭제하시겠습니까?",
+    "blockConfirm": "정말로 차단하시겠습니까?",
+    "logoutConfirm": "정말로 로그아웃 하시겠습니까?",
+    "withdrawalConfirm": "정말로 회원탈퇴 하시겠습니까?",
+    "withdrawalEmailInfo": "회원탈퇴하시면 지금 쓰시는 이메일로는 재가입이 불가능합니다",
     "cancel": "취소",
-    "confirm": "확인"
+    "confirm": "확인",
+    "noBlockedUsers": "차단한 유저가 없습니다.",
+    "noNickname": "닉네임이 없음"
   }
 };
 static const Map<String, Map<String,dynamic>> mapLocales = {"en": en, "ko": ko};

@@ -110,8 +110,14 @@ abstract class  LocaleKeys {
   static const postViewUtils_cancel = 'postViewUtils.cancel';
   static const postViewUtils = 'postViewUtils';
   static const dialogs_deleteConfirm = 'dialogs.deleteConfirm';
+  static const dialogs_blockConfirm = 'dialogs.blockConfirm';
+  static const dialogs_logoutConfirm = 'dialogs.logoutConfirm';
+  static const dialogs_withdrawalConfirm = 'dialogs.withdrawalConfirm';
+  static const dialogs_withdrawalEmailInfo = 'dialogs.withdrawalEmailInfo';
   static const dialogs_cancel = 'dialogs.cancel';
   static const dialogs_confirm = 'dialogs.confirm';
+  static const dialogs_noBlockedUsers = 'dialogs.noBlockedUsers';
+  static const dialogs_noNickname = 'dialogs.noNickname';
   static const dialogs = 'dialogs';
 
 }

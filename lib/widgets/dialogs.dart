@@ -285,12 +285,16 @@ class DeleteDialog extends StatelessWidget {
                 BlendMode.srcIn,
               ),
             ),
-            Text(
-              LocaleKeys.dialogs_deleteConfirm.tr(),
-              style: const TextStyle(
-                fontSize: 17,
-                fontWeight: FontWeight.w700,
-                color: Colors.black,
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 25),
+              child: Text(
+                LocaleKeys.dialogs_deleteConfirm.tr(),
+                textAlign: TextAlign.center,
+                style: const TextStyle(
+                  fontSize: 17,
+                  fontWeight: FontWeight.w700,
+                  color: Colors.black,
+                ),
               ),
             ),
             const SizedBox(height: 20),
@@ -432,10 +436,10 @@ class _BlockedUserDialogState extends State<BlockedUserDialog> {
                     height: 55,
                     margin: const EdgeInsets.only(
                         left: 15, right: 15, top: 5, bottom: 5),
-                    child: const Center(
+                    child: Center(
                       child: Text(
-                        "차단한 유저가 없습니다",
-                        style: TextStyle(
+                        LocaleKeys.dialogs_noBlockedUsers.tr(),
+                        style: const TextStyle(
                           color: Colors.black,
                           fontSize: 15,
                           fontWeight: FontWeight.w500,
@@ -512,7 +516,7 @@ class _BlockedUserDialogState extends State<BlockedUserDialog> {
                               Expanded(
                                 child: Text(
                                   blockedUser.user.profile.nickname ??
-                                      "닉네임이 없음",
+                                      LocaleKeys.dialogs_noNickname.tr(),
                                   overflow: TextOverflow.ellipsis,
                                   maxLines: 1,
                                   style: const TextStyle(
@@ -623,12 +627,16 @@ class BlockConfirmDialog extends StatelessWidget {
                 BlendMode.srcIn,
               ),
             ),
-            const Text(
-              '정말로 차단하시겠습니까?',
-              style: TextStyle(
-                fontSize: 17,
-                fontWeight: FontWeight.w700,
-                color: Colors.black,
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 25),
+              child: Text(
+                LocaleKeys.dialogs_blockConfirm.tr(),
+                textAlign: TextAlign.center,
+                style: const TextStyle(
+                  fontSize: 17,
+                  fontWeight: FontWeight.w700,
+                  color: Colors.black,
+                ),
               ),
             ),
             const SizedBox(height: 20),
@@ -652,10 +660,10 @@ class BlockConfirmDialog extends StatelessWidget {
                     ),
                     width: 60,
                     height: 40,
-                    child: const Center(
+                    child: Center(
                       child: Text(
-                        '취소',
-                        style: TextStyle(
+                        LocaleKeys.dialogs_cancel.tr(),
+                        style: const TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w500,
                           color: Colors.black,
@@ -675,10 +683,10 @@ class BlockConfirmDialog extends StatelessWidget {
                     ),
                     width: 60,
                     height: 40,
-                    child: const Center(
+                    child: Center(
                       child: Text(
-                        '확인',
-                        style: TextStyle(
+                        LocaleKeys.dialogs_confirm.tr(),
+                        style: const TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w500,
                           color: Colors.white,
@@ -734,9 +742,9 @@ class SignoutConfirmDialog extends StatelessWidget {
                 BlendMode.srcIn,
               ),
             ),
-            const Text(
-              '정말로 로그아웃 하시겠습니까?',
-              style: TextStyle(
+            Text(
+              LocaleKeys.dialogs_logoutConfirm.tr(),
+              style: const TextStyle(
                 fontSize: 17,
                 fontWeight: FontWeight.w700,
                 color: Colors.black,
@@ -763,10 +771,10 @@ class SignoutConfirmDialog extends StatelessWidget {
                     ),
                     width: 60,
                     height: 40,
-                    child: const Center(
+                    child: Center(
                       child: Text(
-                        '취소',
-                        style: TextStyle(
+                        LocaleKeys.dialogs_cancel.tr(),
+                        style: const TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w500,
                           color: Colors.black,
@@ -786,10 +794,10 @@ class SignoutConfirmDialog extends StatelessWidget {
                     ),
                     width: 60,
                     height: 40,
-                    child: const Center(
+                    child: Center(
                       child: Text(
-                        '확인',
-                        style: TextStyle(
+                        LocaleKeys.dialogs_confirm.tr(),
+                        style: const TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w500,
                           color: Colors.white,
@@ -830,7 +838,7 @@ class UnregisterConfirmDialog extends StatelessWidget {
         decoration: const BoxDecoration(
           borderRadius: BorderRadius.all(Radius.circular(15)),
         ),
-        width: 350,
+        width: 360,
         height: 200,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
@@ -845,19 +853,24 @@ class UnregisterConfirmDialog extends StatelessWidget {
                 BlendMode.srcIn,
               ),
             ),
-            const Text(
-              '정말로 회원탈퇴 하시겠습니까?',
-              style: TextStyle(
-                fontSize: 17,
-                fontWeight: FontWeight.w700,
-                color: Colors.black,
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 35),
+              child: Text(
+                LocaleKeys.dialogs_withdrawalConfirm.tr(),
+                textAlign: TextAlign.center,
+                style: const TextStyle(
+                  fontSize: 17,
+                  fontWeight: FontWeight.w700,
+                  color: Colors.black,
+                ),
               ),
             ),
-            const Padding(
-              padding: EdgeInsets.symmetric(horizontal: 50),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 50),
               child: Text(
-                '회원탈퇴하시면 지금 쓰시는 이메일로는 재가입이 불가능합니다',
-                style: TextStyle(
+                LocaleKeys.dialogs_withdrawalEmailInfo.tr(),
+                textAlign: TextAlign.center,
+                style: const TextStyle(
                   fontSize: 12,
                   fontWeight: FontWeight.w700,
                   color: Color(0xFFBBBBBB),
@@ -885,10 +898,10 @@ class UnregisterConfirmDialog extends StatelessWidget {
                     ),
                     width: 60,
                     height: 40,
-                    child: const Center(
+                    child: Center(
                       child: Text(
-                        '취소',
-                        style: TextStyle(
+                        LocaleKeys.dialogs_cancel.tr(),
+                        style: const TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w500,
                           color: Colors.black,
@@ -897,7 +910,7 @@ class UnregisterConfirmDialog extends StatelessWidget {
                     ),
                   ),
                 ),
-                const SizedBox(width: 10),
+                const SizedBox(width: 5),
                 InkWell(
                   // 인자로 전달받은 onTap 사용.
                   onTap: onTap,
@@ -908,10 +921,10 @@ class UnregisterConfirmDialog extends StatelessWidget {
                     ),
                     width: 60,
                     height: 40,
-                    child: const Center(
+                    child: Center(
                       child: Text(
-                        '확인',
-                        style: TextStyle(
+                        LocaleKeys.dialogs_confirm.tr(),
+                        style: const TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w500,
                           color: Colors.white,
@@ -921,7 +934,7 @@ class UnregisterConfirmDialog extends StatelessWidget {
                   ),
                 ),
               ],
-            )
+            ),
           ],
         ),
       ),

@@ -119,8 +119,14 @@
         "cancel": "Cancel"
     },
     "dialogs": {
-        "deleteConfirm": "Are you really want to delete this post?",
+        "deleteConfirm": "Do you really want to delete this post?",
+        "blockConfirm": "Do you really want to block this user?",
+        "logoutConfirm": "Do you really want to sign out?",
+        "withdrawalConfirm": "Do you really want to withdraw the membership?",
+        "withdrawalEmailInfo": "If you leave the membership, you can't re-sign up with the email you're using now",
         "cancel": "Cancel",
-        "confirm": "OK"
+        "confirm": "OK",
+        "noBlockedUsers": "There are no blocked users.",
+        "noNickname": "No nickname"
     }
 }
