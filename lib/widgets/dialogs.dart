@@ -17,6 +17,7 @@ import 'package:new_ara_app/constants/url_info.dart';
                     
                         */
 
+// TODO: 현재 post_view_utils.dart와 겹침. 리팩토링 필요
 /// 신고 기능이 글, 댓글 모두에게 필요하여 만든 위젯.
 class ReportDialog extends StatefulWidget {
   /// 글에 대한 신고일 경우 null이 아님.
