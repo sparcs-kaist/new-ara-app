@@ -129,5 +129,15 @@ abstract class  LocaleKeys {
   static const popUpMenuButtons = 'popUpMenuButtons';
   static const postPreview_blockedUsersPost = 'postPreview.blockedUsersPost';
   static const postPreview = 'postPreview';
+  static const profileEditPage_settingInfoText = 'profileEditPage.settingInfoText';
+  static const profileEditPage_editProfile = 'profileEditPage.editProfile';
+  static const profileEditPage_complete = 'profileEditPage.complete';
+  static const profileEditPage_nickname = 'profileEditPage.nickname';
+  static const profileEditPage_email = 'profileEditPage.email';
+  static const profileEditPage_noEmail = 'profileEditPage.noEmail';
+  static const profileEditPage_nicknameInfo = 'profileEditPage.nicknameInfo';
+  static const profileEditPage_nicknameHintText = 'profileEditPage.nicknameHintText';
+  static const profileEditPage_nicknameEmptyInfo = 'profileEditPage.nicknameEmptyInfo';
+  static const profileEditPage = 'profileEditPage';
 
 }

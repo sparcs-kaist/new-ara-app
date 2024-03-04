@@ -140,5 +140,16 @@
     },
     "postPreview": {
         "blockedUsersPost": "차단한 사용자의 게시물입니다."
+    },
+    "profileEditPage": {
+        "settingInfoText": "설정 변경 중 문제가 발생했습니다.",
+        "editProfile": "프로필 수정",
+        "complete": "완료",
+        "nickname": "닉네임",
+        "email": "이메일",
+        "noEmail": "이메일 정보가 없습니다.",
+        "nicknameInfo": "닉네임은 한번 변경할 시 3개월간 변경이 불가합니다.",
+        "nicknameHintText": "변경하실 닉네임을 입력해주세요.",
+        "nicknameEmptyInfo": "닉네임이 작성되지 않았습니다!"
     }
 }

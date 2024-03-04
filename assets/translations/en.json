@@ -140,5 +140,16 @@
     },
     "postPreview": {
         "blockedUsersPost": "This post was written by blocked user."
+    },
+    "profileEditPage": {
+        "settingInfoText": "There was a problem changing the settings.",
+        "editProfile": "Edit Profile",
+        "complete": "Complete",
+        "nickname": "Nickname",
+        "email": "Email",
+        "noEmail": "Email not exist",
+        "nicknameInfo": "Once you change your nickname, you can't change it for three months.",
+        "nicknameHintText": "Please enter the nickname you want to change.",
+        "nicknameEmptyInfo": "Nickname not written!"
     }
 }

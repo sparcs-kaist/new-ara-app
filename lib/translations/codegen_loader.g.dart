@@ -156,6 +156,17 @@ class CodegenLoader extends AssetLoader{
   },
   "postPreview": {
     "blockedUsersPost": "This post was written by blocked user."
+  },
+  "profileEditPage": {
+    "settingInfoText": "There was a problem changing the settings.",
+    "editProfile": "Edit Profile",
+    "complete": "Complete",
+    "nickname": "Nickname",
+    "email": "Email",
+    "noEmail": "Email not exist",
+    "nicknameInfo": "Once you change your nickname, you can't change it for three months.",
+    "nicknameHintText": "Please enter the nickname you want to change.",
+    "nicknameEmptyInfo": "Nickname not written!"
   }
 };
 static const Map<String,dynamic> ko = {
@@ -300,6 +311,17 @@ static const Map<String,dynamic> ko = {
   },
   "postPreview": {
     "blockedUsersPost": "차단한 사용자의 게시물입니다."
+  },
+  "profileEditPage": {
+    "settingInfoText": "설정 변경 중 문제가 발생했습니다.",
+    "editProfile": "프로필 수정",
+    "complete": "완료",
+    "nickname": "닉네임",
+    "email": "이메일",
+    "noEmail": "이메일 정보가 없습니다.",
+    "nicknameInfo": "닉네임은 한번 변경할 시 3개월간 변경이 불가합니다.",
+    "nicknameHintText": "변경하실 닉네임을 입력해주세요.",
+    "nicknameEmptyInfo": "닉네임이 작성되지 않았습니다!"
   }
 };
 static const Map<String, Map<String,dynamic>> mapLocales = {"en": en, "ko": ko};
