@@ -119,5 +119,12 @@ abstract class  LocaleKeys {
   static const dialogs_noBlockedUsers = 'dialogs.noBlockedUsers';
   static const dialogs_noNickname = 'dialogs.noNickname';
   static const dialogs = 'dialogs';
+  static const popUpMenuButtons_downloadSucceed = 'popUpMenuButtons.downloadSucceed';
+  static const popUpMenuButtons_downloadFailed = 'popUpMenuButtons.downloadFailed';
+  static const popUpMenuButtons_attachments = 'popUpMenuButtons.attachments';
+  static const popUpMenuButtons_report = 'popUpMenuButtons.report';
+  static const popUpMenuButtons_edit = 'popUpMenuButtons.edit';
+  static const popUpMenuButtons_delete = 'popUpMenuButtons.delete';
+  static const popUpMenuButtons = 'popUpMenuButtons';
 
 }

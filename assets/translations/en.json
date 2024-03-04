@@ -128,5 +128,13 @@
         "confirm": "OK",
         "noBlockedUsers": "There are no blocked users.",
         "noNickname": "No nickname"
+    },
+    "popUpMenuButtons": {
+        "downloadSucceed": "Downloading File succeed",
+        "downloadFailed": "Downloading File failed",
+        "attachments": "Attachments",
+        "report": "Report",
+        "edit": "Edit",
+        "delete": "Delete"
     }
 }

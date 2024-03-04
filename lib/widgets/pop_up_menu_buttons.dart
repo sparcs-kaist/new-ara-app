@@ -3,6 +3,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:easy_localization/easy_localization.dart';
+import 'package:new_ara_app/translations/locale_keys.g.dart';
 
 import 'package:new_ara_app/models/attachment_model.dart';
 import 'package:new_ara_app/providers/user_provider.dart';
@@ -57,7 +59,9 @@ class AttachPopupMenuButton extends StatelessWidget {
                       height: 32,
                     ),
                     Text(
-                      res ? "파일 다운로드에 성공했습니다" : "파일 다운로드에 실패했습니다.",
+                      res
+                          ? LocaleKeys.popUpMenuButtons_downloadSucceed.tr()
+                          : LocaleKeys.popUpMenuButtons_downloadFailed.tr(),
                       style: const TextStyle(
                         color: Colors.black,
                         fontWeight: FontWeight.w400,
@@ -70,7 +74,7 @@ class AttachPopupMenuButton extends StatelessWidget {
         });
       },
       child: Text(
-        '첨부파일 모아보기 $fileNum',
+        '${LocaleKeys.popUpMenuButtons_attachments.tr()} $fileNum',
         style: const TextStyle(
           fontSize: 16,
           fontWeight: FontWeight.w500,
@@ -221,9 +225,9 @@ class OthersPopupMenuButton extends StatelessWidget {
                   colorFilter: const ColorFilter.mode(
                       ColorsInfo.newara, BlendMode.srcIn)),
               const SizedBox(width: 10),
-              const Text(
-                '신고',
-                style: TextStyle(
+              Text(
+                LocaleKeys.popUpMenuButtons_report.tr(),
+                style: const TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.w700,
                   color: ColorsInfo.newara,
@@ -299,9 +303,9 @@ class MyPopupMenuButton extends StatelessWidget {
                 ),
               ),
               const SizedBox(width: 10),
-              const Text(
-                '수정',
-                style: TextStyle(
+              Text(
+                LocaleKeys.popUpMenuButtons_edit.tr(),
+                style: const TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w700,
                     color: Color.fromRGBO(51, 51, 51, 1)),
@@ -319,9 +323,9 @@ class MyPopupMenuButton extends StatelessWidget {
                   colorFilter: const ColorFilter.mode(
                       ColorsInfo.newara, BlendMode.srcIn)),
               const SizedBox(width: 10),
-              const Text(
-                '삭제',
-                style: TextStyle(
+              Text(
+                LocaleKeys.popUpMenuButtons_delete.tr(),
+                style: const TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.w700,
                   color: ColorsInfo.newara,

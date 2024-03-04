@@ -144,6 +144,14 @@ class CodegenLoader extends AssetLoader{
     "confirm": "OK",
     "noBlockedUsers": "There are no blocked users.",
     "noNickname": "No nickname"
+  },
+  "popUpMenuButtons": {
+    "downloadSucceed": "Downloading File succeed",
+    "downloadFailed": "Downloading File failed",
+    "attachments": "Attachments",
+    "report": "Report",
+    "edit": "Edit",
+    "delete": "Delete"
   }
 };
 static const Map<String,dynamic> ko = {
@@ -276,6 +284,14 @@ static const Map<String,dynamic> ko = {
     "confirm": "확인",
     "noBlockedUsers": "차단한 유저가 없습니다.",
     "noNickname": "닉네임이 없음"
+  },
+  "popUpMenuButtons": {
+    "downloadSucceed": "파일 다운로드에 성공했습니다",
+    "downloadFailed": "파일 다운로드에 실패했습니다",
+    "attachments": "첨부파일 모아보기",
+    "report": "신고",
+    "edit": "수정",
+    "delete": "삭제"
   }
 };
 static const Map<String, Map<String,dynamic>> mapLocales = {"en": en, "ko": ko};
