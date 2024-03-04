@@ -133,6 +133,11 @@ class CodegenLoader extends AssetLoader{
     "alreadyReported": "You've already report this post.",
     "reportButton": "Report",
     "cancel": "Cancel"
+  },
+  "dialogs": {
+    "deleteConfirm": "Are you really want to delete this post?",
+    "cancel": "Cancel",
+    "confirm": "OK"
   }
 };
 static const Map<String,dynamic> ko = {
@@ -254,6 +259,11 @@ static const Map<String,dynamic> ko = {
     "alreadyReported": "이미 신고한 게시글입니다.",
     "reportButton": "신고하기",
     "cancel": "취소"
+  },
+  "dialogs": {
+    "deleteConfirm": "정말로 삭제하시겠습니까?",
+    "cancel": "취소",
+    "confirm": "확인"
   }
 };
 static const Map<String, Map<String,dynamic>> mapLocales = {"en": en, "ko": ko};

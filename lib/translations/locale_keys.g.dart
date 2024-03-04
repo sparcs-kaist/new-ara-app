@@ -109,5 +109,9 @@ abstract class  LocaleKeys {
   static const postViewUtils_reportButton = 'postViewUtils.reportButton';
   static const postViewUtils_cancel = 'postViewUtils.cancel';
   static const postViewUtils = 'postViewUtils';
+  static const dialogs_deleteConfirm = 'dialogs.deleteConfirm';
+  static const dialogs_cancel = 'dialogs.cancel';
+  static const dialogs_confirm = 'dialogs.confirm';
+  static const dialogs = 'dialogs';
 
 }

@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
 import 'package:dio/dio.dart';
+import 'package:easy_localization/easy_localization.dart';
+import 'package:new_ara_app/translations/locale_keys.g.dart';
 
 import 'package:new_ara_app/providers/user_provider.dart';
 import 'package:new_ara_app/constants/colors_info.dart';
@@ -74,16 +76,13 @@ class _ReportDialogState extends State<ReportDialog> {
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            SvgPicture.asset(
-              "assets/icons/information.svg",
-              width: 45,
-              height: 45,
-              colorFilter: const ColorFilter.mode(
-                ColorsInfo.newara,
-                BlendMode.srcIn,
-              )
-        
-            ),
+            SvgPicture.asset("assets/icons/information.svg",
+                width: 45,
+                height: 45,
+                colorFilter: const ColorFilter.mode(
+                  ColorsInfo.newara,
+                  BlendMode.srcIn,
+                )),
             const SizedBox(height: 5),
             Text(
               '${widget.articleID == null ? '댓글' : '게시글'} 신고 사유를 알려주세요.',
@@ -286,9 +285,9 @@ class DeleteDialog extends StatelessWidget {
                 BlendMode.srcIn,
               ),
             ),
-            const Text(
-              '정말로 삭제하시겠습니까?',
-              style: TextStyle(
+            Text(
+              LocaleKeys.dialogs_deleteConfirm.tr(),
+              style: const TextStyle(
                 fontSize: 17,
                 fontWeight: FontWeight.w700,
                 color: Colors.black,
@@ -315,10 +314,10 @@ class DeleteDialog extends StatelessWidget {
                     ),
                     width: 60,
                     height: 40,
-                    child: const Center(
+                    child: Center(
                       child: Text(
-                        '취소',
-                        style: TextStyle(
+                        LocaleKeys.dialogs_cancel.tr(),
+                        style: const TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w500,
                           color: Colors.black,
@@ -338,10 +337,10 @@ class DeleteDialog extends StatelessWidget {
                     ),
                     width: 60,
                     height: 40,
-                    child: const Center(
+                    child: Center(
                       child: Text(
-                        '확인',
-                        style: TextStyle(
+                        LocaleKeys.dialogs_confirm.tr(),
+                        style: const TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w500,
                           color: Colors.white,
@@ -743,7 +742,6 @@ class SignoutConfirmDialog extends StatelessWidget {
                 color: Colors.black,
               ),
             ),
-            
             const SizedBox(height: 20),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,

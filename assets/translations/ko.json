@@ -117,5 +117,10 @@
         "alreadyReported": "이미 신고한 게시글입니다.",
         "reportButton": "신고하기",
         "cancel": "취소"
+    },
+    "dialogs": {
+        "deleteConfirm": "정말로 삭제하시겠습니까?",
+        "cancel": "취소",
+        "confirm": "확인"
     }
 }

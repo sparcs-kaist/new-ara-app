@@ -117,5 +117,10 @@
         "alreadyReported": "You've already report this post.",
         "reportButton": "Report",
         "cancel": "Cancel"
+    },
+    "dialogs": {
+        "deleteConfirm": "Are you really want to delete this post?",
+        "cancel": "Cancel",
+        "confirm": "OK"
     }
 }
