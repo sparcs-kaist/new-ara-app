@@ -123,7 +123,8 @@ class CodegenLoader extends AssetLoader{
     "blockedUsersComment": "This comment was written by blocked user.",
     "commentHintText": "Type your comment here.",
     "noCommentWarning": "No comment has been written!",
-    "displayCommentCount": " comments"
+    "displayCommentCount": " comments",
+    "copyLinkToClipBoard": "Copied URL to the clipboard."
   }
 };
 static const Map<String,dynamic> ko = {
@@ -235,7 +236,8 @@ static const Map<String,dynamic> ko = {
     "blockedUsersComment": "차단한 사용자의 댓글입니다.",
     "commentHintText": "댓글을 입력해주세요.",
     "noCommentWarning": "댓글이 작성되지 않았습니다!",
-    "displayCommentCount": "개의 댓글"
+    "displayCommentCount": "개의 댓글",
+    "copyLinkToClipBoard": "URL을 클립 보드에 복사했습니다."
   }
 };
 static const Map<String, Map<String,dynamic>> mapLocales = {"en": en, "ko": ko};

@@ -979,12 +979,12 @@ class _PostViewPageState extends State<PostViewPage> {
                                 height: 32,
                               ),
                               const SizedBox(width: 8),
-                              const Flexible(
+                              Flexible(
                                 child: Text(
-                                  "URL을 클립 보드에 복사했습니다.",
+                                  LocaleKeys.postViewPage_copyLinkToClipBoard.tr(),
                                   // 오버플로우 나면 다음줄로 넘어가도록 하기 위해
                                   overflow: TextOverflow.visible,
-                                  style: TextStyle(
+                                  style: const TextStyle(
                                     color: Colors.black,
                                     fontWeight: FontWeight.w400,
                                     fontSize: 15,

@@ -107,6 +107,7 @@
         "blockedUsersComment": "This comment was written by blocked user.",
         "commentHintText": "Type your comment here.",
         "noCommentWarning": "No comment has been written!",
-        "displayCommentCount": " comments"
+        "displayCommentCount": " comments",
+        "copyLinkToClipBoard": "Copied URL to the clipboard."
     }
 }
