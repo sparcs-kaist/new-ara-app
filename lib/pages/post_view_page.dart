@@ -560,7 +560,7 @@ class _PostViewPageState extends State<PostViewPage> {
                                             MediaQuery.of(context).size.width -
                                                 40,
                                         child: Text(
-                                          '${_article.comment_count}개의 댓글',
+                                          '${_article.comment_count}${LocaleKeys.postViewPage_displayCommentCount.tr()}',
                                           style: const TextStyle(
                                             fontSize: 16,
                                             fontWeight: FontWeight.w700,

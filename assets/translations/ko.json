@@ -106,6 +106,7 @@
         "edit": "수정",
         "blockedUsersComment": "차단한 사용자의 댓글입니다.",
         "commentHintText": "댓글을 입력해주세요.",
-        "noCommentWarning": "댓글이 작성되지 않았습니다!"
+        "noCommentWarning": "댓글이 작성되지 않았습니다!",
+        "displayCommentCount": "개의 댓글"
     }
 }

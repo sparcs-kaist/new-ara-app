@@ -106,6 +106,7 @@
         "edit": "Edit",
         "blockedUsersComment": "This comment was written by blocked user.",
         "commentHintText": "Type your comment here.",
-        "noCommentWarning": "No comment has been written!"
+        "noCommentWarning": "No comment has been written!",
+        "displayCommentCount": " comments"
     }
 }

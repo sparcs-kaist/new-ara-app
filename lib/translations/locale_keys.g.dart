@@ -99,6 +99,7 @@ abstract class  LocaleKeys {
   static const postViewPage_blockedUsersComment = 'postViewPage.blockedUsersComment';
   static const postViewPage_commentHintText = 'postViewPage.commentHintText';
   static const postViewPage_noCommentWarning = 'postViewPage.noCommentWarning';
+  static const postViewPage_displayCommentCount = 'postViewPage.displayCommentCount';
   static const postViewPage = 'postViewPage';
 
 }
