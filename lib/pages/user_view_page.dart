@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
 import 'package:dio/dio.dart';
+import 'package:easy_localization/easy_localization.dart';
 
 import 'package:new_ara_app/constants/colors_info.dart';
 import 'package:new_ara_app/models/public_user_profile_model.dart';
@@ -146,7 +147,7 @@ class _UserViewPageState extends State<UserViewPage> {
                       SizedBox(
                         width: MediaQuery.of(context).size.width - 40,
                         child: Text(
-                          '총 $_articleCount개의 글',
+                          context.locale == const Locale('ko') ? '총 $_articleCount개의 글' : '$_articleCount posts',
                           style: const TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.w700,
