@@ -22,7 +22,7 @@ class _PostPreviewState extends State<PostPreview> {
   Widget build(BuildContext context) {
     BlockedProvider blockedProvider = context.watch<BlockedProvider>();
 
-    String time = getTime(widget.model.created_at.toString());
+    String time = getTime(widget.model.created_at.toString(), context.locale);
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       crossAxisAlignment: CrossAxisAlignment.start,

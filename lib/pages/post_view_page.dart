@@ -1384,7 +1384,7 @@ class _PostViewPageState extends State<PostViewPage> {
                                   overflow: TextOverflow.ellipsis,
                                 )),
                             const SizedBox(width: 7),
-                            Text(getTime(curComment.created_at),
+                            Text(getTime(curComment.created_at, context.locale),
                                 style: const TextStyle(
                                   fontSize: 12,
                                   fontWeight: FontWeight.w400,

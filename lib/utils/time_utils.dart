@@ -1,3 +1,5 @@
+import 'dart:core';
+import 'package:flutter/material.dart';
 import 'package:easy_localization/easy_localization.dart';
 
 /// parameter로 전달받은 rawTime을
@@ -9,16 +11,16 @@ String specificTime(String rawTime) {
   return time;
 }
 
-String getTime(String rawTime) {
+String getTime(String rawTime, Locale locale) {
   DateTime now = DateTime.now();
 
   DateTime date = DateTime.parse(rawTime).toLocal();
   var difference = now.difference(date);
-  String time = "미정";
+  String time = locale == const Locale('ko') ? "미정" : "Not specified";
   if (difference.inMinutes < 1) {
-    time = "${difference.inSeconds}초 전";
+    time = "${difference.inSeconds}${locale == const Locale('ko') ? "초 전" : " seconds ago"}";
   } else if (difference.inHours < 1) {
-    time = '${difference.inMinutes}분 전';
+    time = '${difference.inMinutes}${locale == const Locale('ko') ? "분 전": " days ago"}';
   } else if (date.year == now.year &&
       date.month == now.month &&
       date.day == now.day) {
