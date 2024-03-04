@@ -296,8 +296,11 @@ class _PostViewPageState extends State<PostViewPage> {
                                                     _article.url.toString())
                                                 .then((launchRes) {
                                               if (launchRes == false) {
-                                                showInfoBySnackBar(context,
-                                                    LocaleKeys.postViewPage_launchInBrowserNotAvailable.tr());
+                                                showInfoBySnackBar(
+                                                    context,
+                                                    LocaleKeys
+                                                        .postViewPage_launchInBrowserNotAvailable
+                                                        .tr());
                                               }
                                             });
                                           },
@@ -313,7 +316,8 @@ class _PostViewPageState extends State<PostViewPage> {
                                                   const BorderRadius.all(
                                                       Radius.circular(10)),
                                               border: Border.all(
-                                                  color: const Color(0xFFDBDBDB),
+                                                  color:
+                                                      const Color(0xFFDBDBDB),
                                                   width: 1),
                                               boxShadow: const [
                                                 BoxShadow(
@@ -474,7 +478,11 @@ class _PostViewPageState extends State<PostViewPage> {
                                                             .can_override_hidden ==
                                                         true,
                                                     child: Container(
-                                                        width: context.locale == const Locale('ko') ? 104 : 150,
+                                                        width: context.locale ==
+                                                                const Locale(
+                                                                    'ko')
+                                                            ? 104
+                                                            : 150,
                                                         height: 36,
                                                         decoration:
                                                             BoxDecoration(
@@ -499,8 +507,11 @@ class _PostViewPageState extends State<PostViewPage> {
                                                           },
                                                           child: Center(
                                                             child: Text(
-                                                              LocaleKeys.postViewPage_showHiddenPosts.tr(),
-                                                              style: const TextStyle(
+                                                              LocaleKeys
+                                                                  .postViewPage_showHiddenPosts
+                                                                  .tr(),
+                                                              style:
+                                                                  const TextStyle(
                                                                 color: Color(
                                                                     0xff4a4a4a),
                                                                 fontWeight:
@@ -769,7 +780,8 @@ class _PostViewPageState extends State<PostViewPage> {
           onTap: () async {
             // 자신의 글에는 요청을 보내지 않고 미리 차단하기
             if (_article.is_mine) {
-              showInfoBySnackBar(context, LocaleKeys.postViewPage_noSelfVotingInfo.tr());
+              showInfoBySnackBar(
+                  context, LocaleKeys.postViewPage_noSelfVotingInfo.tr());
               return;
             }
             // 다른 사람의 글인 경우
@@ -810,7 +822,8 @@ class _PostViewPageState extends State<PostViewPage> {
           // TODO: onTap 메서드 함수화하기
           onTap: () async {
             if (_article.is_mine) {
-              showInfoBySnackBar(context, LocaleKeys.postViewPage_noSelfVotingInfo.tr());
+              showInfoBySnackBar(
+                  context, LocaleKeys.postViewPage_noSelfVotingInfo.tr());
               return;
             } else {
               ArticleModel tmpArticle =
@@ -924,7 +937,9 @@ class _PostViewPageState extends State<PostViewPage> {
                     ),
                     //const SizedBox(width: 4),
                     Text(
-                      _article.my_scrap == null ? LocaleKeys.postViewPage_scrap.tr() : LocaleKeys.postViewPage_scrapped.tr(),
+                      _article.my_scrap == null
+                          ? LocaleKeys.postViewPage_scrap.tr()
+                          : LocaleKeys.postViewPage_scrapped.tr(),
                       style: TextStyle(
                         color: _article.my_scrap == null
                             ? const Color(0xFF646464)
@@ -1067,7 +1082,8 @@ class _PostViewPageState extends State<PostViewPage> {
                             else {
                               debugPrint("failed to block");
                               Navigator.pop(context);
-                              showInfoBySnackBar(context, LocaleKeys.postViewPage_failedToBlock.tr());
+                              showInfoBySnackBar(context,
+                                  LocaleKeys.postViewPage_failedToBlock.tr());
                             }
                           });
                         },
@@ -1467,8 +1483,10 @@ class _PostViewPageState extends State<PostViewPage> {
                                 // onTap 메서드 함수화하기
                                 onTap: () async {
                                   if (curComment.is_mine) {
-                                    showInfoBySnackBar(context,
-                                        LocaleKeys.postViewPage_noSelfVotingInfo.tr());
+                                    showInfoBySnackBar(
+                                        context,
+                                        LocaleKeys.postViewPage_noSelfVotingInfo
+                                            .tr());
                                     return;
                                   } else {
                                     CommentNestedCommentListActionModel
@@ -1514,8 +1532,10 @@ class _PostViewPageState extends State<PostViewPage> {
                                 onTap: () async {
                                   // onTap 메서드 함수화하기
                                   if (curComment.is_mine) {
-                                    showInfoBySnackBar(context,
-                                        LocaleKeys.postViewPage_noSelfVotingInfo.tr());
+                                    showInfoBySnackBar(
+                                        context,
+                                        LocaleKeys.postViewPage_noSelfVotingInfo
+                                            .tr());
                                     return;
                                   } else {
                                     // 원래 모델값을 저장하기 위해 임시 모델 생성
@@ -1654,7 +1674,9 @@ class _PostViewPageState extends State<PostViewPage> {
               children: [
                 const SizedBox(height: 3),
                 Text(
-                  '${(targetComment == null ? false : targetComment!.is_mine) ? '\'나\'에게' : "'${targetComment?.created_by.profile.nickname}'님께"} 답글을 작성하는 중',
+                  context.locale == const Locale('ko')
+                      ? '${(targetComment == null ? false : targetComment!.is_mine) ? "'나'에게" : "'${targetComment?.created_by.profile.nickname}'님께"} 답글을 작성하는 중'
+                      : "Replying to '${targetComment?.created_by.profile.nickname}'",
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: const TextStyle(
@@ -1672,7 +1694,9 @@ class _PostViewPageState extends State<PostViewPage> {
               children: [
                 const SizedBox(height: 3),
                 Text(
-                  context.locale == const Locale('ko') ? '나의 댓글 "${targetComment?.content}" 수정 중' : 'Editing my comment "${targetComment?.content}"',
+                  context.locale == const Locale('ko')
+                      ? '나의 댓글 "${targetComment?.content}" 수정 중'
+                      : 'Editing my comment "${targetComment?.content}"',
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: const TextStyle(
