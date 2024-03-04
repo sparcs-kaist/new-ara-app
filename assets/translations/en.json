@@ -109,5 +109,13 @@
         "noCommentWarning": "No comment has been written!",
         "displayCommentCount": " comments",
         "copyLinkToClipBoard": "Copied URL to the clipboard."
+    },
+    "postViewUtils": {
+        "letUsKnowPostReportReason": "Let us know your reason for reporting the post.",
+        "letUsKnowCommentReportReason": "Let us know your reason for reporting the comment.",
+        "reportPostSucceed": "Post is successfully reported.",
+        "alreadyReported": "You've already report this post.",
+        "reportButton": "Report",
+        "cancel": "Cancel"
     }
 }

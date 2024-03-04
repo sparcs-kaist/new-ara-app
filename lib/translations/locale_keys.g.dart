@@ -102,5 +102,12 @@ abstract class  LocaleKeys {
   static const postViewPage_displayCommentCount = 'postViewPage.displayCommentCount';
   static const postViewPage_copyLinkToClipBoard = 'postViewPage.copyLinkToClipBoard';
   static const postViewPage = 'postViewPage';
+  static const postViewUtils_letUsKnowPostReportReason = 'postViewUtils.letUsKnowPostReportReason';
+  static const postViewUtils_letUsKnowCommentReportReason = 'postViewUtils.letUsKnowCommentReportReason';
+  static const postViewUtils_reportPostSucceed = 'postViewUtils.reportPostSucceed';
+  static const postViewUtils_alreadyReported = 'postViewUtils.alreadyReported';
+  static const postViewUtils_reportButton = 'postViewUtils.reportButton';
+  static const postViewUtils_cancel = 'postViewUtils.cancel';
+  static const postViewUtils = 'postViewUtils';
 
 }

@@ -125,6 +125,14 @@ class CodegenLoader extends AssetLoader{
     "noCommentWarning": "No comment has been written!",
     "displayCommentCount": " comments",
     "copyLinkToClipBoard": "Copied URL to the clipboard."
+  },
+  "postViewUtils": {
+    "letUsKnowPostReportReason": "Let us know your reason for reporting the post.",
+    "letUsKnowCommentReportReason": "Let us know your reason for reporting the comment.",
+    "reportPostSucceed": "Post is successfully reported.",
+    "alreadyReported": "You've already report this post.",
+    "reportButton": "Report",
+    "cancel": "Cancel"
   }
 };
 static const Map<String,dynamic> ko = {
@@ -238,6 +246,14 @@ static const Map<String,dynamic> ko = {
     "noCommentWarning": "댓글이 작성되지 않았습니다!",
     "displayCommentCount": "개의 댓글",
     "copyLinkToClipBoard": "URL을 클립 보드에 복사했습니다."
+  },
+  "postViewUtils": {
+    "letUsKnowPostReportReason": "게시글 신고 사유를 알려주세요.",
+    "letUsKnowCommentReportReason": "댓글 신고 사유를 알려주세요.",
+    "reportPostSucceed": "해당 게시글을 신고했습니다.",
+    "alreadyReported": "이미 신고한 게시글입니다.",
+    "reportButton": "신고하기",
+    "cancel": "취소"
   }
 };
 static const Map<String, Map<String,dynamic>> mapLocales = {"en": en, "ko": ko};
