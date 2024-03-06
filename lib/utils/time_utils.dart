@@ -29,11 +29,13 @@ String getTime(String rawTime, Locale locale) {
       date.day == now.day) {
     time = '${DateFormat('HH').format(date)}:${DateFormat('mm').format(date)}';
   } else if (date.year == now.year) {
-    time = '${DateFormat('MM').format(date)}/${DateFormat('dd').format(date)}';
+    time = locale == const Locale('ko')
+        ? DateFormat('MM/dd').format(date)
+        : DateFormat('MMM d', 'en_US').format(date);
   } else {
-    time =
-        '${DateFormat('yyyy').format(date)}/${DateFormat('MM').format(date)}/${DateFormat('dd').format(date)}';
+    time = locale == const Locale('ko')
+        ? DateFormat('yyyy/MM/dd').format(date)
+        : DateFormat('MMM d, yyyy', 'en_US').format(date);
   }
-
   return time;
 }
