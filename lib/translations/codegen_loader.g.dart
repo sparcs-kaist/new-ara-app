@@ -113,7 +113,7 @@ class CodegenLoader extends AssetLoader{
     "launchInBrowserNotAvailable": "The URL could not be opened by browser.",
     "blockedUsersPost": "This post was written by blocked user.",
     "showHiddenPosts": "Show hidden posts",
-    "hit": "Hit",
+    "hit": "hits",
     "noSelfVotingInfo": "You cannot vote for your post or comment!",
     "failedToBlock": "Failed to block.",
     "unblock": "Unblock",
@@ -131,7 +131,7 @@ class CodegenLoader extends AssetLoader{
     "letUsKnowPostReportReason": "Let us know your reason for reporting the post.",
     "letUsKnowCommentReportReason": "Let us know your reason for reporting the comment.",
     "reportPostSucceed": "Post is successfully reported.",
-    "alreadyReported": "You've already report this post.",
+    "alreadyReported": "You've already reported this post.",
     "reportButton": "Report",
     "cancel": "Cancel"
   },
@@ -149,7 +149,7 @@ class CodegenLoader extends AssetLoader{
   "popUpMenuButtons": {
     "downloadSucceed": "File downloaded successfully",
     "downloadFailed": "Downloading File failed",
-    "attachments": "Attachents",
+    "attachments": "Attachments",
     "report": "Report",
     "edit": "Edit",
     "delete": "Delete"
@@ -181,7 +181,7 @@ class CodegenLoader extends AssetLoader{
     "adult": "Adult",
     "politics": "Politics",
     "contentPlaceholder": "Type content here",
-    "conditionSnackBar": "Please select a bulletin board and enter the title and content.",
+    "conditionSnackBar": "Please select a board and enter the title and content.",
     "noCategory": "No Topics",
     "selectCategory": "Select Topic"
   }
