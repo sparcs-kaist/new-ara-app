@@ -34,7 +34,7 @@ class CodegenLoader extends AssetLoader{
   },
   "inquiryPage": {
     "title": "Inquiries and Suggestions",
-    "reLoginErrorWithWithdrawalGuide": "This account has already been withdrawn.\nIf you wish to re-register, please click this link to contact us via email.",
+    "reLoginErrorWithWithdrawalGuide": "This account has already been deactivated.\nIf you wish to re-register, please click this link to contact us via email.",
     "reLoginErrorWithWithdrawalEmailTitle": "Re-registration Inquiry",
     "reLoginErrorWithWithdrawalEmailContents": "If you have any additional comments, please write them below.\n\n※ An Ara administrator will respond within 48 hours.※\n\nUser ID: {userID}\nNickname: {nickname}\nEmail: {email}\nPlatform: App\n"
   },
@@ -63,7 +63,7 @@ class CodegenLoader extends AssetLoader{
     "today": "Today",
     "post": "Post",
     "newComment": "New comment to your post.",
-    "allNotificationsChecked": "You've already check all the notifications."
+    "allNotificationsChecked": "You've already checked all the notifications."
   },
   "postListShowPage": {
     "boards": "Boards",
@@ -76,7 +76,7 @@ class CodegenLoader extends AssetLoader{
   "settingPage": {
     "title": "Setting",
     "postSetting": "Post Setting",
-    "adult": "Allow Access to Sexual Posts",
+    "adult": "Allow Access to Adult Posts",
     "politics": "Allow Access to Political Posts",
     "block": "Blocked Users",
     "viewBlockedUsers": "View Blocked Users",
@@ -86,7 +86,7 @@ class CodegenLoader extends AssetLoader{
     "contactAdmins": "Contact the Admins",
     "signOut": "Sign out",
     "withdrawal": "Withdrawal",
-    "withdrawalGuide": "Membership withdrawal will be processed after confirmation by the Ara administrator, and it may take up to 24 hours.",
+    "withdrawalGuide": "Your request for account deletion will be processed after confirmation by the Ara administrator, and it may take up to 24 hours.",
     "userBlockingGuide": "User blocking can be done through the 'More' option in posts. You can change it up to 10 times per day.",
     "settingsSaved": "The settings have been saved.",
     "errorSavingSettings": "An error occurred, and the settings could not be applied. Please try again.",
@@ -94,8 +94,8 @@ class CodegenLoader extends AssetLoader{
     "replies": "Nested Comments",
     "hotNotifications": "Hot Notifications",
     "hotPosts": "Hot Posts",
-    "hotInfo": "We deliver hot announcements and posts every day at 8:30 a.m.",
-    "emailNotAvailable": "The default mail application cannot be opened, please contact ara@sparcs.org ."
+    "hotInfo": "We deliver trending announcements and posts every day at 8:30 a.m.",
+    "emailNotAvailable": "If the default mail application cannot be opened, please contact ara@sparcs.org."
   },
   "userPage": {
     "change": "Chg.",
@@ -147,9 +147,9 @@ class CodegenLoader extends AssetLoader{
     "noNickname": "No nickname"
   },
   "popUpMenuButtons": {
-    "downloadSucceed": "Downloading File succeed",
+    "downloadSucceed": "File downloaded successfully",
     "downloadFailed": "Downloading File failed",
-    "attachments": "Attachments",
+    "attachments": "Attachents",
     "report": "Report",
     "edit": "Edit",
     "delete": "Delete"
@@ -163,10 +163,10 @@ class CodegenLoader extends AssetLoader{
     "complete": "Complete",
     "nickname": "Nickname",
     "email": "Email",
-    "noEmail": "Email not exist",
+    "noEmail": "Email doesn't exist",
     "nicknameInfo": "Once you change your nickname, you can't change it for three months.",
-    "nicknameHintText": "Please enter the nickname you want to change.",
-    "nicknameEmptyInfo": "Nickname not written!"
+    "nicknameHintText": "Please enter the nickname you want to change to.",
+    "nicknameEmptyInfo": "Nickname not provided!"
   },
   "postWritePage": {
     "write": "Write a post",
@@ -181,7 +181,7 @@ class CodegenLoader extends AssetLoader{
     "adult": "Adult",
     "politics": "Politics",
     "contentPlaceholder": "Type content here",
-    "conditionSnackBar": "Please select a bulletin board and enter the title and contents.",
+    "conditionSnackBar": "Please select a bulletin board and enter the title and content.",
     "noCategory": "No Topics",
     "selectCategory": "Select Topic"
   }
