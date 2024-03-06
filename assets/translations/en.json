@@ -97,7 +97,7 @@
         "launchInBrowserNotAvailable": "The URL could not be opened by browser.",
         "blockedUsersPost": "This post was written by blocked user.",
         "showHiddenPosts": "Show hidden posts",
-        "hit": "Hit",
+        "hit": "hits",
         "noSelfVotingInfo": "You cannot vote for your post or comment!",
         "failedToBlock": "Failed to block.",
         "unblock": "Unblock",
