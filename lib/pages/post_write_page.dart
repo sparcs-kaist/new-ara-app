@@ -566,7 +566,7 @@ class _PostWritePageState extends State<PostWritePage>
                           // TODO: 원하는 메뉴 모양 만들기 위해 속성 테스트 할 것
                           // isDense: true,
                           // isExpanded: true,
-
+                          isExpanded: true,
                           value: _chosenBoardValue,
                           style: const TextStyle(color: ColorsInfo.newara),
                           borderRadius: BorderRadius.circular(20.0),
@@ -579,7 +579,7 @@ class _PostWritePageState extends State<PostWritePage>
                               child: Padding(
                                 padding: const EdgeInsets.only(left: 0.0),
                                 child: Text(
-                                  value.ko_name,
+                                  context.locale == const Locale('ko') ? value.ko_name : value.en_name,
                                   style: TextStyle(
                                     color: value.id == -1 || _isEditingPost
                                         ? const Color(0xFFBBBBBB)
@@ -615,6 +615,7 @@ class _PostWritePageState extends State<PostWritePage>
                   child: ButtonTheme(
                     alignedDropdown: true,
                     child: DropdownButton<TopicModel>(
+                      isExpanded: true,
                       value: _chosenTopicValue,
                       style: const TextStyle(color: Colors.red),
                       borderRadius: BorderRadius.circular(20.0),
@@ -623,7 +624,7 @@ class _PostWritePageState extends State<PostWritePage>
                         return DropdownMenuItem<TopicModel>(
                           value: value,
                           child: Text(
-                            value.ko_name,
+                            context.locale == const Locale('ko') ? value.ko_name : value.en_name,
                             style: TextStyle(
                               color: value.id == -1 || _isEditingPost
                                   ? const Color(0xFFBBBBBB)
@@ -1039,8 +1040,8 @@ class _PostWritePageState extends State<PostWritePage>
               const SizedBox(
                 width: 20,
               ),
-              _buildCheckBox(),
-              const Spacer(),
+              Expanded(child: _buildCheckBox()),
+              
               GestureDetector(
                 onTap: () {
                   Navigator.of(context).push(
@@ -1076,6 +1077,7 @@ class _PostWritePageState extends State<PostWritePage>
     if (_chosenBoardValue != null && _chosenBoardValue!.slug == 'with-school') {
       return Text(LocaleKeys.postWritePage_realNameNotice.tr(),
           style: const TextStyle(
+            overflow: TextOverflow.ellipsis,
             fontSize: 16,
             fontWeight: FontWeight.w500,
             color: ColorsInfo.newara,
