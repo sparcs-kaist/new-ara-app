@@ -49,16 +49,23 @@ class _PostListShowPageState extends State<PostListShowPage>
     var userProvider = context.read<UserProvider>();
     _scrollController.addListener(_scrollListener);
     WidgetsBinding.instance.addObserver(this);
-    updateAllBulletinList().then(
-      (value) {
-        _loadNextPage();
-      },
-    );
+    // updateAllBulletinList().then(
+    //   (value) {
+    //     _loadNextPage();
+    //   },
+    // );
     context.read<NotificationProvider>().checkIsNotReadExist(userProvider);
   }
+
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
+
+    /// initState 직후에는 updateAllBulletinList가 호출되어야 함.
+    /// initState 직후에는 apiUrl == ""이므로 이를 통해
+    /// didChangeDependencies에서 initState 직후 임을 파악하고 updateAllBulletinList 함수를 호출함.
+    String prevApiUrl = apiUrl;
+
     // 게시판 타입에 따라 API URL과 게시판 이름을 설정
     switch (widget.boardType) {
       case BoardType.free:
@@ -87,6 +94,14 @@ class _PostListShowPageState extends State<PostListShowPage>
         apiUrl = "articles/?page=";
         _boardName = LocaleKeys.postListShowPage_testBoard.tr();
         break;
+    }
+    // initState 직후에는 updateAllBulletinList 함수를 호출함.
+    if (prevApiUrl == "") {
+      updateAllBulletinList().then(
+        (_) {
+          _loadNextPage();
+        },
+      );
     }
   }
 
