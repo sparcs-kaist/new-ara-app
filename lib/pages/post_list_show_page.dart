@@ -67,6 +67,7 @@ class _PostListShowPageState extends State<PostListShowPage>
     String prevApiUrl = apiUrl;
 
     // 게시판 타입에 따라 API URL과 게시판 이름을 설정
+    debugPrint("Current Locale: ${context.locale == const Locale('kr') ? "Korean" : "English"}");
     switch (widget.boardType) {
       case BoardType.free:
         apiUrl = "articles/?parent_board=${widget.boardInfo!.id.toInt()}&page=";
@@ -126,6 +127,7 @@ class _PostListShowPageState extends State<PostListShowPage>
   /// [pageLimitToReload] : 새로 로딩할 최대 페이지 수.
   /// [currentPage] 값보다 [pageLimitToReload] 값이 큰 지 코딩할 때 주의 바랍니다.
   Future<void> updateAllBulletinList({int? pageLimitToReload}) async {
+    debugPrint("updateAllBulletinList called!!!!!!");
     List<ArticleListActionModel> newList = [];
     UserProvider userProvider = context.read<UserProvider>();
 
@@ -152,6 +154,7 @@ class _PostListShowPageState extends State<PostListShowPage>
       }
     }
 
+    debugPrint("updateAllBulleinList mounted: $mounted");
     // 위젯이 마운트 상태인 경우 상태를 업데이트합니다.
     if (mounted) {
       setState(() {
