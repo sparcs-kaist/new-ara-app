@@ -107,8 +107,8 @@ class CodegenLoader extends AssetLoader{
   },
   "postViewPage": {
     "reply": "Reply",
-    "scrap": "Scrap",
-    "scrapped": "Scrapped",
+    "scrap": "Bookmark",
+    "scrapped": "Bookmarked",
     "share": "Share",
     "launchInBrowserNotAvailable": "The URL could not be opened by browser.",
     "blockedUsersPost": "This post was written by blocked user.",

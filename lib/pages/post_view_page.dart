@@ -915,7 +915,7 @@ class _PostViewPageState extends State<PostViewPage> {
                 });
               },
               child: Container(
-                width: 88,
+                width: 100,
                 height: 35,
                 decoration: BoxDecoration(
                   color: Colors.white,
