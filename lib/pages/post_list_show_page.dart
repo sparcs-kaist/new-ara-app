@@ -67,11 +67,11 @@ class _PostListShowPageState extends State<PostListShowPage>
     String prevApiUrl = apiUrl;
 
     // 게시판 타입에 따라 API URL과 게시판 이름을 설정
-    debugPrint("Current Locale: ${context.locale == const Locale('kr') ? "Korean" : "English"}");
+    debugPrint("Current Locale: ${context.locale}");
     switch (widget.boardType) {
       case BoardType.free:
         apiUrl = "articles/?parent_board=${widget.boardInfo!.id.toInt()}&page=";
-        _boardName = context.locale == const Locale("kr")
+        _boardName = context.locale == const Locale("ko")
             ? widget.boardInfo!.ko_name
             : widget.boardInfo!.en_name;
         break;
