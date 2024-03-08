@@ -200,6 +200,11 @@ class CodegenLoader extends AssetLoader{
     "conditionSnackBar": "Please select a board and enter the title and content.",
     "noCategory": "No Topics",
     "selectCategory": "Select Topic"
+  },
+  "termsAndConditionsPage": {
+    "termsAndConditions": "Terms and Conditions of Service",
+    "agree": "Agree",
+    "agreed": "You've already agreed."
   }
 };
 static const Map<String,dynamic> ko = {
@@ -388,6 +393,11 @@ static const Map<String,dynamic> ko = {
     "conditionSnackBar": "게시판을 선택해주시고 제목, 내용을 입력해주세요.",
     "noCategory": "말머리 없음",
     "selectCategory": "말머리를 선택하세요"
+  },
+  "termsAndConditionsPage": {
+    "termsAndConditions": "이용약관",
+    "agree": "동의 하기",
+    "agreed": "이미 동의하셨습니다."
   }
 };
 static const Map<String, Map<String,dynamic>> mapLocales = {"en": en, "ko": ko};

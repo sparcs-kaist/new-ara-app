@@ -171,5 +171,9 @@ abstract class  LocaleKeys {
   static const postWritePage_noCategory = 'postWritePage.noCategory';
   static const postWritePage_selectCategory = 'postWritePage.selectCategory';
   static const postWritePage = 'postWritePage';
+  static const termsAndConditionsPage_termsAndConditions = 'termsAndConditionsPage.termsAndConditions';
+  static const termsAndConditionsPage_agree = 'termsAndConditionsPage.agree';
+  static const termsAndConditionsPage_agreed = 'termsAndConditionsPage.agreed';
+  static const termsAndConditionsPage = 'termsAndConditionsPage';
 
 }

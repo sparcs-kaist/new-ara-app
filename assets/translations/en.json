@@ -184,5 +184,10 @@
         "conditionSnackBar": "Please select a board and enter the title and content.",
         "noCategory": "No Topics",
         "selectCategory": "Select Topic"
+    },
+    "termsAndConditionsPage": {
+        "termsAndConditions": "Terms and Conditions of Service",
+        "agree": "Agree",
+        "agreed": "You've already agreed."
     }
 }
