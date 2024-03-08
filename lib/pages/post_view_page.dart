@@ -915,7 +915,7 @@ class _PostViewPageState extends State<PostViewPage> {
                 });
               },
               child: Container(
-                width: 100,
+                width: context.locale == const Locale('ko') ? 80 : 110,
                 height: 35,
                 decoration: BoxDecoration(
                   color: Colors.white,
