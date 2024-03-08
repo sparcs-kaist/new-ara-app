@@ -100,7 +100,7 @@ class CodegenLoader extends AssetLoader{
   "userPage": {
     "change": "Chg.",
     "myPosts": "My Posts",
-    "bookmarks": "Scrapped",
+    "bookmarks": "Bookmarks",
     "history": "History",
     "totalNPosts": "{curCount} posts",
     "noEmailInfo": "No email information"
