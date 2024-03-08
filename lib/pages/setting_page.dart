@@ -374,7 +374,7 @@ class SettingPageState extends State<SettingPage> {
                                   slideRoute(
                                     const TermsAndConditionsPage(),
                                   ),
-                                ).then((_) => setState(() {}));
+                                );
                               },
                               child: Row(
                                 mainAxisAlignment:
