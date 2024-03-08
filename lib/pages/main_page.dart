@@ -1279,7 +1279,7 @@ class LittleText extends StatelessWidget {
             ),
           TextSpan(
             text:
-                getTitle(content.title, content.is_hidden, content.why_hidden),
+                getTitle(content.title, content.is_hidden, content.why_hidden, context.locale),
             style: TextStyle(
               color: content.is_hidden ? const Color(0xFFBBBBBB) : Colors.black,
               fontSize: 14,

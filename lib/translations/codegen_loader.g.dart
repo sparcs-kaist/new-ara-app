@@ -111,7 +111,6 @@ class CodegenLoader extends AssetLoader{
     "scrapped": "Bookmarked",
     "share": "Share",
     "launchInBrowserNotAvailable": "The URL could not be opened by browser.",
-    "blockedUsersPost": "This post was written by blocked user.",
     "showHiddenPosts": "Show hidden posts",
     "hit": "hits",
     "noSelfVotingInfo": "You cannot vote for your post or comment!",
@@ -121,11 +120,23 @@ class CodegenLoader extends AssetLoader{
     "delete": "Delete",
     "report": "Report",
     "edit": "Edit",
-    "blockedUsersComment": "This comment was written by blocked user.",
     "commentHintText": "Type your comment here.",
     "noCommentWarning": "No comment has been written!",
     "displayCommentCount": " comments",
-    "copyLinkToClipBoard": "Copied URL to the clipboard."
+    "copyLinkToClipBoard": "Copied URL to the clipboard.",
+    "blockedUsersPost": "This post was written by blocked user.",
+    "blockedUsersComment": "This comment was written by blocked user.",
+    "reportedPost": "This post is hidden due to the accumulation of reports.",
+    "reportedComment": "This comment is hidden due to the accumulation of reports.",
+    "adultPost": "This post has adult/obscene contents.",
+    "socialPost": "This post has political/social contents.",
+    "accessDeniedPost": "Access for this post is denied.",
+    "hiddenPost": "This post is hidden.",
+    "deletedComment": "This comment is deleted.",
+    "hiddenComment": "This comment is hidden.",
+    "blockedUsersContentNotice": "You can change blocked users in your Setting page.",
+    "adultContentNotice": "You can change the setting in your Setting page to show this kinds of post.",
+    "socialContentNotice": "You can change the setting in your Setting page to show this kinds of post."
   },
   "postViewUtils": {
     "letUsKnowPostReportReason": "Let us know your reason for reporting the post.",
@@ -155,7 +166,12 @@ class CodegenLoader extends AssetLoader{
     "delete": "Delete"
   },
   "postPreview": {
-    "blockedUsersPost": "This post was written by blocked user."
+    "blockedUsersPost": "This post was written by blocked user.",
+    "reportedPost": "This post is hidden due to the accumulation of reports.",
+    "adultPost": "This post has adult/obscene contents.",
+    "socialPost": "This post has political/social contents.",
+    "accessDeniedPost": "Access for this post is denied.",
+    "hiddenPost": "This post is hidden."
   },
   "profileEditPage": {
     "settingInfoText": "There was a problem changing the settings.",
@@ -283,7 +299,6 @@ static const Map<String,dynamic> ko = {
     "scrapped": "담아둔 글",
     "share": "공유",
     "launchInBrowserNotAvailable": "브라우저로 URL을 열 수 없습니다.",
-    "blockedUsersPost": "차단한 사용자의 게시물입니다.",
     "showHiddenPosts": "숨긴내용 보기",
     "hit": "조회",
     "noSelfVotingInfo": "본인 게시글이나 댓글에는 좋아요를 누를 수 없습니다.",
@@ -293,11 +308,23 @@ static const Map<String,dynamic> ko = {
     "delete": "삭제",
     "report": "신고",
     "edit": "수정",
-    "blockedUsersComment": "차단한 사용자의 댓글입니다.",
     "commentHintText": "댓글을 입력해주세요.",
     "noCommentWarning": "댓글이 작성되지 않았습니다!",
     "displayCommentCount": "개의 댓글",
-    "copyLinkToClipBoard": "URL을 클립 보드에 복사했습니다."
+    "copyLinkToClipBoard": "URL을 클립 보드에 복사했습니다.",
+    "blockedUsersPost": "차단한 사용자의 게시물입니다.",
+    "blockedUsersComment": "차단한 사용자의 댓글입니다.",
+    "reportedPost": "신고 누적으로 숨김된 게시물입니다.",
+    "reportedComment": "신고 누적으로 숨김된 댓글입니다.",
+    "adultPost": "성인/음란성 내용의 게시물입니다.",
+    "socialPost": "정치/사회성 내용의 게시물입니다.",
+    "accessDeniedPost": "접근 권한이 없는 게시물입니다.",
+    "hiddenPost": "숨겨진 게시물입니다.",
+    "deletedComment": "삭제된 댓글입니다.",
+    "hiddenComment": "숨겨진 댓글입니다.",
+    "blockedUsersContentNotice": "차단 사용자 설정은 설정페이지에서 수정할 수 있습니다.",
+    "adultContentNotice": "게시글 보기 설정은 설정페이지에서 수정할 수 있습니다.",
+    "socialContentNotice": "게시글 보기 설정은 설정페이지에서 수정할 수 있습니다."
   },
   "postViewUtils": {
     "letUsKnowPostReportReason": "게시글 신고 사유를 알려주세요.",
@@ -327,7 +354,12 @@ static const Map<String,dynamic> ko = {
     "delete": "삭제"
   },
   "postPreview": {
-    "blockedUsersPost": "차단한 사용자의 게시물입니다."
+    "blockedUsersPost": "차단한 사용자의 게시물입니다.",
+    "reportedPost": "신고 누적으로 숨김된 게시물입니다.",
+    "adultPost": "성인/음란성 내용의 게시물입니다.",
+    "socialPost": "정치/사회성 내용의 게시물입니다.",
+    "accessDeniedPost": "접근 권한이 없는 게시물입니다.",
+    "hiddenPost": "숨겨진 게시물입니다."
   },
   "profileEditPage": {
     "settingInfoText": "설정 변경 중 문제가 발생했습니다.",

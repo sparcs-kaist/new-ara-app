@@ -95,7 +95,6 @@
         "scrapped": "담아둔 글",
         "share": "공유",
         "launchInBrowserNotAvailable": "브라우저로 URL을 열 수 없습니다.",
-        "blockedUsersPost": "차단한 사용자의 게시물입니다.",
         "showHiddenPosts": "숨긴내용 보기",
         "hit": "조회",
         "noSelfVotingInfo": "본인 게시글이나 댓글에는 좋아요를 누를 수 없습니다.",
@@ -105,11 +104,23 @@
         "delete": "삭제",
         "report": "신고",
         "edit": "수정",
-        "blockedUsersComment": "차단한 사용자의 댓글입니다.",
         "commentHintText": "댓글을 입력해주세요.",
         "noCommentWarning": "댓글이 작성되지 않았습니다!",
         "displayCommentCount": "개의 댓글",
-        "copyLinkToClipBoard": "URL을 클립 보드에 복사했습니다."
+        "copyLinkToClipBoard": "URL을 클립 보드에 복사했습니다.",
+        "blockedUsersPost": "차단한 사용자의 게시물입니다.",
+        "blockedUsersComment": "차단한 사용자의 댓글입니다.",
+        "reportedPost": "신고 누적으로 숨김된 게시물입니다.",
+        "reportedComment": "신고 누적으로 숨김된 댓글입니다.",
+        "adultPost": "성인/음란성 내용의 게시물입니다.",
+        "socialPost": "정치/사회성 내용의 게시물입니다.",
+        "accessDeniedPost": "접근 권한이 없는 게시물입니다.",
+        "hiddenPost": "숨겨진 게시물입니다.",
+        "deletedComment": "삭제된 댓글입니다.",
+        "hiddenComment": "숨겨진 댓글입니다.",
+        "blockedUsersContentNotice": "차단 사용자 설정은 설정페이지에서 수정할 수 있습니다.",
+        "adultContentNotice": "게시글 보기 설정은 설정페이지에서 수정할 수 있습니다.",
+        "socialContentNotice": "게시글 보기 설정은 설정페이지에서 수정할 수 있습니다."
     },
     "postViewUtils": {
         "letUsKnowPostReportReason": "게시글 신고 사유를 알려주세요.",
@@ -139,7 +150,12 @@
         "delete": "삭제"
     },
     "postPreview": {
-        "blockedUsersPost": "차단한 사용자의 게시물입니다."
+        "blockedUsersPost": "차단한 사용자의 게시물입니다.",
+        "reportedPost": "신고 누적으로 숨김된 게시물입니다.",
+        "adultPost": "성인/음란성 내용의 게시물입니다.",
+        "socialPost": "정치/사회성 내용의 게시물입니다.",
+        "accessDeniedPost": "접근 권한이 없는 게시물입니다.",
+        "hiddenPost": "숨겨진 게시물입니다."
     },
     "profileEditPage": {
         "settingInfoText": "설정 변경 중 문제가 발생했습니다.",

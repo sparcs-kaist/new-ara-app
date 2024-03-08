@@ -95,7 +95,6 @@
         "scrapped": "Bookmarked",
         "share": "Share",
         "launchInBrowserNotAvailable": "The URL could not be opened by browser.",
-        "blockedUsersPost": "This post was written by blocked user.",
         "showHiddenPosts": "Show hidden posts",
         "hit": "hits",
         "noSelfVotingInfo": "You cannot vote for your post or comment!",
@@ -105,11 +104,23 @@
         "delete": "Delete",
         "report": "Report",
         "edit": "Edit",
-        "blockedUsersComment": "This comment was written by blocked user.",
         "commentHintText": "Type your comment here.",
         "noCommentWarning": "No comment has been written!",
         "displayCommentCount": " comments",
-        "copyLinkToClipBoard": "Copied URL to the clipboard."
+        "copyLinkToClipBoard": "Copied URL to the clipboard.",
+        "blockedUsersPost": "This post was written by blocked user.",
+        "blockedUsersComment": "This comment was written by blocked user.",
+        "reportedPost": "This post is hidden due to the accumulation of reports.",
+        "reportedComment": "This comment is hidden due to the accumulation of reports.",
+        "adultPost": "This post has adult/obscene contents.",
+        "socialPost": "This post has political/social contents.",
+        "accessDeniedPost": "Access for this post is denied.",
+        "hiddenPost": "This post is hidden.",
+        "deletedComment": "This comment is deleted.",
+        "hiddenComment": "This comment is hidden.",
+        "blockedUsersContentNotice": "You can change blocked users in your Setting page.",
+        "adultContentNotice": "You can change the setting in your Setting page to show this kinds of post.",
+        "socialContentNotice": "You can change the setting in your Setting page to show this kinds of post."
     },
     "postViewUtils": {
         "letUsKnowPostReportReason": "Let us know your reason for reporting the post.",
@@ -139,7 +150,12 @@
         "delete": "Delete"
     },
     "postPreview": {
-        "blockedUsersPost": "This post was written by blocked user."
+        "blockedUsersPost": "This post was written by blocked user.",
+        "reportedPost": "This post is hidden due to the accumulation of reports.",
+        "adultPost": "This post has adult/obscene contents.",
+        "socialPost": "This post has political/social contents.",
+        "accessDeniedPost": "Access for this post is denied.",
+        "hiddenPost": "This post is hidden."
     },
     "profileEditPage": {
         "settingInfoText": "There was a problem changing the settings.",
