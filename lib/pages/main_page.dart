@@ -1014,7 +1014,8 @@ class _MainPageState extends State<MainPage> with WidgetsBindingObserver {
   Widget _buildStuCommunityContents() {
     return Column(
       children: [
-        MainPageTextButton(LocaleKeys.mainPage_organizationsAndClubs.tr(), () async {
+        MainPageTextButton(LocaleKeys.mainPage_organizationsAndClubs.tr(),
+            () async {
           await Navigator.of(context).push(slideRoute(PostListShowPage(
               boardType: BoardType.free,
               boardInfo: _searchBoard("students-group"))));
@@ -1103,7 +1104,7 @@ class _MainPageState extends State<MainPage> with WidgetsBindingObserver {
               Row(
                 children: [
                   Text(
-                    LocaleKeys.mainPage_topPost.tr(),
+                    LocaleKeys.mainPage_freshmanCouncil.tr(),
                     style: const TextStyle(
                       fontWeight: FontWeight.w700,
                       fontSize: 14,
