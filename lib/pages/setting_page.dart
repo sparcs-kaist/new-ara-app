@@ -368,12 +368,13 @@ class SettingPageState extends State<SettingPage> {
                             const SizedBox(height: 10),
                             // 이용약관
                             InkWell(
-                              onTap: () async {
-                                await Navigator.of(context).push(
+                              onTap: () {
+                                // TermsAndConditionsPage의 변경된 locale을 즉시 적용하기 위해 setState 호출함.
+                                Navigator.of(context).push(
                                   slideRoute(
                                     const TermsAndConditionsPage(),
                                   ),
-                                );
+                                ).then((_) => setState(() {}));
                               },
                               child: Row(
                                 mainAxisAlignment:

@@ -202,7 +202,7 @@ class CodegenLoader extends AssetLoader{
     "selectCategory": "Select Topic"
   },
   "termsAndConditionsPage": {
-    "termsAndConditions": "Terms and Conditions of Service",
+    "termsAndConditions": "Terms and Conditions",
     "agree": "Agree",
     "agreed": "You've already agreed."
   }

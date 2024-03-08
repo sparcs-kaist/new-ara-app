@@ -69,7 +69,7 @@ class _UserPageState extends State<UserPage>
   /// 현재 로드한 마지막 페이지를 나타냄.
   List<int> curPage = [1, 1, 1];
 
-  final List<String> _tabs = [
+  List<String> tabs = [
     LocaleKeys.userPage_myPosts.tr(),
     LocaleKeys.userPage_bookmarks.tr(),
     LocaleKeys.userPage_history.tr()
@@ -79,7 +79,7 @@ class _UserPageState extends State<UserPage>
   void initState() {
     super.initState();
     _tabController = TabController(
-      length: _tabs.length,
+      length: tabs.length,
       vsync: this,
     );
 
@@ -193,7 +193,16 @@ class _UserPageState extends State<UserPage>
               height: 35,
             ),
             onPressed: () {
-              Navigator.of(context).push(slideRoute(const SettingPage()));
+              // SettingPage에서 변경된 locale을 즉시 반영하기 위해 setState를 호출함.
+              Navigator.of(context)
+                  .push(slideRoute(const SettingPage()))
+                  .then((_) => setState(() {
+                        tabs = [
+                          LocaleKeys.userPage_myPosts.tr(),
+                          LocaleKeys.userPage_bookmarks.tr(),
+                          LocaleKeys.userPage_history.tr()
+                        ];
+                      }));
             },
           ),
           const SizedBox(width: 11),
@@ -213,7 +222,7 @@ class _UserPageState extends State<UserPage>
                   unselectedLabelColor: const Color.fromRGBO(177, 177, 177, 1),
                   labelColor: ColorsInfo.newara,
                   indicatorColor: ColorsInfo.newara,
-                  tabs: _tabs.map((String tab) {
+                  tabs: tabs.map((String tab) {
                     return Tab(text: tab);
                   }).toList(),
                   controller: _tabController,
@@ -227,7 +236,8 @@ class _UserPageState extends State<UserPage>
                 width: MediaQuery.of(context).size.width - 40,
                 height: 24,
                 child: Text(
-                  LocaleKeys.userPage_totalNPosts.tr(namedArgs: {'curCount':curCount.toString()}),
+                  LocaleKeys.userPage_totalNPosts
+                      .tr(namedArgs: {'curCount': curCount.toString()}),
                   style: const TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w700,

@@ -32,6 +32,7 @@ class _TermsAndConditionsPageState extends State<TermsAndConditionsPage> {
         title: SizedBox(
           child: Text(
             LocaleKeys.termsAndConditionsPage_termsAndConditions.tr(),
+            textAlign: TextAlign.center,
             style: const TextStyle(
               color: ColorsInfo.newara,
               fontSize: 18,
@@ -39,23 +40,31 @@ class _TermsAndConditionsPageState extends State<TermsAndConditionsPage> {
             ),
           ),
         ),
-        leading: GestureDetector(
-          behavior: HitTestBehavior.translucent,
-          onTap: () => Navigator.pop(context),
-          child: Stack(
-            alignment: Alignment.centerLeft,
-            children: [
-              SvgPicture.asset(
-                'assets/icons/left_chevron.svg',
-                colorFilter: const ColorFilter.mode(
-                    ColorsInfo.newara, BlendMode.srcATop),
-                fit: BoxFit.fill,
-                width: 35,
-                height: 35,
-              ),
-            ],
+        leading: IconButton(
+          color: ColorsInfo.newara,
+          icon: SvgPicture.asset(
+            'assets/icons/left_chevron.svg',
+            colorFilter:
+                const ColorFilter.mode(ColorsInfo.newara, BlendMode.srcIn),
+            width: 35,
+            height: 35,
           ),
+          onPressed: () => Navigator.pop(context),
         ),
+        actions: [
+          IconButton(
+              onPressed: () async {
+                if (context.locale == const Locale('ko')) {
+                  await context.setLocale(const Locale('en'));
+                } else {
+                  await context.setLocale(const Locale('ko'));
+                }
+              },
+              icon: const Icon(
+                Icons.language,
+                color: ColorsInfo.newara,
+              )),
+        ],
       ),
       body: SafeArea(
         child: _isLoading
@@ -189,7 +198,8 @@ class _TermsAndConditionsPageState extends State<TermsAndConditionsPage> {
         ? Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _buildNormalText('The terms and conditions of new Ara ("Ara") are currently in effect.\n'),
+              _buildNormalText(
+                  'The terms and conditions of new Ara ("Ara") are currently in effect.\n'),
               _buildBoldText("I. Ara's Purpose"),
               Padding(
                 padding: const EdgeInsets.only(left: 20.0),
@@ -209,17 +219,22 @@ class _TermsAndConditionsPageState extends State<TermsAndConditionsPage> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    _buildNormalText("1. Ara is only available to KAIST members."),
-                    _buildNormalText("2. Ara can be registered through SPARCS SSO."),
+                    _buildNormalText(
+                        "1. Ara is only available to KAIST members."),
+                    _buildNormalText(
+                        "2. Ara can be registered through SPARCS SSO."),
                     _buildNormalText(
                         "  - When you sign up with KAIST IAM in SPARCS SSO, you can use the service immediately without any additional approval (professors, faculty, students, graduates, etc.)."),
                     _buildNormalText(
                         "   - When you sign up with other methods without KAIST IAM in SPARCS SSO, The service can only be used by the Ara management team (such as tenant companies)."),
                     _buildNormalText(
                         "3. Ara does not have a withdrawal function. However, you can request Ara's management team to withdraw membership."),
-                    _buildNormalText("4. Membership may be revoked in the following cases:"),
-                    _buildNormalText("  - If found not to be a member of KAIST;"),
-                    _buildNormalText("  - Failure to comply with the obligations of the members specified in the Ara's Terms of Service;"),
+                    _buildNormalText(
+                        "4. Membership may be revoked in the following cases:"),
+                    _buildNormalText(
+                        "  - If found not to be a member of KAIST;"),
+                    _buildNormalText(
+                        "  - Failure to comply with the obligations of the members specified in the Ara's Terms of Service;"),
                     _buildNormalText(
                         "  - Where the Act on Promotion of Information and Communications Network Utilization and Information Protection, the related statute, prohibited acts by the Terms of Service or an act contrary to the public order during the use of Ara;\n"),
                   ],
@@ -231,20 +246,27 @@ class _TermsAndConditionsPageState extends State<TermsAndConditionsPage> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    _buildNormalText("1. The member shall not perform any of the following acts in connection with the use of Ara:."),
+                    _buildNormalText(
+                        "1. The member shall not perform any of the following acts in connection with the use of Ara:."),
                     _buildNormalText(
                         "  - Impersonating SPARCS, Ara management team, or a specific individual or organization."),
                     _buildNormalText(
                         "  - Copying, duplicating, changing, translating, publishing, broadcasting, or providing information obtained using Ara to others without prior consent from the authorship or Ara management team."),
-                    _buildNormalText("  - Fraudulently using another member's account"),
+                    _buildNormalText(
+                        "  - Fraudulently using another member's account"),
                     _buildNormalText("  - Defaming or insulting others."),
-                    _buildNormalText("  - Infringing on the rights of others, such as intellectual property, etc."),
-                    _buildNormalText("  - Hacking or distributing computer viruses"),
-                    _buildNormalText("  - Continuously transmitting certain contents, such as advertising information."),
+                    _buildNormalText(
+                        "  - Infringing on the rights of others, such as intellectual property, etc."),
+                    _buildNormalText(
+                        "  - Hacking or distributing computer viruses"),
+                    _buildNormalText(
+                        "  - Continuously transmitting certain contents, such as advertising information."),
                     _buildNormalText(
                         "  - Any act that is likely to interfere with or hinder the safe operation of the service."),
-                    _buildNormalText("  - Any act aimed at or related to a criminal act."),
-                    _buildNormalText("  - The act of using Ara for profit without the consent of SPARCS."),
+                    _buildNormalText(
+                        "  - Any act aimed at or related to a criminal act."),
+                    _buildNormalText(
+                        "  - The act of using Ara for profit without the consent of SPARCS."),
                     _buildNormalText(
                         "  - Other acts against Ara's Community Code or deemed inappropriate in the operation of Ara services.\n"),
                   ],
@@ -275,15 +297,22 @@ class _TermsAndConditionsPageState extends State<TermsAndConditionsPage> {
                   children: [
                     _buildNormalText(
                         "1. SPARCS is not responsible for discontinuing the service due to the following reasons:"),
-                    _buildNormalText("  - In case it is inevitable for repair of equipment, etc."),
-                    _buildNormalText("  - When KAIST stops telecommunication service"),
-                    _buildNormalText("  - In case of natural disasters, power outages and wartime situations"),
-                    _buildNormalText("  - Other reasons for not being able to provide this service arise."),
-                    _buildNormalText("2. SPARCS is not responsible for the following matters:."),
-                    _buildNormalText("  - Accuracy, and reliability of the members' posts."),
+                    _buildNormalText(
+                        "  - In case it is inevitable for repair of equipment, etc."),
+                    _buildNormalText(
+                        "  - When KAIST stops telecommunication service"),
+                    _buildNormalText(
+                        "  - In case of natural disasters, power outages and wartime situations"),
+                    _buildNormalText(
+                        "  - Other reasons for not being able to provide this service arise."),
+                    _buildNormalText(
+                        "2. SPARCS is not responsible for the following matters:."),
+                    _buildNormalText(
+                        "  - Accuracy, and reliability of the members' posts."),
                     _buildNormalText(
                         "  - Disputes arising between members and and third parties through Ara's medium"),
-                    _buildNormalText("   - Other damages and disputes arising from the use of Ara\n"),
+                    _buildNormalText(
+                        "   - Other damages and disputes arising from the use of Ara\n"),
                   ],
                 ),
               ),
