@@ -72,8 +72,10 @@ SPARCS_SSO_DEFAULT_URL=https://sparcssso.kaist.ac.kr
 
 - `development`와 `production` 둘 중 하나를 선택해서 실행합니다.
 - 지정하지 않을 시 `development`로 자동 실행됩니다.
-ex) `flutter run --dart-define=ENV=development`
-ex) `flutter run --dart-define=ENV=production`
+  
+ex) **`flutter run --dart-define=ENV=development`**
+
+ex) **`flutter run --dart-define=ENV=production`**
 
 #### VSCode
 
@@ -104,5 +106,5 @@ ex) `flutter run --dart-define=ENV=production`
 }
 ```
 
-##How to Deploy
+## How to Deploy
 - [CONTRIBUTING.md](https://github.com/sparcs-kaist/new-ara-app/blob/dev/CONTRIBUTING.md) 참조

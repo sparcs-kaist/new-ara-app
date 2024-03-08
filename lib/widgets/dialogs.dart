@@ -941,3 +941,162 @@ class UnregisterConfirmDialog extends StatelessWidget {
     );
   }
 }
+
+class ForAndroidTesterDialog extends StatelessWidget {
+  final UserProvider userProvider;
+  final _scrollController = ScrollController();
+
+  /// PostViewPage의 context.
+  final BuildContext targetContext;
+
+  /// '확인' 버튼을 눌렀을 때 적용되는 onTap 메서드
+  final void Function()? onTap;
+
+  ForAndroidTesterDialog({
+    super.key,
+    required this.userProvider,
+    required this.targetContext,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Dialog(
+      child: Container(
+        decoration: const BoxDecoration(
+          borderRadius: BorderRadius.all(Radius.circular(15)),
+        ),
+        child: SizedBox(
+          width: 350,
+          height: 500,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              SvgPicture.asset(
+                'assets/icons/information.svg',
+                width: 55,
+                height: 55,
+                colorFilter: const ColorFilter.mode(
+                  ColorsInfo.newara,
+                  BlendMode.srcIn,
+                ),
+              ),
+              const Text(
+                'Dear Google Play Review Team,',
+                style: TextStyle(
+                  fontSize: 17,
+                  fontWeight: FontWeight.w700,
+                  color: Colors.black,
+                ),
+              ),
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(
+                    30,
+                    10,
+                    20,
+                    10,
+                  ),
+                  child: Scrollbar(
+                    thumbVisibility: true,
+                    controller: _scrollController,
+                    child: Padding(
+                      padding: const EdgeInsets.only(right: 10),
+                      child: ListView(
+                        controller: _scrollController,
+                        children: const [
+                          Text(
+                            '''I am writing to seek assistance regarding an issue we have encountered following the production review of our app on the Google Play Store.
+
+During our production review process, we observed an unusual volume of comments within our app, which appear to be related to the review process itself. These abnormal comments were made using an account provided exclusively to Google Play Store reviewers. This situation has caused significant inconvenience, especially for students who rely on our app for communication and educational purposes.
+
+While we understand the importance of thorough app reviews and user feedback, we suspect that a misunderstanding or a technical issue has led to the excessive commenting. This not only affects the app's performance but also its acceptance among our target audience.
+
+To resolve this issue, we would greatly appreciate it if you could provide guidelines on why comment posting is necessary during the review process and what features we should demonstrate. Our goal is to ensure a positive and constructive environment for our users while adhering to Google Play's policies and standards.
+
+We are thankful for your understanding and support on this matter. Please let us know if there are specific procedures we should follow or if additional information is required from our side.
+
+Thank you for your attention and support on this issue. We look forward to your prompt response.
+
+Sincerely,
+
+
+안녕하십니까? 구글 플레이 스토어의 프로덕션 심사 후 저희가 마주한 문제에 대해 도움을 요청하기 위해 이 메시지를 작성합니다.
+
+저희 프로덕션 심사 과정 중, 앱 내에서 심사 과정과 관련된 것으로 보이는 비정상적인 댓글 양을 관찰했습니다. 이 비정상적인 댓글은 구글 플레이 스토어 심사관에게만 제공한 계정을 통해 작성되었습니다. 이는 특히 저희 앱을 소통과 교육 목적으로 의존하는 학생들의 사용자 경험에 큰 불편을 초래하고 있습니다.
+
+철저한 앱 리뷰와 사용자 피드백의 중요성을 이해하고 있지만, 과도한 댓글이 발생한 배경에는 오해나 기술적 문제가 있을 것으로 생각합니다. 이는 앱의 성능뿐만 아니라 저희 타겟 오디언스 사이에서의 수용성에도 영향을 미치고 있습니다.
+
+이 문제를 해결하기 위해, 심사 과정 중 앱 내에서 댓글 작성이 필요한 이유와 저희가 어떤 기능을 보여줘야 하는지에 대한 가이드라인을 제시해주시면 감사하겠습니다. 저희의 목표는 구글 플레이의 정책과 기준을 준수하면서 사용자에게 긍정적이고 건설적인 환경을 보장하는 것입니다.
+
+이 문제에 대한 이해와 지원에 감사드립니다. 저희가 따라야 할 특정한 절차가 있거나 저희 측에서 추가 정보가 필요한 경우 알려주시기 바랍니다.
+
+이 문제에 주목해주시고 지원해주셔서 감사합니다. 신속한 답변과 지원을 기대합니다.
+
+감사합니다,  
+
+Google Playストアでのアプリのプロダクションレビュー後に遭遇した問題について支援を求めています。
+
+プロダクションレビュープロセス中に、レビュープロセス自体に関連していると思われるアプリ内での異常なコメントの量を観察しました。これらの異常なコメントは、Google Playストアのレビュアーにのみ提供されたアカウントを使用して作成されました。この状況は、通信および教育目的で私たちのアプリに依存している学生を含むユーザーにとって、大きな不便を引き起こしています。
+
+徹底的なアプリレビューとユーザーフィードバックの重要性を理解していますが、過剰なコメントにつながった誤解または技術的な問題があると疑っています。これは、アプリのパフォーマンスだけでなく、ターゲットオーディエンスの間での受け入れにも影響を与えています。
+
+この問題を解決するために、レビュープロセス中にコメント投稿が必要な理由と、私たちが示すべき機能についてのガイドラインを提供していただければ幸いです。私たちの目標は、Google Playのポリシーと基準を遵守しながら、ユーザーにとって肯定的で建設的な環境を確保することです。
+
+この件に関するご理解とサポートに感謝します。特定の手順を踏むべきか、私たちの側から追加情報が必要かどうか教えてください。
+
+この問題に対するご注意とサポートに感謝します。迅速なご返答をお待ちしています。
+
+敬具、
+                            ''',
+                            style: TextStyle(
+                              fontSize: 15,
+                              fontWeight: FontWeight.w700,
+                              color: Color(0xFFBBBBBB),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 20),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  InkWell(
+                    // 인자로 전달받은 onTap 사용.
+                    onTap: onTap,
+                    child: Container(
+                      decoration: const BoxDecoration(
+                        borderRadius: BorderRadius.all(Radius.circular(20)),
+                        color: ColorsInfo.newara,
+                      ),
+                      width: 80,
+                      height: 40,
+                      child: const Center(
+                        child: Text(
+                          'Confirm',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w500,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(
+                height: 20,
+              )
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
