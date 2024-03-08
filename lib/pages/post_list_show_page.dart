@@ -1,7 +1,9 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:new_ara_app/pages/bulletin_search_page.dart';
 import 'package:new_ara_app/pages/post_write_page.dart';
+import 'package:new_ara_app/translations/locale_keys.g.dart';
 import 'package:provider/provider.dart';
 
 import 'package:new_ara_app/constants/board_type.dart';
@@ -45,43 +47,63 @@ class _PostListShowPageState extends State<PostListShowPage>
     super.initState();
 
     var userProvider = context.read<UserProvider>();
+    _scrollController.addListener(_scrollListener);
+    WidgetsBinding.instance.addObserver(this);
+    // updateAllBulletinList().then(
+    //   (value) {
+    //     _loadNextPage();
+    //   },
+    // );
+    context.read<NotificationProvider>().checkIsNotReadExist(userProvider);
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+
+    /// initState 직후에는 updateAllBulletinList가 호출되어야 함.
+    /// initState 직후에는 apiUrl == ""이므로 이를 통해
+    /// didChangeDependencies에서 initState 직후 임을 파악하고 updateAllBulletinList 함수를 호출함.
+    String prevApiUrl = apiUrl;
 
     // 게시판 타입에 따라 API URL과 게시판 이름을 설정
+    debugPrint("Current Locale: ${context.locale}");
     switch (widget.boardType) {
       case BoardType.free:
         apiUrl = "articles/?parent_board=${widget.boardInfo!.id.toInt()}&page=";
-        _boardName = widget.boardInfo!.ko_name;
+        _boardName = context.locale == const Locale("ko")
+            ? widget.boardInfo!.ko_name
+            : widget.boardInfo!.en_name;
         break;
       case BoardType.recent:
         apiUrl = "articles/recent/?page=";
-        _boardName = "최근 본 글";
+        _boardName = LocaleKeys.postListShowPage_history.tr();
         break;
       case BoardType.top:
         apiUrl = "articles/top/?page=";
-        _boardName = "실시간 인기글";
+        _boardName = LocaleKeys.postListShowPage_topPosts.tr();
         break;
       case BoardType.all:
         apiUrl = "articles/?page=";
-        _boardName = "전체보기";
+        _boardName = LocaleKeys.postListShowPage_allPosts.tr();
         break;
       case BoardType.scraps:
         apiUrl = "scraps/?page=";
-        _boardName = "담아둔 글";
+        _boardName = LocaleKeys.postListShowPage_bookmarks.tr();
         break;
       default:
         apiUrl = "articles/?page=";
-        _boardName = "테스트 게시판";
+        _boardName = LocaleKeys.postListShowPage_testBoard.tr();
         break;
     }
-
-    _scrollController.addListener(_scrollListener);
-    WidgetsBinding.instance.addObserver(this);
-    updateAllBulletinList().then(
-      (value) {
-        _loadNextPage();
-      },
-    );
-    context.read<NotificationProvider>().checkIsNotReadExist(userProvider);
+    // initState 직후에는 updateAllBulletinList 함수를 호출함.
+    if (prevApiUrl == "") {
+      updateAllBulletinList().then(
+        (_) {
+          _loadNextPage();
+        },
+      );
+    }
   }
 
   @override
@@ -105,6 +127,7 @@ class _PostListShowPageState extends State<PostListShowPage>
   /// [pageLimitToReload] : 새로 로딩할 최대 페이지 수.
   /// [currentPage] 값보다 [pageLimitToReload] 값이 큰 지 코딩할 때 주의 바랍니다.
   Future<void> updateAllBulletinList({int? pageLimitToReload}) async {
+    debugPrint("updateAllBulletinList called!!!!!!");
     List<ArticleListActionModel> newList = [];
     UserProvider userProvider = context.read<UserProvider>();
 
@@ -131,6 +154,7 @@ class _PostListShowPageState extends State<PostListShowPage>
       }
     }
 
+    debugPrint("updateAllBulleinList mounted: $mounted");
     // 위젯이 마운트 상태인 경우 상태를 업데이트합니다.
     if (mounted) {
       setState(() {
@@ -213,11 +237,11 @@ class _PostListShowPageState extends State<PostListShowPage>
                 width: 35,
                 height: 35,
               ),
-              const Padding(
-                padding: EdgeInsets.only(left: 29),
+              Padding(
+                padding: const EdgeInsets.only(left: 29),
                 child: Text(
-                  "게시판",
-                  style: TextStyle(
+                  LocaleKeys.postListShowPage_boards.tr(),
+                  style: const TextStyle(
                     color: Color(0xFFED3A3A),
                     fontSize: 17,
                     fontWeight: FontWeight.w500,

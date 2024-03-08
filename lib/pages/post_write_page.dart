@@ -35,6 +35,8 @@ import 'package:html2md/html2md.dart' as html2md;
 import 'package:markdown_quill/markdown_quill.dart';
 import 'package:markdown/markdown.dart' as md;
 import 'package:new_ara_app/widgets/snackbar_noti.dart';
+import 'package:easy_localization/easy_localization.dart';
+import 'package:new_ara_app/translations/locale_keys.g.dart';
 
 /// 사용자가 게시물을 작성하거나 편집할 수 있는 페이지를 나타내는 StatefulWidget입니다.
 class PostWritePage extends StatefulWidget {
@@ -110,7 +112,7 @@ class _PostWritePageState extends State<PostWritePage>
   final _defaultTopicModelSelect = TopicModel(
     id: -1,
     slug: "",
-    ko_name: "말머리를 선택하세요",
+    ko_name: LocaleKeys.postWritePage_selectCategory.tr(),
     en_name: "No Topic",
   );
   final _defaultBoardDetailActionModel = BoardDetailActionModel(
@@ -119,7 +121,7 @@ class _PostWritePageState extends State<PostWritePage>
     user_readable: true,
     user_writable: true,
     slug: '',
-    ko_name: '게시판을 선택하세요',
+    ko_name: LocaleKeys.postWritePage_selectBoard.tr(),
     en_name: 'No Board',
     group: SimpleBoardModel(id: -1, slug: '', ko_name: '', en_name: ''),
   );
@@ -474,10 +476,10 @@ class _PostWritePageState extends State<PostWritePage>
             height: 35),
         onPressed: () => Navigator.pop(context),
       ),
-      title: const SizedBox(
+      title: SizedBox(
         child: Text(
-          "글 쓰기",
-          style: TextStyle(
+          LocaleKeys.postWritePage_write.tr(),
+          style: const TextStyle(
             color: ColorsInfo.newara,
             fontSize: 18,
             fontWeight: FontWeight.w700,
@@ -495,7 +497,7 @@ class _PostWritePageState extends State<PostWritePage>
                       previousArticleId: widget.previousArticle!.id)
                   : _managePost())
               : () =>
-                  showInfoBySnackBar(context, "게시판을 선택해주시고 제목, 내용을 입력해주세요."),
+                  showInfoBySnackBar(context, LocaleKeys.postWritePage_conditionSnackBar.tr()),
           // 버튼이 클릭되었을 때 수행할 동작
           padding: EdgeInsets.zero, // 패딩 제거
           child: canIupload
@@ -508,9 +510,9 @@ class _PostWritePageState extends State<PostWritePage>
                     constraints:
                         const BoxConstraints(maxWidth: 65.0, maxHeight: 35.0),
                     alignment: Alignment.center,
-                    child: const Text(
-                      '올리기',
-                      style: TextStyle(color: Colors.white),
+                    child: Text(
+                      LocaleKeys.postWritePage_submit.tr(),
+                      style: const TextStyle(color: Colors.white),
                     ),
                   ),
                 )
@@ -526,9 +528,9 @@ class _PostWritePageState extends State<PostWritePage>
                     constraints:
                         const BoxConstraints(maxWidth: 65.0, maxHeight: 35.0),
                     alignment: Alignment.center,
-                    child: const Text(
-                      '올리기',
-                      style: TextStyle(color: Color(0xFFBBBBBB)),
+                    child: Text(
+                      LocaleKeys.postWritePage_submit.tr(),
+                      style: const TextStyle(color: Color(0xFFBBBBBB)),
                     ),
                   ),
                 ),
@@ -564,7 +566,7 @@ class _PostWritePageState extends State<PostWritePage>
                           // TODO: 원하는 메뉴 모양 만들기 위해 속성 테스트 할 것
                           // isDense: true,
                           // isExpanded: true,
-
+                          isExpanded: true,
                           value: _chosenBoardValue,
                           style: const TextStyle(color: ColorsInfo.newara),
                           borderRadius: BorderRadius.circular(20.0),
@@ -577,7 +579,7 @@ class _PostWritePageState extends State<PostWritePage>
                               child: Padding(
                                 padding: const EdgeInsets.only(left: 0.0),
                                 child: Text(
-                                  value.ko_name,
+                                  context.locale == const Locale('ko') ? value.ko_name : value.en_name,
                                   style: TextStyle(
                                     color: value.id == -1 || _isEditingPost
                                         ? const Color(0xFFBBBBBB)
@@ -613,6 +615,7 @@ class _PostWritePageState extends State<PostWritePage>
                   child: ButtonTheme(
                     alignedDropdown: true,
                     child: DropdownButton<TopicModel>(
+                      isExpanded: true,
                       value: _chosenTopicValue,
                       style: const TextStyle(color: Colors.red),
                       borderRadius: BorderRadius.circular(20.0),
@@ -621,7 +624,7 @@ class _PostWritePageState extends State<PostWritePage>
                         return DropdownMenuItem<TopicModel>(
                           value: value,
                           child: Text(
-                            value.ko_name,
+                            context.locale == const Locale('ko') ? value.ko_name : value.en_name,
                             style: TextStyle(
                               color: value.id == -1 || _isEditingPost
                                   ? const Color(0xFFBBBBBB)
@@ -671,9 +674,9 @@ class _PostWritePageState extends State<PostWritePage>
           // build 함수를 다시 실행하여 올릴 수 있는 게시물인지 유효성 검사
           setState(() {});
         },
-        decoration: const InputDecoration(
-          hintText: "제목을 입력해주세요.",
-          hintStyle: TextStyle(
+        decoration: InputDecoration(
+          hintText: LocaleKeys.postWritePage_titleHintText.tr(),
+          hintStyle: const TextStyle(
               height: 27 / 22,
               fontSize: 22,
               color: Color(0xFFBBBBBB),
@@ -686,13 +689,13 @@ class _PostWritePageState extends State<PostWritePage>
           fillColor: Colors.white,
           isDense: true,
           isCollapsed: true,
-          contentPadding: EdgeInsets.fromLTRB(0, 0, 0, 0),
-          enabledBorder: OutlineInputBorder(
+          contentPadding: const EdgeInsets.fromLTRB(0, 0, 0, 0),
+          enabledBorder: const OutlineInputBorder(
             borderSide: BorderSide(
               color: Colors.transparent, // 테두리 색상 설정
             ), // 모서리를 둥글게 설정
           ),
-          focusedBorder: OutlineInputBorder(
+          focusedBorder: const OutlineInputBorder(
             borderSide: BorderSide(
               color: Colors.transparent, // 테두리 색상 설정
             ), // 모서리를 둥글게 설정
@@ -722,9 +725,9 @@ class _PostWritePageState extends State<PostWritePage>
                 Builder(
                   builder: (BuildContext context) {
                     if (_chosenBoardValue == _defaultBoardDetailActionModel) {
-                      return const Text(
-                        "게시판을 선택해주세요.",
-                        style: TextStyle(
+                      return Text(
+                        LocaleKeys.postWritePage_selectBoard.tr(),
+                        style: const TextStyle(
                           fontSize: 16,
                           height: 24 / 16,
                           fontWeight: FontWeight.w500,
@@ -800,9 +803,9 @@ class _PostWritePageState extends State<PostWritePage>
                             width: 34,
                             height: 34,
                           ),
-                          const Text(
-                            "첨부파일 추가",
-                            style: TextStyle(
+                          Text(
+                            LocaleKeys.postWritePage_addAttach.tr(),
+                            style: const TextStyle(
                                 fontWeight: FontWeight.w500,
                                 fontSize: 16,
                                 color: Color(0xFF636363)),
@@ -852,9 +855,9 @@ class _PostWritePageState extends State<PostWritePage>
                           },
                           child: Row(
                             children: [
-                              const Text(
-                                "첨부파일",
-                                style: TextStyle(
+                              Text(
+                                LocaleKeys.postWritePage_attachments.tr(),
+                                style: const TextStyle(
                                   fontSize: 16,
                                   fontWeight: FontWeight.w500,
                                 ),
@@ -1037,8 +1040,8 @@ class _PostWritePageState extends State<PostWritePage>
               const SizedBox(
                 width: 20,
               ),
-              _buildCheckBox(),
-              const Spacer(),
+              Expanded(child: _buildCheckBox()),
+              
               GestureDetector(
                 onTap: () {
                   Navigator.of(context).push(
@@ -1047,9 +1050,9 @@ class _PostWritePageState extends State<PostWritePage>
                     ),
                   );
                 },
-                child: const Text(
-                  "이용약관",
-                  style: TextStyle(
+                child: Text(
+                  LocaleKeys.postWritePage_terms.tr(),
+                  style: const TextStyle(
                     decoration: TextDecoration.underline,
                     fontSize: 16,
                     fontWeight: FontWeight.w500,
@@ -1072,8 +1075,9 @@ class _PostWritePageState extends State<PostWritePage>
 
   Widget _buildCheckBox() {
     if (_chosenBoardValue != null && _chosenBoardValue!.slug == 'with-school') {
-      return const Text("이 게시물은 실명으로 게시됩니다.",
-          style: TextStyle(
+      return Text(LocaleKeys.postWritePage_realNameNotice.tr(),
+          style: const TextStyle(
+            overflow: TextOverflow.ellipsis,
             fontSize: 16,
             fontWeight: FontWeight.w500,
             color: ColorsInfo.newara,
@@ -1116,7 +1120,7 @@ class _PostWritePageState extends State<PostWritePage>
                       width: 6,
                     ),
                     Text(
-                      "익명",
+                      LocaleKeys.postWritePage_anonymous.tr(),
                       style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w500,
@@ -1166,7 +1170,7 @@ class _PostWritePageState extends State<PostWritePage>
                 width: 6,
               ),
               Text(
-                "성인",
+                LocaleKeys.postWritePage_adult.tr(),
                 style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.w500,
@@ -1214,7 +1218,7 @@ class _PostWritePageState extends State<PostWritePage>
                 width: 6,
               ),
               Text(
-                "정치",
+                LocaleKeys.postWritePage_politics.tr(),
                 style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.w500,
@@ -1373,7 +1377,7 @@ class _PostWritePageState extends State<PostWritePage>
       child: quill.QuillEditor(
         focusNode: _editorFocusNode,
         controller: _quillController,
-        placeholder: '내용을 입력해주세요.',
+        placeholder: LocaleKeys.postWritePage_contentPlaceholder.tr(),
         embedBuilders: FlutterQuillEmbeds.builders(),
         readOnly: false, // The editor is editable
 

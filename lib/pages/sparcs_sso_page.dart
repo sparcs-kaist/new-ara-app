@@ -110,7 +110,7 @@ class _SparcsSSOPageState extends State<SparcsSSOPage> {
                     // 탈퇴했던 유저 아이디를 로컬에 저장하고 이를 로그인 할 때 확인하여 탈퇴한 유저임을 확인
                     if (!mounted) return;
                     Navigator.of(context)
-                        .pushReplacement(slideRoute(const InQuiryPage()));
+                        .pushReplacement(slideRoute(const InquiryPage()));
                     return;
                   }
 
@@ -126,7 +126,7 @@ class _SparcsSSOPageState extends State<SparcsSSOPage> {
                     // 회원 탈퇴일이 1900년 1월 1일 이후라면 탈퇴한 유저
                     if (!mounted) return;
                     Navigator.of(context)
-                        .pushReplacement(slideRoute(const InQuiryPage()));
+                        .pushReplacement(slideRoute(const InquiryPage()));
                     return;
                   }
                 } catch (e) {

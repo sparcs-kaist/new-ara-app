@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:new_ara_app/translations/locale_keys.g.dart';
 import 'package:provider/provider.dart';
 import 'package:dio/dio.dart';
 
@@ -178,7 +179,7 @@ class _NotificationPageState extends State<NotificationPage> {
       appBar: AppBar(
         centerTitle: false,
         title: Text(
-          'appBar.notification'.tr(),
+          LocaleKeys.notificationPage_notifications.tr(),
           style: const TextStyle(
             fontSize: 28,
             fontWeight: FontWeight.w700,
@@ -224,9 +225,11 @@ class _NotificationPageState extends State<NotificationPage> {
                                         BlendMode.srcIn,
                                       ),
                                     ),
-                                    const Text(
-                                      '알림이 없습니다.',
-                                      style: TextStyle(
+                                    Text(
+                                      LocaleKeys
+                                          .notificationPage_noNotifications
+                                          .tr(),
+                                      style: const TextStyle(
                                         color: Color(0xFFBBBBBB),
                                         fontSize: 15,
                                       ),
@@ -256,11 +259,13 @@ class _NotificationPageState extends State<NotificationPage> {
                                           ? _buildDateInfo(
                                               _modelList[idx - 1].created_at,
                                               _modelList[idx].created_at)
-                                          : const SizedBox(
+                                          : SizedBox(
                                               height: 35,
                                               child: Text(
-                                                '오늘',
-                                                style: TextStyle(
+                                                LocaleKeys
+                                                    .notificationPage_today
+                                                    .tr(),
+                                                style: const TextStyle(
                                                   fontSize: 14,
                                                   fontWeight: FontWeight.w500,
                                                   color: Color.fromRGBO(
@@ -342,7 +347,8 @@ class _NotificationPageState extends State<NotificationPage> {
                                                         color: (targetNoti
                                                                     .is_read ??
                                                                 false)
-                                                            ? const Color(0xffbbbbbb)
+                                                            ? const Color(
+                                                                0xffbbbbbb)
                                                             : ColorsInfo.newara,
                                                       ),
                                                       child: Center(
@@ -371,8 +377,11 @@ class _NotificationPageState extends State<NotificationPage> {
                                                         CrossAxisAlignment
                                                             .start,
                                                     children: [
+                                                      //TODO: 나중에 백엔드에서 보내주는 내용으로 보여줘야함.
                                                       Text(
-                                                        targetNoti.title,
+                                                        LocaleKeys
+                                                            .notificationPage_newComment
+                                                            .tr(),
                                                         maxLines: 1,
                                                         overflow: TextOverflow
                                                             .ellipsis,
@@ -399,7 +408,7 @@ class _NotificationPageState extends State<NotificationPage> {
                                                         ),
                                                       ),
                                                       Text(
-                                                        "| 게시글: ${targetNoti.related_article.title}",
+                                                        "| ${LocaleKeys.notificationPage_post.tr()}: ${targetNoti.related_article.title}",
                                                         maxLines: 1,
                                                         overflow: TextOverflow
                                                             .ellipsis,
@@ -451,7 +460,7 @@ class _NotificationPageState extends State<NotificationPage> {
               _setIsLoadingTotal(false);
             }
           } else {
-            requestInfoSnackBar("이미 알림을 모두 읽으셨습니다.");
+            requestInfoSnackBar(LocaleKeys.notificationPage_allNotificationsChecked.tr());
           }
         },
         backgroundColor: Colors.white,
@@ -480,13 +489,21 @@ class _NotificationPageState extends State<NotificationPage> {
     if (prevDate.year == curDate.year &&
         prevDate.month == curDate.month &&
         prevDate.day == curDate.day) return Container();
-    String dateText =
+
+    String dateTextInKorean =
         "${(curDate.year != now.year ? "${curDate.year}년 " : "")}${curDate.month}월 ${curDate.day}일";
+
+    String dateTextInEnglish =
+        DateFormat("MMMM d${curDate.year != now.year ? ", yyyy" : ""}", "en_US")
+            .format(curDate);
+
     return SizedBox(
       height: 60,
       child: Center(
         child: Text(
-          dateText,
+          context.locale.languageCode == "ko"
+              ? dateTextInKorean
+              : dateTextInEnglish,
           style: const TextStyle(
             fontSize: 14,
             fontWeight: FontWeight.w500,

@@ -3,6 +3,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:new_ara_app/constants/url_info.dart';
+import 'package:new_ara_app/translations/locale_keys.g.dart';
 import 'package:provider/provider.dart';
 import 'package:easy_localization/easy_localization.dart';
 
@@ -68,17 +69,17 @@ class _UserPageState extends State<UserPage>
   /// 현재 로드한 마지막 페이지를 나타냄.
   List<int> curPage = [1, 1, 1];
 
-  final List<String> _tabs = [
-    'myPage.mypost'.tr(),
-    'myPage.scrap'.tr(),
-    'myPage.recent'.tr()
+  List<String> tabs = [
+    LocaleKeys.userPage_myPosts.tr(),
+    LocaleKeys.userPage_bookmarks.tr(),
+    LocaleKeys.userPage_history.tr()
   ];
 
   @override
   void initState() {
     super.initState();
     _tabController = TabController(
-      length: _tabs.length,
+      length: tabs.length,
       vsync: this,
     );
 
@@ -186,14 +187,22 @@ class _UserPageState extends State<UserPage>
             splashColor: Colors.white,
             icon: SvgPicture.asset(
               'assets/icons/setting.svg',
-             
-              colorFilter: const ColorFilter.mode(
-                  ColorsInfo.newara, BlendMode.srcIn),
+              colorFilter:
+                  const ColorFilter.mode(ColorsInfo.newara, BlendMode.srcIn),
               width: 35,
               height: 35,
             ),
             onPressed: () {
-              Navigator.of(context).push(slideRoute(const SettingPage()));
+              // SettingPage에서 변경된 locale을 즉시 반영하기 위해 setState를 호출함.
+              Navigator.of(context)
+                  .push(slideRoute(const SettingPage()))
+                  .then((_) => setState(() {
+                        tabs = [
+                          LocaleKeys.userPage_myPosts.tr(),
+                          LocaleKeys.userPage_bookmarks.tr(),
+                          LocaleKeys.userPage_history.tr()
+                        ];
+                      }));
             },
           ),
           const SizedBox(width: 11),
@@ -213,7 +222,7 @@ class _UserPageState extends State<UserPage>
                   unselectedLabelColor: const Color.fromRGBO(177, 177, 177, 1),
                   labelColor: ColorsInfo.newara,
                   indicatorColor: ColorsInfo.newara,
-                  tabs: _tabs.map((String tab) {
+                  tabs: tabs.map((String tab) {
                     return Tab(text: tab);
                   }).toList(),
                   controller: _tabController,
@@ -227,7 +236,8 @@ class _UserPageState extends State<UserPage>
                 width: MediaQuery.of(context).size.width - 40,
                 height: 24,
                 child: Text(
-                  '총 $curCount개의 글',
+                  LocaleKeys.userPage_totalNPosts
+                      .tr(namedArgs: {'curCount': curCount.toString()}),
                   style: const TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w700,
@@ -306,7 +316,7 @@ class _UserPageState extends State<UserPage>
                   Text(
                     userProvider.naUser == null ||
                             userProvider.naUser?.email == null
-                        ? "이메일 정보가 없습니다."
+                        ? LocaleKeys.userPage_noEmailInfo.tr()
                         : "${userProvider.naUser?.email}",
                     style: const TextStyle(
                       fontSize: 14,
@@ -320,7 +330,7 @@ class _UserPageState extends State<UserPage>
           ),
           const SizedBox(width: 30),
           SizedBox(
-            width: 26,
+            width: 30,
             height: 21,
             child: GestureDetector(
               behavior: HitTestBehavior.translucent,
@@ -332,7 +342,7 @@ class _UserPageState extends State<UserPage>
                 );
               },
               child: Text(
-                'myPage.change'.tr(),
+                LocaleKeys.userPage_change.tr(),
                 style: const TextStyle(
                   color: Color.fromRGBO(100, 100, 100, 1),
                   fontSize: 14,

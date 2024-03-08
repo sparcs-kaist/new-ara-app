@@ -1,36 +1,193 @@
 {
-    "appBar": {
-        "chatting": "Chatting",
-        "notification": "Notifications",
-        "bulletin": "Bulletins"
+    "boardListPage": {
+        "boards": "Boards",
+        "searchBoardsPostsComments": "Search boards, posts, and comments",
+        "viewAll": "View All",
+        "topPosts": "Top Posts",
+        "bookmarks": "Bookmarks"
     },
-    "main_page": {
-        "realtime": "Hot posts",
-        "notice": "Notices",
-        "stu_community": "Student Community"
+    "bulletinSearchPage": {
+        "searchIn": "Search in {en_name}",
+        "searchInAllPosts": "Search in all posts",
+        "searchInHistory": "Search in recently viewed posts",
+        "searchInTopPosts": "Search in real-time popular posts",
+        "searchInBookmarks": "Search in saved posts",
+        "search": "Search",
+        "pleaseEnter": "Please enter a search term",
+        "noResults": "No results found."
     },
-    "myPage": {
-        "change": "change",
-        "mypost": "My Posts",
-        "scrap": "Scrapped",
-        "recent": "Recent"
+    "inquiryPage": {
+        "title": "Inquiries and Suggestions",
+        "reLoginErrorWithWithdrawalGuide": "This account has already been deactivated.\nIf you wish to re-register, please click this link to contact us via email.",
+        "reLoginErrorWithWithdrawalEmailTitle": "Re-registration Inquiry",
+        "reLoginErrorWithWithdrawalEmailContents": "If you have any additional comments, please write them below.\n\n※ An Ara administrator will respond within 48 hours.※\n\nUser ID: {userID}\nNickname: {nickname}\nEmail: {email}\nPlatform: App\n"
     },
-    "login_page": {
+    "loginPage": {
         "login": "Sign in with SPARCS SSO"
     },
-    "setting_page": {
-        "title": "setting",
-        "bulletin": "Bulletins",
-        "adult": "R-rated posts",
-        "politics": "Political posts",
-        "block": "Account Blocking",
-        "blocked_users": "List of Blocked Users",
-        "block_howto": "You can block accounts through the detail function in posts or comments.",
-        "noti": "Notifications",
-        "myreply": "Comments and Nested Comments of My Posts",
-        "reply": "Nested Comments",
-        "hot_noti": "Hot Notifications",
-        "hot_posts": "Hot Posts",
-        "hot_info": "We deliver hot announcements and posts every day at 8:30 a.m."
+    "mainPage": {
+        "topPost": "Top Posts",
+        "notice": "Notice",
+        "portalNotice": "Portal Notice",
+        "facility": "Facility",
+        "araAdmins": "Ara Admins",
+        "trades": "Trades",
+        "realEstate": "Real Estate",
+        "market": "Market",
+        "jobsWanted": "Jobs Wanted",
+        "organizationsAndClubs": "Organizations and Clubs",
+        "gradAssoc": "Grad Assoc",
+        "undergradAssoc": "Undergrad Assoc",
+        "freshmanCouncil": "Freshman Council",
+        "talk": "Talk"
+    },
+    "notificationPage": {
+        "notifications": "Notifications",
+        "noNotifications": "No notifications.",
+        "today": "Today",
+        "post": "Post",
+        "newComment": "New comment to your post.",
+        "allNotificationsChecked": "You've already checked all the notifications."
+    },
+    "postListShowPage": {
+        "boards": "Boards",
+        "history": "History",
+        "topPosts":"Top Posts",
+        "allPosts":"All Posts",
+        "bookmarks":"Bookmarks",
+        "testBoard":"Test Board"
+    },
+    "settingPage": {
+        "title": "Setting",
+        "postSetting": "Post Setting",
+        "adult": "Allow Access to Adult Posts",
+        "politics": "Allow Access to Political Posts",
+        "block": "Blocked Users",
+        "viewBlockedUsers": "View Blocked Users",
+        "howToBlock": "You can block accounts through the detail function in posts or comments.",
+        "information": "Information",
+        "termsAndConditions": "Terms and Conditions of Service",
+        "contactAdmins": "Contact the Admins",
+        "signOut": "Sign out",
+        "withdrawal": "Withdrawal",
+        "withdrawalGuide": "Your request for account deletion will be processed after confirmation by the Ara administrator, and it may take up to 24 hours.",
+        "userBlockingGuide": "User blocking can be done through the 'More' option in posts. You can change it up to 10 times per day.",
+        "settingsSaved": "The settings have been saved.",
+        "errorSavingSettings": "An error occurred, and the settings could not be applied. Please try again.",
+        "myReplies": "Comments and Nested Comments of My Posts",
+        "replies": "Nested Comments",
+        "hotNotifications": "Hot Notifications",
+        "hotPosts": "Hot Posts",
+        "hotInfo": "We deliver trending announcements and posts every day at 8:30 a.m.",
+        "emailNotAvailable": "If the default mail application cannot be opened, please contact ara@sparcs.org."
+    },
+    "userPage": {
+        "change": "Chg.",
+        "myPosts": "My Posts",
+        "bookmarks": "Bookmarks",
+        "history": "History",
+        "totalNPosts": "{curCount} posts",
+        "noEmailInfo": "No email information"
+    },
+    "postViewPage": {
+        "reply": "Reply",
+        "scrap": "To Bookmark",
+        "scrapped": "Bookmarked",
+        "share": "Share",
+        "launchInBrowserNotAvailable": "The URL could not be opened by browser.",
+        "showHiddenPosts": "Show hidden posts",
+        "hit": "hits",
+        "noSelfVotingInfo": "You cannot vote for your post or comment!",
+        "failedToBlock": "Failed to block.",
+        "unblock": "Unblock",
+        "block": "Block",
+        "delete": "Delete",
+        "report": "Report",
+        "edit": "Edit",
+        "commentHintText": "Type your comment here.",
+        "noCommentWarning": "No comment has been written!",
+        "displayCommentCount": " comments",
+        "copyLinkToClipBoard": "Copied URL to the clipboard.",
+        "blockedUsersPost": "This post was written by blocked user.",
+        "blockedUsersComment": "This comment was written by blocked user.",
+        "reportedPost": "This post is hidden due to the accumulation of reports.",
+        "reportedComment": "This comment is hidden due to the accumulation of reports.",
+        "adultPost": "This post has adult/obscene contents.",
+        "socialPost": "This post has political/social contents.",
+        "accessDeniedPost": "Access for this post is denied.",
+        "hiddenPost": "This post is hidden.",
+        "deletedComment": "This comment is deleted.",
+        "hiddenComment": "This comment is hidden.",
+        "blockedUsersContentNotice": "You can change blocked users in your Setting page.",
+        "adultContentNotice": "You can change the setting in your Setting page to show this kinds of post.",
+        "socialContentNotice": "You can change the setting in your Setting page to show this kinds of post."
+    },
+    "postViewUtils": {
+        "letUsKnowPostReportReason": "Let us know your reason for reporting the post.",
+        "letUsKnowCommentReportReason": "Let us know your reason for reporting the comment.",
+        "reportPostSucceed": "Post is successfully reported.",
+        "alreadyReported": "You've already reported this post.",
+        "reportButton": "Report",
+        "cancel": "Cancel"
+    },
+    "dialogs": {
+        "deleteConfirm": "Do you really want to delete this post?",
+        "blockConfirm": "Do you really want to block this user?",
+        "logoutConfirm": "Do you really want to sign out?",
+        "withdrawalConfirm": "Do you really want to withdraw the membership?",
+        "withdrawalEmailInfo": "If you leave the membership, you can't re-sign up with the email you're using now",
+        "cancel": "Cancel",
+        "confirm": "OK",
+        "noBlockedUsers": "There are no blocked users.",
+        "noNickname": "No nickname"
+    },
+    "popUpMenuButtons": {
+        "downloadSucceed": "File downloaded successfully",
+        "downloadFailed": "Downloading File failed",
+        "attachments": "Attachments",
+        "report": "Report",
+        "edit": "Edit",
+        "delete": "Delete"
+    },
+    "postPreview": {
+        "blockedUsersPost": "This post was written by blocked user.",
+        "reportedPost": "This post is hidden due to the accumulation of reports.",
+        "adultPost": "This post has adult/obscene contents.",
+        "socialPost": "This post has political/social contents.",
+        "accessDeniedPost": "Access for this post is denied.",
+        "hiddenPost": "This post is hidden."
+    },
+    "profileEditPage": {
+        "settingInfoText": "There was a problem changing the settings.",
+        "editProfile": "Edit Profile",
+        "complete": "Complete",
+        "nickname": "Nickname",
+        "email": "Email",
+        "noEmail": "Email doesn't exist",
+        "nicknameInfo": "Once you change your nickname, you can't change it for three months.",
+        "nicknameHintText": "Please enter the nickname you want to change to.",
+        "nicknameEmptyInfo": "Nickname not provided!"
+    },
+    "postWritePage": {
+        "write": "Write a post",
+        "submit": "Submit",
+        "titleHintText": "Type title here",
+        "selectBoard": "Select Board",
+        "addAttach": "Upload Attachments",
+        "attachments": "Attachments",
+        "terms": "Terms",
+        "realNameNotice": "This post will be under your real name.",
+        "anonymous": "Anon",
+        "adult": "Adult",
+        "politics": "Politics",
+        "contentPlaceholder": "Type content here",
+        "conditionSnackBar": "Please select a board and enter the title and content.",
+        "noCategory": "No Topics",
+        "selectCategory": "Select Topic"
+    },
+    "termsAndConditionsPage": {
+        "termsAndConditions": "Terms and Conditions",
+        "agree": "Agree",
+        "agreed": "You've already agreed."
     }
 }

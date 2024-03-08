@@ -144,7 +144,7 @@ class UserProvider with ChangeNotifier {
     try {
       response = await dio.get(totUrl);
     } on DioException catch (e) {
-      debugPrint("getApiRes failed with DioException: $e");
+      debugPrint("getApiRes failed with DioException (URL: $apiUrl): $e");
       // 서버에서 response를 보냈지만 invalid한 statusCode일 때
       if (e.response != null) {
         debugPrint("${e.response!.data}");

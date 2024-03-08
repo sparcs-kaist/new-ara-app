@@ -1,8 +1,10 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:new_ara_app/constants/colors_info.dart';
 import 'package:new_ara_app/providers/user_provider.dart';
+import 'package:new_ara_app/translations/locale_keys.g.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -11,14 +13,14 @@ import 'package:url_launcher/url_launcher.dart';
 ///TODO: class 명과 파일명은 변경 필요
 ///
 ///TODO: 디자인 변경 필요
-class InQuiryPage extends StatefulWidget {
-  const InQuiryPage({super.key});
+class InquiryPage extends StatefulWidget {
+  const InquiryPage({super.key});
 
   @override
-  State<InQuiryPage> createState() => _InQuiryPageState();
+  State<InquiryPage> createState() => _InquiryPageState();
 }
 
-class _InQuiryPageState extends State<InQuiryPage> {
+class _InquiryPageState extends State<InquiryPage> {
   @override
   Widget build(BuildContext context) {
     UserProvider userProvider = context.watch<UserProvider>();
@@ -26,10 +28,10 @@ class _InQuiryPageState extends State<InQuiryPage> {
       backgroundColor: Colors.white,
       appBar: AppBar(
         centerTitle: true,
-        title: const SizedBox(
+        title: SizedBox(
           child: Text(
-            "문의 페이지",
-            style: TextStyle(
+            LocaleKeys.inquiryPage_title.tr(),
+            style: const TextStyle(
               color: ColorsInfo.newara,
               fontSize: 18,
               fontWeight: FontWeight.w700,
@@ -62,23 +64,29 @@ class _InQuiryPageState extends State<InQuiryPage> {
             children: [
               Text.rich(
                 TextSpan(
-                  text: '이미 탈퇴 했던 계정입니다.\n재가입을 하고 싶다면 이메일로 문의하세요.',
+                  text: LocaleKeys.inquiryPage_reLoginErrorWithWithdrawalGuide.tr(),
                   style: const TextStyle(
-                    decoration: TextDecoration.underline,
-                    color: Colors.blue, fontSize: 20),
+                      decoration: TextDecoration.underline,
+                      color: Colors.blue,
+                      fontSize: 20),
                   recognizer: TapGestureRecognizer()
                     ..onTap = () async {
                       int? userID = userProvider.naUser!.user;
                       String? email = userProvider.naUser?.email;
                       String? nickname = userProvider.naUser?.nickname;
 
-                      final String body =
-                          """여기 아래에 문의 사항을 적어주세요.\n\n※ Ara 관리자가 48시간 이내로 답변드립니다.※\n\n유저 번호: $userID\n닉네임: $nickname\n이메일: $email\n플랫폼: App\n""";
+                      final String body = LocaleKeys.inquiryPage_reLoginErrorWithWithdrawalEmailContents.tr(
+                            namedArgs: {
+                              'userID': userID.toString(),
+                              'email': email.toString(),
+                              'nickname': nickname.toString(),
+                            },
+                          );
                       final emailLaunchUri = Uri(
                         scheme: 'mailto',
                         path: 'ara@sparcs.org',
                         query: encodeQueryParameters(<String, String>{
-                          'subject': 'Ara에 문의합니다',
+                          'subject': LocaleKeys.inquiryPage_reLoginErrorWithWithdrawalEmailTitle.tr(),
                           'body': body,
                         }),
                       );

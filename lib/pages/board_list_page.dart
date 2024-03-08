@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:new_ara_app/models/board_group_model.dart';
 import 'package:new_ara_app/pages/bulletin_search_page.dart';
+import 'package:new_ara_app/translations/locale_keys.g.dart';
 import 'package:new_ara_app/utils/cache_function.dart';
 import 'package:provider/provider.dart';
 
@@ -17,20 +19,20 @@ import 'package:new_ara_app/providers/notification_provider.dart';
 const boardsByGroupLength = 5;
 
 /// `BulletinListPage`는 사용자가 이 페이지에서 다양한 게시판을 탐색하고 선택함..
-class BulletinListPage extends StatefulWidget {
-  const BulletinListPage({super.key});
+class BoardListPage extends StatefulWidget {
+  const BoardListPage({super.key});
   @override
-  State<StatefulWidget> createState() => _BulletinListPageState();
+  State<StatefulWidget> createState() => _BoardListPageState();
 }
 
-class _BulletinListPageState extends State<BulletinListPage> {
+class _BoardListPageState extends State<BoardListPage> {
   /// 데이터 로딩 상태
   bool isLoading = true;
 
   /// 게시판 그룹 별로 게시판 목록 저장하는 변수. 게시판 그룹은 1부터 시작하도록 초기화.
   List<List<BoardDetailActionModel>> boardsByGroup =
       List.generate(boardsByGroupLength + 1, (_) => []);
-  List<Map<String, dynamic>> textContent = [];
+  List<BoardGroupModel> boardModels = [];
   final FocusNode _focusNode = FocusNode();
 
   @override
@@ -81,7 +83,7 @@ class _BulletinListPageState extends State<BulletinListPage> {
       appBar: AppBar(
         centerTitle: false,
         title: Text(
-          "appBar.bulletin".tr(),
+          LocaleKeys.boardListPage_boards.tr(),
           style: const TextStyle(
             fontSize: 28,
             fontWeight: FontWeight.w700,
@@ -147,7 +149,9 @@ class _BulletinListPageState extends State<BulletinListPage> {
                                   ),
                                 ),
                               ),
-                              hintText: '게시판, 게시글 및 댓글 검색',
+                              hintText: LocaleKeys
+                                  .boardListPage_searchBoardsPostsComments
+                                  .tr(),
                               hintStyle: const TextStyle(
                                 color: Color(0xFFBBBBBB),
                                 fontSize: 16,
@@ -201,9 +205,9 @@ class _BulletinListPageState extends State<BulletinListPage> {
                                 const SizedBox(
                                   width: 5,
                                 ),
-                                const Text(
-                                  '전체보기',
-                                  style: TextStyle(
+                                Text(
+                                  LocaleKeys.boardListPage_viewAll.tr(),
+                                  style: const TextStyle(
                                     color: Color(0xFF333333),
                                     fontSize: 17,
                                     fontWeight: FontWeight.w700,
@@ -242,9 +246,9 @@ class _BulletinListPageState extends State<BulletinListPage> {
                                 const SizedBox(
                                   width: 5,
                                 ),
-                                const Text(
-                                  '인기글',
-                                  style: TextStyle(
+                                Text(
+                                  LocaleKeys.boardListPage_topPosts.tr(),
+                                  style: const TextStyle(
                                     color: Color(0xFF333333),
                                     fontSize: 17,
                                     fontWeight: FontWeight.w700,
@@ -283,9 +287,9 @@ class _BulletinListPageState extends State<BulletinListPage> {
                                 const SizedBox(
                                   width: 5,
                                 ),
-                                const Text(
-                                  '담아둔 글',
-                                  style: TextStyle(
+                                Text(
+                                  LocaleKeys.boardListPage_bookmarks.tr(),
+                                  style: const TextStyle(
                                     color: Color(0xFF333333),
                                     fontSize: 17,
                                     fontWeight: FontWeight.w700,
@@ -306,7 +310,7 @@ class _BulletinListPageState extends State<BulletinListPage> {
                           height: 10,
                         ),
 
-                        BoardExpansionTile(1, "공지", boardsByGroup[1]),
+                        BoardExpansionTile(1, boardsByGroup[1]),
 
                         /// 자유 게시판은 별도의 하위 목록이 없기에 따로 처리
                         InkWell(
@@ -335,7 +339,9 @@ class _BulletinListPageState extends State<BulletinListPage> {
                                     width: 5,
                                   ),
                                   Text(
-                                    boardsByGroup[2][0].ko_name,
+                                    context.locale == const Locale("ko")
+                                        ? boardsByGroup[2][0].ko_name
+                                        : boardsByGroup[2][0].en_name,
                                     style: const TextStyle(
                                       color: Color(0xFF333333),
                                       fontSize: 20,
@@ -345,9 +351,9 @@ class _BulletinListPageState extends State<BulletinListPage> {
                                 ],
                               ),
                             )),
-                        BoardExpansionTile(3, "학생 단체 및 동아리", boardsByGroup[3]),
-                        BoardExpansionTile(4, "거래", boardsByGroup[4]),
-                        BoardExpansionTile(5, "소통", boardsByGroup[5]),
+                        BoardExpansionTile(3, boardsByGroup[3]),
+                        BoardExpansionTile(4, boardsByGroup[4]),
+                        BoardExpansionTile(5, boardsByGroup[5]),
                       ],
                     ),
                   ),
@@ -365,13 +371,11 @@ class _BulletinListPageState extends State<BulletinListPage> {
 class BoardExpansionTile extends StatelessWidget {
   // TODO: titleNum이 필요한 이유 알기
   final int titleNum;
-  final String title;
   final List<BoardDetailActionModel> boardsByGroup;
 
   /// [titleNum]은 게시판 그룹의 번호, [title]은 게시판 그룹의 제목,
   /// [boardsByGroup]은 해당 그룹에 속한 게시판 목록.
-  const BoardExpansionTile(this.titleNum, this.title, this.boardsByGroup,
-      {super.key});
+  const BoardExpansionTile(this.titleNum, this.boardsByGroup, {super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -406,7 +410,9 @@ class BoardExpansionTile extends StatelessWidget {
                   width: 5,
                 ),
                 Text(
-                  title,
+                  context.locale == const Locale("ko")
+                      ? boardsByGroup[0].group.ko_name
+                      : boardsByGroup[0].group.en_name,
                   style: const TextStyle(
                     color: Color(0xFF333333),
                     fontSize: 20,
@@ -430,7 +436,9 @@ class BoardExpansionTile extends StatelessWidget {
                       width: 40,
                     ),
                     Text(
-                      model.ko_name,
+                      context.locale == const Locale("ko")
+                          ? model.ko_name
+                          : model.en_name,
                       style: const TextStyle(
                         color: Color(0xFF333333),
                         fontSize: 16,

@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:new_ara_app/constants/board_type.dart';
@@ -8,6 +9,7 @@ import 'package:new_ara_app/models/article_list_action_model.dart';
 import 'package:new_ara_app/models/board_detail_action_model.dart';
 import 'package:new_ara_app/pages/post_view_page.dart';
 import 'package:new_ara_app/providers/user_provider.dart';
+import 'package:new_ara_app/translations/locale_keys.g.dart';
 import 'package:new_ara_app/utils/slide_routing.dart';
 import 'package:new_ara_app/widgets/loading_indicator.dart';
 import 'package:new_ara_app/widgets/post_preview.dart';
@@ -47,27 +49,30 @@ class _BulletinSearchPageState extends State<BulletinSearchPage> {
       case BoardType.free:
         _apiUrl =
             "articles/?parent_board=${widget.boardInfo!.id.toInt()}&page=";
-        _hintText = "${widget.boardInfo!.ko_name}에서 검색";
+        _hintText = LocaleKeys.bulletinSearchPage_searchIn.tr(namedArgs: {
+          "en_name": widget.boardInfo!.en_name,
+          "ko_name": widget.boardInfo!.ko_name
+        });
         break;
       case BoardType.all:
         _apiUrl = "articles/?page=";
-        _hintText = "전체 보기에서 검색";
+        _hintText = LocaleKeys.bulletinSearchPage_searchInAllPosts.tr();
         break;
       case BoardType.recent:
         _apiUrl = "articles/recent/?page=";
-        _hintText = "최근 본 글에서 검색";
+        _hintText = LocaleKeys.bulletinSearchPage_searchInHistory.tr();
         break;
       case BoardType.top:
         _apiUrl = "articles/top/?page=";
-        _hintText = "실시간 인기글에서 검색";
+        _hintText = LocaleKeys.bulletinSearchPage_searchInTopPosts.tr();
         break;
       case BoardType.scraps:
         _apiUrl = "scraps/?page=";
-        _hintText = "담아둔 글에서 검색";
+        _hintText = LocaleKeys.bulletinSearchPage_searchInBookmarks.tr();
         break;
       default:
         _apiUrl = "articles/recent/?page=";
-        _hintText = "검색";
+        _hintText = LocaleKeys.bulletinSearchPage_search.tr();
         break;
     }
     // 위젯이 빌드된 후에 포커스를 줍니다.
@@ -164,7 +169,7 @@ class _BulletinSearchPageState extends State<BulletinSearchPage> {
           myMap != null &&
           _textEdtingController.text == targetWord) {
         setState(() {
-          for (int i = 0; i < (myMap!["results"].length ?? 0); i++) {
+          for (int i = 0; i < (myMap["results"].length ?? 0); i++) {
             //???/
             if (myMap["results"][i]["created_by"]["profile"] != null) {
               postPreviewList.add(
@@ -330,15 +335,16 @@ class _BulletinSearchPageState extends State<BulletinSearchPage> {
                       // 검색어가 없을 때와 검색 결과가 없을 때의 처리
                       if (_textEdtingController.text == "" &&
                           postPreviewList.isEmpty)
-                        const Expanded(
+                        Expanded(
                           child: Center(
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               crossAxisAlignment: CrossAxisAlignment.center,
                               children: [
                                 Text(
-                                  '검색어를 입력해주세요.',
-                                  style: TextStyle(
+                                  LocaleKeys.bulletinSearchPage_pleaseEnter
+                                      .tr(),
+                                  style: const TextStyle(
                                     color: Color(0xFFBBBBBB),
                                     fontSize: 16,
                                     fontWeight: FontWeight.w500,
@@ -351,15 +357,15 @@ class _BulletinSearchPageState extends State<BulletinSearchPage> {
                       // 검색어가 있는데 검색 결과가 없을 때의 처리
                       if (_textEdtingController.text != "" &&
                           postPreviewList.isEmpty)
-                        const Expanded(
+                        Expanded(
                           child: Center(
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               crossAxisAlignment: CrossAxisAlignment.center,
                               children: [
                                 Text(
-                                  '검색 결과가 없습니다.',
-                                  style: TextStyle(
+                                  LocaleKeys.bulletinSearchPage_noResults.tr(),
+                                  style: const TextStyle(
                                     color: Color(0xFFBBBBBB),
                                     fontSize: 16,
                                     fontWeight: FontWeight.w500,
