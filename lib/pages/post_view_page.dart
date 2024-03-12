@@ -31,6 +31,7 @@ import 'package:new_ara_app/utils/profile_image.dart';
 import 'package:new_ara_app/widgets/snackbar_noti.dart';
 import 'package:new_ara_app/providers/blocked_provider.dart';
 import 'package:new_ara_app/utils/handle_hidden.dart';
+import 'package:new_ara_app/utils/handle_name.dart';
 
 // TODO: Dio 사용방식 createDioWithHeaders~ 로 변경하기
 
@@ -749,7 +750,10 @@ class _PostViewPageState extends State<PostViewPage> {
               constraints: BoxConstraints(
                   maxWidth: MediaQuery.of(context).size.width - 150),
               child: Text(
-                _article.created_by.profile.nickname.toString(),
+                getName(
+                    _article.name_type,
+                    _article.created_by.profile.nickname.toString(),
+                    context.locale),
                 style: const TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.w500,
@@ -1376,8 +1380,7 @@ class _PostViewPageState extends State<PostViewPage> {
                                       MediaQuery.of(context).size.width - 250,
                                 ),
                                 child: Text(
-                                  curComment.created_by.profile.nickname
-                                      .toString(),
+                                  getName(curComment.name_type, curComment.created_by.profile.nickname.toString(), context.locale),
                                   style: const TextStyle(
                                     fontSize: 14,
                                     fontWeight: FontWeight.w500,
