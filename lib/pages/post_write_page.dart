@@ -418,6 +418,7 @@ class _PostWritePageState extends State<PostWritePage>
 
   @override
   Widget build(BuildContext context) {
+    debugPrint("BUILD invoked!!!");
     /// 게시물 업로드 가능한지 확인
     /// TODO: 업로드 로딩 인디케이터 추가하기
     bool canIupload = _titleController.text != '' &&

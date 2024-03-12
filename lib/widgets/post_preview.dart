@@ -9,6 +9,7 @@ import 'package:new_ara_app/utils/time_utils.dart';
 import 'package:new_ara_app/providers/blocked_provider.dart';
 import 'package:new_ara_app/utils/handle_hidden.dart';
 import 'package:provider/provider.dart';
+import 'package:new_ara_app/utils/handle_name.dart';
 
 class PostPreview extends StatefulWidget {
   final ArticleListActionModel model;
@@ -111,7 +112,7 @@ class _PostPreviewState extends State<PostPreview> {
               children: [
                 Flexible(
                   child: Text(
-                    widget.model.created_by.profile.nickname.toString(),
+                    getName(widget.model.name_type, widget.model.created_by.profile.nickname.toString(), context.locale),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: const TextStyle(
