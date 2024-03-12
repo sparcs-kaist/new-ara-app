@@ -7,7 +7,7 @@
         "bookmarks": "담아둔 글"
     },
     "bulletinSearchPage": {
-        "searchIn": "{koName}에서 검색",
+        "searchIn": "{ko_name}에서 검색",
         "searchInAllPosts": "전체 보기에서 검색",
         "searchInHistory": "최근 본 글에서 검색",
         "searchInTopPosts": "실시간 인기글에서 검색",
