@@ -23,7 +23,7 @@ String getTime(String rawTime, Locale locale) {
         "${difference.inSeconds}${locale == const Locale('ko') ? "초 전" : " seconds ago"}";
   } else if (difference.inHours < 1) {
     time =
-        '${difference.inMinutes}${locale == const Locale('ko') ? "분 전" : " days ago"}';
+        '${difference.inMinutes}${locale == const Locale('ko') ? "분 전" : " minutes ago"}';
   } else if (date.year == now.year &&
       date.month == now.month &&
       date.day == now.day) {
