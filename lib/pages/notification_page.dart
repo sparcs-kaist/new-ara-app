@@ -262,9 +262,9 @@ class _NotificationPageState extends State<NotificationPage> {
                                           : SizedBox(
                                               height: 35,
                                               child: Text(
-                                                LocaleKeys
-                                                    .notificationPage_today
-                                                    .tr(),
+                                                getFormattedDate(
+                                                    _modelList[0].created_at,
+                                                    context.locale),
                                                 style: const TextStyle(
                                                   fontSize: 14,
                                                   fontWeight: FontWeight.w500,
@@ -460,7 +460,8 @@ class _NotificationPageState extends State<NotificationPage> {
               _setIsLoadingTotal(false);
             }
           } else {
-            requestInfoSnackBar(LocaleKeys.notificationPage_allNotificationsChecked.tr());
+            requestInfoSnackBar(
+                LocaleKeys.notificationPage_allNotificationsChecked.tr());
           }
         },
         backgroundColor: Colors.white,
@@ -479,6 +480,29 @@ class _NotificationPageState extends State<NotificationPage> {
         ),
       ),
     );
+  }
+
+  /// 가장 상단 알림의 날짜 출력을 위해 사용됨.
+  String getFormattedDate(String dateTimeStr, Locale locale) {
+    DateTime targetDateTime = DateTime.parse(dateTimeStr).toLocal();
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+    if (targetDateTime.year == today.year &&
+        targetDateTime.month == today.month &&
+        targetDateTime.day == today.day) {
+      return LocaleKeys.notificationPage_today.tr();
+    } else {
+      String dateTextInKorean =
+          "${(targetDateTime.year != now.year ? "${targetDateTime.year}년 " : "")}${targetDateTime.month}월 ${targetDateTime.day}일";
+
+      String dateTextInEnglish = DateFormat(
+              "MMMM d${targetDateTime.year != now.year ? ", yyyy" : ""}",
+              "en_US")
+          .format(targetDateTime);
+      return (locale == const Locale('ko')
+          ? dateTextInKorean
+          : dateTextInEnglish);
+    }
   }
 
   /// 현재 date와 알림 생성 date의 차이를 계산하여 문자열로 변경해줌.
