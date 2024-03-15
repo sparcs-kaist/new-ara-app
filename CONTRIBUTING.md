@@ -124,12 +124,12 @@ bundle exec fastlane create_release_note short_name:prod
 - iOS Xcode 프로젝트 관련 파일들( `ios/Runner.xcodeproj/project.pbxproj`, `ios/Runner/Info.plist` )의 변경사항을 Discard 합니다.
 
 ## English translation
-외부 패키지 사용했으니 자세한 내용은 [easy_localization](https://pub.dev/packages/easy_localization) 문서 읽어주시기 바랍니다.
+- 외부 패키지 사용했으니 자세한 내용은 [easy_localization](https://pub.dev/packages/easy_localization) 문서 읽어주시기 바랍니다.
 
-`assets/translations`에 번역 파일을 저장하고 있으며,
-class 형식으로 쓰고 싶으시면 json 수정할 때마다 아래 명령어 실행 후 dart 파일 내에서 `LocaleKeys.****` 형식으로 사용하시면 됩니다.
+- `assets/translations`에 번역 파일을 json 형식으로 저장하고 있습니다.
+- json 수정할 때마다 프로젝트의 root 디렉토리에서 **아래 명령어** 실행 후 dart 파일 내에서 `LocaleKeys.****` 같은 클래스 형식으로 가능합니다.
 ```
-flutter pub run easy_localization:generate -S "assets/translations" -O "lib/translations" & flutter pub run easy_localization:generate -S "assets/translations" -O "lib/translations" -f keys -o locale_keys.g.dart`
+dart run easy_localization:generate -S "assets/translations" -O "lib/translations" && dart run easy_localization:generate -S "assets/translations" -O "lib/translations" -f keys -o locale_keys.g.dart
 ```
 
 
