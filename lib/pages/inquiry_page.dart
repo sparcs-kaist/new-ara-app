@@ -64,10 +64,11 @@ class _InquiryPageState extends State<InquiryPage> {
             children: [
               Text.rich(
                 TextSpan(
-                  text: LocaleKeys.inquiryPage_reLoginErrorWithWithdrawalGuide.tr(),
+                  text: LocaleKeys.inquiryPage_reLoginErrorWithWithdrawalGuide
+                      .tr(),
                   style: const TextStyle(
                       decoration: TextDecoration.underline,
-                      color: Colors.blue,
+                      color: Colors.green,
                       fontSize: 20),
                   recognizer: TapGestureRecognizer()
                     ..onTap = () async {
@@ -75,18 +76,22 @@ class _InquiryPageState extends State<InquiryPage> {
                       String? email = userProvider.naUser?.email;
                       String? nickname = userProvider.naUser?.nickname;
 
-                      final String body = LocaleKeys.inquiryPage_reLoginErrorWithWithdrawalEmailContents.tr(
-                            namedArgs: {
-                              'userID': userID.toString(),
-                              'email': email.toString(),
-                              'nickname': nickname.toString(),
-                            },
-                          );
+                      final String body = LocaleKeys
+                          .inquiryPage_reLoginErrorWithWithdrawalEmailContents
+                          .tr(
+                        namedArgs: {
+                          'userID': userID.toString(),
+                          'email': email.toString(),
+                          'nickname': nickname.toString(),
+                        },
+                      );
                       final emailLaunchUri = Uri(
                         scheme: 'mailto',
                         path: 'ara@sparcs.org',
                         query: encodeQueryParameters(<String, String>{
-                          'subject': LocaleKeys.inquiryPage_reLoginErrorWithWithdrawalEmailTitle.tr(),
+                          'subject': LocaleKeys
+                              .inquiryPage_reLoginErrorWithWithdrawalEmailTitle
+                              .tr(),
                           'body': body,
                         }),
                       );
