@@ -26,6 +26,11 @@ abstract class  LocaleKeys {
   static const mainPage_topPost = 'mainPage.topPost';
   static const mainPage_notice = 'mainPage.notice';
   static const mainPage_portalNotice = 'mainPage.portalNotice';
+  static const mainPage_communication = 'mainPage.communication';
+  static const mainPage_msgToSchool = 'mainPage.msgToSchool';
+  static const mainPage_newaraFeedback = 'mainPage.newaraFeedback';
+  static const mainPage_facilityFeedback = 'mainPage.facilityFeedback';
+  static const mainPage_kaistNews = 'mainPage.kaistNews';
   static const mainPage_facility = 'mainPage.facility';
   static const mainPage_araAdmins = 'mainPage.araAdmins';
   static const mainPage_trades = 'mainPage.trades';

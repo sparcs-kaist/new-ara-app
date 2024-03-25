@@ -447,6 +447,8 @@ class _MainPageState extends State<MainPage> with WidgetsBindingObserver {
                         const SizedBox(height: 20),
                         _buildTradeContents(),
                         const SizedBox(height: 20),
+                        _buildCommunicationContents(),
+                        const SizedBox(height: 20),
                         _buildStuCommunityContents(),
                         const SizedBox(height: 20),
                       ],
@@ -810,6 +812,291 @@ class _MainPageState extends State<MainPage> with WidgetsBindingObserver {
                   ],
                 ),
               ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildCommunicationContents() {
+    return Column(
+      children: [
+        SizedBox(
+          width: MediaQuery.of(context).size.width - 40,
+          child: Text(
+            LocaleKeys.mainPage_communication.tr(),
+            style: const TextStyle(
+              fontWeight: FontWeight.w600,
+              fontSize: 20,
+              color: Colors.black,
+            ),
+          ),
+        ),
+        const SizedBox(height: 9),
+        Container(
+          padding: const EdgeInsets.all(15),
+          width: MediaQuery.of(context).size.width - 40,
+          // height: 200,
+          decoration: BoxDecoration(
+            border: Border.all(
+              width: 1,
+              color: const Color.fromRGBO(240, 240, 240, 1),
+            ),
+            borderRadius: const BorderRadius.all(Radius.circular(20)),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              InkWell(
+                onTap: () async {
+                  await Navigator.of(context).push(slideRoute(PostListShowPage(
+                    boardType: BoardType.free,
+                    boardInfo: _searchBoard("portal-notice"),
+                  )));
+                  await _refreshAllPosts();
+                },
+                child: Row(
+                  children: [
+                    SizedBox(
+                      width: 19,
+                      height: 19,
+                      child: Image.asset(
+                        'assets/icons/kaist.png',
+                        fit: BoxFit.cover,
+                      ),
+                    ),
+                    const SizedBox(
+                      width: 5,
+                    ),
+                    Text(
+                      LocaleKeys.mainPage_msgToSchool.tr(),
+                      style: const TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w700,
+                        color: Color(0xFF1F4899),
+                      ),
+                    ),
+                    const SizedBox(
+                      width: 5,
+                    ),
+                    SvgPicture.asset(
+                      'assets/icons/right_chevron.svg',
+                      colorFilter: const ColorFilter.mode(
+                          Color(0xFF1F4899), BlendMode.srcIn),
+                      fit: BoxFit.fill,
+                      width: 17,
+                      height: 17,
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(
+                height: 10,
+              ),
+              _portalContents.isNotEmpty
+                  ? InkWell(
+                      onTap: () async {
+                        await Navigator.of(context).push(slideRoute(
+                            PostViewPage(id: _portalContents[0].id)));
+                        await _refreshAllPosts();
+                      },
+                      child: LittleText(
+                        content: _portalContents[0],
+                      ),
+                    )
+                  : Container(),
+              const SizedBox(
+                height: 10,
+              ),
+              _portalContents.length > 1
+                  ? InkWell(
+                      onTap: () async {
+                        await Navigator.of(context).push(slideRoute(
+                            PostViewPage(id: _portalContents[1].id)));
+                        await _refreshAllPosts();
+                      },
+                      child: LittleText(
+                        content: _portalContents[1],
+                      ),
+                    )
+                  : Container(),
+              const SizedBox(
+                height: 10,
+              ),
+              _portalContents.length > 2
+                  ? InkWell(
+                      onTap: () async {
+                        await Navigator.of(context).push(slideRoute(
+                            PostViewPage(id: _portalContents[2].id)));
+                        await _refreshAllPosts();
+                      },
+                      child: LittleText(
+                        content: _portalContents[2],
+                      ),
+                    )
+                  : Container(),
+              const SizedBox(
+                height: 14,
+              ),
+              Container(
+                height: 1,
+                color: const Color(0xFFF0F0F0),
+              ),
+              const SizedBox(
+                height: 14,
+              ),
+              InkWell(
+                onTap: () async {
+                  await Navigator.of(context).push(slideRoute(PostListShowPage(
+                      boardType: BoardType.free,
+                      boardInfo: _searchBoard("facility-notice"))));
+                  await _refreshAllPosts();
+                },
+                child: Row(
+                  children: [
+                    Text(
+                      LocaleKeys.mainPage_kaistNews.tr(),
+                      style: const TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w700,
+                        color: Color(0xFF646464),
+                      ),
+                    ),
+                    const SizedBox(
+                      width: 5,
+                    ),
+                    SvgPicture.asset(
+                      'assets/icons/right_chevron.svg',
+                      colorFilter: const ColorFilter.mode(
+                          Color(0xFF646464), BlendMode.srcIn),
+                      fit: BoxFit.fill,
+                      width: 17,
+                      height: 17,
+                    ),
+                    const SizedBox(
+                      width: 10,
+                    ),
+                    Expanded(
+                      child: _facilityContents.isNotEmpty
+                          ? InkWell(
+                              onTap: () async {
+                                await Navigator.of(context).push(slideRoute(
+                                    PostViewPage(id: _facilityContents[0].id)));
+                                await _refreshAllPosts();
+                              },
+                              child: LittleText(
+                                content: _facilityContents[0],
+                              ),
+                            )
+                          : Container(),
+                    )
+                  ],
+                ),
+              ),
+              const SizedBox(
+                height: 10,
+              ),
+              InkWell(
+                onTap: () async {
+                  await Navigator.of(context).push(slideRoute(PostListShowPage(
+                    boardType: BoardType.free,
+                    boardInfo: _searchBoard("ara-notice"),
+                  )));
+                  await _refreshAllPosts();
+                },
+                child: Row(
+                  children: [
+                    Text(
+                      LocaleKeys.mainPage_newaraFeedback.tr(),
+                      style: const TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w700,
+                        color: Color(0xFFED3A3A),
+                      ),
+                    ),
+                    const SizedBox(
+                      width: 5,
+                    ),
+                    SvgPicture.asset(
+                      'assets/icons/right_chevron.svg',
+                      colorFilter: const ColorFilter.mode(
+                          Color(0xFFED3A3A), BlendMode.srcIn),
+                      fit: BoxFit.fill,
+                      width: 17,
+                      height: 17,
+                    ),
+                    const SizedBox(
+                      width: 10,
+                    ),
+                    Expanded(
+                      child: _newAraContents.isNotEmpty
+                          ? InkWell(
+                              onTap: () async {
+                                await Navigator.of(context).push(slideRoute(
+                                    PostViewPage(id: _newAraContents[0].id)));
+                                await _refreshAllPosts();
+                              },
+                              child: LittleText(
+                                content: _newAraContents[0],
+                              ),
+                            )
+                          : Container(),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 10),
+              InkWell(
+                onTap: () async {
+                  await Navigator.of(context).push(slideRoute(PostListShowPage(
+                    boardType: BoardType.free,
+                    boardInfo: _searchBoard("ara-notice"),
+                  )));
+                  await _refreshAllPosts();
+                },
+                child: Row(
+                  children: [
+                    Text(
+                      LocaleKeys.mainPage_facilityFeedback.tr(),
+                      style: const TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w700,
+                        color: Color(0xFFED3A3A),
+                      ),
+                    ),
+                    const SizedBox(
+                      width: 5,
+                    ),
+                    SvgPicture.asset(
+                      'assets/icons/right_chevron.svg',
+                      colorFilter: const ColorFilter.mode(
+                          Color(0xFFED3A3A), BlendMode.srcIn),
+                      fit: BoxFit.fill,
+                      width: 17,
+                      height: 17,
+                    ),
+                    const SizedBox(
+                      width: 10,
+                    ),
+                    Expanded(
+                      child: _newAraContents.isNotEmpty
+                          ? InkWell(
+                              onTap: () async {
+                                await Navigator.of(context).push(slideRoute(
+                                    PostViewPage(id: _newAraContents[0].id)));
+                                await _refreshAllPosts();
+                              },
+                              child: LittleText(
+                                content: _newAraContents[0],
+                              ),
+                            )
+                          : Container(),
+                    ),
+                  ],
+                ),
+              ),
+            
             ],
           ),
         ),
