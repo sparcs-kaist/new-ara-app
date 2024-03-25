@@ -62,14 +62,28 @@ class _InquiryPageState extends State<InquiryPage> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Text.rich(
+              Container(
+                width: MediaQuery.of(context).size.width,
+                margin: EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0), 
+                decoration: BoxDecoration(
+                  color: Colors.white, 
+                  borderRadius: BorderRadius.circular(8.0), 
+                  border: Border.all(
+                    color: Colors.red, 
+                    width: 3.5, // Border width
+                  ),
+                ),
+              
+              child : Text.rich(
                 TextSpan(
                   text: LocaleKeys.inquiryPage_reLoginErrorWithWithdrawalGuide
                       .tr(),
                   style: const TextStyle(
-                      decoration: TextDecoration.underline,
-                      color: Colors.green,
-                      fontSize: 20),
+                      color: Colors.red, 
+                      fontSize: 23.0, 
+                      fontWeight: FontWeight.bold, 
+                      decoration : TextDecoration.underline,
+                    ),
                   recognizer: TapGestureRecognizer()
                     ..onTap = () async {
                       int? userID = userProvider.naUser!.user;
@@ -105,6 +119,7 @@ class _InquiryPageState extends State<InquiryPage> {
                     },
                 ),
               ),
+            ),
             ],
           ),
         ),
