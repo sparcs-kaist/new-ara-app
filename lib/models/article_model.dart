@@ -27,7 +27,7 @@ class ArticleModel {
   PublicUserModel created_by;
   int? article_current_page;
   dynamic side_articles; // 변수의 타입 및 용도 불분명
-  dynamic communication_article_status; // 타입 및 용도 불분명
+  dynamic communication_article_status; // 학교에게 전합니다 게시글에 적용 (0: 달성 전, 1: 답변 대기 중, 2: 답변 완료)
   dynamic days_left; // 타입 불분명
   String created_at;
   String updated_at;
