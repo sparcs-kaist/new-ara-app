@@ -652,6 +652,29 @@ class _PostViewPageState extends State<PostViewPage> {
                     color: Color(0xFFBBBBBB),
                   ),
                 ),
+                if (_article.parent_board.slug == 'with-school')
+                  Row(
+                    children: [
+                      const SizedBox(width: 10),
+                      Container(
+                        decoration: BoxDecoration(
+                            border: Border.all(
+                                color: const Color(0xFFBBBBBB), width: 1.0),
+                            borderRadius: BorderRadius.all(Radius.circular(4))),
+                        child: Padding(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 2.0, vertical: 1.0),
+                            child: Text(
+                              '답변작성',
+                              style: const TextStyle(
+                                fontSize: 12,
+                                fontWeight: FontWeight.w500,
+                                color: Color(0xFFBBBBBB),
+                              ),
+                            )),
+                      ),
+                    ],
+                  ),
               ],
             ),
             // 좋아요, 싫어요, 댓글 갯수 표시 Row
@@ -1380,7 +1403,11 @@ class _PostViewPageState extends State<PostViewPage> {
                                       MediaQuery.of(context).size.width - 250,
                                 ),
                                 child: Text(
-                                  getName(curComment.name_type, curComment.created_by.profile.nickname.toString(), context.locale),
+                                  getName(
+                                      curComment.name_type,
+                                      curComment.created_by.profile.nickname
+                                          .toString(),
+                                      context.locale),
                                   style: const TextStyle(
                                     fontSize: 14,
                                     fontWeight: FontWeight.w500,

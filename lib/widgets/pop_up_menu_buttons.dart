@@ -36,7 +36,7 @@ class WithSchoolPopupMenuButton extends StatelessWidget {
       ),
       itemBuilder: (BuildContext context) => [
         PopupMenuItem<String>(
-          value: 'Report',
+          value: 'info',
           child: Text(
             LocaleKeys.popUpMenuButtons_withSchoolInfoText.tr(),
             style: const TextStyle(
