@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:new_ara_app/translations/locale_keys.g.dart';
 
-import 'package:new_ara_app/translations/codegen_loader.g.dart';
 import 'package:new_ara_app/models/article_list_action_model.dart';
 import 'package:new_ara_app/utils/time_utils.dart';
 import 'package:new_ara_app/providers/blocked_provider.dart';
@@ -12,8 +11,7 @@ import 'package:new_ara_app/utils/handle_hidden.dart';
 import 'package:provider/provider.dart';
 import 'package:new_ara_app/utils/handle_name.dart';
 import 'package:new_ara_app/constants/colors_info.dart';
-
-enum WithSchoolStatus { beforeUpVoteThreshold, beforeSchoolConfirm, answerDone }
+import 'package:new_ara_app/utils/with_school.dart';
 
 class PostPreview extends StatefulWidget {
   final ArticleListActionModel model;
@@ -258,22 +256,5 @@ class _PostPreviewState extends State<PostPreview> {
   // TODO: 아래 코드는 iOS 심사 통과를 위한 임시 방편. 익명 차단이 BE에서 구현되면 제거해야함 (2023.02.29)
   bool isAnonymousIOS(ArticleListActionModel model) {
     return (Platform.isIOS && model.name_type == 2);
-  }
-
-  String defineCommunicationStatus(int? magicNum) {
-    late String status;
-    if (magicNum == WithSchoolStatus.beforeUpVoteThreshold.index) {
-      status = LocaleKeys.postPreview_beforeUpVoteThreshold.tr();
-    } else if (magicNum == WithSchoolStatus.beforeSchoolConfirm.index) {
-      status = LocaleKeys.postPreview_beforeSchoolConfirm.tr();
-    } else if (magicNum == WithSchoolStatus.answerDone.index) {
-      status = LocaleKeys.postPreview_answerDone.tr();
-    } else {
-      // 위 경우에 해당하지 않는 경우에는 우선 '달성 전'으로 표기
-      debugPrint("with-school status: undefined status $magicNum");
-      status = LocaleKeys.postPreview_beforeUpVoteThreshold.tr();
-    }
-
-    return status;
   }
 }
