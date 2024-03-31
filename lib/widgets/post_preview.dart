@@ -10,6 +10,9 @@ import 'package:new_ara_app/providers/blocked_provider.dart';
 import 'package:new_ara_app/utils/handle_hidden.dart';
 import 'package:provider/provider.dart';
 import 'package:new_ara_app/utils/handle_name.dart';
+import 'package:new_ara_app/constants/colors_info.dart';
+
+enum WithSchoolStatus { beforeUpVoteThreshold, beforeSchoolConfirm, answerDone }
 
 class PostPreview extends StatefulWidget {
   final ArticleListActionModel model;
@@ -110,9 +113,29 @@ class _PostPreviewState extends State<PostPreview> {
           Expanded(
             child: Row(
               children: [
+                if (widget.model.parent_board.slug == 'with-school')
+                  Row(
+                    children: [
+                      Text(
+                        defineCommunicationStatus(
+                            widget.model.communication_article_status),
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: widget.model.communication_article_status ==
+                                  WithSchoolStatus.beforeUpVoteThreshold.index
+                              ? const Color(0xFFB1B1B1)
+                              : ColorsInfo.newara,
+                        ),
+                      ),
+                      const SizedBox(width: 8)
+                    ],
+                  ),
                 Flexible(
                   child: Text(
-                    getName(widget.model.name_type, widget.model.created_by.profile.nickname.toString(), context.locale),
+                    getName(
+                        widget.model.name_type,
+                        widget.model.created_by.profile.nickname.toString(),
+                        context.locale),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: const TextStyle(
@@ -234,5 +257,21 @@ class _PostPreviewState extends State<PostPreview> {
   // TODO: 아래 코드는 iOS 심사 통과를 위한 임시 방편. 익명 차단이 BE에서 구현되면 제거해야함 (2023.02.29)
   bool isAnonymousIOS(ArticleListActionModel model) {
     return (Platform.isIOS && model.name_type == 2);
+  }
+
+  String defineCommunicationStatus(int magicNum) {
+    late String status;
+    if (magicNum == WithSchoolStatus.beforeUpVoteThreshold.index) {
+      status = "달성 전";
+    } else if (magicNum == WithSchoolStatus.beforeSchoolConfirm.index) {
+      status = "답변 대기 중";
+    } else if (magicNum == WithSchoolStatus.answerDone.index) {
+      status = "답변 완료";
+    } else {
+      debugPrint("with-school status: undefined status ${magicNum}");
+      status = "Unknown";
+    }
+
+    return status;
   }
 }
