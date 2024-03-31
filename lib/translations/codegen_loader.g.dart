@@ -171,7 +171,10 @@ class CodegenLoader extends AssetLoader{
     "adultPost": "This post has adult/obscene contents.",
     "socialPost": "This post has political/social contents.",
     "accessDeniedPost": "Access for this post is denied.",
-    "hiddenPost": "This post is hidden."
+    "hiddenPost": "This post is hidden.",
+    "beforeUpVoteThreshold": "Polling",
+    "beforeSchoolConfirm": "Preparing",
+    "answerDone": "Answered"
   },
   "profileEditPage": {
     "settingInfoText": "There was a problem changing the settings.",
@@ -364,7 +367,10 @@ static const Map<String,dynamic> ko = {
     "adultPost": "성인/음란성 내용의 게시물입니다.",
     "socialPost": "정치/사회성 내용의 게시물입니다.",
     "accessDeniedPost": "접근 권한이 없는 게시물입니다.",
-    "hiddenPost": "숨겨진 게시물입니다."
+    "hiddenPost": "숨겨진 게시물입니다.",
+    "beforeUpVoteThreshold": "달성 전",
+    "beforeSchoolConfirm": "답변 대기 중",
+    "answerDone": "답변 완료"
   },
   "profileEditPage": {
     "settingInfoText": "설정 변경 중 문제가 발생했습니다.",

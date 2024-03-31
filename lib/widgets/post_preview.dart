@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:new_ara_app/translations/locale_keys.g.dart';
 
+import 'package:new_ara_app/translations/codegen_loader.g.dart';
 import 'package:new_ara_app/models/article_list_action_model.dart';
 import 'package:new_ara_app/utils/time_utils.dart';
 import 'package:new_ara_app/providers/blocked_provider.dart';
@@ -262,11 +263,11 @@ class _PostPreviewState extends State<PostPreview> {
   String defineCommunicationStatus(int? magicNum) {
     late String status;
     if (magicNum == WithSchoolStatus.beforeUpVoteThreshold.index) {
-      status = "달성 전";
+      status = LocaleKeys.postPreview_beforeUpVoteThreshold.tr();
     } else if (magicNum == WithSchoolStatus.beforeSchoolConfirm.index) {
-      status = "답변 준비 중";
+      status = LocaleKeys.postPreview_beforeSchoolConfirm.tr();
     } else if (magicNum == WithSchoolStatus.answerDone.index) {
-      status = "답변 완료";
+      status = LocaleKeys.postPreview_answerDone.tr();
     } else {
       // 위 경우에 해당하지 않는 경우에는 우선 '달성 전'으로 표기
       debugPrint("with-school status: undefined status $magicNum");

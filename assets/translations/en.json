@@ -155,7 +155,10 @@
         "adultPost": "This post has adult/obscene contents.",
         "socialPost": "This post has political/social contents.",
         "accessDeniedPost": "Access for this post is denied.",
-        "hiddenPost": "This post is hidden."
+        "hiddenPost": "This post is hidden.",
+        "beforeUpVoteThreshold": "Polling",
+        "beforeSchoolConfirm": "Preparing",
+        "answerDone": "Answered"
     },
     "profileEditPage": {
         "settingInfoText": "There was a problem changing the settings.",
