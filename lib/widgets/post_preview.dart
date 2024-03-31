@@ -259,17 +259,18 @@ class _PostPreviewState extends State<PostPreview> {
     return (Platform.isIOS && model.name_type == 2);
   }
 
-  String defineCommunicationStatus(int magicNum) {
+  String defineCommunicationStatus(int? magicNum) {
     late String status;
     if (magicNum == WithSchoolStatus.beforeUpVoteThreshold.index) {
       status = "달성 전";
     } else if (magicNum == WithSchoolStatus.beforeSchoolConfirm.index) {
-      status = "답변 대기 중";
+      status = "답변 준비 중";
     } else if (magicNum == WithSchoolStatus.answerDone.index) {
       status = "답변 완료";
     } else {
-      debugPrint("with-school status: undefined status ${magicNum}");
-      status = "Unknown";
+      // 위 경우에 해당하지 않는 경우에는 우선 '달성 전'으로 표기
+      debugPrint("with-school status: undefined status $magicNum");
+      status = "달성 전";
     }
 
     return status;
