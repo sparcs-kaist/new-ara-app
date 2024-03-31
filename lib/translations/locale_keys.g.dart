@@ -137,6 +137,7 @@ abstract class  LocaleKeys {
   static const popUpMenuButtons_report = 'popUpMenuButtons.report';
   static const popUpMenuButtons_edit = 'popUpMenuButtons.edit';
   static const popUpMenuButtons_delete = 'popUpMenuButtons.delete';
+  static const popUpMenuButtons_withSchoolInfoText = 'popUpMenuButtons.withSchoolInfoText';
   static const popUpMenuButtons = 'popUpMenuButtons';
   static const postPreview_blockedUsersPost = 'postPreview.blockedUsersPost';
   static const postPreview_reportedPost = 'postPreview.reportedPost';

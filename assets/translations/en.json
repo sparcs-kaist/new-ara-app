@@ -147,7 +147,8 @@
         "attachments": "Attachments",
         "report": "Report",
         "edit": "Edit",
-        "delete": "Delete"
+        "delete": "Delete",
+        "withSchoolInfoText": "This board is for students to freely share their opinions with the school. Any post with over 20 votes will get an official reply from the school. Please be aware that all posts here are made with real names, for clear and responsible communication. "
     },
     "postPreview": {
         "blockedUsersPost": "This post was written by blocked user.",

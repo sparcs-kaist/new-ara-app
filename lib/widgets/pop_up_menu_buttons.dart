@@ -13,6 +13,47 @@ import 'package:new_ara_app/utils/post_view_utils.dart';
 import 'package:new_ara_app/constants/colors_info.dart';
 import 'package:new_ara_app/widgets/snackbar_noti.dart';
 
+class WithSchoolPopupMenuButton extends StatelessWidget {
+  const WithSchoolPopupMenuButton({
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return PopupMenuButton<String>(
+      shadowColor: const Color.fromRGBO(0, 0, 0, 0.2),
+      splashRadius: 5,
+      shape: const RoundedRectangleBorder(
+          side: BorderSide(color: Color.fromRGBO(217, 217, 217, 1), width: 0.5),
+          borderRadius: BorderRadius.all(Radius.circular(12.0))),
+      padding: const EdgeInsets.all(2.0),
+      offset: Offset(0, 45),
+      child: SvgPicture.asset(
+        'assets/icons/information.svg',
+        colorFilter: const ColorFilter.mode(Colors.grey, BlendMode.srcIn),
+        width: 32,
+        height: 32,
+      ),
+      itemBuilder: (BuildContext context) => [
+        PopupMenuItem<String>(
+          value: 'Report',
+          child: Text(
+            LocaleKeys.popUpMenuButtons_withSchoolInfoText.tr(),
+            style: const TextStyle(
+              color: ColorsInfo.newara,
+              fontWeight: FontWeight.w400,
+              fontSize: 15,
+            ),
+          ),
+        ),
+      ],
+      onSelected: (String result) {
+        switch (result) {}
+      },
+    );
+  }
+}
+
 /// PostViewPage에서 첨부파일 표시에 쓰이는 PopupMenuButton
 class AttachPopupMenuButton extends StatelessWidget {
   /// 첨부파일의 개수

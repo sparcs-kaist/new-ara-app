@@ -271,7 +271,7 @@ class _PostPreviewState extends State<PostPreview> {
     } else {
       // 위 경우에 해당하지 않는 경우에는 우선 '달성 전'으로 표기
       debugPrint("with-school status: undefined status $magicNum");
-      status = "달성 전";
+      status = LocaleKeys.postPreview_beforeUpVoteThreshold.tr();
     }
 
     return status;
