@@ -445,6 +445,8 @@ class _MainPageState extends State<MainPage> with WidgetsBindingObserver {
                         const SizedBox(height: 20),
                         _buildNoticeContents(),
                         const SizedBox(height: 20),
+                        _buildWithSchoolContents(),
+                        const SizedBox(height: 20),
                         _buildTradeContents(),
                         const SizedBox(height: 20),
                         _buildStuCommunityContents(),
@@ -582,6 +584,66 @@ class _MainPageState extends State<MainPage> with WidgetsBindingObserver {
       ],
     );
   }
+
+  Widget _buildWithSchoolContents() {
+    return Column(
+      children: [
+        MainPageTextButton(
+          '학교에게 전합니다',
+          () async {
+            await Navigator.of(context).push(slideRoute(PostListShowPage(
+              boardType: BoardType.free,
+              boardInfo: _searchBoard("talk"),
+            )));
+            await _refreshAllPosts();
+          },
+        ),
+        SizedBox(
+          width: MediaQuery.of(context).size.width - 40,
+          child: Column(
+            children: [
+              PopularBoard(
+                model: _talksContents[0],
+                showBoardNumber: false,
+                refreshAllPosts: _refreshAllPosts,
+              ),
+              Row(
+                children: [
+                  Expanded(
+                    child: Container(
+                      height: 1,
+                      color: const Color(0xFFF0F0F0),
+                    ),
+                  ),
+                ],
+              ),
+              PopularBoard(
+                model: _talksContents[1],
+                refreshAllPosts: _refreshAllPosts,
+                showBoardNumber: false,
+              ),
+              Row(
+                children: [
+                  Expanded(
+                    child: Container(
+                      height: 1,
+                      color: const Color(0xFFF0F0F0),
+                    ),
+                  ),
+                ],
+              ),
+              PopularBoard(
+                model: _talksContents[2],
+                refreshAllPosts: _refreshAllPosts,
+                showBoardNumber: false,
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
 
   Widget _buildNoticeContents() {
     return Column(
