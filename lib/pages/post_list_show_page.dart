@@ -170,9 +170,11 @@ class _PostListShowPageState extends State<PostListShowPage>
   /// 다음 페이지를 로드하는 함수
   Future<void> _loadNextPage() async {
     var userProvider = context.read<UserProvider>();
+    
     setState(() {
       _isLoadingNextPage = true;
     });
+    
 
     // api 호출과 Provider 정보 동기화.
     // await Future.delayed(Duration(seconds: 1));
@@ -313,13 +315,15 @@ class _PostListShowPageState extends State<PostListShowPage>
           ],
         ),
       ),
-      body: isLoading
+      body: /*isLoading
           ? const LoadingIndicator()
-          : SafeArea(
+          :*/ 
+          SafeArea(
               child: Center(
                 child: SizedBox(
                   width: MediaQuery.of(context).size.width - 18,
                   child: RefreshIndicator.adaptive(
+                    displacement : 0.0,
                     color: ColorsInfo.newara,
                     onRefresh: () async {
                       setState((() => isLoading = true));
@@ -335,12 +339,13 @@ class _PostListShowPageState extends State<PostListShowPage>
                     child: ListView.separated(
                       physics: const AlwaysScrollableScrollPhysics(),
                       controller: _scrollController,
-                      itemCount: postPreviewList.length +
-                          (_isLoadingNextPage ? 1 : 0), // 아이템 개수
+                      itemCount: postPreviewList.length
+                      + (_isLoadingNextPage ? 1 : 0), // 아이템 개수
                       itemBuilder: (BuildContext context, int index) {
                         // 각 아이템을 위한 위젯 생성
                         if (_isLoadingNextPage &&
                             index == postPreviewList.length) {
+                            debugPrint('Next Page Load Request');
                           return const SizedBox(
                             height: 50,
                             child: Center(
