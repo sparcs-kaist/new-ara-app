@@ -65,6 +65,7 @@ class _InquiryPageState extends State<InquiryPage> {
               Container(
                 width: MediaQuery.of(context).size.width,
                 margin: EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0), 
+                padding: EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
                 decoration: BoxDecoration(
                   color: Colors.white, 
                   borderRadius: BorderRadius.circular(8.0), 
@@ -82,7 +83,7 @@ class _InquiryPageState extends State<InquiryPage> {
                       color: Colors.red, 
                       fontSize: 23.0, 
                       fontWeight: FontWeight.bold, 
-                      decoration : TextDecoration.underline,
+                      //decoration : TextDecoration.underline,
                     ),
                   recognizer: TapGestureRecognizer()
                     ..onTap = () async {
