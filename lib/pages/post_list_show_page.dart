@@ -315,9 +315,10 @@ class _PostListShowPageState extends State<PostListShowPage>
           ],
         ),
       ),
-      body: isLoading
+      body: /*isLoading
           ? const LoadingIndicator()
-          : SafeArea(
+          :*/ 
+          SafeArea(
               child: Center(
                 child: SizedBox(
                   width: MediaQuery.of(context).size.width - 18,
@@ -337,7 +338,7 @@ class _PostListShowPageState extends State<PostListShowPage>
                     child: ListView.separated(
                       physics: const AlwaysScrollableScrollPhysics(),
                       controller: _scrollController,
-                      itemCount: postPreviewList.length 
+                      itemCount: postPreviewList.length,
                       //+ (_isLoadingNextPage ? 1 : 0), // 아이템 개수
                       itemBuilder: (BuildContext context, int index) {
                         // 각 아이템을 위한 위젯 생성
