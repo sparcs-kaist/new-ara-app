@@ -137,6 +137,7 @@ abstract class  LocaleKeys {
   static const popUpMenuButtons_report = 'popUpMenuButtons.report';
   static const popUpMenuButtons_edit = 'popUpMenuButtons.edit';
   static const popUpMenuButtons_delete = 'popUpMenuButtons.delete';
+  static const popUpMenuButtons_withSchoolInfoText = 'popUpMenuButtons.withSchoolInfoText';
   static const popUpMenuButtons = 'popUpMenuButtons';
   static const postPreview_blockedUsersPost = 'postPreview.blockedUsersPost';
   static const postPreview_reportedPost = 'postPreview.reportedPost';
@@ -144,6 +145,9 @@ abstract class  LocaleKeys {
   static const postPreview_socialPost = 'postPreview.socialPost';
   static const postPreview_accessDeniedPost = 'postPreview.accessDeniedPost';
   static const postPreview_hiddenPost = 'postPreview.hiddenPost';
+  static const postPreview_beforeUpVoteThreshold = 'postPreview.beforeUpVoteThreshold';
+  static const postPreview_beforeSchoolConfirm = 'postPreview.beforeSchoolConfirm';
+  static const postPreview_answerDone = 'postPreview.answerDone';
   static const postPreview = 'postPreview';
   static const profileEditPage_settingInfoText = 'profileEditPage.settingInfoText';
   static const profileEditPage_editProfile = 'profileEditPage.editProfile';

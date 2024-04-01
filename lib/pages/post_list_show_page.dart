@@ -16,6 +16,7 @@ import 'package:new_ara_app/models/article_list_action_model.dart';
 import 'package:new_ara_app/pages/post_view_page.dart';
 import 'package:new_ara_app/utils/slide_routing.dart';
 import 'package:new_ara_app/providers/notification_provider.dart';
+import 'package:new_ara_app/widgets/pop_up_menu_buttons.dart';
 
 /// PostListShowPage는 게시물 목록를 나타내는 위젯.
 /// boardType에 따라 게시판의 종류를 판별하고, 특성화 된 위젯들을 활성화 비활성화 되도록 설계.
@@ -264,6 +265,8 @@ class _PostListShowPageState extends State<PostListShowPage>
           ),
         ),
         actions: [
+          if (widget.boardInfo?.slug == 'with-school')
+            const WithSchoolPopupMenuButton(),
           IconButton(
             icon: SvgPicture.asset(
               'assets/icons/search.svg',

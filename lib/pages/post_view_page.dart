@@ -32,6 +32,7 @@ import 'package:new_ara_app/widgets/snackbar_noti.dart';
 import 'package:new_ara_app/providers/blocked_provider.dart';
 import 'package:new_ara_app/utils/handle_hidden.dart';
 import 'package:new_ara_app/utils/handle_name.dart';
+import 'package:new_ara_app/utils/with_school.dart';
 
 // TODO: Dio 사용방식 createDioWithHeaders~ 로 변경하기
 
@@ -652,6 +653,8 @@ class _PostViewPageState extends State<PostViewPage> {
                     color: Color(0xFFBBBBBB),
                   ),
                 ),
+                if (_article.parent_board.slug == 'with-school')
+                  buildWithSchoolStatusBox(_article.communication_article_status),
               ],
             ),
             // 좋아요, 싫어요, 댓글 갯수 표시 Row
@@ -1380,7 +1383,11 @@ class _PostViewPageState extends State<PostViewPage> {
                                       MediaQuery.of(context).size.width - 250,
                                 ),
                                 child: Text(
-                                  getName(curComment.name_type, curComment.created_by.profile.nickname.toString(), context.locale),
+                                  getName(
+                                      curComment.name_type,
+                                      curComment.created_by.profile.nickname
+                                          .toString(),
+                                      context.locale),
                                   style: const TextStyle(
                                     fontSize: 14,
                                     fontWeight: FontWeight.w500,

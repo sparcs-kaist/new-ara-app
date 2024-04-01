@@ -163,7 +163,8 @@ class CodegenLoader extends AssetLoader{
     "attachments": "Attachments",
     "report": "Report",
     "edit": "Edit",
-    "delete": "Delete"
+    "delete": "Delete",
+    "withSchoolInfoText": "This board is for students to freely share their opinions with the school. Any post with over 20 votes will get an official reply from the school. Please be aware that all posts here are made with real names, for clear and responsible communication. "
   },
   "postPreview": {
     "blockedUsersPost": "This post was written by blocked user.",
@@ -171,7 +172,10 @@ class CodegenLoader extends AssetLoader{
     "adultPost": "This post has adult/obscene contents.",
     "socialPost": "This post has political/social contents.",
     "accessDeniedPost": "Access for this post is denied.",
-    "hiddenPost": "This post is hidden."
+    "hiddenPost": "This post is hidden.",
+    "beforeUpVoteThreshold": "Polling",
+    "beforeSchoolConfirm": "Preparing",
+    "answerDone": "Answered"
   },
   "profileEditPage": {
     "settingInfoText": "There was a problem changing the settings.",
@@ -356,7 +360,8 @@ static const Map<String,dynamic> ko = {
     "attachments": "첨부파일 모아보기",
     "report": "신고",
     "edit": "수정",
-    "delete": "삭제"
+    "delete": "삭제",
+    "withSchoolInfoText": "본 게시판은 교내 구성원들이 실명으로 학교에 의견을 제시하는 게시판이며, 좋아요 수가 20개 이상인 모든 글에 대해 학교 측 공식 답변을 받으실 수 있습니다. 투명하고 책임감 있는 의견 공유를 위해 댓글 작성 시 실명으로 공개됩니다."
   },
   "postPreview": {
     "blockedUsersPost": "차단한 사용자의 게시물입니다.",
@@ -364,7 +369,10 @@ static const Map<String,dynamic> ko = {
     "adultPost": "성인/음란성 내용의 게시물입니다.",
     "socialPost": "정치/사회성 내용의 게시물입니다.",
     "accessDeniedPost": "접근 권한이 없는 게시물입니다.",
-    "hiddenPost": "숨겨진 게시물입니다."
+    "hiddenPost": "숨겨진 게시물입니다.",
+    "beforeUpVoteThreshold": "달성 전",
+    "beforeSchoolConfirm": "답변 대기 중",
+    "answerDone": "답변 완료"
   },
   "profileEditPage": {
     "settingInfoText": "설정 변경 중 문제가 발생했습니다.",
