@@ -276,7 +276,6 @@ class _PostWritePageState extends State<PostWritePage>
         apiUrl: "boards/", // API URL을 지정합니다. 이 예에서는 "boards/"를 대상으로 합니다.
         userProvider: userProvider, // API 요청을 담당할 userProvider 인스턴스를 전달합니다.
         callback: (response) {
-          try {
           if (mounted) {
             setState(() {
               // `_boardList` 초기화 후 기본 게시판 추가.
