@@ -277,41 +277,26 @@ class _PostWritePageState extends State<PostWritePage>
         userProvider: userProvider, // API 요청을 담당할 userProvider 인스턴스를 전달합니다.
         callback: (response) {
           try {
-            if (mounted) {
-              setState(() {
-                // `_boardList` 초기화 후 기본 게시판 추가.
-                _boardList = [_defaultBoardDetailActionModel];
+          if (mounted) {
+            setState(() {
+              // `_boardList` 초기화 후 기본 게시판 추가.
+              _boardList = [_defaultBoardDetailActionModel];
 
-                // Json 응답에서 게시물 목록 파싱 후 `_boardList`에 추가.
-                for (Map<String, dynamic> boardJson in response) {
-                  try {
-                    BoardDetailActionModel boardDetail =
-                        BoardDetailActionModel.fromJson(boardJson);
-                    if (boardDetail.user_writable) {
-                      _boardList.add(boardDetail);
-                    }
-                  } catch (error) {
-                    debugPrint(
-                        "refreshBoardList BoardDetailActionModel.fromJson 실패: $error");
-                    return;
+              // Json 응답에서 게시물 목록 파싱 후 `_boardList`에 추가.
+              for (Map<String, dynamic> boardJson in response) {
+                try {
+                  BoardDetailActionModel boardDetail =
+                      BoardDetailActionModel.fromJson(boardJson);
+                  if (boardDetail.user_writable) {
+                    _boardList.add(boardDetail);
                   }
+                } catch (error) {
+                  debugPrint(
+                      "refreshBoardList BoardDetailActionModel.fromJson 실패: $error");
+                  return;
                 }
-              });
-            }
-          } on DioException catch (e) {
-            if (e.response != null) {
-              // 응답이 있는 에러
-              debugPrint('Dio error!');
-              debugPrint('STATUS: ${e.response?.statusCode}');
-              debugPrint('DATA: ${e.response?.data}');
-              debugPrint('HEADERS: ${e.response?.headers}');
-            } else {
-              // 응답이 없는 에러
-              debugPrint('Error sending request!');
-              debugPrint(e.message);
-            }
-          } catch (error) {
-            return;
+              }
+            });
           }
         });
 
