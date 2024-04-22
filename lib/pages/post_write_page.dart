@@ -20,6 +20,7 @@ import 'package:new_ara_app/models/topic_model.dart';
 import 'package:new_ara_app/pages/post_view_page.dart';
 import 'package:new_ara_app/pages/terms_and_conditions_page.dart';
 import 'package:new_ara_app/providers/user_provider.dart';
+import 'package:new_ara_app/utils/cache_function.dart';
 import 'package:new_ara_app/utils/slide_routing.dart';
 import 'package:new_ara_app/widgets/loading_indicator.dart';
 import 'package:provider/provider.dart';
@@ -268,43 +269,35 @@ class _PostWritePageState extends State<PostWritePage>
   /// API에서 게시판 목록을 가져와 `_boardList`에 저장.
   Future<void> _getBoardList() async {
     // 사용자 정보 제공자로부터 쿠키 정보 가져오기.
-    var userProvider = context.read<UserProvider>();
-    try {
-      Dio dio = userProvider.createDioWithHeadersForGet();
-      var response = await dio.get('$newAraDefaultUrl/api/boards/');
+    UserProvider userProvider = context.read<UserProvider>();
 
-      // 기본 게시판 정보를 `_boardList`에 초기화.
-      _boardList = [_defaultBoardDetailActionModel];
+    //게시판 목록을 API에서 혹은 cache에서 불러오기.
+    await updateStateWithCachedOrFetchedApiData(
+        apiUrl: "boards/", // API URL을 지정합니다. 이 예에서는 "boards/"를 대상으로 합니다.
+        userProvider: userProvider, // API 요청을 담당할 userProvider 인스턴스를 전달합니다.
+        callback: (response) {
+          if (mounted) {
+            setState(() {
+              // `_boardList` 초기화 후 기본 게시판 추가.
+              _boardList = [_defaultBoardDetailActionModel];
 
-      // API 응답으로부터 게시판 목록 파싱 후 `_boardList`에 추가.
-      for (Map<String, dynamic> json in response.data) {
-        try {
-          BoardDetailActionModel boardDetail =
-              BoardDetailActionModel.fromJson(json);
-          if (boardDetail.user_writable) {
-            _boardList.add(boardDetail);
+              // Json 응답에서 게시물 목록 파싱 후 `_boardList`에 추가.
+              for (Map<String, dynamic> boardJson in response) {
+                try {
+                  BoardDetailActionModel boardDetail =
+                      BoardDetailActionModel.fromJson(boardJson);
+                  if (boardDetail.user_writable) {
+                    _boardList.add(boardDetail);
+                  }
+                } catch (error) {
+                  debugPrint(
+                      "refreshBoardList BoardDetailActionModel.fromJson 실패: $error");
+                  return;
+                }
+              }
+            });
           }
-        } catch (error) {
-          debugPrint(
-              "refreshBoardList BoardDetailActionModel.fromJson 실패: $error");
-          return;
-        }
-      }
-    } on DioException catch (e) {
-      if (e.response != null) {
-        // 응답이 있는 에러
-        debugPrint('Dio error!');
-        debugPrint('STATUS: ${e.response?.statusCode}');
-        debugPrint('DATA: ${e.response?.data}');
-        debugPrint('HEADERS: ${e.response?.headers}');
-      } else {
-        // 응답이 없는 에러
-        debugPrint('Error sending request!');
-        debugPrint(e.message);
-      }
-    } catch (error) {
-      return;
-    }
+        });
 
     // 게시판 목록 상태 업데이트.(넘어본 게시판의 정보가 있을 경우 && 게시물을 쓸 수 있는 게시판의 경우)
     if (widget.previousBoard != null && widget.previousBoard!.user_writable) {
@@ -419,6 +412,7 @@ class _PostWritePageState extends State<PostWritePage>
   @override
   Widget build(BuildContext context) {
     debugPrint("BUILD invoked!!!");
+
     /// 게시물 업로드 가능한지 확인
     /// TODO: 업로드 로딩 인디케이터 추가하기
     bool canIupload = _titleController.text != '' &&
@@ -497,8 +491,8 @@ class _PostWritePageState extends State<PostWritePage>
                       isUpdate: true,
                       previousArticleId: widget.previousArticle!.id)
                   : _managePost())
-              : () =>
-                  showInfoBySnackBar(context, LocaleKeys.postWritePage_conditionSnackBar.tr()),
+              : () => showInfoBySnackBar(
+                  context, LocaleKeys.postWritePage_conditionSnackBar.tr()),
           // 버튼이 클릭되었을 때 수행할 동작
           padding: EdgeInsets.zero, // 패딩 제거
           child: canIupload
@@ -580,7 +574,9 @@ class _PostWritePageState extends State<PostWritePage>
                               child: Padding(
                                 padding: const EdgeInsets.only(left: 0.0),
                                 child: Text(
-                                  context.locale == const Locale('ko') ? value.ko_name : value.en_name,
+                                  context.locale == const Locale('ko')
+                                      ? value.ko_name
+                                      : value.en_name,
                                   style: TextStyle(
                                     color: value.id == -1 || _isEditingPost
                                         ? const Color(0xFFBBBBBB)
@@ -625,7 +621,9 @@ class _PostWritePageState extends State<PostWritePage>
                         return DropdownMenuItem<TopicModel>(
                           value: value,
                           child: Text(
-                            context.locale == const Locale('ko') ? value.ko_name : value.en_name,
+                            context.locale == const Locale('ko')
+                                ? value.ko_name
+                                : value.en_name,
                             style: TextStyle(
                               color: value.id == -1 || _isEditingPost
                                   ? const Color(0xFFBBBBBB)
@@ -1042,7 +1040,6 @@ class _PostWritePageState extends State<PostWritePage>
                 width: 20,
               ),
               Expanded(child: _buildCheckBox()),
-              
               GestureDetector(
                 onTap: () {
                   Navigator.of(context).push(
