@@ -129,40 +129,45 @@ class UserProvider with ChangeNotifier {
   }
 
   /// 지정된 API URL로 GET 요청을 전송하고 응답의 data를 반환합니다.
-  /// 
+  ///
   /// 실패 시 null을 반환합니다.
-  /// 
-  /// sendText는 개발자가 디버깅을 위한 문자열입니다.
-  /// 
-  /// 사용 예시: await getApiRes('unregister', sendText: '디버깅용 테스트 문자열 입니다.');
-  Future<dynamic> getApiRes(String apiUrl, {String? sendText}) async {
-    var totUrl = "$newAraDefaultUrl/api/$apiUrl";
-
+  //
+  /// endpoint는 API 주소입니다.
+  ///
+  /// 사용 예시: await getApiRes('unregister', queryParameters);
+  Future<Response<T>?> getApiRes<T>(
+    String endpoint, {
+    Map<String, dynamic>? queryParameters,
+  }) async {
+    var toUrl = "$newAraDefaultUrl/api/$endpoint";
     Dio dio = createDioWithHeadersForGet();
-
-    late dynamic response;
     try {
-      response = await dio.get(totUrl);
+      final response = await dio.get<T>(
+        toUrl,
+        queryParameters: queryParameters,
+      );
+      return response;
     } on DioException catch (e) {
-      debugPrint("getApiRes failed with DioException (URL: $apiUrl): $e");
-      // 서버에서 response를 보냈지만 invalid한 statusCode일 때
-      if (e.response != null) {
-        debugPrint("${e.response!.data}");
-        debugPrint("${e.response!.headers}");
-        debugPrint("${e.response!.requestOptions}");
+      if (e.type == DioExceptionType.connectionTimeout) {
+        debugPrint("Connection Time Out");
+        return null;
+      } else if (e.type == DioExceptionType.sendTimeout) {
+        debugPrint("Send Time Out");
+        return null;
+      } else if (e.type == DioExceptionType.receiveTimeout) {
+        debugPrint("Receive Time Out");
+        return null;
+      } else if (e.type == DioExceptionType.badResponse) {
+        debugPrint("Bad Response");
+        return null;
+      } else {
+        debugPrint("알 수 없는 오류 발생: ${e.message}");
+        return null;
       }
-      // request의 setting, sending에서 문제 발생
-      // requestOption, message를 출력.
-      else {
-        debugPrint("${e.requestOptions}");
-        debugPrint("${e.message}");
-      }
-      return null;
     } catch (e) {
-      debugPrint("_fetchUser failed with error: $e");
+      debugPrint("오류 발생: ${e.toString()}");
       return null;
     }
-    return response.data;
   }
 
   Future<dynamic> postApiRes(String apiUrl, {dynamic payload}) async {
