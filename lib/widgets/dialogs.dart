@@ -205,7 +205,7 @@ class _ReportDialogState extends State<ReportDialog> {
     try {
       await userProvider.postApiRes(
         "reports/",
-        payload: defaultPayload,
+        data: defaultPayload,
       );
     } catch (error) {
       debugPrint("postReport() failed with error: $error");
