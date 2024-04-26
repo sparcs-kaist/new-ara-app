@@ -129,11 +129,11 @@ class UserProvider with ChangeNotifier {
   }
 
   /// 지정된 API URL로 GET 요청을 전송하고 응답의 data를 반환합니다.
-  /// 
+  ///
   /// 실패 시 null을 반환합니다.
-  /// 
+  ///
   /// sendText는 개발자가 디버깅을 위한 문자열입니다.
-  /// 
+  ///
   /// 사용 예시: await getApiRes('unregister', sendText: '디버깅용 테스트 문자열 입니다.');
   Future<dynamic> getApiRes(String apiUrl, {String? sendText}) async {
     var totUrl = "$newAraDefaultUrl/api/$apiUrl";
@@ -165,37 +165,66 @@ class UserProvider with ChangeNotifier {
     return response.data;
   }
 
-  Future<dynamic> postApiRes(String apiUrl, {dynamic payload}) async {
-    String totUrl = "$newAraDefaultUrl/api/$apiUrl";
-
+  Future<Response<T>> postApiRes<T>(
+    String path, {
+    Object? data,
+    Map<String, dynamic>? queryParameters,
+    Options? options,
+    CancelToken? cancelToken,
+    ProgressCallback? onSendProgress,
+    ProgressCallback? onReceiveProgress
+  }) async {
+    String toUrl = "$newAraDefaultUrl/api/$path";
     Dio dio = createDioWithHeadersForNonget();
-    dio.options.headers['Cookie'] = getCookiesToString();
-    dio.options.headers['X-Csrftoken'] = getCsrftokenToString();
-
-    late dynamic response;
     try {
-      response = await dio.post(totUrl, data: payload);
+      final response = await dio.post<T>(
+        toUrl,
+        data: data,
+        queryParameters: queryParameters,
+        options: options,
+        cancelToken: cancelToken,
+        onSendProgress: onSendProgress,
+        onReceiveProgress: onReceiveProgress
+      );
+      return response;
     } on DioException catch (e) {
-      debugPrint("getApiRes failed with DioException: $e");
-      // 서버에서 response를 보냈지만 invalid한 statusCode일 때
+      late String errorMessage;
+      if (e.type == DioExceptionType.connectionTimeout) {
+        errorMessage = "DioException: Connection Time Out";
+      } else if (e.type == DioExceptionType.sendTimeout) {
+        errorMessage = "DioException: Send Time Out";
+      } else if (e.type == DioExceptionType.receiveTimeout) {
+        errorMessage = "DioException: Receive Time Out";
+      } else if (e.type == DioExceptionType.badCertificate) {
+        errorMessage = "DioException: Bad Certificate";
+      } else if (e.type == DioExceptionType.badResponse) {
+        errorMessage = "DioException: Bad Response";
+      } else if (e.type == DioExceptionType.cancel) {
+        errorMessage = "DioException: Cancel";
+      } else if (e.type == DioExceptionType.connectionError) {
+        errorMessage = "DioException: Connection Error";
+      } else if (e.type == DioExceptionType.unknown) {
+        errorMessage = "DioException: Unknown: ${e.message}";
+      } else {  // 이 case는 이론상 없어야 함. 추후 DioExceptionType이 dio package 버전에 따라 변경되었을 때를 대비해 넣어둠.
+        errorMessage = "DioExceptionType enum에 정의되어있지 않은 오류 발생";
+      }
+      debugPrint(errorMessage);
       if (e.response != null) {
         debugPrint("${e.response!.data}");
         debugPrint("${e.response!.headers}");
         debugPrint("${e.response!.requestOptions}");
-        return e.response;
       }
       // request의 setting, sending에서 문제 발생
       // requestOption, message를 출력.
       else {
         debugPrint("${e.requestOptions}");
         debugPrint("${e.message}");
-        return null;
       }
+      throw Exception(errorMessage);
     } catch (e) {
-      debugPrint("_fetchUser failed with error: $e");
-      return null;
+      debugPrint("오류 발생: ${e.toString()}");
+      throw Exception("Non-DioException occurred: ${e.toString()}");
     }
-    return response;
   }
 
   Future<dynamic> delApiRes(String apiUrl, {dynamic payload}) async {

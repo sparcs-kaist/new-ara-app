@@ -34,15 +34,21 @@ class ArticleController {
     if (model.is_mine) return false;
     int id = model.id;
     if (model.my_vote == true) {
-      var cancelRes = await userProvider.postApiRes(
-        "articles/$id/vote_cancel/",
-      );
-      if (cancelRes == null || cancelRes.statusCode != 200) return false;
+      try {
+        await userProvider.postApiRes(
+          'articles/$id/vote_cancel/',
+        );
+      } catch (e) {
+        debugPrint("posVote() failed: $e");
+        return false;
+      }
     } else {
-      var postRes = await userProvider.postApiRes(
-        "articles/$id/vote_positive/",
-      );
-      if (postRes == null || postRes.statusCode != 200) return false;
+      try {
+        await userProvider.postApiRes('articles/$id/vote_positive/');
+      } catch (e) {
+        debugPrint("posVote() failed: $e");
+        return false;
+      }
     }
     return true;
   }
@@ -53,15 +59,23 @@ class ArticleController {
     if (model.is_mine == true) return false;
     int id = model.id;
     if (model.my_vote == false) {
-      var cancelRes = await userProvider.postApiRes(
-        "articles/$id/vote_cancel/",
-      );
-      if (cancelRes == null || cancelRes.statusCode != 200) return false;
+      try {
+        await userProvider.postApiRes(
+          "articles/$id/vote_cancel/",
+        );
+      } catch (e) {
+        debugPrint("negVote() failed: $e");
+        return false;
+      }
     } else {
-      var postRes = await userProvider.postApiRes(
-        "articles/$id/vote_negative/",
-      );
-      if (postRes == null || postRes.statusCode != 200) return false;
+      try {
+        await userProvider.postApiRes(
+          "articles/$id/vote_negative/",
+        );
+      } catch (e) {
+        debugPrint("negVote() failed: $e");
+        return false;
+      }
     }
     return true;
   }
@@ -93,19 +107,26 @@ class ArticleController {
   /// 스크랩 관련 API 요청이 성공하면 true, 실패하면 false를 반환.
   Future<bool> scrap() async {
     if (model.my_scrap == null) {
-      var postRes = await userProvider.postApiRes(
-        "scraps/",
-        payload: {
-          "parent_article": model.id,
-        },
-      );
-      if (postRes.statusCode != 201) return false;
-      model.my_scrap = ScrapCreateActionModel.fromJson(postRes.data);
+      try {
+        Response postRes = await userProvider.postApiRes(
+          "scraps/",
+          data: {
+            "parent_article": model.id,
+          },
+        );
+        model.my_scrap = ScrapCreateActionModel.fromJson(postRes.data);
+      } catch (e) {
+        debugPrint("scrap() failed: $e");
+        return false;
+      }
     } else {
-      var delRes =
-          await userProvider.delApiRes("scraps/${model.my_scrap!.id}/");
-      if (delRes.statusCode != 204) return false;
-      model.my_scrap = null;
+      try {
+        await userProvider.delApiRes("scraps/${model.my_scrap!.id}/");
+        model.my_scrap = null;
+      } catch (e) {
+        debugPrint("scrap() failed: $e");
+        return false;
+      }
     }
     return true;
   }
@@ -266,15 +287,21 @@ class CommentController {
     if (model.is_mine) return false;
     int id = model.id;
     if (model.my_vote == true) {
-      var cancelRes = await userProvider.postApiRes(
-        "comments/$id/vote_cancel/",
-      );
-      if (cancelRes == null || cancelRes.statusCode != 200) return false;
+      try {
+        await userProvider.postApiRes(
+          'comments/$id/vote_cancel/',
+        );
+      } catch (e) {
+        debugPrint("posVote() failed: $e");
+        return false;
+      }
     } else {
-      var postRes = await userProvider.postApiRes(
-        "comments/$id/vote_positive/",
-      );
-      if (postRes == null || postRes.statusCode != 200) return false;
+      try {
+        await userProvider.postApiRes('comments/$id/vote_positive/');
+      } catch (e) {
+        debugPrint("posVote() failed: $e");
+        return false;
+      }
     }
     return true;
   }
@@ -284,15 +311,23 @@ class CommentController {
     if (model.is_mine == true) return false;
     int id = model.id;
     if (model.my_vote == false) {
-      var cancelRes = await userProvider.postApiRes(
-        "comments/$id/vote_cancel/",
-      );
-      if (cancelRes == null || cancelRes.statusCode != 200) return false;
+      try {
+        await userProvider.postApiRes(
+          "comments/$id/vote_cancel/",
+        );
+      } catch (e) {
+        debugPrint("negVote() failed: $e");
+        return false;
+      }
     } else {
-      var postRes = await userProvider.postApiRes(
-        "comments/$id/vote_negative/",
-      );
-      if (postRes == null || postRes.statusCode != 200) return false;
+      try {
+        await userProvider.postApiRes(
+          "comments/$id/vote_negative/",
+        );
+      } catch (e) {
+        debugPrint("negVote() failed: $e");
+        return false;
+      }
     }
     return true;
   }
@@ -528,7 +563,7 @@ class _ReportDialogWidgetState extends State<ReportDialogWidget> {
     try {
       await userProvider.postApiRes(
         "reports/",
-        payload: defaultPayload,
+        data: defaultPayload,
       );
     } catch (error) {
       debugPrint("postReport() failed with error: $error");
