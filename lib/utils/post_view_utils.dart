@@ -33,20 +33,12 @@ class ArticleController {
   Future<bool> posVote() async {
     if (model.is_mine) return false;
     int id = model.id;
-    if (model.my_vote == true) {
-      Response? postRes = await userProvider.postApiRes(
-        'articles/$id/vote_cancel/'
-      );
-      if (postRes == null) {
-        debugPrint("posVote() failed");
-        return false;
-      }
-    } else {
-      Response? postRes = await userProvider.postApiRes('articles/$id/vote_positive/');
-      if (postRes == null) {
-        debugPrint("posVote() failed");
-        return false;
-      }
+    Response? postRes = await userProvider.postApiRes(model.my_vote == true
+        ? 'articles/$id/vote_cancel/'
+        : 'articles/$id/vote_positive/');
+    if (postRes == null) {
+      debugPrint("posVote() failed");
+      return false;
     }
     return true;
   }
@@ -56,18 +48,12 @@ class ArticleController {
   Future<bool> negVote() async {
     if (model.is_mine == true) return false;
     int id = model.id;
-    if (model.my_vote == false) {
-      Response? postRes = await userProvider.postApiRes('articles/$id/vote_cancel/');
-      if (postRes == null) {
-        debugPrint("negVote() failed");
-        return false;
-      }
-    } else {
-      Response? postRes = await userProvider.postApiRes('articles/$id/vote_negative/');
-      if (postRes == null) {
-        debugPrint("negVote() failed");
-        return false;
-      }
+    Response? postRes = await userProvider.postApiRes(model.my_vote == false
+        ? 'articles/$id/vote_cancel/'
+        : 'articles/$id/vote_negative/');
+    if (postRes == null) {
+      debugPrint("negVote() failed");
+      return false;
     }
     return true;
   }
@@ -99,25 +85,24 @@ class ArticleController {
   /// 스크랩 관련 API 요청이 성공하면 true, 실패하면 false를 반환.
   Future<bool> scrap() async {
     if (model.my_scrap == null) {
-      var postRes = await userProvider.postApiRes(
-          "scraps/",
-          data: {
-            "parent_article": model.id,
-          },
-        );
+      Response? postRes = await userProvider.postApiRes(
+        "scraps/",
+        data: {
+          "parent_article": model.id,
+        },
+      );
       if (postRes != null) {
         model.my_scrap = ScrapCreateActionModel.fromJson(postRes.data);
-      }
-      else {
+      } else {
         debugPrint("scrap() failed");
         return false;
       }
     } else {
-      var delRes = await userProvider.delApiRes("scraps/${model.my_scrap!.id}/");
+      var delRes =
+          await userProvider.delApiRes("scraps/${model.my_scrap!.id}/");
       if (delRes != null) {
         model.my_scrap = null;
-      }
-      else {
+      } else {
         debugPrint("scrap() failed");
         return false;
       }
@@ -280,22 +265,12 @@ class CommentController {
   Future<bool> posVote() async {
     if (model.is_mine) return false;
     int id = model.id;
-    if (model.my_vote == true) {
-      try {
-        await userProvider.postApiRes(
-          'comments/$id/vote_cancel/',
-        );
-      } catch (e) {
-        debugPrint("posVote() failed: $e");
-        return false;
-      }
-    } else {
-      try {
-        await userProvider.postApiRes('comments/$id/vote_positive/');
-      } catch (e) {
-        debugPrint("posVote() failed: $e");
-        return false;
-      }
+    Response? postRes = await userProvider.postApiRes(model.my_vote == true
+        ? 'comments/$id/vote_cancel/'
+        : 'comments/$id/vote_positive/');
+    if (postRes == null) {
+      debugPrint("posVote() failed");
+      return false;
     }
     return true;
   }
@@ -304,24 +279,12 @@ class CommentController {
   Future<bool> negVote() async {
     if (model.is_mine == true) return false;
     int id = model.id;
-    if (model.my_vote == false) {
-      try {
-        await userProvider.postApiRes(
-          "comments/$id/vote_cancel/",
-        );
-      } catch (e) {
-        debugPrint("negVote() failed: $e");
-        return false;
-      }
-    } else {
-      try {
-        await userProvider.postApiRes(
-          "comments/$id/vote_negative/",
-        );
-      } catch (e) {
-        debugPrint("negVote() failed: $e");
-        return false;
-      }
+    Response? postRes = await userProvider.postApiRes(model.my_vote == false
+        ? "comments/$id/vote_cancel/"
+        : "comments/$id/vote_negative/");
+    if (postRes == null) {
+      debugPrint("negVote() failed");
+      return false;
     }
     return true;
   }
@@ -554,13 +517,12 @@ class _ReportDialogWidgetState extends State<ReportDialogWidget> {
         ? {"parent_comment": widget.commentID ?? 0}
         : {"parent_article": widget.articleID ?? 0});
     UserProvider userProvider = context.read<UserProvider>();
-    try {
-      await userProvider.postApiRes(
-        "reports/",
-        data: defaultPayload,
-      );
-    } catch (error) {
-      debugPrint("postReport() failed with error: $error");
+    Response? postRes = await userProvider.postApiRes(
+      "reports/",
+      data: defaultPayload,
+    );
+    if (postRes == null) {
+      debugPrint("postReport() failed with error");
       return false;
     }
 
