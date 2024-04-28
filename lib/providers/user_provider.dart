@@ -295,6 +295,71 @@ class UserProvider with ChangeNotifier {
     }
   }
 
+  /// path에 주어진 경로와 data, queryParameters를 이용해 PATCH 요청을 보냄.
+  /// 성공하면 Response 객체를 반환.
+  /// 실패하면 내부에서 exception handling한 이후 null을 반환.
+  Future<Response<T>?> patchApiRes<T>(
+    String path, {
+    Object? data,
+    Map<String, dynamic>? queryParameters,
+    Options? options,
+    CancelToken? cancelToken,
+    ProgressCallback? onSendProgress,
+    ProgressCallback? onReceiveProgress
+  }) async {
+    String toUrl = "$newAraDefaultUrl/api/$path";
+    Dio dio = createDioWithHeadersForNonget();
+    try {
+      final response = await dio.patch<T>(
+        toUrl,
+        data: data,
+        queryParameters: queryParameters,
+        options: options,
+        cancelToken: cancelToken,
+        onSendProgress: onSendProgress,
+        onReceiveProgress: onReceiveProgress
+      );
+      return response;
+    } on DioException catch (e) {
+      late String errorMessage;
+      if (e.type == DioExceptionType.connectionTimeout) {
+        errorMessage = "DioException: Connection Time Out";
+      } else if (e.type == DioExceptionType.sendTimeout) {
+        errorMessage = "DioException: Send Time Out";
+      } else if (e.type == DioExceptionType.receiveTimeout) {
+        errorMessage = "DioException: Receive Time Out";
+      } else if (e.type == DioExceptionType.badCertificate) {
+        errorMessage = "DioException: Bad Certificate";
+      } else if (e.type == DioExceptionType.badResponse) {
+        errorMessage = "DioException: Bad Response";
+      } else if (e.type == DioExceptionType.cancel) {
+        errorMessage = "DioException: Cancel";
+      } else if (e.type == DioExceptionType.connectionError) {
+        errorMessage = "DioException: Connection Error";
+      } else if (e.type == DioExceptionType.unknown) {
+        errorMessage = "DioException: Unknown: ${e.message}";
+      } else {  // 이 case는 이론상 없어야 함. 추후 DioExceptionType이 dio package 버전에 따라 변경되었을 때를 대비해 넣어둠.
+        errorMessage = "DioExceptionType enum에 정의되어있지 않은 오류 발생";
+      }
+      debugPrint(errorMessage);
+      if (e.response != null) {
+        //debugPrint("${e.response!.data}");
+        debugPrint("${e.response!.headers}");
+        debugPrint("${e.response!.requestOptions}");
+      }
+      // request의 setting, sending에서 문제 발생
+      // requestOption, message를 출력.
+      else {
+        debugPrint("${e.requestOptions}");
+        debugPrint("${e.message}");
+      }
+      return null;
+    } catch (e) {
+      debugPrint("오류 발생: ${e.toString()}");
+      return null;
+    }
+  }
+
   Future<dynamic> delApiRes(String apiUrl, {dynamic payload}) async {
     String totUrl = "$newAraDefaultUrl/api/$apiUrl";
 
@@ -321,38 +386,6 @@ class UserProvider with ChangeNotifier {
         debugPrint("${e.message}");
         return null;
       }
-    } catch (e) {
-      debugPrint("_fetchUser failed with error: $e");
-      return null;
-    }
-    return response;
-  }
-
-  Future<Response?> patchApiRes(String apiUrl, {dynamic payload}) async {
-    String totUrl = "$newAraDefaultUrl/api/$apiUrl";
-
-    Dio dio = createDioWithHeadersForNonget();
-    dio.options.headers['Cookie'] = getCookiesToString();
-    dio.options.headers['X-Csrftoken'] = getCsrftokenToString();
-
-    late Response response;
-    try {
-      response = await dio.patch(totUrl, data: payload);
-    } on DioException catch (e) {
-      debugPrint("getApiRes failed with DioException: $e");
-      // 서버에서 response를 보냈지만 invalid한 statusCode일 때
-      if (e.response != null) {
-        debugPrint("${e.response!.data}");
-        debugPrint("${e.response!.headers}");
-        debugPrint("${e.response!.requestOptions}");
-      }
-      // request의 setting, sending에서 문제 발생
-      // requestOption, message를 출력.
-      else {
-        debugPrint("${e.requestOptions}");
-        debugPrint("${e.message}");
-      }
-      return e.response;
     } catch (e) {
       debugPrint("_fetchUser failed with error: $e");
       return null;

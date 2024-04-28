@@ -1965,9 +1965,9 @@ class _PostViewPageState extends State<PostViewPage> {
       };
       Response? patchRes = await userProvider.patchApiRes(
         "comments/${targetComment!.id}/",
-        payload: defaultPayload,
+        data: defaultPayload,
       );
-      if (patchRes != null && patchRes.statusCode != 200) {
+      if (patchRes == null) {
         debugPrint("PATCH /api/comments/${targetComment!.id}/ failed");
         return false;
       }
