@@ -49,7 +49,9 @@ Future<void> updateStateWithCachedOrFetchedApiData({
       await callback(recentJson);
     }
     // UserProvider를 통해 API로부터 새로운 데이터를 요청합니다.
-    final dynamic response = await userProvider.getApiRes(apiUrl);
+    var getResponse = await userProvider.getApiRes(apiUrl);
+    final Map<String, dynamic>? response = await getResponse?.data;
+
     if (response != null) {
       // 새로운 데이터를 캐시에 저장하고, 콜백 함수를 통해 상태를 업데이트합니다.
       await cacheApiData(apiUrl, response);

@@ -138,7 +138,8 @@ class _PostListShowPageState extends State<PostListShowPage>
             // pageLimitToReload가 null이 아니면(파라미터가 존재하면) currentPage보다 우선시 합니다.
             (pageLimitToReload ?? currentPage);
         page++) {
-      Map<String, dynamic>? json = await userProvider.getApiRes("$apiUrl$page");
+      var response = await userProvider.getApiRes("$apiUrl$page");
+      final Map<String, dynamic>? json = await response?.data;
 
       if (json != null && json.containsKey("results")) {
         for (var result in json["results"]) {
@@ -171,18 +172,18 @@ class _PostListShowPageState extends State<PostListShowPage>
   /// 다음 페이지를 로드하는 함수
   Future<void> _loadNextPage() async {
     var userProvider = context.read<UserProvider>();
-    
+
     setState(() {
       _isLoadingNextPage = true;
     });
-    
 
     // api 호출과 Provider 정보 동기화.
     // await Future.delayed(Duration(seconds: 1));
     try {
       currentPage = currentPage + 1;
-      Map<String, dynamic>? myMap =
-          await userProvider.getApiRes("$apiUrl$currentPage");
+      var response = await userProvider.getApiRes("$apiUrl$currentPage");
+      final Map<String, dynamic>? myMap = await response?.data;
+
       if (mounted) {
         setState(() {
           for (int i = 0; i < (myMap!["results"].length ?? 0); i++) {
@@ -320,71 +321,69 @@ class _PostListShowPageState extends State<PostListShowPage>
       ),
       body: /*isLoading
           ? const LoadingIndicator()
-          :*/ 
+          :*/
           SafeArea(
-              child: Center(
-                child: SizedBox(
-                  width: MediaQuery.of(context).size.width - 18,
-                  child: RefreshIndicator.adaptive(
-                    displacement : 0.0,
-                    color: ColorsInfo.newara,
-                    onRefresh: () async {
-                      setState((() => isLoading = true));
-                      // 리프레쉬시 게시물 목록을 업데이트합니다.
-                      // 1페이지만 로드하도록 설정하여 최신 게시물을 불러옵니다.
-                      // 1페이지만 로드하면 태블릿에서 게시물로 화면을 꽉채우지 못하므로 다음 페이지도 로드합니다.
-                      await updateAllBulletinList(pageLimitToReload: 1).then(
-                        (value) {
-                          _loadNextPage();
-                        },
-                      );
-                    },
-                    child: ListView.separated(
-                      physics: const AlwaysScrollableScrollPhysics(),
-                      controller: _scrollController,
-                      itemCount: postPreviewList.length
-                      + (_isLoadingNextPage ? 1 : 0), // 아이템 개수
-                      itemBuilder: (BuildContext context, int index) {
-                        // 각 아이템을 위한 위젯 생성
-                        if (_isLoadingNextPage &&
-                            index == postPreviewList.length) {
-                            debugPrint('Next Page Load Request');
-                          return const SizedBox(
-                            height: 50,
-                            child: Center(
-                              child: LoadingIndicator(),
-                            ),
-                          );
-                        } else {
-                          return InkWell(
-                            onTap: () async {
-                              await Navigator.of(context).push(slideRoute(
-                                  PostViewPage(id: postPreviewList[index].id)));
-                              updateAllBulletinList();
-                            },
-                            child: Column(
-                              children: [
-                                Padding(
-                                  padding: const EdgeInsets.all(11.0),
-                                  child: PostPreview(
-                                      model: postPreviewList[index]),
-                                ),
-                              ],
-                            ),
-                          );
-                        }
+        child: Center(
+          child: SizedBox(
+            width: MediaQuery.of(context).size.width - 18,
+            child: RefreshIndicator.adaptive(
+              displacement: 0.0,
+              color: ColorsInfo.newara,
+              onRefresh: () async {
+                setState((() => isLoading = true));
+                // 리프레쉬시 게시물 목록을 업데이트합니다.
+                // 1페이지만 로드하도록 설정하여 최신 게시물을 불러옵니다.
+                // 1페이지만 로드하면 태블릿에서 게시물로 화면을 꽉채우지 못하므로 다음 페이지도 로드합니다.
+                await updateAllBulletinList(pageLimitToReload: 1).then(
+                  (value) {
+                    _loadNextPage();
+                  },
+                );
+              },
+              child: ListView.separated(
+                physics: const AlwaysScrollableScrollPhysics(),
+                controller: _scrollController,
+                itemCount: postPreviewList.length +
+                    (_isLoadingNextPage ? 1 : 0), // 아이템 개수
+                itemBuilder: (BuildContext context, int index) {
+                  // 각 아이템을 위한 위젯 생성
+                  if (_isLoadingNextPage && index == postPreviewList.length) {
+                    debugPrint('Next Page Load Request');
+                    return const SizedBox(
+                      height: 50,
+                      child: Center(
+                        child: LoadingIndicator(),
+                      ),
+                    );
+                  } else {
+                    return InkWell(
+                      onTap: () async {
+                        await Navigator.of(context).push(slideRoute(
+                            PostViewPage(id: postPreviewList[index].id)));
+                        updateAllBulletinList();
                       },
-                      separatorBuilder: (BuildContext context, int index) {
-                        return Container(
-                          height: 1,
-                          color: const Color(0xFFF0F0F0),
-                        );
-                      },
-                    ),
-                  ),
-                ),
+                      child: Column(
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.all(11.0),
+                            child: PostPreview(model: postPreviewList[index]),
+                          ),
+                        ],
+                      ),
+                    );
+                  }
+                },
+                separatorBuilder: (BuildContext context, int index) {
+                  return Container(
+                    height: 1,
+                    color: const Color(0xFFF0F0F0),
+                  );
+                },
               ),
             ),
+          ),
+        ),
+      ),
     );
   }
 }

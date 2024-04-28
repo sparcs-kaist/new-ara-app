@@ -370,11 +370,13 @@ class SettingPageState extends State<SettingPage> {
                             InkWell(
                               onTap: () {
                                 // TermsAndConditionsPage의 변경된 locale을 즉시 적용하기 위해 setState 호출함.
-                                Navigator.of(context).push(
-                                  slideRoute(
-                                    const TermsAndConditionsPage(),
-                                  ),
-                                ).then((_) => setState(() {}));
+                                Navigator.of(context)
+                                    .push(
+                                      slideRoute(
+                                        const TermsAndConditionsPage(),
+                                      ),
+                                    )
+                                    .then((_) => setState(() {}));
                               },
                               child: Row(
                                 mainAxisAlignment:
@@ -493,10 +495,12 @@ class SettingPageState extends State<SettingPage> {
                                     setState(() {
                                       _isLoading = true;
                                     });
+                                    var response = await userProvider
+                                        .getApiRes('unregister');
                                     // ignore: unused_local_variable
-                                    Map<String, dynamic>? responseResult =
-                                        await userProvider
-                                            .getApiRes('unregister');
+                                    final Map<String, dynamic>? responseResult =
+                                        await response?.data;
+
                                     //TODO: 회원탈퇴 로직 보강 필요
                                     // if(responseResult == null){
                                     //   ///회원탈퇴 실패
