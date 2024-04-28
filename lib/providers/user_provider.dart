@@ -165,6 +165,9 @@ class UserProvider with ChangeNotifier {
     return response.data;
   }
 
+  /// path에 주어진 경로와 data, queryParameters를 이용해 POST 요청을 보냄.
+  /// 성공하면 Response 객체를 반환.
+  /// 실패하면 내부에서 exception handling한 이후 null을 반환.
   Future<Response<T>?> postApiRes<T>(
     String path, {
     Object? data,
