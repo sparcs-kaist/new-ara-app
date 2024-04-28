@@ -57,21 +57,15 @@ class ArticleController {
     if (model.is_mine == true) return false;
     int id = model.id;
     if (model.my_vote == false) {
-      try {
-        await userProvider.postApiRes(
-          "articles/$id/vote_cancel/",
-        );
-      } catch (e) {
-        debugPrint("negVote() failed: $e");
+      Response? postRes = await userProvider.postApiRes('articles/$id/vote_cancel/');
+      if (postRes == null) {
+        debugPrint("negVote() failed");
         return false;
       }
     } else {
-      try {
-        await userProvider.postApiRes(
-          "articles/$id/vote_negative/",
-        );
-      } catch (e) {
-        debugPrint("negVote() failed: $e");
+      Response? postRes = await userProvider.postApiRes('articles/$id/vote_negative/');
+      if (postRes == null) {
+        debugPrint("negVote() failed");
         return false;
       }
     }
