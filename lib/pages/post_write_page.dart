@@ -1589,7 +1589,7 @@ class _PostWritePageState extends State<PostWritePage>
               _chosenTopicValue!.id == -1 ? '' : _chosenTopicValue!.id;
           data['parent_board'] = _chosenBoardValue!.id;
           response = await dio.post(
-            '$newAraDefaultUrl/api/articles/$previousArticleId/',
+            '$newAraDefaultUrl/api/articles/',
             data: data,
           );
         }
