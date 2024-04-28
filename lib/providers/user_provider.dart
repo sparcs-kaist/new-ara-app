@@ -156,6 +156,7 @@ class UserProvider with ChangeNotifier {
       );
       return response;
     } on DioException catch (e) {
+      late String errorMessage;
       if (e.type == DioExceptionType.connectionTimeout) {
         errorMessage = "DioException: Connection Time Out";
       } else if (e.type == DioExceptionType.sendTimeout) {
