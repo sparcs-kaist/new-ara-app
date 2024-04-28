@@ -34,19 +34,17 @@ class ArticleController {
     if (model.is_mine) return false;
     int id = model.id;
     if (model.my_vote == true) {
-      try {
-        await userProvider.postApiRes(
-          'articles/$id/vote_cancel/',
-        );
-      } catch (e) {
-        debugPrint("posVote() failed: $e");
+      Response? postRes = await userProvider.postApiRes(
+        'articles/$id/vote_cancel/'
+      );
+      if (postRes == null) {
+        debugPrint("posVote() failed");
         return false;
       }
     } else {
-      try {
-        await userProvider.postApiRes('articles/$id/vote_positive/');
-      } catch (e) {
-        debugPrint("posVote() failed: $e");
+      Response? postRes = await userProvider.postApiRes('articles/$id/vote_positive/');
+      if (postRes == null) {
+        debugPrint("posVote() failed");
         return false;
       }
     }
