@@ -165,7 +165,7 @@ class UserProvider with ChangeNotifier {
     return response.data;
   }
 
-  Future<Response<T>> postApiRes<T>(
+  Future<Response<T>?> postApiRes<T>(
     String path, {
     Object? data,
     Map<String, dynamic>? queryParameters,
@@ -220,10 +220,10 @@ class UserProvider with ChangeNotifier {
         debugPrint("${e.requestOptions}");
         debugPrint("${e.message}");
       }
-      throw Exception(errorMessage);
+      return null;
     } catch (e) {
       debugPrint("오류 발생: ${e.toString()}");
-      throw Exception("Non-DioException occurred: ${e.toString()}");
+      return null;
     }
   }
 

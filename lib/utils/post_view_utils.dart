@@ -107,24 +107,26 @@ class ArticleController {
   /// 스크랩 관련 API 요청이 성공하면 true, 실패하면 false를 반환.
   Future<bool> scrap() async {
     if (model.my_scrap == null) {
-      try {
-        Response postRes = await userProvider.postApiRes(
+      var postRes = await userProvider.postApiRes(
           "scraps/",
           data: {
             "parent_article": model.id,
           },
         );
+      if (postRes != null) {
         model.my_scrap = ScrapCreateActionModel.fromJson(postRes.data);
-      } catch (e) {
-        debugPrint("scrap() failed: $e");
+      }
+      else {
+        debugPrint("scrap() failed");
         return false;
       }
     } else {
-      try {
-        await userProvider.delApiRes("scraps/${model.my_scrap!.id}/");
+      var delRes = await userProvider.delApiRes("scraps/${model.my_scrap!.id}/");
+      if (delRes != null) {
         model.my_scrap = null;
-      } catch (e) {
-        debugPrint("scrap() failed: $e");
+      }
+      else {
+        debugPrint("scrap() failed");
         return false;
       }
     }
