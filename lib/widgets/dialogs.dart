@@ -202,13 +202,10 @@ class _ReportDialogState extends State<ReportDialog> {
         ? {"parent_comment": widget.commentID ?? 0}
         : {"parent_article": widget.articleID ?? 0});
     UserProvider userProvider = context.read<UserProvider>();
-    try {
-      await userProvider.postApiRes(
-        "reports/",
-        data: defaultPayload,
-      );
-    } catch (error) {
-      debugPrint("postReport() failed with error: $error");
+    Response? postRes =
+        await userProvider.postApiRes('reports/', data: defaultPayload);
+    if (postRes == null) {
+      debugPrint("postReport() failed with error");
       return false;
     }
 
