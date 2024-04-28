@@ -1519,7 +1519,7 @@ class _PostWritePageState extends State<PostWritePage>
         _isLoading = true;
       });
 
-      Dio dio = userProvider.createDioWithHeadersForNonget();
+      Dio dio = userProvider.createDioWithHeadersForNonget();  // TODO: 적절한 apiRes함수로 변경해야 함.
 
       for (int i = 0; i < _attachmentList.length; i++) {
         //새로 올리는 파일이면 새로운 id 할당 받기.
@@ -1561,6 +1561,7 @@ class _PostWritePageState extends State<PostWritePage>
         }
       }
 
+      // TODO: putApiRes 만들고 나서 try-catch 한번에 제거하기.
       try {
         Response response;
         var data = {
@@ -1588,7 +1589,7 @@ class _PostWritePageState extends State<PostWritePage>
               _chosenTopicValue!.id == -1 ? '' : _chosenTopicValue!.id;
           data['parent_board'] = _chosenBoardValue!.id;
           response = await dio.post(
-            '$newAraDefaultUrl/api/articles/',
+            '$newAraDefaultUrl/api/articles/$previousArticleId/',
             data: data,
           );
         }
