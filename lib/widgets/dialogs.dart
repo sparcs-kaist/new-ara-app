@@ -390,13 +390,12 @@ class _BlockedUserDialogState extends State<BlockedUserDialog> {
   /// 성공 시에 BlockModel의 리스트를 반환함. 실패할 시 empty list 반환.
   Future<List<BlockModel>> fetchBlockedUsers() async {
     UserProvider userProvider = context.read<UserProvider>();
-    String apiUrl = "/api/blocks/";
+    String apiUrl = "/blocks/";
     List<BlockModel> resList = [];
     try {
-      var response = await userProvider
-          .createDioWithHeadersForGet()
-          .get("$newAraDefaultUrl$apiUrl");
-      List<dynamic> jsonUserList = response.data['results'];
+      var response = await userProvider.getApiRes(apiUrl);
+      final Map<String, dynamic>? jsonList = await response?.data;
+      List<dynamic> jsonUserList = jsonList?['results'];
       for (Map<String, dynamic> json in jsonUserList) {
         try {
           resList.add(BlockModel.fromJson(json));

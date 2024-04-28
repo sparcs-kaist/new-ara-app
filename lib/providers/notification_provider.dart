@@ -6,17 +6,15 @@
 
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:dio/dio.dart';
 
-import 'package:new_ara_app/constants/url_info.dart';
 import 'package:new_ara_app/providers/user_provider.dart';
+
 /// 새로운 알림 여부를 알려주는 ChangeNotifier.
 /// 알림 생성 여부가 필요한 다양한 위젯에 활용하기 위해 ChangeNotifier로 구현함.
 /// 알림 생성 여부 조회를 위해 [checkIsNotReadExist] 메서드를 제공함.
 class NotificationProvider with ChangeNotifier {
   bool _isNotReadExist = false;
   bool get isNotReadExist => _isNotReadExist;
-
 
   // ignore: unused_field
   String _cookieString = "";
@@ -41,8 +39,6 @@ class NotificationProvider with ChangeNotifier {
   Future<void> checkIsNotReadExist(UserProvider userProvider) async {
     bool res = false;
 
-    Dio dio = userProvider.createDioWithHeadersForGet();
-
     int curPage = 1;
 
     /// 다음 페이지가 존재하는 지 나타냄.
@@ -51,9 +47,11 @@ class NotificationProvider with ChangeNotifier {
     do {
       try {
         var response =
-            await dio.get("$newAraDefaultUrl/api/notifications/?page=$curPage");
-        hasNext = response.data["next"] == null ? false : true; // 다음 페이지 존재 확인.
-        List<dynamic> resultsJson = response.data["results"];
+            await userProvider.getApiRes("notifications/?page=$curPage");
+        final Map<String, dynamic>? jsonList = await response?.data;
+
+        hasNext = jsonList?["next"] == null ? false : true; // 다음 페이지 존재 확인.
+        List<dynamic> resultsJson = jsonList?["results"];
         for (var json in resultsJson) {
           if (!(json['is_read'] ?? true)) {
             res = true;
