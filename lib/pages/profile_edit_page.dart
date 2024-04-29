@@ -112,7 +112,7 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
       data: formData,
     );
     if (response == null) {
-      // TODO: 닉네임 변경 기한 관련 메시지 출력 기능 추가
+      // TODO: 닉네임 변경 기한 관련 메시지 출력 기능 추가 (인터넷 에러 처리할 때 완료하기)
       return false;
     }
     // try {
