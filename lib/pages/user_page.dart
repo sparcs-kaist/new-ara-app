@@ -477,11 +477,11 @@ class _UserPageState extends State<UserPage>
   String getApiUrl(TabType tabType, int page, int user) {
     switch (tabType) {
       case TabType.created:
-        return "/api/articles/?page=$page&created_by=$user";
+        return "/articles/?page=$page&created_by=$user";
       case TabType.scrap:
-        return "/api/scraps/?page=$page&created_by=$user";
+        return "/scraps/?page=$page&created_by=$user";
       case TabType.recent:
-        return "/api/articles/recent/?page=$page";
+        return "/articles/recent/?page=$page";
     }
   }
 
@@ -540,11 +540,10 @@ class _UserPageState extends State<UserPage>
     if (page == 1) clearList(tabType);
 
     try {
-      var response = await userProvider
-          .createDioWithHeadersForGet()
-          .get('$newAraDefaultUrl$apiUrl');
+      var response = await userProvider.getApiRes(apiUrl);
+      final Map<String, dynamic>? jsonList = await response?.data;
 
-      List<dynamic> rawPostList = response.data['results'];
+      List<dynamic> rawPostList = jsonList?['results'];
       for (int i = 0; i < rawPostList.length; i++) {
         Map<String, dynamic>? rawPost = rawPostList[i];
         if (rawPost != null) {
@@ -557,7 +556,7 @@ class _UserPageState extends State<UserPage>
         }
       }
       // pageT에 해당하는 페이지의 글 개수를 업데이트함.
-      articleCount[tabType.index] = response.data['num_items'];
+      articleCount[tabType.index] = jsonList?['num_items'];
       debugPrint("fetchArticles() succeeded for page: $page");
       return true;
     } on DioException catch (e) {

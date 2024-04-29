@@ -286,7 +286,8 @@ class _MainPageState extends State<MainPage> with WidgetsBindingObserver {
   Future<void> _refreshTopContents(UserProvider userProvider,
       List<ArticleListActionModel> contentList) async {
     String apiUrl = 'articles/top/';
-    final dynamic response = await userProvider.getApiRes(apiUrl);
+    var getResponse = await userProvider.getApiRes(apiUrl);
+    final Map<String, dynamic>? response = await getResponse?.data;
     if (mounted && response != null) {
       setState(() {
         contentList.clear();
@@ -315,7 +316,8 @@ class _MainPageState extends State<MainPage> with WidgetsBindingObserver {
     String apiUrl = topicID == -1
         ? "articles/?parent_board=$boardID"
         : "articles/?parent_board=$boardID&parent_topic=$topicID";
-    final dynamic response = await userProvider.getApiRes(apiUrl);
+    var getResponse = await userProvider.getApiRes(apiUrl);
+    final Map<String, dynamic>? response = await getResponse?.data;
     if (mounted && response != null) {
       setState(() {
         contentList.clear();
@@ -1320,7 +1322,8 @@ class LittleText extends StatelessWidget {
               ),
             ),
           TextSpan(
-            text: getTitle(content.title, content.is_hidden, content.why_hidden),
+            text:
+                getTitle(content.title, content.is_hidden, content.why_hidden),
             style: TextStyle(
               color: content.is_hidden ? const Color(0xFFBBBBBB) : Colors.black,
               fontSize: 14,

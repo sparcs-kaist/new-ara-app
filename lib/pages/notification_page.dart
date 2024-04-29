@@ -5,9 +5,9 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:new_ara_app/translations/locale_keys.g.dart';
 import 'package:provider/provider.dart';
-import 'package:dio/dio.dart';
 
 import 'package:new_ara_app/constants/url_info.dart';
+import 'package:dio/dio.dart';
 import 'package:new_ara_app/widgets/loading_indicator.dart';
 import 'package:new_ara_app/constants/colors_info.dart';
 import 'package:new_ara_app/providers/user_provider.dart';
@@ -66,12 +66,13 @@ class _NotificationPageState extends State<NotificationPage> {
   /// 결과 리스트를 반환함.
   Future<List<NotificationModel>> _fetchEachPage(
       UserProvider userProvider, int targetPage) async {
-    Dio dio = userProvider.createDioWithHeadersForGet();
     List<NotificationModel> resList = [];
     try {
-      var response = await dio
-          .get("$newAraDefaultUrl/api/notifications/?page=$targetPage");
-      List<dynamic> resultsList = response.data["results"];
+      var response =
+          await userProvider.getApiRes("notifications/?page=$targetPage");
+      final Map<String, dynamic>? jsonList = await response?.data;
+
+      List<dynamic> resultsList = jsonList?["results"];
       for (var json in resultsList) {
         try {
           resList.add(NotificationModel.fromJson(json));
@@ -99,15 +100,15 @@ class _NotificationPageState extends State<NotificationPage> {
       bool hasNext = true;
       UserProvider userProvider = context.read<UserProvider>();
       List<NotificationModel> resList = [];
-      Dio dio = userProvider.createDioWithHeadersForGet();
       int page = 1;
       for (page = 1; hasNext; page++) {
         if (page > _curPage + 1) break;
         try {
           var response =
-              await dio.get("$newAraDefaultUrl/api/notifications/?page=$page");
-          hasNext = response.data["next"] == null ? false : true;
-          List<dynamic> resultsList = response.data["results"];
+              await userProvider.getApiRes("notifications/?page=$page");
+          final Map<String, dynamic>? jsonList = await response?.data;
+          hasNext = jsonList?["next"] == null ? false : true;
+          List<dynamic> resultsList = jsonList?["results"];
           for (var json in resultsList) {
             try {
               resList.add(NotificationModel.fromJson(json));

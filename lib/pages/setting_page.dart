@@ -497,10 +497,12 @@ class SettingPageState extends State<SettingPage> {
                                     setState(() {
                                       _isLoading = true;
                                     });
+                                    var response = await userProvider
+                                        .getApiRes('unregister');
                                     // ignore: unused_local_variable
-                                    Map<String, dynamic>? responseResult =
-                                        await userProvider
-                                            .getApiRes('unregister');
+                                    final Map<String, dynamic>? responseResult =
+                                        await response?.data;
+
                                     //TODO: 회원탈퇴 로직 보강 필요
                                     // if(responseResult == null){
                                     //   ///회원탈퇴 실패

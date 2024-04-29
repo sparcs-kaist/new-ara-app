@@ -4,7 +4,6 @@ import 'dart:core';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:new_ara_app/constants/url_info.dart';
 import 'package:provider/provider.dart';
 import 'package:dio/dio.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -133,15 +132,14 @@ class _PostViewPageState extends State<PostViewPage> {
   /// _article, _commentList, _commentKeys의 값이 모두 설정되면 true, 아닌 경우 false 반환.
   Future<bool> _fetchArticle(UserProvider userProvider,
       {overrideHidden = false}) async {
-    dynamic articleJson;
-    String apiUrl = "$newAraDefaultUrl/api/articles/${widget.articleID}";
+    Map<String, dynamic>? articleJson;
+    String apiUrl = "articles/${widget.articleID}";
     // 차단된 유저의 글에 대한 내용을 로드하는 경우 주소를 수정함.
     if (overrideHidden) apiUrl += "/?override_hidden=true";
 
     try {
-      var response =
-          await userProvider.createDioWithHeadersForGet().get(apiUrl);
-      articleJson = response.data;
+      var response = await userProvider.getApiRes(apiUrl);
+      articleJson = await response?.data;
     } on DioException catch (e) {
       debugPrint("DioException occurred");
       if (e.response != null) {

@@ -104,8 +104,11 @@ class _BulletinSearchPageState extends State<BulletinSearchPage> {
     }
     final UserProvider userProvider = context.read<UserProvider>();
     // 타겟 단어의 1페이지 검색 결과만 불러옴.
-    final Map<String, dynamic>? myMap = await userProvider
+
+    var response = await userProvider
         .getApiRes("${_apiUrl}1&main_search__contains=$targetWord");
+    final Map<String, dynamic>? myMap = await response?.data;
+
     if (mounted && myMap != null && targetWord == _textEdtingController.text) {
       setState(() {
         postPreviewList.clear();
@@ -161,8 +164,9 @@ class _BulletinSearchPageState extends State<BulletinSearchPage> {
       UserProvider userProvider = context.read<UserProvider>();
       _currentPage = _currentPage + 1;
       //TODO: 더 이상 불러올 게시물이 없을 때의 처리
-      Map<String, dynamic>? myMap = await userProvider.getApiRes(
+      var response = await userProvider.getApiRes(
           "$_apiUrl$_currentPage&main_search__contains=${_textEdtingController.text}");
+      final Map<String, dynamic>? myMap = await response?.data;
 
       //비동기 함수 이후에 검색창의 검색어가 바뀌었을 경우에는 하지 않음
       if (mounted &&
