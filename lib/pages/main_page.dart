@@ -485,6 +485,8 @@ class _MainPageState extends State<MainPage> with WidgetsBindingObserver {
                         const SizedBox(height: 20),
                         _buildTradeContents(),
                         const SizedBox(height: 20),
+                        _buildMessagesToSchoolContents(),
+                        const SizedBox(height: 20),
                         _buildCommunicationContents(),
                         const SizedBox(height: 20),
                         _buildStuCommunityContents(),
@@ -1051,6 +1053,66 @@ class _MainPageState extends State<MainPage> with WidgetsBindingObserver {
     );
   }
 
+  Widget _buildMessagesToSchoolContents() {
+    return Column(
+      children: [
+        MainPageTextButton(
+          LocaleKeys.mainPage_messagesToSchool.tr(),
+          () async {
+            await Navigator.of(context).push(slideRoute(PostListShowPage(
+              boardType: BoardType.free,
+              boardInfo: _searchBoard("with-school"),
+            )));
+            await _refreshAllPosts();
+          },
+        ),
+        SizedBox(
+          width: MediaQuery.of(context).size.width - 40,
+          child: Column(
+            children: [
+              PopularBoard(
+                model: _messagesToSchoolContents[0],
+                showBoardNumber: false,
+                refreshAllPosts: _refreshAllPosts,
+              ),
+              Row(
+                children: [
+                  Expanded(
+                    child: Container(
+                      height: 1,
+                      color: const Color(0xFFF0F0F0),
+                    ),
+                  ),
+                ],
+              ),
+              PopularBoard(
+                model: _messagesToSchoolContents[1],
+                refreshAllPosts: _refreshAllPosts,
+                showBoardNumber: false,
+              ),
+              Row(
+                children: [
+                  Expanded(
+                    child: Container(
+                      height: 1,
+                      color: const Color(0xFFF0F0F0),
+                    ),
+                  ),
+                ],
+              ),
+              PopularBoard(
+                model: _messagesToSchoolContents[2],
+                refreshAllPosts: _refreshAllPosts,
+                showBoardNumber: false,
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  /// '학교에게 전합니다' 게시판은 별도로 구성됨 (TODO: 이러한 방식에 대해 논의해보아야 함.)
   Widget _buildCommunicationContents() {
     return Column(
       children: [
@@ -1083,104 +1145,6 @@ class _MainPageState extends State<MainPage> with WidgetsBindingObserver {
               InkWell(
                 onTap: () async {
                   await Navigator.of(context).push(slideRoute(PostListShowPage(
-                    boardType: BoardType.free,
-                    boardInfo: _searchBoard("with-school"),
-                  )));
-                  await _refreshAllPosts();
-                },
-                child: Row(
-                  children: [
-                    SizedBox(
-                      width: 19,
-                      height: 19,
-                      child: Image.asset(
-                        'assets/icons/kaist.png', // TODO: 이미지 변경 필요
-                        fit: BoxFit.cover,
-                      ),
-                    ),
-                    const SizedBox(
-                      width: 5,
-                    ),
-                    Text(
-                      LocaleKeys.mainPage_messagesToSchool.tr(),
-                      style: const TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w700,
-                        color: Color(0xFF1F4899),
-                      ),
-                    ),
-                    const SizedBox(
-                      width: 5,
-                    ),
-                    SvgPicture.asset(
-                      'assets/icons/right_chevron.svg',
-                      colorFilter: const ColorFilter.mode(
-                          Color(0xFF1F4899), BlendMode.srcIn),
-                      fit: BoxFit.fill,
-                      width: 17,
-                      height: 17,
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(
-                height: 10,
-              ),
-              _messagesToSchoolContents.isNotEmpty
-                  ? InkWell(
-                      onTap: () async {
-                        await Navigator.of(context).push(slideRoute(
-                            PostViewPage(id: _messagesToSchoolContents[0].id)));
-                        await _refreshAllPosts();
-                      },
-                      child: LittleText(
-                        content: _messagesToSchoolContents[0],
-                      ),
-                    )
-                  : Container(),
-              const SizedBox(
-                height: 10,
-              ),
-              _messagesToSchoolContents.length > 1
-                  ? InkWell(
-                      onTap: () async {
-                        await Navigator.of(context).push(slideRoute(
-                            PostViewPage(id: _messagesToSchoolContents[1].id)));
-                        await _refreshAllPosts();
-                      },
-                      child: LittleText(
-                        content: _messagesToSchoolContents[1],
-                      ),
-                    )
-                  : Container(),
-              const SizedBox(
-                height: 10,
-              ),
-              _messagesToSchoolContents.length > 2
-                  ? InkWell(
-                      onTap: () async {
-                        await Navigator.of(context).push(slideRoute(
-                            PostViewPage(id: _messagesToSchoolContents[2].id)));
-                        await _refreshAllPosts();
-                      },
-                      child: LittleText(
-                        content: _messagesToSchoolContents[2],
-                      ),
-                    )
-                  : Container(),
-              const SizedBox(
-                height: 14,
-              ),
-              Container(
-                height: 1,
-                color: const Color(0xFFF0F0F0),
-              ),
-              const SizedBox(
-                height: 14,
-              ),
-              InkWell(
-                onTap: () async {
-                  await Navigator.of(context).push(slideRoute(PostListShowPage(
                       boardType: BoardType.free,
                       boardInfo: _searchBoard("kaist-news"))));
                   await _refreshAllPosts();
@@ -1192,7 +1156,7 @@ class _MainPageState extends State<MainPage> with WidgetsBindingObserver {
                       style: const TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.w700,
-                        color: Color(0xFF646464),
+                        color: Color(0xFF1F4899),
                       ),
                     ),
                     const SizedBox(
