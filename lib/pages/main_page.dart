@@ -41,6 +41,10 @@ class _MainPageState extends State<MainPage> with WidgetsBindingObserver {
     true, //_wantedContents(구인구직)
     true, //_marketContents(중고거래)
     true, //_realEstateContents(부동산)
+    true, //_messagesToSchoolContents (학교에게 전합니다)
+    true, //_kaistNewsContents (카이스트 뉴스)
+    true, //_araFeedbackContents (아라 피드백)
+    true, //_facilityFeedbackContents (입주업체 피드백)
   ];
   //각 컨텐츠 별 데이터 리스트
 
@@ -58,6 +62,10 @@ class _MainPageState extends State<MainPage> with WidgetsBindingObserver {
   final List<ArticleListActionModel> _wantedContents = [];
   final List<ArticleListActionModel> _marketContents = [];
   final List<ArticleListActionModel> _realEstateContents = [];
+  final List<ArticleListActionModel> _messagesToSchoolContents = [];
+  final List<ArticleListActionModel> _kaistNewsContents = [];
+  final List<ArticleListActionModel> _araFeedbackContents = [];
+  final List<ArticleListActionModel> _facilityFeedbackContents = [];
 
   @override
   void initState() {
@@ -153,7 +161,11 @@ class _MainPageState extends State<MainPage> with WidgetsBindingObserver {
             _initTalks(userProvider),
             _initMarket(userProvider),
             _initWanted(userProvider),
-            _initRealEstate(userProvider)
+            _initRealEstate(userProvider),
+            _initMessagesToSchool(userProvider),
+            _initKaistNews(userProvider),
+            _initAraFeedback(userProvider),
+            _initFacilityFeedback(userProvider)
           ]);
         }
       },
@@ -221,6 +233,28 @@ class _MainPageState extends State<MainPage> with WidgetsBindingObserver {
     //부동산
     await _initBoardContent(
         userProvider, "real-estate", "", _realEstateContents, 11);
+  }
+
+  Future<void> _initMessagesToSchool(UserProvider userProvider) async {
+    await _initBoardContent(
+        userProvider, "with-school", "", _messagesToSchoolContents, 12);
+  }
+
+  Future<void> _initKaistNews(UserProvider userProvider) async {
+    await _initBoardContent(
+        userProvider, "kaist-news", "", _kaistNewsContents, 13);
+  }
+
+  Future<void> _initAraFeedback(UserProvider userProvider) async {
+    // dev, prod에서 slug가 다름
+    // dev: ara-feedback, prod: newara-feedback
+    await _initBoardContent(
+        userProvider, "ara-feedback", "", _araFeedbackContents, 14);
+  }
+
+  Future<void> _initFacilityFeedback(UserProvider userProvider) async {
+    await _initBoardContent(
+        userProvider, "facility-feedback", "", _facilityFeedbackContents, 15);
   }
 
   /// 게시판의 게시물들을 불러옴. 코드 중복을 줄이기 위해 사용.
@@ -425,7 +459,11 @@ class _MainPageState extends State<MainPage> with WidgetsBindingObserver {
                 _isLoading[8] ||
                 _isLoading[9] ||
                 _isLoading[10] ||
-                _isLoading[11]
+                _isLoading[11] ||
+                _isLoading[12] ||
+                _isLoading[13] ||
+                _isLoading[14] ||
+                _isLoading[15]
             ? const LoadingIndicator()
             : RefreshIndicator.adaptive(
                 color: ColorsInfo.newara,
@@ -1019,7 +1057,7 @@ class _MainPageState extends State<MainPage> with WidgetsBindingObserver {
         SizedBox(
           width: MediaQuery.of(context).size.width - 40,
           child: Text(
-            LocaleKeys.mainPage_trades.tr(),
+            LocaleKeys.mainPage_communication.tr(),
             style: const TextStyle(
               fontWeight: FontWeight.w600,
               fontSize: 20,
@@ -1046,18 +1084,29 @@ class _MainPageState extends State<MainPage> with WidgetsBindingObserver {
                 onTap: () async {
                   await Navigator.of(context).push(slideRoute(PostListShowPage(
                     boardType: BoardType.free,
-                    boardInfo: _searchBoard("real-estate"),
+                    boardInfo: _searchBoard("with-school"),
                   )));
                   await _refreshAllPosts();
                 },
                 child: Row(
                   children: [
+                    SizedBox(
+                      width: 19,
+                      height: 19,
+                      child: Image.asset(
+                        'assets/icons/kaist.png', // TODO: 이미지 변경 필요
+                        fit: BoxFit.cover,
+                      ),
+                    ),
+                    const SizedBox(
+                      width: 5,
+                    ),
                     Text(
-                      LocaleKeys.mainPage_realEstate.tr(),
+                      LocaleKeys.mainPage_messagesToSchool.tr(),
                       style: const TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.w700,
-                        color: Color(0xFF4A90E2),
+                        color: Color(0xFF1F4899),
                       ),
                     ),
                     const SizedBox(
@@ -1066,31 +1115,10 @@ class _MainPageState extends State<MainPage> with WidgetsBindingObserver {
                     SvgPicture.asset(
                       'assets/icons/right_chevron.svg',
                       colorFilter: const ColorFilter.mode(
-                        Color(0xFF4A90E2),
-                        BlendMode.srcIn,
-                      ),
+                          Color(0xFF1F4899), BlendMode.srcIn),
                       fit: BoxFit.fill,
                       width: 17,
                       height: 17,
-                    ),
-                    const SizedBox(
-                      width: 10,
-                    ),
-                    Expanded(
-                      child: _realEstateContents.isNotEmpty
-                          ? InkWell(
-                              onTap: () async {
-                                await Navigator.of(context).push(slideRoute(
-                                    PostViewPage(
-                                        id: _realEstateContents[0].id)));
-                                await _refreshAllPosts();
-                              },
-                              child: LittleText(
-                                content: _realEstateContents[0],
-                                showTopic: true,
-                              ),
-                            )
-                          : Container(),
                     ),
                   ],
                 ),
@@ -1098,17 +1126,69 @@ class _MainPageState extends State<MainPage> with WidgetsBindingObserver {
               const SizedBox(
                 height: 10,
               ),
+              _messagesToSchoolContents.isNotEmpty
+                  ? InkWell(
+                      onTap: () async {
+                        await Navigator.of(context).push(slideRoute(
+                            PostViewPage(id: _messagesToSchoolContents[0].id)));
+                        await _refreshAllPosts();
+                      },
+                      child: LittleText(
+                        content: _messagesToSchoolContents[0],
+                      ),
+                    )
+                  : Container(),
+              const SizedBox(
+                height: 10,
+              ),
+              _messagesToSchoolContents.length > 1
+                  ? InkWell(
+                      onTap: () async {
+                        await Navigator.of(context).push(slideRoute(
+                            PostViewPage(id: _messagesToSchoolContents[1].id)));
+                        await _refreshAllPosts();
+                      },
+                      child: LittleText(
+                        content: _messagesToSchoolContents[1],
+                      ),
+                    )
+                  : Container(),
+              const SizedBox(
+                height: 10,
+              ),
+              _messagesToSchoolContents.length > 2
+                  ? InkWell(
+                      onTap: () async {
+                        await Navigator.of(context).push(slideRoute(
+                            PostViewPage(id: _messagesToSchoolContents[2].id)));
+                        await _refreshAllPosts();
+                      },
+                      child: LittleText(
+                        content: _messagesToSchoolContents[2],
+                      ),
+                    )
+                  : Container(),
+              const SizedBox(
+                height: 14,
+              ),
+              Container(
+                height: 1,
+                color: const Color(0xFFF0F0F0),
+              ),
+              const SizedBox(
+                height: 14,
+              ),
               InkWell(
                 onTap: () async {
                   await Navigator.of(context).push(slideRoute(PostListShowPage(
                       boardType: BoardType.free,
-                      boardInfo: _searchBoard("market"))));
+                      boardInfo: _searchBoard("kaist-news"))));
                   await _refreshAllPosts();
                 },
                 child: Row(
                   children: [
                     Text(
-                      LocaleKeys.mainPage_market.tr(),
+                      LocaleKeys.mainPage_kaistNews.tr(),
                       style: const TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.w700,
@@ -1130,16 +1210,68 @@ class _MainPageState extends State<MainPage> with WidgetsBindingObserver {
                       width: 10,
                     ),
                     Expanded(
-                      child: _marketContents.isNotEmpty
+                      child: _kaistNewsContents.isNotEmpty
                           ? InkWell(
                               onTap: () async {
                                 await Navigator.of(context).push(slideRoute(
-                                    PostViewPage(id: _marketContents[0].id)));
+                                    PostViewPage(
+                                        id: _kaistNewsContents[0].id)));
                                 await _refreshAllPosts();
                               },
                               child: LittleText(
-                                content: _marketContents[0],
-                                showTopic: true,
+                                content: _kaistNewsContents[0],
+                              ),
+                            )
+                          : Container(),
+                    )
+                  ],
+                ),
+              ),
+              const SizedBox(
+                height: 10,
+              ),
+              InkWell(
+                onTap: () async {
+                  await Navigator.of(context).push(slideRoute(PostListShowPage(
+                      boardType: BoardType.free,
+                      boardInfo: _searchBoard("facility-feedback"))));
+                  await _refreshAllPosts();
+                },
+                child: Row(
+                  children: [
+                    Text(
+                      LocaleKeys.mainPage_facilityFeedback.tr(),
+                      style: const TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w700,
+                        color: Color(0xFF646464),
+                      ),
+                    ),
+                    const SizedBox(
+                      width: 5,
+                    ),
+                    SvgPicture.asset(
+                      'assets/icons/right_chevron.svg',
+                      colorFilter: const ColorFilter.mode(
+                          Color(0xFF646464), BlendMode.srcIn),
+                      fit: BoxFit.fill,
+                      width: 17,
+                      height: 17,
+                    ),
+                    const SizedBox(
+                      width: 10,
+                    ),
+                    Expanded(
+                      child: _facilityFeedbackContents.isNotEmpty
+                          ? InkWell(
+                              onTap: () async {
+                                await Navigator.of(context).push(slideRoute(
+                                    PostViewPage(
+                                        id: _facilityFeedbackContents[0].id)));
+                                await _refreshAllPosts();
+                              },
+                              child: LittleText(
+                                content: _facilityFeedbackContents[0],
                               ),
                             )
                           : Container(),
@@ -1154,14 +1286,15 @@ class _MainPageState extends State<MainPage> with WidgetsBindingObserver {
                 onTap: () async {
                   await Navigator.of(context).push(slideRoute(PostListShowPage(
                     boardType: BoardType.free,
-                    boardInfo: _searchBoard("wanted"),
+                    boardInfo:
+                        _searchBoard("ara-feedback"), // prod에서는 newara-feedback
                   )));
                   await _refreshAllPosts();
                 },
                 child: Row(
                   children: [
                     Text(
-                      LocaleKeys.mainPage_jobsWanted.tr(),
+                      LocaleKeys.mainPage_araFeedback.tr(),
                       style: const TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.w700,
@@ -1183,16 +1316,16 @@ class _MainPageState extends State<MainPage> with WidgetsBindingObserver {
                       width: 10,
                     ),
                     Expanded(
-                      child: _wantedContents.isNotEmpty
+                      child: _araFeedbackContents.isNotEmpty
                           ? InkWell(
                               onTap: () async {
                                 await Navigator.of(context).push(slideRoute(
-                                    PostViewPage(id: _wantedContents[0].id)));
+                                    PostViewPage(
+                                        id: _araFeedbackContents[0].id)));
                                 await _refreshAllPosts();
                               },
                               child: LittleText(
-                                content: _wantedContents[0],
-                                showTopic: true,
+                                content: _araFeedbackContents[0],
                               ),
                             )
                           : Container(),

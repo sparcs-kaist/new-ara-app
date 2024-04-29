@@ -53,6 +53,11 @@ class CodegenLoader extends AssetLoader{
     "jobsWanted": "Jobs Wanted",
     "organizationsAndClubs": "Organizations and Clubs",
     "gradAssoc": "Grad Assoc",
+    "communication": "Communication",
+    "messagesToSchool": "Messages to school",
+    "kaistNews": "KAIST News",
+    "araFeedback": "Ara Feedback",
+    "facilityFeedback": "Facility Feedback",
     "undergradAssoc": "Undergrad Assoc",
     "freshmanCouncil": "Freshman Council",
     "talk": "Talk"
@@ -252,6 +257,11 @@ static const Map<String,dynamic> ko = {
     "gradAssoc": "원총",
     "undergradAssoc": "총학",
     "freshmanCouncil": "새학",
+    "communication": "소통",
+    "messagesToSchool": "학교에게 전합니다",
+    "kaistNews": "카이스트 뉴스",
+    "araFeedback": "아라 피드백",
+    "facilityFeedback": "입주업체 피드백",
     "talk": "자유게시판"
   },
   "notificationPage": {
