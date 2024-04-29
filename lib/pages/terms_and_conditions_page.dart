@@ -113,7 +113,7 @@ class _TermsAndConditionsPageState extends State<TermsAndConditionsPage> {
                                     });
                                     Response? res = await userProvider.patchApiRes(
                                         'user_profiles/${userProvider.naUser!.user}/agree_terms_of_service/',
-                                        payload: {});
+                                        data: {});
                                     if (res != null &&
                                         (res.statusCode == 200 ||
                                             res.statusCode == 400)) {

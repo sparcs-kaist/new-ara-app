@@ -1947,12 +1947,8 @@ class _PostViewPageState extends State<PostViewPage> {
       defaultPayload.addAll(targetComment != null
           ? {"parent_comment": targetComment!.id}
           : {"parent_article": _article.id});
-      var postRes = await userProvider.postApiRes(
-        'comments/',
-        payload: defaultPayload,
-      );
-      if (postRes.statusCode != 201) {
-        // 나중에 사용자용 알림 기능 추가해야 함
+      var postRes = await userProvider.postApiRes('comments/', data: defaultPayload);
+      if (postRes == null) {
         debugPrint("POST /api/comments failed");
         return false;
       }
@@ -1967,9 +1963,9 @@ class _PostViewPageState extends State<PostViewPage> {
       };
       Response? patchRes = await userProvider.patchApiRes(
         "comments/${targetComment!.id}/",
-        payload: defaultPayload,
+        data: defaultPayload,
       );
-      if (patchRes != null && patchRes.statusCode != 200) {
+      if (patchRes == null) {
         debugPrint("PATCH /api/comments/${targetComment!.id}/ failed");
         return false;
       }

@@ -202,13 +202,10 @@ class _ReportDialogState extends State<ReportDialog> {
         ? {"parent_comment": widget.commentID ?? 0}
         : {"parent_article": widget.articleID ?? 0});
     UserProvider userProvider = context.read<UserProvider>();
-    try {
-      await userProvider.postApiRes(
-        "reports/",
-        payload: defaultPayload,
-      );
-    } catch (error) {
-      debugPrint("postReport() failed with error: $error");
+    Response? postRes =
+        await userProvider.postApiRes('reports/', data: defaultPayload);
+    if (postRes == null) {
+      debugPrint("postReport() failed with error");
       return false;
     }
 
@@ -561,29 +558,14 @@ class _BlockedUserDialogState extends State<BlockedUserDialog> {
   /// 성공하면 true. 아니면 false 반환.
   Future<bool> unblockUser(int userID) async {
     UserProvider userProvider = context.read<UserProvider>();
-    String apiUrl = "/api/blocks/$userID/";
-    try {
-      await userProvider
-          .createDioWithHeadersForNonget()
-          .delete("$newAraDefaultUrl$apiUrl");
+    String apiUrl = "blocks/$userID/";
+    Response? delRes = await userProvider.delApiRes(apiUrl);
+    if (delRes != null) {
       return true;
-    } on DioException catch (e) {
-      debugPrint("DioException occurred");
-      if (e.response != null) {
-        debugPrint("${e.response!.data}");
-        debugPrint("${e.response!.headers}");
-        debugPrint("${e.response!.requestOptions}");
-      }
-      // request의 setting, sending에서 문제 발생
-      // requestOption, message를 출력.
-      else {
-        debugPrint("${e.requestOptions}");
-        debugPrint("${e.message}");
-      }
-    } catch (e) {
-      debugPrint("unblock error: $e");
+    } else {
+      debugPrint("unblockUser() failed");
+      return false;
     }
-    return false;
   }
 }
 
