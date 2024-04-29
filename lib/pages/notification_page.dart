@@ -145,7 +145,8 @@ class _NotificationPageState extends State<NotificationPage> {
   /// API 통신에 필요한 [userProvider], 알림 식별에 필요한 [id]를 전달받음.
   /// 읽음 처리가 성공하면 true, 그렇지 않으면 false 리턴.
   Future<bool> _readNotification(UserProvider userProvider, int id) async {
-    Response? postRes = await userProvider.postApiRes("notifications/$id/read/");
+    Response? postRes =
+        await userProvider.postApiRes("notifications/$id/read/");
     if (postRes == null) {
       debugPrint("POST /api/notifications/$id/read/ failed");
       return false;
@@ -157,7 +158,8 @@ class _NotificationPageState extends State<NotificationPage> {
   /// API 통신을 위해 [userProvider]를 이용함.
   /// 모두 읽음 처리 성공 시에 true, 아니면 false를 반환함.
   Future<bool> _readAllNotification(UserProvider userProvider) async {
-    Response? postRes = await userProvider.postApiRes("notifications/read_all/");
+    Response? postRes =
+        await userProvider.postApiRes("notifications/read_all/");
     if (postRes == null) {
       debugPrint("POST /api/notifications/read_all failed");
       return false;

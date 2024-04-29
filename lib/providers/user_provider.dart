@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:new_ara_app/constants/url_info.dart';
 import 'package:new_ara_app/models/user_profile_model.dart';
 import 'package:new_ara_app/utils/create_dio_with_config.dart';
+import 'package:new_ara_app/widgets/snackbar_noti.dart';
+import 'package:path/path.dart';
 import 'package:webview_cookie_manager/webview_cookie_manager.dart';
 
 /// `UserProvider`는 사용자 정보 및 연관된 API 로직을 관리하는 클래스입니다.
@@ -170,7 +172,16 @@ class UserProvider with ChangeNotifier {
       } else if (e.type == DioExceptionType.cancel) {
         errorMessage = "DioException: Cancel";
       } else if (e.type == DioExceptionType.connectionError) {
+        //와이파이 연결에 문제가 발생할 때 connectionError가 throw됨.
         errorMessage = "DioException: Connection Error";
+
+        //이에 따라 인터넷 에러를 표시하는 snackBar 추가
+        /*
+        try {
+          showInternetErrorBySnackBar(context, '인터넷 에러가 발생하였습니다.');
+        } catch (e) {
+          debugPrint("인터넷 에러 snackBar 렌더링 오류 발생");
+        }*/
       } else if (e.type == DioExceptionType.unknown) {
         errorMessage = "DioException: Unknown: ${e.message}";
       } else {
@@ -204,27 +215,23 @@ class UserProvider with ChangeNotifier {
   /// path에 주어진 경로와 data, queryParameters를 이용해 POST 요청을 보냄.
   /// 성공하면 Response 객체를 반환.
   /// 실패하면 내부에서 exception handling한 이후 null을 반환.
-  Future<Response<T>?> postApiRes<T>(
-    String path, {
-    Object? data,
-    Map<String, dynamic>? queryParameters,
-    Options? options,
-    CancelToken? cancelToken,
-    ProgressCallback? onSendProgress,
-    ProgressCallback? onReceiveProgress
-  }) async {
+  Future<Response<T>?> postApiRes<T>(String path,
+      {Object? data,
+      Map<String, dynamic>? queryParameters,
+      Options? options,
+      CancelToken? cancelToken,
+      ProgressCallback? onSendProgress,
+      ProgressCallback? onReceiveProgress}) async {
     String toUrl = "$newAraDefaultUrl/api/$path";
     Dio dio = createDioWithHeadersForNonget();
     try {
-      final response = await dio.post<T>(
-        toUrl,
-        data: data,
-        queryParameters: queryParameters,
-        options: options,
-        cancelToken: cancelToken,
-        onSendProgress: onSendProgress,
-        onReceiveProgress: onReceiveProgress
-      );
+      final response = await dio.post<T>(toUrl,
+          data: data,
+          queryParameters: queryParameters,
+          options: options,
+          cancelToken: cancelToken,
+          onSendProgress: onSendProgress,
+          onReceiveProgress: onReceiveProgress);
       return response;
     } on DioException catch (e) {
       late String errorMessage;
@@ -244,7 +251,8 @@ class UserProvider with ChangeNotifier {
         errorMessage = "DioException: Connection Error";
       } else if (e.type == DioExceptionType.unknown) {
         errorMessage = "DioException: Unknown: ${e.message}";
-      } else {  // 이 case는 이론상 없어야 함. 추후 DioExceptionType이 dio package 버전에 따라 변경되었을 때를 대비해 넣어둠.
+      } else {
+        // 이 case는 이론상 없어야 함. 추후 DioExceptionType이 dio package 버전에 따라 변경되었을 때를 대비해 넣어둠.
         errorMessage = "DioExceptionType enum에 정의되어있지 않은 오류 발생";
       }
       debugPrint(errorMessage);
@@ -269,27 +277,23 @@ class UserProvider with ChangeNotifier {
   /// path에 주어진 경로와 data, queryParameters를 이용해 PUT 요청을 보냄.
   /// 성공하면 Response 객체를 반환.
   /// 실패하면 내부에서 exception handling한 이후 null을 반환.
-  Future<Response<T>?> putApiRes<T>(
-    String path, {
-    Object? data,
-    Map<String, dynamic>? queryParameters,
-    Options? options,
-    CancelToken? cancelToken,
-    ProgressCallback? onSendProgress,
-    ProgressCallback? onReceiveProgress
-  }) async {
+  Future<Response<T>?> putApiRes<T>(String path,
+      {Object? data,
+      Map<String, dynamic>? queryParameters,
+      Options? options,
+      CancelToken? cancelToken,
+      ProgressCallback? onSendProgress,
+      ProgressCallback? onReceiveProgress}) async {
     String toUrl = "$newAraDefaultUrl/api/$path";
     Dio dio = createDioWithHeadersForNonget();
     try {
-      final response = await dio.put<T>(
-        toUrl,
-        data: data,
-        queryParameters: queryParameters,
-        options: options,
-        cancelToken: cancelToken,
-        onSendProgress: onSendProgress,
-        onReceiveProgress: onReceiveProgress
-      );
+      final response = await dio.put<T>(toUrl,
+          data: data,
+          queryParameters: queryParameters,
+          options: options,
+          cancelToken: cancelToken,
+          onSendProgress: onSendProgress,
+          onReceiveProgress: onReceiveProgress);
       return response;
     } on DioException catch (e) {
       late String errorMessage;
@@ -309,7 +313,8 @@ class UserProvider with ChangeNotifier {
         errorMessage = "DioException: Connection Error";
       } else if (e.type == DioExceptionType.unknown) {
         errorMessage = "DioException: Unknown: ${e.message}";
-      } else {  // 이 case는 이론상 없어야 함. 추후 DioExceptionType이 dio package 버전에 따라 변경되었을 때를 대비해 넣어둠.
+      } else {
+        // 이 case는 이론상 없어야 함. 추후 DioExceptionType이 dio package 버전에 따라 변경되었을 때를 대비해 넣어둠.
         errorMessage = "DioExceptionType enum에 정의되어있지 않은 오류 발생";
       }
       debugPrint(errorMessage);
@@ -334,27 +339,23 @@ class UserProvider with ChangeNotifier {
   /// path에 주어진 경로와 data, queryParameters를 이용해 PATCH 요청을 보냄.
   /// 성공하면 Response 객체를 반환.
   /// 실패하면 내부에서 exception handling한 이후 null을 반환.
-  Future<Response<T>?> patchApiRes<T>(
-    String path, {
-    Object? data,
-    Map<String, dynamic>? queryParameters,
-    Options? options,
-    CancelToken? cancelToken,
-    ProgressCallback? onSendProgress,
-    ProgressCallback? onReceiveProgress
-  }) async {
+  Future<Response<T>?> patchApiRes<T>(String path,
+      {Object? data,
+      Map<String, dynamic>? queryParameters,
+      Options? options,
+      CancelToken? cancelToken,
+      ProgressCallback? onSendProgress,
+      ProgressCallback? onReceiveProgress}) async {
     String toUrl = "$newAraDefaultUrl/api/$path";
     Dio dio = createDioWithHeadersForNonget();
     try {
-      final response = await dio.patch<T>(
-        toUrl,
-        data: data,
-        queryParameters: queryParameters,
-        options: options,
-        cancelToken: cancelToken,
-        onSendProgress: onSendProgress,
-        onReceiveProgress: onReceiveProgress
-      );
+      final response = await dio.patch<T>(toUrl,
+          data: data,
+          queryParameters: queryParameters,
+          options: options,
+          cancelToken: cancelToken,
+          onSendProgress: onSendProgress,
+          onReceiveProgress: onReceiveProgress);
       return response;
     } on DioException catch (e) {
       late String errorMessage;
@@ -374,7 +375,8 @@ class UserProvider with ChangeNotifier {
         errorMessage = "DioException: Connection Error";
       } else if (e.type == DioExceptionType.unknown) {
         errorMessage = "DioException: Unknown: ${e.message}";
-      } else {  // 이 case는 이론상 없어야 함. 추후 DioExceptionType이 dio package 버전에 따라 변경되었을 때를 대비해 넣어둠.
+      } else {
+        // 이 case는 이론상 없어야 함. 추후 DioExceptionType이 dio package 버전에 따라 변경되었을 때를 대비해 넣어둠.
         errorMessage = "DioExceptionType enum에 정의되어있지 않은 오류 발생";
       }
       debugPrint(errorMessage);
@@ -435,7 +437,8 @@ class UserProvider with ChangeNotifier {
         errorMessage = "DioException: Connection Error";
       } else if (e.type == DioExceptionType.unknown) {
         errorMessage = "DioException: Unknown: ${e.message}";
-      } else {  // 이 case는 이론상 없어야 함. 추후 DioExceptionType이 dio package 버전에 따라 변경되었을 때를 대비해 넣어둠.
+      } else {
+        // 이 case는 이론상 없어야 함. 추후 DioExceptionType이 dio package 버전에 따라 변경되었을 때를 대비해 넣어둠.
         errorMessage = "DioExceptionType enum에 정의되어있지 않은 오류 발생";
       }
       debugPrint(errorMessage);
