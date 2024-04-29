@@ -1519,7 +1519,8 @@ class _PostWritePageState extends State<PostWritePage>
         _isLoading = true;
       });
 
-      Dio dio = userProvider.createDioWithHeadersForNonget();
+      Dio dio = userProvider
+          .createDioWithHeadersForNonget(); // TODO: 적절한 apiRes함수로 변경해야 함.
 
       for (int i = 0; i < _attachmentList.length; i++) {
         //새로 올리는 파일이면 새로운 id 할당 받기.
@@ -1531,28 +1532,16 @@ class _PostWritePageState extends State<PostWritePage>
               "file": await MultipartFile.fromFile(attachFile.path,
                   filename: attachFile.path.split('/').last),
             });
-            try {
-              Response response = await dio
-                  .post("$newAraDefaultUrl/api/attachments/", data: formData);
+            Response? response = await userProvider.postApiRes(
+                "$newAraDefaultUrl/api/attachments/",
+                data: formData);
+            if (response != null) {
               final attachmentModel = AttachmentModel.fromJson(response.data);
               attachmentIds.add(attachmentModel.id);
               contentValue = _manageImgTagSrc(contentValue,
                   _attachmentList[i].fileLocalPath!, attachmentModel.file);
-            } on DioException catch (e) {
-              // Handle the DioError separately to handle only Dio related errors
-              if (e.response != null) {
-                // DioError contains response data
-                debugPrint('Dio error!');
-                debugPrint('STATUS: ${e.response?.statusCode}');
-                debugPrint('DATA: ${e.response?.data}');
-                debugPrint('HEADERS: ${e.response?.headers}');
-              } else {
-                // Error due to setting up or sending/receiving the request
-                debugPrint('Error sending request!');
-                debugPrint(e.message);
-              }
-            } catch (error) {
-              debugPrint("$error");
+            } else {
+              debugPrint("POST /api/attachments/ failed");
             }
           }
         } else {
@@ -1561,38 +1550,37 @@ class _PostWritePageState extends State<PostWritePage>
         }
       }
 
-      try {
-        Response response;
-        var data = {
-          'title': titleValue,
-          'content': contentValue,
-          'attachments': attachmentIds,
-          'is_content_sexual': _selectedCheckboxes[1],
-          'is_content_social': _selectedCheckboxes[2],
-          // TODO: 명명 규칙 다름
-          'name_type': _chosenBoardValue!.slug == 'with-school'
-              ? 'REALNAME'
-              : _chosenBoardValue!.slug == "talk" &&
-                      _selectedCheckboxes[0]! == true
-                  ? 'ANONYMOUS'
-                  : 'REGULAR',
-        };
-
-        if (isUpdate) {
-          response = await dio.put(
-            '$newAraDefaultUrl/api/articles/$previousArticleId/',
-            data: data,
-          );
-        } else {
-          data['parent_topic'] =
-              _chosenTopicValue!.id == -1 ? '' : _chosenTopicValue!.id;
-          data['parent_board'] = _chosenBoardValue!.id;
-          response = await dio.post(
-            '$newAraDefaultUrl/api/articles/',
-            data: data,
-          );
-        }
-
+      // TODO: putApiRes 만들고 나서 try-catch 한번에 제거하기.
+      var data = {
+        'title': titleValue,
+        'content': contentValue,
+        'attachments': attachmentIds,
+        'is_content_sexual': _selectedCheckboxes[1],
+        'is_content_social': _selectedCheckboxes[2],
+        // TODO: 명명 규칙 다름
+        'name_type': _chosenBoardValue!.slug == 'with-school'
+            ? 'REALNAME'
+            : _chosenBoardValue!.slug == "talk" &&
+                    _selectedCheckboxes[0]! == true
+                ? 'ANONYMOUS'
+                : 'REGULAR',
+      };
+      Response? response;
+      if (isUpdate) {
+        response = await userProvider.putApiRes(
+          'articles/$previousArticleId/',
+          data: data,
+        );
+      } else {
+        data['parent_topic'] =
+            _chosenTopicValue!.id == -1 ? '' : _chosenTopicValue!.id;
+        data['parent_board'] = _chosenBoardValue!.id;
+        response = await userProvider.postApiRes(
+          'articles/',
+          data: data,
+        );
+      }
+      if (response != null) {
         debugPrint('Response data: ${response.data}');
         if (mounted) {
           if (_isEditingPost) {
@@ -1607,8 +1595,9 @@ class _PostWritePageState extends State<PostWritePage>
             );
           }
         }
-      } on DioException catch (error) {
-        debugPrint('post Error: ${error.response!.data}');
+      }
+      else {
+        debugPrint("post Error occurred");
       }
 
       if (mounted) {

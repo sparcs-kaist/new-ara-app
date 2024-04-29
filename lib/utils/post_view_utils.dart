@@ -33,16 +33,12 @@ class ArticleController {
   Future<bool> posVote() async {
     if (model.is_mine) return false;
     int id = model.id;
-    if (model.my_vote == true) {
-      var cancelRes = await userProvider.postApiRes(
-        "articles/$id/vote_cancel/",
-      );
-      if (cancelRes == null || cancelRes.statusCode != 200) return false;
-    } else {
-      var postRes = await userProvider.postApiRes(
-        "articles/$id/vote_positive/",
-      );
-      if (postRes == null || postRes.statusCode != 200) return false;
+    Response? postRes = await userProvider.postApiRes(model.my_vote == true
+        ? 'articles/$id/vote_cancel/'
+        : 'articles/$id/vote_positive/');
+    if (postRes == null) {
+      debugPrint("posVote() failed");
+      return false;
     }
     return true;
   }
@@ -52,16 +48,12 @@ class ArticleController {
   Future<bool> negVote() async {
     if (model.is_mine == true) return false;
     int id = model.id;
-    if (model.my_vote == false) {
-      var cancelRes = await userProvider.postApiRes(
-        "articles/$id/vote_cancel/",
-      );
-      if (cancelRes == null || cancelRes.statusCode != 200) return false;
-    } else {
-      var postRes = await userProvider.postApiRes(
-        "articles/$id/vote_negative/",
-      );
-      if (postRes == null || postRes.statusCode != 200) return false;
+    Response? postRes = await userProvider.postApiRes(model.my_vote == false
+        ? 'articles/$id/vote_cancel/'
+        : 'articles/$id/vote_negative/');
+    if (postRes == null) {
+      debugPrint("negVote() failed");
+      return false;
     }
     return true;
   }
@@ -93,19 +85,27 @@ class ArticleController {
   /// 스크랩 관련 API 요청이 성공하면 true, 실패하면 false를 반환.
   Future<bool> scrap() async {
     if (model.my_scrap == null) {
-      var postRes = await userProvider.postApiRes(
+      Response? postRes = await userProvider.postApiRes(
         "scraps/",
-        payload: {
+        data: {
           "parent_article": model.id,
         },
       );
-      if (postRes.statusCode != 201) return false;
-      model.my_scrap = ScrapCreateActionModel.fromJson(postRes.data);
+      if (postRes != null) {
+        model.my_scrap = ScrapCreateActionModel.fromJson(postRes.data);
+      } else {
+        debugPrint("scrap() failed");
+        return false;
+      }
     } else {
-      var delRes =
+      Response? delRes =
           await userProvider.delApiRes("scraps/${model.my_scrap!.id}/");
-      if (delRes.statusCode != 204) return false;
-      model.my_scrap = null;
+      if (delRes != null) {
+        model.my_scrap = null;
+      } else {
+        debugPrint("scrap() failed");
+        return false;
+      }
     }
     return true;
   }
@@ -122,60 +122,32 @@ class ArticleController {
   /// 전달받은 id에 해당하는 글을 삭제하는 메서드.
   /// 삭제가 정상적으로 완료되면 true, 아니면 false 반환.
   Future<bool> delete() async {
-    String apiUrl = "$newAraDefaultUrl/api/articles/${model.id}/";
-    try {
-      await userProvider.createDioWithHeadersForNonget().delete(apiUrl);
+    String apiUrl = "articles/${model.id}/";
+    Response? delRes = await userProvider.delApiRes(apiUrl);
+    if (delRes != null) {
       return true;
-    } on DioException catch (e) {
-      debugPrint("DioException occurred");
-      if (e.response != null) {
-        debugPrint("${e.response!.data}");
-        debugPrint("${e.response!.headers}");
-        debugPrint("${e.response!.requestOptions}");
-      }
-      // request의 setting, sending에서 문제 발생
-      // requestOption, message를 출력.
-      else {
-        debugPrint("${e.requestOptions}");
-        debugPrint("${e.message}");
-      }
-    } catch (e) {
-      debugPrint("error at delete: $e");
+    } else {
+      debugPrint("delete() failed");
+      return false;
     }
-    return false;
   }
 
   /// post의 작성자에 대한 차단 및 차단 해제 요청을 보내는 함수
   /// block이 true이면 차단, false이면 차단 해제 요청을 보냄
   /// 성공하면 true, 실패하면 false 리턴.
   Future<bool> handleBlock(bool block) async {
-    String apiUrl = "$newAraDefaultUrl/api/blocks/";
+    String apiUrl = "blocks/";
     // 차단 해제하는 경우 apiUrl을 변경
     if (!block) apiUrl += "without_id/";
 
     int userID = model.created_by.id;
-
-    try {
-      await userProvider
-          .createDioWithHeadersForNonget()
-          .post(apiUrl, data: block ? {'user': userID} : {'blocked': userID});
+    Response? postRes = await userProvider.postApiRes(
+      apiUrl, data: block ? {'user': userID} : {'blocked': userID}
+    );
+    if (postRes != null) {
       return true;
-    } on DioException catch (e) {
-      debugPrint("DioException occurred");
-      if (e.response != null) {
-        debugPrint("${e.response!.data}");
-        debugPrint("${e.response!.headers}");
-        debugPrint("${e.response!.requestOptions}");
-      }
-      // request의 setting, sending에서 문제 발생
-      // requestOption, message를 출력.
-      else {
-        debugPrint("${e.requestOptions}");
-        debugPrint("${e.message}");
-      }
-    } catch (e) {
-      debugPrint("error on handleBlock: $e");
     }
+    debugPrint("handleBlock() failed");
 
     return false;
   }
@@ -265,16 +237,12 @@ class CommentController {
   Future<bool> posVote() async {
     if (model.is_mine) return false;
     int id = model.id;
-    if (model.my_vote == true) {
-      var cancelRes = await userProvider.postApiRes(
-        "comments/$id/vote_cancel/",
-      );
-      if (cancelRes == null || cancelRes.statusCode != 200) return false;
-    } else {
-      var postRes = await userProvider.postApiRes(
-        "comments/$id/vote_positive/",
-      );
-      if (postRes == null || postRes.statusCode != 200) return false;
+    Response? postRes = await userProvider.postApiRes(model.my_vote == true
+        ? 'comments/$id/vote_cancel/'
+        : 'comments/$id/vote_positive/');
+    if (postRes == null) {
+      debugPrint("posVote() failed");
+      return false;
     }
     return true;
   }
@@ -283,16 +251,12 @@ class CommentController {
   Future<bool> negVote() async {
     if (model.is_mine == true) return false;
     int id = model.id;
-    if (model.my_vote == false) {
-      var cancelRes = await userProvider.postApiRes(
-        "comments/$id/vote_cancel/",
-      );
-      if (cancelRes == null || cancelRes.statusCode != 200) return false;
-    } else {
-      var postRes = await userProvider.postApiRes(
-        "comments/$id/vote_negative/",
-      );
-      if (postRes == null || postRes.statusCode != 200) return false;
+    Response? postRes = await userProvider.postApiRes(model.my_vote == false
+        ? "comments/$id/vote_cancel/"
+        : "comments/$id/vote_negative/");
+    if (postRes == null) {
+      debugPrint("negVote() failed");
+      return false;
     }
     return true;
   }
@@ -313,11 +277,11 @@ class CommentController {
   /// 댓글 식별을 위한 [id], API 통신을 위한 [userProvider]를 전달받음.
   /// 댓글 삭제 API 요청이 성공하면 true, 그 외에는 false를 반환함.
   Future<bool> delComment(int id, UserProvider userProvider) async {
-    try {
-      await userProvider.delApiRes("comments/$id/");
+    Response? delRes = await userProvider.delApiRes("comments/$id/");
+    if (delRes != null) {
       return true;
-    } catch (error) {
-      debugPrint("DELETE /api/comments/$id failed: $error");
+    } else {
+      debugPrint("delComment() failed");
       return false;
     }
   }
@@ -525,13 +489,12 @@ class _ReportDialogWidgetState extends State<ReportDialogWidget> {
         ? {"parent_comment": widget.commentID ?? 0}
         : {"parent_article": widget.articleID ?? 0});
     UserProvider userProvider = context.read<UserProvider>();
-    try {
-      await userProvider.postApiRes(
-        "reports/",
-        payload: defaultPayload,
-      );
-    } catch (error) {
-      debugPrint("postReport() failed with error: $error");
+    Response? postRes = await userProvider.postApiRes(
+      "reports/",
+      data: defaultPayload,
+    );
+    if (postRes == null) {
+      debugPrint("postReport() failed with error");
       return false;
     }
 

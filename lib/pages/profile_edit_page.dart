@@ -107,37 +107,44 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
       );
     }
     var formData = FormData.fromMap(payload);
-    Dio dio = userProvider.createDioWithHeadersForNonget();
-    try {
-      var response = await dio.patch(
-        "$newAraDefaultUrl/api/user_profiles/${userProfileModel.user}/",
-        data: formData,
-      );
-      if (response.statusCode != 200) return false;
-    } on DioException catch (e) {
-      debugPrint("updateProfile failed with DioException: $e");
-      // 서버에서 response를 보냈지만 invalid한 statusCode일 때
-      String infoText = LocaleKeys.profileEditPage_settingInfoText.tr();
-      if (e.response != null) {
-        debugPrint("${e.response!.data['nickname'][0]}");
-        debugPrint("${e.response!.headers}");
-        debugPrint("${e.response!.requestOptions}");
-        // 인터넷 문제가 아닌 경우 닉네임 관련 규정 설명을 추가함.
-        infoText += ' ${e.response!.data['nickname'][0]}';
-      }
-      // request의 setting, sending에서 문제 발생
-      // requestOption, message를 출력.
-      else {
-        debugPrint("${e.requestOptions}");
-        debugPrint("${e.message}");
-      }
-      // 유저에게 스낵바 알림
-      noticeUserBySnackBar(infoText);
-      return false;
-    } catch (e) {
-      debugPrint("updateProfile failed with error: $e");
+    Response? response = await userProvider.patchApiRes(
+      "user_profiles/${userProfileModel.user}/",
+      data: formData,
+    );
+    if (response == null) {
+      // TODO: 닉네임 변경 기한 관련 메시지 출력 기능 추가 (인터넷 에러 처리할 때 완료하기)
       return false;
     }
+    // try {
+    //   var response = await dio.patch(
+    //     "$newAraDefaultUrl/api/user_profiles/${userProfileModel.user}/",
+    //     data: formData,
+    //   );
+    //   if (response.statusCode != 200) return false;
+    // } on DioException catch (e) {
+    //   debugPrint("updateProfile failed with DioException: $e");
+    //   // 서버에서 response를 보냈지만 invalid한 statusCode일 때
+    //   String infoText = LocaleKeys.profileEditPage_settingInfoText.tr();
+    //   if (e.response != null) {
+    //     debugPrint("${e.response!.data['nickname'][0]}");
+    //     debugPrint("${e.response!.headers}");
+    //     debugPrint("${e.response!.requestOptions}");
+    //     // 인터넷 문제가 아닌 경우 닉네임 관련 규정 설명을 추가함.
+    //     infoText += ' ${e.response!.data['nickname'][0]}';
+    //   }
+    //   // request의 setting, sending에서 문제 발생
+    //   // requestOption, message를 출력.
+    //   else {
+    //     debugPrint("${e.requestOptions}");
+    //     debugPrint("${e.message}");
+    //   }
+    //   // 유저에게 스낵바 알림
+    //   noticeUserBySnackBar(infoText);
+    //   return false;
+    // } catch (e) {
+    //   debugPrint("updateProfile failed with error: $e");
+    //   return false;
+    // }
     return true;
   }
 
@@ -230,13 +237,13 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
                     child: Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 5),
                       child: Text(
-                      LocaleKeys.profileEditPage_complete.tr(),
-                      style: const TextStyle(
-                        color: ColorsInfo.newara,
-                        fontWeight: FontWeight.w500,
-                        fontSize: 17,
+                        LocaleKeys.profileEditPage_complete.tr(),
+                        style: const TextStyle(
+                          color: ColorsInfo.newara,
+                          fontWeight: FontWeight.w500,
+                          fontSize: 17,
+                        ),
                       ),
-                    ),
                     ),
                   ),
                 ),
@@ -343,7 +350,10 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
                         SizedBox(
                           width: mediaQueryData.size.width - 60,
                           child: Padding(
-                            padding: EdgeInsets.only(left: context.locale == const Locale('ko') ? 80 : 110),
+                            padding: EdgeInsets.only(
+                                left: context.locale == const Locale('ko')
+                                    ? 80
+                                    : 110),
                             child: Text(
                               LocaleKeys.profileEditPage_nicknameInfo.tr(),
                               style: const TextStyle(
@@ -367,7 +377,10 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
                                   color: Color.fromRGBO(99, 99, 99, 1),
                                 ),
                               ),
-                              SizedBox(width: context.locale == const Locale('ko') ? 45 : 80),
+                              SizedBox(
+                                  width: context.locale == const Locale('ko')
+                                      ? 45
+                                      : 80),
                               Expanded(
                                 child: Text(
                                   userProviderData.naUser!.email ??

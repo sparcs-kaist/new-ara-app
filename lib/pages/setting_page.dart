@@ -155,19 +155,20 @@ class SettingPageState extends State<SettingPage> {
                                         value: seeSexual,
                                         onChanged: (value) async {
                                           setState(() => seeSexual = value);
-                                          try {
-                                            await dio.patch(
-                                                '$newAraDefaultUrl/api/user_profiles/${userProvider.naUser!.user}/',
-                                                data: {'see_sexual': value});
+                                          Response? patchRes =
+                                              await userProvider.patchApiRes(
+                                                  'user_profiles/${userProvider.naUser!.user}/',
+                                                  data: {'see_sexual': value});
+                                          if (patchRes != null) {
                                             await userProvider.apiMeUserInfo();
                                             debugPrint(
                                                 "Change of 'see_sexual' succeed!");
                                             requestSnackBar(LocaleKeys
                                                 .settingPage_settingsSaved
                                                 .tr());
-                                          } catch (error) {
+                                          } else {
                                             debugPrint(
-                                                "Change of 'see_sexual' failed: $error");
+                                                "Change of 'see_sexual' failed");
                                             requestSnackBar(LocaleKeys
                                                 .settingPage_errorSavingSettings
                                                 .tr());
@@ -207,19 +208,20 @@ class SettingPageState extends State<SettingPage> {
                                           setState(() {
                                             seeSocial = value;
                                           });
-                                          try {
-                                            await dio.patch(
-                                                '$newAraDefaultUrl/api/user_profiles/${userProvider.naUser!.user}/',
-                                                data: {'see_social': value});
+                                          Response? patchRes =
+                                              await userProvider.patchApiRes(
+                                                  'user_profiles/${userProvider.naUser!.user}/',
+                                                  data: {'see_social': value});
+                                          if (patchRes != null) {
                                             await userProvider.apiMeUserInfo();
                                             debugPrint(
                                                 "Change of 'see_social' succeed!");
                                             requestSnackBar(LocaleKeys
                                                 .settingPage_settingsSaved
                                                 .tr());
-                                          } catch (error) {
+                                          } else {
                                             debugPrint(
-                                                "Change of 'see_social' failed: $error");
+                                                "Change of 'see_social' failed");
                                             requestSnackBar(LocaleKeys
                                                 .settingPage_errorSavingSettings
                                                 .tr());
@@ -370,11 +372,13 @@ class SettingPageState extends State<SettingPage> {
                             InkWell(
                               onTap: () {
                                 // TermsAndConditionsPage의 변경된 locale을 즉시 적용하기 위해 setState 호출함.
-                                Navigator.of(context).push(
-                                  slideRoute(
-                                    const TermsAndConditionsPage(),
-                                  ),
-                                ).then((_) => setState(() {}));
+                                Navigator.of(context)
+                                    .push(
+                                      slideRoute(
+                                        const TermsAndConditionsPage(),
+                                      ),
+                                    )
+                                    .then((_) => setState(() {}));
                               },
                               child: Row(
                                 mainAxisAlignment:
