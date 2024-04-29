@@ -179,7 +179,7 @@ class UserProvider with ChangeNotifier {
       }
       debugPrint(errorMessage);
       if (e.response != null) {
-        debugPrint("${e.response!.data}");
+        //debugPrint("${e.response!.data}");
         debugPrint("${e.response!.headers}");
         debugPrint("${e.response!.requestOptions}");
       }
@@ -189,10 +189,13 @@ class UserProvider with ChangeNotifier {
         debugPrint("${e.requestOptions}");
         debugPrint("${e.message}");
       }
+
+      debugPrint("Error occured in fetching : $toUrl");
       return null;
       //throw Exception(errorMessage);
     } catch (e) {
       debugPrint("오류 발생: ${e.toString()}");
+      debugPrint("Error occured in fetching : $toUrl");
       return null;
       //throw Exception("Non-DioException occurred: ${e.toString()}");
     }
