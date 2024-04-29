@@ -98,7 +98,7 @@ class ArticleController {
         return false;
       }
     } else {
-      var delRes =
+      Response? delRes =
           await userProvider.delApiRes("scraps/${model.my_scrap!.id}/");
       if (delRes != null) {
         model.my_scrap = null;
@@ -122,27 +122,14 @@ class ArticleController {
   /// 전달받은 id에 해당하는 글을 삭제하는 메서드.
   /// 삭제가 정상적으로 완료되면 true, 아니면 false 반환.
   Future<bool> delete() async {
-    String apiUrl = "$newAraDefaultUrl/api/articles/${model.id}/";
-    try {
-      await userProvider.createDioWithHeadersForNonget().delete(apiUrl);
+    String apiUrl = "articles/${model.id}/";
+    Response? delRes = await userProvider.delApiRes(apiUrl);
+    if (delRes != null) {
       return true;
-    } on DioException catch (e) {
-      debugPrint("DioException occurred");
-      if (e.response != null) {
-        debugPrint("${e.response!.data}");
-        debugPrint("${e.response!.headers}");
-        debugPrint("${e.response!.requestOptions}");
-      }
-      // request의 setting, sending에서 문제 발생
-      // requestOption, message를 출력.
-      else {
-        debugPrint("${e.requestOptions}");
-        debugPrint("${e.message}");
-      }
-    } catch (e) {
-      debugPrint("error at delete: $e");
+    } else {
+      debugPrint("delete() failed");
+      return false;
     }
-    return false;
   }
 
   /// post의 작성자에 대한 차단 및 차단 해제 요청을 보내는 함수
@@ -290,11 +277,11 @@ class CommentController {
   /// 댓글 식별을 위한 [id], API 통신을 위한 [userProvider]를 전달받음.
   /// 댓글 삭제 API 요청이 성공하면 true, 그 외에는 false를 반환함.
   Future<bool> delComment(int id, UserProvider userProvider) async {
-    try {
-      await userProvider.delApiRes("comments/$id/");
+    Response? delRes = await userProvider.delApiRes("comments/$id/");
+    if (delRes != null) {
       return true;
-    } catch (error) {
-      debugPrint("DELETE /api/comments/$id failed: $error");
+    } else {
+      debugPrint("delComment() failed");
       return false;
     }
   }
