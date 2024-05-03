@@ -430,6 +430,7 @@ class _MainPageState extends State<MainPage> with WidgetsBindingObserver {
                 _isLoading[11]
             ? const LoadingIndicator()
             : RefreshIndicator.adaptive(
+                displacement: 0.0,
                 color: ColorsInfo.newara,
                 onRefresh: () async {
                   //api를 호출 후 최신 데이터로 갱신
