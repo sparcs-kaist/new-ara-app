@@ -176,12 +176,11 @@ class UserProvider with ChangeNotifier {
         errorMessage = "DioException: Connection Error";
 
         //이에 따라 인터넷 에러를 표시하는 snackBar 추가
-        /*
         try {
-          showInternetErrorBySnackBar(context, '인터넷 에러가 발생하였습니다.');
+          showInternetErrorBySnackBar('인터넷 에러가 발생하였습니다.');
         } catch (e) {
-          debugPrint("인터넷 에러 snackBar 렌더링 오류 발생");
-        }*/
+          debugPrint("showInternetErrorBySnackBar 렌더링 오류 발생");
+        }
       } else if (e.type == DioExceptionType.unknown) {
         errorMessage = "DioException: Unknown: ${e.message}";
       } else {

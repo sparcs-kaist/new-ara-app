@@ -128,7 +128,7 @@ class _MyAppState extends State<MyApp> {
         localizationsDelegates: context.localizationDelegates,
         supportedLocales: context.supportedLocales,
         locale: context.locale,
-        scaffoldMessengerKey: snackBarKey,
+        scaffoldMessengerKey: snackBarKey, //
         theme: _setThemeData(),
         // TODO: CustionScrollBehavior의 역할은?
         builder: (context, child) {
