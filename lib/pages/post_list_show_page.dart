@@ -319,71 +319,75 @@ class _PostListShowPageState extends State<PostListShowPage>
           ],
         ),
       ),
-      body: /*isLoading
+      body: isLoading  // 페이지를 처음 로드할 때만 LoadingIndicator()를 부름.
           ? const LoadingIndicator()
-          :*/
-          SafeArea(
-        child: Center(
-          child: SizedBox(
-            width: MediaQuery.of(context).size.width - 18,
-            child: RefreshIndicator.adaptive(
-              displacement: 0.0,
-              color: ColorsInfo.newara,
-              onRefresh: () async {
-                setState((() => isLoading = true));
-                // 리프레쉬시 게시물 목록을 업데이트합니다.
-                // 1페이지만 로드하도록 설정하여 최신 게시물을 불러옵니다.
-                // 1페이지만 로드하면 태블릿에서 게시물로 화면을 꽉채우지 못하므로 다음 페이지도 로드합니다.
-                await updateAllBulletinList(pageLimitToReload: 1).then(
-                  (value) {
-                    _loadNextPage();
-                  },
-                );
-              },
-              child: ListView.separated(
-                physics: const AlwaysScrollableScrollPhysics(),
-                controller: _scrollController,
-                itemCount: postPreviewList.length +
-                    (_isLoadingNextPage ? 1 : 0), // 아이템 개수
-                itemBuilder: (BuildContext context, int index) {
-                  // 각 아이템을 위한 위젯 생성
-                  if (_isLoadingNextPage && index == postPreviewList.length) {
-                    debugPrint('Next Page Load Request');
-                    return const SizedBox(
-                      height: 50,
-                      child: Center(
-                        child: LoadingIndicator(),
-                      ),
-                    );
-                  } else {
-                    return InkWell(
-                      onTap: () async {
-                        await Navigator.of(context).push(slideRoute(
-                            PostViewPage(id: postPreviewList[index].id)));
-                        updateAllBulletinList();
+          : SafeArea(
+              child: Center(
+                child: SizedBox(
+                  width: MediaQuery.of(context).size.width - 18,
+                  child: RefreshIndicator.adaptive(
+                    displacement: 0.0,
+                    color: ColorsInfo.newara,
+                    onRefresh: () async {
+                      // refresh 중에는 LoadingIndicator를 사용하지 않으므로 setState()는 제거함.
+                      // 로직상 isLoading 변수의 값은 상황에 맞게 변경되도록 함.
+                      isLoading = true;
+                      // 리프레쉬시 게시물 목록을 업데이트합니다.
+                      // 1페이지만 로드하도록 설정하여 최신 게시물을 불러옵니다.
+                      // 1페이지만 로드하면 태블릿에서 게시물로 화면을 꽉채우지 못하므로 다음 페이지도 로드합니다.
+                      await updateAllBulletinList(pageLimitToReload: 1).then(
+                        (value) {
+                          _loadNextPage();
+                        },
+                      );
+                      isLoading = false;
+                    },
+                    child: ListView.separated(
+                      physics: const AlwaysScrollableScrollPhysics(),
+                      controller: _scrollController,
+                      itemCount: postPreviewList.length +
+                          (_isLoadingNextPage ? 1 : 0), // 아이템 개수
+                      itemBuilder: (BuildContext context, int index) {
+                        // 각 아이템을 위한 위젯 생성
+                        if (_isLoadingNextPage &&
+                            index == postPreviewList.length) {
+                          debugPrint('Next Page Load Request');
+                          return const SizedBox(
+                            height: 50,
+                            child: Center(
+                              child: LoadingIndicator(),
+                            ),
+                          );
+                        } else {
+                          return InkWell(
+                            onTap: () async {
+                              await Navigator.of(context).push(slideRoute(
+                                  PostViewPage(id: postPreviewList[index].id)));
+                              updateAllBulletinList();
+                            },
+                            child: Column(
+                              children: [
+                                Padding(
+                                  padding: const EdgeInsets.all(11.0),
+                                  child: PostPreview(
+                                      model: postPreviewList[index]),
+                                ),
+                              ],
+                            ),
+                          );
+                        }
                       },
-                      child: Column(
-                        children: [
-                          Padding(
-                            padding: const EdgeInsets.all(11.0),
-                            child: PostPreview(model: postPreviewList[index]),
-                          ),
-                        ],
-                      ),
-                    );
-                  }
-                },
-                separatorBuilder: (BuildContext context, int index) {
-                  return Container(
-                    height: 1,
-                    color: const Color(0xFFF0F0F0),
-                  );
-                },
+                      separatorBuilder: (BuildContext context, int index) {
+                        return Container(
+                          height: 1,
+                          color: const Color(0xFFF0F0F0),
+                        );
+                      },
+                    ),
+                  ),
+                ),
               ),
             ),
-          ),
-        ),
-      ),
     );
   }
 }
