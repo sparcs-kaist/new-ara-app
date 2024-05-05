@@ -247,7 +247,15 @@ class UserProvider with ChangeNotifier {
       } else if (e.type == DioExceptionType.cancel) {
         errorMessage = "DioException: Cancel";
       } else if (e.type == DioExceptionType.connectionError) {
+        //와이파이 연결에 문제가 발생할 때 connectionError가 throw됨.
         errorMessage = "DioException: Connection Error";
+
+        //이에 따라 인터넷 에러를 표시하는 snackBar 추가
+        try {
+          showInternetErrorBySnackBar('인터넷 에러가 발생하였습니다.');
+        } catch (e) {
+          debugPrint("showInternetErrorBySnackBar 렌더링 오류 발생");
+        }
       } else if (e.type == DioExceptionType.unknown) {
         errorMessage = "DioException: Unknown: ${e.message}";
       } else {
@@ -309,7 +317,15 @@ class UserProvider with ChangeNotifier {
       } else if (e.type == DioExceptionType.cancel) {
         errorMessage = "DioException: Cancel";
       } else if (e.type == DioExceptionType.connectionError) {
+        //와이파이 연결에 문제가 발생할 때 connectionError가 throw됨.
         errorMessage = "DioException: Connection Error";
+
+        //이에 따라 인터넷 에러를 표시하는 snackBar 추가
+        try {
+          showInternetErrorBySnackBar('인터넷 에러가 발생하였습니다.');
+        } catch (e) {
+          debugPrint("showInternetErrorBySnackBar 렌더링 오류 발생");
+        }
       } else if (e.type == DioExceptionType.unknown) {
         errorMessage = "DioException: Unknown: ${e.message}";
       } else {
@@ -371,7 +387,15 @@ class UserProvider with ChangeNotifier {
       } else if (e.type == DioExceptionType.cancel) {
         errorMessage = "DioException: Cancel";
       } else if (e.type == DioExceptionType.connectionError) {
+        //와이파이 연결에 문제가 발생할 때 connectionError가 throw됨.
         errorMessage = "DioException: Connection Error";
+
+        //이에 따라 인터넷 에러를 표시하는 snackBar 추가
+        try {
+          showInternetErrorBySnackBar('인터넷 에러가 발생하였습니다.');
+        } catch (e) {
+          debugPrint("showInternetErrorBySnackBar 렌더링 오류 발생");
+        }
       } else if (e.type == DioExceptionType.unknown) {
         errorMessage = "DioException: Unknown: ${e.message}";
       } else {
@@ -433,7 +457,15 @@ class UserProvider with ChangeNotifier {
       } else if (e.type == DioExceptionType.cancel) {
         errorMessage = "DioException: Cancel";
       } else if (e.type == DioExceptionType.connectionError) {
+        //와이파이 연결에 문제가 발생할 때 connectionError가 throw됨.
         errorMessage = "DioException: Connection Error";
+
+        //이에 따라 인터넷 에러를 표시하는 snackBar 추가
+        try {
+          showInternetErrorBySnackBar('인터넷 에러가 발생하였습니다.');
+        } catch (e) {
+          debugPrint("showInternetErrorBySnackBar 렌더링 오류 발생");
+        }
       } else if (e.type == DioExceptionType.unknown) {
         errorMessage = "DioException: Unknown: ${e.message}";
       } else {
