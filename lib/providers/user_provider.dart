@@ -1,9 +1,12 @@
 import 'dart:io';
 import 'package:dio/dio.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:new_ara_app/constants/url_info.dart';
 import 'package:new_ara_app/models/user_profile_model.dart';
+import 'package:new_ara_app/translations/locale_keys.g.dart';
 import 'package:new_ara_app/utils/create_dio_with_config.dart';
+import 'package:new_ara_app/utils/global_key.dart';
 import 'package:new_ara_app/widgets/snackbar_noti.dart';
 import 'package:path/path.dart';
 import 'package:webview_cookie_manager/webview_cookie_manager.dart';
@@ -147,6 +150,7 @@ class UserProvider with ChangeNotifier {
   }) async {
     var toUrl = "$newAraDefaultUrl/api/$path";
     Dio dio = createDioWithHeadersForGet();
+    bool internetConnected = true; //인터넷 연결 여부 표시
     try {
       final response = await dio.get<T>(
         toUrl,
@@ -156,6 +160,11 @@ class UserProvider with ChangeNotifier {
         cancelToken: cancelToken,
         onReceiveProgress: onReceiveProgress,
       );
+      internetConnected = true;
+
+      //인터넷 오류 snackBar 모두 지우기
+      snackBarKey.currentState?.clearSnackBars();
+
       return response;
     } on DioException catch (e) {
       late String errorMessage;
@@ -176,10 +185,11 @@ class UserProvider with ChangeNotifier {
         errorMessage = "DioException: Connection Error";
 
         //이에 따라 인터넷 에러를 표시하는 snackBar 추가
-        try {
-          showInternetErrorBySnackBar('인터넷 에러가 발생하였습니다.');
-        } catch (e) {
-          debugPrint("showInternetErrorBySnackBar 렌더링 오류 발생");
+        if (internetConnected) {
+          // 첫 실행이라면
+          internetConnected = false; // 이후 snackBar 생성하지 않음.
+          showInternetErrorBySnackBar(
+              LocaleKeys.userProvider_internetError.tr());
         }
       } else if (e.type == DioExceptionType.unknown) {
         errorMessage = "DioException: Unknown: ${e.message}";

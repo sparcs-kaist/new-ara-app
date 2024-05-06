@@ -179,5 +179,7 @@ abstract class  LocaleKeys {
   static const termsAndConditionsPage_agree = 'termsAndConditionsPage.agree';
   static const termsAndConditionsPage_agreed = 'termsAndConditionsPage.agreed';
   static const termsAndConditionsPage = 'termsAndConditionsPage';
+  static const userProvider_internetError = 'userProvider.internetError';
+  static const userProvider = 'userProvider';
 
 }

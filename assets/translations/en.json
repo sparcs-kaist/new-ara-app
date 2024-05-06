@@ -193,5 +193,8 @@
         "termsAndConditions": "Terms and Conditions",
         "agree": "Agree",
         "agreed": "You've already agreed."
+    },
+    "userProvider" :{
+        "internetError" : "Please check your network."
     }
 }

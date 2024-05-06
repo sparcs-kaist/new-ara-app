@@ -126,7 +126,7 @@ SnackBar buildAraSnackBarFromGlobalKey({
     action: action,
     actionOverflowThreshold: actionOverflowThreshold,
     showCloseIcon: showCloseIcon,
-    duration: duration,
+    duration: const Duration(minutes: 10),
     animation: animation,
     onVisible: onVisible,
     dismissDirection: dismissDirection,
@@ -177,7 +177,7 @@ void showInfoBySnackBar(BuildContext context, String infoText) {
 void showInternetErrorBySnackBar(String errorText) {
   WidgetsBinding.instance.addPostFrameCallback((_) {
     // 이전에 존재하던 스낵바 제거
-    snackBarKey.currentState?.hideCurrentSnackBar();
+    //snackBarKey.currentState?.hideCurrentSnackBar();
     snackBarKey.currentState?.showSnackBar(buildAraSnackBarFromGlobalKey(
         content: Row(
       children: [
