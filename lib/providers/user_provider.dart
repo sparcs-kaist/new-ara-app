@@ -25,6 +25,8 @@ class UserProvider with ChangeNotifier {
   bool get hasData => _hasData;
   dynamic get apiRes => _apiRes;
 
+  bool internetConnected = true; //인터넷 연결 여부 표시
+
   /// `_hasData`의 값을 설정하고 UI를 업데이트합니다.
   void setHasData(bool tf) {
     _hasData = tf;
@@ -133,6 +135,52 @@ class UserProvider with ChangeNotifier {
     return dio;
   }
 
+  /// get, post, patch, put 등 wrapper의
+  /// error handling 방식을 통일합니다.
+  void dioErrorHandling(DioException e) {
+    late String errorMessage;
+    if (e.type == DioExceptionType.connectionTimeout) {
+      errorMessage = "DioException: Connection Time Out";
+    } else if (e.type == DioExceptionType.sendTimeout) {
+      errorMessage = "DioException: Send Time Out";
+    } else if (e.type == DioExceptionType.receiveTimeout) {
+      errorMessage = "DioException: Receive Time Out";
+    } else if (e.type == DioExceptionType.badCertificate) {
+      errorMessage = "DioException: Bad Certificate";
+    } else if (e.type == DioExceptionType.badResponse) {
+      errorMessage = "DioException: Bad Response";
+    } else if (e.type == DioExceptionType.cancel) {
+      errorMessage = "DioException: Cancel";
+    } else if (e.type == DioExceptionType.connectionError) {
+      //와이파이 연결에 문제가 발생할 때 connectionError가 throw됨.
+      errorMessage = "DioException: Connection Error";
+
+      //이에 따라 인터넷 에러를 표시하는 snackBar 추가
+      if (internetConnected) {
+        // 첫 실행이라면
+        internetConnected = false; // 이후 snackBar 생성하지 않음.
+        showInternetErrorBySnackBar(LocaleKeys.userProvider_internetError.tr());
+      }
+    } else if (e.type == DioExceptionType.unknown) {
+      errorMessage = "DioException: Unknown: ${e.message}";
+    } else {
+      // 이 case는 이론상 없어야 함. 추후 DioExceptionType이 dio package 버전에 따라 변경되었을 때를 대비해 넣어둠.
+      errorMessage = "DioExceptionType enum에 정의되어있지 않은 오류 발생";
+    }
+    debugPrint(errorMessage);
+    if (e.response != null) {
+      //debugPrint("${e.response!.data}");
+      debugPrint("${e.response!.headers}");
+      debugPrint("${e.response!.requestOptions}");
+    }
+    // request의 setting, sending에서 문제 발생
+    // requestOption, message를 출력.
+    else {
+      debugPrint("${e.requestOptions}");
+      debugPrint("${e.message}");
+    }
+  }
+
   /// 지정된 API URL로 GET 요청을 전송하고 응답의 data를 반환합니다.
   ///
   /// 실패 시 null을 return하고, 오류 메시지를 debugPrint합니다.
@@ -150,7 +198,6 @@ class UserProvider with ChangeNotifier {
   }) async {
     var toUrl = "$newAraDefaultUrl/api/$path";
     Dio dio = createDioWithHeadersForGet();
-    bool internetConnected = true; //인터넷 연결 여부 표시
     try {
       final response = await dio.get<T>(
         toUrl,
@@ -167,52 +214,9 @@ class UserProvider with ChangeNotifier {
 
       return response;
     } on DioException catch (e) {
-      late String errorMessage;
-      if (e.type == DioExceptionType.connectionTimeout) {
-        errorMessage = "DioException: Connection Time Out";
-      } else if (e.type == DioExceptionType.sendTimeout) {
-        errorMessage = "DioException: Send Time Out";
-      } else if (e.type == DioExceptionType.receiveTimeout) {
-        errorMessage = "DioException: Receive Time Out";
-      } else if (e.type == DioExceptionType.badCertificate) {
-        errorMessage = "DioException: Bad Certificate";
-      } else if (e.type == DioExceptionType.badResponse) {
-        errorMessage = "DioException: Bad Response";
-      } else if (e.type == DioExceptionType.cancel) {
-        errorMessage = "DioException: Cancel";
-      } else if (e.type == DioExceptionType.connectionError) {
-        //와이파이 연결에 문제가 발생할 때 connectionError가 throw됨.
-        errorMessage = "DioException: Connection Error";
-
-        //이에 따라 인터넷 에러를 표시하는 snackBar 추가
-        if (internetConnected) {
-          // 첫 실행이라면
-          internetConnected = false; // 이후 snackBar 생성하지 않음.
-          showInternetErrorBySnackBar(
-              LocaleKeys.userProvider_internetError.tr());
-        }
-      } else if (e.type == DioExceptionType.unknown) {
-        errorMessage = "DioException: Unknown: ${e.message}";
-      } else {
-        // 이 case는 이론상 없어야 함. 추후 DioExceptionType이 dio package 버전에 따라 변경되었을 때를 대비해 넣어둠.
-        errorMessage = "DioExceptionType enum에 정의되어있지 않은 오류 발생";
-      }
-      debugPrint(errorMessage);
-      if (e.response != null) {
-        //debugPrint("${e.response!.data}");
-        debugPrint("${e.response!.headers}");
-        debugPrint("${e.response!.requestOptions}");
-      }
-      // request의 setting, sending에서 문제 발생
-      // requestOption, message를 출력.
-      else {
-        debugPrint("${e.requestOptions}");
-        debugPrint("${e.message}");
-      }
-
       debugPrint("Error occured in fetching : $toUrl");
+      dioErrorHandling(e);
       return null;
-      //throw Exception(errorMessage);
     } catch (e) {
       debugPrint("오류 발생: ${e.toString()}");
       debugPrint("Error occured in fetching : $toUrl");
@@ -241,49 +245,14 @@ class UserProvider with ChangeNotifier {
           cancelToken: cancelToken,
           onSendProgress: onSendProgress,
           onReceiveProgress: onReceiveProgress);
+      internetConnected = true;
+
+      //인터넷 오류 snackBar 모두 지우기
+      snackBarKey.currentState?.clearSnackBars();
       return response;
     } on DioException catch (e) {
-      late String errorMessage;
-      if (e.type == DioExceptionType.connectionTimeout) {
-        errorMessage = "DioException: Connection Time Out";
-      } else if (e.type == DioExceptionType.sendTimeout) {
-        errorMessage = "DioException: Send Time Out";
-      } else if (e.type == DioExceptionType.receiveTimeout) {
-        errorMessage = "DioException: Receive Time Out";
-      } else if (e.type == DioExceptionType.badCertificate) {
-        errorMessage = "DioException: Bad Certificate";
-      } else if (e.type == DioExceptionType.badResponse) {
-        errorMessage = "DioException: Bad Response";
-      } else if (e.type == DioExceptionType.cancel) {
-        errorMessage = "DioException: Cancel";
-      } else if (e.type == DioExceptionType.connectionError) {
-        //와이파이 연결에 문제가 발생할 때 connectionError가 throw됨.
-        errorMessage = "DioException: Connection Error";
-
-        //이에 따라 인터넷 에러를 표시하는 snackBar 추가
-        try {
-          showInternetErrorBySnackBar('인터넷 에러가 발생하였습니다.');
-        } catch (e) {
-          debugPrint("showInternetErrorBySnackBar 렌더링 오류 발생");
-        }
-      } else if (e.type == DioExceptionType.unknown) {
-        errorMessage = "DioException: Unknown: ${e.message}";
-      } else {
-        // 이 case는 이론상 없어야 함. 추후 DioExceptionType이 dio package 버전에 따라 변경되었을 때를 대비해 넣어둠.
-        errorMessage = "DioExceptionType enum에 정의되어있지 않은 오류 발생";
-      }
-      debugPrint(errorMessage);
-      if (e.response != null) {
-        //debugPrint("${e.response!.data}");
-        debugPrint("${e.response!.headers}");
-        debugPrint("${e.response!.requestOptions}");
-      }
-      // request의 setting, sending에서 문제 발생
-      // requestOption, message를 출력.
-      else {
-        debugPrint("${e.requestOptions}");
-        debugPrint("${e.message}");
-      }
+      debugPrint("Error occured in fetching : $toUrl");
+      dioErrorHandling(e);
       return null;
     } catch (e) {
       debugPrint("오류 발생: ${e.toString()}");
@@ -311,49 +280,14 @@ class UserProvider with ChangeNotifier {
           cancelToken: cancelToken,
           onSendProgress: onSendProgress,
           onReceiveProgress: onReceiveProgress);
+      internetConnected = true;
+
+      //인터넷 오류 snackBar 모두 지우기
+      snackBarKey.currentState?.clearSnackBars();
       return response;
     } on DioException catch (e) {
-      late String errorMessage;
-      if (e.type == DioExceptionType.connectionTimeout) {
-        errorMessage = "DioException: Connection Time Out";
-      } else if (e.type == DioExceptionType.sendTimeout) {
-        errorMessage = "DioException: Send Time Out";
-      } else if (e.type == DioExceptionType.receiveTimeout) {
-        errorMessage = "DioException: Receive Time Out";
-      } else if (e.type == DioExceptionType.badCertificate) {
-        errorMessage = "DioException: Bad Certificate";
-      } else if (e.type == DioExceptionType.badResponse) {
-        errorMessage = "DioException: Bad Response";
-      } else if (e.type == DioExceptionType.cancel) {
-        errorMessage = "DioException: Cancel";
-      } else if (e.type == DioExceptionType.connectionError) {
-        //와이파이 연결에 문제가 발생할 때 connectionError가 throw됨.
-        errorMessage = "DioException: Connection Error";
-
-        //이에 따라 인터넷 에러를 표시하는 snackBar 추가
-        try {
-          showInternetErrorBySnackBar('인터넷 에러가 발생하였습니다.');
-        } catch (e) {
-          debugPrint("showInternetErrorBySnackBar 렌더링 오류 발생");
-        }
-      } else if (e.type == DioExceptionType.unknown) {
-        errorMessage = "DioException: Unknown: ${e.message}";
-      } else {
-        // 이 case는 이론상 없어야 함. 추후 DioExceptionType이 dio package 버전에 따라 변경되었을 때를 대비해 넣어둠.
-        errorMessage = "DioExceptionType enum에 정의되어있지 않은 오류 발생";
-      }
-      debugPrint(errorMessage);
-      if (e.response != null) {
-        //debugPrint("${e.response!.data}");
-        debugPrint("${e.response!.headers}");
-        debugPrint("${e.response!.requestOptions}");
-      }
-      // request의 setting, sending에서 문제 발생
-      // requestOption, message를 출력.
-      else {
-        debugPrint("${e.requestOptions}");
-        debugPrint("${e.message}");
-      }
+      debugPrint("Error occured in fetching : $toUrl");
+      dioErrorHandling(e);
       return null;
     } catch (e) {
       debugPrint("오류 발생: ${e.toString()}");
@@ -381,49 +315,14 @@ class UserProvider with ChangeNotifier {
           cancelToken: cancelToken,
           onSendProgress: onSendProgress,
           onReceiveProgress: onReceiveProgress);
+      internetConnected = true;
+
+      //인터넷 오류 snackBar 모두 지우기
+      snackBarKey.currentState?.clearSnackBars();
       return response;
     } on DioException catch (e) {
-      late String errorMessage;
-      if (e.type == DioExceptionType.connectionTimeout) {
-        errorMessage = "DioException: Connection Time Out";
-      } else if (e.type == DioExceptionType.sendTimeout) {
-        errorMessage = "DioException: Send Time Out";
-      } else if (e.type == DioExceptionType.receiveTimeout) {
-        errorMessage = "DioException: Receive Time Out";
-      } else if (e.type == DioExceptionType.badCertificate) {
-        errorMessage = "DioException: Bad Certificate";
-      } else if (e.type == DioExceptionType.badResponse) {
-        errorMessage = "DioException: Bad Response";
-      } else if (e.type == DioExceptionType.cancel) {
-        errorMessage = "DioException: Cancel";
-      } else if (e.type == DioExceptionType.connectionError) {
-        //와이파이 연결에 문제가 발생할 때 connectionError가 throw됨.
-        errorMessage = "DioException: Connection Error";
-
-        //이에 따라 인터넷 에러를 표시하는 snackBar 추가
-        try {
-          showInternetErrorBySnackBar('인터넷 에러가 발생하였습니다.');
-        } catch (e) {
-          debugPrint("showInternetErrorBySnackBar 렌더링 오류 발생");
-        }
-      } else if (e.type == DioExceptionType.unknown) {
-        errorMessage = "DioException: Unknown: ${e.message}";
-      } else {
-        // 이 case는 이론상 없어야 함. 추후 DioExceptionType이 dio package 버전에 따라 변경되었을 때를 대비해 넣어둠.
-        errorMessage = "DioExceptionType enum에 정의되어있지 않은 오류 발생";
-      }
-      debugPrint(errorMessage);
-      if (e.response != null) {
-        //debugPrint("${e.response!.data}");
-        debugPrint("${e.response!.headers}");
-        debugPrint("${e.response!.requestOptions}");
-      }
-      // request의 setting, sending에서 문제 발생
-      // requestOption, message를 출력.
-      else {
-        debugPrint("${e.requestOptions}");
-        debugPrint("${e.message}");
-      }
+      debugPrint("Error occured in fetching : $toUrl");
+      dioErrorHandling(e);
       return null;
     } catch (e) {
       debugPrint("오류 발생: ${e.toString()}");
@@ -451,49 +350,14 @@ class UserProvider with ChangeNotifier {
         options: options,
         cancelToken: cancelToken,
       );
+      internetConnected = true;
+
+      //인터넷 오류 snackBar 모두 지우기
+      snackBarKey.currentState?.clearSnackBars();
       return response;
     } on DioException catch (e) {
-      late String errorMessage;
-      if (e.type == DioExceptionType.connectionTimeout) {
-        errorMessage = "DioException: Connection Time Out";
-      } else if (e.type == DioExceptionType.sendTimeout) {
-        errorMessage = "DioException: Send Time Out";
-      } else if (e.type == DioExceptionType.receiveTimeout) {
-        errorMessage = "DioException: Receive Time Out";
-      } else if (e.type == DioExceptionType.badCertificate) {
-        errorMessage = "DioException: Bad Certificate";
-      } else if (e.type == DioExceptionType.badResponse) {
-        errorMessage = "DioException: Bad Response";
-      } else if (e.type == DioExceptionType.cancel) {
-        errorMessage = "DioException: Cancel";
-      } else if (e.type == DioExceptionType.connectionError) {
-        //와이파이 연결에 문제가 발생할 때 connectionError가 throw됨.
-        errorMessage = "DioException: Connection Error";
-
-        //이에 따라 인터넷 에러를 표시하는 snackBar 추가
-        try {
-          showInternetErrorBySnackBar('인터넷 에러가 발생하였습니다.');
-        } catch (e) {
-          debugPrint("showInternetErrorBySnackBar 렌더링 오류 발생");
-        }
-      } else if (e.type == DioExceptionType.unknown) {
-        errorMessage = "DioException: Unknown: ${e.message}";
-      } else {
-        // 이 case는 이론상 없어야 함. 추후 DioExceptionType이 dio package 버전에 따라 변경되었을 때를 대비해 넣어둠.
-        errorMessage = "DioExceptionType enum에 정의되어있지 않은 오류 발생";
-      }
-      debugPrint(errorMessage);
-      if (e.response != null) {
-        //debugPrint("${e.response!.data}");
-        debugPrint("${e.response!.headers}");
-        debugPrint("${e.response!.requestOptions}");
-      }
-      // request의 setting, sending에서 문제 발생
-      // requestOption, message를 출력.
-      else {
-        debugPrint("${e.requestOptions}");
-        debugPrint("${e.message}");
-      }
+      debugPrint("Error occured in fetching : $toUrl");
+      dioErrorHandling(e);
       return null;
     } catch (e) {
       debugPrint("오류 발생: ${e.toString()}");
