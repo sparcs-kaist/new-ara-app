@@ -477,11 +477,11 @@ class _UserPageState extends State<UserPage>
   String getApiUrl(TabType tabType, int page, int user) {
     switch (tabType) {
       case TabType.created:
-        return "/articles/?page=$page&created_by=$user";
+        return "articles/?page=$page&created_by=$user";
       case TabType.scrap:
-        return "/scraps/?page=$page&created_by=$user";
+        return "scraps/?page=$page&created_by=$user";
       case TabType.recent:
-        return "/articles/recent/?page=$page";
+        return "articles/recent/?page=$page";
     }
   }
 

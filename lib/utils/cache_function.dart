@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:dio/dio.dart';
 import 'package:new_ara_app/providers/user_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -49,16 +50,15 @@ Future<void> updateStateWithCachedOrFetchedApiData({
       await callback(recentJson);
     }
     // UserProvider를 통해 API로부터 새로운 데이터를 요청합니다.
-    var getResponse = await userProvider.getApiRes(apiUrl);
-    final Map<String, dynamic>? response = await getResponse?.data;
+    Response? response = await userProvider.getApiRes(apiUrl);
 
     if (response != null) {
       // 새로운 데이터를 캐시에 저장하고, 콜백 함수를 통해 상태를 업데이트합니다.
-      await cacheApiData(apiUrl, response);
-      await callback(response);
+      await cacheApiData(apiUrl, response.data);
+      await callback(response.data);
     }
   } catch (error) {
-    debugPrint("updateStateWithCachedOrFetchedApiData error: $error");
+    debugPrint("updateStateWithCachedOrFetchedApiData error: $error, apiurl: $apiUrl");
     // 에러 발생 시 적절한 에러 처리 로직을 추가합니다.
   }
 }

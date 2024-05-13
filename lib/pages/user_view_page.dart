@@ -328,7 +328,7 @@ class _UserViewPageState extends State<UserViewPage> {
   /// API 통신 및 userProfileModel에 정보 저장이 모두 성공적일 경우 true.
   /// 아닌 경우 false 반환.
   Future<bool> _fetchUser(UserProvider userProvider) async {
-    String apiUrl = "/user_profiles/${widget.userID}";
+    String apiUrl = "user_profiles/${widget.userID}";
     try {
       var response = await userProvider.getApiRes(apiUrl);
       final Map<String, dynamic>? json = await response?.data;
@@ -363,7 +363,7 @@ class _UserViewPageState extends State<UserViewPage> {
   Future<bool> _fetchCreatedArticles(
       UserProvider userProvider, int page) async {
     int user = _userProfileModel.user;
-    String apiUrl = "/articles/?page=$page&created_by=$user";
+    String apiUrl = "articles/?page=$page&created_by=$user";
     // 첫 페이지일 경우 기존에 존재하는 article을 모두 제거.
     if (page == 1) {
       _articleList.clear();
