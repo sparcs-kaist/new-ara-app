@@ -317,7 +317,7 @@ class _MainPageState extends State<MainPage> with WidgetsBindingObserver {
         ? "articles/?parent_board=$boardID"
         : "articles/?parent_board=$boardID&parent_topic=$topicID";
     var getResponse = await userProvider.getApiRes(apiUrl);
-    final Map<String, dynamic>? response = await getResponse?.data;
+    final dynamic response = await getResponse?.data;
     if (mounted && response != null) {
       setState(() {
         contentList.clear();
