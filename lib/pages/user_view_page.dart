@@ -328,7 +328,7 @@ class _UserViewPageState extends State<UserViewPage> {
   /// API 통신 및 userProfileModel에 정보 저장이 모두 성공적일 경우 true.
   /// 아닌 경우 false 반환.
   Future<bool> _fetchUser(UserProvider userProvider) async {
-    String apiUrl = "/user_profiles/${widget.userID}";
+    String apiUrl = "user_profiles/${widget.userID}";
     try {
       var response = await userProvider.getApiRes(apiUrl);
       final Map<String, dynamic>? json = await response?.data;
