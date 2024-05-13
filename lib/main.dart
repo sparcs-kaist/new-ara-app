@@ -4,6 +4,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:new_ara_app/constants/url_info.dart';
 import 'package:new_ara_app/translations/codegen_loader.g.dart';
+import 'package:new_ara_app/utils/global_key.dart';
 import 'package:new_ara_app/widgets/loading_indicator.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
@@ -23,7 +24,6 @@ void main() async {
   WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
   FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
   await EasyLocalization.ensureInitialized();
-
 
   // .env.delevopment 또는 .env.production 파일을 읽어서 환경변수 설정
   // ex) flutter run --dart-define=ENV=development
@@ -128,6 +128,7 @@ class _MyAppState extends State<MyApp> {
         localizationsDelegates: context.localizationDelegates,
         supportedLocales: context.supportedLocales,
         locale: context.locale,
+        scaffoldMessengerKey: snackBarKey, //
         theme: _setThemeData(),
         // TODO: CustionScrollBehavior의 역할은?
         builder: (context, child) {

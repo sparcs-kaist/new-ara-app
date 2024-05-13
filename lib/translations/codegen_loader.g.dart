@@ -209,6 +209,9 @@ class CodegenLoader extends AssetLoader{
     "termsAndConditions": "Terms and Conditions",
     "agree": "Agree",
     "agreed": "You've already agreed."
+  },
+  "userProvider": {
+    "internetError": "Please check your network."
   }
 };
 static const Map<String,dynamic> ko = {
@@ -406,6 +409,9 @@ static const Map<String,dynamic> ko = {
     "termsAndConditions": "이용약관",
     "agree": "동의 하기",
     "agreed": "이미 동의하셨습니다."
+  },
+  "userProvider": {
+    "internetError": "인터넷 오류가 발생하였습니다."
   }
 };
 static const Map<String, Map<String,dynamic>> mapLocales = {"en": en, "ko": ko};

@@ -1947,7 +1947,8 @@ class _PostViewPageState extends State<PostViewPage> {
       defaultPayload.addAll(targetComment != null
           ? {"parent_comment": targetComment!.id}
           : {"parent_article": _article.id});
-      var postRes = await userProvider.postApiRes('comments/', data: defaultPayload);
+      var postRes =
+          await userProvider.postApiRes('comments/', data: defaultPayload);
       if (postRes == null) {
         debugPrint("POST /api/comments failed");
         return false;
