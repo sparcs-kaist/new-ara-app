@@ -363,7 +363,7 @@ class _UserViewPageState extends State<UserViewPage> {
   Future<bool> _fetchCreatedArticles(
       UserProvider userProvider, int page) async {
     int user = _userProfileModel.user;
-    String apiUrl = "/articles/?page=$page&created_by=$user";
+    String apiUrl = "articles/?page=$page&created_by=$user";
     // 첫 페이지일 경우 기존에 존재하는 article을 모두 제거.
     if (page == 1) {
       _articleList.clear();
