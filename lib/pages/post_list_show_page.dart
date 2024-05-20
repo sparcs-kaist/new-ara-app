@@ -42,6 +42,8 @@ class _PostListShowPageState extends State<PostListShowPage>
   String _boardName = "";
   bool _isLoadingNextPage = false;
   final ScrollController _scrollController = ScrollController();
+  final GlobalKey<RefreshIndicatorState> _refreshIndicatorKey =
+      GlobalKey<RefreshIndicatorState>(); //RefreshIndicator custom 처리용 key
 
   @override
   void initState() {
@@ -224,170 +226,183 @@ class _PostListShowPageState extends State<PostListShowPage>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        centerTitle: true,
-        leadingWidth: 100,
-        leading: GestureDetector(
-          behavior: HitTestBehavior.translucent,
-          onTap: () => Navigator.pop(context),
-          child: Stack(
-            alignment: Alignment.centerLeft,
-            children: [
-              SvgPicture.asset(
-                'assets/icons/left_chevron.svg',
-                colorFilter: const ColorFilter.mode(
-                    ColorsInfo.newara, BlendMode.srcATop),
-                fit: BoxFit.fill,
-                width: 35,
-                height: 35,
-              ),
-              Padding(
-                padding: const EdgeInsets.only(left: 29),
-                child: Text(
-                  LocaleKeys.postListShowPage_boards.tr(),
-                  style: const TextStyle(
-                    color: Color(0xFFED3A3A),
-                    fontSize: 17,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-        title: SizedBox(
-          child: Text(
-            _boardName,
-            style: const TextStyle(
-              color: ColorsInfo.newara,
-              fontSize: 18,
-              fontWeight: FontWeight.w700,
-            ),
-          ),
-        ),
-        actions: [
-          if (widget.boardInfo?.slug == 'with-school')
-            const WithSchoolPopupMenuButton(),
-          IconButton(
-            icon: SvgPicture.asset(
-              'assets/icons/search.svg',
-              colorFilter:
-                  const ColorFilter.mode(ColorsInfo.newara, BlendMode.srcIn),
-              width: 35,
-              height: 35,
-            ),
-            onPressed: () async {
-              await Navigator.of(context).push(slideRoute(BulletinSearchPage(
-                boardType: widget.boardType,
-                boardInfo: widget.boardInfo,
-              )));
-            },
-          ),
-        ],
-      ),
-      // snackbar와 floatingActionButton이 충돌을 일으킬 수 있어서
-      // 기존에 Column()으로 선언되어있는 floatingActionButton에
-      // SizedBox로 크기를 지정함.
-      floatingActionButton: SizedBox(
-        height: 80,
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.end,
-          children: [
-            FloatingActionButton(
-              onPressed: () async {
-                await Navigator.of(context).push(slideRoute(PostWritePage(
-                  previousBoard: widget.boardInfo,
-                )));
-                updateAllBulletinList();
-                debugPrint('FloatingActionButton pressed');
-              },
-              backgroundColor: ColorsInfo.newara,
-              child: SizedBox(
-                width: 42,
-                height: 42,
-                child: SvgPicture.asset(
-                  'assets/icons/modify.svg',
-                  fit: BoxFit.fill,
+        appBar: AppBar(
+          centerTitle: true,
+          leadingWidth: 100,
+          leading: GestureDetector(
+            behavior: HitTestBehavior.translucent,
+            onTap: () => Navigator.pop(context),
+            child: Stack(
+              alignment: Alignment.centerLeft,
+              children: [
+                SvgPicture.asset(
+                  'assets/icons/left_chevron.svg',
                   colorFilter: const ColorFilter.mode(
-                      Colors.white, BlendMode.srcIn), // 글쓰기 아이콘 색상 변경
+                      ColorsInfo.newara, BlendMode.srcATop),
+                  fit: BoxFit.fill,
+                  width: 35,
+                  height: 35,
                 ),
-              ),
-            ),
-            const SizedBox(
-              height: 20,
-            )
-          ],
-        ),
-      ),
-      body: isLoading  // 페이지를 처음 로드할 때만 LoadingIndicator()를 부름.
-          ? const LoadingIndicator()
-          : SafeArea(
-              child: Center(
-                child: SizedBox(
-                  width: MediaQuery.of(context).size.width - 18,
-                  child: RefreshIndicator.adaptive(
-                    displacement: 0.0,
-                    color: ColorsInfo.newara,
-                    onRefresh: () async {
-                      // refresh 중에는 LoadingIndicator를 사용하지 않으므로 setState()는 제거함.
-                      // 로직상 isLoading 변수의 값은 상황에 맞게 변경되도록 함.
-                      isLoading = true;
-                      // 리프레쉬시 게시물 목록을 업데이트합니다.
-                      // 1페이지만 로드하도록 설정하여 최신 게시물을 불러옵니다.
-                      // 1페이지만 로드하면 태블릿에서 게시물로 화면을 꽉채우지 못하므로 다음 페이지도 로드합니다.
-                      await updateAllBulletinList(pageLimitToReload: 1).then(
-                        (value) {
-                          _loadNextPage();
-                        },
-                      );
-                      isLoading = false;
-                    },
-                    child: ListView.separated(
-                      physics: const AlwaysScrollableScrollPhysics(),
-                      controller: _scrollController,
-                      itemCount: postPreviewList.length +
-                          (_isLoadingNextPage ? 1 : 0), // 아이템 개수
-                      itemBuilder: (BuildContext context, int index) {
-                        // 각 아이템을 위한 위젯 생성
-                        if (_isLoadingNextPage &&
-                            index == postPreviewList.length) {
-                          debugPrint('Next Page Load Request');
-                          return const SizedBox(
-                            height: 50,
-                            child: Center(
-                              child: LoadingIndicator(),
-                            ),
-                          );
-                        } else {
-                          return InkWell(
-                            onTap: () async {
-                              await Navigator.of(context).push(slideRoute(
-                                  PostViewPage(id: postPreviewList[index].id)));
-                              updateAllBulletinList();
-                            },
-                            child: Column(
-                              children: [
-                                Padding(
-                                  padding: const EdgeInsets.all(11.0),
-                                  child: PostPreview(
-                                      model: postPreviewList[index]),
-                                ),
-                              ],
-                            ),
-                          );
-                        }
-                      },
-                      separatorBuilder: (BuildContext context, int index) {
-                        return Container(
-                          height: 1,
-                          color: const Color(0xFFF0F0F0),
-                        );
-                      },
+                Padding(
+                  padding: const EdgeInsets.only(left: 29),
+                  child: Text(
+                    LocaleKeys.postListShowPage_boards.tr(),
+                    style: const TextStyle(
+                      color: Color(0xFFED3A3A),
+                      fontSize: 17,
+                      fontWeight: FontWeight.w500,
                     ),
                   ),
                 ),
+              ],
+            ),
+          ),
+          title: SizedBox(
+            child: Text(
+              _boardName,
+              style: const TextStyle(
+                color: ColorsInfo.newara,
+                fontSize: 18,
+                fontWeight: FontWeight.w700,
               ),
             ),
-    );
+          ),
+          actions: [
+            if (widget.boardInfo?.slug == 'with-school')
+              const WithSchoolPopupMenuButton(),
+            IconButton(
+              icon: SvgPicture.asset(
+                'assets/icons/search.svg',
+                colorFilter:
+                    const ColorFilter.mode(ColorsInfo.newara, BlendMode.srcIn),
+                width: 35,
+                height: 35,
+              ),
+              onPressed: () async {
+                await Navigator.of(context).push(slideRoute(BulletinSearchPage(
+                  boardType: widget.boardType,
+                  boardInfo: widget.boardInfo,
+                )));
+              },
+            ),
+          ],
+        ),
+        // snackbar와 floatingActionButton이 충돌을 일으킬 수 있어서
+        // 기존에 Column()으로 선언되어있는 floatingActionButton에
+        // SizedBox로 크기를 지정함.
+        floatingActionButton: SizedBox(
+          height: 80,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              FloatingActionButton(
+                onPressed: () async {
+                  await Navigator.of(context).push(slideRoute(PostWritePage(
+                    previousBoard: widget.boardInfo,
+                  )));
+                  updateAllBulletinList();
+                  debugPrint('FloatingActionButton pressed');
+                },
+                backgroundColor: ColorsInfo.newara,
+                child: SizedBox(
+                  width: 42,
+                  height: 42,
+                  child: SvgPicture.asset(
+                    'assets/icons/modify.svg',
+                    fit: BoxFit.fill,
+                    colorFilter: const ColorFilter.mode(
+                        Colors.white, BlendMode.srcIn), // 글쓰기 아이콘 색상 변경
+                  ),
+                ),
+              ),
+              const SizedBox(
+                height: 20,
+              )
+            ],
+          ),
+        ),
+        body: isLoading // 페이지를 처음 로드할 때만 LoadingIndicator()를 부름.
+            ? const LoadingIndicator()
+            : SafeArea(
+                child: Center(
+                  child: SizedBox(
+                    width: MediaQuery.of(context).size.width - 18,
+                    child: NotificationListener<ScrollNotification>(
+                      //Custom으로 RefreshIndicator 생성
+                      onNotification: (ScrollNotification notification) {
+                        if (notification is ScrollUpdateNotification &&
+                            notification.metrics.pixels <= -20) {
+                          // Custom trigger distance = -20
+                          _refreshIndicatorKey.currentState?.show();
+                        }
+                        return false;
+                      },
+                      child: RefreshIndicator.adaptive(
+                        key: _refreshIndicatorKey,
+                        displacement: 0.0,
+                        color: ColorsInfo.newara,
+                        onRefresh: () async {
+                          // refresh 중에는 LoadingIndicator를 사용하지 않으므로 setState()는 제거함.
+                          // 로직상 isLoading 변수의 값은 상황에 맞게 변경되도록 함.
+                          isLoading = true;
+                          // 리프레쉬시 게시물 목록을 업데이트합니다.
+                          // 1페이지만 로드하도록 설정하여 최신 게시물을 불러옵니다.
+                          // 1페이지만 로드하면 태블릿에서 게시물로 화면을 꽉채우지 못하므로 다음 페이지도 로드합니다.
+                          await updateAllBulletinList(pageLimitToReload: 1)
+                              .then(
+                            (value) {
+                              _loadNextPage();
+                            },
+                          );
+                          isLoading = false;
+                        },
+                        child: ListView.separated(
+                          physics: const AlwaysScrollableScrollPhysics(),
+                          controller: _scrollController,
+                          itemCount: postPreviewList.length +
+                              (_isLoadingNextPage ? 1 : 0), // 아이템 개수
+                          itemBuilder: (BuildContext context, int index) {
+                            // 각 아이템을 위한 위젯 생성
+                            if (_isLoadingNextPage &&
+                                index == postPreviewList.length) {
+                              debugPrint('Next Page Load Request');
+                              return const SizedBox(
+                                height: 50,
+                                child: Center(
+                                  child: LoadingIndicator(),
+                                ),
+                              );
+                            } else {
+                              return InkWell(
+                                onTap: () async {
+                                  await Navigator.of(context).push(slideRoute(
+                                      PostViewPage(
+                                          id: postPreviewList[index].id)));
+                                  updateAllBulletinList();
+                                },
+                                child: Column(
+                                  children: [
+                                    Padding(
+                                      padding: const EdgeInsets.all(11.0),
+                                      child: PostPreview(
+                                          model: postPreviewList[index]),
+                                    ),
+                                  ],
+                                ),
+                              );
+                            }
+                          },
+                          separatorBuilder: (BuildContext context, int index) {
+                            return Container(
+                              height: 1,
+                              color: const Color(0xFFF0F0F0),
+                            );
+                          },
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ));
   }
 }
