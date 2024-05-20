@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:new_ara_app/pages/bulletin_search_page.dart';
-import 'package:new_ara_app/pages/inquiry_page.dart';
+import 'package:new_ara_app/translations/locale_keys.g.dart';
 import 'package:provider/provider.dart';
 
 import 'package:new_ara_app/constants/board_type.dart';
@@ -17,11 +17,10 @@ import 'package:new_ara_app/models/article_list_action_model.dart';
 import 'package:new_ara_app/pages/post_view_page.dart';
 import 'package:new_ara_app/utils/slide_routing.dart';
 import 'package:new_ara_app/providers/notification_provider.dart';
-import 'package:new_ara_app/utils/handle_hidden.dart';
 import 'package:new_ara_app/utils/cache_function.dart';
 
 class MainPage extends StatefulWidget {
-  const MainPage({Key? key}) : super(key: key);
+  const MainPage({super.key});
   @override
   State<StatefulWidget> createState() => _MainPageState();
 }
@@ -96,7 +95,6 @@ class _MainPageState extends State<MainPage> with WidgetsBindingObserver {
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) async {
-    UserProvider userProvider = context.read<UserProvider>();
     // 앱이 포그라운드로 전환될 때 실행할 함수
     if (state == AppLifecycleState.resumed) {
       //api를 호출 후 최신 데이터로 갱신
@@ -288,7 +286,8 @@ class _MainPageState extends State<MainPage> with WidgetsBindingObserver {
   Future<void> _refreshTopContents(UserProvider userProvider,
       List<ArticleListActionModel> contentList) async {
     String apiUrl = 'articles/top/';
-    final dynamic response = await userProvider.getApiRes(apiUrl);
+    var getResponse = await userProvider.getApiRes(apiUrl);
+    final Map<String, dynamic>? response = await getResponse?.data;
     if (mounted && response != null) {
       setState(() {
         contentList.clear();
@@ -317,7 +316,8 @@ class _MainPageState extends State<MainPage> with WidgetsBindingObserver {
     String apiUrl = topicID == -1
         ? "articles/?parent_board=$boardID"
         : "articles/?parent_board=$boardID&parent_topic=$topicID";
-    final dynamic response = await userProvider.getApiRes(apiUrl);
+    var getResponse = await userProvider.getApiRes(apiUrl);
+    final dynamic response = await getResponse?.data;
     if (mounted && response != null) {
       setState(() {
         contentList.clear();
@@ -363,7 +363,7 @@ class _MainPageState extends State<MainPage> with WidgetsBindingObserver {
 
   @override
   Widget build(BuildContext context) {
-    UserProvider userProvider = context.watch<UserProvider>();
+    debugPrint("build invoked!!");
     return Scaffold(
       appBar: AppBar(
         elevation: 0,
@@ -372,6 +372,18 @@ class _MainPageState extends State<MainPage> with WidgetsBindingObserver {
           fit: BoxFit.cover,
         ),
         actions: [
+          IconButton(
+              onPressed: () async {
+                if (context.locale == const Locale('ko')) {
+                  await context.setLocale(const Locale('en'));
+                } else {
+                  await context.setLocale(const Locale('ko'));
+                }
+              },
+              icon: const Icon(
+                Icons.language,
+                color: ColorsInfo.newara,
+              )),
           IconButton(
             icon: SvgPicture.asset(
               'assets/icons/post.svg',
@@ -418,6 +430,7 @@ class _MainPageState extends State<MainPage> with WidgetsBindingObserver {
                 _isLoading[11]
             ? const LoadingIndicator()
             : RefreshIndicator.adaptive(
+                displacement: 0.0,
                 color: ColorsInfo.newara,
                 onRefresh: () async {
                   //api를 호출 후 최신 데이터로 갱신
@@ -452,7 +465,7 @@ class _MainPageState extends State<MainPage> with WidgetsBindingObserver {
     return Column(
       children: [
         MainPageTextButton(
-          'main_page.realtime',
+          LocaleKeys.mainPage_topPost.tr(),
           () async {
             await Navigator.of(context).push(slideRoute(const PostListShowPage(
               boardType: BoardType.top,
@@ -518,7 +531,7 @@ class _MainPageState extends State<MainPage> with WidgetsBindingObserver {
     return Column(
       children: [
         MainPageTextButton(
-          '자유게시판',
+          LocaleKeys.mainPage_talk.tr(),
           () async {
             await Navigator.of(context).push(slideRoute(PostListShowPage(
               boardType: BoardType.free,
@@ -578,9 +591,9 @@ class _MainPageState extends State<MainPage> with WidgetsBindingObserver {
       children: [
         SizedBox(
           width: MediaQuery.of(context).size.width - 40,
-          child: const Text(
-            '공지',
-            style: TextStyle(
+          child: Text(
+            LocaleKeys.mainPage_notice.tr(),
+            style: const TextStyle(
               fontWeight: FontWeight.w600,
               fontSize: 20,
               color: Colors.black,
@@ -623,9 +636,9 @@ class _MainPageState extends State<MainPage> with WidgetsBindingObserver {
                     const SizedBox(
                       width: 5,
                     ),
-                    const Text(
-                      "포탈 공지",
-                      style: TextStyle(
+                    Text(
+                      LocaleKeys.mainPage_portalNotice.tr(),
+                      style: const TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.w700,
                         color: Color(0xFF1F4899),
@@ -709,9 +722,9 @@ class _MainPageState extends State<MainPage> with WidgetsBindingObserver {
                 },
                 child: Row(
                   children: [
-                    const Text(
-                      "입주 업체",
-                      style: TextStyle(
+                    Text(
+                      LocaleKeys.mainPage_facility.tr(),
+                      style: const TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.w700,
                         color: Color(0xFF646464),
@@ -761,9 +774,9 @@ class _MainPageState extends State<MainPage> with WidgetsBindingObserver {
                 },
                 child: Row(
                   children: [
-                    const Text(
-                      "Ara 운영진",
-                      style: TextStyle(
+                    Text(
+                      LocaleKeys.mainPage_araAdmins.tr(),
+                      style: const TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.w700,
                         color: Color(0xFFED3A3A),
@@ -812,9 +825,9 @@ class _MainPageState extends State<MainPage> with WidgetsBindingObserver {
       children: [
         SizedBox(
           width: MediaQuery.of(context).size.width - 40,
-          child: const Text(
-            '거래',
-            style: TextStyle(
+          child: Text(
+            LocaleKeys.mainPage_trades.tr(),
+            style: const TextStyle(
               fontWeight: FontWeight.w600,
               fontSize: 20,
               color: Colors.black,
@@ -846,9 +859,9 @@ class _MainPageState extends State<MainPage> with WidgetsBindingObserver {
                 },
                 child: Row(
                   children: [
-                    const Text(
-                      "부동산",
-                      style: TextStyle(
+                    Text(
+                      LocaleKeys.mainPage_realEstate.tr(),
+                      style: const TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.w700,
                         color: Color(0xFF4A90E2),
@@ -901,9 +914,9 @@ class _MainPageState extends State<MainPage> with WidgetsBindingObserver {
                 },
                 child: Row(
                   children: [
-                    const Text(
-                      "중고거래",
-                      style: TextStyle(
+                    Text(
+                      LocaleKeys.mainPage_market.tr(),
+                      style: const TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.w700,
                         color: Color(0xFF646464),
@@ -954,9 +967,9 @@ class _MainPageState extends State<MainPage> with WidgetsBindingObserver {
                 },
                 child: Row(
                   children: [
-                    const Text(
-                      "구인구직",
-                      style: TextStyle(
+                    Text(
+                      LocaleKeys.mainPage_jobsWanted.tr(),
+                      style: const TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.w700,
                         color: Color(0xFFED3A3A),
@@ -1004,7 +1017,8 @@ class _MainPageState extends State<MainPage> with WidgetsBindingObserver {
   Widget _buildStuCommunityContents() {
     return Column(
       children: [
-        MainPageTextButton('main_page.stu_community', () async {
+        MainPageTextButton(LocaleKeys.mainPage_organizationsAndClubs.tr(),
+            () async {
           await Navigator.of(context).push(slideRoute(PostListShowPage(
               boardType: BoardType.free,
               boardInfo: _searchBoard("students-group"))));
@@ -1028,9 +1042,9 @@ class _MainPageState extends State<MainPage> with WidgetsBindingObserver {
             children: [
               Row(
                 children: [
-                  const Text(
-                    '원총',
-                    style: TextStyle(
+                  Text(
+                    LocaleKeys.mainPage_gradAssoc.tr(),
+                    style: const TextStyle(
                       fontWeight: FontWeight.w700,
                       fontSize: 14,
                       color: Color.fromRGBO(177, 177, 177, 1),
@@ -1060,9 +1074,9 @@ class _MainPageState extends State<MainPage> with WidgetsBindingObserver {
               ),
               Row(
                 children: [
-                  const Text(
-                    '총학',
-                    style: TextStyle(
+                  Text(
+                    LocaleKeys.mainPage_undergradAssoc.tr(),
+                    style: const TextStyle(
                       fontWeight: FontWeight.w700,
                       fontSize: 14,
                       color: Color.fromRGBO(177, 177, 177, 1),
@@ -1092,9 +1106,9 @@ class _MainPageState extends State<MainPage> with WidgetsBindingObserver {
               ),
               Row(
                 children: [
-                  const Text(
-                    '새학',
-                    style: TextStyle(
+                  Text(
+                    LocaleKeys.mainPage_freshmanCouncil.tr(),
+                    style: const TextStyle(
                       fontWeight: FontWeight.w700,
                       fontSize: 14,
                       color: Color.fromRGBO(177, 177, 177, 1),
@@ -1206,7 +1220,7 @@ class MainPageTextButton extends StatelessWidget {
             child: Row(
               children: [
                 Text(
-                  buttonTitle.tr(),
+                  buttonTitle,
                   style: const TextStyle(
                     fontWeight: FontWeight.w600,
                     fontSize: 20,
@@ -1249,6 +1263,47 @@ class LittleText extends StatelessWidget {
     this.showTopic = false,
   });
 
+  /// 게시글 정보를 입력받고 그에 상태에 따라 적절한 제목을 리턴하는 함수.
+  /// UserViewPage, UserPage, PostListShowPage, PostViewPage에서 사용함.
+  String getTitle(
+      String? orignialTitle, bool isHidden, List<dynamic> whyHidden) {
+    // 숨겨진 글이 아닌 경우
+    if (isHidden == false) {
+      return orignialTitle.toString();
+    }
+    // 숨겨졌으나 why_hidden이 지정되지 않은 경우. 혹시 모를 에러 방지를 위해 추가함.
+    else if (whyHidden.isEmpty) {
+      return LocaleKeys.postPreview_hiddenPost.tr();
+    }
+
+    // TODO: 새로운 사유가 있을 경우 코드에 반영하기.
+    late String title;
+    switch (whyHidden[0]) {
+      case "REPORTED_CONTENT":
+        title = LocaleKeys.postPreview_reportedPost.tr();
+        break;
+      case "BLOCKED_USER_CONTENT":
+        title = LocaleKeys.postPreview_blockedUsersPost.tr();
+        break;
+      case "ADULT_CONTENT":
+        title = LocaleKeys.postPreview_adultPost.tr();
+        break;
+      case "SOCIAL_CONTENT":
+        title = LocaleKeys.postPreview_socialPost.tr();
+        break;
+      case "ACCESS_DENIED_CONTENT":
+        title = LocaleKeys.postPreview_accessDeniedPost.tr();
+        break;
+      // 새로운 whyHidden에 대해서는 숨겨진 게시글로 표기. 이후 앱에서 반영해줘야 함.
+      default:
+        debugPrint(
+            "\n***********************\nANOTHER HIDDEN REASON FOUND: ${whyHidden[0]}\n***********************\n");
+        title = LocaleKeys.postPreview_hiddenPost.tr();
+    }
+
+    return title;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Text.rich(
@@ -1258,7 +1313,9 @@ class LittleText extends StatelessWidget {
         children: [
           if (content.parent_topic != null && showTopic)
             TextSpan(
-              text: "[${content.parent_topic!.ko_name}] ",
+              text: context.locale == const Locale('ko')
+                  ? "[${content.parent_topic!.ko_name}] "
+                  : "[${content.parent_topic!.en_name}] ",
               style: const TextStyle(
                 fontSize: 14,
                 fontWeight: FontWeight.w400,

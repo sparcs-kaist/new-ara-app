@@ -1,8 +1,9 @@
-/// 사용자 본인 정보 표시 페이지를 관리하는 파일
+// 사용자 본인 정보 표시 페이지를 관리하는 파일
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:new_ara_app/constants/url_info.dart';
+import 'package:new_ara_app/translations/locale_keys.g.dart';
 import 'package:provider/provider.dart';
 import 'package:easy_localization/easy_localization.dart';
 
@@ -13,12 +14,10 @@ import 'package:new_ara_app/widgets/loading_indicator.dart';
 import 'package:new_ara_app/models/article_list_action_model.dart';
 import 'package:new_ara_app/models/scrap_model.dart';
 import 'package:new_ara_app/pages/post_view_page.dart';
-import 'package:new_ara_app/utils/time_utils.dart';
 import 'package:new_ara_app/utils/slide_routing.dart';
 import 'package:new_ara_app/pages/profile_edit_page.dart';
 import 'package:new_ara_app/providers/notification_provider.dart';
 import 'package:new_ara_app/utils/profile_image.dart';
-import 'package:new_ara_app/utils/handle_hidden.dart';
 import 'package:new_ara_app/widgets/post_preview.dart';
 
 /// 작성한 글, 담아둔 글, 최근 본 글을 나타내기 위해 사용
@@ -26,7 +25,7 @@ enum TabType { created, scrap, recent }
 
 /// 사용자 본인 정보 페이지의 빌드 및 이벤트 처리를 담당하는 위젯
 class UserPage extends StatefulWidget {
-  const UserPage({Key? key}) : super(key: key);
+  const UserPage({super.key});
   @override
   State<StatefulWidget> createState() => _UserPageState();
 }
@@ -70,17 +69,17 @@ class _UserPageState extends State<UserPage>
   /// 현재 로드한 마지막 페이지를 나타냄.
   List<int> curPage = [1, 1, 1];
 
-  final List<String> _tabs = [
-    'myPage.mypost'.tr(),
-    'myPage.scrap'.tr(),
-    'myPage.recent'.tr()
+  List<String> tabs = [
+    LocaleKeys.userPage_myPosts.tr(),
+    LocaleKeys.userPage_bookmarks.tr(),
+    LocaleKeys.userPage_history.tr()
   ];
 
   @override
   void initState() {
     super.initState();
     _tabController = TabController(
-      length: _tabs.length,
+      length: tabs.length,
       vsync: this,
     );
 
@@ -188,12 +187,22 @@ class _UserPageState extends State<UserPage>
             splashColor: Colors.white,
             icon: SvgPicture.asset(
               'assets/icons/setting.svg',
-              color: ColorsInfo.newara,
+              colorFilter:
+                  const ColorFilter.mode(ColorsInfo.newara, BlendMode.srcIn),
               width: 35,
               height: 35,
             ),
             onPressed: () {
-              Navigator.of(context).push(slideRoute(const SettingPage()));
+              // SettingPage에서 변경된 locale을 즉시 반영하기 위해 setState를 호출함.
+              Navigator.of(context)
+                  .push(slideRoute(const SettingPage()))
+                  .then((_) => setState(() {
+                        tabs = [
+                          LocaleKeys.userPage_myPosts.tr(),
+                          LocaleKeys.userPage_bookmarks.tr(),
+                          LocaleKeys.userPage_history.tr()
+                        ];
+                      }));
             },
           ),
           const SizedBox(width: 11),
@@ -213,7 +222,7 @@ class _UserPageState extends State<UserPage>
                   unselectedLabelColor: const Color.fromRGBO(177, 177, 177, 1),
                   labelColor: ColorsInfo.newara,
                   indicatorColor: ColorsInfo.newara,
-                  tabs: _tabs.map((String tab) {
+                  tabs: tabs.map((String tab) {
                     return Tab(text: tab);
                   }).toList(),
                   controller: _tabController,
@@ -227,7 +236,8 @@ class _UserPageState extends State<UserPage>
                 width: MediaQuery.of(context).size.width - 40,
                 height: 24,
                 child: Text(
-                  '총 $curCount개의 글',
+                  LocaleKeys.userPage_totalNPosts
+                      .tr(namedArgs: {'curCount': curCount.toString()}),
                   style: const TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w700,
@@ -306,7 +316,7 @@ class _UserPageState extends State<UserPage>
                   Text(
                     userProvider.naUser == null ||
                             userProvider.naUser?.email == null
-                        ? "이메일 정보가 없습니다."
+                        ? LocaleKeys.userPage_noEmailInfo.tr()
                         : "${userProvider.naUser?.email}",
                     style: const TextStyle(
                       fontSize: 14,
@@ -320,7 +330,7 @@ class _UserPageState extends State<UserPage>
           ),
           const SizedBox(width: 30),
           SizedBox(
-            width: 26,
+            width: 30,
             height: 21,
             child: GestureDetector(
               behavior: HitTestBehavior.translucent,
@@ -332,7 +342,7 @@ class _UserPageState extends State<UserPage>
                 );
               },
               child: Text(
-                'myPage.change'.tr(),
+                LocaleKeys.userPage_change.tr(),
                 style: const TextStyle(
                   color: Color.fromRGBO(100, 100, 100, 1),
                   fontSize: 14,
@@ -467,11 +477,11 @@ class _UserPageState extends State<UserPage>
   String getApiUrl(TabType tabType, int page, int user) {
     switch (tabType) {
       case TabType.created:
-        return "/api/articles/?page=$page&created_by=$user";
+        return "articles/?page=$page&created_by=$user";
       case TabType.scrap:
-        return "/api/scraps/?page=$page&created_by=$user";
+        return "scraps/?page=$page&created_by=$user";
       case TabType.recent:
-        return "/api/articles/recent/?page=$page";
+        return "articles/recent/?page=$page";
     }
   }
 
@@ -530,11 +540,10 @@ class _UserPageState extends State<UserPage>
     if (page == 1) clearList(tabType);
 
     try {
-      var response = await userProvider
-          .createDioWithHeadersForGet()
-          .get('$newAraDefaultUrl$apiUrl');
+      var response = await userProvider.getApiRes(apiUrl);
+      final Map<String, dynamic>? jsonList = await response?.data;
 
-      List<dynamic> rawPostList = response.data['results'];
+      List<dynamic> rawPostList = jsonList?['results'];
       for (int i = 0; i < rawPostList.length; i++) {
         Map<String, dynamic>? rawPost = rawPostList[i];
         if (rawPost != null) {
@@ -547,7 +556,7 @@ class _UserPageState extends State<UserPage>
         }
       }
       // pageT에 해당하는 페이지의 글 개수를 업데이트함.
-      articleCount[tabType.index] = response.data['num_items'];
+      articleCount[tabType.index] = jsonList?['num_items'];
       debugPrint("fetchArticles() succeeded for page: $page");
       return true;
     } on DioException catch (e) {

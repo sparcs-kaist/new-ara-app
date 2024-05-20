@@ -1,7 +1,5 @@
-/// 유저 설정 관리, 차단한 유저 목록, 로그아웃을 관리하는 파일.
-/// Author: 김상오(alvin)
-
-import 'dart:convert';
+// 유저 설정 관리, 차단한 유저 목록, 로그아웃을 관리하는 파일.
+// Author: 김상오(alvin)
 
 import 'package:flutter/material.dart';
 import 'package:easy_localization/easy_localization.dart';
@@ -10,7 +8,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:new_ara_app/constants/url_info.dart';
 import 'package:new_ara_app/pages/terms_and_conditions_page.dart';
 import 'package:new_ara_app/providers/user_provider.dart';
-import 'package:new_ara_app/utils/create_dio_with_config.dart';
+import 'package:new_ara_app/translations/locale_keys.g.dart';
 import 'package:new_ara_app/utils/slide_routing.dart';
 import 'package:new_ara_app/widgets/loading_indicator.dart';
 import 'package:provider/provider.dart';
@@ -22,16 +20,13 @@ import 'package:url_launcher/url_launcher.dart';
 
 import 'package:new_ara_app/constants/colors_info.dart';
 import 'package:new_ara_app/widgets/text_info.dart';
-import 'package:new_ara_app/widgets/border_boxes.dart';
-import 'package:new_ara_app/widgets/text_and_switch.dart';
 import 'package:new_ara_app/providers/notification_provider.dart';
-import 'package:new_ara_app/models/block_model.dart';
 import 'package:new_ara_app/widgets/dialogs.dart';
 import 'package:new_ara_app/widgets/snackbar_noti.dart';
 
 /// 설정 페이지 빌드 및 이벤트 처리를 담당하는 StatefulWidget.
 class SettingPage extends StatefulWidget {
-  const SettingPage({Key? key}) : super(key: key);
+  const SettingPage({super.key});
   @override
   State<SettingPage> createState() => SettingPageState();
 }
@@ -40,10 +35,10 @@ class SettingPageState extends State<SettingPage> {
   // 백엔드 모델과 동일한 변수명을 사용하기 위해 snake case 사용함.
 
   /// 성인글 보기 설정. true이면 성인글을 보여줌.
-  late bool see_sexual;
+  late bool seeSexual;
 
   /// 정치글 보기 설정. true이면 정치글을 보여줌.
-  late bool see_social;
+  late bool seeSocial;
 
   bool _isLoading = false;
 
@@ -51,8 +46,8 @@ class SettingPageState extends State<SettingPage> {
   void initState() {
     super.initState();
     var userProvider = context.read<UserProvider>();
-    see_sexual = userProvider.naUser?.see_sexual ?? true;
-    see_social = userProvider.naUser?.see_social ?? true;
+    seeSexual = userProvider.naUser?.see_sexual ?? true;
+    seeSocial = userProvider.naUser?.see_social ?? true;
     // 페이지 전환 과정에서 새로운 알림을 확인하기 위한 호출.
     context.read<NotificationProvider>().checkIsNotReadExist(userProvider);
   }
@@ -68,13 +63,18 @@ class SettingPageState extends State<SettingPage> {
         centerTitle: true,
         leading: IconButton(
           color: ColorsInfo.newara,
-          icon: SvgPicture.asset('assets/icons/left_chevron.svg',
-              color: ColorsInfo.newara, width: 35, height: 35),
+          icon: SvgPicture.asset(
+            'assets/icons/left_chevron.svg',
+            colorFilter:
+                const ColorFilter.mode(ColorsInfo.newara, BlendMode.srcIn),
+            width: 35,
+            height: 35,
+          ),
           onPressed: () => Navigator.pop(context),
         ),
         title: SizedBox(
           child: Text(
-            'setting_page.title'.tr(),
+            LocaleKeys.settingPage_title.tr(),
             style: const TextStyle(
               color: ColorsInfo.newara,
               fontSize: 18,
@@ -104,7 +104,7 @@ class SettingPageState extends State<SettingPage> {
                               height: 34,
                             ),
                             Text(
-                              'setting_page.bulletin'.tr(),
+                              LocaleKeys.settingPage_postSetting.tr(),
                               style: const TextStyle(
                                 fontSize: 18,
                                 fontWeight: FontWeight.w700,
@@ -137,7 +137,7 @@ class SettingPageState extends State<SettingPage> {
                                 Container(
                                     margin: const EdgeInsets.only(left: 10),
                                     child: Text(
-                                      "setting_page.adult".tr(),
+                                      LocaleKeys.settingPage_adult.tr(),
                                       style: const TextStyle(
                                         fontSize: 16,
                                         fontWeight: FontWeight.w500,
@@ -152,23 +152,27 @@ class SettingPageState extends State<SettingPage> {
                                     fit: BoxFit.fill,
                                     child: CupertinoSwitch(
                                         activeColor: ColorsInfo.newara,
-                                        value: see_sexual,
+                                        value: seeSexual,
                                         onChanged: (value) async {
-                                          setState(() => see_sexual = value);
-                                          try {
-                                            await dio.patch(
-                                                '$newAraDefaultUrl/api/user_profiles/${userProvider.naUser!.user}/',
-                                                data: {'see_sexual': value});
+                                          setState(() => seeSexual = value);
+                                          Response? patchRes =
+                                              await userProvider.patchApiRes(
+                                                  'user_profiles/${userProvider.naUser!.user}/',
+                                                  data: {'see_sexual': value});
+                                          if (patchRes != null) {
                                             await userProvider.apiMeUserInfo();
                                             debugPrint(
                                                 "Change of 'see_sexual' succeed!");
-                                            requestSnackBar("설정이 저장되었습니다.");
-                                          } catch (error) {
+                                            requestSnackBar(LocaleKeys
+                                                .settingPage_settingsSaved
+                                                .tr());
+                                          } else {
                                             debugPrint(
-                                                "Change of 'see_sexual' failed: $error");
-                                            requestSnackBar(
-                                                "에러가 발생하여 설정 반영에 실패했습니다. 다시 시도해주십시오.");
-                                            setState(() => see_sexual = !value);
+                                                "Change of 'see_sexual' failed");
+                                            requestSnackBar(LocaleKeys
+                                                .settingPage_errorSavingSettings
+                                                .tr());
+                                            setState(() => seeSexual = !value);
                                           }
                                         }),
                                   ),
@@ -184,7 +188,7 @@ class SettingPageState extends State<SettingPage> {
                                 Container(
                                     margin: const EdgeInsets.only(left: 10),
                                     child: Text(
-                                      "setting_page.politics".tr(),
+                                      LocaleKeys.settingPage_politics.tr(),
                                       style: const TextStyle(
                                         fontSize: 16,
                                         fontWeight: FontWeight.w500,
@@ -199,25 +203,29 @@ class SettingPageState extends State<SettingPage> {
                                     fit: BoxFit.fill,
                                     child: CupertinoSwitch(
                                         activeColor: ColorsInfo.newara,
-                                        value: see_social,
+                                        value: seeSocial,
                                         onChanged: (value) async {
                                           setState(() {
-                                            see_social = value;
+                                            seeSocial = value;
                                           });
-                                          try {
-                                            await dio.patch(
-                                                '$newAraDefaultUrl/api/user_profiles/${userProvider.naUser!.user}/',
-                                                data: {'see_social': value});
+                                          Response? patchRes =
+                                              await userProvider.patchApiRes(
+                                                  'user_profiles/${userProvider.naUser!.user}/',
+                                                  data: {'see_social': value});
+                                          if (patchRes != null) {
                                             await userProvider.apiMeUserInfo();
                                             debugPrint(
                                                 "Change of 'see_social' succeed!");
-                                            requestSnackBar("설정이 저장되었습니다.");
-                                          } catch (error) {
+                                            requestSnackBar(LocaleKeys
+                                                .settingPage_settingsSaved
+                                                .tr());
+                                          } else {
                                             debugPrint(
-                                                "Change of 'see_social' failed: $error");
-                                            requestSnackBar(
-                                                "에러가 발생하여 설정 반영에 실패했습니다. 다시 시도해주십시오.");
-                                            setState(() => see_social = !value);
+                                                "Change of 'see_social' failed");
+                                            requestSnackBar(LocaleKeys
+                                                .settingPage_errorSavingSettings
+                                                .tr());
+                                            setState(() => seeSocial = !value);
                                           }
                                         }),
                                   ),
@@ -270,7 +278,7 @@ class SettingPageState extends State<SettingPage> {
                               height: 34,
                             ),
                             Text(
-                              'setting_page.block'.tr(),
+                              LocaleKeys.settingPage_block.tr(),
                               style: const TextStyle(
                                 fontSize: 18,
                                 fontWeight: FontWeight.w700,
@@ -299,14 +307,15 @@ class SettingPageState extends State<SettingPage> {
                                     const BlockedUserDialog());
                           },
                           child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
                             crossAxisAlignment: CrossAxisAlignment.center,
                             children: [
-                              const SizedBox(height: 13),
                               SizedBox(
                                 width: MediaQuery.of(context).size.width - 60,
                                 child: Center(
                                   child: Text(
-                                    'setting_page.blocked_users'.tr(),
+                                    LocaleKeys.settingPage_viewBlockedUsers
+                                        .tr(),
                                     style: const TextStyle(
                                       color: ColorsInfo.newara,
                                       fontSize: 16,
@@ -321,8 +330,7 @@ class SettingPageState extends State<SettingPage> {
                       ),
                       const SizedBox(height: 5),
                       // 유저 차단 기능 설명 문구
-                      const TextInfo(
-                          '유저 차단은 게시글의 더보기 기능에서 하실 수 있습니다.\n하루에 최대 10번만 변경 가능합니다.'),
+                      TextInfo(LocaleKeys.settingPage_userBlockingGuide.tr()),
                       const SizedBox(height: 20),
                       SizedBox(
                         width: MediaQuery.of(context).size.width - 50,
@@ -333,9 +341,9 @@ class SettingPageState extends State<SettingPage> {
                               width: 36,
                               height: 36,
                             ),
-                            const Text(
-                              '정보',
-                              style: TextStyle(
+                            Text(
+                              LocaleKeys.settingPage_information.tr(),
+                              style: const TextStyle(
                                 fontSize: 18,
                                 fontWeight: FontWeight.w700,
                               ),
@@ -356,17 +364,21 @@ class SettingPageState extends State<SettingPage> {
                           ),
                         ),
                         child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
                           crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
                             const SizedBox(height: 10),
                             // 이용약관
                             InkWell(
-                              onTap: () async {
-                                await Navigator.of(context).push(
-                                  slideRoute(
-                                    const TermsAndConditionsPage(),
-                                  ),
-                                );
+                              onTap: () {
+                                // TermsAndConditionsPage의 변경된 locale을 즉시 적용하기 위해 setState 호출함.
+                                Navigator.of(context)
+                                    .push(
+                                      slideRoute(
+                                        const TermsAndConditionsPage(),
+                                      ),
+                                    )
+                                    .then((_) => setState(() {}));
                               },
                               child: Row(
                                 mainAxisAlignment:
@@ -374,9 +386,11 @@ class SettingPageState extends State<SettingPage> {
                                 children: [
                                   Container(
                                       margin: const EdgeInsets.only(left: 10),
-                                      child: const Text(
-                                        '이용약관',
-                                        style: TextStyle(
+                                      child: Text(
+                                        LocaleKeys
+                                            .settingPage_termsAndConditions
+                                            .tr(),
+                                        style: const TextStyle(
                                           fontSize: 16,
                                           fontWeight: FontWeight.w500,
                                         ),
@@ -400,9 +414,10 @@ class SettingPageState extends State<SettingPage> {
                                   // 정치글 보기 글씨
                                   Container(
                                       margin: const EdgeInsets.only(left: 10),
-                                      child: const Text(
-                                        '운영진에게 문의하기',
-                                        style: TextStyle(
+                                      child: Text(
+                                        LocaleKeys.settingPage_contactAdmins
+                                            .tr(),
+                                        style: const TextStyle(
                                           fontSize: 16,
                                           fontWeight: FontWeight.w500,
                                         ),
@@ -446,10 +461,10 @@ class SettingPageState extends State<SettingPage> {
                                 ),
                               );
                             },
-                            child: const Center(
+                            child: Center(
                               child: Text(
-                                '로그아웃',
-                                style: TextStyle(
+                                LocaleKeys.settingPage_signOut.tr(),
+                                style: const TextStyle(
                                   color: ColorsInfo.newara,
                                   fontSize: 16,
                                   fontWeight: FontWeight.w500,
@@ -482,16 +497,21 @@ class SettingPageState extends State<SettingPage> {
                                     setState(() {
                                       _isLoading = true;
                                     });
-                                    Map<String, dynamic>? responseResult =
-                                        await userProvider
-                                            .getApiRes('unregister');
+                                    var response = await userProvider
+                                        .getApiRes('unregister');
+                                    // ignore: unused_local_variable
+                                    final Map<String, dynamic>? responseResult =
+                                        await response?.data;
+
                                     //TODO: 회원탈퇴 로직 보강 필요
                                     // if(responseResult == null){
                                     //   ///회원탈퇴 실패
                                     // }
                                     final prefs =
                                         await SharedPreferences.getInstance();
-                                    String jsonString=userProvider.naUser!.user.toString(); // 데이터를 JSON 문자열로 인코딩
+                                    String jsonString = userProvider
+                                        .naUser!.user
+                                        .toString(); // 데이터를 JSON 문자열로 인코딩
                                     await prefs.setString(
                                         '심사통과를위한탈퇴탈퇴한유저', jsonString);
 
@@ -507,10 +527,10 @@ class SettingPageState extends State<SettingPage> {
                                 ),
                               );
                             },
-                            child: const Center(
+                            child: Center(
                               child: Text(
-                                '회원탈퇴',
-                                style: TextStyle(
+                                LocaleKeys.settingPage_withdrawal.tr(),
+                                style: const TextStyle(
                                   color: ColorsInfo.newara,
                                   fontSize: 16,
                                   fontWeight: FontWeight.w500,
@@ -521,8 +541,7 @@ class SettingPageState extends State<SettingPage> {
                         ),
                       ),
                       const SizedBox(height: 5),
-                      const TextInfo(
-                          '회원 탈퇴는 Ara 관리자가 확인 후 처리해드리며, 최대 24시간이 소요될 수 있습니다'),
+                      TextInfo(LocaleKeys.settingPage_withdrawalGuide.tr()),
                     ],
                   ),
                 ),
@@ -585,7 +604,7 @@ class SettingPageState extends State<SettingPage> {
     )) {
       debugPrint('Could not launch mail');
       debugPrint("기본 메일앱을 열 수 없습니다.");
-      requestSnackBar("기본 메일 어플리케이션을 열 수 없습니다. ara@sparcs.org로 문의 부탁드립니다.");
+      requestSnackBar(LocaleKeys.settingPage_emailNotAvailable.tr());
       return false;
     }
 

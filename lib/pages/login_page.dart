@@ -5,13 +5,13 @@ import 'package:flutter_native_splash/flutter_native_splash.dart';
 
 import 'package:new_ara_app/constants/colors_info.dart';
 import 'package:new_ara_app/pages/sparcs_sso_page.dart';
-import 'package:new_ara_app/pages/terms_and_conditions_page.dart';
+import 'package:new_ara_app/translations/locale_keys.g.dart';
 import 'package:new_ara_app/utils/slide_routing.dart';
 
 /// `LoginPage` 위젯은 사용자에게 로그인 페이지를 표시.
 class LoginPage extends StatefulWidget {
   /// 기본 생성자입니다.
-  const LoginPage({Key? key}) : super(key: key);
+  const LoginPage({super.key});
 
   @override
   State<LoginPage> createState() => _LoginPageState();
@@ -54,7 +54,7 @@ class _LoginPageState extends State<LoginPage> {
                 ),
                 child: TextButton(
                   child: Text(
-                    'login_page.login'.tr(),
+                    LocaleKeys.loginPage_login.tr(),
                     style: const TextStyle(
                       color: Colors.white,
                       fontSize: 18,

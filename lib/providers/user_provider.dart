@@ -1,12 +1,14 @@
-import 'dart:convert';
 import 'dart:io';
-import 'dart:math';
-import 'package:http/http.dart' as http;
 import 'package:dio/dio.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:new_ara_app/constants/url_info.dart';
 import 'package:new_ara_app/models/user_profile_model.dart';
+import 'package:new_ara_app/translations/locale_keys.g.dart';
 import 'package:new_ara_app/utils/create_dio_with_config.dart';
+import 'package:new_ara_app/utils/global_key.dart';
+import 'package:new_ara_app/widgets/snackbar_noti.dart';
+import 'package:path/path.dart';
 import 'package:webview_cookie_manager/webview_cookie_manager.dart';
 
 /// `UserProvider`는 사용자 정보 및 연관된 API 로직을 관리하는 클래스입니다.
@@ -22,6 +24,8 @@ class UserProvider with ChangeNotifier {
   UserProfileModel? get naUser => _naUser;
   bool get hasData => _hasData;
   dynamic get apiRes => _apiRes;
+
+  bool internetConnected = true; //인터넷 연결 여부 표시
 
   /// `_hasData`의 값을 설정하고 UI를 업데이트합니다.
   void setHasData(bool tf) {
@@ -131,138 +135,233 @@ class UserProvider with ChangeNotifier {
     return dio;
   }
 
+  /// get, post, patch, put 등 wrapper의
+  /// error handling 방식을 통일합니다.
+  void dioErrorHandling(DioException e) {
+    late String errorMessage;
+    if (e.type == DioExceptionType.connectionTimeout) {
+      errorMessage = "DioException: Connection Time Out";
+    } else if (e.type == DioExceptionType.sendTimeout) {
+      errorMessage = "DioException: Send Time Out";
+    } else if (e.type == DioExceptionType.receiveTimeout) {
+      errorMessage = "DioException: Receive Time Out";
+    } else if (e.type == DioExceptionType.badCertificate) {
+      errorMessage = "DioException: Bad Certificate";
+    } else if (e.type == DioExceptionType.badResponse) {
+      errorMessage = "DioException: Bad Response";
+    } else if (e.type == DioExceptionType.cancel) {
+      errorMessage = "DioException: Cancel";
+    } else if (e.type == DioExceptionType.connectionError) {
+      //와이파이 연결에 문제가 발생할 때 connectionError가 throw됨.
+      errorMessage = "DioException: Connection Error";
+
+      //이에 따라 인터넷 에러를 표시하는 snackBar 추가
+      if (internetConnected) {
+        // 첫 실행이라면
+        internetConnected = false; // 이후 snackBar 생성하지 않음.
+        showInternetErrorBySnackBar(LocaleKeys.userProvider_internetError.tr());
+      }
+    } else if (e.type == DioExceptionType.unknown) {
+      errorMessage = "DioException: Unknown: ${e.message}";
+    } else {
+      // 이 case는 이론상 없어야 함. 추후 DioExceptionType이 dio package 버전에 따라 변경되었을 때를 대비해 넣어둠.
+      errorMessage = "DioExceptionType enum에 정의되어있지 않은 오류 발생";
+    }
+    debugPrint(errorMessage);
+    if (e.response != null) {
+      //debugPrint("${e.response!.data}");
+      debugPrint("${e.response!.headers}");
+      debugPrint("${e.response!.requestOptions}");
+    }
+    // request의 setting, sending에서 문제 발생
+    // requestOption, message를 출력.
+    else {
+      debugPrint("${e.requestOptions}");
+      debugPrint("${e.message}");
+    }
+  }
+
   /// 지정된 API URL로 GET 요청을 전송하고 응답의 data를 반환합니다.
-  /// 
-  /// 실패 시 null을 반환합니다.
-  /// 
-  /// sendText는 개발자가 디버깅을 위한 문자열입니다.
-  /// 
-  /// 사용 예시: await getApiRes('unregister', sendText: '디버깅용 테스트 문자열 입니다.');
-  Future<dynamic> getApiRes(String apiUrl, {String? sendText}) async {
-    var totUrl = "$newAraDefaultUrl/api/$apiUrl";
-
+  ///
+  /// 실패 시 null을 return하고, 오류 메시지를 debugPrint합니다.
+  //
+  /// path는 API 주소입니다.
+  ///
+  /// 사용 예시: await getApiRes('unregister', queryParameters:queryParameters);
+  Future<Response<T>?> getApiRes<T>(
+    String path, {
+    Object? data,
+    Map<String, dynamic>? queryParameters,
+    Options? options,
+    CancelToken? cancelToken,
+    ProgressCallback? onReceiveProgress,
+  }) async {
+    var toUrl = "$newAraDefaultUrl/api/$path";
     Dio dio = createDioWithHeadersForGet();
-
-    late dynamic response;
     try {
-      response = await dio.get(totUrl);
+      final response = await dio.get<T>(
+        toUrl,
+        data: data,
+        queryParameters: queryParameters,
+        options: options,
+        cancelToken: cancelToken,
+        onReceiveProgress: onReceiveProgress,
+      );
+      internetConnected = true;
+
+      //인터넷 오류 snackBar 모두 지우기
+      snackBarKey.currentState?.clearSnackBars();
+
+      return response;
     } on DioException catch (e) {
-      debugPrint("getApiRes failed with DioException: $e");
-      // 서버에서 response를 보냈지만 invalid한 statusCode일 때
-      if (e.response != null) {
-        debugPrint("${e.response!.data}");
-        debugPrint("${e.response!.headers}");
-        debugPrint("${e.response!.requestOptions}");
-      }
-      // request의 setting, sending에서 문제 발생
-      // requestOption, message를 출력.
-      else {
-        debugPrint("${e.requestOptions}");
-        debugPrint("${e.message}");
-      }
+      debugPrint("Error occured in fetching : $toUrl");
+      dioErrorHandling(e);
       return null;
     } catch (e) {
-      debugPrint("_fetchUser failed with error: $e");
+      debugPrint("오류 발생: ${e.toString()}");
+      debugPrint("Error occured in fetching : $toUrl");
       return null;
+      //throw Exception("Non-DioException occurred: ${e.toString()}");
     }
-    return response.data;
   }
 
-  Future<dynamic> postApiRes(String apiUrl, {dynamic payload}) async {
-    String totUrl = "$newAraDefaultUrl/api/$apiUrl";
-
+  /// path에 주어진 경로와 data, queryParameters를 이용해 POST 요청을 보냄.
+  /// 성공하면 Response 객체를 반환.
+  /// 실패하면 내부에서 exception handling한 이후 null을 반환.
+  Future<Response<T>?> postApiRes<T>(String path,
+      {Object? data,
+      Map<String, dynamic>? queryParameters,
+      Options? options,
+      CancelToken? cancelToken,
+      ProgressCallback? onSendProgress,
+      ProgressCallback? onReceiveProgress}) async {
+    String toUrl = "$newAraDefaultUrl/api/$path";
     Dio dio = createDioWithHeadersForNonget();
-    dio.options.headers['Cookie'] = getCookiesToString();
-    dio.options.headers['X-Csrftoken'] = getCsrftokenToString();
-
-    late dynamic response;
     try {
-      response = await dio.post(totUrl, data: payload);
+      final response = await dio.post<T>(toUrl,
+          data: data,
+          queryParameters: queryParameters,
+          options: options,
+          cancelToken: cancelToken,
+          onSendProgress: onSendProgress,
+          onReceiveProgress: onReceiveProgress);
+      internetConnected = true;
+
+      //인터넷 오류 snackBar 모두 지우기
+      snackBarKey.currentState?.clearSnackBars();
+      return response;
     } on DioException catch (e) {
-      debugPrint("getApiRes failed with DioException: $e");
-      // 서버에서 response를 보냈지만 invalid한 statusCode일 때
-      if (e.response != null) {
-        debugPrint("${e.response!.data}");
-        debugPrint("${e.response!.headers}");
-        debugPrint("${e.response!.requestOptions}");
-        return e.response;
-      }
-      // request의 setting, sending에서 문제 발생
-      // requestOption, message를 출력.
-      else {
-        debugPrint("${e.requestOptions}");
-        debugPrint("${e.message}");
-        return null;
-      }
+      debugPrint("Error occured in fetching : $toUrl");
+      dioErrorHandling(e);
+      return null;
     } catch (e) {
-      debugPrint("_fetchUser failed with error: $e");
+      debugPrint("오류 발생: ${e.toString()}");
       return null;
     }
-    return response;
   }
 
-  Future<dynamic> delApiRes(String apiUrl, {dynamic payload}) async {
-    String totUrl = "$newAraDefaultUrl/api/$apiUrl";
-
+  /// path에 주어진 경로와 data, queryParameters를 이용해 PUT 요청을 보냄.
+  /// 성공하면 Response 객체를 반환.
+  /// 실패하면 내부에서 exception handling한 이후 null을 반환.
+  Future<Response<T>?> putApiRes<T>(String path,
+      {Object? data,
+      Map<String, dynamic>? queryParameters,
+      Options? options,
+      CancelToken? cancelToken,
+      ProgressCallback? onSendProgress,
+      ProgressCallback? onReceiveProgress}) async {
+    String toUrl = "$newAraDefaultUrl/api/$path";
     Dio dio = createDioWithHeadersForNonget();
-    dio.options.headers['Cookie'] = getCookiesToString();
-    dio.options.headers['X-Csrftoken'] = getCsrftokenToString();
-
-    late dynamic response;
     try {
-      response = await dio.delete(totUrl, data: payload);
+      final response = await dio.put<T>(toUrl,
+          data: data,
+          queryParameters: queryParameters,
+          options: options,
+          cancelToken: cancelToken,
+          onSendProgress: onSendProgress,
+          onReceiveProgress: onReceiveProgress);
+      internetConnected = true;
+
+      //인터넷 오류 snackBar 모두 지우기
+      snackBarKey.currentState?.clearSnackBars();
+      return response;
     } on DioException catch (e) {
-      debugPrint("getApiRes failed with DioException: $e");
-      // 서버에서 response를 보냈지만 invalid한 statusCode일 때
-      if (e.response != null) {
-        debugPrint("${e.response!.data}");
-        debugPrint("${e.response!.headers}");
-        debugPrint("${e.response!.requestOptions}");
-        return e.response;
-      }
-      // request의 setting, sending에서 문제 발생
-      // requestOption, message를 출력.
-      else {
-        debugPrint("${e.requestOptions}");
-        debugPrint("${e.message}");
-        return null;
-      }
+      debugPrint("Error occured in fetching : $toUrl");
+      dioErrorHandling(e);
+      return null;
     } catch (e) {
-      debugPrint("_fetchUser failed with error: $e");
+      debugPrint("오류 발생: ${e.toString()}");
       return null;
     }
-    return response;
   }
 
-  Future<Response?> patchApiRes(String apiUrl, {dynamic payload}) async {
-    String totUrl = "$newAraDefaultUrl/api/$apiUrl";
-
+  /// path에 주어진 경로와 data, queryParameters를 이용해 PATCH 요청을 보냄.
+  /// 성공하면 Response 객체를 반환.
+  /// 실패하면 내부에서 exception handling한 이후 null을 반환.
+  Future<Response<T>?> patchApiRes<T>(String path,
+      {Object? data,
+      Map<String, dynamic>? queryParameters,
+      Options? options,
+      CancelToken? cancelToken,
+      ProgressCallback? onSendProgress,
+      ProgressCallback? onReceiveProgress}) async {
+    String toUrl = "$newAraDefaultUrl/api/$path";
     Dio dio = createDioWithHeadersForNonget();
-    dio.options.headers['Cookie'] = getCookiesToString();
-    dio.options.headers['X-Csrftoken'] = getCsrftokenToString();
-
-    late Response response;
     try {
-      response = await dio.patch(totUrl, data: payload);
+      final response = await dio.patch<T>(toUrl,
+          data: data,
+          queryParameters: queryParameters,
+          options: options,
+          cancelToken: cancelToken,
+          onSendProgress: onSendProgress,
+          onReceiveProgress: onReceiveProgress);
+      internetConnected = true;
+
+      //인터넷 오류 snackBar 모두 지우기
+      snackBarKey.currentState?.clearSnackBars();
+      return response;
     } on DioException catch (e) {
-      debugPrint("getApiRes failed with DioException: $e");
-      // 서버에서 response를 보냈지만 invalid한 statusCode일 때
-      if (e.response != null) {
-        debugPrint("${e.response!.data}");
-        debugPrint("${e.response!.headers}");
-        debugPrint("${e.response!.requestOptions}");
-      }
-      // request의 setting, sending에서 문제 발생
-      // requestOption, message를 출력.
-      else {
-        debugPrint("${e.requestOptions}");
-        debugPrint("${e.message}");
-      }
-      return e.response;
+      debugPrint("Error occured in fetching : $toUrl");
+      dioErrorHandling(e);
+      return null;
     } catch (e) {
-      debugPrint("_fetchUser failed with error: $e");
+      debugPrint("오류 발생: ${e.toString()}");
       return null;
     }
-    return response;
+  }
+
+  /// path에 주어진 경로와 data, queryParameters를 이용해 DELETE 요청을 보냄.
+  /// 성공하면 Response 객체를 반환.
+  /// 실패하면 내부에서 exception handling한 이후 null을 반환.
+  Future<Response<T>?> delApiRes<T>(
+    String path, {
+    Object? data,
+    Map<String, dynamic>? queryParameters,
+    Options? options,
+    CancelToken? cancelToken,
+  }) async {
+    String toUrl = "$newAraDefaultUrl/api/$path";
+    Dio dio = createDioWithHeadersForNonget();
+    try {
+      final response = await dio.delete<T>(
+        toUrl,
+        data: data,
+        queryParameters: queryParameters,
+        options: options,
+        cancelToken: cancelToken,
+      );
+      internetConnected = true;
+
+      //인터넷 오류 snackBar 모두 지우기
+      snackBarKey.currentState?.clearSnackBars();
+      return response;
+    } on DioException catch (e) {
+      debugPrint("Error occured in fetching : $toUrl");
+      dioErrorHandling(e);
+      return null;
+    } catch (e) {
+      debugPrint("오류 발생: ${e.toString()}");
+      return null;
+    }
   }
 }

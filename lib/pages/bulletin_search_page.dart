@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:new_ara_app/constants/board_type.dart';
@@ -8,6 +9,7 @@ import 'package:new_ara_app/models/article_list_action_model.dart';
 import 'package:new_ara_app/models/board_detail_action_model.dart';
 import 'package:new_ara_app/pages/post_view_page.dart';
 import 'package:new_ara_app/providers/user_provider.dart';
+import 'package:new_ara_app/translations/locale_keys.g.dart';
 import 'package:new_ara_app/utils/slide_routing.dart';
 import 'package:new_ara_app/widgets/loading_indicator.dart';
 import 'package:new_ara_app/widgets/post_preview.dart';
@@ -39,7 +41,6 @@ class _BulletinSearchPageState extends State<BulletinSearchPage> {
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
 
     // 게시판 유형에 따라 API URL 및 힌트 텍스트를 다르게 설정
@@ -48,36 +49,37 @@ class _BulletinSearchPageState extends State<BulletinSearchPage> {
       case BoardType.free:
         _apiUrl =
             "articles/?parent_board=${widget.boardInfo!.id.toInt()}&page=";
-        _hintText = "${widget.boardInfo!.ko_name}에서 검색";
+        _hintText = LocaleKeys.bulletinSearchPage_searchIn.tr(namedArgs: {
+          "en_name": widget.boardInfo!.en_name,
+          "ko_name": widget.boardInfo!.ko_name
+        });
         break;
       case BoardType.all:
         _apiUrl = "articles/?page=";
-        _hintText = "전체 보기에서 검색";
+        _hintText = LocaleKeys.bulletinSearchPage_searchInAllPosts.tr();
         break;
       case BoardType.recent:
         _apiUrl = "articles/recent/?page=";
-        _hintText = "최근 본 글에서 검색";
+        _hintText = LocaleKeys.bulletinSearchPage_searchInHistory.tr();
         break;
       case BoardType.top:
         _apiUrl = "articles/top/?page=";
-        _hintText = "실시간 인기글에서 검색";
+        _hintText = LocaleKeys.bulletinSearchPage_searchInTopPosts.tr();
         break;
       case BoardType.scraps:
         _apiUrl = "scraps/?page=";
-        _hintText = "담아둔 글에서 검색";
+        _hintText = LocaleKeys.bulletinSearchPage_searchInBookmarks.tr();
         break;
       default:
         _apiUrl = "articles/recent/?page=";
-        _hintText = "검색";
+        _hintText = LocaleKeys.bulletinSearchPage_search.tr();
         break;
     }
-
-    UserProvider userProvider = context.read<UserProvider>();
     // 위젯이 빌드된 후에 포커스를 줍니다.
     WidgetsBinding.instance
         .addPostFrameCallback((_) => _focusNode.requestFocus());
     _scrollController.addListener(_scrollListener);
-    refreshPostList("");
+    _initPostList("");
   }
 
   @override
@@ -89,8 +91,8 @@ class _BulletinSearchPageState extends State<BulletinSearchPage> {
     super.dispose();
   }
 
-  /// 사용자가 입력한 검색어를 기반으로 게시물 새로 고침.
-  void refreshPostList(String targetWord) async {
+  /// 사용자가 입력한 검색어를 기반으로 게시물 목록 초기화
+  Future<void> _initPostList(String targetWord) async {
     if (targetWord == "") {
       if (mounted) {
         setState(() {
@@ -101,21 +103,27 @@ class _BulletinSearchPageState extends State<BulletinSearchPage> {
       return;
     }
     final UserProvider userProvider = context.read<UserProvider>();
-    final Map<String, dynamic>? myMap = await userProvider
+    // 타겟 단어의 1페이지 검색 결과만 불러옴.
+
+    var response = await userProvider
         .getApiRes("${_apiUrl}1&main_search__contains=$targetWord");
-    if (mounted && targetWord == _textEdtingController.text) {
+    final Map<String, dynamic>? myMap = await response?.data;
+
+    if (mounted && myMap != null && targetWord == _textEdtingController.text) {
       setState(() {
         postPreviewList.clear();
-        for (int i = 0; i < (myMap?["results"].length ?? 0); i++) {
+        for (int i = 0; i < (myMap["results"].length ?? 0); i++) {
           try {
             postPreviewList
-                .add(ArticleListActionModel.fromJson(myMap!["results"][i]));
+                .add(ArticleListActionModel.fromJson(myMap["results"][i]));
             //     debugPrint("refreshPostList : postPreviewList[$i] : ${_temp[i].title}");
           } catch (error) {
             debugPrint(
                 "refreshPostList error at $i : $error"); // invalid json 걸러내기
           }
         }
+        // 타겟 단어 1페이지 검색 결과만 불러오므로 현재 페이지를 1로 설정
+        _currentPage = 1;
         _isLoading = false;
       });
     }
@@ -125,52 +133,64 @@ class _BulletinSearchPageState extends State<BulletinSearchPage> {
   void _scrollListener() async {
     //스크롤 시 포커스 해제
     FocusScope.of(context).unfocus();
-    if (_textEdtingController.text == "") {
-      if (mounted) {
-        setState(() {
-          postPreviewList.clear();
-          _isLoading = false;
-        });
-      }
-      return;
-    }
 
+    if (_scrollController.position.pixels >=
+        _scrollController.position.maxScrollExtent) {
+      _loadNextPage(_textEdtingController.text);
+    }
+  }
+
+  /// 다음 페이지의 게시물을 불러옴
+  ///
+  /// [targetWord] : api로 요청된 검색어
+  ///
+  /// [_textEdtingController.text] : 현재 검색창에 입력된 검색어
+  ///
+  /// 두 값을 비교해서 같을 경우에만 다음 페이지의 게시물을 빌드함.
+  Future<void> _loadNextPage(String targetWord) async {
+    setState(() {
+      _isLoadingNextPage = true;
+    });
     try {
-      if (mounted) {
-        setState(() {
-          _isLoadingNextPage = true;
-        });
-      }
-      UserProvider userProvider = context.read<UserProvider>();
-      if (_scrollController.position.pixels >=
-          _scrollController.position.maxScrollExtent) {
-        _currentPage = _currentPage + 1;
-        //TODO: 더 이상 불러올 게시물이 없을 때의 처리
-        Map<String, dynamic>? myMap = await userProvider.getApiRes(
-            "$_apiUrl$_currentPage&main_search__contains=${_textEdtingController.text}");
+      if (_textEdtingController.text == "") {
         if (mounted) {
           setState(() {
-            for (int i = 0; i < (myMap!["results"].length ?? 0); i++) {
-              //???/
-              if (myMap["results"][i]["created_by"]["profile"] != null) {
-                postPreviewList.add(
-                    ArticleListActionModel.fromJson(myMap["results"][i] ?? {}));
-              }
-            }
-          });
-          setState(() {
-            _isLoading = false;
+            postPreviewList.clear();
             _isLoadingNextPage = false;
           });
         }
+        return;
+      }
+      UserProvider userProvider = context.read<UserProvider>();
+      _currentPage = _currentPage + 1;
+      //TODO: 더 이상 불러올 게시물이 없을 때의 처리
+      var response = await userProvider.getApiRes(
+          "$_apiUrl$_currentPage&main_search__contains=${_textEdtingController.text}");
+      final Map<String, dynamic>? myMap = await response?.data;
+
+      //비동기 함수 이후에 검색창의 검색어가 바뀌었을 경우에는 하지 않음
+      if (mounted &&
+          myMap != null &&
+          _textEdtingController.text == targetWord) {
+        setState(() {
+          for (int i = 0; i < (myMap["results"].length ?? 0); i++) {
+            //???/
+            if (myMap["results"][i]["created_by"]["profile"] != null) {
+              postPreviewList.add(
+                  ArticleListActionModel.fromJson(myMap["results"][i] ?? {}));
+            }
+          }
+          // api별로 호출부터 응답 시간이 다르므로, _loadNextPage 함수 호출이 연속으로 일어나는 경우에는 게시물을 정렬해주어야함.
+          postPreviewList.sort((a, b) => b.created_at.compareTo(a.created_at));
+        });
       }
     } catch (error) {
       _currentPage = _currentPage - 1;
+    }
+    if (mounted) {
       setState(() {
-        _isLoading = false;
         _isLoadingNextPage = false;
       });
-      debugPrint("scrollListener error : $error");
     }
   }
 
@@ -224,13 +244,19 @@ class _BulletinSearchPageState extends State<BulletinSearchPage> {
                             setState(() {
                               _isLoading = true;
                             });
-                            refreshPostList(text);
+                            // 1페이지만 불러오면 한 페이지의 검색 결과의 게시물들로 태블릿의 화면을 채울 수가 없어 2페이지도 자동으로 불러오게 함
+                            _initPostList(text).then((value) {
+                              _loadNextPage(text);
+                            });
                           },
                           onChanged: (String text) {
                             _debouncer.run(() {
                               debugPrint(
                                   "bulletin_search_page: onChanged(${DateTime.now().toString()}) : $text");
-                              refreshPostList(text);
+                              // 1페이지만 불러오면 한 페이지의 검색 결과의 게시물들로 태블릿의 화면을 채울 수가 없어 2페이지도 자동으로 불러오게 함
+                              _initPostList(text).then((value) {
+                                _loadNextPage(text);
+                              });
                             });
                           },
                           style: const TextStyle(
@@ -313,15 +339,16 @@ class _BulletinSearchPageState extends State<BulletinSearchPage> {
                       // 검색어가 없을 때와 검색 결과가 없을 때의 처리
                       if (_textEdtingController.text == "" &&
                           postPreviewList.isEmpty)
-                        const Expanded(
+                        Expanded(
                           child: Center(
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               crossAxisAlignment: CrossAxisAlignment.center,
                               children: [
                                 Text(
-                                  '검색어를 입력해주세요.',
-                                  style: TextStyle(
+                                  LocaleKeys.bulletinSearchPage_pleaseEnter
+                                      .tr(),
+                                  style: const TextStyle(
                                     color: Color(0xFFBBBBBB),
                                     fontSize: 16,
                                     fontWeight: FontWeight.w500,
@@ -334,15 +361,15 @@ class _BulletinSearchPageState extends State<BulletinSearchPage> {
                       // 검색어가 있는데 검색 결과가 없을 때의 처리
                       if (_textEdtingController.text != "" &&
                           postPreviewList.isEmpty)
-                        const Expanded(
+                        Expanded(
                           child: Center(
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               crossAxisAlignment: CrossAxisAlignment.center,
                               children: [
                                 Text(
-                                  '검색 결과가 없습니다.',
-                                  style: TextStyle(
+                                  LocaleKeys.bulletinSearchPage_noResults.tr(),
+                                  style: const TextStyle(
                                     color: Color(0xFFBBBBBB),
                                     fontSize: 16,
                                     fontWeight: FontWeight.w500,

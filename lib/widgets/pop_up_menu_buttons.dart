@@ -1,8 +1,10 @@
-/// PostViewPage에 쓰이는 PopupMenuButton 위젯 일부를 클래스화한 파일
-/// 첨부파일, 타인의 댓글에 사용되는 PopupMenuButton을 클래스화함.
+// PostViewPage에 쓰이는 PopupMenuButton 위젯 일부를 클래스화한 파일
+// 첨부파일, 타인의 댓글에 사용되는 PopupMenuButton을 클래스화함.
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:easy_localization/easy_localization.dart';
+import 'package:new_ara_app/translations/locale_keys.g.dart';
 
 import 'package:new_ara_app/models/attachment_model.dart';
 import 'package:new_ara_app/providers/user_provider.dart';
@@ -10,6 +12,47 @@ import 'package:new_ara_app/constants/file_type.dart';
 import 'package:new_ara_app/utils/post_view_utils.dart';
 import 'package:new_ara_app/constants/colors_info.dart';
 import 'package:new_ara_app/widgets/snackbar_noti.dart';
+
+class WithSchoolPopupMenuButton extends StatelessWidget {
+  const WithSchoolPopupMenuButton({
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return PopupMenuButton<String>(
+      shadowColor: const Color.fromRGBO(0, 0, 0, 0.2),
+      splashRadius: 5,
+      shape: const RoundedRectangleBorder(
+          side: BorderSide(color: Color.fromRGBO(217, 217, 217, 1), width: 0.5),
+          borderRadius: BorderRadius.all(Radius.circular(12.0))),
+      padding: const EdgeInsets.all(2.0),
+      offset: Offset(0, 45),
+      child: SvgPicture.asset(
+        'assets/icons/information.svg',
+        colorFilter: const ColorFilter.mode(Colors.grey, BlendMode.srcIn),
+        width: 32,
+        height: 32,
+      ),
+      itemBuilder: (BuildContext context) => [
+        PopupMenuItem<String>(
+          value: 'info',
+          child: Text(
+            LocaleKeys.popUpMenuButtons_withSchoolInfoText.tr(),
+            style: const TextStyle(
+              color: ColorsInfo.newara,
+              fontWeight: FontWeight.w400,
+              fontSize: 15,
+            ),
+          ),
+        ),
+      ],
+      onSelected: (String result) {
+        switch (result) {}
+      },
+    );
+  }
+}
 
 /// PostViewPage에서 첨부파일 표시에 쓰이는 PopupMenuButton
 class AttachPopupMenuButton extends StatelessWidget {
@@ -57,7 +100,9 @@ class AttachPopupMenuButton extends StatelessWidget {
                       height: 32,
                     ),
                     Text(
-                      res ? "파일 다운로드에 성공했습니다" : "파일 다운로드에 실패했습니다.",
+                      res
+                          ? LocaleKeys.popUpMenuButtons_downloadSucceed.tr()
+                          : LocaleKeys.popUpMenuButtons_downloadFailed.tr(),
                       style: const TextStyle(
                         color: Colors.black,
                         fontWeight: FontWeight.w400,
@@ -70,7 +115,7 @@ class AttachPopupMenuButton extends StatelessWidget {
         });
       },
       child: Text(
-        '첨부파일 모아보기 $fileNum',
+        '${LocaleKeys.popUpMenuButtons_attachments.tr()} $fileNum',
         style: const TextStyle(
           fontSize: 16,
           fontWeight: FontWeight.w500,
@@ -156,7 +201,7 @@ class AttachPopupMenuButton extends StatelessWidget {
     debugPrint(ext);
     return SvgPicture.asset(
       assetPath,
-      color: Colors.black,
+      colorFilter: const ColorFilter.mode(Colors.black, BlendMode.srcIn),
       width: 30,
       height: 30,
     );
@@ -184,7 +229,7 @@ class OthersPopupMenuButton extends StatelessWidget {
       padding: const EdgeInsets.all(2.0),
       child: SvgPicture.asset(
         'assets/icons/menu_2.svg',
-        color: Colors.grey,
+        colorFilter: const ColorFilter.mode(Colors.grey, BlendMode.srcIn),
         width: 50,
         height: 20,
       ),
@@ -215,16 +260,15 @@ class OthersPopupMenuButton extends StatelessWidget {
           value: 'Report',
           child: Row(
             children: [
-              SvgPicture.asset(
-                'assets/icons/warning.svg',
-                width: 20,
-                height: 20,
-                color: ColorsInfo.newara,
-              ),
+              SvgPicture.asset('assets/icons/warning.svg',
+                  width: 20,
+                  height: 20,
+                  colorFilter: const ColorFilter.mode(
+                      ColorsInfo.newara, BlendMode.srcIn)),
               const SizedBox(width: 10),
-              const Text(
-                '신고',
-                style: TextStyle(
+              Text(
+                LocaleKeys.popUpMenuButtons_report.tr(),
+                style: const TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.w700,
                   color: ColorsInfo.newara,
@@ -294,12 +338,15 @@ class MyPopupMenuButton extends StatelessWidget {
                 'assets/icons/modify.svg',
                 width: 25,
                 height: 25,
-                color: const Color.fromRGBO(51, 51, 51, 1),
+                colorFilter: const ColorFilter.mode(
+                  Color.fromRGBO(51, 51, 51, 1),
+                  BlendMode.srcIn,
+                ),
               ),
               const SizedBox(width: 10),
-              const Text(
-                '수정',
-                style: TextStyle(
+              Text(
+                LocaleKeys.popUpMenuButtons_edit.tr(),
+                style: const TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w700,
                     color: Color.fromRGBO(51, 51, 51, 1)),
@@ -311,16 +358,15 @@ class MyPopupMenuButton extends StatelessWidget {
           value: 'Delete',
           child: Row(
             children: [
-              SvgPicture.asset(
-                'assets/icons/delete.svg',
-                width: 25,
-                height: 25,
-                color: ColorsInfo.newara,
-              ),
+              SvgPicture.asset('assets/icons/delete.svg',
+                  width: 25,
+                  height: 25,
+                  colorFilter: const ColorFilter.mode(
+                      ColorsInfo.newara, BlendMode.srcIn)),
               const SizedBox(width: 10),
-              const Text(
-                '삭제',
-                style: TextStyle(
+              Text(
+                LocaleKeys.popUpMenuButtons_delete.tr(),
+                style: const TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.w700,
                   color: ColorsInfo.newara,
@@ -333,7 +379,7 @@ class MyPopupMenuButton extends StatelessWidget {
       onSelected: onSelected,
       child: SvgPicture.asset(
         'assets/icons/menu_2.svg',
-        color: Colors.grey,
+        colorFilter: const ColorFilter.mode(Colors.grey, BlendMode.srcIn),
         width: 50,
         height: 20,
       ),

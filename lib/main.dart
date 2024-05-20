@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:easy_localization/easy_localization.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:new_ara_app/pages/terms_and_conditions_page.dart';
+import 'package:new_ara_app/constants/url_info.dart';
+import 'package:new_ara_app/translations/codegen_loader.g.dart';
+import 'package:new_ara_app/utils/global_key.dart';
 import 'package:new_ara_app/widgets/loading_indicator.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
-
 import 'package:new_ara_app/pages/main_navigation_tab_page.dart';
 import 'package:new_ara_app/pages/login_page.dart';
 import 'package:new_ara_app/providers/user_provider.dart';
@@ -23,6 +25,17 @@ void main() async {
   FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
   await EasyLocalization.ensureInitialized();
 
+  // .env.delevopment 또는 .env.production 파일을 읽어서 환경변수 설정
+  // ex) flutter run --dart-define=ENV=development
+  // ex) flutter run --dart-define=ENV=production
+  const String environment =
+      String.fromEnvironment('ENV', defaultValue: 'development');
+  await dotenv.load(fileName: ".env.$environment");
+
+  newAraDefaultUrl = dotenv.env['NEW_ARA_DEFAULT_URL']!;
+  newAraAuthority = dotenv.env['NEW_ARA_AUTHORITY']!;
+  sparcsSSODefaultUrl = dotenv.env['SPARCS_SSO_DEFAULT_URL']!;
+
   // 앱 시작점. 다국어 지원 및 여러 데이터 제공자를 포함한 구조로 설정
   runApp(
     EasyLocalization(
@@ -30,6 +43,7 @@ void main() async {
       path: 'assets/translations',
       fallbackLocale: const Locale('en'),
       startLocale: const Locale('ko'),
+      assetLoader: const CodegenLoader(),
       child: MultiProvider(
         providers: [
           ChangeNotifierProvider(create: (_) => UserProvider()),
@@ -71,6 +85,7 @@ class _MyAppState extends State<MyApp> {
   @override
   void initState() {
     super.initState();
+
     // 자동 로그인을 위한 초기 설정
     autoLoginByGetCookie(Provider.of<UserProvider>(context, listen: false));
 
@@ -113,6 +128,7 @@ class _MyAppState extends State<MyApp> {
         localizationsDelegates: context.localizationDelegates,
         supportedLocales: context.supportedLocales,
         locale: context.locale,
+        scaffoldMessengerKey: snackBarKey, //
         theme: _setThemeData(),
         // TODO: CustionScrollBehavior의 역할은?
         builder: (context, child) {
@@ -144,7 +160,7 @@ class _MyAppState extends State<MyApp> {
     return ThemeData(
       appBarTheme:
           const AppBarTheme(elevation: 0, backgroundColor: Colors.white),
-      fontFamily: 'NotoSansKR',
+      fontFamily: 'Pretendard',
       scaffoldBackgroundColor: Colors.white,
       splashColor: Colors.transparent,
       textSelectionTheme: const TextSelectionThemeData(

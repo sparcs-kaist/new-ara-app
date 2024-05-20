@@ -1,13 +1,13 @@
-/// 사용자에 대한 이때까지의 알림을 보여주는 페이지 관리 파일
+// 사용자에 대한 이때까지의 알림을 보여주는 페이지 관리 파일
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:new_ara_app/utils/create_dio_with_config.dart';
+import 'package:new_ara_app/translations/locale_keys.g.dart';
 import 'package:provider/provider.dart';
-import 'package:dio/dio.dart';
 
 import 'package:new_ara_app/constants/url_info.dart';
+import 'package:dio/dio.dart';
 import 'package:new_ara_app/widgets/loading_indicator.dart';
 import 'package:new_ara_app/constants/colors_info.dart';
 import 'package:new_ara_app/providers/user_provider.dart';
@@ -19,7 +19,7 @@ import 'package:new_ara_app/widgets/snackbar_noti.dart';
 
 /// 알림페이지의 빌드 및 이벤트 처리를 담당하는 위젯.
 class NotificationPage extends StatefulWidget {
-  const NotificationPage({Key? key}) : super(key: key);
+  const NotificationPage({super.key});
   @override
   State<StatefulWidget> createState() => _NotificationPageState();
 }
@@ -66,12 +66,13 @@ class _NotificationPageState extends State<NotificationPage> {
   /// 결과 리스트를 반환함.
   Future<List<NotificationModel>> _fetchEachPage(
       UserProvider userProvider, int targetPage) async {
-    Dio dio = userProvider.createDioWithHeadersForGet();
     List<NotificationModel> resList = [];
     try {
-      var response = await dio
-          .get("$newAraDefaultUrl/api/notifications/?page=$targetPage");
-      List<dynamic> resultsList = response.data["results"];
+      var response =
+          await userProvider.getApiRes("notifications/?page=$targetPage");
+      final Map<String, dynamic>? jsonList = await response?.data;
+
+      List<dynamic> resultsList = jsonList?["results"];
       for (var json in resultsList) {
         try {
           resList.add(NotificationModel.fromJson(json));
@@ -99,15 +100,15 @@ class _NotificationPageState extends State<NotificationPage> {
       bool hasNext = true;
       UserProvider userProvider = context.read<UserProvider>();
       List<NotificationModel> resList = [];
-      Dio dio = userProvider.createDioWithHeadersForGet();
       int page = 1;
       for (page = 1; hasNext; page++) {
         if (page > _curPage + 1) break;
         try {
           var response =
-              await dio.get("$newAraDefaultUrl/api/notifications/?page=$page");
-          hasNext = response.data["next"] == null ? false : true;
-          List<dynamic> resultsList = response.data["results"];
+              await userProvider.getApiRes("notifications/?page=$page");
+          final Map<String, dynamic>? jsonList = await response?.data;
+          hasNext = jsonList?["next"] == null ? false : true;
+          List<dynamic> resultsList = jsonList?["results"];
           for (var json in resultsList) {
             try {
               resList.add(NotificationModel.fromJson(json));
@@ -144,12 +145,10 @@ class _NotificationPageState extends State<NotificationPage> {
   /// API 통신에 필요한 [userProvider], 알림 식별에 필요한 [id]를 전달받음.
   /// 읽음 처리가 성공하면 true, 그렇지 않으면 false 리턴.
   Future<bool> _readNotification(UserProvider userProvider, int id) async {
-    try {
-      await userProvider
-          .createDioWithHeadersForNonget()
-          .post("$newAraDefaultUrl/api/notifications/$id/read/");
-    } catch (error) {
-      debugPrint("POST /api/notifications/$id/read/ failed: $error");
+    Response? postRes =
+        await userProvider.postApiRes("notifications/$id/read/");
+    if (postRes == null) {
+      debugPrint("POST /api/notifications/$id/read/ failed");
       return false;
     }
     return true;
@@ -159,12 +158,10 @@ class _NotificationPageState extends State<NotificationPage> {
   /// API 통신을 위해 [userProvider]를 이용함.
   /// 모두 읽음 처리 성공 시에 true, 아니면 false를 반환함.
   Future<bool> _readAllNotification(UserProvider userProvider) async {
-    try {
-      await userProvider
-          .createDioWithHeadersForNonget()
-          .post("$newAraDefaultUrl/api/notifications/read_all/");
-    } catch (error) {
-      debugPrint("POST /api/notifications/read_all failed: $error");
+    Response? postRes =
+        await userProvider.postApiRes("notifications/read_all/");
+    if (postRes == null) {
+      debugPrint("POST /api/notifications/read_all failed");
       return false;
     }
     return true;
@@ -179,7 +176,7 @@ class _NotificationPageState extends State<NotificationPage> {
       appBar: AppBar(
         centerTitle: false,
         title: Text(
-          'appBar.notification'.tr(),
+          LocaleKeys.notificationPage_notifications.tr(),
           style: const TextStyle(
             fontSize: 28,
             fontWeight: FontWeight.w700,
@@ -225,9 +222,11 @@ class _NotificationPageState extends State<NotificationPage> {
                                         BlendMode.srcIn,
                                       ),
                                     ),
-                                    const Text(
-                                      '알림이 없습니다.',
-                                      style: TextStyle(
+                                    Text(
+                                      LocaleKeys
+                                          .notificationPage_noNotifications
+                                          .tr(),
+                                      style: const TextStyle(
                                         color: Color(0xFFBBBBBB),
                                         fontSize: 15,
                                       ),
@@ -257,11 +256,13 @@ class _NotificationPageState extends State<NotificationPage> {
                                           ? _buildDateInfo(
                                               _modelList[idx - 1].created_at,
                                               _modelList[idx].created_at)
-                                          : const SizedBox(
+                                          : SizedBox(
                                               height: 35,
                                               child: Text(
-                                                '오늘',
-                                                style: TextStyle(
+                                                getFormattedDate(
+                                                    _modelList[0].created_at,
+                                                    context.locale),
+                                                style: const TextStyle(
                                                   fontSize: 14,
                                                   fontWeight: FontWeight.w500,
                                                   color: Color.fromRGBO(
@@ -313,7 +314,7 @@ class _NotificationPageState extends State<NotificationPage> {
                                             decoration: BoxDecoration(
                                               border: Border.all(
                                                 width: 1,
-                                                color: Color(0xfff0f0f0),
+                                                color: const Color(0xfff0f0f0),
                                               ),
                                               borderRadius:
                                                   const BorderRadius.all(
@@ -343,7 +344,8 @@ class _NotificationPageState extends State<NotificationPage> {
                                                         color: (targetNoti
                                                                     .is_read ??
                                                                 false)
-                                                            ? Color(0xffbbbbbb)
+                                                            ? const Color(
+                                                                0xffbbbbbb)
                                                             : ColorsInfo.newara,
                                                       ),
                                                       child: Center(
@@ -372,8 +374,11 @@ class _NotificationPageState extends State<NotificationPage> {
                                                         CrossAxisAlignment
                                                             .start,
                                                     children: [
+                                                      //TODO: 나중에 백엔드에서 보내주는 내용으로 보여줘야함.
                                                       Text(
-                                                        targetNoti.title,
+                                                        LocaleKeys
+                                                            .notificationPage_newComment
+                                                            .tr(),
                                                         maxLines: 1,
                                                         overflow: TextOverflow
                                                             .ellipsis,
@@ -400,7 +405,7 @@ class _NotificationPageState extends State<NotificationPage> {
                                                         ),
                                                       ),
                                                       Text(
-                                                        "| 게시글: ${targetNoti.related_article.title}",
+                                                        "| ${LocaleKeys.notificationPage_post.tr()}: ${targetNoti.related_article.title}",
                                                         maxLines: 1,
                                                         overflow: TextOverflow
                                                             .ellipsis,
@@ -452,7 +457,8 @@ class _NotificationPageState extends State<NotificationPage> {
               _setIsLoadingTotal(false);
             }
           } else {
-            requestInfoSnackBar("이미 알림을 모두 읽으셨습니다.");
+            requestInfoSnackBar(
+                LocaleKeys.notificationPage_allNotificationsChecked.tr());
           }
         },
         backgroundColor: Colors.white,
@@ -473,6 +479,29 @@ class _NotificationPageState extends State<NotificationPage> {
     );
   }
 
+  /// 가장 상단 알림의 날짜 출력을 위해 사용됨.
+  String getFormattedDate(String dateTimeStr, Locale locale) {
+    DateTime targetDateTime = DateTime.parse(dateTimeStr).toLocal();
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+    if (targetDateTime.year == today.year &&
+        targetDateTime.month == today.month &&
+        targetDateTime.day == today.day) {
+      return LocaleKeys.notificationPage_today.tr();
+    } else {
+      String dateTextInKorean =
+          "${(targetDateTime.year != now.year ? "${targetDateTime.year}년 " : "")}${targetDateTime.month}월 ${targetDateTime.day}일";
+
+      String dateTextInEnglish = DateFormat(
+              "MMMM d${targetDateTime.year != now.year ? ", yyyy" : ""}",
+              "en_US")
+          .format(targetDateTime);
+      return (locale == const Locale('ko')
+          ? dateTextInKorean
+          : dateTextInEnglish);
+    }
+  }
+
   /// 현재 date와 알림 생성 date의 차이를 계산하여 문자열로 변경해줌.
   Widget _buildDateInfo(String strDate1, String strDate2) {
     DateTime now = DateTime.now();
@@ -481,13 +510,21 @@ class _NotificationPageState extends State<NotificationPage> {
     if (prevDate.year == curDate.year &&
         prevDate.month == curDate.month &&
         prevDate.day == curDate.day) return Container();
-    String dateText =
+
+    String dateTextInKorean =
         "${(curDate.year != now.year ? "${curDate.year}년 " : "")}${curDate.month}월 ${curDate.day}일";
+
+    String dateTextInEnglish =
+        DateFormat("MMMM d${curDate.year != now.year ? ", yyyy" : ""}", "en_US")
+            .format(curDate);
+
     return SizedBox(
       height: 60,
       child: Center(
         child: Text(
-          dateText,
+          context.locale.languageCode == "ko"
+              ? dateTextInKorean
+              : dateTextInEnglish,
           style: const TextStyle(
             fontSize: 14,
             fontWeight: FontWeight.w500,

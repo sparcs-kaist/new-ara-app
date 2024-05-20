@@ -1,3 +1,5 @@
+// ignore_for_file: non_constant_identifier_names
+
 import 'package:new_ara_app/models/public_user_profile_model.dart';
 
 class PublicUserModel {

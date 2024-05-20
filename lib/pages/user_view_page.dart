@@ -1,10 +1,11 @@
-/// 임의의 유저에 대한 닉네임, 프로필, 작성한 글 등을 보여주는 페이지 관리 파일.
-/// article, comment에서 작성자의 정보를 확인하는 기능을 위해 만들어짐.
+// 임의의 유저에 대한 닉네임, 프로필, 작성한 글 등을 보여주는 페이지 관리 파일.
+// article, comment에서 작성자의 정보를 확인하는 기능을 위해 만들어짐.
 
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
 import 'package:dio/dio.dart';
+import 'package:easy_localization/easy_localization.dart';
 
 import 'package:new_ara_app/constants/colors_info.dart';
 import 'package:new_ara_app/models/public_user_profile_model.dart';
@@ -12,14 +13,11 @@ import 'package:new_ara_app/models/article_list_action_model.dart';
 import 'package:new_ara_app/providers/user_provider.dart';
 import 'package:new_ara_app/widgets/loading_indicator.dart';
 import 'package:new_ara_app/constants/url_info.dart';
-import 'package:new_ara_app/utils/time_utils.dart';
 import 'package:new_ara_app/pages/post_view_page.dart';
 import 'package:new_ara_app/utils/slide_routing.dart';
 import 'package:new_ara_app/providers/notification_provider.dart';
 import 'package:new_ara_app/utils/profile_image.dart';
-import 'package:new_ara_app/utils/handle_hidden.dart';
 import 'package:new_ara_app/widgets/post_preview.dart';
-
 
 /// 유저 관련 정보 페이지 뷰, 이벤트 처리를 모두 관리하는 StatefulWidget
 /// **중요: name_type == 1 이 아닌 경우에 대해서는 사용하면 안됨.**
@@ -55,7 +53,7 @@ class _UserViewPageState extends State<UserViewPage> {
   final ScrollController _listViewController = ScrollController();
 
   /// 사용자가 작성한 글 모델을 저장하는 리스트.
-  List<ArticleListActionModel> _articleList = [];
+  final List<ArticleListActionModel> _articleList = [];
 
   @override
   void initState() {
@@ -148,7 +146,9 @@ class _UserViewPageState extends State<UserViewPage> {
                       SizedBox(
                         width: MediaQuery.of(context).size.width - 40,
                         child: Text(
-                          '총 $_articleCount개의 글',
+                          context.locale == const Locale('ko')
+                              ? '총 $_articleCount개의 글'
+                              : '$_articleCount posts',
                           style: const TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.w700,
@@ -249,9 +249,8 @@ class _UserViewPageState extends State<UserViewPage> {
               },
               // 각각의 작성한 글
               child: Padding(
-                padding: const EdgeInsets.symmetric(vertical: 11.0),
-                child: PostPreview(model: curPost)
-              ),
+                  padding: const EdgeInsets.symmetric(vertical: 11.0),
+                  child: PostPreview(model: curPost)),
             );
           },
           separatorBuilder: (BuildContext context, int idx) {
@@ -266,6 +265,7 @@ class _UserViewPageState extends State<UserViewPage> {
   }
 
   /// 글에 첨부된 파일의 타입에 따른 위젯을 리턴하는 함수.
+  // ignore: unused_element
   Widget _buildAttachImage(String attachmentType) {
     return Row(
       children: [
@@ -328,12 +328,12 @@ class _UserViewPageState extends State<UserViewPage> {
   /// API 통신 및 userProfileModel에 정보 저장이 모두 성공적일 경우 true.
   /// 아닌 경우 false 반환.
   Future<bool> _fetchUser(UserProvider userProvider) async {
-    String apiUrl = "/api/user_profiles/${widget.userID}";
+    String apiUrl = "user_profiles/${widget.userID}";
     try {
-      var response = await userProvider.createDioWithHeadersForGet().get("$newAraDefaultUrl$apiUrl");
-      dynamic json = response.data;
+      var response = await userProvider.getApiRes(apiUrl);
+      final Map<String, dynamic>? json = await response?.data;
       try {
-        _userProfileModel = PublicUserProfileModel.fromJson(json);
+        _userProfileModel = PublicUserProfileModel.fromJson(json!);
         return true;
       } catch (error) {
         debugPrint("fetch user failed: ${widget.userID}");
@@ -363,15 +363,16 @@ class _UserViewPageState extends State<UserViewPage> {
   Future<bool> _fetchCreatedArticles(
       UserProvider userProvider, int page) async {
     int user = _userProfileModel.user;
-    String apiUrl = "/api/articles/?page=$page&created_by=$user";
+    String apiUrl = "articles/?page=$page&created_by=$user";
     // 첫 페이지일 경우 기존에 존재하는 article을 모두 제거.
     if (page == 1) {
       _articleList.clear();
       _nextPage = 1;
     }
     try {
-      var response = await userProvider.createDioWithHeadersForGet().get("$newAraDefaultUrl$apiUrl");
-      List<dynamic> rawPostList = response.data['results'];
+      var response = await userProvider.getApiRes(apiUrl);
+      final Map<String, dynamic>? jsonList = await response?.data;
+      List<dynamic> rawPostList = jsonList?['results'];
       for (int i = 0; i < rawPostList.length; i++) {
         Map<String, dynamic>? rawPost = rawPostList[i];
         // 가끔 형식에 맞지 않은 데이터를 가진 글이 있어 추가함.(2023.05.26)
@@ -387,7 +388,7 @@ class _UserViewPageState extends State<UserViewPage> {
         }
       }
       _nextPage += 1;
-      _articleCount = response.data['num_items'];
+      _articleCount = jsonList?['num_items'];
       return true;
     } on DioException catch (e) {
       // 서버에서 response를 보냈지만 invalid한 statusCode일 때

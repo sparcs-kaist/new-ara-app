@@ -2,7 +2,8 @@ import 'dart:io';
 import 'package:http_parser/http_parser.dart';
 import 'package:flutter/material.dart';
 import 'package:new_ara_app/constants/url_info.dart';
-import 'package:new_ara_app/utils/create_dio_with_config.dart';
+import 'package:easy_localization/easy_localization.dart';
+import 'package:new_ara_app/translations/locale_keys.g.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:image_picker/image_picker.dart';
@@ -16,7 +17,6 @@ import 'package:new_ara_app/widgets/loading_indicator.dart';
 import 'package:new_ara_app/providers/notification_provider.dart';
 import 'package:new_ara_app/utils/profile_image.dart';
 import 'package:new_ara_app/widgets/snackbar_noti.dart';
-import 'package:new_ara_app/widgets/text_info.dart';
 
 class ProfileEditPage extends StatefulWidget {
   const ProfileEditPage({super.key});
@@ -30,7 +30,10 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
   final ImagePicker _imagePicker = ImagePicker();
   bool _isLoading = false, _isCamClicked = false;
   XFile? _selectedImage;
-  String? _changedNick, _retrieveDataError;
+  String? _changedNick;
+
+  // ignore: unused_field
+  String? _retrieveDataError;
 
   @override
   void initState() {
@@ -104,37 +107,44 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
       );
     }
     var formData = FormData.fromMap(payload);
-    Dio dio = userProvider.createDioWithHeadersForNonget();
-    try {
-      var response = await dio.patch(
-        "$newAraDefaultUrl/api/user_profiles/${userProfileModel.user}/",
-        data: formData,
-      );
-      if (response.statusCode != 200) return false;
-    } on DioException catch (e) {
-      debugPrint("updateProfile failed with DioException: $e");
-      // 서버에서 response를 보냈지만 invalid한 statusCode일 때
-      String infoText = '설정 변경 중 문제가 발생했습니다.';
-      if (e.response != null) {
-        debugPrint("${e.response!.data['nickname'][0]}");
-        debugPrint("${e.response!.headers}");
-        debugPrint("${e.response!.requestOptions}");
-        // 인터넷 문제가 아닌 경우 닉네임 관련 규정 설명을 추가함.
-        infoText += ' ${e.response!.data['nickname'][0]}';
-      }
-      // request의 setting, sending에서 문제 발생
-      // requestOption, message를 출력.
-      else {
-        debugPrint("${e.requestOptions}");
-        debugPrint("${e.message}");
-      }
-      // 유저에게 스낵바 알림
-      noticeUserBySnackBar(infoText);
-      return false;
-    } catch (e) {
-      debugPrint("updateProfile failed with error: $e");
+    Response? response = await userProvider.patchApiRes(
+      "user_profiles/${userProfileModel.user}/",
+      data: formData,
+    );
+    if (response == null) {
+      // TODO: 닉네임 변경 기한 관련 메시지 출력 기능 추가 (인터넷 에러 처리할 때 완료하기)
       return false;
     }
+    // try {
+    //   var response = await dio.patch(
+    //     "$newAraDefaultUrl/api/user_profiles/${userProfileModel.user}/",
+    //     data: formData,
+    //   );
+    //   if (response.statusCode != 200) return false;
+    // } on DioException catch (e) {
+    //   debugPrint("updateProfile failed with DioException: $e");
+    //   // 서버에서 response를 보냈지만 invalid한 statusCode일 때
+    //   String infoText = LocaleKeys.profileEditPage_settingInfoText.tr();
+    //   if (e.response != null) {
+    //     debugPrint("${e.response!.data['nickname'][0]}");
+    //     debugPrint("${e.response!.headers}");
+    //     debugPrint("${e.response!.requestOptions}");
+    //     // 인터넷 문제가 아닌 경우 닉네임 관련 규정 설명을 추가함.
+    //     infoText += ' ${e.response!.data['nickname'][0]}';
+    //   }
+    //   // request의 setting, sending에서 문제 발생
+    //   // requestOption, message를 출력.
+    //   else {
+    //     debugPrint("${e.requestOptions}");
+    //     debugPrint("${e.message}");
+    //   }
+    //   // 유저에게 스낵바 알림
+    //   noticeUserBySnackBar(infoText);
+    //   return false;
+    // } catch (e) {
+    //   debugPrint("updateProfile failed with error: $e");
+    //   return false;
+    // }
     return true;
   }
 
@@ -199,17 +209,17 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
                   ],
                 ),
               ),
-              title: const Text(
-                "프로필 수정",
-                style: TextStyle(
+              title: Text(
+                LocaleKeys.profileEditPage_editProfile.tr(),
+                style: const TextStyle(
                   fontWeight: FontWeight.w700,
                   fontSize: 18,
                   color: ColorsInfo.newara,
                 ),
               ),
               actions: [
-                IconButton(
-                  onPressed: () async {
+                InkWell(
+                  onTap: () async {
                     _setIsLoading(true);
                     bool updateRes = await _updateProfile(userProvider);
                     debugPrint("updateRes: $updateRes");
@@ -223,15 +233,21 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
                       _setIsLoading(false);
                     }
                   },
-                  icon: const Text(
-                    '완료',
-                    style: TextStyle(
-                      color: ColorsInfo.newara,
-                      fontWeight: FontWeight.w500,
-                      fontSize: 17,
+                  child: Center(
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 5),
+                      child: Text(
+                        LocaleKeys.profileEditPage_complete.tr(),
+                        style: const TextStyle(
+                          color: ColorsInfo.newara,
+                          fontWeight: FontWeight.w500,
+                          fontSize: 17,
+                        ),
+                      ),
                     ),
                   ),
                 ),
+                const SizedBox(width: 10),
               ],
             ),
             body: SafeArea(
@@ -293,7 +309,8 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
                                     ),
                                     child: SvgPicture.asset(
                                       "assets/icons/camera.svg",
-                                      color: Colors.white,
+                                      colorFilter: const ColorFilter.mode(
+                                          Colors.white, BlendMode.srcIn),
                                     ),
                                   ),
                                 ),
@@ -306,9 +323,9 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
                           width: mediaQueryData.size.width - 60,
                           child: Row(
                             children: [
-                              const Text(
-                                '닉네임',
-                                style: TextStyle(
+                              Text(
+                                LocaleKeys.profileEditPage_nickname.tr(),
+                                style: const TextStyle(
                                   fontWeight: FontWeight.w700,
                                   fontSize: 17,
                                   color: Color.fromRGBO(99, 99, 99, 1),
@@ -332,11 +349,14 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
                         // 닉네임 정책 안내 문구
                         SizedBox(
                           width: mediaQueryData.size.width - 60,
-                          child: const Padding(
-                            padding: EdgeInsets.only(left: 80),
+                          child: Padding(
+                            padding: EdgeInsets.only(
+                                left: context.locale == const Locale('ko')
+                                    ? 80
+                                    : 110),
                             child: Text(
-                              '닉네임은 한번 변경할 시 3개월간 변경이 불가합니다.',
-                              style: TextStyle(
+                              LocaleKeys.profileEditPage_nicknameInfo.tr(),
+                              style: const TextStyle(
                                 fontSize: 12,
                                 fontWeight: FontWeight.w600,
                                 color: Color.fromRGBO(191, 191, 191, 1),
@@ -349,19 +369,22 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
                           width: mediaQueryData.size.width - 60,
                           child: Row(
                             children: [
-                              const Text(
-                                '이메일',
-                                style: TextStyle(
+                              Text(
+                                LocaleKeys.profileEditPage_email.tr(),
+                                style: const TextStyle(
                                   fontWeight: FontWeight.w700,
                                   fontSize: 17,
                                   color: Color.fromRGBO(99, 99, 99, 1),
                                 ),
                               ),
-                              const SizedBox(width: 45),
+                              SizedBox(
+                                  width: context.locale == const Locale('ko')
+                                      ? 45
+                                      : 80),
                               Expanded(
                                 child: Text(
                                   userProviderData.naUser!.email ??
-                                      "이메일 정보가 없습니다.",
+                                      LocaleKeys.profileEditPage_noEmail.tr(),
                                   style: const TextStyle(
                                     fontWeight: FontWeight.w500,
                                     fontSize: 15,
@@ -411,14 +434,14 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
             initialValue: initialNick,
             maxLines: 1,
             keyboardType: TextInputType.multiline,
-            decoration: const InputDecoration(
+            decoration: InputDecoration(
               border: InputBorder.none,
-              hintText: '변경하실 닉네임을 입력해주세요.',
+              hintText: LocaleKeys.profileEditPage_nicknameHintText.tr(),
             ),
             validator: (value) {
               // (2023.08.19) 나중에 글자 수 확인도 추가해야 함
               if (value == null || value.isEmpty) {
-                return '닉네임이 작성되지 않았습니다!';
+                return LocaleKeys.profileEditPage_nicknameEmptyInfo.tr();
               }
               return null;
             },

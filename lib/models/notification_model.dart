@@ -1,3 +1,5 @@
+// ignore_for_file: non_constant_identifier_names
+
 import 'package:new_ara_app/models/base_article_model.dart';
 
 class NotificationModel {

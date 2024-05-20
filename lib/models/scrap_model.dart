@@ -1,3 +1,5 @@
+// ignore_for_file: non_constant_identifier_names
+
 import 'package:new_ara_app/models/public_user_model.dart';
 import 'package:new_ara_app/models/article_list_action_model.dart';
 
@@ -19,13 +21,13 @@ class ScrapModel {
   });
 
   ScrapModel.fromJson(Map<String, dynamic> json)
-      : this.id = json['id'],
-        this.parent_article =
+      : id = json['id'],
+        parent_article =
             ArticleListActionModel.fromJson(json['parent_article']),
-        this.scrapped_by = PublicUserModel.fromJson(json['scrapped_by']),
-        this.created_at = json['created_at'],
-        this.updated_at = json['updated_at'],
-        this.deleted_at = json['deleted_at'];
+        scrapped_by = PublicUserModel.fromJson(json['scrapped_by']),
+        created_at = json['created_at'],
+        updated_at = json['updated_at'],
+        deleted_at = json['deleted_at'];
 
   Map<String, dynamic> toJson() => {
         'id': id,

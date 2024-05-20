@@ -1,9 +1,9 @@
-import 'dart:math';
-
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:new_ara_app/pages/bulletin_search_page.dart';
 import 'package:new_ara_app/pages/post_write_page.dart';
+import 'package:new_ara_app/translations/locale_keys.g.dart';
 import 'package:provider/provider.dart';
 
 import 'package:new_ara_app/constants/board_type.dart';
@@ -16,6 +16,7 @@ import 'package:new_ara_app/models/article_list_action_model.dart';
 import 'package:new_ara_app/pages/post_view_page.dart';
 import 'package:new_ara_app/utils/slide_routing.dart';
 import 'package:new_ara_app/providers/notification_provider.dart';
+import 'package:new_ara_app/widgets/pop_up_menu_buttons.dart';
 
 /// PostListShowPage는 게시물 목록를 나타내는 위젯.
 /// boardType에 따라 게시판의 종류를 판별하고, 특성화 된 위젯들을 활성화 비활성화 되도록 설계.
@@ -47,43 +48,63 @@ class _PostListShowPageState extends State<PostListShowPage>
     super.initState();
 
     var userProvider = context.read<UserProvider>();
+    _scrollController.addListener(_scrollListener);
+    WidgetsBinding.instance.addObserver(this);
+    // updateAllBulletinList().then(
+    //   (value) {
+    //     _loadNextPage();
+    //   },
+    // );
+    context.read<NotificationProvider>().checkIsNotReadExist(userProvider);
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+
+    /// initState 직후에는 updateAllBulletinList가 호출되어야 함.
+    /// initState 직후에는 apiUrl == ""이므로 이를 통해
+    /// didChangeDependencies에서 initState 직후 임을 파악하고 updateAllBulletinList 함수를 호출함.
+    String prevApiUrl = apiUrl;
 
     // 게시판 타입에 따라 API URL과 게시판 이름을 설정
+    debugPrint("Current Locale: ${context.locale}");
     switch (widget.boardType) {
       case BoardType.free:
         apiUrl = "articles/?parent_board=${widget.boardInfo!.id.toInt()}&page=";
-        _boardName = widget.boardInfo!.ko_name;
+        _boardName = context.locale == const Locale("ko")
+            ? widget.boardInfo!.ko_name
+            : widget.boardInfo!.en_name;
         break;
       case BoardType.recent:
         apiUrl = "articles/recent/?page=";
-        _boardName = "최근 본 글";
+        _boardName = LocaleKeys.postListShowPage_history.tr();
         break;
       case BoardType.top:
         apiUrl = "articles/top/?page=";
-        _boardName = "실시간 인기글";
+        _boardName = LocaleKeys.postListShowPage_topPosts.tr();
         break;
       case BoardType.all:
         apiUrl = "articles/?page=";
-        _boardName = "전체보기";
+        _boardName = LocaleKeys.postListShowPage_allPosts.tr();
         break;
       case BoardType.scraps:
         apiUrl = "scraps/?page=";
-        _boardName = "담아둔 글";
+        _boardName = LocaleKeys.postListShowPage_bookmarks.tr();
         break;
       default:
         apiUrl = "articles/?page=";
-        _boardName = "테스트 게시판";
+        _boardName = LocaleKeys.postListShowPage_testBoard.tr();
         break;
     }
-
-    _scrollController.addListener(_scrollListener);
-    WidgetsBinding.instance.addObserver(this);
-    updateAllBulletinList().then(
-      (value) {
-        _loadNextPage();
-      },
-    );
-    context.read<NotificationProvider>().checkIsNotReadExist(userProvider);
+    // initState 직후에는 updateAllBulletinList 함수를 호출함.
+    if (prevApiUrl == "") {
+      updateAllBulletinList().then(
+        (_) {
+          _loadNextPage();
+        },
+      );
+    }
   }
 
   @override
@@ -107,6 +128,7 @@ class _PostListShowPageState extends State<PostListShowPage>
   /// [pageLimitToReload] : 새로 로딩할 최대 페이지 수.
   /// [currentPage] 값보다 [pageLimitToReload] 값이 큰 지 코딩할 때 주의 바랍니다.
   Future<void> updateAllBulletinList({int? pageLimitToReload}) async {
+    debugPrint("updateAllBulletinList called!!!!!!");
     List<ArticleListActionModel> newList = [];
     UserProvider userProvider = context.read<UserProvider>();
 
@@ -116,7 +138,8 @@ class _PostListShowPageState extends State<PostListShowPage>
             // pageLimitToReload가 null이 아니면(파라미터가 존재하면) currentPage보다 우선시 합니다.
             (pageLimitToReload ?? currentPage);
         page++) {
-      Map<String, dynamic>? json = await userProvider.getApiRes("$apiUrl$page");
+      var response = await userProvider.getApiRes("$apiUrl$page");
+      final Map<String, dynamic>? json = await response?.data;
 
       if (json != null && json.containsKey("results")) {
         for (var result in json["results"]) {
@@ -133,6 +156,7 @@ class _PostListShowPageState extends State<PostListShowPage>
       }
     }
 
+    debugPrint("updateAllBulleinList mounted: $mounted");
     // 위젯이 마운트 상태인 경우 상태를 업데이트합니다.
     if (mounted) {
       setState(() {
@@ -148,6 +172,7 @@ class _PostListShowPageState extends State<PostListShowPage>
   /// 다음 페이지를 로드하는 함수
   Future<void> _loadNextPage() async {
     var userProvider = context.read<UserProvider>();
+
     setState(() {
       _isLoadingNextPage = true;
     });
@@ -156,8 +181,9 @@ class _PostListShowPageState extends State<PostListShowPage>
     // await Future.delayed(Duration(seconds: 1));
     try {
       currentPage = currentPage + 1;
-      Map<String, dynamic>? myMap =
-          await userProvider.getApiRes("$apiUrl$currentPage");
+      var response = await userProvider.getApiRes("$apiUrl$currentPage");
+      final Map<String, dynamic>? myMap = await response?.data;
+
       if (mounted) {
         setState(() {
           for (int i = 0; i < (myMap!["results"].length ?? 0); i++) {
@@ -170,6 +196,7 @@ class _PostListShowPageState extends State<PostListShowPage>
                   myMap["results"][i]["parent_article"] ?? {}));
             }
           }
+          postPreviewList.sort((a, b) => b.created_at.compareTo(a.created_at));
         });
       }
     } catch (error) {
@@ -214,11 +241,11 @@ class _PostListShowPageState extends State<PostListShowPage>
                 width: 35,
                 height: 35,
               ),
-              const Padding(
-                padding: EdgeInsets.only(left: 29),
+              Padding(
+                padding: const EdgeInsets.only(left: 29),
                 child: Text(
-                  "게시판",
-                  style: TextStyle(
+                  LocaleKeys.postListShowPage_boards.tr(),
+                  style: const TextStyle(
                     color: Color(0xFFED3A3A),
                     fontSize: 17,
                     fontWeight: FontWeight.w500,
@@ -239,6 +266,8 @@ class _PostListShowPageState extends State<PostListShowPage>
           ),
         ),
         actions: [
+          if (widget.boardInfo?.slug == 'with-school')
+            const WithSchoolPopupMenuButton(),
           IconButton(
             icon: SvgPicture.asset(
               'assets/icons/search.svg',
@@ -272,7 +301,7 @@ class _PostListShowPageState extends State<PostListShowPage>
                 updateAllBulletinList();
                 debugPrint('FloatingActionButton pressed');
               },
-              backgroundColor: Colors.white,
+              backgroundColor: ColorsInfo.newara,
               child: SizedBox(
                 width: 42,
                 height: 42,
@@ -280,7 +309,7 @@ class _PostListShowPageState extends State<PostListShowPage>
                   'assets/icons/modify.svg',
                   fit: BoxFit.fill,
                   colorFilter: const ColorFilter.mode(
-                      ColorsInfo.newara, BlendMode.srcIn), // 글쓰기 아이콘 색상 변경
+                      Colors.white, BlendMode.srcIn), // 글쓰기 아이콘 색상 변경
                 ),
               ),
             ),
@@ -290,17 +319,28 @@ class _PostListShowPageState extends State<PostListShowPage>
           ],
         ),
       ),
-      body: isLoading
+      body: isLoading  // 페이지를 처음 로드할 때만 LoadingIndicator()를 부름.
           ? const LoadingIndicator()
           : SafeArea(
               child: Center(
                 child: SizedBox(
                   width: MediaQuery.of(context).size.width - 18,
                   child: RefreshIndicator.adaptive(
+                    displacement: 0.0,
                     color: ColorsInfo.newara,
                     onRefresh: () async {
-                      setState((() => isLoading = true));
-                      await updateAllBulletinList(pageLimitToReload: 1);
+                      // refresh 중에는 LoadingIndicator를 사용하지 않으므로 setState()는 제거함.
+                      // 로직상 isLoading 변수의 값은 상황에 맞게 변경되도록 함.
+                      isLoading = true;
+                      // 리프레쉬시 게시물 목록을 업데이트합니다.
+                      // 1페이지만 로드하도록 설정하여 최신 게시물을 불러옵니다.
+                      // 1페이지만 로드하면 태블릿에서 게시물로 화면을 꽉채우지 못하므로 다음 페이지도 로드합니다.
+                      await updateAllBulletinList(pageLimitToReload: 1).then(
+                        (value) {
+                          _loadNextPage();
+                        },
+                      );
+                      isLoading = false;
                     },
                     child: ListView.separated(
                       physics: const AlwaysScrollableScrollPhysics(),
@@ -311,6 +351,7 @@ class _PostListShowPageState extends State<PostListShowPage>
                         // 각 아이템을 위한 위젯 생성
                         if (_isLoadingNextPage &&
                             index == postPreviewList.length) {
+                          debugPrint('Next Page Load Request');
                           return const SizedBox(
                             height: 50,
                             child: Center(

@@ -1,4 +1,4 @@
-/// PostViewPage 내부에서 사용되는 메서드가 많아 별도의 파일로 분류함.
+// PostViewPage 내부에서 사용되는 메서드가 많아 별도의 파일로 분류함.
 
 import 'dart:io';
 import 'package:flutter/material.dart';
@@ -8,7 +8,9 @@ import 'package:path_provider/path_provider.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
 import 'package:dio/dio.dart';
+import 'package:easy_localization/easy_localization.dart';
 
+import 'package:new_ara_app/translations/locale_keys.g.dart';
 import 'package:new_ara_app/models/article_model.dart';
 import 'package:new_ara_app/models/comment_nested_comment_list_action_model.dart';
 import 'package:new_ara_app/models/attachment_model.dart';
@@ -16,7 +18,6 @@ import 'package:new_ara_app/models/scrap_create_action_model.dart';
 import 'package:new_ara_app/providers/user_provider.dart';
 import 'package:new_ara_app/constants/url_info.dart';
 import 'package:new_ara_app/constants/colors_info.dart';
-import 'package:new_ara_app/pages/post_view_page.dart';
 
 class ArticleController {
   ArticleModel model;
@@ -32,16 +33,12 @@ class ArticleController {
   Future<bool> posVote() async {
     if (model.is_mine) return false;
     int id = model.id;
-    if (model.my_vote == true) {
-      var cancelRes = await userProvider.postApiRes(
-        "articles/$id/vote_cancel/",
-      );
-      if (cancelRes == null || cancelRes.statusCode != 200) return false;
-    } else {
-      var postRes = await userProvider.postApiRes(
-        "articles/$id/vote_positive/",
-      );
-      if (postRes == null || postRes.statusCode != 200) return false;
+    Response? postRes = await userProvider.postApiRes(model.my_vote == true
+        ? 'articles/$id/vote_cancel/'
+        : 'articles/$id/vote_positive/');
+    if (postRes == null) {
+      debugPrint("posVote() failed");
+      return false;
     }
     return true;
   }
@@ -51,16 +48,12 @@ class ArticleController {
   Future<bool> negVote() async {
     if (model.is_mine == true) return false;
     int id = model.id;
-    if (model.my_vote == false) {
-      var cancelRes = await userProvider.postApiRes(
-        "articles/$id/vote_cancel/",
-      );
-      if (cancelRes == null || cancelRes.statusCode != 200) return false;
-    } else {
-      var postRes = await userProvider.postApiRes(
-        "articles/$id/vote_negative/",
-      );
-      if (postRes == null || postRes.statusCode != 200) return false;
+    Response? postRes = await userProvider.postApiRes(model.my_vote == false
+        ? 'articles/$id/vote_cancel/'
+        : 'articles/$id/vote_negative/');
+    if (postRes == null) {
+      debugPrint("negVote() failed");
+      return false;
     }
     return true;
   }
@@ -92,19 +85,27 @@ class ArticleController {
   /// 스크랩 관련 API 요청이 성공하면 true, 실패하면 false를 반환.
   Future<bool> scrap() async {
     if (model.my_scrap == null) {
-      var postRes = await userProvider.postApiRes(
+      Response? postRes = await userProvider.postApiRes(
         "scraps/",
-        payload: {
+        data: {
           "parent_article": model.id,
         },
       );
-      if (postRes.statusCode != 201) return false;
-      model.my_scrap = ScrapCreateActionModel.fromJson(postRes.data);
+      if (postRes != null) {
+        model.my_scrap = ScrapCreateActionModel.fromJson(postRes.data);
+      } else {
+        debugPrint("scrap() failed");
+        return false;
+      }
     } else {
-      var delRes =
+      Response? delRes =
           await userProvider.delApiRes("scraps/${model.my_scrap!.id}/");
-      if (delRes.statusCode != 204) return false;
-      model.my_scrap = null;
+      if (delRes != null) {
+        model.my_scrap = null;
+      } else {
+        debugPrint("scrap() failed");
+        return false;
+      }
     }
     return true;
   }
@@ -121,61 +122,32 @@ class ArticleController {
   /// 전달받은 id에 해당하는 글을 삭제하는 메서드.
   /// 삭제가 정상적으로 완료되면 true, 아니면 false 반환.
   Future<bool> delete() async {
-    String apiUrl = "$newAraDefaultUrl/api/articles/${model.id}/";
-    try {
-      await userProvider.createDioWithHeadersForNonget().delete(apiUrl);
+    String apiUrl = "articles/${model.id}/";
+    Response? delRes = await userProvider.delApiRes(apiUrl);
+    if (delRes != null) {
       return true;
-    } on DioException catch (e) {
-      debugPrint("DioException occurred");
-      if (e.response != null) {
-        debugPrint("${e.response!.data}");
-        debugPrint("${e.response!.headers}");
-        debugPrint("${e.response!.requestOptions}");
-      }
-      // request의 setting, sending에서 문제 발생
-      // requestOption, message를 출력.
-      else {
-        debugPrint("${e.requestOptions}");
-        debugPrint("${e.message}");
-      }
-    } catch (e) {
-      debugPrint("error at delete: $e");
+    } else {
+      debugPrint("delete() failed");
+      return false;
     }
-    return false;
   }
 
   /// post의 작성자에 대한 차단 및 차단 해제 요청을 보내는 함수
   /// block이 true이면 차단, false이면 차단 해제 요청을 보냄
   /// 성공하면 true, 실패하면 false 리턴.
   Future<bool> handleBlock(bool block) async {
-    String apiUrl = "$newAraDefaultUrl/api/blocks/";
+    String apiUrl = "blocks/";
     // 차단 해제하는 경우 apiUrl을 변경
     if (!block) apiUrl += "without_id/";
 
     int userID = model.created_by.id;
-
-    try {
-      await userProvider.createDioWithHeadersForNonget().post(
-        apiUrl,
-        data: block ? {'user': userID} : {'blocked': userID}
-      );
+    Response? postRes = await userProvider.postApiRes(
+      apiUrl, data: block ? {'user': userID} : {'blocked': userID}
+    );
+    if (postRes != null) {
       return true;
-    } on DioException catch (e) {
-      debugPrint("DioException occurred");
-      if (e.response != null) {
-        debugPrint("${e.response!.data}");
-        debugPrint("${e.response!.headers}");
-        debugPrint("${e.response!.requestOptions}");
-      }
-      // request의 setting, sending에서 문제 발생
-      // requestOption, message를 출력.
-      else {
-        debugPrint("${e.requestOptions}");
-        debugPrint("${e.message}");
-      }
-    } catch (e) {
-      debugPrint("error on handleBlock: $e");
     }
+    debugPrint("handleBlock() failed");
 
     return false;
   }
@@ -242,7 +214,9 @@ class FileController {
   /// 다운로드가 성공하면 true, 그렇지 않으면 false 리턴.
   Future<bool> _downloadFile(String uri, String totalPath) async {
     try {
-      await userProvider.createDioWithHeadersForNonget().download(uri, totalPath);
+      await userProvider
+          .createDioWithHeadersForNonget()
+          .download(uri, totalPath);
     } catch (error) {
       return false;
     }
@@ -263,16 +237,12 @@ class CommentController {
   Future<bool> posVote() async {
     if (model.is_mine) return false;
     int id = model.id;
-    if (model.my_vote == true) {
-      var cancelRes = await userProvider.postApiRes(
-        "comments/$id/vote_cancel/",
-      );
-      if (cancelRes == null || cancelRes.statusCode != 200) return false;
-    } else {
-      var postRes = await userProvider.postApiRes(
-        "comments/$id/vote_positive/",
-      );
-      if (postRes == null || postRes.statusCode != 200) return false;
+    Response? postRes = await userProvider.postApiRes(model.my_vote == true
+        ? 'comments/$id/vote_cancel/'
+        : 'comments/$id/vote_positive/');
+    if (postRes == null) {
+      debugPrint("posVote() failed");
+      return false;
     }
     return true;
   }
@@ -281,16 +251,12 @@ class CommentController {
   Future<bool> negVote() async {
     if (model.is_mine == true) return false;
     int id = model.id;
-    if (model.my_vote == false) {
-      var cancelRes = await userProvider.postApiRes(
-        "comments/$id/vote_cancel/",
-      );
-      if (cancelRes == null || cancelRes.statusCode != 200) return false;
-    } else {
-      var postRes = await userProvider.postApiRes(
-        "comments/$id/vote_negative/",
-      );
-      if (postRes == null || postRes.statusCode != 200) return false;
+    Response? postRes = await userProvider.postApiRes(model.my_vote == false
+        ? "comments/$id/vote_cancel/"
+        : "comments/$id/vote_negative/");
+    if (postRes == null) {
+      debugPrint("negVote() failed");
+      return false;
     }
     return true;
   }
@@ -311,11 +277,11 @@ class CommentController {
   /// 댓글 식별을 위한 [id], API 통신을 위한 [userProvider]를 전달받음.
   /// 댓글 삭제 API 요청이 성공하면 true, 그 외에는 false를 반환함.
   Future<bool> delComment(int id, UserProvider userProvider) async {
-    try {
-      await userProvider.delApiRes("comments/$id/");
+    Response? delRes = await userProvider.delApiRes("comments/$id/");
+    if (delRes != null) {
       return true;
-    } catch (error) {
-      debugPrint("DELETE /api/comments/$id failed: $error");
+    } else {
+      debugPrint("delComment() failed");
       return false;
     }
   }
@@ -355,6 +321,15 @@ class _ReportDialogWidgetState extends State<ReportDialogWidget> {
     "기타"
   ];
 
+  List<String> reportContentEng = [
+    "Hate Speech",
+    "Unauthorized Sales",
+    "Spam",
+    "Fake Information",
+    "Defamation",
+    "Other"
+  ];
+
   /// 각각의 신고 내역에 대해 선택되었는지 여부를 나타냄.
   late List<bool> isChosen;
 
@@ -377,19 +352,23 @@ class _ReportDialogWidgetState extends State<ReportDialogWidget> {
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            SvgPicture.asset(
-              "assets/icons/information.svg",
-              width: 45,
-              height: 45,
-              color: ColorsInfo.newara,
-            ),
+            SvgPicture.asset("assets/icons/information.svg",
+                width: 45,
+                height: 45,
+                colorFilter: const ColorFilter.mode(
+                  ColorsInfo.newara,
+                  BlendMode.srcIn,
+                )),
             const SizedBox(height: 5),
             Text(
-              '${widget.articleID == null ? '댓글' : '게시글'} 신고 사유를 알려주세요.',
+              widget.articleID == null
+                  ? LocaleKeys.postViewUtils_letUsKnowCommentReportReason.tr()
+                  : LocaleKeys.postViewUtils_letUsKnowPostReportReason.tr(),
               style: const TextStyle(
                 fontSize: 17,
                 fontWeight: FontWeight.w600,
               ),
+              textAlign: TextAlign.center,
             ),
             const SizedBox(height: 20),
             _buildReportButton(0),
@@ -422,10 +401,10 @@ class _ReportDialogWidgetState extends State<ReportDialogWidget> {
                     ),
                     width: 60,
                     height: 40,
-                    child: const Center(
+                    child: Center(
                       child: Text(
-                        '취소',
-                        style: TextStyle(
+                        LocaleKeys.postViewUtils_cancel.tr(),
+                        style: const TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w500,
                           color: Colors.black,
@@ -443,7 +422,11 @@ class _ReportDialogWidgetState extends State<ReportDialogWidget> {
                       // TODO: postApiRes의 response를 가져와서 신고에 실패한 경우
                       // e.response가 null이 아닐 경우에는 실패 사유도 출력하도록 변경하기
                       // 우선은 신고가 실패하면 무조건 '이미 신고한 게시물입니다'로 나오도록 함. (2023.02.16)
-                      showInfoBySnackBar(context, res ? '해당 게시글을 신고했습니다.' : '이미 신고한 게시물입니다.');
+                      showInfoBySnackBar(
+                          context,
+                          res
+                              ? LocaleKeys.postViewUtils_reportPostSucceed.tr()
+                              : LocaleKeys.postViewUtils_alreadyReported.tr());
                     });
                   },
                   child: Container(
@@ -460,10 +443,10 @@ class _ReportDialogWidgetState extends State<ReportDialogWidget> {
                     ),
                     width: 100,
                     height: 40,
-                    child: const Center(
+                    child: Center(
                       child: Text(
-                        '신고하기',
-                        style: TextStyle(
+                        LocaleKeys.postViewUtils_reportButton.tr(),
+                        style: const TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w500,
                           color: Colors.white,
@@ -506,13 +489,12 @@ class _ReportDialogWidgetState extends State<ReportDialogWidget> {
         ? {"parent_comment": widget.commentID ?? 0}
         : {"parent_article": widget.articleID ?? 0});
     UserProvider userProvider = context.read<UserProvider>();
-    try {
-      await userProvider.postApiRes(
-        "reports/",
-        payload: defaultPayload,
-      );
-    } catch (error) {
-      debugPrint("postReport() failed with error: $error");
+    Response? postRes = await userProvider.postApiRes(
+      "reports/",
+      data: defaultPayload,
+    );
+    if (postRes == null) {
+      debugPrint("postReport() failed with error");
       return false;
     }
 
@@ -537,7 +519,9 @@ class _ReportDialogWidgetState extends State<ReportDialogWidget> {
         height: 40,
         child: Center(
           child: Text(
-            reportContentKor[idx],
+            context.locale == const Locale('ko')
+                ? reportContentKor[idx]
+                : reportContentEng[idx],
             style: TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.w500,

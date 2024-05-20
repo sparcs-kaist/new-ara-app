@@ -1,12 +1,17 @@
 import 'dart:io';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:new_ara_app/translations/locale_keys.g.dart';
 
 import 'package:new_ara_app/models/article_list_action_model.dart';
 import 'package:new_ara_app/utils/time_utils.dart';
-import 'package:new_ara_app/utils/handle_hidden.dart';
 import 'package:new_ara_app/providers/blocked_provider.dart';
+import 'package:new_ara_app/utils/handle_hidden.dart';
 import 'package:provider/provider.dart';
+import 'package:new_ara_app/utils/handle_name.dart';
+import 'package:new_ara_app/constants/colors_info.dart';
+import 'package:new_ara_app/utils/with_school.dart';
 
 class PostPreview extends StatefulWidget {
   final ArticleListActionModel model;
@@ -21,7 +26,7 @@ class _PostPreviewState extends State<PostPreview> {
   Widget build(BuildContext context) {
     BlockedProvider blockedProvider = context.watch<BlockedProvider>();
 
-    String time = getTime(widget.model.created_at.toString());
+    String time = getTime(widget.model.created_at.toString(), context.locale);
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -33,7 +38,9 @@ class _PostPreviewState extends State<PostPreview> {
             children: [
               if (widget.model.parent_topic != null)
                 Text(
-                  "[${widget.model.parent_topic!.ko_name}] ",
+                  context.locale == const Locale('ko')
+                      ? "[${widget.model.parent_topic!.ko_name}] "
+                      : "[${widget.model.parent_topic!.en_name}] ",
                   style: const TextStyle(
                     color: Color(0xFFED3A3A),
                     fontWeight: FontWeight.w500,
@@ -47,7 +54,7 @@ class _PostPreviewState extends State<PostPreview> {
                   (isAnonymousIOS(widget.model) &&
                           blockedProvider.blockedAnonymousPostIDs
                               .contains(widget.model.created_by.id))
-                      ? "차단한 사용자의 게시물입니다."
+                      ? LocaleKeys.postPreview_blockedUsersPost.tr()
                       : getTitle(widget.model.title, widget.model.is_hidden,
                           widget.model.why_hidden),
                   style: TextStyle(
@@ -105,9 +112,29 @@ class _PostPreviewState extends State<PostPreview> {
           Expanded(
             child: Row(
               children: [
+                if (widget.model.parent_board.slug == 'with-school')
+                  Row(
+                    children: [
+                      Text(
+                        defineCommunicationStatus(
+                            widget.model.communication_article_status),
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: widget.model.communication_article_status ==
+                                  WithSchoolStatus.beforeUpVoteThreshold.index
+                              ? const Color(0xFFB1B1B1)
+                              : ColorsInfo.newara,
+                        ),
+                      ),
+                      const SizedBox(width: 8)
+                    ],
+                  ),
                 Flexible(
                   child: Text(
-                    widget.model.created_by.profile.nickname.toString(),
+                    getName(
+                        widget.model.name_type,
+                        widget.model.created_by.profile.nickname.toString(),
+                        context.locale),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: const TextStyle(

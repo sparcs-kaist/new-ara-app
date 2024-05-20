@@ -48,7 +48,7 @@ class BlockedProvider with ChangeNotifier {
 
   Future<void> fetchBlockedAnonymousPostID() async {
     dynamic fetchedList = await fetchCachedApiData(blockedPostAnonymousKey);
-    debugPrint('fetchedList: ${fetchedList}');
+    debugPrint('fetchedList: $fetchedList');
     if (fetchedList == null) {
       _blockedAnonymousPostIDs = {};
     } else {
@@ -61,7 +61,7 @@ class BlockedProvider with ChangeNotifier {
 
   Future<void> fetchBlockedAnonymousCommentID() async {
     dynamic fetchedList = await fetchCachedApiData(blockedCommentAnonymousKey);
-    debugPrint('fetchedList: ${fetchedList}');
+    debugPrint('fetchedList: $fetchedList');
     if (fetchedList == null) {
       _blockedAnonymousCommentIDs = {};
     } else {

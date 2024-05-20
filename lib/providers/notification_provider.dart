@@ -1,16 +1,13 @@
-/// 'notification_provider.dart'
-/// [NotificationProvider]를 정의함.
-/// 새로운 알림이 생성되었는지 확인하고 구독 중인 리스너에게 알려주는 기능.
-///
-/// Author: 김상오(alvin)
+// 'notification_provider.dart'
+// [NotificationProvider]를 정의함.
+// 새로운 알림이 생성되었는지 확인하고 구독 중인 리스너에게 알려주는 기능.
+//
+// Author: 김상오(alvin)
 
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:dio/dio.dart';
 
-import 'package:new_ara_app/constants/url_info.dart';
 import 'package:new_ara_app/providers/user_provider.dart';
-import 'package:provider/provider.dart';
 
 /// 새로운 알림 여부를 알려주는 ChangeNotifier.
 /// 알림 생성 여부가 필요한 다양한 위젯에 활용하기 위해 ChangeNotifier로 구현함.
@@ -19,6 +16,7 @@ class NotificationProvider with ChangeNotifier {
   bool _isNotReadExist = false;
   bool get isNotReadExist => _isNotReadExist;
 
+  // ignore: unused_field
   String _cookieString = "";
 
   /// [checkIsNotReadExist] 속의 dio를 위한 쿠키를 설정해줌.
@@ -41,8 +39,6 @@ class NotificationProvider with ChangeNotifier {
   Future<void> checkIsNotReadExist(UserProvider userProvider) async {
     bool res = false;
 
-    Dio dio = userProvider.createDioWithHeadersForGet();
-
     int curPage = 1;
 
     /// 다음 페이지가 존재하는 지 나타냄.
@@ -51,9 +47,11 @@ class NotificationProvider with ChangeNotifier {
     do {
       try {
         var response =
-            await dio.get("$newAraDefaultUrl/api/notifications/?page=$curPage");
-        hasNext = response.data["next"] == null ? false : true; // 다음 페이지 존재 확인.
-        List<dynamic> resultsJson = response.data["results"];
+            await userProvider.getApiRes("notifications/?page=$curPage");
+        final Map<String, dynamic>? jsonList = await response?.data;
+
+        hasNext = jsonList?["next"] == null ? false : true; // 다음 페이지 존재 확인.
+        List<dynamic> resultsJson = jsonList?["results"];
         for (var json in resultsJson) {
           if (!(json['is_read'] ?? true)) {
             res = true;
