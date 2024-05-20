@@ -18,6 +18,7 @@ import 'package:new_ara_app/pages/post_view_page.dart';
 import 'package:new_ara_app/utils/slide_routing.dart';
 import 'package:new_ara_app/providers/notification_provider.dart';
 import 'package:new_ara_app/utils/cache_function.dart';
+import 'package:new_ara_app/utils/global_key.dart';
 
 class MainPage extends StatefulWidget {
   const MainPage({super.key});
@@ -365,100 +366,114 @@ class _MainPageState extends State<MainPage> with WidgetsBindingObserver {
   Widget build(BuildContext context) {
     debugPrint("build invoked!!");
     return Scaffold(
-      appBar: AppBar(
-        elevation: 0,
-        title: SvgPicture.asset(
-          'assets/images/logo.svg',
-          fit: BoxFit.cover,
-        ),
-        actions: [
-          IconButton(
-              onPressed: () async {
-                if (context.locale == const Locale('ko')) {
-                  await context.setLocale(const Locale('en'));
-                } else {
-                  await context.setLocale(const Locale('ko'));
-                }
-              },
-              icon: const Icon(
-                Icons.language,
-                color: ColorsInfo.newara,
-              )),
-          IconButton(
-            icon: SvgPicture.asset(
-              'assets/icons/post.svg',
-              colorFilter:
-                  const ColorFilter.mode(ColorsInfo.newara, BlendMode.srcIn),
-              width: 35,
-              height: 35,
-            ),
-            onPressed: () async {
-              await Navigator.of(context)
-                  .push(slideRoute(const PostWritePage()));
-              await _refreshAllPosts();
-            },
+        appBar: AppBar(
+          elevation: 0,
+          title: SvgPicture.asset(
+            'assets/images/logo.svg',
+            fit: BoxFit.cover,
           ),
-          IconButton(
-            icon: SvgPicture.asset(
-              'assets/icons/search.svg',
-              colorFilter:
-                  const ColorFilter.mode(ColorsInfo.newara, BlendMode.srcIn),
-              width: 35,
-              height: 35,
-            ),
-            onPressed: () async {
-              await Navigator.of(context).push(slideRoute(
-                  const BulletinSearchPage(
-                      boardType: BoardType.all, boardInfo: null)));
-              await _refreshAllPosts();
-            },
-          ),
-        ],
-      ),
-      body: SafeArea(
-        child: _isLoading[0] ||
-                _isLoading[1] ||
-                _isLoading[2] ||
-                _isLoading[3] ||
-                _isLoading[4] ||
-                _isLoading[5] ||
-                _isLoading[6] ||
-                _isLoading[7] ||
-                _isLoading[8] ||
-                _isLoading[9] ||
-                _isLoading[10] ||
-                _isLoading[11]
-            ? const LoadingIndicator()
-            : RefreshIndicator.adaptive(
-                displacement: 0.0,
-                color: ColorsInfo.newara,
-                onRefresh: () async {
-                  //api를 호출 후 최신 데이터로 갱신
-                  await _refreshAllPosts();
+          actions: [
+            IconButton(
+                onPressed: () async {
+                  if (context.locale == const Locale('ko')) {
+                    await context.setLocale(const Locale('en'));
+                  } else {
+                    await context.setLocale(const Locale('ko'));
+                  }
                 },
-                child: SingleChildScrollView(
-                  child: SizedBox(
-                    width: MediaQuery.of(context).size.width,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        _buildTopContents(),
-                        const SizedBox(height: 20),
-                        _buildTalkContents(),
-                        const SizedBox(height: 20),
-                        _buildNoticeContents(),
-                        const SizedBox(height: 20),
-                        _buildTradeContents(),
-                        const SizedBox(height: 20),
-                        _buildStuCommunityContents(),
-                        const SizedBox(height: 20),
-                      ],
+                icon: const Icon(
+                  Icons.language,
+                  color: ColorsInfo.newara,
+                )),
+            IconButton(
+              icon: SvgPicture.asset(
+                'assets/icons/post.svg',
+                colorFilter:
+                    const ColorFilter.mode(ColorsInfo.newara, BlendMode.srcIn),
+                width: 35,
+                height: 35,
+              ),
+              onPressed: () async {
+                await Navigator.of(context)
+                    .push(slideRoute(const PostWritePage()));
+                await _refreshAllPosts();
+              },
+            ),
+            IconButton(
+              icon: SvgPicture.asset(
+                'assets/icons/search.svg',
+                colorFilter:
+                    const ColorFilter.mode(ColorsInfo.newara, BlendMode.srcIn),
+                width: 35,
+                height: 35,
+              ),
+              onPressed: () async {
+                await Navigator.of(context).push(slideRoute(
+                    const BulletinSearchPage(
+                        boardType: BoardType.all, boardInfo: null)));
+                await _refreshAllPosts();
+              },
+            ),
+          ],
+        ),
+        body: SafeArea(
+          child: _isLoading[0] ||
+                  _isLoading[1] ||
+                  _isLoading[2] ||
+                  _isLoading[3] ||
+                  _isLoading[4] ||
+                  _isLoading[5] ||
+                  _isLoading[6] ||
+                  _isLoading[7] ||
+                  _isLoading[8] ||
+                  _isLoading[9] ||
+                  _isLoading[10] ||
+                  _isLoading[11]
+              ? const LoadingIndicator()
+              : NotificationListener<ScrollNotification>(
+                  //Custom으로 RefreshIndicator 생성
+                  onNotification: (ScrollNotification notification) {
+                    if (notification is ScrollUpdateNotification &&
+                        notification.metrics.axisDirection ==
+                            AxisDirection.down &&
+                        notification.metrics.pixels <= -20) {
+                      // Custom trigger distance = -20
+                      refreshIndicatorKey.currentState?.show();
+                    }
+                    return false;
+                  },
+                  child: RefreshIndicator.adaptive(
+                    key: refreshIndicatorKey,
+                    displacement: 0.0,
+                    color: ColorsInfo.newara,
+                    onRefresh: () async {
+                      //api를 호출 후 최신 데이터로 갱신
+                      await _refreshAllPosts();
+                    },
+                    child: SingleChildScrollView(
+                      physics: const AlwaysScrollableScrollPhysics(),
+                      child: SizedBox(
+                        width: MediaQuery.of(context).size.width,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            _buildTopContents(),
+                            const SizedBox(height: 20),
+                            _buildTalkContents(),
+                            const SizedBox(height: 20),
+                            _buildNoticeContents(),
+                            const SizedBox(height: 20),
+                            _buildTradeContents(),
+                            const SizedBox(height: 20),
+                            _buildStuCommunityContents(),
+                            const SizedBox(height: 20),
+                          ],
+                        ),
+                      ),
                     ),
                   ),
                 ),
-              ),
-      ),
-    );
+        ));
   }
 
   Widget _buildTopContents() {
