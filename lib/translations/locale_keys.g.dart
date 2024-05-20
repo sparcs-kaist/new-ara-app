@@ -34,6 +34,11 @@ abstract class  LocaleKeys {
   static const mainPage_jobsWanted = 'mainPage.jobsWanted';
   static const mainPage_organizationsAndClubs = 'mainPage.organizationsAndClubs';
   static const mainPage_gradAssoc = 'mainPage.gradAssoc';
+  static const mainPage_communication = 'mainPage.communication';
+  static const mainPage_messagesToSchool = 'mainPage.messagesToSchool';
+  static const mainPage_kaistNews = 'mainPage.kaistNews';
+  static const mainPage_araFeedback = 'mainPage.araFeedback';
+  static const mainPage_facilityFeedback = 'mainPage.facilityFeedback';
   static const mainPage_undergradAssoc = 'mainPage.undergradAssoc';
   static const mainPage_freshmanCouncil = 'mainPage.freshmanCouncil';
   static const mainPage_talk = 'mainPage.talk';

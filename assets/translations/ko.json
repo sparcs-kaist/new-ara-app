@@ -39,6 +39,11 @@
         "gradAssoc": "원총",
         "undergradAssoc": "총학",
         "freshmanCouncil": "새학",
+        "communication": "소통",
+        "messagesToSchool": "학교에게 전합니다",
+        "kaistNews": "카이스트 뉴스",
+        "araFeedback": "아라 피드백",
+        "facilityFeedback": "입주업체 피드백",
         "talk": "자유게시판"
     },
     "notificationPage": {
