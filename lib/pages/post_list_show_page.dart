@@ -41,6 +41,7 @@ class _PostListShowPageState extends State<PostListShowPage>
   String apiUrl = "";
   String _boardName = "";
   bool _isLoadingNextPage = false;
+  bool _isLastItem = false;
   final ScrollController _scrollController = ScrollController();
 
   @override
@@ -199,6 +200,10 @@ class _PostListShowPageState extends State<PostListShowPage>
           postPreviewList.sort((a, b) => b.created_at.compareTo(a.created_at));
         });
       }
+    } on TypeError {
+      //Last item에 도달함 (_CastError)
+      _isLastItem = true;
+      debugPrint("post_list_show_page : last item reached");
     } catch (error) {
       currentPage = currentPage - 1;
       debugPrint("scrollListener error : $error");
@@ -319,7 +324,7 @@ class _PostListShowPageState extends State<PostListShowPage>
           ],
         ),
       ),
-      body: isLoading  // 페이지를 처음 로드할 때만 LoadingIndicator()를 부름.
+      body: isLoading // 페이지를 처음 로드할 때만 LoadingIndicator()를 부름.
           ? const LoadingIndicator()
           : SafeArea(
               child: Center(
@@ -352,10 +357,12 @@ class _PostListShowPageState extends State<PostListShowPage>
                         if (_isLoadingNextPage &&
                             index == postPreviewList.length) {
                           debugPrint('Next Page Load Request');
-                          return const SizedBox(
+                          return SizedBox(
                             height: 50,
                             child: Center(
-                              child: LoadingIndicator(),
+                              child: _isLastItem
+                                  ? Text("Last Item") //마지막 페이지 도달 시
+                                  : LoadingIndicator(),
                             ),
                           );
                         } else {
