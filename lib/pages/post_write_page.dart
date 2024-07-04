@@ -735,7 +735,9 @@ class _PostWritePageState extends State<PostWritePage>
                       );
                     } else {
                       return Text(
-                        "${_chosenBoardValue!.ko_name}에 글 쓰는 중...",
+                        context.locale == const Locale("ko")
+                            ? "${_chosenBoardValue!.ko_name}에 글 쓰는 중..."
+                            : "Writing to ${_chosenBoardValue!.en_name} Board",
                         style: const TextStyle(
                           fontSize: 16,
                           height: 24 / 16,
@@ -1595,8 +1597,7 @@ class _PostWritePageState extends State<PostWritePage>
             );
           }
         }
-      }
-      else {
+      } else {
         debugPrint("post Error occurred");
       }
 
