@@ -360,9 +360,11 @@ class _PostListShowPageState extends State<PostListShowPage>
                           return SizedBox(
                             height: 50,
                             child: Center(
-                              child: _isLastItem
-                                  ? Text("Last Item") //마지막 페이지 도달 시
-                                  : LoadingIndicator(),
+                              child: _isLastItem //마지막 페이지 도달 시
+                                  ? Text(context.locale == const Locale("ko")
+                                      ? "마지막 페이지입니다"
+                                      : "You have reached the last page")
+                                  : const LoadingIndicator(),
                             ),
                           );
                         } else {
