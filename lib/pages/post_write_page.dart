@@ -472,23 +472,28 @@ class _PostWritePageState extends State<PostWritePage>
             width: 35,
             height: 35),
         onPressed: () {
-          showDialog(
-              context: context,
-              builder: (context) => ExitConfirmDialog(
-                    userProvider: userProvider,
-                    targetContext: context,
-                    onTap: () {
-                      // 사용자가 미리 뒤로가기 버튼을 누르는 경우 에러 방지를 위해
-                      // try-catch 문을 도입함.
-                      try {
-                        Navigator.of(context)
-                          ..pop() //dialog pop
-                          ..pop(); //PostWritePage pop
-                      } catch (error) {
-                        debugPrint("pop error: $error");
-                      }
-                    },
-                  ));
+          //글이나 제목이 있다면 exitConfirm dialog
+          if (_hasEditorText || _titleController.text != '') {
+            showDialog(
+                context: context,
+                builder: (context) => ExitConfirmDialog(
+                      userProvider: userProvider,
+                      targetContext: context,
+                      onTap: () {
+                        // 사용자가 미리 뒤로가기 버튼을 누르는 경우 에러 방지를 위해
+                        // try-catch 문을 도입함.
+                        try {
+                          Navigator.of(context)
+                            ..pop() //dialog pop
+                            ..pop(); //PostWritePage pop
+                        } catch (error) {
+                          debugPrint("pop error: $error");
+                        }
+                      },
+                    ));
+          } else {
+            Navigator.of(context).pop();
+          }
         },
       ),
       title: SizedBox(
