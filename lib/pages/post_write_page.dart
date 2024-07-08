@@ -22,6 +22,7 @@ import 'package:new_ara_app/pages/terms_and_conditions_page.dart';
 import 'package:new_ara_app/providers/user_provider.dart';
 import 'package:new_ara_app/utils/cache_function.dart';
 import 'package:new_ara_app/utils/slide_routing.dart';
+import 'package:new_ara_app/widgets/dialogs.dart';
 import 'package:new_ara_app/widgets/loading_indicator.dart';
 import 'package:provider/provider.dart';
 import 'package:uuid/uuid.dart';
@@ -459,6 +460,7 @@ class _PostWritePageState extends State<PostWritePage>
   }
 
   PreferredSizeWidget _buildAppBar(bool canIupload) {
+    UserProvider userProvider = context.read<UserProvider>();
     return AppBar(
       centerTitle: true,
       leading: IconButton(
@@ -469,7 +471,25 @@ class _PostWritePageState extends State<PostWritePage>
             ),
             width: 35,
             height: 35),
-        onPressed: () => Navigator.pop(context),
+        onPressed: () {
+          showDialog(
+              context: context,
+              builder: (context) => ExitConfirmDialog(
+                    userProvider: userProvider,
+                    targetContext: context,
+                    onTap: () {
+                      // 사용자가 미리 뒤로가기 버튼을 누르는 경우 에러 방지를 위해
+                      // try-catch 문을 도입함.
+                      try {
+                        Navigator.of(context)
+                          ..pop() //dialog pop
+                          ..pop(); //PostWritePage pop
+                      } catch (error) {
+                        debugPrint("pop error: $error");
+                      }
+                    },
+                  ));
+        },
       ),
       title: SizedBox(
         child: Text(

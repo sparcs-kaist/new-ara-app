@@ -139,7 +139,8 @@
         "cancel": "Cancel",
         "confirm": "OK",
         "noBlockedUsers": "There are no blocked users.",
-        "noNickname": "No nickname"
+        "noNickname": "No nickname",
+        "exitConfirm": "Do you really want to go back? Your post will not be saved"
     },
     "popUpMenuButtons": {
         "downloadSucceed": "File downloaded successfully",
