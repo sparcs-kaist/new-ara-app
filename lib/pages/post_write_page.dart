@@ -424,43 +424,62 @@ class _PostWritePageState extends State<PostWritePage>
     //빌드 전 첨부파일의 유효성 확인
     _checkAttachmentsValid();
 
+    UserProvider userProvider = context.read<UserProvider>();
+
     return _isLoading
         ? const LoadingIndicator()
-        : Scaffold(
-            appBar: _buildAppBar(canIupload),
-            body: SafeArea(
-              child: Column(
-                children: [
-                  if (_isKeyboardClosed) _buildMenubar(),
-                  const SizedBox(
-                    height: 15,
-                  ),
-                  _buildTitle(),
-                  const SizedBox(height: 15),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 20),
-                    child: Container(
-                      height: 1,
-                      color: const Color(0xFFF0F0F0),
+        : WillPopScope(
+            onWillPop: () async {
+              if (_hasEditorText || _titleController.text != '') {
+                final shouldPop = await showDialog<bool>(
+                    context: context,
+                    builder: (context) => ExitConfirmDialog(
+                          userProvider: userProvider,
+                          targetContext: context,
+                          onTap: () {
+                            Navigator.pop(context, true); //dialog pop
+                          },
+                        ));
+                return shouldPop ?? false;
+              } else {
+                return true;
+              }
+            },
+            child: Scaffold(
+              appBar: _buildAppBar(canIupload, userProvider),
+              body: SafeArea(
+                child: Column(
+                  children: [
+                    if (_isKeyboardClosed) _buildMenubar(),
+                    const SizedBox(
+                      height: 15,
                     ),
-                  ),
-                  const SizedBox(
-                    height: 15,
-                  ),
-                  _buildToolbar(),
-                  const SizedBox(
-                    height: 10,
-                  ),
-                  Expanded(child: _buildEditor()),
-                  _buildAttachmentShow()
-                ],
+                    _buildTitle(),
+                    const SizedBox(height: 15),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 20),
+                      child: Container(
+                        height: 1,
+                        color: const Color(0xFFF0F0F0),
+                      ),
+                    ),
+                    const SizedBox(
+                      height: 15,
+                    ),
+                    _buildToolbar(),
+                    const SizedBox(
+                      height: 10,
+                    ),
+                    Expanded(child: _buildEditor()),
+                    _buildAttachmentShow()
+                  ],
+                ),
               ),
             ),
           );
   }
 
-  PreferredSizeWidget _buildAppBar(bool canIupload) {
-    UserProvider userProvider = context.read<UserProvider>();
+  PreferredSizeWidget _buildAppBar(bool canIupload, UserProvider userProvider) {
     return AppBar(
       centerTitle: true,
       leading: IconButton(
@@ -471,8 +490,7 @@ class _PostWritePageState extends State<PostWritePage>
             ),
             width: 35,
             height: 35),
-        onPressed: () {
-          //글이나 제목이 있다면 exitConfirm dialog
+        onPressed: () async {
           if (_hasEditorText || _titleController.text != '') {
             showDialog(
                 context: context,
@@ -492,7 +510,7 @@ class _PostWritePageState extends State<PostWritePage>
                       },
                     ));
           } else {
-            Navigator.of(context).pop();
+            Navigator.pop(context);
           }
         },
       ),

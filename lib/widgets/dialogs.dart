@@ -1141,7 +1141,7 @@ class ExitConfirmDialog extends StatelessWidget {
                   onTap: () {
                     // PostWritePage에서 pop해야 하므로
                     // targetContext 사용.
-                    Navigator.pop(targetContext);
+                    Navigator.pop(targetContext, false);
                   },
                   child: Container(
                     decoration: BoxDecoration(
