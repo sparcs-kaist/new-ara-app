@@ -61,6 +61,7 @@ class _PostListShowPageState extends State<PostListShowPage>
       });
     }
     debugPrint("=========================");
+    // TODO: '학교에게 전합니다' 게시판의 말머리가 생길 경우 조건문 수정해야함.
     isTopicsFilterRequired = (widget.boardInfo != null &&
         (widget.boardInfo!.slug == 'with-school' ||
             widget.boardInfo!.topics.isNotEmpty));
@@ -237,6 +238,75 @@ class _PostListShowPageState extends State<PostListShowPage>
     }
   }
 
+  List<Widget> _buildTopicBoxes(
+      BuildContext context, BoardDetailActionModel model) {
+    late List<Widget> ret;
+    if (model.slug != 'with-school') {
+      ret = List<Widget>.generate(model.topics.length, (index) {
+        return Container(
+          height: 35,
+          decoration: BoxDecoration(
+              borderRadius: const BorderRadius.all(Radius.circular(30)),
+              border: Border.all(color: const Color(0xFFBBBBBB))),
+          margin: const EdgeInsets.only(right: 15),
+          padding: const EdgeInsets.all(3.5),
+          child: InkWell(
+              borderRadius: const BorderRadius.all(Radius.circular(30)),
+              onTap: () {},
+              child: Center(
+                  child: Text(
+                context.locale == const Locale('ko')
+                    ? model.topics[index].ko_name
+                    : model.topics[index].en_name,
+                style: const TextStyle(
+                  fontSize: 16, // PostPreview의 제목과 동일한 폰트 크기
+                ),
+              ))),
+        );
+      });
+    } else {
+      ret = [
+        Container(
+          decoration: const BoxDecoration(
+            borderRadius: BorderRadius.all(Radius.circular(20)),
+          ),
+          child: Text(
+            context.locale == const Locale('ko') ? "답변완료" : "Answered",
+          ),
+        ),
+        Container(
+          decoration: const BoxDecoration(
+            borderRadius: BorderRadius.all(Radius.circular(20)),
+          ),
+          child: Text(
+            context.locale == const Locale('ko') ? "달성 전" : "Preparing",
+          ),
+        )
+      ];
+    }
+    return <Widget>[
+          Container(
+            height: 35,
+            decoration: BoxDecoration(
+                borderRadius: const BorderRadius.all(Radius.circular(25)),
+                border: Border.all(color: const Color(0xFFBBBBBB))),
+            margin: const EdgeInsets.only(right: 15),
+            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+            child: InkWell(
+                borderRadius: const BorderRadius.all(Radius.circular(30)),
+                onTap: () {},
+                child: Center(
+                    child: Text(
+                  context.locale == const Locale('ko') ? "전체" : "Total",
+                  style: const TextStyle(
+                    fontSize: 16, // PostPreview의 제목과 동일한 폰트 크기
+                  ),
+                ))),
+          )
+        ] +
+        ret;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -345,7 +415,19 @@ class _PostListShowPageState extends State<PostListShowPage>
                     children: [
                       // 말머리필터
                       if (isTopicsFilterRequired)
-                        SizedBox(height: 35, child: Placeholder()),
+                        SizedBox(
+                          width: MediaQuery.of(context).size.width - 18,
+                          height: 40,
+                          child: SingleChildScrollView(
+                            scrollDirection: Axis.horizontal,
+                            child: Row(
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              // isTopicsFilterRequired가 true이면 boardInfo가 null이 아님이 보장됨.
+                              children:
+                                  _buildTopicBoxes(context, widget.boardInfo!),
+                            ),
+                          ),
+                        ),
                       Expanded(
                         child: RefreshIndicator.adaptive(
                           displacement: 0.0,
