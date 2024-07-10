@@ -285,9 +285,7 @@ class _PostListShowPageState extends State<PostListShowPage>
               ),
               onPressed: () {},
               child: Text(
-                context.locale == const Locale('ko')
-                    ? "달성 전"
-                    : "Preparing",
+                context.locale == const Locale('ko') ? "달성 전" : "Preparing",
                 style: const TextStyle(
                   fontSize: 16, // PostPreview의 제목과 동일한 폰트 크기
                   color: Color.fromARGB(255, 101, 100, 100),
@@ -309,9 +307,7 @@ class _PostListShowPageState extends State<PostListShowPage>
               ),
               onPressed: () {},
               child: Text(
-                context.locale == const Locale('ko')
-                    ? "답변 완료"
-                    : "Completed",
+                context.locale == const Locale('ko') ? "답변 완료" : "Completed",
                 style: const TextStyle(
                   fontSize: 16, // PostPreview의 제목과 동일한 폰트 크기
                   color: Color.fromARGB(255, 101, 100, 100),
@@ -322,29 +318,28 @@ class _PostListShowPageState extends State<PostListShowPage>
     }
     return <Widget>[
           Container(
-          height: 35,
-          margin: const EdgeInsets.only(right: 15),
-          child: TextButton(
-              style: ButtonStyle(
-                overlayColor: MaterialStateProperty.all(Colors.transparent),
-                shape: MaterialStateProperty.all(
-                  RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(30),
-                    side: const BorderSide(color: Color(0xFFBBBBBB), width: 1),
+            height: 35,
+            margin: const EdgeInsets.only(right: 15),
+            child: TextButton(
+                style: ButtonStyle(
+                  overlayColor: MaterialStateProperty.all(Colors.transparent),
+                  shape: MaterialStateProperty.all(
+                    RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(30),
+                      side:
+                          const BorderSide(color: Color(0xFFBBBBBB), width: 1),
+                    ),
                   ),
                 ),
-              ),
-              onPressed: () {},
-              child: Text(
-                context.locale == const Locale('ko')
-                    ? "전체"
-                    : "Total",
-                style: const TextStyle(
-                  fontSize: 16, // PostPreview의 제목과 동일한 폰트 크기
-                  color: Color.fromARGB(255, 101, 100, 100),
-                ),
-              )),
-        )
+                onPressed: () {},
+                child: Text(
+                  context.locale == const Locale('ko') ? "전체" : "Total",
+                  style: const TextStyle(
+                    fontSize: 16, // PostPreview의 제목과 동일한 폰트 크기
+                    color: Color.fromARGB(255, 101, 100, 100),
+                  ),
+                )),
+          )
         ] +
         ret;
   }
@@ -471,7 +466,11 @@ class _PostListShowPageState extends State<PostListShowPage>
                           ),
                         ),
                       if (isTopicsFilterRequired)
-                        const Divider(),
+                        Container(
+                          margin: EdgeInsets.only(top: 5),
+                          height: 1,
+                          color: const Color(0xFFF0F0F0),
+                        ),
                       Expanded(
                         child: RefreshIndicator.adaptive(
                           displacement: 0.0,
