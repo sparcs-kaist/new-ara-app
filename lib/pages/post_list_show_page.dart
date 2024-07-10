@@ -245,64 +245,106 @@ class _PostListShowPageState extends State<PostListShowPage>
       ret = List<Widget>.generate(model.topics.length, (index) {
         return Container(
           height: 35,
-          decoration: BoxDecoration(
-              borderRadius: const BorderRadius.all(Radius.circular(30)),
-              border: Border.all(color: const Color(0xFFBBBBBB))),
           margin: const EdgeInsets.only(right: 15),
-          padding: const EdgeInsets.all(3.5),
-          child: InkWell(
-              borderRadius: const BorderRadius.all(Radius.circular(30)),
-              onTap: () {},
-              child: Center(
-                  child: Text(
+          child: TextButton(
+              style: ButtonStyle(
+                overlayColor: MaterialStateProperty.all(Colors.transparent),
+                shape: MaterialStateProperty.all(
+                  RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(30),
+                    side: const BorderSide(color: Color(0xFFBBBBBB), width: 1),
+                  ),
+                ),
+              ),
+              onPressed: () {},
+              child: Text(
                 context.locale == const Locale('ko')
                     ? model.topics[index].ko_name
                     : model.topics[index].en_name,
                 style: const TextStyle(
                   fontSize: 16, // PostPreview의 제목과 동일한 폰트 크기
+                  color: Color.fromARGB(255, 101, 100, 100),
                 ),
-              ))),
+              )),
         );
       });
     } else {
       ret = [
         Container(
-          decoration: const BoxDecoration(
-            borderRadius: BorderRadius.all(Radius.circular(20)),
-          ),
-          child: Text(
-            context.locale == const Locale('ko') ? "답변완료" : "Answered",
-          ),
+          height: 35,
+          margin: const EdgeInsets.only(right: 15),
+          child: TextButton(
+              style: ButtonStyle(
+                overlayColor: MaterialStateProperty.all(Colors.transparent),
+                shape: MaterialStateProperty.all(
+                  RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(30),
+                    side: const BorderSide(color: Color(0xFFBBBBBB), width: 1),
+                  ),
+                ),
+              ),
+              onPressed: () {},
+              child: Text(
+                context.locale == const Locale('ko')
+                    ? "달성 전"
+                    : "Preparing",
+                style: const TextStyle(
+                  fontSize: 16, // PostPreview의 제목과 동일한 폰트 크기
+                  color: Color.fromARGB(255, 101, 100, 100),
+                ),
+              )),
         ),
         Container(
-          decoration: const BoxDecoration(
-            borderRadius: BorderRadius.all(Radius.circular(20)),
-          ),
-          child: Text(
-            context.locale == const Locale('ko') ? "달성 전" : "Preparing",
-          ),
+          height: 35,
+          margin: const EdgeInsets.only(right: 15),
+          child: TextButton(
+              style: ButtonStyle(
+                overlayColor: MaterialStateProperty.all(Colors.transparent),
+                shape: MaterialStateProperty.all(
+                  RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(30),
+                    side: const BorderSide(color: Color(0xFFBBBBBB), width: 1),
+                  ),
+                ),
+              ),
+              onPressed: () {},
+              child: Text(
+                context.locale == const Locale('ko')
+                    ? "답변 완료"
+                    : "Completed",
+                style: const TextStyle(
+                  fontSize: 16, // PostPreview의 제목과 동일한 폰트 크기
+                  color: Color.fromARGB(255, 101, 100, 100),
+                ),
+              )),
         )
       ];
     }
     return <Widget>[
           Container(
-            height: 35,
-            decoration: BoxDecoration(
-                borderRadius: const BorderRadius.all(Radius.circular(25)),
-                border: Border.all(color: const Color(0xFFBBBBBB))),
-            margin: const EdgeInsets.only(right: 15),
-            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-            child: InkWell(
-                borderRadius: const BorderRadius.all(Radius.circular(30)),
-                onTap: () {},
-                child: Center(
-                    child: Text(
-                  context.locale == const Locale('ko') ? "전체" : "Total",
-                  style: const TextStyle(
-                    fontSize: 16, // PostPreview의 제목과 동일한 폰트 크기
+          height: 35,
+          margin: const EdgeInsets.only(right: 15),
+          child: TextButton(
+              style: ButtonStyle(
+                overlayColor: MaterialStateProperty.all(Colors.transparent),
+                shape: MaterialStateProperty.all(
+                  RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(30),
+                    side: const BorderSide(color: Color(0xFFBBBBBB), width: 1),
                   ),
-                ))),
-          )
+                ),
+              ),
+              onPressed: () {},
+              child: Text(
+                context.locale == const Locale('ko')
+                    ? "전체"
+                    : "Total",
+                style: const TextStyle(
+                  fontSize: 16, // PostPreview의 제목과 동일한 폰트 크기
+                  color: Color.fromARGB(255, 101, 100, 100),
+                ),
+              )),
+        )
         ] +
         ret;
   }
@@ -417,7 +459,7 @@ class _PostListShowPageState extends State<PostListShowPage>
                       if (isTopicsFilterRequired)
                         SizedBox(
                           width: MediaQuery.of(context).size.width - 18,
-                          height: 40,
+                          height: 35,
                           child: SingleChildScrollView(
                             scrollDirection: Axis.horizontal,
                             child: Row(
@@ -428,6 +470,8 @@ class _PostListShowPageState extends State<PostListShowPage>
                             ),
                           ),
                         ),
+                      if (isTopicsFilterRequired)
+                        const Divider(),
                       Expanded(
                         child: RefreshIndicator.adaptive(
                           displacement: 0.0,
