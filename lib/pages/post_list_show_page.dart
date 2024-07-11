@@ -57,15 +57,6 @@ class _PostListShowPageState extends State<PostListShowPage>
     super.initState();
 
     var userProvider = context.read<UserProvider>();
-    debugPrint("========================="); // TEST
-    if (widget.boardInfo!.topics.isEmpty) {
-      debugPrint("No topics!");
-    } else {
-      widget.boardInfo!.topics.forEach((topicModel) {
-        debugPrint(topicModel.ko_name);
-      });
-    }
-    debugPrint("=========================");
     // TODO: '학교에게 전합니다' 게시판의 말머리가 생길 경우 조건문 수정해야함.
     isTopicsFilterRequired = (widget.boardInfo != null &&
         (widget.boardInfo!.slug == 'with-school' ||
@@ -244,7 +235,9 @@ class _PostListShowPageState extends State<PostListShowPage>
   }
 
   void Function() setCurrentFilterIndex(int index) {
-    return () => setState(() => currentFilter = index);
+    return () {
+      return setState(() => currentFilter = index);
+    };
   }
 
   Widget _buildTopicButton(String text, int index) {
@@ -268,7 +261,29 @@ class _PostListShowPageState extends State<PostListShowPage>
               ),
             ),
           ),
-          onPressed: setCurrentFilterIndex(index),
+          onPressed: () async {
+            setState(() => currentFilter = index);
+            isLoading = true;
+
+            // _buildTopicButton이 호출될때는 BoardType이 free임이 보장되나
+            // 의도치 않은 예외 방지를 위해 조건문 추가함.
+            if (widget.boardType == BoardType.free) {
+              apiUrl = index == 0
+                  ? "articles/?parent_board=${widget.boardInfo!.id.toInt()}&page="
+                  : (!isWithSchoolBoard(widget.boardInfo)
+                      ? "articles/?parent_board=${widget.boardInfo!.id.toInt()}&parent_topic=${widget.boardInfo!.topics[index - 1].id}&page="
+                      : "articles/?parent_board=${widget.boardInfo!.id.toInt()}&communication_article__school_response_status=${WithSchoolStatus.values[index - 1].index}&page=");
+            }
+            // 리프레쉬시 게시물 목록을 업데이트합니다.
+            // 1페이지만 로드하도록 설정하여 최신 게시물을 불러옵니다.
+            // 1페이지만 로드하면 태블릿에서 게시물로 화면을 꽉채우지 못하므로 다음 페이지도 로드합니다.
+            await updateAllBulletinList(pageLimitToReload: 1).then(
+              (value) {
+                _loadNextPage();
+              },
+            );
+            isLoading = false;
+          },
           child: Text(
             text,
             style: TextStyle(
@@ -423,55 +438,53 @@ class _PostListShowPageState extends State<PostListShowPage>
           ],
         ),
       ),
-      body: isLoading // 페이지를 처음 로드할 때만 LoadingIndicator()를 부름.
-          ? const LoadingIndicator()
-          : SafeArea(
-              child: Center(
-                child: SizedBox(
-                  width: MediaQuery.of(context).size.width - 18,
-                  child: Column(
-                    children: [
-                      // 말머리필터
-                      if (isTopicsFilterRequired)
-                        SizedBox(
-                          width: MediaQuery.of(context).size.width - 18,
-                          height: 40,
-                          child: SingleChildScrollView(
-                            scrollDirection: Axis.horizontal,
-                            child: Row(
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              // isTopicsFilterRequired가 true이면 boardInfo가 null이 아님이 보장됨.
-                              children:
-                                  _buildTopicBoxes(context, widget.boardInfo!),
-                            ),
-                          ),
-                        ),
-                      if (isTopicsFilterRequired)
-                        Container(
-                          margin: const EdgeInsets.only(top: 5),
-                          height: 1,
-                          color: const Color(0xFFF0F0F0),
-                        ),
-                      Expanded(
-                        child: RefreshIndicator.adaptive(
-                          displacement: 0.0,
-                          color: ColorsInfo.newara,
-                          onRefresh: () async {
-                            // refresh 중에는 LoadingIndicator를 사용하지 않으므로 setState()는 제거함.
-                            // 로직상 isLoading 변수의 값은 상황에 맞게 변경되도록 함.
-                            isLoading = true;
-                            // 리프레쉬시 게시물 목록을 업데이트합니다.
-                            // 1페이지만 로드하도록 설정하여 최신 게시물을 불러옵니다.
-                            // 1페이지만 로드하면 태블릿에서 게시물로 화면을 꽉채우지 못하므로 다음 페이지도 로드합니다.
-                            await updateAllBulletinList(pageLimitToReload: 1)
-                                .then(
-                              (value) {
-                                _loadNextPage();
-                              },
-                            );
-                            isLoading = false;
-                          },
-                          child: ListView.separated(
+      body: SafeArea(
+        child: Center(
+          child: SizedBox(
+            width: MediaQuery.of(context).size.width - 18,
+            child: Column(
+              children: [
+                // 말머리필터
+                if (isTopicsFilterRequired)
+                  SizedBox(
+                    width: MediaQuery.of(context).size.width - 18,
+                    height: 40,
+                    child: SingleChildScrollView(
+                      scrollDirection: Axis.horizontal,
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        // isTopicsFilterRequired가 true이면 boardInfo가 null이 아님이 보장됨.
+                        children: _buildTopicBoxes(context, widget.boardInfo!),
+                      ),
+                    ),
+                  ),
+                if (isTopicsFilterRequired)
+                  Container(
+                    margin: const EdgeInsets.only(top: 5),
+                    height: 1,
+                    color: const Color(0xFFF0F0F0),
+                  ),
+                Expanded(
+                  child: RefreshIndicator.adaptive(
+                    displacement: 0.0,
+                    color: ColorsInfo.newara,
+                    onRefresh: () async {
+                      // refresh 중에는 LoadingIndicator를 사용하지 않으므로 setState()는 제거함.
+                      // 로직상 isLoading 변수의 값은 상황에 맞게 변경되도록 함.
+                      isLoading = true;
+                      // 리프레쉬시 게시물 목록을 업데이트합니다.
+                      // 1페이지만 로드하도록 설정하여 최신 게시물을 불러옵니다.
+                      // 1페이지만 로드하면 태블릿에서 게시물로 화면을 꽉채우지 못하므로 다음 페이지도 로드합니다.
+                      await updateAllBulletinList(pageLimitToReload: 1).then(
+                        (value) {
+                          _loadNextPage();
+                        },
+                      );
+                      isLoading = false;
+                    },
+                    child: isLoading
+                        ? const LoadingIndicator()
+                        : ListView.separated(
                             physics: const AlwaysScrollableScrollPhysics(),
                             controller: _scrollController,
                             itemCount: postPreviewList.length +
@@ -527,13 +540,13 @@ class _PostListShowPageState extends State<PostListShowPage>
                               }
                             },
                           ),
-                        ),
-                      ),
-                    ],
                   ),
                 ),
-              ),
+              ],
             ),
+          ),
+        ),
+      ),
     );
   }
 }
