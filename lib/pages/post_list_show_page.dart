@@ -309,6 +309,22 @@ class _PostListShowPageState extends State<PostListShowPage>
         ret;
   }
 
+  /// articleModel 게시글이 필터링되어야(화면에 보이지 않아야) 하는 경우에 true를 반환.
+  /// 아래 ListView.separated에서 사용하기 위해 작성.
+  bool isFiltered(BoardDetailActionModel? boardModel,
+      ArticleListActionModel articleModel, int filterIdx) {
+    // board가 지정되지 않은 경우, '전체'인 경우 필터링이 필요하지 않음.
+    if (boardModel == null || filterIdx == 0) return false;
+
+    if (isWithSchoolBoard(boardModel)) {
+      return (articleModel.communication_article_status !=
+          WithSchoolStatus.values[filterIdx - 1].index);
+    } else {
+      return (articleModel.parent_topic?.slug !=
+          boardModel.topics[filterIdx - 1].slug);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -354,7 +370,7 @@ class _PostListShowPageState extends State<PostListShowPage>
           ),
         ),
         actions: [
-          if (widget.boardInfo?.slug == 'with-school')
+          if (isWithSchoolBoard(widget.boardInfo))
             const WithSchoolPopupMenuButton(),
           IconButton(
             icon: SvgPicture.asset(
@@ -473,26 +489,10 @@ class _PostListShowPageState extends State<PostListShowPage>
                                 );
                               } else {
                                 // 말머리 필터가 '전체'가 아닌 경우 (학교에게 전합니다 게시판은 아래에서 처리)
-                                if (widget.boardInfo?.slug != 'with-school' &&
-                                    currentFilter != 0) {
-                                  if (postPreviewList[index]
-                                          .parent_topic
-                                          ?.slug !=
-                                      widget.boardInfo
-                                          ?.topics[currentFilter - 1].slug) {
-                                    return Container();
-                                  }
-                                }
-
-                                return (widget.boardInfo?.slug != 'with-school' || widget.boardInfo?.slug ==
-                                            'with-school' &&
-                                        (currentFilter == 0 ||
-                                            postPreviewList[index]
-                                                    .communication_article_status ==
-                                                WithSchoolStatus
-                                                    .values[currentFilter - 1]
-                                                    .index))
-                                    ? InkWell(
+                                return isFiltered(widget.boardInfo,
+                                        postPreviewList[index], currentFilter)
+                                    ? Container()
+                                    : InkWell(
                                         onTap: () async {
                                           await Navigator.of(context).push(
                                               slideRoute(PostViewPage(
@@ -511,31 +511,20 @@ class _PostListShowPageState extends State<PostListShowPage>
                                             ),
                                           ],
                                         ),
-                                      )
-                                    : Container();
+                                      );
                               }
                             },
                             separatorBuilder:
                                 (BuildContext context, int index) {
-                              if (widget.boardInfo?.slug != 'with-school' &&
-                                  currentFilter != 0) {
-                                if (postPreviewList[index].parent_topic?.slug !=
-                                    widget.boardInfo?.topics[currentFilter - 1]
-                                        .slug) {
-                                  return Container();
-                                }
+                              if (!isFiltered(widget.boardInfo,
+                                  postPreviewList[index], currentFilter)) {
+                                return Container(
+                                  height: 1,
+                                  color: const Color(0xFFF0F0F0),
+                                );
+                              } else {
+                                return Container();
                               }
-                              if (!(widget.boardInfo?.slug != 'with-school' || (widget.boardInfo?.slug == 'with-school' &&
-                                  (currentFilter == 0 ||
-                                      postPreviewList[index]
-                                              .communication_article_status ==
-                                          WithSchoolStatus
-                                              .values[currentFilter - 1]
-                                              .index)))) return Container();
-                              return Container(
-                                height: 1,
-                                color: const Color(0xFFF0F0F0),
-                              );
                             },
                           ),
                         ),
