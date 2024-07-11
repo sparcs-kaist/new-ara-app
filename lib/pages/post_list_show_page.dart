@@ -17,6 +17,7 @@ import 'package:new_ara_app/pages/post_view_page.dart';
 import 'package:new_ara_app/utils/slide_routing.dart';
 import 'package:new_ara_app/providers/notification_provider.dart';
 import 'package:new_ara_app/widgets/pop_up_menu_buttons.dart';
+import 'package:new_ara_app/utils/with_school.dart';
 
 /// PostListShowPage는 게시물 목록를 나타내는 위젯.
 /// boardType에 따라 게시판의 종류를 판별하고, 특성화 된 위젯들을 활성화 비활성화 되도록 설계.
@@ -34,6 +35,10 @@ class PostListShowPage extends StatefulWidget {
 class _PostListShowPageState extends State<PostListShowPage>
     with WidgetsBindingObserver {
   List<ArticleListActionModel> postPreviewList = [];
+
+  /// 현재 선택된 말머리 필터의 인덱스를 나타냄.
+  /// 기본값은 전체(= 0)
+  int currentFilter = 0;
 
   /// 말머리 필터가 필요한 지 여부를 나타내는 변수
   /// 학교에게 전합니다 게시판 or BoardDetailActionModel의 topics가 isNotEmpty일 때 true
@@ -238,108 +243,68 @@ class _PostListShowPageState extends State<PostListShowPage>
     }
   }
 
+  void Function() setCurrentFilterIndex(int index) {
+    return () => setState(() => currentFilter = index);
+  }
+
+  Widget _buildTopicButton(String text, int index) {
+    return Container(
+      height: 35,
+      margin: const EdgeInsets.only(right: 10),
+      child: TextButton(
+          style: ButtonStyle(
+            backgroundColor: MaterialStateProperty.all(
+                currentFilter == index ? ColorsInfo.newara : Colors.white),
+            overlayColor:
+                MaterialStateProperty.all(Colors.transparent), // no splash
+            shape: MaterialStateProperty.all(
+              RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(30),
+                side: BorderSide(
+                    color: currentFilter == index
+                        ? ColorsInfo.newara
+                        : const Color(0xFFBBBBBB),
+                    width: 1),
+              ),
+            ),
+          ),
+          onPressed: setCurrentFilterIndex(index),
+          child: Text(
+            text,
+            style: TextStyle(
+              fontSize: 16, // PostPreview의 제목과 동일한 폰트 크기
+              color: currentFilter == index
+                  ? Colors.white
+                  : const Color.fromARGB(255, 101, 100, 100),
+            ),
+          )),
+    );
+  }
+
   List<Widget> _buildTopicBoxes(
       BuildContext context, BoardDetailActionModel model) {
     late List<Widget> ret;
     if (model.slug != 'with-school') {
       ret = List<Widget>.generate(model.topics.length, (index) {
-        return Container(
-          height: 35,
-          margin: const EdgeInsets.only(right: 15),
-          child: TextButton(
-              style: ButtonStyle(
-                overlayColor: MaterialStateProperty.all(Colors.transparent),
-                shape: MaterialStateProperty.all(
-                  RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(30),
-                    side: const BorderSide(color: Color(0xFFBBBBBB), width: 1),
-                  ),
-                ),
-              ),
-              onPressed: () {},
-              child: Text(
-                context.locale == const Locale('ko')
-                    ? model.topics[index].ko_name
-                    : model.topics[index].en_name,
-                style: const TextStyle(
-                  fontSize: 16, // PostPreview의 제목과 동일한 폰트 크기
-                  color: Color.fromARGB(255, 101, 100, 100),
-                ),
-              )),
-        );
+        return _buildTopicButton(
+            context.locale == const Locale('ko')
+                ? model.topics[index].ko_name
+                : model.topics[index].en_name,
+            index + 1); // total이 첫번째이므로 + 1 씩 크게
       });
     } else {
       ret = [
-        Container(
-          height: 35,
-          margin: const EdgeInsets.only(right: 15),
-          child: TextButton(
-              style: ButtonStyle(
-                overlayColor: MaterialStateProperty.all(Colors.transparent),
-                shape: MaterialStateProperty.all(
-                  RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(30),
-                    side: const BorderSide(color: Color(0xFFBBBBBB), width: 1),
-                  ),
-                ),
-              ),
-              onPressed: () {},
-              child: Text(
-                context.locale == const Locale('ko') ? "달성 전" : "Preparing",
-                style: const TextStyle(
-                  fontSize: 16, // PostPreview의 제목과 동일한 폰트 크기
-                  color: Color.fromARGB(255, 101, 100, 100),
-                ),
-              )),
-        ),
-        Container(
-          height: 35,
-          margin: const EdgeInsets.only(right: 15),
-          child: TextButton(
-              style: ButtonStyle(
-                overlayColor: MaterialStateProperty.all(Colors.transparent),
-                shape: MaterialStateProperty.all(
-                  RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(30),
-                    side: const BorderSide(color: Color(0xFFBBBBBB), width: 1),
-                  ),
-                ),
-              ),
-              onPressed: () {},
-              child: Text(
-                context.locale == const Locale('ko') ? "답변 완료" : "Completed",
-                style: const TextStyle(
-                  fontSize: 16, // PostPreview의 제목과 동일한 폰트 크기
-                  color: Color.fromARGB(255, 101, 100, 100),
-                ),
-              )),
-        )
+        _buildTopicButton(
+            context.locale == const Locale('ko') ? "달성 전" : "Polling", 1),
+        _buildTopicButton(
+            context.locale == const Locale('ko') ? "답변 준비중" : "Preparing", 2),
+        _buildTopicButton(
+            context.locale == const Locale('ko') ? "답변 완료" : "Answered", 3),
       ];
     }
     return <Widget>[
-          Container(
-            height: 35,
-            margin: const EdgeInsets.only(right: 15),
-            child: TextButton(
-                style: ButtonStyle(
-                  overlayColor: MaterialStateProperty.all(Colors.transparent),
-                  shape: MaterialStateProperty.all(
-                    RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(30),
-                      side:
-                          const BorderSide(color: Color(0xFFBBBBBB), width: 1),
-                    ),
-                  ),
-                ),
-                onPressed: () {},
-                child: Text(
-                  context.locale == const Locale('ko') ? "전체" : "Total",
-                  style: const TextStyle(
-                    fontSize: 16, // PostPreview의 제목과 동일한 폰트 크기
-                    color: Color.fromARGB(255, 101, 100, 100),
-                  ),
-                )),
-          )
+          _buildTopicButton(
+              context.locale == const Locale('ko') ? "전체" : "Total", 0)
         ] +
         ret;
   }
@@ -454,7 +419,7 @@ class _PostListShowPageState extends State<PostListShowPage>
                       if (isTopicsFilterRequired)
                         SizedBox(
                           width: MediaQuery.of(context).size.width - 18,
-                          height: 35,
+                          height: 40,
                           child: SingleChildScrollView(
                             scrollDirection: Axis.horizontal,
                             child: Row(
@@ -467,7 +432,7 @@ class _PostListShowPageState extends State<PostListShowPage>
                         ),
                       if (isTopicsFilterRequired)
                         Container(
-                          margin: EdgeInsets.only(top: 5),
+                          margin: const EdgeInsets.only(top: 5),
                           height: 1,
                           color: const Color(0xFFF0F0F0),
                         ),
@@ -507,27 +472,66 @@ class _PostListShowPageState extends State<PostListShowPage>
                                   ),
                                 );
                               } else {
-                                return InkWell(
-                                  onTap: () async {
-                                    await Navigator.of(context).push(slideRoute(
-                                        PostViewPage(
-                                            id: postPreviewList[index].id)));
-                                    updateAllBulletinList();
-                                  },
-                                  child: Column(
-                                    children: [
-                                      Padding(
-                                        padding: const EdgeInsets.all(11.0),
-                                        child: PostPreview(
-                                            model: postPreviewList[index]),
-                                      ),
-                                    ],
-                                  ),
-                                );
+                                // 말머리 필터가 '전체'가 아닌 경우 (학교에게 전합니다 게시판은 아래에서 처리)
+                                if (widget.boardInfo?.slug != 'with-school' &&
+                                    currentFilter != 0) {
+                                  if (postPreviewList[index]
+                                          .parent_topic
+                                          ?.slug !=
+                                      widget.boardInfo
+                                          ?.topics[currentFilter - 1].slug) {
+                                    return Container();
+                                  }
+                                }
+
+                                return (widget.boardInfo?.slug != 'with-school' || widget.boardInfo?.slug ==
+                                            'with-school' &&
+                                        (currentFilter == 0 ||
+                                            postPreviewList[index]
+                                                    .communication_article_status ==
+                                                WithSchoolStatus
+                                                    .values[currentFilter - 1]
+                                                    .index))
+                                    ? InkWell(
+                                        onTap: () async {
+                                          await Navigator.of(context).push(
+                                              slideRoute(PostViewPage(
+                                                  id: postPreviewList[index]
+                                                      .id)));
+                                          updateAllBulletinList();
+                                        },
+                                        child: Column(
+                                          children: [
+                                            Padding(
+                                              padding:
+                                                  const EdgeInsets.all(11.0),
+                                              child: PostPreview(
+                                                  model:
+                                                      postPreviewList[index]),
+                                            ),
+                                          ],
+                                        ),
+                                      )
+                                    : Container();
                               }
                             },
                             separatorBuilder:
                                 (BuildContext context, int index) {
+                              if (widget.boardInfo?.slug != 'with-school' &&
+                                  currentFilter != 0) {
+                                if (postPreviewList[index].parent_topic?.slug !=
+                                    widget.boardInfo?.topics[currentFilter - 1]
+                                        .slug) {
+                                  return Container();
+                                }
+                              }
+                              if (!(widget.boardInfo?.slug != 'with-school' || (widget.boardInfo?.slug == 'with-school' &&
+                                  (currentFilter == 0 ||
+                                      postPreviewList[index]
+                                              .communication_article_status ==
+                                          WithSchoolStatus
+                                              .values[currentFilter - 1]
+                                              .index)))) return Container();
                               return Container(
                                 height: 1,
                                 color: const Color(0xFFF0F0F0),
