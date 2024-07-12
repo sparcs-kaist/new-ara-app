@@ -43,8 +43,8 @@ class _PostListShowPageState extends State<PostListShowPage>
   String _boardName = "";
   bool _isLoadingNextPage = false;
   final ScrollController _scrollController = ScrollController();
-  //final GlobalKey<RefreshIndicatorState> _refreshIndicatorKey =
-  //    GlobalKey<RefreshIndicatorState>(); //RefreshIndicator custom 처리용 key
+  final GlobalKey<RefreshIndicatorState> _refreshIndicatorKey =
+      GlobalKey<RefreshIndicatorState>(); //RefreshIndicator custom 처리용 key
 
   @override
   void initState() {
@@ -334,13 +334,12 @@ class _PostListShowPageState extends State<PostListShowPage>
                         if (notification is ScrollUpdateNotification &&
                             notification.metrics.pixels <= -20) {
                           // Custom trigger distance = -20
-                          refreshIndicatorKey.currentState?.show();
-                          debugPrint('hey');
+                          _refreshIndicatorKey.currentState?.show();
                         }
                         return false;
                       },
                       child: RefreshIndicator.adaptive(
-                        key: refreshIndicatorKey,
+                        key: _refreshIndicatorKey,
                         displacement: 0.0,
                         color: ColorsInfo.newara,
                         onRefresh: () async {
@@ -359,7 +358,8 @@ class _PostListShowPageState extends State<PostListShowPage>
                           isLoading = false;
                         },
                         child: ListView.separated(
-                          physics: const AlwaysScrollableScrollPhysics(),
+                          physics: const AlwaysScrollableScrollPhysics(
+                              parent: BouncingScrollPhysics()),
                           controller: _scrollController,
                           itemCount: postPreviewList.length +
                               (_isLoadingNextPage ? 1 : 0), // 아이템 개수

@@ -454,7 +454,8 @@ class _MainPageState extends State<MainPage> with WidgetsBindingObserver {
                       await _refreshAllPosts();
                     },
                     child: SingleChildScrollView(
-                      physics: const AlwaysScrollableScrollPhysics(),
+                      physics: const AlwaysScrollableScrollPhysics(
+                          parent: BouncingScrollPhysics()),
                       child: SizedBox(
                         width: MediaQuery.of(context).size.width,
                         child: Column(
