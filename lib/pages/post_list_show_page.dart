@@ -4,6 +4,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:new_ara_app/pages/bulletin_search_page.dart';
 import 'package:new_ara_app/pages/post_write_page.dart';
 import 'package:new_ara_app/translations/locale_keys.g.dart';
+import 'package:new_ara_app/utils/global_key.dart';
 import 'package:provider/provider.dart';
 
 import 'package:new_ara_app/constants/board_type.dart';
@@ -42,8 +43,8 @@ class _PostListShowPageState extends State<PostListShowPage>
   String _boardName = "";
   bool _isLoadingNextPage = false;
   final ScrollController _scrollController = ScrollController();
-  final GlobalKey<RefreshIndicatorState> _refreshIndicatorKey =
-      GlobalKey<RefreshIndicatorState>(); //RefreshIndicator custom 처리용 key
+  //final GlobalKey<RefreshIndicatorState> _refreshIndicatorKey =
+  //    GlobalKey<RefreshIndicatorState>(); //RefreshIndicator custom 처리용 key
 
   @override
   void initState() {
@@ -333,12 +334,13 @@ class _PostListShowPageState extends State<PostListShowPage>
                         if (notification is ScrollUpdateNotification &&
                             notification.metrics.pixels <= -20) {
                           // Custom trigger distance = -20
-                          _refreshIndicatorKey.currentState?.show();
+                          refreshIndicatorKey.currentState?.show();
+                          debugPrint('hey');
                         }
                         return false;
                       },
                       child: RefreshIndicator.adaptive(
-                        key: _refreshIndicatorKey,
+                        key: refreshIndicatorKey,
                         displacement: 0.0,
                         color: ColorsInfo.newara,
                         onRefresh: () async {

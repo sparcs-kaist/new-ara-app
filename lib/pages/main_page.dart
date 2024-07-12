@@ -60,6 +60,9 @@ class _MainPageState extends State<MainPage> with WidgetsBindingObserver {
   final List<ArticleListActionModel> _marketContents = [];
   final List<ArticleListActionModel> _realEstateContents = [];
 
+  final GlobalKey<RefreshIndicatorState> _refreshIndicatorKey =
+      GlobalKey<RefreshIndicatorState>(); //RefreshIndicator custom 처리용 key
+
   @override
   void initState() {
     super.initState();
@@ -438,12 +441,12 @@ class _MainPageState extends State<MainPage> with WidgetsBindingObserver {
                             AxisDirection.down &&
                         notification.metrics.pixels <= -20) {
                       // Custom trigger distance = -20
-                      refreshIndicatorKey.currentState?.show();
+                      _refreshIndicatorKey.currentState?.show();
                     }
                     return false;
                   },
                   child: RefreshIndicator.adaptive(
-                    key: refreshIndicatorKey,
+                    key: _refreshIndicatorKey,
                     displacement: 0.0,
                     color: ColorsInfo.newara,
                     onRefresh: () async {
