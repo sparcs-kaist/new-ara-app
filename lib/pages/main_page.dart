@@ -3,6 +3,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:new_ara_app/pages/bulletin_search_page.dart';
 import 'package:new_ara_app/translations/locale_keys.g.dart';
+import 'package:new_ara_app/utils/refresh_indicator.dart';
 import 'package:provider/provider.dart';
 
 import 'package:new_ara_app/constants/board_type.dart';
@@ -18,6 +19,7 @@ import 'package:new_ara_app/pages/post_view_page.dart';
 import 'package:new_ara_app/utils/slide_routing.dart';
 import 'package:new_ara_app/providers/notification_provider.dart';
 import 'package:new_ara_app/utils/cache_function.dart';
+import 'package:new_ara_app/utils/global_key.dart';
 
 class MainPage extends StatefulWidget {
   const MainPage({super.key});
@@ -58,6 +60,9 @@ class _MainPageState extends State<MainPage> with WidgetsBindingObserver {
   final List<ArticleListActionModel> _wantedContents = [];
   final List<ArticleListActionModel> _marketContents = [];
   final List<ArticleListActionModel> _realEstateContents = [];
+
+  final GlobalKey<RefreshIndicatorState> _refreshIndicatorKey =
+      GlobalKey<RefreshIndicatorState>(); //RefreshIndicator custom 처리용 key
 
   @override
   void initState() {
@@ -429,14 +434,15 @@ class _MainPageState extends State<MainPage> with WidgetsBindingObserver {
                 _isLoading[10] ||
                 _isLoading[11]
             ? const LoadingIndicator()
-            : RefreshIndicator.adaptive(
-                displacement: 0.0,
-                color: ColorsInfo.newara,
+            : customRefreshIndicator(
+                globalKey: _refreshIndicatorKey,
                 onRefresh: () async {
                   //api를 호출 후 최신 데이터로 갱신
                   await _refreshAllPosts();
                 },
                 child: SingleChildScrollView(
+                  physics: const AlwaysScrollableScrollPhysics(
+                      parent: BouncingScrollPhysics()),
                   child: SizedBox(
                     width: MediaQuery.of(context).size.width,
                     child: Column(

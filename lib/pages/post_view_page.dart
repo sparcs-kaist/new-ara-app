@@ -4,6 +4,7 @@ import 'dart:core';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:new_ara_app/utils/refresh_indicator.dart';
 import 'package:provider/provider.dart';
 import 'package:dio/dio.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -209,6 +210,8 @@ class _PostViewPageState extends State<PostViewPage> {
   Widget build(BuildContext context) {
     UserProvider userProvider = context.read<UserProvider>();
     BlockedProvider blockedProvider = context.watch<BlockedProvider>();
+    final GlobalKey<RefreshIndicatorState> _refreshIndicatorKey =
+        GlobalKey<RefreshIndicatorState>(); //RefreshIndicator custom 처리용 key
 
     // _fetchArticle이 진행중일 때는 Stack을 이용해 가림.
     // _fetchArticle이 끝났지만 웹뷰 로드가 끝나지 않았을 때는 조건문으로 가림.
@@ -266,8 +269,8 @@ class _PostViewPageState extends State<PostViewPage> {
                             // article 부분
                             Expanded(
                               // Android, iOS 여부에 따라 다른 새로고침
-                              child: RefreshIndicator.adaptive(
-                                color: ColorsInfo.newara,
+                              child: customRefreshIndicator(
+                                globalKey: _refreshIndicatorKey,
                                 onRefresh: () async {
                                   userProvider.setIsContentLoaded(false);
                                   _setIsPageLoaded(false);
@@ -277,8 +280,8 @@ class _PostViewPageState extends State<PostViewPage> {
                                 child: SingleChildScrollView(
                                   // 위젯이 화면을 넘어가지 않더라고 scrollable 처리.
                                   // 새로고침 기능을 위한 physics.
-                                  physics:
-                                      const AlwaysScrollableScrollPhysics(),
+                                  physics: const AlwaysScrollableScrollPhysics(
+                                      parent: BouncingScrollPhysics()),
                                   controller: _scrollController,
                                   child: Column(
                                     crossAxisAlignment:

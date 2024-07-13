@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:new_ara_app/constants/url_info.dart';
 import 'package:new_ara_app/translations/locale_keys.g.dart';
+import 'package:new_ara_app/utils/global_key.dart';
+import 'package:new_ara_app/utils/refresh_indicator.dart';
 import 'package:provider/provider.dart';
 import 'package:easy_localization/easy_localization.dart';
 
@@ -361,79 +363,91 @@ class _UserPageState extends State<UserPage>
   Widget _buildPostList(TabType tabType, UserProvider userProvider) {
     // build 대상 tab의 article 개수 조회
     int itemCount = getItemCount(tabType);
-    return RefreshIndicator.adaptive(
-      color: ColorsInfo.newara,
-      onRefresh: () async {
-        setIsLoaded(false, tabType);
-        UserProvider userProvider = context.read<UserProvider>();
-        isLoadedList[tabType.index] =
-            await fetchArticles(userProvider, 1, tabType);
-        // 페이지 로드가 성공한 경우
-        // 성공하지 못하면 계속 로딩 페이지
-        if (isLoadedList[tabType.index]) {
-          curPage[tabType.index] = 1;
-          setCurCount(tabType);
-        }
-      },
-      child: ListView.separated(
-        // item의 개수가 화면을 넘어가지 않더라도 scrollable 취급
-        // 새로고침 기능을 위해 필요한 physics
-        physics: const AlwaysScrollableScrollPhysics(),
-        // 다음 페이지 호출시에 사용되는 LoadingIndicator로 인해 1 추가
-        itemCount: itemCount + 1,
-        controller: scrollControllerList[tabType.index],
-        itemBuilder: (context, index) {
-          // 다음페이지를 호출하는 경우
-          if (index == itemCount) {
-            return Visibility(
-              visible: isLoadingNextPage[tabType.index],
-              child: const SizedBox(
-                height: 40,
-                child: Center(
-                  child: LoadingIndicator(),
-                ),
-              ),
-            );
+    return NotificationListener<ScrollNotification>(
+        //Custom으로 RefreshIndicator 생성
+        onNotification: (ScrollNotification notification) {
+          if (notification is ScrollUpdateNotification &&
+              notification.metrics.pixels <= -20) {
+            // Custom trigger distance = -20
+            refreshIndicatorKey.currentState?.show();
           }
-          late ArticleListActionModel curPost;
-          ScrapModel? scrapInfo;
-          switch (tabType) {
-            case TabType.created:
-              curPost = createdArticleList[index];
-              break;
-            case TabType.scrap:
-              scrapInfo = scrappedArticleList[index];
-              curPost = scrapInfo.parent_article;
-              break;
-            case TabType.recent:
-              curPost = recentArticleList[index];
-          }
-          return InkWell(
-              onTap: () async {
-                // 사용자가 글을 보고난 이후 article list를 다시 조회.
-                await Navigator.of(context)
-                    .push(slideRoute(PostViewPage(id: curPost.id)));
-                int newMaxPage = 0;
-                for (int page = 1; page <= curPage[tabType.index]; page++) {
-                  bool res = await fetchArticles(userProvider, page, tabType);
-                  if (!res) break;
-                  newMaxPage = page;
-                }
-                curPage[tabType.index] = newMaxPage;
-                setCurCount(tabType);
-              },
-              child: Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 11),
-                  child: PostPreview(model: curPost)));
+          return false;
         },
-        separatorBuilder: (context, index) {
-          return Container(
-            height: 1,
-            color: const Color(0xFFF0F0F0),
-          );
-        },
-      ),
-    );
+        child: customRefreshIndicator(
+          globalKey: refreshIndicatorKey,
+          onRefresh: () async {
+            setIsLoaded(false, tabType);
+            UserProvider userProvider = context.read<UserProvider>();
+            isLoadedList[tabType.index] =
+                await fetchArticles(userProvider, 1, tabType);
+            // 페이지 로드가 성공한 경우
+            // 성공하지 못하면 계속 로딩 페이지
+            if (isLoadedList[tabType.index]) {
+              curPage[tabType.index] = 1;
+              setCurCount(tabType);
+            }
+          },
+          child: ListView.separated(
+            // item의 개수가 화면을 넘어가지 않더라도 scrollable 취급
+            // 새로고침 기능을 위해 필요한 physics
+            physics: const AlwaysScrollableScrollPhysics(
+                parent: BouncingScrollPhysics()),
+            // 다음 페이지 호출시에 사용되는 LoadingIndicator로 인해 1 추가
+            itemCount: itemCount + 1,
+            controller: scrollControllerList[tabType.index],
+            itemBuilder: (context, index) {
+              // 다음페이지를 호출하는 경우
+              if (index == itemCount) {
+                return Visibility(
+                  visible: isLoadingNextPage[tabType.index],
+                  child: const SizedBox(
+                    height: 40,
+                    child: Center(
+                      child: LoadingIndicator(),
+                    ),
+                  ),
+                );
+              }
+              late ArticleListActionModel curPost;
+              ScrapModel? scrapInfo;
+              switch (tabType) {
+                case TabType.created:
+                  curPost = createdArticleList[index];
+                  break;
+                case TabType.scrap:
+                  scrapInfo = scrappedArticleList[index];
+                  curPost = scrapInfo.parent_article;
+                  break;
+                case TabType.recent:
+                  curPost = recentArticleList[index];
+              }
+              return InkWell(
+                  onTap: () async {
+                    // 사용자가 글을 보고난 이후 article list를 다시 조회.
+                    await Navigator.of(context)
+                        .push(slideRoute(PostViewPage(id: curPost.id)));
+                    int newMaxPage = 0;
+                    for (int page = 1; page <= curPage[tabType.index]; page++) {
+                      bool res =
+                          await fetchArticles(userProvider, page, tabType);
+                      if (!res) break;
+                      newMaxPage = page;
+                    }
+                    curPage[tabType.index] = newMaxPage;
+                    setCurCount(tabType);
+                  },
+                  child: Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 11),
+                      child: PostPreview(model: curPost)));
+            },
+            separatorBuilder: (context, index) {
+              return Container(
+                height: 1,
+                color: const Color(0xFFF0F0F0),
+              );
+            },
+          ),
+        ));
   }
 
   /// 유저가 탭 전환을 하였을 때 전환된 탭의 새로고침을 위해 사용됨.

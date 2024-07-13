@@ -4,6 +4,8 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:new_ara_app/pages/bulletin_search_page.dart';
 import 'package:new_ara_app/pages/post_write_page.dart';
 import 'package:new_ara_app/translations/locale_keys.g.dart';
+import 'package:new_ara_app/utils/global_key.dart';
+import 'package:new_ara_app/utils/refresh_indicator.dart';
 import 'package:provider/provider.dart';
 
 import 'package:new_ara_app/constants/board_type.dart';
@@ -42,6 +44,8 @@ class _PostListShowPageState extends State<PostListShowPage>
   String _boardName = "";
   bool _isLoadingNextPage = false;
   final ScrollController _scrollController = ScrollController();
+  final GlobalKey<RefreshIndicatorState> _refreshIndicatorKey =
+      GlobalKey<RefreshIndicatorState>(); //RefreshIndicator custom 처리용 key
 
   @override
   void initState() {
@@ -319,15 +323,15 @@ class _PostListShowPageState extends State<PostListShowPage>
           ],
         ),
       ),
-      body: isLoading  // 페이지를 처음 로드할 때만 LoadingIndicator()를 부름.
+      body: isLoading // 페이지를 처음 로드할 때만 LoadingIndicator()를 부름.
           ? const LoadingIndicator()
           : SafeArea(
               child: Center(
                 child: SizedBox(
                   width: MediaQuery.of(context).size.width - 18,
-                  child: RefreshIndicator.adaptive(
-                    displacement: 0.0,
-                    color: ColorsInfo.newara,
+                  child: customRefreshIndicator(
+                    //Custom으로 RefreshIndicator 생성
+                    globalKey: _refreshIndicatorKey,
                     onRefresh: () async {
                       // refresh 중에는 LoadingIndicator를 사용하지 않으므로 setState()는 제거함.
                       // 로직상 isLoading 변수의 값은 상황에 맞게 변경되도록 함.
@@ -343,7 +347,8 @@ class _PostListShowPageState extends State<PostListShowPage>
                       isLoading = false;
                     },
                     child: ListView.separated(
-                      physics: const AlwaysScrollableScrollPhysics(),
+                      physics: const AlwaysScrollableScrollPhysics(
+                          parent: BouncingScrollPhysics()),
                       controller: _scrollController,
                       itemCount: postPreviewList.length +
                           (_isLoadingNextPage ? 1 : 0), // 아이템 개수

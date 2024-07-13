@@ -3,6 +3,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:new_ara_app/utils/refresh_indicator.dart';
 import 'package:provider/provider.dart';
 import 'package:dio/dio.dart';
 import 'package:easy_localization/easy_localization.dart';
@@ -54,6 +55,9 @@ class _UserViewPageState extends State<UserViewPage> {
 
   /// 사용자가 작성한 글 모델을 저장하는 리스트.
   final List<ArticleListActionModel> _articleList = [];
+
+  final GlobalKey<RefreshIndicatorState> _refreshIndicatorKey =
+      GlobalKey<RefreshIndicatorState>(); //RefreshIndicator custom 처리용 key
 
   @override
   void initState() {
@@ -130,8 +134,8 @@ class _UserViewPageState extends State<UserViewPage> {
             ? const LoadingIndicator()
             : SizedBox(
                 width: MediaQuery.of(context).size.width,
-                child: RefreshIndicator.adaptive(
-                  color: ColorsInfo.newara,
+                child: customRefreshIndicator(
+                  globalKey: _refreshIndicatorKey,
                   onRefresh: () async {
                     _setIsLoaded(false);
                     await loadAll(userProvider, 1);
@@ -223,7 +227,8 @@ class _UserViewPageState extends State<UserViewPage> {
         width: MediaQuery.of(context).size.width - 40,
         child: ListView.separated(
           // PullToRefresh를 위해 아래 physics 추가 필요
-          physics: const AlwaysScrollableScrollPhysics(),
+          physics: const AlwaysScrollableScrollPhysics(
+              parent: BouncingScrollPhysics()),
           controller: _listViewController,
           itemCount: _articleList.length + 1,
           itemBuilder: (BuildContext context, int idx) {
