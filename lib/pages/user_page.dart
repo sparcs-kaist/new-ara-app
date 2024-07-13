@@ -5,6 +5,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:new_ara_app/constants/url_info.dart';
 import 'package:new_ara_app/translations/locale_keys.g.dart';
 import 'package:new_ara_app/utils/global_key.dart';
+import 'package:new_ara_app/utils/refresh_indicator.dart';
 import 'package:provider/provider.dart';
 import 'package:easy_localization/easy_localization.dart';
 
@@ -372,10 +373,8 @@ class _UserPageState extends State<UserPage>
           }
           return false;
         },
-        child: RefreshIndicator.adaptive(
-          key: refreshIndicatorKey,
-          displacement: 0.0,
-          color: ColorsInfo.newara,
+        child: customRefreshIndicator(
+          globalKey: refreshIndicatorKey,
           onRefresh: () async {
             setIsLoaded(false, tabType);
             UserProvider userProvider = context.read<UserProvider>();
@@ -391,7 +390,8 @@ class _UserPageState extends State<UserPage>
           child: ListView.separated(
             // item의 개수가 화면을 넘어가지 않더라도 scrollable 취급
             // 새로고침 기능을 위해 필요한 physics
-            physics: const AlwaysScrollableScrollPhysics(),
+            physics: const AlwaysScrollableScrollPhysics(
+                parent: BouncingScrollPhysics()),
             // 다음 페이지 호출시에 사용되는 LoadingIndicator로 인해 1 추가
             itemCount: itemCount + 1,
             controller: scrollControllerList[tabType.index],

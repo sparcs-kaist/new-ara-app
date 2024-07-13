@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:new_ara_app/translations/locale_keys.g.dart';
+import 'package:new_ara_app/utils/refresh_indicator.dart';
 import 'package:provider/provider.dart';
 
 import 'package:new_ara_app/constants/url_info.dart';
@@ -39,6 +40,9 @@ class _NotificationPageState extends State<NotificationPage> {
 
   /// 알림 ListView에 표시되는 알림 모델의 리스트.
   List<NotificationModel> _modelList = [];
+
+  final GlobalKey<RefreshIndicatorState> _refreshIndicatorKey =
+      GlobalKey<RefreshIndicatorState>(); //RefreshIndicator custom 처리용 key
 
   @override
   void initState() {
@@ -196,8 +200,8 @@ class _NotificationPageState extends State<NotificationPage> {
                   width: MediaQuery.of(context).size.width - 40,
                   // Android, IOS에 따라 당겨서 새로고침 디자인이 다르므로
                   // adaptive 적용.
-                  child: RefreshIndicator.adaptive(
-                    color: ColorsInfo.newara,
+                  child: customRefreshIndicator(
+                    globalKey: _refreshIndicatorKey,
                     onRefresh: () async {
                       // 새로고침 시 첫 페이지만 다시 불러옴.
                       await _initNotificationPage(userProvider);
@@ -235,6 +239,8 @@ class _NotificationPageState extends State<NotificationPage> {
                                 ),
                               )
                             : ListView.separated(
+                                physics: const AlwaysScrollableScrollPhysics(
+                                    parent: BouncingScrollPhysics()),
                                 controller: _listViewController,
                                 itemCount: _modelList.length + 1,
                                 itemBuilder: (context, idx) {
