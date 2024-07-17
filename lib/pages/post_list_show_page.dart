@@ -234,12 +234,6 @@ class _PostListShowPageState extends State<PostListShowPage>
     }
   }
 
-  void Function() setCurrentFilterIndex(int index) {
-    return () {
-      return setState(() => currentFilter = index);
-    };
-  }
-
   Widget _buildTopicButton(String text, int index) {
     return Container(
       height: 35,
