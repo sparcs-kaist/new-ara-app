@@ -22,6 +22,7 @@ import 'package:new_ara_app/pages/terms_and_conditions_page.dart';
 import 'package:new_ara_app/providers/user_provider.dart';
 import 'package:new_ara_app/utils/cache_function.dart';
 import 'package:new_ara_app/utils/slide_routing.dart';
+import 'package:new_ara_app/widgets/dialogs.dart';
 import 'package:new_ara_app/widgets/loading_indicator.dart';
 import 'package:provider/provider.dart';
 import 'package:uuid/uuid.dart';
@@ -423,42 +424,62 @@ class _PostWritePageState extends State<PostWritePage>
     //빌드 전 첨부파일의 유효성 확인
     _checkAttachmentsValid();
 
+    UserProvider userProvider = context.read<UserProvider>();
+
     return _isLoading
         ? const LoadingIndicator()
-        : Scaffold(
-            appBar: _buildAppBar(canIupload),
-            body: SafeArea(
-              child: Column(
-                children: [
-                  if (_isKeyboardClosed) _buildMenubar(),
-                  const SizedBox(
-                    height: 15,
-                  ),
-                  _buildTitle(),
-                  const SizedBox(height: 15),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 20),
-                    child: Container(
-                      height: 1,
-                      color: const Color(0xFFF0F0F0),
+        : WillPopScope(
+            onWillPop: () async {
+              if (_hasEditorText || _titleController.text != '') {
+                final shouldPop = await showDialog<bool>(
+                    context: context,
+                    builder: (context) => ExitConfirmDialog(
+                          userProvider: userProvider,
+                          targetContext: context,
+                          onTap: () {
+                            Navigator.pop(context, true); //dialog pop
+                          },
+                        ));
+                return shouldPop ?? false;
+              } else {
+                return true;
+              }
+            },
+            child: Scaffold(
+              appBar: _buildAppBar(canIupload, userProvider),
+              body: SafeArea(
+                child: Column(
+                  children: [
+                    if (_isKeyboardClosed) _buildMenubar(),
+                    const SizedBox(
+                      height: 15,
                     ),
-                  ),
-                  const SizedBox(
-                    height: 15,
-                  ),
-                  _buildToolbar(),
-                  const SizedBox(
-                    height: 10,
-                  ),
-                  Expanded(child: _buildEditor()),
-                  _buildAttachmentShow()
-                ],
+                    _buildTitle(),
+                    const SizedBox(height: 15),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 20),
+                      child: Container(
+                        height: 1,
+                        color: const Color(0xFFF0F0F0),
+                      ),
+                    ),
+                    const SizedBox(
+                      height: 15,
+                    ),
+                    _buildToolbar(),
+                    const SizedBox(
+                      height: 10,
+                    ),
+                    Expanded(child: _buildEditor()),
+                    _buildAttachmentShow()
+                  ],
+                ),
               ),
             ),
           );
   }
 
-  PreferredSizeWidget _buildAppBar(bool canIupload) {
+  PreferredSizeWidget _buildAppBar(bool canIupload, UserProvider userProvider) {
     return AppBar(
       centerTitle: true,
       leading: IconButton(
@@ -469,7 +490,29 @@ class _PostWritePageState extends State<PostWritePage>
             ),
             width: 35,
             height: 35),
-        onPressed: () => Navigator.pop(context),
+        onPressed: () async {
+          if (_hasEditorText || _titleController.text != '') {
+            showDialog(
+                context: context,
+                builder: (context) => ExitConfirmDialog(
+                      userProvider: userProvider,
+                      targetContext: context,
+                      onTap: () {
+                        // 사용자가 미리 뒤로가기 버튼을 누르는 경우 에러 방지를 위해
+                        // try-catch 문을 도입함.
+                        try {
+                          Navigator.of(context)
+                            ..pop() //dialog pop
+                            ..pop(); //PostWritePage pop
+                        } catch (error) {
+                          debugPrint("pop error: $error");
+                        }
+                      },
+                    ));
+          } else {
+            Navigator.pop(context);
+          }
+        },
       ),
       title: SizedBox(
         child: Text(

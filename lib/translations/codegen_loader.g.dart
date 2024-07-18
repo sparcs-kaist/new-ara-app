@@ -155,7 +155,8 @@ class CodegenLoader extends AssetLoader{
     "cancel": "Cancel",
     "confirm": "OK",
     "noBlockedUsers": "There are no blocked users.",
-    "noNickname": "No nickname"
+    "noNickname": "No nickname",
+    "exitConfirm": "Do you really want to go back? Your post will not be saved"
   },
   "popUpMenuButtons": {
     "downloadSucceed": "File downloaded successfully",
@@ -355,7 +356,8 @@ static const Map<String,dynamic> ko = {
     "cancel": "취소",
     "confirm": "확인",
     "noBlockedUsers": "차단한 유저가 없습니다.",
-    "noNickname": "닉네임이 없음"
+    "noNickname": "닉네임이 없음",
+    "exitConfirm": "정말로 돌아가시겠습니까? 작성하신 글은 저장되지 않습니다"
   },
   "popUpMenuButtons": {
     "downloadSucceed": "파일 다운로드에 성공했습니다",
