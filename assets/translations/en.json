@@ -133,6 +133,7 @@
     "dialogs": {
         "deleteConfirm": "Do you really want to delete this post?",
         "blockConfirm": "Do you really want to block this user?",
+        "blockConfirmInfo": "You can block up to 10 users per day",
         "logoutConfirm": "Do you really want to sign out?",
         "withdrawalConfirm": "Do you really want to withdraw the membership?",
         "withdrawalEmailInfo": "If you leave the membership, you can't re-sign up with the email you're using now",
