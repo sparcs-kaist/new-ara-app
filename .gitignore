@@ -34,7 +34,6 @@ migrate_working_dir/
 /build/
 
 # fvm related
-.fvm/flutter_sdk
 
 # Symbolication related
 app.*.symbols
@@ -59,3 +58,6 @@ ios/Runner.ipa
 
 .env
 .env.*
+
+# FVM Version Cache
+.fvm/
