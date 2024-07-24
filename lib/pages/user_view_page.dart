@@ -3,7 +3,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:new_ara_app/utils/refresh_indicator.dart';
+import 'package:new_ara_app/widgets/refresh_indicator.dart';
 import 'package:provider/provider.dart';
 import 'package:dio/dio.dart';
 import 'package:easy_localization/easy_localization.dart';

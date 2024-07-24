@@ -6,5 +6,5 @@ final GlobalKey<ScaffoldMessengerState> snackBarKey =
     GlobalKey<ScaffoldMessengerState>();
 
 /// refreshIndicator를 custom하게 변경하는 globalKey
-final GlobalKey<RefreshIndicatorState> refreshIndicatorKey =
-    GlobalKey<RefreshIndicatorState>(); //RefreshIndicator custom 처리용 key
+//final GlobalKey<RefreshIndicatorState> refreshIndicatorKey =
+//    GlobalKey<RefreshIndicatorState>(); //RefreshIndicator custom 처리용 key

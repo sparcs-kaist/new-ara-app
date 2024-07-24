@@ -4,7 +4,7 @@ import 'dart:core';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:new_ara_app/utils/refresh_indicator.dart';
+import 'package:new_ara_app/widgets/refresh_indicator.dart';
 import 'package:provider/provider.dart';
 import 'package:dio/dio.dart';
 import 'package:url_launcher/url_launcher.dart';
