@@ -350,7 +350,7 @@ static const Map<String,dynamic> ko = {
   "dialogs": {
     "deleteConfirm": "정말로 삭제하시겠습니까?",
     "blockConfirm": "정말로 차단하시겠습니까?",
-    "blockConfirmInfo": "하루에 최대 10명의 사용자까지 차단할 수 있습니다",
+    "blockConfirmInfo": "하루에 최대 10명의 사용자까지\n차단할 수 있습니다",
     "logoutConfirm": "정말로 로그아웃 하시겠습니까?",
     "withdrawalConfirm": "정말로 회원탈퇴 하시겠습니까?",
     "withdrawalEmailInfo": "회원탈퇴하시면 지금 쓰시는 이메일로는 재가입이 불가능합니다",
