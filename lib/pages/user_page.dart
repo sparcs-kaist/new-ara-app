@@ -66,6 +66,7 @@ class _UserPageState extends State<UserPage>
   /// 작성한 글, 담아둔 글, 최근 본 글 각각에 대해
   /// article list 로드가 완료되었는지 여부.
   List<bool> isLoadedList = [false, false, false];
+  List<bool> isFirstLoad = [true, true, true];
 
   /// 작성한 글, 담아둔 글, 최근 본 글 각각에 대해
   /// 현재 로드한 마지막 페이지를 나타냄.
@@ -77,8 +78,11 @@ class _UserPageState extends State<UserPage>
     LocaleKeys.userPage_history.tr()
   ];
 
-  final GlobalKey<RefreshIndicatorState> _refreshIndicatorKey =
-      GlobalKey<RefreshIndicatorState>(); //RefreshIndicator custom 처리용 key
+  final List<GlobalKey<RefreshIndicatorState>> _refreshIndicatorKey = [
+    GlobalKey<RefreshIndicatorState>(),
+    GlobalKey<RefreshIndicatorState>(),
+    GlobalKey<RefreshIndicatorState>()
+  ]; //RefreshIndicator custom 처리용 key, 3개 tab별로 필요
 
   @override
   void initState() {
@@ -258,13 +262,16 @@ class _UserPageState extends State<UserPage>
                   child: TabBarView(
                     controller: _tabController,
                     children: [
-                      !isLoadedList[TabType.created.index]
+                      (!isLoadedList[TabType.created.index] &&
+                              isFirstLoad[TabType.created.index])
                           ? const LoadingIndicator()
                           : _buildPostList(TabType.created, userProvider),
-                      !isLoadedList[TabType.scrap.index]
+                      (!isLoadedList[TabType.scrap.index] &&
+                              isFirstLoad[TabType.scrap.index])
                           ? const LoadingIndicator()
                           : _buildPostList(TabType.scrap, userProvider),
-                      !isLoadedList[TabType.recent.index]
+                      (!isLoadedList[TabType.recent.index] &&
+                              isFirstLoad[TabType.scrap.index])
                           ? const LoadingIndicator()
                           : _buildPostList(TabType.recent, userProvider),
                     ],
@@ -367,12 +374,13 @@ class _UserPageState extends State<UserPage>
     // build 대상 tab의 article 개수 조회
     int itemCount = getItemCount(tabType);
     return customRefreshIndicator(
-      globalKey: _refreshIndicatorKey,
+      globalKey: _refreshIndicatorKey[tabType.index],
       onRefresh: () async {
         setIsLoaded(false, tabType);
         UserProvider userProvider = context.read<UserProvider>();
         isLoadedList[tabType.index] =
             await fetchArticles(userProvider, 1, tabType);
+        isFirstLoad[tabType.index] = false;
         // 페이지 로드가 성공한 경우
         // 성공하지 못하면 계속 로딩 페이지
         if (isLoadedList[tabType.index]) {

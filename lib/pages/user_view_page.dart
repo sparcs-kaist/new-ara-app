@@ -35,6 +35,7 @@ class UserViewPage extends StatefulWidget {
 class _UserViewPageState extends State<UserViewPage> {
   /// 페이지 로딩이 완료되었는지 여부를 나타냄.
   bool _isLoaded = false;
+  bool _isFirstLoad = true;
 
   /// 스크롤 최하단에 도달하여 다음 페이지를 로딩중일 경우 true.
   /// 아니면 false.
@@ -130,13 +131,14 @@ class _UserViewPageState extends State<UserViewPage> {
         ),
       ),
       body: SafeArea(
-        child: !_isLoaded
+        child: !_isLoaded && _isFirstLoad
             ? const LoadingIndicator()
             : SizedBox(
                 width: MediaQuery.of(context).size.width,
                 child: customRefreshIndicator(
                   globalKey: _refreshIndicatorKey,
                   onRefresh: () async {
+                    _isFirstLoad = false;
                     _setIsLoaded(false);
                     await loadAll(userProvider, 1);
                   },

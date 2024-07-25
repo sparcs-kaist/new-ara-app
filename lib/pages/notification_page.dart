@@ -204,6 +204,7 @@ class _NotificationPageState extends State<NotificationPage> {
                     globalKey: _refreshIndicatorKey,
                     onRefresh: () async {
                       // 새로고침 시 첫 페이지만 다시 불러옴.
+                      _setIsLoadingTotal(false);
                       await _initNotificationPage(userProvider);
                       await notificationProvider
                           .checkIsNotReadExist(userProvider);

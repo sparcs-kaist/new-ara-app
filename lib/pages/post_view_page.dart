@@ -61,6 +61,10 @@ class _PostViewPageState extends State<PostViewPage> {
   /// 웹뷰를 제외한 페이지 전체에 대한 로드 완료 여부를 나타냄.
   late bool _isPageLoaded;
 
+  /// 첫 번째로 페이지를 로드하였는지 나타냄.
+  /// LoadingIndicator를 처음에만 표시하기 위해 사용됨.
+  bool _isFirstLoad = true;
+
   /// 사용자가 댓글을 수정 중인 지에 대한 여부를 나타냄.
   /// 댓글을 수정 중이라면 true. 아닌 경우 false.
   late bool _isModify;
@@ -257,7 +261,9 @@ class _PostViewPageState extends State<PostViewPage> {
                 ),
               ),
             ),
-            body: _isPageLoaded
+            body: !_isFirstLoad || _isPageLoaded
+                // _isFirstLoad && !_isPageLoaded (첫 방문일 때) 에만 false 반환
+                // 이 때 LoadingIndicator 표시
                 ? SafeArea(
                     child: GestureDetector(
                       // 화면을 탭하면 키보드가 내려가도록 하기 위해 사용함.
@@ -272,6 +278,8 @@ class _PostViewPageState extends State<PostViewPage> {
                               child: customRefreshIndicator(
                                 globalKey: _refreshIndicatorKey,
                                 onRefresh: () async {
+                                  // First Load가 아님
+                                  _isFirstLoad = false;
                                   userProvider.setIsContentLoaded(false);
                                   _setIsPageLoaded(false);
                                   _setIsPageLoaded(

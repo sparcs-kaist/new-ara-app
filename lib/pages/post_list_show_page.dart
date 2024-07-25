@@ -323,7 +323,7 @@ class _PostListShowPageState extends State<PostListShowPage>
           ],
         ),
       ),
-      body: isLoading // 페이지를 처음 로드할 때만 LoadingIndicator()를 부름.
+      body: isLoading // 페이지를 '처음 로드할 때만' LoadingIndicator()를 부름.
           ? const LoadingIndicator()
           : SafeArea(
               child: Center(
@@ -334,8 +334,6 @@ class _PostListShowPageState extends State<PostListShowPage>
                     globalKey: _refreshIndicatorKey,
                     onRefresh: () async {
                       // refresh 중에는 LoadingIndicator를 사용하지 않으므로 setState()는 제거함.
-                      // 로직상 isLoading 변수의 값은 상황에 맞게 변경되도록 함.
-                      isLoading = true;
                       // 리프레쉬시 게시물 목록을 업데이트합니다.
                       // 1페이지만 로드하도록 설정하여 최신 게시물을 불러옵니다.
                       // 1페이지만 로드하면 태블릿에서 게시물로 화면을 꽉채우지 못하므로 다음 페이지도 로드합니다.
@@ -344,7 +342,6 @@ class _PostListShowPageState extends State<PostListShowPage>
                           _loadNextPage();
                         },
                       );
-                      isLoading = false;
                     },
                     child: ListView.separated(
                       physics: const AlwaysScrollableScrollPhysics(
