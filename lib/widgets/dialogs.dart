@@ -9,7 +9,6 @@ import 'package:new_ara_app/translations/locale_keys.g.dart';
 import 'package:new_ara_app/providers/user_provider.dart';
 import 'package:new_ara_app/constants/colors_info.dart';
 import 'package:new_ara_app/models/block_model.dart';
-import 'package:new_ara_app/constants/url_info.dart';
 
 /// 사용 예시
 /* await showDialog(
@@ -620,7 +619,19 @@ class BlockConfirmDialog extends StatelessWidget {
                 ),
               ),
             ),
-            const SizedBox(height: 20),
+            Padding(
+              padding: const EdgeInsets.all(10),
+              child: Text(
+                LocaleKeys.dialogs_blockConfirmInfo.tr(),
+                textAlign: TextAlign.center,
+                style: const TextStyle(
+                  fontSize: 15,
+                  fontWeight: FontWeight.w500,
+                  color: Colors.grey,
+                ),
+              ),
+            ),
+            //const SizedBox(height: 20),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [

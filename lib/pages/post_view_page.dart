@@ -1387,10 +1387,15 @@ class _PostViewPageState extends State<PostViewPage> {
                                       curComment.created_by.profile.nickname
                                           .toString(),
                                       context.locale),
-                                  style: const TextStyle(
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.w500,
-                                  ),
+                                  style: TextStyle(
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w500,
+                                      //글쓴이의 댓글이면 빨간색으로 표시
+                                      color: (curComment.created_by.id ==
+                                                  _article.created_by.id &&
+                                              _article.name_type == 2)
+                                          ? ColorsInfo.newara
+                                          : Color(0xFF333333)),
                                   maxLines: 1,
                                   overflow: TextOverflow.ellipsis,
                                 )),

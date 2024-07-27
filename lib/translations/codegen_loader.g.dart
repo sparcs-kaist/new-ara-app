@@ -149,6 +149,7 @@ class CodegenLoader extends AssetLoader{
   "dialogs": {
     "deleteConfirm": "Do you really want to delete this post?",
     "blockConfirm": "Do you really want to block this user?",
+    "blockConfirmInfo": "You can block up to 10 users per day",
     "logoutConfirm": "Do you really want to sign out?",
     "withdrawalConfirm": "Do you really want to withdraw the membership?",
     "withdrawalEmailInfo": "If you leave the membership, you can't re-sign up with the email you're using now",
@@ -350,6 +351,7 @@ static const Map<String,dynamic> ko = {
   "dialogs": {
     "deleteConfirm": "정말로 삭제하시겠습니까?",
     "blockConfirm": "정말로 차단하시겠습니까?",
+    "blockConfirmInfo": "하루에 최대 10명의 사용자까지\n차단할 수 있습니다",
     "logoutConfirm": "정말로 로그아웃 하시겠습니까?",
     "withdrawalConfirm": "정말로 회원탈퇴 하시겠습니까?",
     "withdrawalEmailInfo": "회원탈퇴하시면 지금 쓰시는 이메일로는 재가입이 불가능합니다",
