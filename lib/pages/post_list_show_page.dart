@@ -184,6 +184,7 @@ class _PostListShowPageState extends State<PostListShowPage>
       currentPage = currentPage + 1;
       var response = await userProvider.getApiRes("$apiUrl$currentPage");
       final Map<String, dynamic>? myMap = await response?.data;
+      _isLastItem = false; //로딩에 성공함 (마지막 페이지가 아님)
 
       if (mounted) {
         setState(() {
@@ -202,6 +203,7 @@ class _PostListShowPageState extends State<PostListShowPage>
       }
     } on TypeError {
       //Last item에 도달함 (_CastError)
+      currentPage = currentPage - 1;
       _isLastItem = true;
       debugPrint("post_list_show_page : last item reached");
     } catch (error) {
