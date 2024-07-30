@@ -17,6 +17,7 @@ import 'package:new_ara_app/pages/post_view_page.dart';
 import 'package:new_ara_app/utils/slide_routing.dart';
 import 'package:new_ara_app/providers/notification_provider.dart';
 import 'package:new_ara_app/widgets/pop_up_menu_buttons.dart';
+import 'package:new_ara_app/utils/with_school.dart';
 
 /// PostListShowPage는 게시물 목록를 나타내는 위젯.
 /// boardType에 따라 게시판의 종류를 판별하고, 특성화 된 위젯들을 활성화 비활성화 되도록 설계.
@@ -35,6 +36,14 @@ class _PostListShowPageState extends State<PostListShowPage>
     with WidgetsBindingObserver {
   List<ArticleListActionModel> postPreviewList = [];
 
+  /// 현재 선택된 말머리 필터의 인덱스를 나타냄.
+  /// 기본값은 전체(= 0)
+  int currentFilter = 0;
+
+  /// 말머리 필터가 필요한 지 여부를 나타내는 변수
+  /// 학교에게 전합니다 게시판 or BoardDetailActionModel의 topics가 isNotEmpty일 때 true
+  late bool isTopicsFilterRequired;
+
   /// 현재 어디까지 페이지가 로딩됐는 지 기록하는 변수
   int currentPage = 1;
   bool isLoading = true;
@@ -49,6 +58,10 @@ class _PostListShowPageState extends State<PostListShowPage>
     super.initState();
 
     var userProvider = context.read<UserProvider>();
+    // TODO: '학교에게 전합니다' 게시판의 말머리가 생길 경우 조건문 수정해야함.
+    isTopicsFilterRequired = (widget.boardInfo != null &&
+        (widget.boardInfo!.slug == 'with-school' ||
+            widget.boardInfo!.topics.isNotEmpty));
     _scrollController.addListener(_scrollListener);
     WidgetsBinding.instance.addObserver(this);
     // updateAllBulletinList().then(
@@ -228,6 +241,106 @@ class _PostListShowPageState extends State<PostListShowPage>
     }
   }
 
+  Widget _buildTopicButton(String text, int index) {
+    return Container(
+      height: 35,
+      margin: const EdgeInsets.only(right: 10),
+      child: TextButton(
+          style: ButtonStyle(
+            backgroundColor: MaterialStateProperty.all(
+                currentFilter == index ? ColorsInfo.newara : Colors.white),
+            overlayColor:
+                MaterialStateProperty.all(Colors.transparent), // no splash
+            shape: MaterialStateProperty.all(
+              RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(30),
+                side: BorderSide(
+                    color: currentFilter == index
+                        ? ColorsInfo.newara
+                        : const Color(0xFFBBBBBB),
+                    width: 1),
+              ),
+            ),
+          ),
+          onPressed: () async {
+            setState(() => currentFilter = index);
+            isLoading = true;
+
+            // _buildTopicButton이 호출될때는 BoardType이 free임이 보장되나
+            // 의도치 않은 예외 방지를 위해 조건문 추가함.
+            if (widget.boardType == BoardType.free) {
+              apiUrl = index == 0
+                  ? "articles/?parent_board=${widget.boardInfo!.id.toInt()}&page="
+                  : (!isWithSchoolBoard(widget.boardInfo)
+                      ? "articles/?parent_board=${widget.boardInfo!.id.toInt()}&parent_topic=${widget.boardInfo!.topics[index - 1].id}&page="
+                      : "articles/?parent_board=${widget.boardInfo!.id.toInt()}&communication_article__school_response_status=${WithSchoolStatus.values[index - 1].index}&page=");
+            }
+            // 리프레쉬시 게시물 목록을 업데이트합니다.
+            // 1페이지만 로드하도록 설정하여 최신 게시물을 불러옵니다.
+            // 1페이지만 로드하면 태블릿에서 게시물로 화면을 꽉채우지 못하므로 다음 페이지도 로드합니다.
+            await updateAllBulletinList(pageLimitToReload: 1).then(
+              (value) {
+                _loadNextPage();
+              },
+            );
+            isLoading = false;
+          },
+          child: Text(
+            text,
+            style: TextStyle(
+              fontSize: 16, // PostPreview의 제목과 동일한 폰트 크기
+              color: currentFilter == index
+                  ? Colors.white
+                  : const Color.fromARGB(255, 101, 100, 100),
+            ),
+          )),
+    );
+  }
+
+  List<Widget> _buildTopicBoxes(
+      BuildContext context, BoardDetailActionModel model) {
+    late List<Widget> ret;
+    if (model.slug != 'with-school') {
+      ret = List<Widget>.generate(model.topics.length, (index) {
+        return _buildTopicButton(
+            context.locale == const Locale('ko')
+                ? model.topics[index].ko_name
+                : model.topics[index].en_name,
+            index + 1); // total이 첫번째이므로 + 1 씩 크게
+      });
+    } else {
+      ret = [
+        _buildTopicButton(
+            context.locale == const Locale('ko') ? "달성 전" : "Polling", 1),
+        _buildTopicButton(
+            context.locale == const Locale('ko') ? "답변 준비중" : "Preparing", 2),
+        _buildTopicButton(
+            context.locale == const Locale('ko') ? "답변 완료" : "Answered", 3),
+      ];
+    }
+    return <Widget>[
+          _buildTopicButton(
+              context.locale == const Locale('ko') ? "전체" : "Total", 0)
+        ] +
+        ret;
+  }
+
+  /// articleModel 게시글이 필터링되어야(화면에 보이지 않아야) 하는 경우에 true를 반환.
+  /// 아래 ListView.separated에서 사용하기 위해 작성.
+  bool isFiltered(BoardDetailActionModel? boardModel,
+      ArticleListActionModel articleModel, int filterIdx) {
+    // board가 지정되지 않은 경우, '전체'인 경우 필터링이 필요하지 않음.
+    if (boardModel == null || filterIdx == 0) return false;
+
+    if (isWithSchoolBoard(boardModel)) {
+      return (articleModel.communication_article_status !=
+          WithSchoolStatus.values[filterIdx - 1].index);
+    } else {
+      return (articleModel.parent_topic?.slug !=
+          boardModel.topics[filterIdx - 1].slug);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -273,7 +386,7 @@ class _PostListShowPageState extends State<PostListShowPage>
           ),
         ),
         actions: [
-          if (widget.boardInfo?.slug == 'with-school')
+          if (isWithSchoolBoard(widget.boardInfo))
             const WithSchoolPopupMenuButton(),
           IconButton(
             icon: SvgPicture.asset(
@@ -326,12 +439,33 @@ class _PostListShowPageState extends State<PostListShowPage>
           ],
         ),
       ),
-      body: isLoading // 페이지를 처음 로드할 때만 LoadingIndicator()를 부름.
-          ? const LoadingIndicator()
-          : SafeArea(
-              child: Center(
-                child: SizedBox(
-                  width: MediaQuery.of(context).size.width - 18,
+      body: SafeArea(
+        child: Center(
+          child: SizedBox(
+            width: MediaQuery.of(context).size.width - 18,
+            child: Column(
+              children: [
+                // 말머리필터
+                if (isTopicsFilterRequired)
+                  SizedBox(
+                    width: MediaQuery.of(context).size.width - 18,
+                    height: 40,
+                    child: SingleChildScrollView(
+                      scrollDirection: Axis.horizontal,
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        // isTopicsFilterRequired가 true이면 boardInfo가 null이 아님이 보장됨.
+                        children: _buildTopicBoxes(context, widget.boardInfo!),
+                      ),
+                    ),
+                  ),
+                if (isTopicsFilterRequired)
+                  Container(
+                    margin: const EdgeInsets.only(top: 5),
+                    height: 1,
+                    color: const Color(0xFFF0F0F0),
+                  ),
+                Expanded(
                   child: RefreshIndicator.adaptive(
                     displacement: 0.0,
                     color: ColorsInfo.newara,
@@ -349,56 +483,76 @@ class _PostListShowPageState extends State<PostListShowPage>
                       );
                       isLoading = false;
                     },
-                    child: ListView.separated(
-                      physics: const AlwaysScrollableScrollPhysics(),
-                      controller: _scrollController,
-                      itemCount: postPreviewList.length +
-                          (_isLoadingNextPage ? 1 : 0), // 아이템 개수
-                      itemBuilder: (BuildContext context, int index) {
-                        // 각 아이템을 위한 위젯 생성
-                        if (_isLoadingNextPage &&
-                            index == postPreviewList.length) {
-                          debugPrint('Next Page Load Request');
-                          return SizedBox(
-                            height: 50,
-                            child: Center(
-                              child: _isLastItem //마지막 페이지 도달 시
-                                  ? Text(context.locale == const Locale("ko")
-                                      ? "마지막 페이지입니다"
-                                      : "You have reached the last page")
-                                  : const LoadingIndicator(),
-                            ),
-                          );
-                        } else {
-                          return InkWell(
-                            onTap: () async {
-                              await Navigator.of(context).push(slideRoute(
-                                  PostViewPage(id: postPreviewList[index].id)));
-                              updateAllBulletinList();
+                    child: isLoading
+                        ? const LoadingIndicator()
+                        : ListView.separated(
+                            physics: const AlwaysScrollableScrollPhysics(),
+                            controller: _scrollController,
+                            itemCount: postPreviewList.length +
+                                (_isLoadingNextPage ? 1 : 0), // 아이템 개수
+                            itemBuilder: (BuildContext context, int index) {
+                              // 각 아이템을 위한 위젯 생성
+                              if (_isLoadingNextPage &&
+                                  index == postPreviewList.length) {
+                                debugPrint('Next Page Load Request');
+                                return SizedBox(
+                                  height: 50,
+                                  child: Center(
+                                    child: _isLastItem //마지막 페이지 도달 시
+                                        ? Text(context.locale ==
+                                                const Locale("ko")
+                                            ? "마지막 페이지입니다"
+                                            : "You have reached the last page")
+                                        : const LoadingIndicator(),
+                                  ),
+                                );
+                              } else {
+                                // 말머리 필터가 '전체'가 아닌 경우 (학교에게 전합니다 게시판은 아래에서 처리)
+                                return isFiltered(widget.boardInfo,
+                                        postPreviewList[index], currentFilter)
+                                    ? Container()
+                                    : InkWell(
+                                        onTap: () async {
+                                          await Navigator.of(context).push(
+                                              slideRoute(PostViewPage(
+                                                  id: postPreviewList[index]
+                                                      .id)));
+                                          updateAllBulletinList();
+                                        },
+                                        child: Column(
+                                          children: [
+                                            Padding(
+                                              padding:
+                                                  const EdgeInsets.all(11.0),
+                                              child: PostPreview(
+                                                  model:
+                                                      postPreviewList[index]),
+                                            ),
+                                          ],
+                                        ),
+                                      );
+                              }
                             },
-                            child: Column(
-                              children: [
-                                Padding(
-                                  padding: const EdgeInsets.all(11.0),
-                                  child: PostPreview(
-                                      model: postPreviewList[index]),
-                                ),
-                              ],
-                            ),
-                          );
-                        }
-                      },
-                      separatorBuilder: (BuildContext context, int index) {
-                        return Container(
-                          height: 1,
-                          color: const Color(0xFFF0F0F0),
-                        );
-                      },
-                    ),
+                            separatorBuilder:
+                                (BuildContext context, int index) {
+                              if (!isFiltered(widget.boardInfo,
+                                  postPreviewList[index], currentFilter)) {
+                                return Container(
+                                  height: 1,
+                                  color: const Color(0xFFF0F0F0),
+                                );
+                              } else {
+                                return Container();
+                              }
+                            },
+                          ),
                   ),
                 ),
-              ),
+              ],
             ),
+          ),
+        ),
+      ),
     );
   }
 }
