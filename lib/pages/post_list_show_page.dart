@@ -499,10 +499,12 @@ class _PostListShowPageState extends State<PostListShowPage>
                                   height: 50,
                                   child: Center(
                                     child: _isLastItem //마지막 페이지 도달 시
-                                        ? Text(context.locale ==
-                                                const Locale("ko")
-                                            ? "마지막 페이지입니다"
-                                            : "You have reached the last page")
+                                        ? Text(
+                                            LocaleKeys.postListShowPage_lastItem
+                                                .tr(),
+                                            style: const TextStyle(
+                                                color: ColorsInfo.newara),
+                                          )
                                         : const LoadingIndicator(),
                                   ),
                                 );
