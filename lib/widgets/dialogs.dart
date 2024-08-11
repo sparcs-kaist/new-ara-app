@@ -1101,14 +1101,17 @@ class ExitConfirmDialog extends StatelessWidget {
   final BuildContext targetContext;
 
   /// '확인' 버튼을 눌렀을 때 적용되는 onTap 메서드
-  final void Function()? onTap;
+  final void Function()? onTapConfirm;
 
-  const ExitConfirmDialog({
-    super.key,
-    required this.userProvider,
-    required this.targetContext,
-    required this.onTap,
-  });
+  /// '임시 저장' 버튼을 눌렀을 때 적용되는 onTap 메서드
+  final void Function()? onTapSave;
+
+  const ExitConfirmDialog(
+      {super.key,
+      required this.userProvider,
+      required this.targetContext,
+      required this.onTapConfirm,
+      required this.onTapSave});
 
   @override
   Widget build(BuildContext context) {
@@ -1179,16 +1182,13 @@ class ExitConfirmDialog extends StatelessWidget {
                 ),
                 const SizedBox(width: 10),
                 InkWell(
-                  onTap: () {
-                    // 글 제목 / 내용 임시 저장하기 구현
-                    debugPrint("called temporary save");
-                    // TODO: 이하에 caching 구현
-                  },
+                  // 글 제목 / 내용 임시 저장하기 구현
+                  onTap: onTapSave,
                   child: Container(
                     decoration: const BoxDecoration(
-                      borderRadius: BorderRadius.all(Radius.circular(20)),
-                      color: ColorsInfo.newara,
-                    ),
+                        borderRadius: BorderRadius.all(Radius.circular(20)),
+                        color: Colors.grey //ColorsInfo.newaraSoft,
+                        ),
                     width: 120,
                     height: 40,
                     child: Center(
@@ -1205,8 +1205,8 @@ class ExitConfirmDialog extends StatelessWidget {
                 ),
                 const SizedBox(width: 10),
                 InkWell(
-                  // 인자로 전달받은 onTap 사용.
-                  onTap: onTap,
+                  // 나가기(확인) 구현
+                  onTap: onTapConfirm,
                   child: Container(
                     decoration: const BoxDecoration(
                       borderRadius: BorderRadius.all(Radius.circular(20)),
