@@ -1150,7 +1150,7 @@ class ExitConfirmDialog extends StatelessWidget {
               children: [
                 InkWell(
                   onTap: () {
-                    // PostWritePage에서 pop해야 하므로
+                    // 이전 페이지(ex:PostWritePage)에서 pop해야 하므로
                     // targetContext 사용.
                     Navigator.pop(targetContext, false);
                   },
@@ -1172,6 +1172,32 @@ class ExitConfirmDialog extends StatelessWidget {
                           fontSize: 16,
                           fontWeight: FontWeight.w500,
                           color: Colors.black,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 10),
+                InkWell(
+                  onTap: () {
+                    // 글 제목 / 내용 임시 저장하기 구현
+                    debugPrint("called temporary save");
+                    // TODO: 이하에 caching 구현
+                  },
+                  child: Container(
+                    decoration: const BoxDecoration(
+                      borderRadius: BorderRadius.all(Radius.circular(20)),
+                      color: ColorsInfo.newara,
+                    ),
+                    width: 120,
+                    height: 40,
+                    child: Center(
+                      child: Text(
+                        LocaleKeys.dialogs_tempSave.tr(),
+                        style: const TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w500,
+                          color: Colors.white,
                         ),
                       ),
                     ),

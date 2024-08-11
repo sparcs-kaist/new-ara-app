@@ -141,7 +141,8 @@
         "confirm": "OK",
         "noBlockedUsers": "There are no blocked users.",
         "noNickname": "No nickname",
-        "exitConfirm": "Do you really want to go back? Your post will not be saved"
+        "exitConfirm": "Do you really want to go back? Your post will not be saved",
+        "tempSave" : "Save for now"
     },
     "popUpMenuButtons": {
         "downloadSucceed": "File downloaded successfully",
