@@ -1183,7 +1183,10 @@ class ExitConfirmDialog extends StatelessWidget {
                 const SizedBox(width: 10),
                 InkWell(
                   // 글 제목 / 내용 임시 저장하기 구현
-                  onTap: onTapSave,
+                  onTap: () {
+                    onTapSave!();
+                    onTapConfirm!();
+                  },
                   child: Container(
                     decoration: const BoxDecoration(
                         borderRadius: BorderRadius.all(Radius.circular(20)),
