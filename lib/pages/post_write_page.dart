@@ -436,8 +436,12 @@ class _PostWritePageState extends State<PostWritePage>
                     builder: (context) => ExitConfirmDialog(
                           userProvider: userProvider,
                           targetContext: context,
-                          onTap: () {
+                          onTapConfirm: () {
                             Navigator.pop(context, true); //dialog pop
+                          },
+                          onTapSave: () {
+                            debugPrint("called temporary save");
+                            // TODO: 이하에 caching 구현
                           },
                         ));
                 return shouldPop ?? false;
@@ -497,7 +501,7 @@ class _PostWritePageState extends State<PostWritePage>
                 builder: (context) => ExitConfirmDialog(
                       userProvider: userProvider,
                       targetContext: context,
-                      onTap: () {
+                      onTapConfirm: () {
                         // 사용자가 미리 뒤로가기 버튼을 누르는 경우 에러 방지를 위해
                         // try-catch 문을 도입함.
                         try {
@@ -507,6 +511,10 @@ class _PostWritePageState extends State<PostWritePage>
                         } catch (error) {
                           debugPrint("pop error: $error");
                         }
+                      },
+                      onTapSave: () {
+                        debugPrint("called temporary save");
+                        // TODO: 이하에 caching 구현
                       },
                     ));
           } else {
