@@ -359,12 +359,17 @@ class _PostWritePageState extends State<PostWritePage>
     String key =
         (_isEditingPost) ? '/cache/${widget.previousArticle!.id}/' : '/cache/';
     dynamic cachedData = await fetchCachedApiData(key);
-
+    debugPrint('cache : ${cachedData}');
     if (cachedData == null && _isEditingPost) {
       await _getPostContent();
+      return;
     }
 
-    String? title = cachedData['title'];
+    if (cachedData == null) {
+      return;
+    }
+
+    String? title = cachedData?['title'];
     _titleController.text = title ?? '';
 
     for (int i = 0; i < cachedData['attachments'].length; i++) {
@@ -465,7 +470,6 @@ class _PostWritePageState extends State<PostWritePage>
           : _findSpecTopicListValue(widget.previousArticle!.parent_topic!.slug);
       _chosenBoardValue = boardDetailActionModel;
     });
-
   }
 
   /// 주어진 slug 값을 사용하여 게시판 목록에서 해당 게시판을 찾는 함수.
@@ -521,11 +525,16 @@ class _PostWritePageState extends State<PostWritePage>
                           userProvider: userProvider,
                           targetContext: context,
                           onTapConfirm: () async {
-                            Navigator.pop(context, true);
                             //dialog pop
+                            String key = _isEditingPost
+                                ? '/cache/${widget.previousArticle!.id}/'
+                                : '/cache/';
+                            await cacheApiData(key, null);
+                            Navigator.pop(context, true);
                           },
                           onTapSave: () async {
                             await cacheCurrentData();
+                            Navigator.pop(context, true);
                           },
                         ));
                 return shouldPop ?? false;
@@ -588,6 +597,10 @@ class _PostWritePageState extends State<PostWritePage>
                       onTapConfirm: () async {
                         // 사용자가 미리 뒤로가기 버튼을 누르는 경우 에러 방지를 위해
                         // try-catch 문을 도입함.
+                        String key = _isEditingPost
+                            ? '/cache/${widget.previousArticle!.id}/'
+                            : '/cache/';
+                        await cacheApiData(key, null);
                         try {
                           Navigator.of(context)
                             ..pop() //dialog pop
@@ -598,6 +611,13 @@ class _PostWritePageState extends State<PostWritePage>
                       },
                       onTapSave: () async {
                         await cacheCurrentData();
+                        try {
+                          Navigator.of(context)
+                            ..pop() //dialog pop
+                            ..pop(); //PostWritePage pop
+                        } catch (error) {
+                          debugPrint("pop error: $error");
+                        }
                       },
                     ));
           } else {

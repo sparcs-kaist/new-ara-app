@@ -1185,7 +1185,7 @@ class ExitConfirmDialog extends StatelessWidget {
                   // 글 제목 / 내용 임시 저장하기 구현
                   onTap: () {
                     onTapSave!();
-                    onTapConfirm!();
+                    //onTapConfirm!();
                   },
                   child: Container(
                     decoration: const BoxDecoration(
