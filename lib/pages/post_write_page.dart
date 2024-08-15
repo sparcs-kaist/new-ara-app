@@ -176,11 +176,15 @@ class _PostWritePageState extends State<PostWritePage>
 
   bool _isKeyboardClosed = true;
 
+  String userID = '';
+
   final _editorScrollController = ScrollController();
   @override
   void initState() {
     super.initState();
     UserProvider userProvider = context.read<UserProvider>();
+
+    userID = userProvider.naUser!.uid;
 
     context.read<NotificationProvider>().checkIsNotReadExist(userProvider);
     debugPrint("post_write_page.dart: ${widget.previousBoard}");
@@ -289,10 +293,13 @@ class _PostWritePageState extends State<PostWritePage>
 
     data['attachments'] = _attachmentList;
 
-    String key =
-        _isEditingPost ? '/cache/${widget.previousArticle!.id}/' : '/cache/';
+    String key = _isEditingPost
+        ? '/cache/${widget.previousArticle!.id}/'
+        : '/cache/${userID}/';
 
     await cacheApiData(key, data);
+    print(key);
+    print(data);
   }
 
   /// 사용자가 선택 가능한 게시판 목록을 가져오는 함수.
@@ -356,8 +363,9 @@ class _PostWritePageState extends State<PostWritePage>
   }
 
   Future<void> _getCachedContents() async {
-    String key =
-        (_isEditingPost) ? '/cache/${widget.previousArticle!.id}/' : '/cache/';
+    String key = (_isEditingPost)
+        ? '/cache/${widget.previousArticle!.id}/'
+        : '/cache/${userID}/';
     dynamic cachedData = await fetchCachedApiData(key);
     debugPrint('cache : ${cachedData}');
     if (cachedData == null && _isEditingPost) {
@@ -528,7 +536,7 @@ class _PostWritePageState extends State<PostWritePage>
                             //dialog pop
                             String key = _isEditingPost
                                 ? '/cache/${widget.previousArticle!.id}/'
-                                : '/cache/';
+                                : '/cache/${userID}';
                             await cacheApiData(key, null);
                             Navigator.pop(context, true);
                           },
@@ -599,7 +607,7 @@ class _PostWritePageState extends State<PostWritePage>
                         // try-catch 문을 도입함.
                         String key = _isEditingPost
                             ? '/cache/${widget.previousArticle!.id}/'
-                            : '/cache/';
+                            : '/cache/${userID}';
                         await cacheApiData(key, null);
                         try {
                           Navigator.of(context)
