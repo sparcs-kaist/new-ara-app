@@ -36,6 +36,8 @@ String getContentHtml(String content, {double? width}) {
       a {
         color: #00b8d4;
         text-decoration: underline;
+        font-size: 14px;
+        display: inline-block;
       }
 
       h1, h2, h3, h4, h5, h6 {
@@ -150,11 +152,11 @@ String getContentHtml(String content, {double? width}) {
 
       body {
         color: #4a4a4a;
-        font-size: 1rem;
+        font-size: 14px;
         font-weight: 400;
         line-height: 1.5
       }
-
+x
       small {
         font-size: .875em
       }

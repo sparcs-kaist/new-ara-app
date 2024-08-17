@@ -194,6 +194,8 @@ class _InArticleWebViewState extends State<InArticleWebView> {
       ))
       ..loadHtmlString(getContentHtml(widget.content));
 
+    debugPrint(widget.content);
+
     _webViewController = controller;
   }
 
@@ -211,16 +213,17 @@ class _InArticleWebViewState extends State<InArticleWebView> {
           controller: _webViewController.platform,
           displayWithHybridComposition: true,
           gestureRecognizers: {
-          Factory<OneSequenceGestureRecognizer>(() {
-            TapGestureRecognizer tabGestureRecognizer = TapGestureRecognizer();
-            tabGestureRecognizer.onTapDown = (_) {
-              FocusScope.of(context).unfocus();
-            };
-            return tabGestureRecognizer;
-          }),
-          // pinch-to-zoom 기능을 위해서
-          Factory<ScaleGestureRecognizer>(() => ScaleGestureRecognizer()),
-        },
+            Factory<OneSequenceGestureRecognizer>(() {
+              TapGestureRecognizer tabGestureRecognizer =
+                  TapGestureRecognizer();
+              tabGestureRecognizer.onTapDown = (_) {
+                FocusScope.of(context).unfocus();
+              };
+              return tabGestureRecognizer;
+            }),
+            // pinch-to-zoom 기능을 위해서
+            Factory<ScaleGestureRecognizer>(() => ScaleGestureRecognizer()),
+          },
         ),
       );
     } else {
