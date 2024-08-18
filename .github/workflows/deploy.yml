@@ -1,0 +1,22 @@
+name: Deploy to Play Store, App Store
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+    inputs:
+      env:
+        description: 'Environment'
+        required: true
+        type: choice
+        options:
+          - production
+          - development
+
+jobs:
+  deploy-android:
+    name: Deploy to Play Store
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
