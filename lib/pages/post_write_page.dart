@@ -285,11 +285,10 @@ class _PostWritePageState extends State<PostWritePage>
                   ? 'ANONYMOUS'
                   : 'REGULAR')
           : 'REGULAR',
+      'parent_topic' :  _chosenTopicValue!.id == -1 ? '' : _chosenTopicValue!.slug,
+      'parent_board' : _chosenBoardValue!.id == -1 ? '' : _chosenBoardValue!.slug,
+      'attachments' :  _chosenBoardValue!.id == -1 ? '' : _chosenBoardValue!.slug,
     };
-    data['parent_topic'] =
-        _chosenTopicValue!.id == -1 ? '' : _chosenTopicValue!.slug;
-    data['parent_board'] =
-        _chosenBoardValue!.id == -1 ? '' : _chosenBoardValue!.slug;
 
     data['attachments'] = _attachmentList;
 
@@ -298,8 +297,8 @@ class _PostWritePageState extends State<PostWritePage>
         : '/cache/${userID}/';
 
     await cacheApiData(key, data);
-    print(key);
-    print(data);
+    debugPrint(key);
+    debugPrint(data as String?);
   }
 
   /// 사용자가 선택 가능한 게시판 목록을 가져오는 함수.
@@ -366,7 +365,7 @@ class _PostWritePageState extends State<PostWritePage>
     String key = (_isEditingPost)
         ? '/cache/${widget.previousArticle!.id}/'
         : '/cache/${userID}/';
-    dynamic cachedData = await fetchCachedApiData(key);
+    Map<String, dynamic>? cachedData = await fetchCachedApiData(key);
     debugPrint('cache : ${cachedData}');
     if (cachedData == null && _isEditingPost) {
       await _getPostContent();
@@ -377,7 +376,7 @@ class _PostWritePageState extends State<PostWritePage>
       return;
     }
 
-    String? title = cachedData?['title'];
+    String? title = cachedData['title'];
     _titleController.text = title ?? '';
 
     for (int i = 0; i < cachedData['attachments'].length; i++) {
