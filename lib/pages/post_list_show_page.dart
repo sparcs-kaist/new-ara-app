@@ -498,15 +498,17 @@ class _PostListShowPageState extends State<PostListShowPage>
                                 return SizedBox(
                                   height: 50,
                                   child: Center(
-                                    child: _isLastItem //마지막 페이지 도달 시
-                                        ? Text(
-                                            LocaleKeys.postListShowPage_lastItem
-                                                .tr(),
-                                            style: const TextStyle(
-                                                color: ColorsInfo.newara),
-                                          )
-                                        : const LoadingIndicator(),
-                                  ),
+                                      child: currentPage > 10
+                                          ? _isLastItem //마지막 페이지 도달 시
+                                              ? Text(
+                                                  LocaleKeys
+                                                      .postListShowPage_lastItem
+                                                      .tr(),
+                                                  style: const TextStyle(
+                                                      color: ColorsInfo.newara),
+                                                )
+                                              : const LoadingIndicator()
+                                          : null),
                                 );
                               } else {
                                 // 말머리 필터가 '전체'가 아닌 경우 (학교에게 전합니다 게시판은 아래에서 처리)
