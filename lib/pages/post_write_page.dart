@@ -176,11 +176,15 @@ class _PostWritePageState extends State<PostWritePage>
 
   bool _isKeyboardClosed = true;
 
+  String userID = '';
+
   final _editorScrollController = ScrollController();
   @override
   void initState() {
     super.initState();
     UserProvider userProvider = context.read<UserProvider>();
+
+    userID = userProvider.naUser!.uid;
 
     context.read<NotificationProvider>().checkIsNotReadExist(userProvider);
     debugPrint("post_write_page.dart: ${widget.previousBoard}");
@@ -263,7 +267,38 @@ class _PostWritePageState extends State<PostWritePage>
   /// 이전 게시물의 데이터를 가져온다.
   Future<void> _initPostWritePost() async {
     await _getBoardList();
-    await _getPostContent();
+    await _getCachedContents();
+  }
+
+  Future<void> cacheCurrentData() async {
+    var data = {
+      'title': _titleController.text,
+      'content':
+          DeltaToHTML.encodeJson(_quillController.document.toDelta().toJson()),
+      'is_content_sexual': _selectedCheckboxes[1],
+      'is_content_social': _selectedCheckboxes[2],
+      'name_type': (_chosenBoardValue != null)
+          ? (_defaultBoardDetailActionModel.slug == 'with-school'
+              ? 'REALNAME'
+              : _chosenBoardValue!.slug == "talk" &&
+                      _selectedCheckboxes[0]! == true
+                  ? 'ANONYMOUS'
+                  : 'REGULAR')
+          : 'REGULAR',
+      'parent_topic' :  _chosenTopicValue!.id == -1 ? '' : _chosenTopicValue!.slug,
+      'parent_board' : _chosenBoardValue!.id == -1 ? '' : _chosenBoardValue!.slug,
+      'attachments' :  _chosenBoardValue!.id == -1 ? '' : _chosenBoardValue!.slug,
+    };
+
+    data['attachments'] = _attachmentList;
+
+    String key = _isEditingPost
+        ? '/cache/${widget.previousArticle!.id}/'
+        : '/cache/${userID}/';
+
+    await cacheApiData(key, data);
+    debugPrint(key);
+    debugPrint(data as String?);
   }
 
   /// 사용자가 선택 가능한 게시판 목록을 가져오는 함수.
@@ -324,6 +359,66 @@ class _PostWritePageState extends State<PostWritePage>
         _isLoading = false;
       });
     }
+  }
+
+  Future<void> _getCachedContents() async {
+    String key = (_isEditingPost)
+        ? '/cache/${widget.previousArticle!.id}/'
+        : '/cache/${userID}/';
+    Map<String, dynamic>? cachedData = await fetchCachedApiData(key);
+    debugPrint('cache : ${cachedData}');
+    if (cachedData == null && _isEditingPost) {
+      await _getPostContent();
+      return;
+    }
+
+    if (cachedData == null) {
+      return;
+    }
+
+    String? title = cachedData['title'];
+    _titleController.text = title ?? '';
+
+    for (int i = 0; i < cachedData['attachments'].length; i++) {
+      AttachmentModel attachment = cachedData['attachments'][i];
+      int id = attachment.id;
+      String? fileUrlPath = attachment.file;
+      String fileUrlName = _extractAndDecodeFileNameFromUrl(attachment.file);
+      int? fileUrlSize = attachment.size ?? 0;
+
+      // TODO: fileType이 이미지인지 아닌지 판단해서 넣기.
+      _attachmentList.add(AttachmentsFormat(
+          fileType: FileType.image,
+          isNewFile: false,
+          id: id,
+          fileUrlPath: fileUrlPath,
+          fileUrlName: fileUrlName,
+          fileUrlSize: fileUrlSize));
+    }
+
+    setState(() {
+      _quillController.document = (cachedData['content'] != null)
+          ? quill.Document.fromDelta(_htmlToQuillDelta(cachedData['content']))
+          : '';
+      _isFileMenuBarSelected = _attachmentList.isNotEmpty;
+
+      //TODO: 명명 규칙 다름
+      _selectedCheckboxes[0] = cachedData['name_type'] == 2 ? true : false;
+      _selectedCheckboxes[1] = cachedData['is_content_sexual'] ?? false;
+      _selectedCheckboxes[2] = cachedData['is_content_social'] ?? false;
+      _isLoading = false;
+    });
+
+    setState(() {
+      BoardDetailActionModel boardDetailActionModel =
+          _findBoardListValue(cachedData['parent_board']);
+      _specTopicList = [_defaultTopicModelNone];
+      _specTopicList.addAll(boardDetailActionModel.topics);
+      _chosenTopicValue = (cachedData['parent_topic'] == null)
+          ? _specTopicList[0]
+          : _findSpecTopicListValue(cachedData['parent_topic'].toString());
+      _chosenBoardValue = boardDetailActionModel;
+    });
   }
 
   /// 기존 게시물의 내용과 첨부 파일 가져오기.
@@ -436,8 +531,17 @@ class _PostWritePageState extends State<PostWritePage>
                     builder: (context) => ExitConfirmDialog(
                           userProvider: userProvider,
                           targetContext: context,
-                          onTap: () {
-                            Navigator.pop(context, true); //dialog pop
+                          onTapConfirm: () async {
+                            //dialog pop
+                            String key = _isEditingPost
+                                ? '/cache/${widget.previousArticle!.id}/'
+                                : '/cache/${userID}';
+                            await cacheApiData(key, null);
+                            Navigator.pop(context, true);
+                          },
+                          onTapSave: () async {
+                            await cacheCurrentData();
+                            Navigator.pop(context, true);
                           },
                         ));
                 return shouldPop ?? false;
@@ -497,9 +601,23 @@ class _PostWritePageState extends State<PostWritePage>
                 builder: (context) => ExitConfirmDialog(
                       userProvider: userProvider,
                       targetContext: context,
-                      onTap: () {
+                      onTapConfirm: () async {
                         // 사용자가 미리 뒤로가기 버튼을 누르는 경우 에러 방지를 위해
                         // try-catch 문을 도입함.
+                        String key = _isEditingPost
+                            ? '/cache/${widget.previousArticle!.id}/'
+                            : '/cache/${userID}';
+                        await cacheApiData(key, null);
+                        try {
+                          Navigator.of(context)
+                            ..pop() //dialog pop
+                            ..pop(); //PostWritePage pop
+                        } catch (error) {
+                          debugPrint("pop error: $error");
+                        }
+                      },
+                      onTapSave: () async {
+                        await cacheCurrentData();
                         try {
                           Navigator.of(context)
                             ..pop() //dialog pop

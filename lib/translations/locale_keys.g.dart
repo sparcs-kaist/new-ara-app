@@ -133,6 +133,7 @@ abstract class  LocaleKeys {
   static const dialogs_noBlockedUsers = 'dialogs.noBlockedUsers';
   static const dialogs_noNickname = 'dialogs.noNickname';
   static const dialogs_exitConfirm = 'dialogs.exitConfirm';
+  static const dialogs_tempSave = 'dialogs.tempSave';
   static const dialogs = 'dialogs';
   static const popUpMenuButtons_downloadSucceed = 'popUpMenuButtons.downloadSucceed';
   static const popUpMenuButtons_downloadFailed = 'popUpMenuButtons.downloadFailed';
