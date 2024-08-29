@@ -1,0 +1,149 @@
+name: Deploy to Play Store, App Store
+
+on:
+  # main 브랜치에 push 연산이 일어나는 경우
+  push:
+    branches:
+      - main
+  # 수동으로 배포를 진행해야하는 경우에 실행
+  workflow_dispatch:
+    inputs:
+      deploy_environment:
+        description: 'Environment'
+        required: true
+        type: choice
+        options:
+          - production
+          - development
+      # 자동실행되는 경우에는 Both로 처리됨
+      deploy_platform:
+        description: 'Select platform to deploy'
+        required: true
+        type: choice
+        options:
+          - iOS
+          - Android
+          - Both
+
+env:
+  FLUTTER_VERSION: "3.13"
+  JAVA_VERSION: "11"
+  XCODE_VERSION: "9.3"
+  DEPLOY_ENVIRONMENT: ${{ github.event.inputs.deploy_environment || 'production' }}
+
+# 각각의 job이 서로 다른 머신에서 병렬적으로 실행됨
+jobs:
+  deploy-android:
+    name: Deploy to Play Store
+    runs-on: ubuntu-latest
+    if: (github.event_name == 'workflow_dispatch' && (github.event.inputs.deploy_platform == 'Android' || github.event.inputs.deploy_platform == 'Both')) || github.event_name == 'push'
+    steps:
+      - uses: actions/checkout@v3
+      # Setup Flutter environments for Android (Java, Flutter)
+      - name: Set up Java
+        uses: actions/setup-java@v3
+        with:
+          distribution: "adopt"
+          java-version: ${{ env.JAVA_VERSION }}
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+
+      # Setup Fastlane environments for Android
+      - name: Setup Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.3'
+      - name: Install Bundler
+        run: gem install bundler
+      - name: Install Fastlane
+        run: cd android && bundle install && cd ..
+
+      # Setup .env
+      - name: Setup .env files
+        run: |
+          echo "GITHUB_API_TOKEN=${{ secrets.CD_GITHUB_API_TOKEN_FOR_RELEASE_NOTES }}" > android/fastlane/.env
+          echo "${{ secrets.ENV_PRODUCTION_FILE_CONTENT }}" > .env.production
+          echo "${{ secrets.ENV_DEVELOPMENT_FILE_CONTENT }}" > .env.development
+
+      # Setup keystore credentials
+      - name: Create upload-keystore.jks
+        run: |
+          echo "${{ secrets.ANDROID_KEYSTORE_BASE64 }}" > upload-keystore.jks.base64
+          base64 -d -i upload-keystore.jks.base64 > android/fastlane/upload-keystore.jks
+          rm upload-keystore.jks.base64
+
+      # Setup supply
+      - name: Create newara-fastlane.json (supply)
+        run: echo ${{ secrets.ANDROID_GOOGLE_API_ACCOUNT }} > android/fastlane/newara-fastlane.json
+
+      # Setup key.properties
+      - name: Create key.properties
+        run: |
+          echo storeFile=../fastlane/upload-keystore.jks > android/key.properties
+          echo storePassword=${{ secrets.ANDROID_STORE_PASSWORD }} >> android/key.properties
+          echo keyPassword=${{ secrets.ANDROID_KEY_PASSWORD }} >> android/key.properties
+          echo keyAlias=${{ secrets.ANDROID_KEY_ALIAS }} >> android/key.properties
+      
+      # Setup flutter packages
+      - name: Install dependencies
+        run: flutter pub get
+
+      # Upload to Play Store
+      - name: Upload to Play Store via Fastlane
+        run: cd android && bundle exec fastlane alpha env:${{ env.DEPLOY_ENVIRONMENT }}
+  
+  deploy-ios:
+    name: Deploy to TestFlight
+    runs-on: macos-latest
+    if: (github.event_name == 'workflow_dispatch' && (github.event.inputs.deploy_platform == 'iOS' || github.event.inputs.deploy_platform == 'Both')) || github.event_name == 'push'
+    steps:
+      - uses: actions/checkout@v3
+      # Setup Xcode
+      - name: Setup Xcode environment
+        uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: ${{ env.XCODE_VERSION }}
+
+      # Setup Flutter environments for iOS (Flutter, Java는 필요X)
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+
+      # Setup Fastlane environments for iOS
+      - name: Setup Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.3'
+      - name: Install Bundler
+        run: gem install bundler
+      - name: Install Fastlane
+        run: cd ios && bundle install && cd ..
+
+      # Setup .env.default for iOS fastlane
+      - name: Setup .env.default
+        run: |
+          echo "FASTLANE_USER=${{ secrets.IOS_FASTLANE_USER }}" > ios/fastlane/.env.default
+          echo "FASTLANE_PASSWORD=${{ secrets.IOS_FASTLANE_PASSWORD }}" >> ios/fastlane/.env.default
+          echo "FASTLANE_APPLE_APPLICATION_SPECIFIC_PASSWORD=${{ secrets.IOS_FASTLANE_APPLE_APPLICATION_SPECIFIC_PASSWORD }}" >> ios/fastlane/.env.default
+          echo "GITHUB_API_TOKEN=${{ secrets.CD_GITHUB_API_TOKEN_FOR_RELEASE_NOTES }}" >> ios/.env.default
+
+      # Setup .env files for flutter project
+      - name: Setup .env files
+        run: |
+          echo "${{ secrets.ENV_PRODUCTION_FILE_CONTENT }}" > .env.production
+          echo "${{ secrets.ENV_DEVELOPMENT_FILE_CONTENT }}" > .env.development
+
+      # Install dependencies for Flutter, iOS
+      - name: Install flutter dependencies
+        run: flutter pub get
+      - name: Install iOS dependencies
+        run: cd ios && pod install && cd ..
+      
+      # Upload to TestFlight
+      - name: Upload to TestFlight
+        run: cd ios && bundle exec fastlane alpha env:${{ env.DEPLOY_ENVIRONMENT }}
