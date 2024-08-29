@@ -41,6 +41,10 @@ class _MainPageState extends State<MainPage> with WidgetsBindingObserver {
     true, //_wantedContents(구인구직)
     true, //_marketContents(중고거래)
     true, //_realEstateContents(부동산)
+    true, //_messagesToSchoolContents (학교에게 전합니다)
+    true, //_kaistNewsContents (카이스트 뉴스)
+    true, //_araFeedbackContents (아라 피드백)
+    true, //_facilityFeedbackContents (입주업체 피드백)
   ];
   //각 컨텐츠 별 데이터 리스트
 
@@ -58,6 +62,10 @@ class _MainPageState extends State<MainPage> with WidgetsBindingObserver {
   final List<ArticleListActionModel> _wantedContents = [];
   final List<ArticleListActionModel> _marketContents = [];
   final List<ArticleListActionModel> _realEstateContents = [];
+  final List<ArticleListActionModel> _messagesToSchoolContents = [];
+  final List<ArticleListActionModel> _kaistNewsContents = [];
+  final List<ArticleListActionModel> _araFeedbackContents = [];
+  final List<ArticleListActionModel> _facilityFeedbackContents = [];
 
   @override
   void initState() {
@@ -153,7 +161,11 @@ class _MainPageState extends State<MainPage> with WidgetsBindingObserver {
             _initTalks(userProvider),
             _initMarket(userProvider),
             _initWanted(userProvider),
-            _initRealEstate(userProvider)
+            _initRealEstate(userProvider),
+            _initMessagesToSchool(userProvider),
+            _initKaistNews(userProvider),
+            _initAraFeedback(userProvider),
+            _initFacilityFeedback(userProvider)
           ]);
         }
       },
@@ -221,6 +233,28 @@ class _MainPageState extends State<MainPage> with WidgetsBindingObserver {
     //부동산
     await _initBoardContent(
         userProvider, "real-estate", "", _realEstateContents, 11);
+  }
+
+  Future<void> _initMessagesToSchool(UserProvider userProvider) async {
+    await _initBoardContent(
+        userProvider, "with-school", "", _messagesToSchoolContents, 12);
+  }
+
+  Future<void> _initKaistNews(UserProvider userProvider) async {
+    await _initBoardContent(
+        userProvider, "kaist-news", "", _kaistNewsContents, 13);
+  }
+
+  Future<void> _initAraFeedback(UserProvider userProvider) async {
+    // dev, prod에서 slug가 다름
+    // dev: ara-feedback, prod: newara-feedback
+    await _initBoardContent(
+        userProvider, "ara-feedback", "", _araFeedbackContents, 14);
+  }
+
+  Future<void> _initFacilityFeedback(UserProvider userProvider) async {
+    await _initBoardContent(
+        userProvider, "facility-feedback", "", _facilityFeedbackContents, 15);
   }
 
   /// 게시판의 게시물들을 불러옴. 코드 중복을 줄이기 위해 사용.
@@ -427,7 +461,11 @@ class _MainPageState extends State<MainPage> with WidgetsBindingObserver {
                 _isLoading[8] ||
                 _isLoading[9] ||
                 _isLoading[10] ||
-                _isLoading[11]
+                _isLoading[11] ||
+                _isLoading[12] ||
+                _isLoading[13] ||
+                _isLoading[14] ||
+                _isLoading[15]
             ? const LoadingIndicator()
             : RefreshIndicator.adaptive(
                 displacement: 0.0,
@@ -449,6 +487,10 @@ class _MainPageState extends State<MainPage> with WidgetsBindingObserver {
                         _buildNoticeContents(),
                         const SizedBox(height: 20),
                         _buildTradeContents(),
+                        const SizedBox(height: 20),
+                        _buildMessagesToSchoolContents(),
+                        const SizedBox(height: 20),
+                        _buildCommunicationContents(),
                         const SizedBox(height: 20),
                         _buildStuCommunityContents(),
                         const SizedBox(height: 20),
@@ -1000,6 +1042,257 @@ class _MainPageState extends State<MainPage> with WidgetsBindingObserver {
                               child: LittleText(
                                 content: _wantedContents[0],
                                 showTopic: true,
+                              ),
+                            )
+                          : Container(),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildMessagesToSchoolContents() {
+    return Column(
+      children: [
+        MainPageTextButton(
+          LocaleKeys.mainPage_messagesToSchool.tr(),
+          () async {
+            await Navigator.of(context).push(slideRoute(PostListShowPage(
+              boardType: BoardType.free,
+              boardInfo: _searchBoard("with-school"),
+            )));
+            await _refreshAllPosts();
+          },
+        ),
+        SizedBox(
+          width: MediaQuery.of(context).size.width - 40,
+          child: Column(
+            children: [
+              PopularBoard(
+                model: _messagesToSchoolContents[0],
+                showBoardNumber: false,
+                refreshAllPosts: _refreshAllPosts,
+              ),
+              Row(
+                children: [
+                  Expanded(
+                    child: Container(
+                      height: 1,
+                      color: const Color(0xFFF0F0F0),
+                    ),
+                  ),
+                ],
+              ),
+              PopularBoard(
+                model: _messagesToSchoolContents[1],
+                refreshAllPosts: _refreshAllPosts,
+                showBoardNumber: false,
+              ),
+              Row(
+                children: [
+                  Expanded(
+                    child: Container(
+                      height: 1,
+                      color: const Color(0xFFF0F0F0),
+                    ),
+                  ),
+                ],
+              ),
+              PopularBoard(
+                model: _messagesToSchoolContents[2],
+                refreshAllPosts: _refreshAllPosts,
+                showBoardNumber: false,
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  /// '학교에게 전합니다' 게시판은 별도로 구성됨 (TODO: 이러한 방식에 대해 논의해보아야 함.)
+  Widget _buildCommunicationContents() {
+    return Column(
+      children: [
+        SizedBox(
+          width: MediaQuery.of(context).size.width - 40,
+          child: Text(
+            LocaleKeys.mainPage_communication.tr(),
+            style: const TextStyle(
+              fontWeight: FontWeight.w600,
+              fontSize: 20,
+              color: Colors.black,
+            ),
+          ),
+        ),
+        const SizedBox(height: 9),
+        Container(
+          padding: const EdgeInsets.all(15),
+          width: MediaQuery.of(context).size.width - 40,
+          // height: 200,
+          decoration: BoxDecoration(
+            border: Border.all(
+              width: 1,
+              color: const Color.fromRGBO(240, 240, 240, 1),
+            ),
+            borderRadius: const BorderRadius.all(Radius.circular(20)),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              InkWell(
+                onTap: () async {
+                  await Navigator.of(context).push(slideRoute(PostListShowPage(
+                      boardType: BoardType.free,
+                      boardInfo: _searchBoard("kaist-news"))));
+                  await _refreshAllPosts();
+                },
+                child: Row(
+                  children: [
+                    Text(
+                      LocaleKeys.mainPage_kaistNews.tr(),
+                      style: const TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w700,
+                        color: Color(0xFF1F4899),
+                      ),
+                    ),
+                    const SizedBox(
+                      width: 5,
+                    ),
+                    SvgPicture.asset(
+                      'assets/icons/right_chevron.svg',
+                      colorFilter: const ColorFilter.mode(
+                          Color(0xFF646464), BlendMode.srcIn),
+                      fit: BoxFit.fill,
+                      width: 17,
+                      height: 17,
+                    ),
+                    const SizedBox(
+                      width: 10,
+                    ),
+                    Expanded(
+                      child: _kaistNewsContents.isNotEmpty
+                          ? InkWell(
+                              onTap: () async {
+                                await Navigator.of(context).push(slideRoute(
+                                    PostViewPage(
+                                        id: _kaistNewsContents[0].id)));
+                                await _refreshAllPosts();
+                              },
+                              child: LittleText(
+                                content: _kaistNewsContents[0],
+                              ),
+                            )
+                          : Container(),
+                    )
+                  ],
+                ),
+              ),
+              const SizedBox(
+                height: 10,
+              ),
+              InkWell(
+                onTap: () async {
+                  await Navigator.of(context).push(slideRoute(PostListShowPage(
+                      boardType: BoardType.free,
+                      boardInfo: _searchBoard("facility-feedback"))));
+                  await _refreshAllPosts();
+                },
+                child: Row(
+                  children: [
+                    Text(
+                      LocaleKeys.mainPage_facilityFeedback.tr(),
+                      style: const TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w700,
+                        color: Color(0xFF646464),
+                      ),
+                    ),
+                    const SizedBox(
+                      width: 5,
+                    ),
+                    SvgPicture.asset(
+                      'assets/icons/right_chevron.svg',
+                      colorFilter: const ColorFilter.mode(
+                          Color(0xFF646464), BlendMode.srcIn),
+                      fit: BoxFit.fill,
+                      width: 17,
+                      height: 17,
+                    ),
+                    const SizedBox(
+                      width: 10,
+                    ),
+                    Expanded(
+                      child: _facilityFeedbackContents.isNotEmpty
+                          ? InkWell(
+                              onTap: () async {
+                                await Navigator.of(context).push(slideRoute(
+                                    PostViewPage(
+                                        id: _facilityFeedbackContents[0].id)));
+                                await _refreshAllPosts();
+                              },
+                              child: LittleText(
+                                content: _facilityFeedbackContents[0],
+                              ),
+                            )
+                          : Container(),
+                    )
+                  ],
+                ),
+              ),
+              const SizedBox(
+                height: 10,
+              ),
+              InkWell(
+                onTap: () async {
+                  await Navigator.of(context).push(slideRoute(PostListShowPage(
+                    boardType: BoardType.free,
+                    boardInfo:
+                        _searchBoard("ara-feedback"), // prod에서는 newara-feedback
+                  )));
+                  await _refreshAllPosts();
+                },
+                child: Row(
+                  children: [
+                    Text(
+                      LocaleKeys.mainPage_araFeedback.tr(),
+                      style: const TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w700,
+                        color: Color(0xFFED3A3A),
+                      ),
+                    ),
+                    const SizedBox(
+                      width: 5,
+                    ),
+                    SvgPicture.asset(
+                      'assets/icons/right_chevron.svg',
+                      colorFilter: const ColorFilter.mode(
+                          Color(0xFFED3A3A), BlendMode.srcIn),
+                      fit: BoxFit.fill,
+                      width: 17,
+                      height: 17,
+                    ),
+                    const SizedBox(
+                      width: 10,
+                    ),
+                    Expanded(
+                      child: _araFeedbackContents.isNotEmpty
+                          ? InkWell(
+                              onTap: () async {
+                                await Navigator.of(context).push(slideRoute(
+                                    PostViewPage(
+                                        id: _araFeedbackContents[0].id)));
+                                await _refreshAllPosts();
+                              },
+                              child: LittleText(
+                                content: _araFeedbackContents[0],
                               ),
                             )
                           : Container(),
