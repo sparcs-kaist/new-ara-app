@@ -77,15 +77,15 @@ jobs:
 
       # Setup supply
       - name: Create newara-fastlane.json (supply)
-        run: echo ${{ secrets.ANDROID_GOOGLE_API_ACCOUNT }} > android/fastlane/newara-fastlane.json
+        run: echo "${{ secrets.ANDROID_GOOGLE_API_ACCOUNT }}" > android/fastlane/newara-fastlane.json
 
       # Setup key.properties
       - name: Create key.properties
         run: |
-          echo storeFile=../fastlane/upload-keystore.jks > android/key.properties
-          echo storePassword=${{ secrets.ANDROID_STORE_PASSWORD }} >> android/key.properties
-          echo keyPassword=${{ secrets.ANDROID_KEY_PASSWORD }} >> android/key.properties
-          echo keyAlias=${{ secrets.ANDROID_KEY_ALIAS }} >> android/key.properties
+          echo "storeFile=../fastlane/upload-keystore.jks" > android/key.properties
+          echo "storePassword=${{ secrets.ANDROID_STORE_PASSWORD }}" >> android/key.properties
+          echo "keyPassword=${{ secrets.ANDROID_KEY_PASSWORD }}" >> android/key.properties
+          echo "keyAlias=${{ secrets.ANDROID_KEY_ALIAS }}" >> android/key.properties
       
       # Setup flutter packages
       - name: Install dependencies
