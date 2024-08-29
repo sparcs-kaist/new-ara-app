@@ -266,8 +266,8 @@ class _PostWritePageState extends State<PostWritePage>
   /// 게시판 목록을 가져온다.
   /// 이전 게시물의 데이터를 가져온다.
   Future<void> _initPostWritePost() async {
-    await _getBoardList();
     await _getCachedContents();
+    await _getBoardList();
   }
 
   Future<void> cacheCurrentData() async {
@@ -285,9 +285,11 @@ class _PostWritePageState extends State<PostWritePage>
                   ? 'ANONYMOUS'
                   : 'REGULAR')
           : 'REGULAR',
-      'parent_topic' :  _chosenTopicValue!.id == -1 ? '' : _chosenTopicValue!.slug,
-      'parent_board' : _chosenBoardValue!.id == -1 ? '' : _chosenBoardValue!.slug,
-      'attachments' :  _chosenBoardValue!.id == -1 ? '' : _chosenBoardValue!.slug,
+      'parent_topic':
+          _chosenTopicValue!.id == -1 ? '' : _chosenTopicValue!.slug,
+      'parent_board':
+          _chosenBoardValue!.id == -1 ? '' : _chosenBoardValue!.slug,
+      'attachments': _chosenBoardValue!.id == -1 ? '' : _chosenBoardValue!.slug,
     };
 
     data['attachments'] = _attachmentList;
@@ -298,7 +300,6 @@ class _PostWritePageState extends State<PostWritePage>
 
     await cacheApiData(key, data);
     debugPrint(key);
-    debugPrint(data as String?);
   }
 
   /// 사용자가 선택 가능한 게시판 목록을 가져오는 함수.
@@ -331,34 +332,31 @@ class _PostWritePageState extends State<PostWritePage>
                   return;
                 }
               }
+
+              // 게시판 목록 상태 업데이트.(넘어본 게시판의 정보가 있을 경우 && 게시물을 쓸 수 있는 게시판의 경우)
+              if (widget.previousBoard != null &&
+                  widget.previousBoard!.user_writable) {
+                BoardDetailActionModel boardDetailActionModel =
+                    _findBoardListValue(widget.previousBoard!.slug);
+                _specTopicList = [_defaultTopicModelNone];
+                _specTopicList.addAll(boardDetailActionModel.topics);
+
+                _chosenTopicValue = _specTopicList[0];
+
+                _chosenBoardValue = boardDetailActionModel;
+                _isLoading = false;
+              }
+
+              // 게시판 목록 상태 업데이트(else)
+              else {
+                _specTopicList.add(_defaultTopicModelSelect);
+                _chosenTopicValue = _specTopicList[0];
+                _chosenBoardValue = _boardList[0];
+                _isLoading = false;
+              }
             });
           }
         });
-
-    // 게시판 목록 상태 업데이트.(넘어본 게시판의 정보가 있을 경우 && 게시물을 쓸 수 있는 게시판의 경우)
-    if (widget.previousBoard != null && widget.previousBoard!.user_writable) {
-      setState(() {
-        BoardDetailActionModel boardDetailActionModel =
-            _findBoardListValue(widget.previousBoard!.slug);
-        _specTopicList = [_defaultTopicModelNone];
-        _specTopicList.addAll(boardDetailActionModel.topics);
-
-        _chosenTopicValue = _specTopicList[0];
-
-        _chosenBoardValue = boardDetailActionModel;
-        _isLoading = false;
-      });
-    }
-
-    // 게시판 목록 상태 업데이트(else)
-    else {
-      setState(() {
-        _specTopicList.add(_defaultTopicModelSelect);
-        _chosenTopicValue = _specTopicList[0];
-        _chosenBoardValue = _boardList[0];
-        _isLoading = false;
-      });
-    }
   }
 
   Future<void> _getCachedContents() async {
@@ -406,7 +404,7 @@ class _PostWritePageState extends State<PostWritePage>
       _selectedCheckboxes[0] = cachedData['name_type'] == 2 ? true : false;
       _selectedCheckboxes[1] = cachedData['is_content_sexual'] ?? false;
       _selectedCheckboxes[2] = cachedData['is_content_social'] ?? false;
-      _isLoading = false;
+      //_isLoading = false; (only finish loading AFTER boardlist load)
     });
 
     setState(() {
