@@ -25,7 +25,7 @@
 		<key>CFBundleSignature</key>
 		<string>????</string>
 		<key>CFBundleVersion</key>
-		<string>$(FLUTTER_BUILD_NUMBER)</string>
+		<string>240819.1748</string>
 		<key>LSApplicationQueriesSchemes</key>
 		<array>
 			<string>https</string>

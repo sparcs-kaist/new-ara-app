@@ -32,7 +32,11 @@ apply plugin: 'kotlin-android'
 apply from: "$flutterRoot/packages/flutter_tools/gradle/flutter.gradle"
 
 android {
-    compileSdkVersion 33
+    /* compileSdkVersion
+    - 앱을 컴파일할 때 사용하는 SDK의 버전
+    - compileSdkVersion에서 지정한 SDK의 Android API를 사용하게 됨
+    - 구글 정책(2024.08.31 이후로 앱은 API 버전 34를 타겟팅해야함)에 따라 33->34로 상향 */
+    compileSdkVersion 34
     ndkVersion flutter.ndkVersion
 
     compileOptions {
@@ -53,9 +57,16 @@ android {
         // You can update the following values to match your application needs.
         // For more information, see: https://docs.flutter.dev/deployment/android#reviewing-the-build-configuration.
 
-       // minSdkVersion 19 // webview_flutter에서 요구하는 최소 버전
-        minSdkVersion 21 // multiDex에서 요구하는 최소 버전
-        targetSdkVersion flutter.targetSdkVersion
+        /* minSdkVersion
+        - 앱이 설치될 수 있는 최소한의 API 버전 (이 버전보다 낮은 것만 지원하는 기기에는 설치 불가)
+        - multiDex에서 요구하는 최소 버전인 21로 설정 */
+        minSdkVersion 21
+
+        /* targetSdkVersion
+        - 앱이 테스트되고 최적화된 Android SDK 버전을 의미
+        - targetSdkVersion에 해당하는 Android SDK 버전을 염두해두고 개발되었다는 의미 
+        - 구글 정책(2024.08.31 이후로 앱은 API 버전 34를 타겟팅해야함)에 따라 33->34로 상향 */
+        targetSdkVersion 34
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
     }

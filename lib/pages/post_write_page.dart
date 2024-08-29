@@ -1533,7 +1533,7 @@ class _PostWritePageState extends State<PostWritePage>
                   filename: attachFile.path.split('/').last),
             });
             Response? response = await userProvider.postApiRes(
-                "$newAraDefaultUrl/api/attachments/",
+                "attachments/",
                 data: formData);
             if (response != null) {
               final attachmentModel = AttachmentModel.fromJson(response.data);
