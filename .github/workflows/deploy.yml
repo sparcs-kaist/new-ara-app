@@ -1,6 +1,7 @@
 name: Deploy to Play Store, App Store
 
 on:
+  # main 브랜치에 push 연산이 일어나는 경우
   push:
     branches:
       - main
@@ -14,17 +15,28 @@ on:
         options:
           - production
           - development
+      # 자동실행되는 경우에는 Both로 처리됨
+      deploy_platform:
+        description: 'Select platform to deploy'
+        required: true
+        type: choice
+        options:
+          - iOS
+          - Android
+          - Both
 
 env:
   FLUTTER_VERSION: "3.13"
   JAVA_VERSION: "11"
   XCODE_VERSION: "9.3"
+  DEPLOY_ENVIRONMENT: ${{ github.event.inputs.deploy_environment || 'production' }}
 
 # 각각의 job이 서로 다른 머신에서 병렬적으로 실행됨
 jobs:
   deploy-android:
     name: Deploy to Play Store
     runs-on: ubuntu-latest
+    if: (github.event_name == 'workflow_dispatch' && (github.event.inputs.deploy_platform == 'Android' || github.event.inputs.deploy_platform == 'Both')) || github.event_name == 'push'
     steps:
       - uses: actions/checkout@v3
       # Setup Flutter environments for Android (Java, Flutter)
@@ -81,11 +93,12 @@ jobs:
 
       # Upload to Play Store
       - name: Upload to Play Store via Fastlane
-        run: cd android && bundle exec fastlane alpha env:${{ github.event.inputs.deploy_environment }}
+        run: cd android && bundle exec fastlane alpha env:${{ env.DEPLOY_ENVIRONMENT }}
   
   deploy-ios:
     name: Deploy to TestFlight
     runs-on: macos-latest
+    if: (github.event_name == 'workflow_dispatch' && (github.event.inputs.deploy_platform == 'iOS' || github.event.inputs.deploy_platform == 'Both')) || github.event_name == 'push'
     steps:
       - uses: actions/checkout@v3
       # Setup Xcode
@@ -133,4 +146,4 @@ jobs:
       
       # Upload to TestFlight
       - name: Upload to TestFlight
-        run: cd ios && bundle exec fastlane alpha env:env:${{ github.event.inputs.deploy_environment }}
+        run: cd ios && bundle exec fastlane alpha env:${{ env.DEPLOY_ENVIRONMENT }}
