@@ -35,12 +35,47 @@ jobs:
         with:
           channel: stable
           flutter-version: ${{ env.FLUTTER_VERSION }}
-      # Setup private credentials
-      
-      # Setup Fastlane environments for Android (Ruby)
+
+      # Setup Fastlane environments for Android
       - name: Setup Ruby
         uses: ruby/setup-ruby@v1
         with:
           ruby-version: '3.3'
+      - name: Install Bundler
+        run: gem install bundler
       - name: Install Fastlane
         run: cd android && bundle install && cd ..
+
+      # Setup .env
+      - name: Setup .env files
+        run: |
+          echo "GITHUB_API_TOKEN=${{ secrets.CD_GITHUB_API_TOKEN_FOR_RELEASE_NOTES }}" > android/fastlane/.env
+          echo "${{ secrets.ENV_PRODUCTION_FILE_CONTENT }}" > .env.production
+          echo "${{ secrets.ENV_DEVELOPMENT_FILE_CONTENT }}" > .env.development
+
+      # Setup keystore credentials
+      - name: Create upload-keystore.jks
+        run: |
+          echo "${{ secrets.ANDROID_KEYSTORE_BASE64 }}" > upload-keystore.jks.base64
+          base64 -d -i upload-keystore.jks.base64 > android/fastlane/upload-keystore.jks
+          rm upload-keystore.jks.base64
+
+      # Setup supply
+      - name: Create newara-fastlane.json (supply)
+        run: echo ${{ secrets.ANDROID_GOOGLE_API_ACCOUNT }} > android/fastlane/newara-fastlane.json
+
+      # Setup key.properties
+      - name: Create key.properties
+        run: |
+          echo storeFile=../fastlane/upload-keystore.jks > android/key.properties
+          echo storePassword=${{ secrets.ANDROID_STORE_PASSWORD }} >> android/key.properties
+          echo keyPassword=${{ secrets.ANDROID_KEY_PASSWORD }} >> android/key.properties
+          echo keyAlias=${{ secrets.ANDROID_KEY_ALIAS }} >> android/key.properties
+      
+      # Setup flutter packages
+      - name: Install dependencies
+        run: flutter pub get
+
+      # Upload to Play Store
+      - name: Upload to Play Store via Fastlane
+        run: cd android && bundle exec fastlane alpha env:${{ github.event.inputs.deploy_environment }}
