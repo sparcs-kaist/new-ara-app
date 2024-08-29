@@ -179,6 +179,7 @@ class _PostWritePageState extends State<PostWritePage>
   String userID = '';
 
   final _editorScrollController = ScrollController();
+
   @override
   void initState() {
     super.initState();
@@ -203,7 +204,7 @@ class _PostWritePageState extends State<PostWritePage>
     _quillController.addListener(_onTextChanged);
     _titleFocusNode = FocusNode();
     _editorFocusNode = FocusNode();
-    _initPostWritePost();
+    _getBoardList();
 
     //위젯 트리가 빌드된 직후에 포커스를 요청합니다.
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -263,13 +264,6 @@ class _PostWritePageState extends State<PostWritePage>
     });
   }
 
-  /// 게시판 목록을 가져온다.
-  /// 이전 게시물의 데이터를 가져온다.
-  Future<void> _initPostWritePost() async {
-    await _getCachedContents();
-    await _getBoardList();
-  }
-
   Future<void> cacheCurrentData() async {
     var data = {
       'title': _titleController.text,
@@ -314,7 +308,7 @@ class _PostWritePageState extends State<PostWritePage>
         userProvider: userProvider, // API 요청을 담당할 userProvider 인스턴스를 전달합니다.
         callback: (response) {
           if (mounted) {
-            setState(() {
+            setState(() async {
               // `_boardList` 초기화 후 기본 게시판 추가.
               _boardList = [_defaultBoardDetailActionModel];
 
@@ -354,69 +348,84 @@ class _PostWritePageState extends State<PostWritePage>
                 _chosenBoardValue = _boardList[0];
                 _isLoading = false;
               }
+
+              //_boardList를 모두 불러온 후 cache 업데이트
+              await _getCachedContents();
             });
           }
         });
   }
 
+  /// 사용자가 임시 저장한 데이터를 가져오는 함수.
+  /// SharedPreferences에서 작성 내용을 가져와 setState() 호출
   Future<void> _getCachedContents() async {
     String key = (_isEditingPost)
         ? '/cache/${widget.previousArticle!.id}/'
         : '/cache/${userID}/';
     Map<String, dynamic>? cachedData = await fetchCachedApiData(key);
     debugPrint('cache : ${cachedData}');
-    if (cachedData == null && _isEditingPost) {
+    if (_isEditingPost) {
+      //cachedData == null 와는 관계없이 불러오지 않음!
       await _getPostContent();
       return;
     }
 
     if (cachedData == null) {
+      debugPrint('Nothing to load from cache');
       return;
     }
 
-    String? title = cachedData['title'];
-    _titleController.text = title ?? '';
-
-    for (int i = 0; i < cachedData['attachments'].length; i++) {
-      AttachmentModel attachment = cachedData['attachments'][i];
-      int id = attachment.id;
-      String? fileUrlPath = attachment.file;
-      String fileUrlName = _extractAndDecodeFileNameFromUrl(attachment.file);
-      int? fileUrlSize = attachment.size ?? 0;
-
-      // TODO: fileType이 이미지인지 아닌지 판단해서 넣기.
-      _attachmentList.add(AttachmentsFormat(
-          fileType: FileType.image,
-          isNewFile: false,
-          id: id,
-          fileUrlPath: fileUrlPath,
-          fileUrlName: fileUrlName,
-          fileUrlSize: fileUrlSize));
+    if (cachedData.values.any((value) => value == null)) {
+      return;
     }
 
-    setState(() {
-      _quillController.document = (cachedData['content'] != null)
-          ? quill.Document.fromDelta(_htmlToQuillDelta(cachedData['content']))
-          : '';
-      _isFileMenuBarSelected = _attachmentList.isNotEmpty;
+    try {
+      String? title = cachedData['title'];
+      _titleController.text = title ?? '';
 
-      //TODO: 명명 규칙 다름
-      _selectedCheckboxes[0] = cachedData['name_type'] == 2 ? true : false;
-      _selectedCheckboxes[1] = cachedData['is_content_sexual'] ?? false;
-      _selectedCheckboxes[2] = cachedData['is_content_social'] ?? false;
-      //_isLoading = false; (only finish loading AFTER boardlist load)
-    });
+      for (int i = 0; i < cachedData['attachments'].length; i++) {
+        AttachmentModel attachment = cachedData['attachments'][i];
+        int id = attachment.id;
+        String? fileUrlPath = attachment.file;
+        String fileUrlName = _extractAndDecodeFileNameFromUrl(attachment.file);
+        int? fileUrlSize = attachment.size ?? 0;
 
-    setState(() {
-      BoardDetailActionModel boardDetailActionModel =
-          _findBoardListValue(cachedData['parent_board']);
-      _specTopicList = [_defaultTopicModelNone];
-      _specTopicList.addAll(boardDetailActionModel.topics);
-      _chosenTopicValue = (cachedData['parent_topic'] == null)
-          ? _specTopicList[0]
-          : _findSpecTopicListValue(cachedData['parent_topic'].toString());
-      _chosenBoardValue = boardDetailActionModel;
-    });
+        // TODO: fileType이 이미지인지 아닌지 판단해서 넣기.
+        _attachmentList.add(AttachmentsFormat(
+            fileType: FileType.image,
+            isNewFile: false,
+            id: id,
+            fileUrlPath: fileUrlPath,
+            fileUrlName: fileUrlName,
+            fileUrlSize: fileUrlSize));
+      }
+
+      setState(() {
+        _quillController.document = (cachedData['content'] != null)
+            ? quill.Document.fromDelta(_htmlToQuillDelta(cachedData['content']))
+            : '';
+        _isFileMenuBarSelected = _attachmentList.isNotEmpty;
+
+        //TODO: 명명 규칙 다름
+        _selectedCheckboxes[0] = cachedData['name_type'] == 2 ? true : false;
+        _selectedCheckboxes[1] = cachedData['is_content_sexual'] ?? false;
+        _selectedCheckboxes[2] = cachedData['is_content_social'] ?? false;
+        //_isLoading = false; (only finish loading AFTER boardlist load)
+      });
+
+      setState(() {
+        BoardDetailActionModel boardDetailActionModel =
+            _findBoardListValue(cachedData['parent_board']);
+        _specTopicList = [_defaultTopicModelNone];
+        _specTopicList.addAll(boardDetailActionModel.topics);
+        _chosenTopicValue = (cachedData['parent_topic'] == null)
+            ? _specTopicList[0]
+            : _findSpecTopicListValue(cachedData['parent_topic'].toString());
+        _chosenBoardValue = boardDetailActionModel;
+      });
+    } catch (error) {
+      debugPrint('_getCachedContents error: $error');
+    }
   }
 
   /// 기존 게시물의 내용과 첨부 파일 가져오기.
@@ -533,8 +542,9 @@ class _PostWritePageState extends State<PostWritePage>
                             //dialog pop
                             String key = _isEditingPost
                                 ? '/cache/${widget.previousArticle!.id}/'
-                                : '/cache/${userID}';
-                            await cacheApiData(key, null);
+                                : '/cache/${userID}/';
+                            await removeApiData(key);
+                            debugPrint('Cache Reset!');
                             Navigator.pop(context, true);
                           },
                           onTapSave: () async {
@@ -544,6 +554,11 @@ class _PostWritePageState extends State<PostWritePage>
                         ));
                 return shouldPop ?? false;
               } else {
+                String key = _isEditingPost
+                    ? '/cache/${widget.previousArticle!.id}/'
+                    : '/cache/${userID}/';
+                await removeApiData(key);
+                debugPrint('Cache Reset!');
                 return true;
               }
             },
@@ -604,8 +619,9 @@ class _PostWritePageState extends State<PostWritePage>
                         // try-catch 문을 도입함.
                         String key = _isEditingPost
                             ? '/cache/${widget.previousArticle!.id}/'
-                            : '/cache/${userID}';
-                        await cacheApiData(key, null);
+                            : '/cache/${userID}/';
+                        await removeApiData(key);
+                        debugPrint('Cache Reset!');
                         try {
                           Navigator.of(context)
                             ..pop() //dialog pop
@@ -626,6 +642,11 @@ class _PostWritePageState extends State<PostWritePage>
                       },
                     ));
           } else {
+            String key = _isEditingPost
+                ? '/cache/${widget.previousArticle!.id}/'
+                : '/cache/${userID}/';
+            await removeApiData(key);
+            debugPrint('Cache Reset!');
             Navigator.pop(context);
           }
         },
@@ -1679,9 +1700,6 @@ class _PostWritePageState extends State<PostWritePage>
         _isUploadingPost = true;
         _isLoading = true;
       });
-
-      Dio dio = userProvider
-          .createDioWithHeadersForNonget(); // TODO: 적절한 apiRes함수로 변경해야 함.
 
       for (int i = 0; i < _attachmentList.length; i++) {
         //새로 올리는 파일이면 새로운 id 할당 받기.
