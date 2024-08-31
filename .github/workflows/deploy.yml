@@ -130,7 +130,7 @@ jobs:
           echo 'FASTLANE_USER=${{ secrets.IOS_FASTLANE_USER }}' > ios/fastlane/.env.default
           echo 'FASTLANE_PASSWORD=${{ secrets.IOS_FASTLANE_PASSWORD }}' >> ios/fastlane/.env.default
           echo 'FASTLANE_APPLE_APPLICATION_SPECIFIC_PASSWORD=${{ secrets.IOS_FASTLANE_APPLE_APPLICATION_SPECIFIC_PASSWORD }}' >> ios/fastlane/.env.default
-          echo 'GITHUB_API_TOKEN=${{ secrets.CD_GITHUB_API_TOKEN_FOR_RELEASE_NOTES }}' >> ios/.env.default
+          echo 'GITHUB_API_TOKEN=${{ secrets.CD_GITHUB_API_TOKEN_FOR_RELEASE_NOTES }}' >> ios/fastlane/.env.default
 
       # Setup .env files for flutter project
       - name: Setup .env files
