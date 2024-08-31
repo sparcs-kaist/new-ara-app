@@ -545,11 +545,15 @@ class _PostWritePageState extends State<PostWritePage>
                                 : '/cache/${userID}/';
                             await removeApiData(key);
                             debugPrint('Cache Reset!');
-                            Navigator.pop(context, true);
+                            if (mounted) {
+                              Navigator.pop(context, true);
+                            }
                           },
                           onTapSave: () async {
                             await cacheCurrentData();
-                            Navigator.pop(context, true);
+                            if (mounted) {
+                              Navigator.pop(context, true);
+                            }
                           },
                         ));
                 return shouldPop ?? false;
@@ -623,9 +627,11 @@ class _PostWritePageState extends State<PostWritePage>
                         await removeApiData(key);
                         debugPrint('Cache Reset!');
                         try {
-                          Navigator.of(context)
-                            ..pop() //dialog pop
-                            ..pop(); //PostWritePage pop
+                          if (mounted) {
+                            Navigator.of(context)
+                              ..pop() //dialog pop
+                              ..pop(); //PostWritePage pop
+                          }
                         } catch (error) {
                           debugPrint("pop error: $error");
                         }
@@ -633,9 +639,11 @@ class _PostWritePageState extends State<PostWritePage>
                       onTapSave: () async {
                         await cacheCurrentData();
                         try {
-                          Navigator.of(context)
-                            ..pop() //dialog pop
-                            ..pop(); //PostWritePage pop
+                          if (mounted) {
+                            Navigator.of(context)
+                              ..pop() //dialog pop
+                              ..pop(); //PostWritePage pop
+                          }
                         } catch (error) {
                           debugPrint("pop error: $error");
                         }
@@ -647,7 +655,10 @@ class _PostWritePageState extends State<PostWritePage>
                 : '/cache/${userID}/';
             await removeApiData(key);
             debugPrint('Cache Reset!');
-            Navigator.pop(context);
+
+            if (mounted) {
+              Navigator.pop(context);
+            }
           }
         },
       ),
