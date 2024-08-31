@@ -306,53 +306,60 @@ class _PostWritePageState extends State<PostWritePage>
     await updateStateWithCachedOrFetchedApiData(
         apiUrl: "boards/", // API URL을 지정합니다. 이 예에서는 "boards/"를 대상으로 합니다.
         userProvider: userProvider, // API 요청을 담당할 userProvider 인스턴스를 전달합니다.
-        callback: (response) {
+        callback: (response) async {
+          // async 처리를 위해 임시적으로 newBoardList, newChosenBoard, newSpecTopicList가
+          // _boardList, _chosenBoardValue, _specTopicList를 대체합니다.
+
+          // `newBoardList` 초기화 후 기본 게시판 추가.
+          List<BoardDetailActionModel> newBoardList = [
+            _defaultBoardDetailActionModel
+          ];
+          BoardDetailActionModel? newChosenBoard;
+          List<TopicModel> newSpecTopicList;
+
+          // Json 응답에서 게시물 목록 파싱 후 `newBoardList`에 추가.
+          for (Map<String, dynamic> boardJson in response) {
+            try {
+              BoardDetailActionModel boardDetail =
+                  BoardDetailActionModel.fromJson(boardJson);
+              if (boardDetail.user_writable) {
+                newBoardList.add(boardDetail);
+              }
+            } catch (error) {
+              debugPrint(
+                  "refreshBoardList BoardDetailActionModel.fromJson 실패: $error");
+              return;
+            }
+          }
+
+          // 게시판 목록 상태 업데이트.(넘어본 게시판의 정보가 있을 경우 && 게시물을 쓸 수 있는 게시판의 경우)
+          if (widget.previousBoard != null &&
+              widget.previousBoard!.user_writable) {
+            newChosenBoard = newBoardList.firstWhere(
+                (board) => board.slug == widget.previousBoard!.slug,
+                orElse: () => _defaultBoardDetailActionModel);
+            newSpecTopicList = [_defaultTopicModelNone]
+              ..addAll(newChosenBoard.topics);
+            // 게시판 목록 상태 업데이트(else)
+          } else {
+            newSpecTopicList = [_defaultTopicModelSelect];
+            newChosenBoard = newBoardList.first;
+          }
+
+          // 임시 변수들을 state 변수들에 synchronous하게 지정
           if (mounted) {
-            setState(() async {
-              // `_boardList` 초기화 후 기본 게시판 추가.
-              _boardList = [_defaultBoardDetailActionModel];
+            setState(() {
+              _boardList = newBoardList;
+              _chosenBoardValue = newChosenBoard;
+              _specTopicList = newSpecTopicList;
+              _chosenTopicValue = newSpecTopicList[0];
 
-              // Json 응답에서 게시물 목록 파싱 후 `_boardList`에 추가.
-              for (Map<String, dynamic> boardJson in response) {
-                try {
-                  BoardDetailActionModel boardDetail =
-                      BoardDetailActionModel.fromJson(boardJson);
-                  if (boardDetail.user_writable) {
-                    _boardList.add(boardDetail);
-                  }
-                } catch (error) {
-                  debugPrint(
-                      "refreshBoardList BoardDetailActionModel.fromJson 실패: $error");
-                  return;
-                }
-              }
-
-              // 게시판 목록 상태 업데이트.(넘어본 게시판의 정보가 있을 경우 && 게시물을 쓸 수 있는 게시판의 경우)
-              if (widget.previousBoard != null &&
-                  widget.previousBoard!.user_writable) {
-                BoardDetailActionModel boardDetailActionModel =
-                    _findBoardListValue(widget.previousBoard!.slug);
-                _specTopicList = [_defaultTopicModelNone];
-                _specTopicList.addAll(boardDetailActionModel.topics);
-
-                _chosenTopicValue = _specTopicList[0];
-
-                _chosenBoardValue = boardDetailActionModel;
-                _isLoading = false;
-              }
-
-              // 게시판 목록 상태 업데이트(else)
-              else {
-                _specTopicList.add(_defaultTopicModelSelect);
-                _chosenTopicValue = _specTopicList[0];
-                _chosenBoardValue = _boardList[0];
-                _isLoading = false;
-              }
-
-              //_boardList를 모두 불러온 후 cache 업데이트
-              await _getCachedContents();
+              _isLoading = false;
             });
           }
+
+          //_boardList를 모두 불러온 후 cache 업데이트
+          await _getCachedContents();
         });
   }
 
@@ -367,11 +374,10 @@ class _PostWritePageState extends State<PostWritePage>
     if (_isEditingPost) {
       //cachedData == null 와는 관계없이 불러오지 않음!
       await _getPostContent();
-      return;
     }
 
     if (cachedData == null) {
-      debugPrint('Nothing to load from cache');
+      debugPrint('No data from cache');
       return;
     }
 
