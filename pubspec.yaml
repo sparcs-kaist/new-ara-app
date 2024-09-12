@@ -43,6 +43,7 @@ dependencies:
   webview_flutter_android: "^3.15.0"
   webview_flutter_wkwebview: "^3.10.2"
   flutter_dotenv: "^5.1.0"
+  connectivity_plus: "^5.0.2"
 dev_dependencies:
   flutter_test:
     sdk: flutter
