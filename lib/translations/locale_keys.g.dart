@@ -51,6 +51,7 @@ abstract class  LocaleKeys {
   static const postListShowPage_allPosts = 'postListShowPage.allPosts';
   static const postListShowPage_bookmarks = 'postListShowPage.bookmarks';
   static const postListShowPage_testBoard = 'postListShowPage.testBoard';
+  static const postListShowPage_lastItem = 'postListShowPage.lastItem';
   static const postListShowPage = 'postListShowPage';
   static const settingPage_title = 'settingPage.title';
   static const settingPage_postSetting = 'settingPage.postSetting';

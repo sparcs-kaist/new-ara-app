@@ -71,7 +71,8 @@ class CodegenLoader extends AssetLoader{
     "topPosts": "Top Posts",
     "allPosts": "All Posts",
     "bookmarks": "Bookmarks",
-    "testBoard": "Test Board"
+    "testBoard": "Test Board",
+    "lastItem": "You have checked all posts 🎉"
   },
   "settingPage": {
     "title": "Setting",
@@ -274,7 +275,8 @@ static const Map<String,dynamic> ko = {
     "topPosts": "실시간 인기글",
     "allPosts": "전체보기",
     "bookmarks": "담아둔 글",
-    "testBoard": "테스트 게시판"
+    "testBoard": "테스트 게시판",
+    "lastItem": "모든 게시글을 확인했습니다 🎉"
   },
   "settingPage": {
     "title": "설정",

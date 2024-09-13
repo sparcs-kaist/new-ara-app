@@ -55,7 +55,8 @@
         "topPosts": "Top Posts",
         "allPosts": "All Posts",
         "bookmarks": "Bookmarks",
-        "testBoard": "Test Board"
+        "testBoard": "Test Board",
+        "lastItem" : "You have checked all posts 🎉"
     },
     "settingPage": {
         "title": "Setting",
