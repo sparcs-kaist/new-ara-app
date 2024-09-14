@@ -85,6 +85,8 @@ platform :ios do
       scheme: "Runner",
       clean: true,
       export_method: "app-store",
+      xcargs: "-allowProvisioningUpdates",
+      export_xcargs: "-allowProvisioningUpdates",
     )
     upload_to_testflight(
       skip_waiting_for_build_processing: true,
