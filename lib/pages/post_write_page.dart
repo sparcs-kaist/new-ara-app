@@ -93,6 +93,33 @@ class AttachmentsFormat {
     this.fileUrlName = "",
     this.fileUrlSize = 0,
   });
+
+  factory AttachmentsFormat.fromJson(Map<String, dynamic> json) {
+    return AttachmentsFormat(
+      fileType: FileType.values[json['fileType']],
+      isNewFile: json['isNewFile'],
+      fileLocalPath:
+          json['fileLocalPath'] is String ? json['fileLocalPath'] : null,
+      uuid: json['uuid'] is String ? json['uuid'] : null,
+      id: json['id'],
+      fileUrlPath: json['fileUrlPath'] is String ? json['fileUrlPath'] : null,
+      fileUrlName: json['fileUrlName'] is String ? json['fileUrlName'] : "",
+      fileUrlSize: json['fileUrlSize'] ?? 0,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'fileType': fileType.index,
+      'isNewFile': isNewFile,
+      'fileLocalPath': fileLocalPath,
+      'uuid': uuid,
+      'id': id,
+      'fileUrlPath': fileUrlPath,
+      'fileUrlName': fileUrlName,
+      'fileUrlSize': fileUrlSize,
+    };
+  }
 }
 
 class _PostWritePageState extends State<PostWritePage>
@@ -285,20 +312,19 @@ class _PostWritePageState extends State<PostWritePage>
                   ? 'ANONYMOUS'
                   : 'REGULAR')
           : 'REGULAR',
-      'parent_topic' :  _chosenTopicValue!.id == -1 ? '' : _chosenTopicValue!.slug,
-      'parent_board' : _chosenBoardValue!.id == -1 ? '' : _chosenBoardValue!.slug,
-      'attachments' :  _chosenBoardValue!.id == -1 ? '' : _chosenBoardValue!.slug,
+      'parent_topic':
+          _chosenTopicValue!.id == -1 ? '' : _chosenTopicValue!.slug,
+      'parent_board':
+          _chosenBoardValue!.id == -1 ? '' : _chosenBoardValue!.slug,
     };
 
     data['attachments'] = _attachmentList;
 
     String key = _isEditingPost
         ? '/cache/${widget.previousArticle!.id}/'
-        : '/cache/${userID}/';
+        : '/cache/$userID/';
 
     await cacheApiData(key, data);
-    debugPrint(key);
-    debugPrint(data as String?);
   }
 
   /// 사용자가 선택 가능한 게시판 목록을 가져오는 함수.
@@ -364,9 +390,9 @@ class _PostWritePageState extends State<PostWritePage>
   Future<void> _getCachedContents() async {
     String key = (_isEditingPost)
         ? '/cache/${widget.previousArticle!.id}/'
-        : '/cache/${userID}/';
+        : '/cache/$userID/';
     Map<String, dynamic>? cachedData = await fetchCachedApiData(key);
-    debugPrint('cache : ${cachedData}');
+    debugPrint('cache : $cachedData');
     if (cachedData == null && _isEditingPost) {
       await _getPostContent();
       return;
@@ -380,20 +406,9 @@ class _PostWritePageState extends State<PostWritePage>
     _titleController.text = title ?? '';
 
     for (int i = 0; i < cachedData['attachments'].length; i++) {
-      AttachmentModel attachment = cachedData['attachments'][i];
-      int id = attachment.id;
-      String? fileUrlPath = attachment.file;
-      String fileUrlName = _extractAndDecodeFileNameFromUrl(attachment.file);
-      int? fileUrlSize = attachment.size ?? 0;
-
       // TODO: fileType이 이미지인지 아닌지 판단해서 넣기.
-      _attachmentList.add(AttachmentsFormat(
-          fileType: FileType.image,
-          isNewFile: false,
-          id: id,
-          fileUrlPath: fileUrlPath,
-          fileUrlName: fileUrlName,
-          fileUrlSize: fileUrlSize));
+      _attachmentList
+          .add(AttachmentsFormat.fromJson(cachedData['attachments'][i]));
     }
 
     setState(() {
@@ -535,7 +550,7 @@ class _PostWritePageState extends State<PostWritePage>
                             //dialog pop
                             String key = _isEditingPost
                                 ? '/cache/${widget.previousArticle!.id}/'
-                                : '/cache/${userID}';
+                                : '/cache/$userID/';
                             await cacheApiData(key, null);
                             Navigator.pop(context, true);
                           },
@@ -606,7 +621,7 @@ class _PostWritePageState extends State<PostWritePage>
                         // try-catch 문을 도입함.
                         String key = _isEditingPost
                             ? '/cache/${widget.previousArticle!.id}/'
-                            : '/cache/${userID}';
+                            : '/cache/$userID/';
                         await cacheApiData(key, null);
                         try {
                           Navigator.of(context)

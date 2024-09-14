@@ -58,7 +58,8 @@ Future<void> updateStateWithCachedOrFetchedApiData({
       await callback(response.data);
     }
   } catch (error) {
-    debugPrint("updateStateWithCachedOrFetchedApiData error: $error, apiurl: $apiUrl");
+    debugPrint(
+        "updateStateWithCachedOrFetchedApiData error: $error, apiurl: $apiUrl");
     // 에러 발생 시 적절한 에러 처리 로직을 추가합니다.
   }
 }
