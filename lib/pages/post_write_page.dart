@@ -1684,6 +1684,11 @@ class _PostWritePageState extends State<PostWritePage>
       // 게시물에 첨부된 파일의 ID
       List<int> attachmentIds = [];
 
+      String key = isUpdate
+          ? '/cache/${widget.previousArticle!.id}/'
+          : '/cache/$userID/';
+      await cacheApiData(key, null);
+
       try {
         titleValue = _titleController.text;
         contentValue = DeltaToHTML.encodeJson(
