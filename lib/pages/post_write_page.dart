@@ -298,14 +298,11 @@ class _PostWritePageState extends State<PostWritePage>
           DeltaToHTML.encodeJson(_quillController.document.toDelta().toJson()),
       'is_content_sexual': _selectedCheckboxes[1],
       'is_content_social': _selectedCheckboxes[2],
-      'name_type': (_chosenBoardValue != null)
-          ? (_defaultBoardDetailActionModel.slug == 'with-school'
-              ? 'REALNAME'
-              : _chosenBoardValue!.slug == "talk" &&
-                      _selectedCheckboxes[0]! == true
-                  ? 'ANONYMOUS'
-                  : 'REGULAR')
-          : 'REGULAR',
+      'name_type': _chosenBoardValue!.slug == 'with-school'
+          ? 'REALNAME'
+          : _chosenBoardValue!.slug == "talk" && _selectedCheckboxes[0]! == true
+              ? 'ANONYMOUS'
+              : 'REGULAR',
       'parent_topic':
           _chosenTopicValue!.id == -1 ? '' : _chosenTopicValue!.slug,
       'parent_board':
@@ -415,10 +412,10 @@ class _PostWritePageState extends State<PostWritePage>
       _titleController.text = title ?? '';
 
       for (int i = 0; i < cachedData['attachments'].length; i++) {
-      // TODO: fileType이 이미지인지 아닌지 판단해서 넣기.
-      _attachmentList
-          .add(AttachmentsFormat.fromJson(cachedData['attachments'][i]));
-    }
+        // TODO: fileType이 이미지인지 아닌지 판단해서 넣기.
+        _attachmentList
+            .add(AttachmentsFormat.fromJson(cachedData['attachments'][i]));
+      }
 
       setState(() {
         _quillController.document = (cachedData['content'] != null)
@@ -427,7 +424,8 @@ class _PostWritePageState extends State<PostWritePage>
         _isFileMenuBarSelected = _attachmentList.isNotEmpty;
 
         //TODO: 명명 규칙 다름
-        _selectedCheckboxes[0] = cachedData['name_type'] == 2 ? true : false;
+        _selectedCheckboxes[0] =
+            cachedData['name_type'] == 'ANONYMOUS' ? true : false;
         _selectedCheckboxes[1] = cachedData['is_content_sexual'] ?? false;
         _selectedCheckboxes[2] = cachedData['is_content_social'] ?? false;
         //_isLoading = false; (only finish loading AFTER boardlist load)
@@ -450,6 +448,7 @@ class _PostWritePageState extends State<PostWritePage>
 
   /// 기존 게시물의 내용과 첨부 파일 가져오기.
   Future<void> _getPostContent() async {
+    debugPrint('get Post Content called!');
     // 새로 작성하는 게시물의 경우 함수 종료.
     if (!_isEditingPost) return;
 
@@ -477,6 +476,8 @@ class _PostWritePageState extends State<PostWritePage>
           fileUrlName: fileUrlName,
           fileUrlSize: fileUrlSize));
     }
+
+    debugPrint('$_attachmentList');
 
     // 수정 게시물의 기존 상태 반영.
     setState(() {
@@ -1710,6 +1711,7 @@ class _PostWritePageState extends State<PostWritePage>
   /// previousArticleId: 수정하는 경우 수정할 글의 id
   void Function() _managePost({bool isUpdate = false, int? previousArticleId}) {
     UserProvider userProvider = context.read<UserProvider>();
+    debugPrint('manage Post called');
     return () async {
       // 아래의 변수들로 api POST, PATCH를 보낸다.
       // 게시물의 제목
@@ -1736,7 +1738,7 @@ class _PostWritePageState extends State<PostWritePage>
         _isUploadingPost = true;
         _isLoading = true;
       });
-
+      debugPrint('attachmentList : $_attachmentList');
       for (int i = 0; i < _attachmentList.length; i++) {
         //새로 올리는 파일이면 새로운 id 할당 받기.
         if (_attachmentList[i].isNewFile) {
@@ -1747,9 +1749,8 @@ class _PostWritePageState extends State<PostWritePage>
               "file": await MultipartFile.fromFile(attachFile.path,
                   filename: attachFile.path.split('/').last),
             });
-            Response? response = await userProvider.postApiRes(
-                "attachments/",
-                data: formData);
+            Response? response =
+                await userProvider.postApiRes("attachments/", data: formData);
             if (response != null) {
               final attachmentModel = AttachmentModel.fromJson(response.data);
               attachmentIds.add(attachmentModel.id);
@@ -1780,6 +1781,7 @@ class _PostWritePageState extends State<PostWritePage>
                 ? 'ANONYMOUS'
                 : 'REGULAR',
       };
+      debugPrint('manage post data : $data');
       Response? response;
       if (isUpdate) {
         response = await userProvider.putApiRes(
@@ -1825,6 +1827,7 @@ class _PostWritePageState extends State<PostWritePage>
 
   /// 사진 추가 시 실행되는 함수
   Future<void> _pickImage() async {
+    debugPrint('pick Image called');
     FocusScope.of(context).unfocus();
     final ImagePicker imagePicker = ImagePicker();
     final XFile? image =
@@ -1859,6 +1862,7 @@ class _PostWritePageState extends State<PostWritePage>
           fileLocalPath: imageUrl,
           uuid: uuid,
         ));
+        debugPrint('$_attachmentList');
       });
     }
     _editorFocusNode.requestFocus();
@@ -1885,6 +1889,7 @@ class _PostWritePageState extends State<PostWritePage>
           isNewFile: true,
           fileLocalPath: file.path,
         ));
+        debugPrint('$_attachmentList');
       });
       return true;
     } else {
