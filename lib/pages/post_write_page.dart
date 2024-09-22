@@ -408,9 +408,10 @@ class _PostWritePageState extends State<PostWritePage>
     }
 
     try {
+      _attachmentList.clear();
       String? title = cachedData['title'];
       _titleController.text = title ?? '';
-
+      debugPrint('get cached data called!');
       for (int i = 0; i < cachedData['attachments'].length; i++) {
         // TODO: fileType이 이미지인지 아닌지 판단해서 넣기.
         _attachmentList
@@ -441,6 +442,7 @@ class _PostWritePageState extends State<PostWritePage>
             : _findSpecTopicListValue(cachedData['parent_topic'].toString());
         _chosenBoardValue = boardDetailActionModel;
       });
+      debugPrint('get cached data attachment List : $_attachmentList');
     } catch (error) {
       debugPrint('_getCachedContents error: $error');
     }
