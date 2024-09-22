@@ -379,10 +379,9 @@ class _PostWritePageState extends State<PostWritePage>
               _isLoading = false;
             });
           }
-
-          //_boardList를 모두 불러온 후 cache 업데이트
-          await _getCachedContents();
         });
+    //_boardList를 모두 불러온 후 cache 업데이트
+    await _getCachedContents();
   }
 
   /// 사용자가 임시 저장한 데이터를 가져오는 함수.
@@ -408,7 +407,6 @@ class _PostWritePageState extends State<PostWritePage>
     }
 
     try {
-      _attachmentList.clear();
       String? title = cachedData['title'];
       _titleController.text = title ?? '';
       debugPrint('get cached data called!');
