@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'dart:io';
-import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:dio/dio.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
@@ -26,22 +25,6 @@ class UserProvider with ChangeNotifier {
   UserProfileModel? get naUser => _naUser;
   bool get hasData => _hasData;
   dynamic get apiRes => _apiRes;
-
-  bool internetConnected = true; //인터넷 연결 여부 표시
-  StreamSubscription<ConnectivityResult>? connectivitySubscription;
-
-  UserProvider() {
-    _initializeConnectivity();
-  }
-
-  /// 'connectivitySubscription'값을 갱신하고 update에 listen하도록 합니다
-  void _initializeConnectivity() {
-    connectivitySubscription = Connectivity()
-        .onConnectivityChanged
-        .listen((ConnectivityResult result) {
-      showConnectivitySnackBar(result); //변화가 있을 시 snackBar 호출
-    });
-  }
 
   /// `_hasData`의 값을 설정하고 UI를 업데이트합니다.
   void setHasData(bool tf) {
@@ -91,18 +74,6 @@ class UserProvider with ChangeNotifier {
   Future<void> setCookiesFromUrl(url) async {
     _loginCookie = await WebviewCookieManager().getCookies(url);
     return;
-  }
-
-  void showConnectivitySnackBar(ConnectivityResult result) {
-    if (result == ConnectivityResult.none) {
-      //인터넷 연결 없음
-      showInternetErrorBySnackBar(LocaleKeys.userProvider_internetError.tr());
-      debugPrint("Internet Connectivity Error");
-    } else {
-      //연결됨
-      snackBarKey.currentState?.clearSnackBars();
-      debugPrint("Connected to ${result.toString().split('.').last}");
-    }
   }
 
   /// /api/me 엔드포인트를 호출하여 사용자 정보를 갱신합니다.
@@ -184,11 +155,11 @@ class UserProvider with ChangeNotifier {
       errorMessage = "DioException: Connection Error";
 
       //이에 따라 인터넷 에러를 표시하는 snackBar 추가
-      if (internetConnected) {
-        // 첫 실행이라면
-        internetConnected = false; // 이후 snackBar 생성하지 않음.
-        //showInternetErrorBySnackBar(LocaleKeys.userProvider_internetError.tr());
-      }
+      //if (internetConnected) {
+      // 첫 실행이라면
+      // internetConnected = false; // 이후 snackBar 생성하지 않음.
+      //showInternetErrorBySnackBar(LocaleKeys.userProvider_internetError.tr());
+      //}
     } else if (e.type == DioExceptionType.unknown) {
       errorMessage = "DioException: Unknown: ${e.message}";
     } else {
@@ -235,7 +206,6 @@ class UserProvider with ChangeNotifier {
         cancelToken: cancelToken,
         onReceiveProgress: onReceiveProgress,
       );
-      internetConnected = true;
 
       //인터넷 오류 snackBar 모두 지우기
       //snackBarKey.currentState?.clearSnackBars();
@@ -273,10 +243,9 @@ class UserProvider with ChangeNotifier {
           cancelToken: cancelToken,
           onSendProgress: onSendProgress,
           onReceiveProgress: onReceiveProgress);
-      internetConnected = true;
 
       //인터넷 오류 snackBar 모두 지우기
-      snackBarKey.currentState?.clearSnackBars();
+      //snackBarKey.currentState?.clearSnackBars();
       return response;
     } on DioException catch (e) {
       debugPrint("Error occured in fetching : $toUrl");
@@ -308,10 +277,9 @@ class UserProvider with ChangeNotifier {
           cancelToken: cancelToken,
           onSendProgress: onSendProgress,
           onReceiveProgress: onReceiveProgress);
-      internetConnected = true;
 
       //인터넷 오류 snackBar 모두 지우기
-      snackBarKey.currentState?.clearSnackBars();
+      //snackBarKey.currentState?.clearSnackBars();
       return response;
     } on DioException catch (e) {
       debugPrint("Error occured in fetching : $toUrl");
@@ -343,10 +311,9 @@ class UserProvider with ChangeNotifier {
           cancelToken: cancelToken,
           onSendProgress: onSendProgress,
           onReceiveProgress: onReceiveProgress);
-      internetConnected = true;
 
       //인터넷 오류 snackBar 모두 지우기
-      snackBarKey.currentState?.clearSnackBars();
+      //snackBarKey.currentState?.clearSnackBars();
       return response;
     } on DioException catch (e) {
       debugPrint("Error occured in fetching : $toUrl");
@@ -378,10 +345,9 @@ class UserProvider with ChangeNotifier {
         options: options,
         cancelToken: cancelToken,
       );
-      internetConnected = true;
 
       //인터넷 오류 snackBar 모두 지우기
-      snackBarKey.currentState?.clearSnackBars();
+      //snackBarKey.currentState?.clearSnackBars();
       return response;
     } on DioException catch (e) {
       debugPrint("Error occured in fetching : $toUrl");
