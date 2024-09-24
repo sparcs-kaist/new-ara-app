@@ -262,8 +262,8 @@ class _PostWritePageState extends State<PostWritePage>
 
   @override
   void didChangeMetrics() async {
-    var now = DateTime.now();
-    debugPrint("now: $now, ${MediaQuery.of(context).viewInsets.bottom}");
+    // var now = DateTime.now();
+    // debugPrint("now: $now, ${MediaQuery.of(context).viewInsets.bottom}");
     // 기기의 키보드가 올라가거나 내려가는 애니메이션 길이가 다르다.
     // 기기의 애니메이션이 끝나고 확인하기 위해 50ms의 딜레이를 준다.
     await Future.delayed(const Duration(milliseconds: 50));
@@ -441,6 +441,10 @@ class _PostWritePageState extends State<PostWritePage>
         _chosenBoardValue = boardDetailActionModel;
       });
       debugPrint('get cached data attachment List : $_attachmentList');
+
+      if (mounted) {
+        showInfoBySnackBar(context, "임시저장되었던 게시물을 다시 불러왔습니다.");
+      }
     } catch (error) {
       debugPrint('_getCachedContents error: $error');
     }
@@ -535,7 +539,7 @@ class _PostWritePageState extends State<PostWritePage>
 
   @override
   Widget build(BuildContext context) {
-    debugPrint("BUILD invoked!!!");
+    // debugPrint("BUILD invoked!!!");
 
     /// 게시물 업로드 가능한지 확인
     /// TODO: 업로드 로딩 인디케이터 추가하기
@@ -560,6 +564,7 @@ class _PostWritePageState extends State<PostWritePage>
                           userProvider: userProvider,
                           targetContext: context,
                           onTapConfirm: () async {
+                            debugPrint("onTapConfirm invoked");
                             //dialog pop
                             String key = _isEditingPost
                                 ? '/cache/${widget.previousArticle!.id}/'
@@ -571,6 +576,7 @@ class _PostWritePageState extends State<PostWritePage>
                             }
                           },
                           onTapSave: () async {
+                            debugPrint("onTapSave invoked");
                             await cacheCurrentData();
                             if (mounted) {
                               Navigator.pop(context, true);
@@ -664,6 +670,7 @@ class _PostWritePageState extends State<PostWritePage>
                             Navigator.of(context)
                               ..pop() //dialog pop
                               ..pop(); //PostWritePage pop
+                            showInfoBySnackBar(context, "작성 중이신 게시글을 캐시에 임시 저장하였습니다.");
                           }
                         } catch (error) {
                           debugPrint("pop error: $error");
