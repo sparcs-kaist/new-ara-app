@@ -1,7 +1,11 @@
+import 'dart:async';
+
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:new_ara_app/pages/bulletin_search_page.dart';
+import 'package:new_ara_app/providers/connectivity_provider.dart';
 import 'package:new_ara_app/translations/locale_keys.g.dart';
 import 'package:provider/provider.dart';
 
@@ -95,9 +99,16 @@ class _MainPageState extends State<MainPage> with WidgetsBindingObserver {
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) async {
+    super.didChangeAppLifecycleState(state);
     // 앱이 포그라운드로 전환될 때 실행할 함수
-    if (state == AppLifecycleState.resumed) {
+    ConnectivityProvider connectivityProvider =
+        context.read<ConnectivityProvider>();
+
+    // 인터넷 연결 상태도 확인하기
+    if (state == AppLifecycleState.resumed &&
+        connectivityProvider.isConnected) {
       //api를 호출 후 최신 데이터로 갱신
+      debugPrint('App in Foreground');
       await _refreshAllPosts();
     }
   }
@@ -262,24 +273,32 @@ class _MainPageState extends State<MainPage> with WidgetsBindingObserver {
   Future<void> _refreshAllPosts() async {
     debugPrint("main_page.dart: _refreshAllPosts() called.");
     UserProvider userProvider = context.read<UserProvider>();
-    await Future.wait([
-      _refreshTopContents(userProvider, _dailyBestContents),
-      _refreshOtherContents(userProvider, "portal-notice", "", _portalContents),
-      _refreshOtherContents(
-          userProvider, "facility-notice", "", _facilityContents),
-      _refreshOtherContents(userProvider, "ara-notice", "", _newAraContents),
-      _refreshOtherContents(
-          userProvider, "students-group", "grad-assoc", _gradContents),
-      _refreshOtherContents(userProvider, "students-group", "undergrad-assoc",
-          _underGradContents),
-      _refreshOtherContents(userProvider, "students-group", "freshman-council",
-          _freshmanContents),
-      _refreshOtherContents(userProvider, "talk", "", _talksContents),
-      _refreshOtherContents(userProvider, "wanted", "", _wantedContents),
-      _refreshOtherContents(userProvider, "market", "", _marketContents),
-      _refreshOtherContents(
-          userProvider, "real-estate", "", _realEstateContents),
-    ]);
+    ConnectivityProvider connectivityProvider =
+        context.read<ConnectivityProvider>();
+    if (connectivityProvider.isConnected) {
+      await Future.wait([
+        _refreshTopContents(userProvider, _dailyBestContents),
+        _refreshOtherContents(
+            userProvider, "portal-notice", "", _portalContents),
+        _refreshOtherContents(
+            userProvider, "facility-notice", "", _facilityContents),
+        _refreshOtherContents(userProvider, "ara-notice", "", _newAraContents),
+        _refreshOtherContents(
+            userProvider, "students-group", "grad-assoc", _gradContents),
+        _refreshOtherContents(userProvider, "students-group", "undergrad-assoc",
+            _underGradContents),
+        _refreshOtherContents(userProvider, "students-group",
+            "freshman-council", _freshmanContents),
+        _refreshOtherContents(userProvider, "talk", "", _talksContents),
+        _refreshOtherContents(userProvider, "wanted", "", _wantedContents),
+        _refreshOtherContents(userProvider, "market", "", _marketContents),
+        _refreshOtherContents(
+            userProvider, "real-estate", "", _realEstateContents),
+      ]);
+    } else {
+      debugPrint(
+          "main_page.dart: _refreshAllPosts() denied by Internet error.");
+    }
   }
 
   /// 일일 베스트 컨텐츠 데이터를 api로 불러와 화면에 재빌드
@@ -364,101 +383,104 @@ class _MainPageState extends State<MainPage> with WidgetsBindingObserver {
   @override
   Widget build(BuildContext context) {
     debugPrint("build invoked!!");
-    return Scaffold(
-      appBar: AppBar(
-        elevation: 0,
-        title: SvgPicture.asset(
-          'assets/images/logo.svg',
-          fit: BoxFit.cover,
-        ),
-        actions: [
-          IconButton(
-              onPressed: () async {
-                if (context.locale == const Locale('ko')) {
-                  await context.setLocale(const Locale('en'));
-                } else {
-                  await context.setLocale(const Locale('ko'));
-                }
-              },
-              icon: const Icon(
-                Icons.language,
-                color: ColorsInfo.newara,
-              )),
-          IconButton(
-            icon: SvgPicture.asset(
-              'assets/icons/post.svg',
-              colorFilter:
-                  const ColorFilter.mode(ColorsInfo.newara, BlendMode.srcIn),
-              width: 35,
-              height: 35,
-            ),
-            onPressed: () async {
-              await Navigator.of(context)
-                  .push(slideRoute(const PostWritePage()));
-              await _refreshAllPosts();
-            },
+    return Consumer<ConnectivityProvider>(
+        builder: (context, connectivityProvider, child) {
+      return Scaffold(
+        appBar: AppBar(
+          elevation: 0,
+          title: SvgPicture.asset(
+            'assets/images/logo.svg',
+            fit: BoxFit.cover,
           ),
-          IconButton(
-            icon: SvgPicture.asset(
-              'assets/icons/search.svg',
-              colorFilter:
-                  const ColorFilter.mode(ColorsInfo.newara, BlendMode.srcIn),
-              width: 35,
-              height: 35,
-            ),
-            onPressed: () async {
-              await Navigator.of(context).push(slideRoute(
-                  const BulletinSearchPage(
-                      boardType: BoardType.all, boardInfo: null)));
-              await _refreshAllPosts();
-            },
-          ),
-        ],
-      ),
-      body: SafeArea(
-        child: _isLoading[0] ||
-                _isLoading[1] ||
-                _isLoading[2] ||
-                _isLoading[3] ||
-                _isLoading[4] ||
-                _isLoading[5] ||
-                _isLoading[6] ||
-                _isLoading[7] ||
-                _isLoading[8] ||
-                _isLoading[9] ||
-                _isLoading[10] ||
-                _isLoading[11]
-            ? const LoadingIndicator()
-            : RefreshIndicator.adaptive(
-                displacement: 0.0,
-                color: ColorsInfo.newara,
-                onRefresh: () async {
-                  //api를 호출 후 최신 데이터로 갱신
-                  await _refreshAllPosts();
+          actions: [
+            IconButton(
+                onPressed: () async {
+                  if (context.locale == const Locale('ko')) {
+                    await context.setLocale(const Locale('en'));
+                  } else {
+                    await context.setLocale(const Locale('ko'));
+                  }
                 },
-                child: SingleChildScrollView(
-                  child: SizedBox(
-                    width: MediaQuery.of(context).size.width,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        _buildTopContents(),
-                        const SizedBox(height: 20),
-                        _buildTalkContents(),
-                        const SizedBox(height: 20),
-                        _buildNoticeContents(),
-                        const SizedBox(height: 20),
-                        _buildTradeContents(),
-                        const SizedBox(height: 20),
-                        _buildStuCommunityContents(),
-                        const SizedBox(height: 20),
-                      ],
+                icon: const Icon(
+                  Icons.language,
+                  color: ColorsInfo.newara,
+                )),
+            IconButton(
+              icon: SvgPicture.asset(
+                'assets/icons/post.svg',
+                colorFilter:
+                    const ColorFilter.mode(ColorsInfo.newara, BlendMode.srcIn),
+                width: 35,
+                height: 35,
+              ),
+              onPressed: () async {
+                await Navigator.of(context)
+                    .push(slideRoute(const PostWritePage()));
+                await _refreshAllPosts();
+              },
+            ),
+            IconButton(
+              icon: SvgPicture.asset(
+                'assets/icons/search.svg',
+                colorFilter:
+                    const ColorFilter.mode(ColorsInfo.newara, BlendMode.srcIn),
+                width: 35,
+                height: 35,
+              ),
+              onPressed: () async {
+                await Navigator.of(context).push(slideRoute(
+                    const BulletinSearchPage(
+                        boardType: BoardType.all, boardInfo: null)));
+                await _refreshAllPosts();
+              },
+            ),
+          ],
+        ),
+        body: SafeArea(
+          child: _isLoading[0] ||
+                  _isLoading[1] ||
+                  _isLoading[2] ||
+                  _isLoading[3] ||
+                  _isLoading[4] ||
+                  _isLoading[5] ||
+                  _isLoading[6] ||
+                  _isLoading[7] ||
+                  _isLoading[8] ||
+                  _isLoading[9] ||
+                  _isLoading[10] ||
+                  _isLoading[11]
+              ? const LoadingIndicator()
+              : RefreshIndicator.adaptive(
+                  displacement: 0.0,
+                  color: ColorsInfo.newara,
+                  onRefresh: () async {
+                    //api를 호출 후 최신 데이터로 갱신
+                    await _refreshAllPosts();
+                  },
+                  child: SingleChildScrollView(
+                    child: SizedBox(
+                      width: MediaQuery.of(context).size.width,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          _buildTopContents(),
+                          const SizedBox(height: 20),
+                          _buildTalkContents(),
+                          const SizedBox(height: 20),
+                          _buildNoticeContents(),
+                          const SizedBox(height: 20),
+                          _buildTradeContents(),
+                          const SizedBox(height: 20),
+                          _buildStuCommunityContents(),
+                          const SizedBox(height: 20),
+                        ],
+                      ),
                     ),
                   ),
                 ),
-              ),
-      ),
-    );
+        ),
+      );
+    });
   }
 
   Widget _buildTopContents() {

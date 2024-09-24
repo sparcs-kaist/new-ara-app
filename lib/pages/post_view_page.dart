@@ -4,6 +4,7 @@ import 'dart:core';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:new_ara_app/providers/connectivity_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:dio/dio.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -1922,7 +1923,12 @@ class _PostViewPageState extends State<PostViewPage> {
 
   void _updateState() {
     if (!mounted) return;
-    setState(() {});
+    ConnectivityProvider connectivityProvider =
+        context.read<ConnectivityProvider>();
+
+    if (connectivityProvider.isConnected) {
+      setState(() {});
+    }
   }
 
   // 둘 다 false 면 일반적인 댓글

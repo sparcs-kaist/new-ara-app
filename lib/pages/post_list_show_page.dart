@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:new_ara_app/pages/bulletin_search_page.dart';
 import 'package:new_ara_app/pages/post_write_page.dart';
+import 'package:new_ara_app/providers/connectivity_provider.dart';
 import 'package:new_ara_app/translations/locale_keys.g.dart';
 import 'package:provider/provider.dart';
 
@@ -131,7 +132,13 @@ class _PostListShowPageState extends State<PostListShowPage>
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
-    if (state == AppLifecycleState.resumed) {
+    // 앱이 포그라운드로 전환될 때 실행할 함수
+    ConnectivityProvider connectivityProvider =
+        context.read<ConnectivityProvider>();
+
+    // 인터넷 연결 상태도 확인하기
+    if (state == AppLifecycleState.resumed &&
+        connectivityProvider.isConnected) {
       // 앱이 백그라운드에서 포그라운드로 전환될 때 게시물 목록을 업데이트합니다.
       updateAllBulletinList();
     }
@@ -143,43 +150,50 @@ class _PostListShowPageState extends State<PostListShowPage>
   /// [currentPage] 값보다 [pageLimitToReload] 값이 큰 지 코딩할 때 주의 바랍니다.
   Future<void> updateAllBulletinList({int? pageLimitToReload}) async {
     debugPrint("updateAllBulletinList called!!!!!!");
-    List<ArticleListActionModel> newList = [];
-    UserProvider userProvider = context.read<UserProvider>();
+    ConnectivityProvider connectivityProvider =
+        context.read<ConnectivityProvider>();
 
-    // 모든 페이지를 순회하며 게시물 목록을 업데이트합니다.
-    for (int page = 1;
-        page <=
-            // pageLimitToReload가 null이 아니면(파라미터가 존재하면) currentPage보다 우선시 합니다.
-            (pageLimitToReload ?? currentPage);
-        page++) {
-      var response = await userProvider.getApiRes("$apiUrl$page");
-      final Map<String, dynamic>? json = await response?.data;
+    if (connectivityProvider.isConnected) {
+      List<ArticleListActionModel> newList = [];
+      UserProvider userProvider = context.read<UserProvider>();
 
-      if (json != null && json.containsKey("results")) {
-        for (var result in json["results"]) {
-          // 스크랩 게시물인 경우와 아닌 경우를 분기하여 처리합니다.
-          if (widget.boardType != BoardType.scraps &&
-              result["created_by"]["profile"] != null) {
-            newList.add(ArticleListActionModel.fromJson(result));
-          } else if (widget.boardType == BoardType.scraps &&
-              result.containsKey("parent_article")) {
-            newList
-                .add(ArticleListActionModel.fromJson(result["parent_article"]));
+      // 모든 페이지를 순회하며 게시물 목록을 업데이트합니다.
+      for (int page = 1;
+          page <=
+              // pageLimitToReload가 null이 아니면(파라미터가 존재하면) currentPage보다 우선시 합니다.
+              (pageLimitToReload ?? currentPage);
+          page++) {
+        var response = await userProvider.getApiRes("$apiUrl$page");
+        final Map<String, dynamic>? json = await response?.data;
+
+        if (json != null && json.containsKey("results")) {
+          for (var result in json["results"]) {
+            // 스크랩 게시물인 경우와 아닌 경우를 분기하여 처리합니다.
+            if (widget.boardType != BoardType.scraps &&
+                result["created_by"]["profile"] != null) {
+              newList.add(ArticleListActionModel.fromJson(result));
+            } else if (widget.boardType == BoardType.scraps &&
+                result.containsKey("parent_article")) {
+              newList.add(
+                  ArticleListActionModel.fromJson(result["parent_article"]));
+            }
           }
         }
       }
-    }
 
-    debugPrint("updateAllBulleinList mounted: $mounted");
-    // 위젯이 마운트 상태인 경우 상태를 업데이트합니다.
-    if (mounted) {
-      setState(() {
-        /// 현재 어디까지 로딩됐는 지 기록하는 변수 [currentPage]를 업데이트합니다.
-        currentPage = (pageLimitToReload ?? currentPage);
-        postPreviewList.clear();
-        postPreviewList.addAll(newList);
-        isLoading = false; // 로딩 상태 업데이트
-      });
+      debugPrint("updateAllBulleinList mounted: $mounted");
+      // 위젯이 마운트 상태인 경우 상태를 업데이트합니다.
+      if (mounted) {
+        setState(() {
+          /// 현재 어디까지 로딩됐는 지 기록하는 변수 [currentPage]를 업데이트합니다.
+          currentPage = (pageLimitToReload ?? currentPage);
+          postPreviewList.clear();
+          postPreviewList.addAll(newList);
+          isLoading = false; // 로딩 상태 업데이트
+        });
+      }
+    } else {
+      debugPrint("updateAllBulletinList denied by Internet error!");
     }
   }
 
