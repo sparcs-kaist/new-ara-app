@@ -84,13 +84,7 @@ platform :ios do
       workspace: "Runner.xcworkspace",
       scheme: "Runner",
       clean: true,
-      export_method: "app-store",
-      export_options: {
-        provisioningProfiles: {
-          "org.sparcs.new-ara-app" => "match AppStore org.sparcs.new-ara-app"
-        }
-      },
-      xcargs: "-allowProvisioningUpdates"
+      export_method: "app-store"
     )
     upload_to_testflight(
       skip_waiting_for_build_processing: true,
