@@ -85,7 +85,12 @@ platform :ios do
       scheme: "Runner",
       clean: true,
       export_method: "app-store",
-      allowProvisioningUpdates: true # Allow Fastlane to handle provisioning
+      export_options: {
+        provisioningProfiles: {
+          "org.sparcs.new-ara-app" => "match AppStore org.sparcs.new-ara-app"
+        }
+      },
+      xcargs: "-allowProvisioningUpdates"
     )
     upload_to_testflight(
       skip_waiting_for_build_processing: true,
