@@ -443,7 +443,7 @@ class _PostWritePageState extends State<PostWritePage>
       debugPrint('get cached data attachment List : $_attachmentList');
 
       if (mounted) {
-        showInfoBySnackBar(context, "임시저장되었던 게시물을 다시 불러왔습니다.");
+        showInfoBySnackBar(context, LocaleKeys.postWritePage_restoreFromCache.tr());
       }
     } catch (error) {
       debugPrint('_getCachedContents error: $error');
@@ -670,7 +670,7 @@ class _PostWritePageState extends State<PostWritePage>
                             Navigator.of(context)
                               ..pop() //dialog pop
                               ..pop(); //PostWritePage pop
-                            showInfoBySnackBar(context, "작성 중이신 게시글을 캐시에 임시 저장하였습니다.");
+                            showInfoBySnackBar(context, LocaleKeys.postWritePage_savedAtCache.tr());
                           }
                         } catch (error) {
                           debugPrint("pop error: $error");

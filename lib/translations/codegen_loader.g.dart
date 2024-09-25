@@ -207,7 +207,9 @@ class CodegenLoader extends AssetLoader{
     "contentPlaceholder": "Type content here",
     "conditionSnackBar": "Please select a board and enter the title and content.",
     "noCategory": "No Topics",
-    "selectCategory": "Select Topic"
+    "selectCategory": "Select Topic",
+    "savedAtCache": "The post has been saved on your device.",
+    "restoreFromCache": "Stored draft has been restored."
   },
   "termsAndConditionsPage": {
     "termsAndConditions": "Terms and Conditions",
@@ -411,7 +413,9 @@ static const Map<String,dynamic> ko = {
     "contentPlaceholder": "내용을 입력해주세요.",
     "conditionSnackBar": "게시판을 선택해주시고 제목, 내용을 입력해주세요.",
     "noCategory": "말머리 없음",
-    "selectCategory": "말머리를 선택하세요"
+    "selectCategory": "말머리를 선택하세요",
+    "savedAtCache": "작성 중이신 게시글을 디바이스에 저장하였습니다.",
+    "restoreFromCache": "임시 저장되었던 게시글을 다시 불러왔습니다."
   },
   "termsAndConditionsPage": {
     "termsAndConditions": "이용약관",
