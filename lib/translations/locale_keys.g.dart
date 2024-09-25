@@ -178,6 +178,8 @@ abstract class  LocaleKeys {
   static const postWritePage_conditionSnackBar = 'postWritePage.conditionSnackBar';
   static const postWritePage_noCategory = 'postWritePage.noCategory';
   static const postWritePage_selectCategory = 'postWritePage.selectCategory';
+  static const postWritePage_savedAtCache = 'postWritePage.savedAtCache';
+  static const postWritePage_restoreFromCache = 'postWritePage.restoreFromCache';
   static const postWritePage = 'postWritePage';
   static const termsAndConditionsPage_termsAndConditions = 'termsAndConditionsPage.termsAndConditions';
   static const termsAndConditionsPage_agree = 'termsAndConditionsPage.agree';

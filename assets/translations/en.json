@@ -191,7 +191,9 @@
         "contentPlaceholder": "Type content here",
         "conditionSnackBar": "Please select a board and enter the title and content.",
         "noCategory": "No Topics",
-        "selectCategory": "Select Topic"
+        "selectCategory": "Select Topic",
+        "savedAtCache": "The post has been saved on your device.",
+        "restoreFromCache": "Stored draft has been restored."
     },
     "termsAndConditionsPage": {
         "termsAndConditions": "Terms and Conditions",
