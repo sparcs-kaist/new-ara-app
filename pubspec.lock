@@ -302,22 +302,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.1.0"
-  flex_color_picker:
-    dependency: transitive
-    description:
-      name: flex_color_picker
-      sha256: "12dc855ae8ef5491f529b1fc52c655f06dcdf4114f1f7fdecafa41eec2ec8d79"
-      url: "https://pub.dev"
-    source: hosted
-    version: "3.6.0"
-  flex_seed_scheme:
-    dependency: transitive
-    description:
-      name: flex_seed_scheme
-      sha256: "7639d2c86268eff84a909026eb169f008064af0fb3696a651b24b0fa24a40334"
-      url: "https://pub.dev"
-    source: hosted
-    version: "3.4.1"
   flutter:
     dependency: "direct main"
     description: flutter
@@ -344,78 +328,6 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
-  flutter_inappwebview:
-    dependency: transitive
-    description:
-      name: flutter_inappwebview
-      sha256: "274edbb07196944e316722d9f6f641c77d0e71261200869887e10f59614c0458"
-      url: "https://pub.dev"
-    source: hosted
-    version: "6.1.3"
-  flutter_inappwebview_android:
-    dependency: transitive
-    description:
-      name: flutter_inappwebview_android
-      sha256: "9bb3cf50329b32dabc9940d0498541be29755ae7fdf2446652affcc53028b754"
-      url: "https://pub.dev"
-    source: hosted
-    version: "1.1.2"
-  flutter_inappwebview_internal_annotations:
-    dependency: transitive
-    description:
-      name: flutter_inappwebview_internal_annotations
-      sha256: "5f80fd30e208ddded7dbbcd0d569e7995f9f63d45ea3f548d8dd4c0b473fb4c8"
-      url: "https://pub.dev"
-    source: hosted
-    version: "1.1.1"
-  flutter_inappwebview_ios:
-    dependency: transitive
-    description:
-      name: flutter_inappwebview_ios
-      sha256: f6f88d464b38f2fc1c5f2ae74024498115eb1470715bd8b40f902dd4ac99ccc8
-      url: "https://pub.dev"
-    source: hosted
-    version: "1.1.1"
-  flutter_inappwebview_macos:
-    dependency: transitive
-    description:
-      name: flutter_inappwebview_macos
-      sha256: "68e0c3785d8d789710cda7d7efe6effa337c91bf300dd28af7efc2d358fa1a98"
-      url: "https://pub.dev"
-    source: hosted
-    version: "1.1.1"
-  flutter_inappwebview_platform_interface:
-    dependency: transitive
-    description:
-      name: flutter_inappwebview_platform_interface
-      sha256: "97b4ab116d949ede20c90c7e3d15d24afaf1b706cc0af96b060770293cd6c49d"
-      url: "https://pub.dev"
-    source: hosted
-    version: "1.2.0"
-  flutter_inappwebview_web:
-    dependency: transitive
-    description:
-      name: flutter_inappwebview_web
-      sha256: f7f97b6faa39416e4e86da1184edd4de6c27b271d036f0838ea3ff9a250a1de2
-      url: "https://pub.dev"
-    source: hosted
-    version: "1.1.1"
-  flutter_inappwebview_windows:
-    dependency: transitive
-    description:
-      name: flutter_inappwebview_windows
-      sha256: "1cb428210f7486e4decb52262b243505023d0c57609c6ff5cee772e63b51f443"
-      url: "https://pub.dev"
-    source: hosted
-    version: "0.4.1"
-  flutter_keyboard_visibility:
-    dependency: transitive
-    description:
-      name: flutter_keyboard_visibility
-      sha256: "98664be7be0e3ffca00de50f7f6a287ab62c763fc8c762e0a21584584a3ff4f8"
-      url: "https://pub.dev"
-    source: hosted
-    version: "6.0.0"
   flutter_keyboard_visibility_linux:
     dependency: transitive
     description:
@@ -448,14 +360,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.1.1"
-  flutter_keyboard_visibility_web:
-    dependency: transitive
-    description:
-      name: flutter_keyboard_visibility_web
-      sha256: d3771a2e752880c79203f8d80658401d0c998e4183edca05a149f5098ce6e3d1
-      url: "https://pub.dev"
-    source: hosted
-    version: "2.0.0"
   flutter_keyboard_visibility_windows:
     dependency: transitive
     description:
@@ -644,14 +548,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.3.2"
-  html_editor_enhanced:
-    dependency: "direct main"
-    description:
-      name: html_editor_enhanced
-      sha256: "5ae6cd965cca77f7186efccc47ca353799e831b31bd71438687a56131bbcd3a5"
-      url: "https://pub.dev"
-    source: hosted
-    version: "2.6.0"
   http:
     dependency: "direct main"
     description:
@@ -748,14 +644,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.2.1+1"
-  infinite_listview:
-    dependency: transitive
-    description:
-      name: infinite_listview
-      sha256: f6062c1720eb59be553dfa6b89813d3e8dd2f054538445aaa5edaddfa5195ce6
-      url: "https://pub.dev"
-    source: hosted
-    version: "1.1.0"
   intl:
     dependency: transitive
     description:
@@ -916,14 +804,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.0.2"
-  numberpicker:
-    dependency: transitive
-    description:
-      name: numberpicker
-      sha256: "4c129154944b0f6b133e693f8749c3f8bfb67c4d07ef9dcab48b595c22d1f156"
-      url: "https://pub.dev"
-    source: hosted
-    version: "2.1.2"
   package_config:
     dependency: transitive
     description:
@@ -1084,38 +964,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.1.8"
-  pointer_interceptor:
-    dependency: transitive
-    description:
-      name: pointer_interceptor
-      sha256: "57210410680379aea8b1b7ed6ae0c3ad349bfd56fe845b8ea934a53344b9d523"
-      url: "https://pub.dev"
-    source: hosted
-    version: "0.10.1+2"
-  pointer_interceptor_ios:
-    dependency: transitive
-    description:
-      name: pointer_interceptor_ios
-      sha256: a6906772b3205b42c44614fcea28f818b1e5fdad73a4ca742a7bd49818d9c917
-      url: "https://pub.dev"
-    source: hosted
-    version: "0.10.1"
-  pointer_interceptor_platform_interface:
-    dependency: transitive
-    description:
-      name: pointer_interceptor_platform_interface
-      sha256: "0597b0560e14354baeb23f8375cd612e8bd4841bf8306ecb71fcd0bb78552506"
-      url: "https://pub.dev"
-    source: hosted
-    version: "0.10.0+1"
-  pointer_interceptor_web:
-    dependency: transitive
-    description:
-      name: pointer_interceptor_web
-      sha256: "7a7087782110f8c1827170660b09f8aa893e0e9a61431dbbe2ac3fc482e8c044"
-      url: "https://pub.dev"
-    source: hosted
-    version: "0.10.2+1"
   pool:
     dependency: transitive
     description:
@@ -1553,14 +1401,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.3.2"
-  visibility_detector:
-    dependency: transitive
-    description:
-      name: visibility_detector
-      sha256: dd5cc11e13494f432d15939c3aa8ae76844c42b723398643ce9addb88a5ed420
-      url: "https://pub.dev"
-    source: hosted
-    version: "0.4.0+2"
   vm_service:
     dependency: transitive
     description:
