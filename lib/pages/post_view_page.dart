@@ -1395,7 +1395,7 @@ class _PostViewPageState extends State<PostViewPage> {
                                                   _article.created_by.id &&
                                               _article.name_type == 2)
                                           ? ColorsInfo.newara
-                                          : Color(0xFF333333)),
+                                          : const Color(0xFF333333)),
                                   maxLines: 1,
                                   overflow: TextOverflow.ellipsis,
                                 )),
