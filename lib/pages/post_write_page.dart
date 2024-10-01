@@ -1465,6 +1465,12 @@ class _PostWritePageState extends State<PostWritePage>
             child: quill.QuillToolbar.simple(
               controller: _quillController,
               configurations: quill.QuillSimpleToolbarConfigurations(
+                // buttonOptions: quill.QuillSimpleToolbarButtonOptions(
+                //   base: quill.QuillToolbarBaseButtonOptions(
+                //     iconSize: 18,
+                //     iconButtonFactor: 1.0,
+                //   ),
+                // ),
                 multiRowsDisplay: true,
                 showUndo: false,
                 showRedo: false,
@@ -1477,8 +1483,12 @@ class _PostWritePageState extends State<PostWritePage>
                 showSearchButton: false,
                 showSubscript: false,
                 showSuperscript: false,
+                showClipboardPaste: false,
+                showClipboardCopy: false,
+                showClipboardCut: false,
                 toolbarIconAlignment: WrapAlignment.start,
                 toolbarIconCrossAlignment: WrapCrossAlignment.start,
+                toolbarSectionSpacing: 0.5,
                 customButtons: [
                   quill.QuillToolbarCustomButtonOptions(
                     icon: const Icon(Icons.camera_alt),
