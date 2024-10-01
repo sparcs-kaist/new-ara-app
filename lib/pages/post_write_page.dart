@@ -555,10 +555,12 @@ class _PostWritePageState extends State<PostWritePage>
 
     return _isLoading
         ? const LoadingIndicator()
-        : WillPopScope(
-            onWillPop: () async {
-              if (_hasEditorText || _titleController.text != '') {
-                final shouldPop = await showDialog<bool>(
+        : PopScope(
+          canPop: false,
+          onPopInvokedWithResult:(didPop, result) async {
+            if (didPop) return;
+            if (_hasEditorText || _titleController.text != '') {
+              final bool shouldPop = await showDialog<bool>(
                     context: context,
                     builder: (context) => ExitConfirmDialog(
                           userProvider: userProvider,
@@ -582,18 +584,18 @@ class _PostWritePageState extends State<PostWritePage>
                               Navigator.pop(context, true);
                             }
                           },
-                        ));
-                return shouldPop ?? false;
-              } else {
-                String key = _isEditingPost
+                        )) ?? false;
+              if (context.mounted && shouldPop) Navigator.of(context).pop();
+            } else {
+              String key = _isEditingPost
                     ? '/cache/${widget.previousArticle!.id}/'
                     : '/cache/${userID}/';
                 await removeApiData(key);
                 debugPrint('Cache Reset!');
-                return true;
-              }
-            },
-            child: Scaffold(
+                if (context.mounted) Navigator.of(context).pop();
+            }
+          },
+          child: Scaffold(
               appBar: _buildAppBar(canIupload, userProvider),
               body: SafeArea(
                 child: Column(
@@ -624,7 +626,7 @@ class _PostWritePageState extends State<PostWritePage>
                 ),
               ),
             ),
-          );
+        );
   }
 
   PreferredSizeWidget _buildAppBar(bool canIupload, UserProvider userProvider) {
