@@ -2,9 +2,9 @@ name: Deploy to Play Store, App Store
 
 on:
   # main 브랜치에 push 연산이 일어나는 경우
-  push:
-    branches:
-      - main
+  # push:
+  #   branches:
+  #     - main
   # 수동으로 배포를 진행해야하는 경우에 실행
   workflow_dispatch:
     inputs:
