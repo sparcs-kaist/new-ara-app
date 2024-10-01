@@ -59,8 +59,8 @@ android {
 
         /* minSdkVersion
         - 앱이 설치될 수 있는 최소한의 API 버전 (이 버전보다 낮은 것만 지원하는 기기에는 설치 불가)
-        - multiDex에서 요구하는 최소 버전인 21로 설정 */
-        minSdkVersion 21
+        - super_native_extensions에서 요구하는 최소 버전인 23으로 설정 */
+        minSdkVersion 23
 
         /* targetSdkVersion
         - 앱이 테스트되고 최적화된 Android SDK 버전을 의미

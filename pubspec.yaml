@@ -27,7 +27,6 @@ dependencies:
   uuid: ^4.5.1
   html: "^0.15.4"
   sanitize_html: "^2.0.0"
-  flutter_keyboard_visibility: ^6.0.0
   mime: "^1.0.4"
   http_parser: "^4.0.2"
   flutter_quill_extensions: ^10.8.1
