@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:easy_localization/easy_localization.dart';
+import 'package:new_ara_app/models/board_detail_action_model.dart';
 
 import 'package:new_ara_app/translations/locale_keys.g.dart';
 import 'package:new_ara_app/constants/colors_info.dart';
@@ -28,6 +29,12 @@ String defineCommunicationStatus(int? magicNum) {
   }
 
   return status;
+}
+
+/// 학교에게 전합니다 게시판 인지 여부를 리턴하는 함수
+/// PostListShowPage에서 사용 중.
+bool isWithSchoolBoard(BoardDetailActionModel? model) {
+  return model?.slug == 'with-school';
 }
 
 /// communicationArticleStatus를 전달받고 '달성 전' 상태인지 여부를 리턴

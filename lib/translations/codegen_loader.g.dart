@@ -71,7 +71,8 @@ class CodegenLoader extends AssetLoader{
     "topPosts": "Top Posts",
     "allPosts": "All Posts",
     "bookmarks": "Bookmarks",
-    "testBoard": "Test Board"
+    "testBoard": "Test Board",
+    "lastItem": "You have checked all posts 🎉"
   },
   "settingPage": {
     "title": "Setting",
@@ -149,13 +150,16 @@ class CodegenLoader extends AssetLoader{
   "dialogs": {
     "deleteConfirm": "Do you really want to delete this post?",
     "blockConfirm": "Do you really want to block this user?",
+    "blockConfirmInfo": "You can block up to 10 users per day",
     "logoutConfirm": "Do you really want to sign out?",
     "withdrawalConfirm": "Do you really want to withdraw the membership?",
     "withdrawalEmailInfo": "If you leave the membership, you can't re-sign up with the email you're using now",
     "cancel": "Cancel",
     "confirm": "OK",
     "noBlockedUsers": "There are no blocked users.",
-    "noNickname": "No nickname"
+    "noNickname": "No nickname",
+    "exitConfirm": "Do you really want to go back? Your post will not be saved",
+    "tempSave": "Save in drafts"
   },
   "popUpMenuButtons": {
     "downloadSucceed": "File downloaded successfully",
@@ -203,7 +207,9 @@ class CodegenLoader extends AssetLoader{
     "contentPlaceholder": "Type content here",
     "conditionSnackBar": "Please select a board and enter the title and content.",
     "noCategory": "No Topics",
-    "selectCategory": "Select Topic"
+    "selectCategory": "Select Topic",
+    "savedAtCache": "The post has been saved on your device.",
+    "restoreFromCache": "Stored draft has been restored."
   },
   "termsAndConditionsPage": {
     "termsAndConditions": "Terms and Conditions",
@@ -271,7 +277,8 @@ static const Map<String,dynamic> ko = {
     "topPosts": "실시간 인기글",
     "allPosts": "전체보기",
     "bookmarks": "담아둔 글",
-    "testBoard": "테스트 게시판"
+    "testBoard": "테스트 게시판",
+    "lastItem": "모든 게시글을 확인했습니다 🎉"
   },
   "settingPage": {
     "title": "설정",
@@ -349,13 +356,16 @@ static const Map<String,dynamic> ko = {
   "dialogs": {
     "deleteConfirm": "정말로 삭제하시겠습니까?",
     "blockConfirm": "정말로 차단하시겠습니까?",
+    "blockConfirmInfo": "하루에 최대 10명의 사용자까지\n차단할 수 있습니다",
     "logoutConfirm": "정말로 로그아웃 하시겠습니까?",
     "withdrawalConfirm": "정말로 회원탈퇴 하시겠습니까?",
     "withdrawalEmailInfo": "회원탈퇴하시면 지금 쓰시는 이메일로는 재가입이 불가능합니다",
     "cancel": "취소",
     "confirm": "확인",
     "noBlockedUsers": "차단한 유저가 없습니다.",
-    "noNickname": "닉네임이 없음"
+    "noNickname": "닉네임이 없음",
+    "exitConfirm": "정말로 돌아가시겠습니까? 작성하신 글은 저장되지 않습니다",
+    "tempSave": "임시 저장하기"
   },
   "popUpMenuButtons": {
     "downloadSucceed": "파일 다운로드에 성공했습니다",
@@ -403,7 +413,9 @@ static const Map<String,dynamic> ko = {
     "contentPlaceholder": "내용을 입력해주세요.",
     "conditionSnackBar": "게시판을 선택해주시고 제목, 내용을 입력해주세요.",
     "noCategory": "말머리 없음",
-    "selectCategory": "말머리를 선택하세요"
+    "selectCategory": "말머리를 선택하세요",
+    "savedAtCache": "작성 중이신 게시글을 디바이스에 저장하였습니다.",
+    "restoreFromCache": "임시 저장되었던 게시글을 다시 불러왔습니다."
   },
   "termsAndConditionsPage": {
     "termsAndConditions": "이용약관",

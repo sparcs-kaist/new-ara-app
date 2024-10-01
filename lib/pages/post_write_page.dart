@@ -22,6 +22,7 @@ import 'package:new_ara_app/pages/terms_and_conditions_page.dart';
 import 'package:new_ara_app/providers/user_provider.dart';
 import 'package:new_ara_app/utils/cache_function.dart';
 import 'package:new_ara_app/utils/slide_routing.dart';
+import 'package:new_ara_app/widgets/dialogs.dart';
 import 'package:new_ara_app/widgets/loading_indicator.dart';
 import 'package:provider/provider.dart';
 import 'package:uuid/uuid.dart';
@@ -92,6 +93,33 @@ class AttachmentsFormat {
     this.fileUrlName = "",
     this.fileUrlSize = 0,
   });
+
+  factory AttachmentsFormat.fromJson(Map<String, dynamic> json) {
+    return AttachmentsFormat(
+      fileType: FileType.values[json['fileType']],
+      isNewFile: json['isNewFile'],
+      fileLocalPath:
+          json['fileLocalPath'] is String ? json['fileLocalPath'] : null,
+      uuid: json['uuid'] is String ? json['uuid'] : null,
+      id: json['id'],
+      fileUrlPath: json['fileUrlPath'] is String ? json['fileUrlPath'] : null,
+      fileUrlName: json['fileUrlName'] is String ? json['fileUrlName'] : "",
+      fileUrlSize: json['fileUrlSize'] ?? 0,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'fileType': fileType.index,
+      'isNewFile': isNewFile,
+      'fileLocalPath': fileLocalPath,
+      'uuid': uuid,
+      'id': id,
+      'fileUrlPath': fileUrlPath,
+      'fileUrlName': fileUrlName,
+      'fileUrlSize': fileUrlSize,
+    };
+  }
 }
 
 class _PostWritePageState extends State<PostWritePage>
@@ -175,11 +203,16 @@ class _PostWritePageState extends State<PostWritePage>
 
   bool _isKeyboardClosed = true;
 
+  String userID = '';
+
   final _editorScrollController = ScrollController();
+
   @override
   void initState() {
     super.initState();
     UserProvider userProvider = context.read<UserProvider>();
+
+    userID = userProvider.naUser!.uid;
 
     context.read<NotificationProvider>().checkIsNotReadExist(userProvider);
     debugPrint("post_write_page.dart: ${widget.previousBoard}");
@@ -198,7 +231,7 @@ class _PostWritePageState extends State<PostWritePage>
     _quillController.addListener(_onTextChanged);
     _titleFocusNode = FocusNode();
     _editorFocusNode = FocusNode();
-    _initPostWritePost();
+    _getBoardList();
 
     //위젯 트리가 빌드된 직후에 포커스를 요청합니다.
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -229,8 +262,8 @@ class _PostWritePageState extends State<PostWritePage>
 
   @override
   void didChangeMetrics() async {
-    var now = DateTime.now();
-    debugPrint("now: $now, ${MediaQuery.of(context).viewInsets.bottom}");
+    // var now = DateTime.now();
+    // debugPrint("now: $now, ${MediaQuery.of(context).viewInsets.bottom}");
     // 기기의 키보드가 올라가거나 내려가는 애니메이션 길이가 다르다.
     // 기기의 애니메이션이 끝나고 확인하기 위해 50ms의 딜레이를 준다.
     await Future.delayed(const Duration(milliseconds: 50));
@@ -258,11 +291,31 @@ class _PostWritePageState extends State<PostWritePage>
     });
   }
 
-  /// 게시판 목록을 가져온다.
-  /// 이전 게시물의 데이터를 가져온다.
-  Future<void> _initPostWritePost() async {
-    await _getBoardList();
-    await _getPostContent();
+  Future<void> cacheCurrentData() async {
+    var data = {
+      'title': _titleController.text,
+      'content':
+          DeltaToHTML.encodeJson(_quillController.document.toDelta().toJson()),
+      'is_content_sexual': _selectedCheckboxes[1],
+      'is_content_social': _selectedCheckboxes[2],
+      'name_type': _chosenBoardValue!.slug == 'with-school'
+          ? 'REALNAME'
+          : _chosenBoardValue!.slug == "talk" && _selectedCheckboxes[0]! == true
+              ? 'ANONYMOUS'
+              : 'REGULAR',
+      'parent_topic':
+          _chosenTopicValue!.id == -1 ? '' : _chosenTopicValue!.slug,
+      'parent_board':
+          _chosenBoardValue!.id == -1 ? '' : _chosenBoardValue!.slug,
+    };
+
+    data['attachments'] = _attachmentList;
+
+    String key = _isEditingPost
+        ? '/cache/${widget.previousArticle!.id}/'
+        : '/cache/$userID/';
+
+    await cacheApiData(key, data);
   }
 
   /// 사용자가 선택 가능한 게시판 목록을 가져오는 함수.
@@ -275,58 +328,131 @@ class _PostWritePageState extends State<PostWritePage>
     await updateStateWithCachedOrFetchedApiData(
         apiUrl: "boards/", // API URL을 지정합니다. 이 예에서는 "boards/"를 대상으로 합니다.
         userProvider: userProvider, // API 요청을 담당할 userProvider 인스턴스를 전달합니다.
-        callback: (response) {
+        callback: (response) async {
+          // async 처리를 위해 임시적으로 newBoardList, newChosenBoard, newSpecTopicList가
+          // _boardList, _chosenBoardValue, _specTopicList를 대체합니다.
+
+          // `newBoardList` 초기화 후 기본 게시판 추가.
+          List<BoardDetailActionModel> newBoardList = [
+            _defaultBoardDetailActionModel
+          ];
+          BoardDetailActionModel? newChosenBoard;
+          List<TopicModel> newSpecTopicList;
+
+          // Json 응답에서 게시물 목록 파싱 후 `newBoardList`에 추가.
+          for (Map<String, dynamic> boardJson in response) {
+            try {
+              BoardDetailActionModel boardDetail =
+                  BoardDetailActionModel.fromJson(boardJson);
+              if (boardDetail.user_writable) {
+                newBoardList.add(boardDetail);
+              }
+            } catch (error) {
+              debugPrint(
+                  "refreshBoardList BoardDetailActionModel.fromJson 실패: $error");
+              return;
+            }
+          }
+
+          // 게시판 목록 상태 업데이트.(넘어본 게시판의 정보가 있을 경우 && 게시물을 쓸 수 있는 게시판의 경우)
+          if (widget.previousBoard != null &&
+              widget.previousBoard!.user_writable) {
+            newChosenBoard = newBoardList.firstWhere(
+                (board) => board.slug == widget.previousBoard!.slug,
+                orElse: () => _defaultBoardDetailActionModel);
+            newSpecTopicList = [_defaultTopicModelNone]
+              ..addAll(newChosenBoard.topics);
+            // 게시판 목록 상태 업데이트(else)
+          } else {
+            newSpecTopicList = [_defaultTopicModelSelect];
+            newChosenBoard = newBoardList.first;
+          }
+
+          // 임시 변수들을 state 변수들에 synchronous하게 지정
           if (mounted) {
             setState(() {
-              // `_boardList` 초기화 후 기본 게시판 추가.
-              _boardList = [_defaultBoardDetailActionModel];
+              _boardList = newBoardList;
+              _chosenBoardValue = newChosenBoard;
+              _specTopicList = newSpecTopicList;
+              _chosenTopicValue = newSpecTopicList[0];
 
-              // Json 응답에서 게시물 목록 파싱 후 `_boardList`에 추가.
-              for (Map<String, dynamic> boardJson in response) {
-                try {
-                  BoardDetailActionModel boardDetail =
-                      BoardDetailActionModel.fromJson(boardJson);
-                  if (boardDetail.user_writable) {
-                    _boardList.add(boardDetail);
-                  }
-                } catch (error) {
-                  debugPrint(
-                      "refreshBoardList BoardDetailActionModel.fromJson 실패: $error");
-                  return;
-                }
-              }
+              _isLoading = false;
             });
           }
         });
+    //_boardList를 모두 불러온 후 cache 업데이트
+    await _getCachedContents();
+  }
 
-    // 게시판 목록 상태 업데이트.(넘어본 게시판의 정보가 있을 경우 && 게시물을 쓸 수 있는 게시판의 경우)
-    if (widget.previousBoard != null && widget.previousBoard!.user_writable) {
-      setState(() {
-        BoardDetailActionModel boardDetailActionModel =
-            _findBoardListValue(widget.previousBoard!.slug);
-        _specTopicList = [_defaultTopicModelNone];
-        _specTopicList.addAll(boardDetailActionModel.topics);
-
-        _chosenTopicValue = _specTopicList[0];
-
-        _chosenBoardValue = boardDetailActionModel;
-        _isLoading = false;
-      });
+  /// 사용자가 임시 저장한 데이터를 가져오는 함수.
+  /// SharedPreferences에서 작성 내용을 가져와 setState() 호출
+  Future<void> _getCachedContents() async {
+    String key = (_isEditingPost)
+        ? '/cache/${widget.previousArticle!.id}/'
+        : '/cache/$userID/';
+    Map<String, dynamic>? cachedData = await fetchCachedApiData(key);
+    debugPrint('cache : ${cachedData}');
+    if (_isEditingPost) {
+      //cachedData == null 와는 관계없이 불러오지 않음!
+      await _getPostContent();
     }
 
-    // 게시판 목록 상태 업데이트(else)
-    else {
+    if (cachedData == null) {
+      debugPrint('No data from cache');
+      return;
+    }
+
+    if (cachedData.values.any((value) => value == null)) {
+      return;
+    }
+
+    try {
+      String? title = cachedData['title'];
+      _titleController.text = title ?? '';
+      debugPrint('get cached data called!');
+      for (int i = 0; i < cachedData['attachments'].length; i++) {
+        // TODO: fileType이 이미지인지 아닌지 판단해서 넣기.
+        _attachmentList
+            .add(AttachmentsFormat.fromJson(cachedData['attachments'][i]));
+      }
+
       setState(() {
-        _specTopicList.add(_defaultTopicModelSelect);
-        _chosenTopicValue = _specTopicList[0];
-        _chosenBoardValue = _boardList[0];
-        _isLoading = false;
+        _quillController.document = (cachedData['content'] != null)
+            ? quill.Document.fromDelta(_htmlToQuillDelta(cachedData['content']))
+            : '';
+        _isFileMenuBarSelected = _attachmentList.isNotEmpty;
+
+        //TODO: 명명 규칙 다름
+        _selectedCheckboxes[0] =
+            cachedData['name_type'] == 'ANONYMOUS' ? true : false;
+        _selectedCheckboxes[1] = cachedData['is_content_sexual'] ?? false;
+        _selectedCheckboxes[2] = cachedData['is_content_social'] ?? false;
+        //_isLoading = false; (only finish loading AFTER boardlist load)
       });
+
+      setState(() {
+        BoardDetailActionModel boardDetailActionModel =
+            _findBoardListValue(cachedData['parent_board']);
+        _specTopicList = [_defaultTopicModelNone];
+        _specTopicList.addAll(boardDetailActionModel.topics);
+        _chosenTopicValue = (cachedData['parent_topic'] == null)
+            ? _specTopicList[0]
+            : _findSpecTopicListValue(cachedData['parent_topic'].toString());
+        _chosenBoardValue = boardDetailActionModel;
+      });
+      debugPrint('get cached data attachment List : $_attachmentList');
+
+      if (mounted) {
+        showInfoBySnackBar(context, LocaleKeys.postWritePage_restoreFromCache.tr());
+      }
+    } catch (error) {
+      debugPrint('_getCachedContents error: $error');
     }
   }
 
   /// 기존 게시물의 내용과 첨부 파일 가져오기.
   Future<void> _getPostContent() async {
+    debugPrint('get Post Content called!');
     // 새로 작성하는 게시물의 경우 함수 종료.
     if (!_isEditingPost) return;
 
@@ -354,6 +480,8 @@ class _PostWritePageState extends State<PostWritePage>
           fileUrlName: fileUrlName,
           fileUrlSize: fileUrlSize));
     }
+
+    debugPrint('$_attachmentList');
 
     // 수정 게시물의 기존 상태 반영.
     setState(() {
@@ -411,7 +539,7 @@ class _PostWritePageState extends State<PostWritePage>
 
   @override
   Widget build(BuildContext context) {
-    debugPrint("BUILD invoked!!!");
+    // debugPrint("BUILD invoked!!!");
 
     /// 게시물 업로드 가능한지 확인
     /// TODO: 업로드 로딩 인디케이터 추가하기
@@ -423,42 +551,83 @@ class _PostWritePageState extends State<PostWritePage>
     //빌드 전 첨부파일의 유효성 확인
     _checkAttachmentsValid();
 
+    UserProvider userProvider = context.read<UserProvider>();
+
     return _isLoading
         ? const LoadingIndicator()
-        : Scaffold(
-            appBar: _buildAppBar(canIupload),
-            body: SafeArea(
-              child: Column(
-                children: [
-                  if (_isKeyboardClosed) _buildMenubar(),
-                  const SizedBox(
-                    height: 15,
-                  ),
-                  _buildTitle(),
-                  const SizedBox(height: 15),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 20),
-                    child: Container(
-                      height: 1,
-                      color: const Color(0xFFF0F0F0),
+        : WillPopScope(
+            onWillPop: () async {
+              if (_hasEditorText || _titleController.text != '') {
+                final shouldPop = await showDialog<bool>(
+                    context: context,
+                    builder: (context) => ExitConfirmDialog(
+                          userProvider: userProvider,
+                          targetContext: context,
+                          onTapConfirm: () async {
+                            debugPrint("onTapConfirm invoked");
+                            //dialog pop
+                            String key = _isEditingPost
+                                ? '/cache/${widget.previousArticle!.id}/'
+                                : '/cache/${userID}/';
+                            await removeApiData(key);
+                            debugPrint('Cache Reset!');
+                            if (mounted) {
+                              Navigator.pop(context, true);
+                            }
+                          },
+                          onTapSave: () async {
+                            debugPrint("onTapSave invoked");
+                            await cacheCurrentData();
+                            if (mounted) {
+                              Navigator.pop(context, true);
+                            }
+                          },
+                        ));
+                return shouldPop ?? false;
+              } else {
+                String key = _isEditingPost
+                    ? '/cache/${widget.previousArticle!.id}/'
+                    : '/cache/${userID}/';
+                await removeApiData(key);
+                debugPrint('Cache Reset!');
+                return true;
+              }
+            },
+            child: Scaffold(
+              appBar: _buildAppBar(canIupload, userProvider),
+              body: SafeArea(
+                child: Column(
+                  children: [
+                    if (_isKeyboardClosed) _buildMenubar(),
+                    const SizedBox(
+                      height: 15,
                     ),
-                  ),
-                  const SizedBox(
-                    height: 15,
-                  ),
-                  _buildToolbar(),
-                  const SizedBox(
-                    height: 10,
-                  ),
-                  Expanded(child: _buildEditor()),
-                  _buildAttachmentShow()
-                ],
+                    _buildTitle(),
+                    const SizedBox(height: 15),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 20),
+                      child: Container(
+                        height: 1,
+                        color: const Color(0xFFF0F0F0),
+                      ),
+                    ),
+                    const SizedBox(
+                      height: 15,
+                    ),
+                    _buildToolbar(),
+                    const SizedBox(
+                      height: 10,
+                    ),
+                    Expanded(child: _buildEditor()),
+                    _buildAttachmentShow()
+                  ],
+                ),
               ),
             ),
           );
   }
 
-  PreferredSizeWidget _buildAppBar(bool canIupload) {
+  PreferredSizeWidget _buildAppBar(bool canIupload, UserProvider userProvider) {
     return AppBar(
       centerTitle: true,
       leading: IconButton(
@@ -469,7 +638,57 @@ class _PostWritePageState extends State<PostWritePage>
             ),
             width: 35,
             height: 35),
-        onPressed: () => Navigator.pop(context),
+        onPressed: () async {
+          if (_hasEditorText || _titleController.text != '') {
+            showDialog(
+                context: context,
+                builder: (context) => ExitConfirmDialog(
+                      userProvider: userProvider,
+                      targetContext: context,
+                      onTapConfirm: () async {
+                        // 사용자가 미리 뒤로가기 버튼을 누르는 경우 에러 방지를 위해
+                        // try-catch 문을 도입함.
+                        String key = _isEditingPost
+                            ? '/cache/${widget.previousArticle!.id}/'
+                            : '/cache/${userID}/';
+                        await removeApiData(key);
+                        debugPrint('Cache Reset!');
+                        try {
+                          if (mounted) {
+                            Navigator.of(context)
+                              ..pop() //dialog pop
+                              ..pop(); //PostWritePage pop
+                          }
+                        } catch (error) {
+                          debugPrint("pop error: $error");
+                        }
+                      },
+                      onTapSave: () async {
+                        await cacheCurrentData();
+                        try {
+                          if (mounted) {
+                            Navigator.of(context)
+                              ..pop() //dialog pop
+                              ..pop(); //PostWritePage pop
+                            showInfoBySnackBar(context, LocaleKeys.postWritePage_savedAtCache.tr());
+                          }
+                        } catch (error) {
+                          debugPrint("pop error: $error");
+                        }
+                      },
+                    ));
+          } else {
+            String key = _isEditingPost
+                ? '/cache/${widget.previousArticle!.id}/'
+                : '/cache/${userID}/';
+            await removeApiData(key);
+            debugPrint('Cache Reset!');
+
+            if (mounted) {
+              Navigator.pop(context);
+            }
+          }
+        },
       ),
       title: SizedBox(
         child: Text(
@@ -735,7 +954,9 @@ class _PostWritePageState extends State<PostWritePage>
                       );
                     } else {
                       return Text(
-                        "${_chosenBoardValue!.ko_name}에 글 쓰는 중...",
+                        context.locale == const Locale("ko")
+                            ? "${_chosenBoardValue!.ko_name}에 글 쓰는 중..."
+                            : "Writing to ${_chosenBoardValue!.en_name} Board",
                         style: const TextStyle(
                           fontSize: 16,
                           height: 24 / 16,
@@ -1497,6 +1718,7 @@ class _PostWritePageState extends State<PostWritePage>
   /// previousArticleId: 수정하는 경우 수정할 글의 id
   void Function() _managePost({bool isUpdate = false, int? previousArticleId}) {
     UserProvider userProvider = context.read<UserProvider>();
+    debugPrint('manage Post called');
     return () async {
       // 아래의 변수들로 api POST, PATCH를 보낸다.
       // 게시물의 제목
@@ -1505,6 +1727,11 @@ class _PostWritePageState extends State<PostWritePage>
       String contentValue;
       // 게시물에 첨부된 파일의 ID
       List<int> attachmentIds = [];
+
+      String key = isUpdate
+          ? '/cache/${widget.previousArticle!.id}/'
+          : '/cache/$userID/';
+      await cacheApiData(key, null);
 
       try {
         titleValue = _titleController.text;
@@ -1518,10 +1745,7 @@ class _PostWritePageState extends State<PostWritePage>
         _isUploadingPost = true;
         _isLoading = true;
       });
-
-      Dio dio = userProvider
-          .createDioWithHeadersForNonget(); // TODO: 적절한 apiRes함수로 변경해야 함.
-
+      debugPrint('attachmentList : $_attachmentList');
       for (int i = 0; i < _attachmentList.length; i++) {
         //새로 올리는 파일이면 새로운 id 할당 받기.
         if (_attachmentList[i].isNewFile) {
@@ -1532,9 +1756,8 @@ class _PostWritePageState extends State<PostWritePage>
               "file": await MultipartFile.fromFile(attachFile.path,
                   filename: attachFile.path.split('/').last),
             });
-            Response? response = await userProvider.postApiRes(
-                "attachments/",
-                data: formData);
+            Response? response =
+                await userProvider.postApiRes("attachments/", data: formData);
             if (response != null) {
               final attachmentModel = AttachmentModel.fromJson(response.data);
               attachmentIds.add(attachmentModel.id);
@@ -1565,6 +1788,7 @@ class _PostWritePageState extends State<PostWritePage>
                 ? 'ANONYMOUS'
                 : 'REGULAR',
       };
+      debugPrint('manage post data : $data');
       Response? response;
       if (isUpdate) {
         response = await userProvider.putApiRes(
@@ -1595,8 +1819,7 @@ class _PostWritePageState extends State<PostWritePage>
             );
           }
         }
-      }
-      else {
+      } else {
         debugPrint("post Error occurred");
       }
 
@@ -1611,6 +1834,7 @@ class _PostWritePageState extends State<PostWritePage>
 
   /// 사진 추가 시 실행되는 함수
   Future<void> _pickImage() async {
+    debugPrint('pick Image called');
     FocusScope.of(context).unfocus();
     final ImagePicker imagePicker = ImagePicker();
     final XFile? image =
@@ -1645,6 +1869,7 @@ class _PostWritePageState extends State<PostWritePage>
           fileLocalPath: imageUrl,
           uuid: uuid,
         ));
+        debugPrint('$_attachmentList');
       });
     }
     _editorFocusNode.requestFocus();
@@ -1671,6 +1896,7 @@ class _PostWritePageState extends State<PostWritePage>
           isNewFile: true,
           fileLocalPath: file.path,
         ));
+        debugPrint('$_attachmentList');
       });
       return true;
     } else {

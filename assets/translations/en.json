@@ -55,7 +55,8 @@
         "topPosts": "Top Posts",
         "allPosts": "All Posts",
         "bookmarks": "Bookmarks",
-        "testBoard": "Test Board"
+        "testBoard": "Test Board",
+        "lastItem" : "You have checked all posts 🎉"
     },
     "settingPage": {
         "title": "Setting",
@@ -133,13 +134,16 @@
     "dialogs": {
         "deleteConfirm": "Do you really want to delete this post?",
         "blockConfirm": "Do you really want to block this user?",
+        "blockConfirmInfo": "You can block up to 10 users per day",
         "logoutConfirm": "Do you really want to sign out?",
         "withdrawalConfirm": "Do you really want to withdraw the membership?",
         "withdrawalEmailInfo": "If you leave the membership, you can't re-sign up with the email you're using now",
         "cancel": "Cancel",
         "confirm": "OK",
         "noBlockedUsers": "There are no blocked users.",
-        "noNickname": "No nickname"
+        "noNickname": "No nickname",
+        "exitConfirm": "Do you really want to go back? Your post will not be saved",
+        "tempSave" : "Save in drafts"
     },
     "popUpMenuButtons": {
         "downloadSucceed": "File downloaded successfully",
@@ -187,7 +191,9 @@
         "contentPlaceholder": "Type content here",
         "conditionSnackBar": "Please select a board and enter the title and content.",
         "noCategory": "No Topics",
-        "selectCategory": "Select Topic"
+        "selectCategory": "Select Topic",
+        "savedAtCache": "The post has been saved on your device.",
+        "restoreFromCache": "Stored draft has been restored."
     },
     "termsAndConditionsPage": {
         "termsAndConditions": "Terms and Conditions",

@@ -207,10 +207,10 @@ class UserProvider with ChangeNotifier {
         cancelToken: cancelToken,
         onReceiveProgress: onReceiveProgress,
       );
-      internetConnected = true;
-
       //인터넷 오류 snackBar 모두 지우기
-      snackBarKey.currentState?.clearSnackBars();
+      if (!internetConnected) snackBarKey.currentState?.clearSnackBars();
+
+      internetConnected = true;
 
       return response;
     } on DioException catch (e) {
@@ -245,10 +245,10 @@ class UserProvider with ChangeNotifier {
           cancelToken: cancelToken,
           onSendProgress: onSendProgress,
           onReceiveProgress: onReceiveProgress);
+
+      if (!internetConnected) snackBarKey.currentState?.clearSnackBars();
       internetConnected = true;
 
-      //인터넷 오류 snackBar 모두 지우기
-      snackBarKey.currentState?.clearSnackBars();
       return response;
     } on DioException catch (e) {
       debugPrint("Error occured in fetching : $toUrl");
@@ -280,10 +280,10 @@ class UserProvider with ChangeNotifier {
           cancelToken: cancelToken,
           onSendProgress: onSendProgress,
           onReceiveProgress: onReceiveProgress);
+
+      if (!internetConnected) snackBarKey.currentState?.clearSnackBars();
       internetConnected = true;
 
-      //인터넷 오류 snackBar 모두 지우기
-      snackBarKey.currentState?.clearSnackBars();
       return response;
     } on DioException catch (e) {
       debugPrint("Error occured in fetching : $toUrl");
@@ -315,10 +315,10 @@ class UserProvider with ChangeNotifier {
           cancelToken: cancelToken,
           onSendProgress: onSendProgress,
           onReceiveProgress: onReceiveProgress);
+
+      if (!internetConnected) snackBarKey.currentState?.clearSnackBars();
       internetConnected = true;
 
-      //인터넷 오류 snackBar 모두 지우기
-      snackBarKey.currentState?.clearSnackBars();
       return response;
     } on DioException catch (e) {
       debugPrint("Error occured in fetching : $toUrl");
@@ -350,10 +350,9 @@ class UserProvider with ChangeNotifier {
         options: options,
         cancelToken: cancelToken,
       );
+      if (!internetConnected) snackBarKey.currentState?.clearSnackBars();
       internetConnected = true;
 
-      //인터넷 오류 snackBar 모두 지우기
-      snackBarKey.currentState?.clearSnackBars();
       return response;
     } on DioException catch (e) {
       debugPrint("Error occured in fetching : $toUrl");

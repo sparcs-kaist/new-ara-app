@@ -9,7 +9,6 @@ import 'package:new_ara_app/translations/locale_keys.g.dart';
 import 'package:new_ara_app/providers/user_provider.dart';
 import 'package:new_ara_app/constants/colors_info.dart';
 import 'package:new_ara_app/models/block_model.dart';
-import 'package:new_ara_app/constants/url_info.dart';
 
 /// 사용 예시
 /* await showDialog(
@@ -620,7 +619,19 @@ class BlockConfirmDialog extends StatelessWidget {
                 ),
               ),
             ),
-            const SizedBox(height: 20),
+            Padding(
+              padding: const EdgeInsets.all(10),
+              child: Text(
+                LocaleKeys.dialogs_blockConfirmInfo.tr(),
+                textAlign: TextAlign.center,
+                style: const TextStyle(
+                  fontSize: 15,
+                  fontWeight: FontWeight.w500,
+                  color: Colors.grey,
+                ),
+              ),
+            ),
+            //const SizedBox(height: 20),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
@@ -1076,6 +1087,151 @@ Google Playストアでのアプリのプロダクションレビュー後に遭
               )
             ],
           ),
+        ),
+      ),
+    );
+  }
+}
+
+/// PostWritePage의 나가기 확인에 사용되는 Dialog
+class ExitConfirmDialog extends StatelessWidget {
+  final UserProvider userProvider;
+
+  /// PostWritePage의 context.
+  final BuildContext targetContext;
+
+  /// '확인' 버튼을 눌렀을 때 적용되는 onTap 메서드
+  final void Function()? onTapConfirm;
+
+  /// '임시 저장' 버튼을 눌렀을 때 적용되는 onTap 메서드
+  final void Function()? onTapSave;
+
+  const ExitConfirmDialog(
+      {super.key,
+      required this.userProvider,
+      required this.targetContext,
+      required this.onTapConfirm,
+      required this.onTapSave});
+
+  @override
+  Widget build(BuildContext context) {
+    return Dialog(
+      child: Container(
+        decoration: const BoxDecoration(
+          borderRadius: BorderRadius.all(Radius.circular(15)),
+        ),
+        width: 350,
+        height: 200,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            SvgPicture.asset(
+              'assets/icons/warning.svg',
+              width: 55,
+              height: 55,
+              colorFilter: const ColorFilter.mode(
+                ColorsInfo.newara,
+                BlendMode.srcIn,
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 25),
+              child: Text(
+                LocaleKeys.dialogs_exitConfirm.tr(),
+                textAlign: TextAlign.center,
+                style: const TextStyle(
+                  fontSize: 17,
+                  fontWeight: FontWeight.w700,
+                  color: Colors.black,
+                ),
+              ),
+            ),
+            const SizedBox(height: 20),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                InkWell(
+                  onTap: () {
+                    // 이전 페이지(ex:PostWritePage)에서 pop해야 하므로
+                    // targetContext 사용.
+                    Navigator.pop(targetContext, false);
+                  },
+                  child: Container(
+                    decoration: BoxDecoration(
+                      border: Border.all(
+                        color: Colors.grey,
+                        width: 1,
+                      ),
+                      borderRadius: const BorderRadius.all(Radius.circular(20)),
+                      color: Colors.white,
+                    ),
+                    width: 60,
+                    height: 40,
+                    child: Center(
+                      child: Text(
+                        LocaleKeys.dialogs_cancel.tr(),
+                        style: const TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w500,
+                          color: Colors.black,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 10),
+                InkWell(
+                  // 글 제목 / 내용 임시 저장하기 구현
+                  onTap: () {
+                    onTapSave!();
+                    //onTapConfirm!();
+                  },
+                  child: Container(
+                    decoration: const BoxDecoration(
+                        borderRadius: BorderRadius.all(Radius.circular(20)),
+                        color: Colors.grey //ColorsInfo.newaraSoft,
+                        ),
+                    width: 120,
+                    height: 40,
+                    child: Center(
+                      child: Text(
+                        LocaleKeys.dialogs_tempSave.tr(),
+                        style: const TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w500,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 10),
+                InkWell(
+                  // 나가기(확인) 구현
+                  onTap: onTapConfirm,
+                  child: Container(
+                    decoration: const BoxDecoration(
+                      borderRadius: BorderRadius.all(Radius.circular(20)),
+                      color: ColorsInfo.newara,
+                    ),
+                    width: 60,
+                    height: 40,
+                    child: Center(
+                      child: Text(
+                        LocaleKeys.dialogs_confirm.tr(),
+                        style: const TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w500,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            )
+          ],
         ),
       ),
     );

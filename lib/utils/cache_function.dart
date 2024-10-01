@@ -45,6 +45,7 @@ Future<void> updateStateWithCachedOrFetchedApiData({
   try {
     // 캐시에서 최근 JSON 데이터를 시도하여 불러옵니다.
     final dynamic recentJson = await fetchCachedApiData(apiUrl);
+
     if (recentJson != null) {
       // 캐시된 데이터가 있으면 콜백 함수를 통해 상태를 업데이트합니다.
       await callback(recentJson);
@@ -52,13 +53,24 @@ Future<void> updateStateWithCachedOrFetchedApiData({
     // UserProvider를 통해 API로부터 새로운 데이터를 요청합니다.
     Response? response = await userProvider.getApiRes(apiUrl);
 
+    //debugPrint('got response: $apiUrl');
+
     if (response != null) {
       // 새로운 데이터를 캐시에 저장하고, 콜백 함수를 통해 상태를 업데이트합니다.
       await cacheApiData(apiUrl, response.data);
       await callback(response.data);
     }
   } catch (error) {
-    debugPrint("updateStateWithCachedOrFetchedApiData error: $error, apiurl: $apiUrl");
+    debugPrint(
+        "updateStateWithCachedOrFetchedApiData error: $error, apiurl: $apiUrl");
     // 에러 발생 시 적절한 에러 처리 로직을 추가합니다.
   }
+}
+
+/// SharedPreferences에 저장된 값을 리셋(제거)하는 함수입니다.
+///
+/// [key]는 API URL을 의미하며, 해당 값의 데이터는 지워집니다.
+Future<void> removeApiData(String key) async {
+  final prefs = await SharedPreferences.getInstance();
+  await prefs.remove(key);
 }

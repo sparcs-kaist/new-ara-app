@@ -51,6 +51,7 @@ abstract class  LocaleKeys {
   static const postListShowPage_allPosts = 'postListShowPage.allPosts';
   static const postListShowPage_bookmarks = 'postListShowPage.bookmarks';
   static const postListShowPage_testBoard = 'postListShowPage.testBoard';
+  static const postListShowPage_lastItem = 'postListShowPage.lastItem';
   static const postListShowPage = 'postListShowPage';
   static const settingPage_title = 'settingPage.title';
   static const settingPage_postSetting = 'settingPage.postSetting';
@@ -123,6 +124,7 @@ abstract class  LocaleKeys {
   static const postViewUtils = 'postViewUtils';
   static const dialogs_deleteConfirm = 'dialogs.deleteConfirm';
   static const dialogs_blockConfirm = 'dialogs.blockConfirm';
+  static const dialogs_blockConfirmInfo = 'dialogs.blockConfirmInfo';
   static const dialogs_logoutConfirm = 'dialogs.logoutConfirm';
   static const dialogs_withdrawalConfirm = 'dialogs.withdrawalConfirm';
   static const dialogs_withdrawalEmailInfo = 'dialogs.withdrawalEmailInfo';
@@ -130,6 +132,8 @@ abstract class  LocaleKeys {
   static const dialogs_confirm = 'dialogs.confirm';
   static const dialogs_noBlockedUsers = 'dialogs.noBlockedUsers';
   static const dialogs_noNickname = 'dialogs.noNickname';
+  static const dialogs_exitConfirm = 'dialogs.exitConfirm';
+  static const dialogs_tempSave = 'dialogs.tempSave';
   static const dialogs = 'dialogs';
   static const popUpMenuButtons_downloadSucceed = 'popUpMenuButtons.downloadSucceed';
   static const popUpMenuButtons_downloadFailed = 'popUpMenuButtons.downloadFailed';
@@ -174,6 +178,8 @@ abstract class  LocaleKeys {
   static const postWritePage_conditionSnackBar = 'postWritePage.conditionSnackBar';
   static const postWritePage_noCategory = 'postWritePage.noCategory';
   static const postWritePage_selectCategory = 'postWritePage.selectCategory';
+  static const postWritePage_savedAtCache = 'postWritePage.savedAtCache';
+  static const postWritePage_restoreFromCache = 'postWritePage.restoreFromCache';
   static const postWritePage = 'postWritePage';
   static const termsAndConditionsPage_termsAndConditions = 'termsAndConditionsPage.termsAndConditions';
   static const termsAndConditionsPage_agree = 'termsAndConditionsPage.agree';
