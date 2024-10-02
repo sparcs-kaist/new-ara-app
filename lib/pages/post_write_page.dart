@@ -360,8 +360,7 @@ class _PostWritePageState extends State<PostWritePage>
             newChosenBoard = newBoardList.firstWhere(
                 (board) => board.slug == widget.previousBoard!.slug,
                 orElse: () => _defaultBoardDetailActionModel);
-            newSpecTopicList = [_defaultTopicModelNone]
-              ..addAll(newChosenBoard.topics);
+            newSpecTopicList = [_defaultTopicModelNone, ...newChosenBoard.topics];
             // 게시판 목록 상태 업데이트(else)
           } else {
             newSpecTopicList = [_defaultTopicModelSelect];
@@ -573,14 +572,14 @@ class _PostWritePageState extends State<PostWritePage>
                                 : '/cache/${userID}/';
                             await removeApiData(key);
                             debugPrint('Cache Reset!');
-                            if (mounted) {
+                            if (context.mounted) {
                               Navigator.pop(context, true);
                             }
                           },
                           onTapSave: () async {
                             debugPrint("onTapSave invoked");
                             await cacheCurrentData();
-                            if (mounted) {
+                            if (context.mounted) {
                               Navigator.pop(context, true);
                             }
                           },
@@ -656,7 +655,7 @@ class _PostWritePageState extends State<PostWritePage>
                         await removeApiData(key);
                         debugPrint('Cache Reset!');
                         try {
-                          if (mounted) {
+                          if (context.mounted) {
                             Navigator.of(context)
                               ..pop() //dialog pop
                               ..pop(); //PostWritePage pop
@@ -668,7 +667,7 @@ class _PostWritePageState extends State<PostWritePage>
                       onTapSave: () async {
                         await cacheCurrentData();
                         try {
-                          if (mounted) {
+                          if (context.mounted) {
                             Navigator.of(context)
                               ..pop() //dialog pop
                               ..pop(); //PostWritePage pop
@@ -1807,9 +1806,9 @@ class _PostWritePageState extends State<PostWritePage>
                 ? 'ANONYMOUS'
                 : 'REGULAR',
       };
-      debugPrint('manage post data : $data');
       Response? response;
       if (isUpdate) {
+        debugPrint('manage post data : $data');
         response = await userProvider.putApiRes(
           'articles/$previousArticleId/',
           data: data,
@@ -1818,6 +1817,7 @@ class _PostWritePageState extends State<PostWritePage>
         data['parent_topic'] =
             _chosenTopicValue!.id == -1 ? '' : _chosenTopicValue!.id;
         data['parent_board'] = _chosenBoardValue!.id;
+        debugPrint('manage post data : $data');
         response = await userProvider.postApiRes(
           'articles/',
           data: data,
