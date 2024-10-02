@@ -169,6 +169,7 @@ class UserProvider with ChangeNotifier {
     debugPrint(errorMessage);
     if (e.response != null) {
       //debugPrint("${e.response!.data}");
+      debugPrint("${e.response!.statusCode}");
       debugPrint("${e.response!.headers}");
       debugPrint("${e.response!.requestOptions}");
     }
