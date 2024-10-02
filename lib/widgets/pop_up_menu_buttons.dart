@@ -27,7 +27,7 @@ class WithSchoolPopupMenuButton extends StatelessWidget {
           side: BorderSide(color: Color.fromRGBO(217, 217, 217, 1), width: 0.5),
           borderRadius: BorderRadius.all(Radius.circular(12.0))),
       padding: const EdgeInsets.all(2.0),
-      offset: Offset(0, 45),
+      offset: const Offset(0, 45),
       child: SvgPicture.asset(
         'assets/icons/information.svg',
         colorFilter: const ColorFilter.mode(Colors.grey, BlendMode.srcIn),
