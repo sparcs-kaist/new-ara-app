@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:new_ara_app/constants/colors_info.dart';
+import 'package:new_ara_app/constants/theme_info.dart';
+import 'package:new_ara_app/providers/theme_provider.dart';
+import 'package:provider/provider.dart';
 
 class ChatWindowPage extends StatefulWidget {
   const ChatWindowPage({super.key});
@@ -34,6 +37,7 @@ class _ChatWindowPageState extends State<ChatWindowPage> {
 
   @override
   Widget build(BuildContext context) {
+    final themeProvider = Provider.of<ThemeProvider>(context);
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
@@ -138,11 +142,12 @@ class _DefaultInputAreaState extends State<DefaultInputArea> {
 
   @override
   Widget build(BuildContext context) {
+    final themeProvider = Provider.of<ThemeProvider>(context);
     return Column(
       children: [
         Container(
           height: 1,
-          color: const Color(0xFFF0F0F0),
+          color: themeProvider.isDarkMode? NewAraThemes.darkBRLine : NewAraThemes.lightBRLine,
         ),
         Container(
           constraints: const BoxConstraints(
@@ -179,7 +184,7 @@ class _DefaultInputAreaState extends State<DefaultInputArea> {
                     ),
                     decoration: InputDecoration(
                       filled: true,
-                      fillColor: const Color(0xFFF6F6F6),
+                      fillColor: themeProvider.isDarkMode? Color(0xFF161616) : Color(0xFFF6F6F6),
 
                       isDense: true,
                       contentPadding: const EdgeInsets.fromLTRB(
@@ -223,17 +228,18 @@ class MyChatBubble extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final themeProvider = Provider.of<ThemeProvider>(context);
     return SizedBox(
       child: Row(
         mainAxisAlignment: MainAxisAlignment.end,
         crossAxisAlignment: CrossAxisAlignment.end,
         children: [
-          const Text(
+          Text(
             "10:40",
             style: TextStyle(
                 fontSize: 12,
                 fontWeight: FontWeight.w500,
-                color: Color(0xFFB1B1B1)),
+                color: themeProvider.isDarkMode? NewAraThemes.gry61 : NewAraThemes.gryB1),
           ),
           const SizedBox(
             width: 5,
@@ -249,13 +255,13 @@ class MyChatBubble extends StatelessWidget {
                   bottomRight: Radius.circular(3.0), // 좌하단 둥근 모서리 반지름
                 ),
               ),
-              child: const Padding(
+              child: Padding(
                 padding: EdgeInsets.symmetric(vertical: 7, horizontal: 14),
                 child: Text(
                   "겁나긴 메세지1겁나긴 메세지1겁나긴 메세지1겁나긴 메세지1겁나긴 메세지1겁나긴 메세지1겁나긴 메세지1겁나긴 메세지1겁나긴 메세지1겁나긴 메세지1겁나긴 메세지1겁나긴 메세지1겁나긴 메세지1겁나긴 메세지1겁나긴 메세지1겁나긴 메세지끝",
                   style: TextStyle(
                     fontSize: 16,
-                    color: Colors.white,
+                    color: themeProvider.isDarkMode? Colors.black : Colors.white,
                     fontWeight: FontWeight.w500,
                   ),
                 ),
@@ -278,6 +284,7 @@ class OtherChatBubble extends StatefulWidget {
 class _OtherChatBubbleState extends State<OtherChatBubble> {
   @override
   Widget build(BuildContext context) {
+    final themeProvider = Provider.of<ThemeProvider>(context);
     return SizedBox(
       child: Row(
         mainAxisAlignment: MainAxisAlignment.start,
@@ -287,10 +294,10 @@ class _OtherChatBubbleState extends State<OtherChatBubble> {
             height: 40,
             width: 40,
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: themeProvider.isDarkMode? Colors.black : Colors.white,
               shape: BoxShape.circle, // 컨테이너 배경색
               border: Border.all(
-                color: const Color(0xFFD9D9D9), // 테두리 색상
+                color: themeProvider.isDarkMode? Color(0xFF363636) : Color(0xFFD9D9D9), // 테두리 색상
                 width: 1.0,
               ),
             ),
@@ -305,9 +312,9 @@ class _OtherChatBubbleState extends State<OtherChatBubble> {
                 Flexible(
                   child: Container(
                     decoration: BoxDecoration(
-                      color: Colors.white, // 컨테이너 배경색
+                      color: themeProvider.isDarkMode? Colors.black : Colors.white, // 컨테이너 배경색
                       border: Border.all(
-                        color: const Color(0xFFD9D9D9), // 테두리 색상
+                        color: themeProvider.isDarkMode? Color(0xFF363636) : Color(0xFFD9D9D9), // 테두리 색상
                         width: 1.0,
                       ),
                       borderRadius: const BorderRadius.only(
@@ -317,14 +324,14 @@ class _OtherChatBubbleState extends State<OtherChatBubble> {
                         bottomLeft: Radius.circular(3),
                       ),
                     ),
-                    child: const Padding(
+                    child: Padding(
                       padding:
                           EdgeInsets.symmetric(vertical: 7, horizontal: 14),
                       child: Text(
                         "겁나긴 메세지1겁나긴 메세지1겁나긴 메세지1겁나긴 메세지1겁나긴 메세지1겁나긴 메세지1겁나긴 메세지1겁나긴 메세지1겁나긴 메세지1겁나긴 메세지1겁나긴 메세지1겁나긴 메세지1겁나긴 메세지1겁나긴 메세지1겁나긴 메세지1겁나긴 메세지끝",
                         style: TextStyle(
                           fontSize: 16,
-                          color: Color(0xFF333333),
+                          color: themeProvider.isDarkMode? NewAraThemes.gryC : NewAraThemes.gry3,
                           fontWeight: FontWeight.w500,
                         ),
                       ),
@@ -334,12 +341,12 @@ class _OtherChatBubbleState extends State<OtherChatBubble> {
                 const SizedBox(
                   width: 5,
                 ),
-                const Text(
+                Text(
                   "10:40",
                   style: TextStyle(
                       fontSize: 12,
                       fontWeight: FontWeight.w500,
-                      color: Color(0xFFB1B1B1)),
+                      color: themeProvider.isDarkMode? NewAraThemes.gry61 : NewAraThemes.gryB1),
                 ),
               ],
             ),
@@ -360,10 +367,12 @@ class TimeChatBubble extends StatefulWidget {
 class _TimeChatBubbleState extends State<TimeChatBubble> {
   @override
   Widget build(BuildContext context) {
+    final themeProvider = Provider.of<ThemeProvider>(context);
+
     return Center(
       child: Container(
         decoration: BoxDecoration(
-          color: Colors.white, // 컨테이너 배경색
+          color: themeProvider.isDarkMode? Colors.black : Colors.white, // 컨테이너 배경색
           border: Border.all(
             color: const Color(0xFFFFADAD), // 테두리 색상
             width: 1.0,

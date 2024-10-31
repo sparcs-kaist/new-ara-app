@@ -2,6 +2,8 @@ import 'dart:io';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:new_ara_app/constants/theme_info.dart';
+import 'package:new_ara_app/providers/theme_provider.dart';
 import 'package:new_ara_app/translations/locale_keys.g.dart';
 
 import 'package:new_ara_app/models/article_list_action_model.dart';
@@ -24,6 +26,7 @@ class PostPreview extends StatefulWidget {
 class _PostPreviewState extends State<PostPreview> {
   @override
   Widget build(BuildContext context) {
+    final themeProvider = Provider.of<ThemeProvider>(context);
     BlockedProvider blockedProvider = context.watch<BlockedProvider>();
 
     String time = getTime(widget.model.created_at.toString(), context.locale);
@@ -63,8 +66,8 @@ class _PostPreviewState extends State<PostPreview> {
                             (isAnonymousIOS(widget.model) &&
                                 blockedProvider.blockedAnonymousPostIDs
                                     .contains(widget.model.created_by.id)))
-                        ? const Color(0xFFBBBBBB)
-                        : Colors.black,
+                        ? themeProvider.isDarkMode? NewAraThemes.gry6: NewAraThemes.gryB
+                        : themeProvider.isDarkMode? Colors.white: Colors.black,
                     fontWeight: FontWeight.w500,
                     fontSize: 16,
                   ),

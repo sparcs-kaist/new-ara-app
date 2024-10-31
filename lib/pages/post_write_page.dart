@@ -6,6 +6,7 @@ import 'package:dio/dio.dart';
 import 'package:file_icon/file_icon.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:new_ara_app/constants/theme_info.dart';
 import 'package:new_ara_app/constants/url_info.dart';
 import 'dart:io';
 import 'package:flutter/material.dart';
@@ -39,6 +40,8 @@ import 'package:markdown/markdown.dart' as md;
 import 'package:new_ara_app/widgets/snackbar_noti.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:new_ara_app/translations/locale_keys.g.dart';
+
+import '../providers/theme_provider.dart';
 
 /// 사용자가 게시물을 작성하거나 편집할 수 있는 페이지를 나타내는 StatefulWidget입니다.
 class PostWritePage extends StatefulWidget {
@@ -533,6 +536,8 @@ class _PostWritePageState extends State<PostWritePage>
     _checkAttachmentsValid();
 
     UserProvider userProvider = context.read<UserProvider>();
+    final themeProvider = Provider.of<ThemeProvider>(context);
+
 
     return _isLoading
         ? const LoadingIndicator()
@@ -587,7 +592,7 @@ class _PostWritePageState extends State<PostWritePage>
                       padding: const EdgeInsets.symmetric(horizontal: 20),
                       child: Container(
                         height: 1,
-                        color: const Color(0xFFF0F0F0),
+                        color: themeProvider.isDarkMode? NewAraThemes.darkBRLine : NewAraThemes.lightBRLine,
                       ),
                     ),
                     const SizedBox(
@@ -607,6 +612,8 @@ class _PostWritePageState extends State<PostWritePage>
   }
 
   PreferredSizeWidget _buildAppBar(bool canIupload, UserProvider userProvider) {
+    final themeProvider = Provider.of<ThemeProvider>(context);
+
     return AppBar(
       centerTitle: true,
       leading: IconButton(
@@ -704,7 +711,7 @@ class _PostWritePageState extends State<PostWritePage>
                     alignment: Alignment.center,
                     child: Text(
                       LocaleKeys.postWritePage_submit.tr(),
-                      style: const TextStyle(color: Colors.white),
+                      style: TextStyle(color: themeProvider.isDarkMode? Colors.black : Colors.white,),
                     ),
                   ),
                 )
@@ -713,7 +720,7 @@ class _PostWritePageState extends State<PostWritePage>
                       borderRadius: BorderRadius.circular(10.0),
                       color: Colors.transparent,
                       border: Border.all(
-                        color: const Color(0xFFF0F0F0), // #F0F0F0 색상
+                        color: themeProvider.isDarkMode? NewAraThemes.darkBRLine : NewAraThemes.lightBRLine, // #F0F0F0 색상
                         width: 1, // 테두리 두께 1픽셀
                       )),
                   child: Container(
@@ -722,7 +729,7 @@ class _PostWritePageState extends State<PostWritePage>
                     alignment: Alignment.center,
                     child: Text(
                       LocaleKeys.postWritePage_submit.tr(),
-                      style: const TextStyle(color: Color(0xFFBBBBBB)),
+                      style: TextStyle(color: themeProvider.isDarkMode? NewAraThemes.darkInputHint : NewAraThemes.lightInputHint),
                     ),
                   ),
                 ),
@@ -732,6 +739,8 @@ class _PostWritePageState extends State<PostWritePage>
   }
 
   Widget _buildMenubar() {
+    final themeProvider = Provider.of<ThemeProvider>(context);
+
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 15),
       child: SizedBox(
@@ -746,7 +755,7 @@ class _PostWritePageState extends State<PostWritePage>
                 },
                 child: Container(
                   decoration: BoxDecoration(
-                    color: const Color(0xFFF8F8F8),
+                    color: themeProvider.isDarkMode? Color(0xFF181818) : Color(0xFFF8F8F8),
                     borderRadius: BorderRadius.circular(20.0),
                   ),
                   child: DropdownButtonHideUnderline(
@@ -776,7 +785,7 @@ class _PostWritePageState extends State<PostWritePage>
                                       : value.en_name,
                                   style: TextStyle(
                                     color: value.id == -1 || _isEditingPost
-                                        ? const Color(0xFFBBBBBB)
+                                        ? themeProvider.isDarkMode? NewAraThemes.darkInputHint : NewAraThemes.lightInputHint
                                         : ColorsInfo.newara,
                                     fontWeight: FontWeight.w500,
                                     fontSize: 16,
@@ -802,7 +811,7 @@ class _PostWritePageState extends State<PostWritePage>
             Flexible(
               child: Container(
                 decoration: BoxDecoration(
-                  color: const Color(0xFFF8F8F8),
+                  color: themeProvider.isDarkMode? Color(0xFF181818) : Color(0xFFF8F8F8),
                   borderRadius: BorderRadius.circular(20.0),
                 ),
                 child: DropdownButtonHideUnderline(
@@ -823,8 +832,8 @@ class _PostWritePageState extends State<PostWritePage>
                                 : value.en_name,
                             style: TextStyle(
                               color: value.id == -1 || _isEditingPost
-                                  ? const Color(0xFFBBBBBB)
-                                  : Colors.black,
+                                  ? themeProvider.isDarkMode? NewAraThemes.darkInputHint : NewAraThemes.lightInputHint
+                                  : themeProvider.isDarkMode? Colors.white : Colors.black,
                               fontWeight: FontWeight.w500,
                               fontSize: 16,
                             ),
@@ -853,6 +862,8 @@ class _PostWritePageState extends State<PostWritePage>
   }
 
   Widget _buildTitle() {
+    final themeProvider = Provider.of<ThemeProvider>(context);
+
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20),
       child: TextField(
@@ -872,17 +883,17 @@ class _PostWritePageState extends State<PostWritePage>
         },
         decoration: InputDecoration(
           hintText: LocaleKeys.postWritePage_titleHintText.tr(),
-          hintStyle: const TextStyle(
+          hintStyle: TextStyle(
               height: 27 / 22,
               fontSize: 22,
-              color: Color(0xFFBBBBBB),
+              color: themeProvider.isDarkMode? NewAraThemes.darkInputHint : NewAraThemes.lightInputHint,
               fontWeight: FontWeight.w700),
           // counterStyle: TextStyle(
           //   height: double.minPositive,
           // ),
           counterText: "",
           filled: true,
-          fillColor: Colors.white,
+          fillColor: themeProvider.isDarkMode? Colors.black : Colors.white,
           isDense: true,
           isCollapsed: true,
           contentPadding: const EdgeInsets.fromLTRB(0, 0, 0, 0),
@@ -903,13 +914,15 @@ class _PostWritePageState extends State<PostWritePage>
   }
 
   Widget _buildAttachmentShow() {
+    final themeProvider = Provider.of<ThemeProvider>(context);
+
     if (!_isKeyboardClosed) {
       // 키보드가 열려있다면
       return Column(
         children: [
           Container(
             height: 1,
-            color: const Color(0xFFF0F0F0),
+            color: themeProvider.isDarkMode? NewAraThemes.darkBRLine : NewAraThemes.lightBRLine,
           ),
           SizedBox(
             height: 50,
@@ -923,11 +936,11 @@ class _PostWritePageState extends State<PostWritePage>
                     if (_chosenBoardValue == _defaultBoardDetailActionModel) {
                       return Text(
                         LocaleKeys.postWritePage_selectBoard.tr(),
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 16,
                           height: 24 / 16,
                           fontWeight: FontWeight.w500,
-                          color: Color(0xFFBBBBBB),
+                          color: themeProvider.isDarkMode? NewAraThemes.darkInputHint : NewAraThemes.lightInputHint,
                         ),
                       );
                     } else {
@@ -935,11 +948,11 @@ class _PostWritePageState extends State<PostWritePage>
                         context.locale == const Locale("ko")
                             ? "${_chosenBoardValue!.ko_name}에 글 쓰는 중..."
                             : "Writing to ${_chosenBoardValue!.en_name} Board",
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 16,
                           height: 24 / 16,
                           fontWeight: FontWeight.w500,
-                          color: Color(0xFFBBBBBB),
+                          color: themeProvider.isDarkMode? NewAraThemes.darkInputHint : NewAraThemes.lightInputHint,
                         ),
                       );
                     }
@@ -949,7 +962,7 @@ class _PostWritePageState extends State<PostWritePage>
                 Container(
                   height: 30,
                   width: 1,
-                  color: const Color(0xFFF0F0F0),
+                  color: themeProvider.isDarkMode? NewAraThemes.darkBRLine : NewAraThemes.lightBRLine,
                 ),
                 const SizedBox(
                   width: 7,
@@ -1137,8 +1150,7 @@ class _PostWritePageState extends State<PostWritePage>
                                           height: 44,
                                           decoration: BoxDecoration(
                                             border: Border.all(
-                                              color: const Color(
-                                                  0xFFF0F0F0), // #F0F0F0 색상
+                                              color: themeProvider.isDarkMode? NewAraThemes.darkInputHint : NewAraThemes.lightInputHint, // #F0F0F0 색상
                                               width: 1, // 테두리 두께 1픽셀
                                             ),
                                             borderRadius: BorderRadius.circular(
@@ -1190,10 +1202,10 @@ class _PostWritePageState extends State<PostWritePage>
                                                     : formatBytes(
                                                         _attachmentList[index]
                                                             .fileUrlSize),
-                                                style: const TextStyle(
+                                                style: TextStyle(
                                                     fontSize: 14,
                                                     fontWeight: FontWeight.w500,
-                                                    color: Color(0xFFBBBBBB)),
+                                                    color: themeProvider.isDarkMode? NewAraThemes.darkInputHint : NewAraThemes.lightInputHint),
                                               ),
                                               InkWell(
                                                 onTap: () {
@@ -1204,8 +1216,8 @@ class _PostWritePageState extends State<PostWritePage>
                                                   width: 30,
                                                   height: 30,
                                                   colorFilter:
-                                                      const ColorFilter.mode(
-                                                          Color(0xFFBBBBBB),
+                                                    ColorFilter.mode(
+                                                          themeProvider.isDarkMode? NewAraThemes.darkInputHint : NewAraThemes.lightInputHint,
                                                           BlendMode.srcIn),
                                                 ),
                                               ),
@@ -1249,11 +1261,11 @@ class _PostWritePageState extends State<PostWritePage>
                 },
                 child: Text(
                   LocaleKeys.postWritePage_terms.tr(),
-                  style: const TextStyle(
+                  style: TextStyle(
                     decoration: TextDecoration.underline,
                     fontSize: 16,
                     fontWeight: FontWeight.w500,
-                    color: Color(0xFFBBBBBB),
+                    color: themeProvider.isDarkMode? NewAraThemes.darkInputHint : NewAraThemes.lightInputHint,
                   ),
                 ),
               ),
@@ -1271,6 +1283,8 @@ class _PostWritePageState extends State<PostWritePage>
   }
 
   Widget _buildCheckBox() {
+    final themeProvider = Provider.of<ThemeProvider>(context);
+
     if (_chosenBoardValue != null && _chosenBoardValue!.slug == 'with-school') {
       return Text(LocaleKeys.postWritePage_realNameNotice.tr(),
           style: const TextStyle(
@@ -1303,15 +1317,15 @@ class _PostWritePageState extends State<PostWritePage>
                       decoration: BoxDecoration(
                         color: _selectedCheckboxes[0]!
                             ? ColorsInfo.newara
-                            : const Color(0xFFF0F0F0),
+                            : themeProvider.isDarkMode? NewAraThemes.darkInputHint : NewAraThemes.lightInputHint,
                         borderRadius: BorderRadius.circular(5.0),
                       ),
                       alignment: Alignment.center,
                       child: SvgPicture.asset('assets/icons/check.svg',
                           width: 16,
                           height: 16,
-                          colorFilter: const ColorFilter.mode(
-                              Colors.white, BlendMode.srcIn)),
+                          colorFilter: ColorFilter.mode(
+                              themeProvider.isDarkMode? Colors.black: Colors.white, BlendMode.srcIn)),
                     ),
                     const SizedBox(
                       width: 6,
@@ -1323,7 +1337,7 @@ class _PostWritePageState extends State<PostWritePage>
                         fontWeight: FontWeight.w500,
                         color: _selectedCheckboxes[0]!
                             ? ColorsInfo.newara
-                            : const Color(0xFFBBBBBB),
+                            : themeProvider.isDarkMode? NewAraThemes.darkInputHint : NewAraThemes.lightInputHint,
                       ),
                     ),
                   ],
@@ -1351,7 +1365,7 @@ class _PostWritePageState extends State<PostWritePage>
                 decoration: BoxDecoration(
                   color: _selectedCheckboxes[1]!
                       ? ColorsInfo.newara
-                      : const Color(0xFFF0F0F0),
+                      : themeProvider.isDarkMode? NewAraThemes.darkBRLine : NewAraThemes.lightBRLine,
                   borderRadius: BorderRadius.circular(5.0),
                 ),
                 alignment: Alignment.center,
@@ -1359,8 +1373,8 @@ class _PostWritePageState extends State<PostWritePage>
                   'assets/icons/check.svg',
                   width: 16,
                   height: 16,
-                  colorFilter: const ColorFilter.mode(
-                      Colors.white, BlendMode.srcIn), // #FFFFFF 색상
+                  colorFilter: ColorFilter.mode(
+                      themeProvider.isDarkMode? Colors.black : Colors.white, BlendMode.srcIn), // #FFFFFF 색상
                 ),
               ),
               const SizedBox(
@@ -1373,7 +1387,7 @@ class _PostWritePageState extends State<PostWritePage>
                   fontWeight: FontWeight.w500,
                   color: _selectedCheckboxes[1]!
                       ? ColorsInfo.newara
-                      : const Color(0xFFBBBBBB),
+                      : themeProvider.isDarkMode? NewAraThemes.darkInputHint : NewAraThemes.lightInputHint,
                 ),
               ),
             ],
@@ -1399,7 +1413,7 @@ class _PostWritePageState extends State<PostWritePage>
                 decoration: BoxDecoration(
                   color: _selectedCheckboxes[2]!
                       ? ColorsInfo.newara
-                      : const Color(0xFFF0F0F0),
+                      : themeProvider.isDarkMode? NewAraThemes.darkBRLine : NewAraThemes.lightBRLine,
                   borderRadius: BorderRadius.circular(5.0),
                 ),
                 alignment: Alignment.center,
@@ -1407,8 +1421,8 @@ class _PostWritePageState extends State<PostWritePage>
                   'assets/icons/check.svg',
                   width: 16,
                   height: 16,
-                  colorFilter: const ColorFilter.mode(
-                      Colors.white, BlendMode.srcIn), // #FFFFFF 색상
+                  colorFilter: ColorFilter.mode(
+                      themeProvider.isDarkMode? Colors.black : Colors.white, BlendMode.srcIn), // #FFFFFF 색상
                 ),
               ),
               const SizedBox(
@@ -1421,7 +1435,7 @@ class _PostWritePageState extends State<PostWritePage>
                   fontWeight: FontWeight.w500,
                   color: _selectedCheckboxes[2]!
                       ? ColorsInfo.newara
-                      : const Color(0xFFBBBBBB),
+                      : themeProvider.isDarkMode? NewAraThemes.darkInputHint : NewAraThemes.lightInputHint,
                 ),
               ),
             ],
@@ -1432,6 +1446,8 @@ class _PostWritePageState extends State<PostWritePage>
   }
 
   Widget _buildToolbar() {
+    final themeProvider = Provider.of<ThemeProvider>(context);
+
     return Row(
       mainAxisAlignment: MainAxisAlignment.start,
       children: [
@@ -1473,8 +1489,10 @@ class _PostWritePageState extends State<PostWritePage>
   }
 
   quill.DefaultStyles editorStyles() {
-    TextStyle h1h2h3h4h5h6CommonStyle = const TextStyle(
-      color: Colors.black,
+    final themeProvider = Provider.of<ThemeProvider>(context);
+
+    TextStyle h1h2h3h4h5h6CommonStyle = TextStyle(
+      color: themeProvider.isDarkMode? Colors.white : Colors.black,
       fontWeight: FontWeight.w600,
       height: 1.15,
     );
@@ -1533,13 +1551,13 @@ class _PostWritePageState extends State<PostWritePage>
           height: 1.5,
           fontSize: 14,
         ),
-        backgroundColor: const Color(0xfff5f5f5),
+        backgroundColor: themeProvider.isDarkMode? Color(0xff151515) : Color(0xfff5f5f5),
         radius: const Radius.circular(0),
       ),
 
       placeHolder: quill.DefaultTextBlockStyle(
-        const TextStyle(
-          color: Color(0xffBBBBBB),
+        TextStyle(
+          color: themeProvider.isDarkMode? NewAraThemes.darkInputHint : NewAraThemes.lightInputHint,
           fontWeight: FontWeight.w500,
           height: 1.5,
           fontSize: 16,
@@ -1559,8 +1577,8 @@ class _PostWritePageState extends State<PostWritePage>
         ),
         const quill.VerticalSpacing(2, 0),
         const quill.VerticalSpacing(0, 0),
-        const BoxDecoration(
-          color: Color(0xfff5f5f5),
+        BoxDecoration(
+          color: themeProvider.isDarkMode? Color(0xff151515) : Color(0xfff5f5f5),
         ),
       ),
 

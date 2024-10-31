@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:new_ara_app/constants/theme_info.dart';
+import 'package:new_ara_app/providers/theme_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
 
@@ -44,6 +46,8 @@ class _MainNavigationTabPageState extends State<MainNavigationTabPage> {
 
   @override
   Widget build(BuildContext context) {
+    final themeProvider = Provider.of<ThemeProvider>(context);
+
     return Scaffold(
       body: SafeArea(
         // 현재 선택된 탭에 맞는 페이지 출력
@@ -53,7 +57,7 @@ class _MainNavigationTabPageState extends State<MainNavigationTabPage> {
             Container(
               width: MediaQuery.of(context).size.width,
               height: 1,
-              color: const Color(0xFFF0F0F0),
+              color: themeProvider.isDarkMode? NewAraThemes.darkBRLine :NewAraThemes.lightBRLine,
             ),
             _buildBottomNavigationBar(),
           ],
@@ -72,6 +76,8 @@ class _MainNavigationTabPageState extends State<MainNavigationTabPage> {
 
   /// 하단의 네비게이션 바를 구성하는 함수.
   Widget _buildBottomNavigationBar() {
+    final themeProvider = Provider.of<ThemeProvider>(context);
+
     double gapHalfWidth = (MediaQuery.of(context).size.width - 36 * 4) / 10;
     double iconWidth = gapHalfWidth * 2 + 36;
     return SizedBox(
@@ -95,7 +101,7 @@ class _MainNavigationTabPageState extends State<MainNavigationTabPage> {
                   child: SvgPicture.asset(
                     'assets/icons/home.svg',
                     colorFilter: ColorFilter.mode(
-                        _selectedIndex == 0 ? Colors.black : Colors.grey,
+                        _selectedIndex == 0 ? themeProvider.isDarkMode? Colors.white: Colors.black : themeProvider.isDarkMode? NewAraThemes.gry5: NewAraThemes.gryB,
                         BlendMode.srcIn),
                   ),
                 ),
@@ -115,7 +121,7 @@ class _MainNavigationTabPageState extends State<MainNavigationTabPage> {
                   child: SvgPicture.asset(
                     'assets/icons/post_list.svg',
                     colorFilter: ColorFilter.mode(
-                        _selectedIndex == 1 ? Colors.black : Colors.grey,
+                        _selectedIndex == 1 ? themeProvider.isDarkMode? Colors.white: Colors.black : themeProvider.isDarkMode? NewAraThemes.gry5: NewAraThemes.gryB,
                         BlendMode.srcIn),
                     width: 36,
                     height: 36,
@@ -139,7 +145,7 @@ class _MainNavigationTabPageState extends State<MainNavigationTabPage> {
                       SvgPicture.asset(
                         'assets/icons/notification.svg',
                         colorFilter: ColorFilter.mode(
-                            _selectedIndex == 2 ? Colors.black : Colors.grey,
+                            _selectedIndex == 2 ? themeProvider.isDarkMode? Colors.white: Colors.black : themeProvider.isDarkMode? NewAraThemes.gry5: NewAraThemes.gryB,
                             BlendMode.srcIn),
                       ),
                       Visibility(
@@ -178,7 +184,7 @@ class _MainNavigationTabPageState extends State<MainNavigationTabPage> {
                   child: SvgPicture.asset(
                     'assets/icons/member.svg',
                     colorFilter: ColorFilter.mode(
-                        _selectedIndex == 3 ? Colors.black : Colors.grey,
+                        _selectedIndex == 3 ? themeProvider.isDarkMode? Colors.white: Colors.black : themeProvider.isDarkMode? NewAraThemes.gry5: NewAraThemes.gryB,
                         BlendMode.srcIn),
                     width: 36,
                     height: 36,

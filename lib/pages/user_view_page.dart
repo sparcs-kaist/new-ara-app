@@ -3,6 +3,8 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:new_ara_app/constants/theme_info.dart';
+import 'package:new_ara_app/providers/theme_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:dio/dio.dart';
 import 'package:easy_localization/easy_localization.dart';
@@ -111,6 +113,8 @@ class _UserViewPageState extends State<UserViewPage> {
   @override
   Widget build(BuildContext context) {
     UserProvider userProvider = context.read<UserProvider>();
+    final themeProvider = Provider.of<ThemeProvider>(context);
+
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
@@ -149,10 +153,10 @@ class _UserViewPageState extends State<UserViewPage> {
                           context.locale == const Locale('ko')
                               ? '총 $_articleCount개의 글'
                               : '$_articleCount posts',
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.w700,
-                            color: Color.fromRGBO(177, 177, 177, 1),
+                            color: themeProvider.isDarkMode? Color.fromRGBO(177, 177, 177, 1) : Color.fromRGBO(100, 100, 100, 1),
                           ),
                         ),
                       ),
@@ -170,6 +174,8 @@ class _UserViewPageState extends State<UserViewPage> {
   /// 사용자 프로필 이미지, 닉네임을 빌드.
   /// 빌드된 위젯을 리턴.
   Widget _buildUserInfo() {
+    final themeProvider = Provider.of<ThemeProvider>(context);
+
     return SizedBox(
       width: MediaQuery.of(context).size.width - 40,
       height: 60,
@@ -203,9 +209,10 @@ class _UserViewPageState extends State<UserViewPage> {
                 children: [
                   Text(
                     _userProfileModel.nickname.toString(),
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.w700,
+                      color: themeProvider.isDarkMode? Colors.white : Colors.black
                     ),
                   ),
                 ],
@@ -218,6 +225,8 @@ class _UserViewPageState extends State<UserViewPage> {
   }
 
   Widget _buildArticleList(UserProvider userProvider) {
+    final themeProvider = Provider.of<ThemeProvider>(context);
+
     return Expanded(
       child: SizedBox(
         width: MediaQuery.of(context).size.width - 40,
@@ -256,7 +265,7 @@ class _UserViewPageState extends State<UserViewPage> {
           separatorBuilder: (BuildContext context, int idx) {
             return Container(
               height: 1,
-              color: const Color(0xFFF0F0F0),
+              color: themeProvider.isDarkMode? NewAraThemes.darkBRLine : NewAraThemes.lightBRLine,
             );
           },
         ),
@@ -267,6 +276,8 @@ class _UserViewPageState extends State<UserViewPage> {
   /// 글에 첨부된 파일의 타입에 따른 위젯을 리턴하는 함수.
   // ignore: unused_element
   Widget _buildAttachImage(String attachmentType) {
+    final themeProvider = Provider.of<ThemeProvider>(context);
+
     return Row(
       children: [
         if (attachmentType == "NONE") Container() else const SizedBox(width: 5),
