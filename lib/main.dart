@@ -135,7 +135,7 @@ class _MyAppState extends State<MyApp> {
           final MediaQueryData data = MediaQuery.of(context);
           return MediaQuery(
               // 시스템 폰트 사이즈에 영향을 받지 않도록 textScaleFactor 지정함
-              data: data.copyWith(textScaleFactor: 1.0),
+              data: data.copyWith(textScaler: const TextScaler.linear(1.0)),
               child: ScrollConfiguration(
                 behavior: CustomScrollBehavior(),
                 child: child!,

@@ -6,7 +6,6 @@ import 'package:dio/dio.dart';
 import 'package:file_icon/file_icon.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:new_ara_app/constants/url_info.dart';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -32,6 +31,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:html/parser.dart' show parse;
 import 'package:html/dom.dart' as html;
 import 'package:flutter_quill/flutter_quill.dart' as quill;
+import 'package:flutter_quill/quill_delta.dart' as quill_delta;
 import 'package:flutter_quill_extensions/flutter_quill_extensions.dart';
 import 'package:html2md/html2md.dart' as html2md;
 import 'package:markdown_quill/markdown_quill.dart';
@@ -360,8 +360,7 @@ class _PostWritePageState extends State<PostWritePage>
             newChosenBoard = newBoardList.firstWhere(
                 (board) => board.slug == widget.previousBoard!.slug,
                 orElse: () => _defaultBoardDetailActionModel);
-            newSpecTopicList = [_defaultTopicModelNone]
-              ..addAll(newChosenBoard.topics);
+            newSpecTopicList = [_defaultTopicModelNone, ...newChosenBoard.topics];
             // 게시판 목록 상태 업데이트(else)
           } else {
             newSpecTopicList = [_defaultTopicModelSelect];
@@ -419,7 +418,7 @@ class _PostWritePageState extends State<PostWritePage>
       setState(() {
         _quillController.document = (cachedData['content'] != null)
             ? quill.Document.fromDelta(_htmlToQuillDelta(cachedData['content']))
-            : '';
+            : quill.Document.fromDelta(_htmlToQuillDelta(''));  // TODO: 비어있는 document 만드는 방법
         _isFileMenuBarSelected = _attachmentList.isNotEmpty;
 
         //TODO: 명명 규칙 다름
@@ -555,10 +554,12 @@ class _PostWritePageState extends State<PostWritePage>
 
     return _isLoading
         ? const LoadingIndicator()
-        : WillPopScope(
-            onWillPop: () async {
-              if (_hasEditorText || _titleController.text != '') {
-                final shouldPop = await showDialog<bool>(
+        : PopScope(
+          canPop: false,
+          onPopInvokedWithResult:(didPop, result) async {
+            if (didPop) return;
+            if (_hasEditorText || _titleController.text != '') {
+              final bool shouldPop = await showDialog<bool>(
                     context: context,
                     builder: (context) => ExitConfirmDialog(
                           userProvider: userProvider,
@@ -571,29 +572,29 @@ class _PostWritePageState extends State<PostWritePage>
                                 : '/cache/${userID}/';
                             await removeApiData(key);
                             debugPrint('Cache Reset!');
-                            if (mounted) {
+                            if (context.mounted) {
                               Navigator.pop(context, true);
                             }
                           },
                           onTapSave: () async {
                             debugPrint("onTapSave invoked");
                             await cacheCurrentData();
-                            if (mounted) {
+                            if (context.mounted) {
                               Navigator.pop(context, true);
                             }
                           },
-                        ));
-                return shouldPop ?? false;
-              } else {
-                String key = _isEditingPost
+                        )) ?? false;
+              if (context.mounted && shouldPop) Navigator.of(context).pop();
+            } else {
+              String key = _isEditingPost
                     ? '/cache/${widget.previousArticle!.id}/'
                     : '/cache/${userID}/';
                 await removeApiData(key);
                 debugPrint('Cache Reset!');
-                return true;
-              }
-            },
-            child: Scaffold(
+                if (context.mounted) Navigator.of(context).pop();
+            }
+          },
+          child: Scaffold(
               appBar: _buildAppBar(canIupload, userProvider),
               body: SafeArea(
                 child: Column(
@@ -624,7 +625,7 @@ class _PostWritePageState extends State<PostWritePage>
                 ),
               ),
             ),
-          );
+        );
   }
 
   PreferredSizeWidget _buildAppBar(bool canIupload, UserProvider userProvider) {
@@ -654,7 +655,7 @@ class _PostWritePageState extends State<PostWritePage>
                         await removeApiData(key);
                         debugPrint('Cache Reset!');
                         try {
-                          if (mounted) {
+                          if (context.mounted) {
                             Navigator.of(context)
                               ..pop() //dialog pop
                               ..pop(); //PostWritePage pop
@@ -666,7 +667,7 @@ class _PostWritePageState extends State<PostWritePage>
                       onTapSave: () async {
                         await cacheCurrentData();
                         try {
-                          if (mounted) {
+                          if (context.mounted) {
                             Navigator.of(context)
                               ..pop() //dialog pop
                               ..pop(); //PostWritePage pop
@@ -1460,32 +1461,43 @@ class _PostWritePageState extends State<PostWritePage>
         Expanded(
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 20),
-            child: quill.QuillToolbar.basic(
+            child: quill.QuillToolbar.simple(
               controller: _quillController,
-              multiRowsDisplay: true,
-              showUndo: false,
-              showRedo: false,
-              showColorButton: false,
-              showBackgroundColorButton: false,
-              showFontFamily: false,
-              showFontSize: false,
-              showDividers: false,
-              showListCheck: false,
-              showSearchButton: false,
-              showSubscript: false,
-              showSuperscript: false,
-
-              toolbarIconAlignment: WrapAlignment.start,
-              toolbarIconCrossAlignment: WrapCrossAlignment.start,
-              customButtons: [
-                quill.QuillCustomButton(
-                  icon: Icons.camera_alt,
-                  onTap: () async {
+              configurations: quill.QuillSimpleToolbarConfigurations(
+                // buttonOptions: quill.QuillSimpleToolbarButtonOptions(
+                //   base: quill.QuillToolbarBaseButtonOptions(
+                //     iconSize: 18,
+                //     iconButtonFactor: 1.0,
+                //   ),
+                // ),
+                multiRowsDisplay: true,
+                showUndo: false,
+                showRedo: false,
+                showColorButton: false,
+                showBackgroundColorButton: false,
+                showFontFamily: false,
+                showFontSize: false,
+                showDividers: false,
+                showListCheck: false,
+                showSearchButton: false,
+                showSubscript: false,
+                showSuperscript: false,
+                showClipboardPaste: false,
+                showClipboardCopy: false,
+                showClipboardCut: false,
+                toolbarIconAlignment: WrapAlignment.start,
+                toolbarIconCrossAlignment: WrapCrossAlignment.start,
+                toolbarSectionSpacing: 0.5,
+                customButtons: [
+                  quill.QuillToolbarCustomButtonOptions(
+                    icon: const Icon(Icons.camera_alt),
+                    onPressed: () async {
                     await _pickImage();
                     _onTextChanged();
                   },
-                ),
-              ],
+                  ),
+                ],
+              ),
               // embedButtons: FlutterQuillEmbeds.buttons(),
             ),
           ),
@@ -1505,6 +1517,7 @@ class _PostWritePageState extends State<PostWritePage>
         h1h2h3h4h5h6CommonStyle.copyWith(
           fontSize: 32,
         ),
+        quill.HorizontalSpacing.zero,
         // Vertical spacing around a text block.
         const quill.VerticalSpacing(2, 0),
         // Vertical spacing for individual lines within a text block.
@@ -1515,6 +1528,7 @@ class _PostWritePageState extends State<PostWritePage>
         h1h2h3h4h5h6CommonStyle.copyWith(
           fontSize: 28,
         ),
+        quill.HorizontalSpacing.zero,
         const quill.VerticalSpacing(2, 0),
         const quill.VerticalSpacing(0, 0),
         null,
@@ -1523,19 +1537,21 @@ class _PostWritePageState extends State<PostWritePage>
         h1h2h3h4h5h6CommonStyle.copyWith(
           fontSize: 24,
         ),
+        quill.HorizontalSpacing.zero,
         const quill.VerticalSpacing(2, 0),
         const quill.VerticalSpacing(0, 0),
         null,
       ),
-      paragraph: quill.DefaultTextBlockStyle(
-        const TextStyle(
+      paragraph: const quill.DefaultTextBlockStyle(
+        TextStyle(
           color: Color(0xFF4a4a4a),
           fontWeight: FontWeight.w500,
           height: 1.5,
           fontSize: 16,
         ),
-        const quill.VerticalSpacing(2, 0),
-        const quill.VerticalSpacing(0, 0),
+        quill.HorizontalSpacing.zero,
+        quill.VerticalSpacing(2, 0),
+        quill.VerticalSpacing(0, 0),
         null,
       ),
 
@@ -1559,29 +1575,31 @@ class _PostWritePageState extends State<PostWritePage>
         radius: const Radius.circular(0),
       ),
 
-      placeHolder: quill.DefaultTextBlockStyle(
-        const TextStyle(
+      placeHolder: const quill.DefaultTextBlockStyle(
+        TextStyle(
           color: Color(0xffBBBBBB),
           fontWeight: FontWeight.w500,
           height: 1.5,
           fontSize: 16,
         ),
-        const quill.VerticalSpacing(2, 0),
-        const quill.VerticalSpacing(0, 0),
+        quill.HorizontalSpacing.zero,
+        quill.VerticalSpacing(2, 0),
+        quill.VerticalSpacing(0, 0),
         null,
       ),
       // <pre> 태그
-      code: quill.DefaultTextBlockStyle(
-        const TextStyle(
+      code: const quill.DefaultTextBlockStyle(
+        TextStyle(
           //  backgroundColor: Colors.grey,
           color: Color(0xFF4a4a4a),
           fontWeight: FontWeight.w400,
           height: 1.5,
           fontSize: 16,
         ),
-        const quill.VerticalSpacing(2, 0),
-        const quill.VerticalSpacing(0, 0),
-        const BoxDecoration(
+        quill.HorizontalSpacing.zero,
+        quill.VerticalSpacing(2, 0),
+        quill.VerticalSpacing(0, 0),
+        BoxDecoration(
           color: Color(0xfff5f5f5),
         ),
       ),
@@ -1596,17 +1614,17 @@ class _PostWritePageState extends State<PostWritePage>
       child: quill.QuillEditor(
         focusNode: _editorFocusNode,
         controller: _quillController,
-        placeholder: LocaleKeys.postWritePage_contentPlaceholder.tr(),
-        embedBuilders: FlutterQuillEmbeds.builders(),
-        readOnly: false, // The editor is editable
-
+        configurations: quill.QuillEditorConfigurations(
+          placeholder: LocaleKeys.postWritePage_contentPlaceholder.tr(),
+          embedBuilders: FlutterQuillEmbeds.defaultEditorBuilders(),
+          // readOnly: false,
+          padding: EdgeInsets.zero,
+          scrollable: true,
+          autoFocus: false,
+          expands: false,
+          customStyles: editorStyles()
+        ),
         scrollController: _editorScrollController,
-
-        padding: EdgeInsets.zero,
-        scrollable: true,
-        autoFocus: false,
-        expands: false,
-        customStyles: editorStyles(),
       ),
     );
   }
@@ -1624,7 +1642,7 @@ class _PostWritePageState extends State<PostWritePage>
     }
   }
 
-  quill.Delta _htmlToQuillDelta(String html) {
+  quill_delta.Delta _htmlToQuillDelta(String html) {
     //TODO: quill에서 <hr> 지원 안됨
     //TODO: phase3에서 MarkdownToDelta 이 strikethrough 지원 안됨
     html = html
@@ -1788,9 +1806,9 @@ class _PostWritePageState extends State<PostWritePage>
                 ? 'ANONYMOUS'
                 : 'REGULAR',
       };
-      debugPrint('manage post data : $data');
       Response? response;
       if (isUpdate) {
+        debugPrint('manage post data : $data');
         response = await userProvider.putApiRes(
           'articles/$previousArticleId/',
           data: data,
@@ -1799,6 +1817,7 @@ class _PostWritePageState extends State<PostWritePage>
         data['parent_topic'] =
             _chosenTopicValue!.id == -1 ? '' : _chosenTopicValue!.id;
         data['parent_board'] = _chosenBoardValue!.id;
+        debugPrint('manage post data : $data');
         response = await userProvider.postApiRes(
           'articles/',
           data: data,

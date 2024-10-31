@@ -2,7 +2,6 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:new_ara_app/constants/url_info.dart';
 import 'package:new_ara_app/translations/locale_keys.g.dart';
 import 'package:provider/provider.dart';
 import 'package:easy_localization/easy_localization.dart';

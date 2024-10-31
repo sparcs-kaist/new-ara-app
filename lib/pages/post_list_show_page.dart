@@ -247,11 +247,11 @@ class _PostListShowPageState extends State<PostListShowPage>
       margin: const EdgeInsets.only(right: 10),
       child: TextButton(
           style: ButtonStyle(
-            backgroundColor: MaterialStateProperty.all(
+            backgroundColor: WidgetStateProperty.all(
                 currentFilter == index ? ColorsInfo.newara : Colors.white),
             overlayColor:
-                MaterialStateProperty.all(Colors.transparent), // no splash
-            shape: MaterialStateProperty.all(
+                WidgetStateProperty.all(Colors.transparent), // no splash
+            shape: WidgetStateProperty.all(
               RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(30),
                 side: BorderSide(

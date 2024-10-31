@@ -7,8 +7,8 @@ on:
     branches: [dev, main]
 
 env:
-  FLUTTER_VERSION: "3.13"
-  JAVA_VERSION: "11"
+  FLUTTER_VERSION: "3.24"
+  JAVA_VERSION: "17"
 
 jobs:
   build-android:
