@@ -1,8 +1,11 @@
+import 'package:adaptive_theme/adaptive_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:new_ara_app/constants/theme_info.dart';
 import 'package:new_ara_app/constants/url_info.dart';
+import 'package:new_ara_app/providers/theme_provider.dart';
 import 'package:new_ara_app/translations/codegen_loader.g.dart';
 import 'package:new_ara_app/utils/global_key.dart';
 import 'package:new_ara_app/widgets/loading_indicator.dart';
@@ -36,6 +39,9 @@ void main() async {
   newAraAuthority = dotenv.env['NEW_ARA_AUTHORITY']!;
   sparcsSSODefaultUrl = dotenv.env['SPARCS_SSO_DEFAULT_URL']!;
 
+  WidgetsFlutterBinding.ensureInitialized();
+  final savedThemeMode = await AdaptiveTheme.getThemeMode();
+
   // 앱 시작점. 다국어 지원 및 여러 데이터 제공자를 포함한 구조로 설정
   runApp(
     EasyLocalization(
@@ -47,6 +53,7 @@ void main() async {
       child: MultiProvider(
         providers: [
           ChangeNotifierProvider(create: (_) => UserProvider()),
+          ChangeNotifierProvider(create: (_) => ThemeProvider()),
           ChangeNotifierProxyProvider<UserProvider, NotificationProvider>(
               create: (_) => NotificationProvider(),
               // 사용자 정보가 업데이트될 때마다 알림 제공자를 업데이트
@@ -56,7 +63,7 @@ void main() async {
               }),
           ChangeNotifierProvider(create: (_) => BlockedProvider()),
         ],
-        child: const MyApp(),
+        child: MyApp(savedThemeMode: savedThemeMode),
       ),
     ),
   );
@@ -73,7 +80,8 @@ class CustomScrollBehavior extends ScrollBehavior {
 
 /// 앱의 메인 위젯
 class MyApp extends StatefulWidget {
-  const MyApp({super.key});
+  final savedThemeMode;
+  const MyApp({super.key, required this.savedThemeMode});
 
   @override
   State<MyApp> createState() => _MyAppState();
@@ -81,6 +89,7 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> {
   bool isLoading = false;
+
 
   @override
   void initState() {
@@ -124,35 +133,47 @@ class _MyAppState extends State<MyApp> {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-        localizationsDelegates: context.localizationDelegates,
-        supportedLocales: context.supportedLocales,
-        locale: context.locale,
-        scaffoldMessengerKey: snackBarKey, //
-        theme: _setThemeData(),
-        // TODO: CustionScrollBehavior의 역할은?
-        builder: (context, child) {
-          final MediaQueryData data = MediaQuery.of(context);
-          return MediaQuery(
-              // 시스템 폰트 사이즈에 영향을 받지 않도록 textScaleFactor 지정함
-              data: data.copyWith(textScaleFactor: 1.0),
-              child: ScrollConfiguration(
-                behavior: CustomScrollBehavior(),
-                child: child!,
-              ));
-        },
-        // 로그인 상태에 따라서 다른 홈페이지 표시
-        home: isLoading == true
-            ? const LoadingIndicator() // 로그인 중에는 로딩 인디케이터 표시
-            : context.watch<UserProvider>().hasData
-                ? (context
-                            .watch<UserProvider>()
-                            .naUser!
-                            .agree_terms_of_service_at !=
-                        null
-                    ? const MainNavigationTabPage()
-                    : const LoginPage())
-                : const LoginPage());
+    final themeProvider = Provider.of<ThemeProvider>(context);
+
+    return AdaptiveTheme(
+      light: ThemeData.light(useMaterial3: true),
+      dark: ThemeData.dark(useMaterial3: true),
+        initial: widget.savedThemeMode ?? AdaptiveThemeMode.light,
+      builder: (theme, darkTheme) {
+        return MaterialApp(
+            localizationsDelegates: context.localizationDelegates,
+            supportedLocales: context.supportedLocales,
+            locale: context.locale,
+            scaffoldMessengerKey: snackBarKey, //
+            theme: NewAraThemes.lightTheme,
+            darkTheme: NewAraThemes.darkTheme,
+            themeMode: themeProvider.themeMode,
+
+            // TODO: CustionScrollBehavior의 역할은?
+            builder: (context, child) {
+              final MediaQueryData data = MediaQuery.of(context);
+              return MediaQuery(
+                  // 시스템 폰트 사이즈에 영향을 받지 않도록 textScaleFactor 지정함
+                  data: data.copyWith(textScaleFactor: 1.0),
+                  child: ScrollConfiguration(
+                    behavior: CustomScrollBehavior(),
+                    child: child!,
+                  ));
+            },
+            // 로그인 상태에 따라서 다른 홈페이지 표시
+            home: isLoading == true
+                ? const LoadingIndicator() // 로그인 중에는 로딩 인디케이터 표시
+                : context.watch<UserProvider>().hasData
+                    ? (context
+                                .watch<UserProvider>()
+                                .naUser!
+                                .agree_terms_of_service_at !=
+                            null
+                        ? const MainNavigationTabPage()
+                        : const LoginPage())
+                    : const LoginPage());
+      }
+    );
   }
 
   // 앱의 전반적인 테마 설정
