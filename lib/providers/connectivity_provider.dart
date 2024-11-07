@@ -23,30 +23,27 @@ class ConnectivityProvider with ChangeNotifier {
 
   /// 'connectivitySubscription'값을 갱신하고 update에 listen하도록 합니다
   void _initConnectivity() {
-    _connectSubscription = Connectivity()
-        .onConnectivityChanged
-        .listen((List<ConnectivityResult> results) {
-      for (ConnectivityResult result in results) {
-        showConnectivitySnackBar(result); //변화가 있을 시 snackBar 호출}
-      }
-    });
+    _connectSubscription = Connectivity().onConnectivityChanged.listen(
+      (List<ConnectivityResult> results) {
+        showConnectivitySnackBar(results); // 변화가 있을 시 snackBar 호출
+      },
+    );
   }
 
   /// 인터넷 연결 상태에 따라 [showInternetErrorBySnackBar]를 실행합니다.
-  void showConnectivitySnackBar(ConnectivityResult result) {
-    if (result == ConnectivityResult.none) {
-      //인터넷 연결 없음
+  void showConnectivitySnackBar(List<ConnectivityResult> result) {
+    if (result.contains(ConnectivityResult.wifi) ||
+        result.contains(ConnectivityResult.ethernet)) {
+      // 연결됨
+      _isConnected = true;
+      notifyListeners(); // 인터넷 복구를 알림
+      snackBarKey.currentState?.removeCurrentSnackBar();
+      debugPrint("Connected to ${result.last.toString().split('.').last}");
+    } else {
+      // 인터넷 연결 없음
       _isConnected = false;
-
       showInternetErrorBySnackBar(LocaleKeys.userProvider_internetError.tr());
       debugPrint("Internet Connectivity Error");
-    } else {
-      //연결됨
-      _isConnected = true;
-      notifyListeners(); //인터넷 복구를 알림
-
-      snackBarKey.currentState?.clearSnackBars();
-      debugPrint("Connected to ${result.toString().split('.').last}");
     }
   }
 
