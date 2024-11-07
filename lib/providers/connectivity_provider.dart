@@ -9,7 +9,7 @@ import 'package:new_ara_app/widgets/snackbar_noti.dart';
 
 /// `ConnectivityProvider`는 인터넷 에러 관련 로직 및 스낵바를 관리하는 클래스입니다.
 class ConnectivityProvider with ChangeNotifier {
-  StreamSubscription<ConnectivityResult>? _connectSubscription;
+  StreamSubscription<List<ConnectivityResult>>? _connectSubscription;
 
   // 인터넷 연결 여부 표시
   bool _isConnected = false;
@@ -25,8 +25,10 @@ class ConnectivityProvider with ChangeNotifier {
   void _initConnectivity() {
     _connectSubscription = Connectivity()
         .onConnectivityChanged
-        .listen((ConnectivityResult result) {
-      showConnectivitySnackBar(result); //변화가 있을 시 snackBar 호출
+        .listen((List<ConnectivityResult> results) {
+      for (ConnectivityResult result in results) {
+        showConnectivitySnackBar(result); //변화가 있을 시 snackBar 호출}
+      }
     });
   }
 
