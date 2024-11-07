@@ -9,7 +9,6 @@ import 'package:new_ara_app/translations/locale_keys.g.dart';
 import 'package:new_ara_app/utils/create_dio_with_config.dart';
 import 'package:new_ara_app/utils/global_key.dart';
 import 'package:new_ara_app/widgets/snackbar_noti.dart';
-import 'package:path/path.dart';
 import 'package:webview_cookie_manager/webview_cookie_manager.dart';
 
 /// `UserProvider`는 사용자 정보 및 연관된 API 로직을 관리하는 클래스입니다.
@@ -169,6 +168,7 @@ class UserProvider with ChangeNotifier {
     debugPrint(errorMessage);
     if (e.response != null) {
       //debugPrint("${e.response!.data}");
+      debugPrint("${e.response!.statusCode}");
       debugPrint("${e.response!.headers}");
       debugPrint("${e.response!.requestOptions}");
     }
@@ -246,6 +246,7 @@ class UserProvider with ChangeNotifier {
 
       //인터넷 오류 snackBar 모두 지우기
       //snackBarKey.currentState?.clearSnackBars();
+
       return response;
     } on DioException catch (e) {
       debugPrint("Error occured in fetching : $toUrl");
@@ -280,6 +281,7 @@ class UserProvider with ChangeNotifier {
 
       //인터넷 오류 snackBar 모두 지우기
       //snackBarKey.currentState?.clearSnackBars();
+
       return response;
     } on DioException catch (e) {
       debugPrint("Error occured in fetching : $toUrl");
@@ -314,6 +316,7 @@ class UserProvider with ChangeNotifier {
 
       //인터넷 오류 snackBar 모두 지우기
       //snackBarKey.currentState?.clearSnackBars();
+
       return response;
     } on DioException catch (e) {
       debugPrint("Error occured in fetching : $toUrl");
@@ -348,6 +351,7 @@ class UserProvider with ChangeNotifier {
 
       //인터넷 오류 snackBar 모두 지우기
       //snackBarKey.currentState?.clearSnackBars();
+
       return response;
     } on DioException catch (e) {
       debugPrint("Error occured in fetching : $toUrl");

@@ -6,7 +6,6 @@ import 'package:dio/dio.dart';
 import 'package:file_icon/file_icon.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:new_ara_app/constants/url_info.dart';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -32,6 +31,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:html/parser.dart' show parse;
 import 'package:html/dom.dart' as html;
 import 'package:flutter_quill/flutter_quill.dart' as quill;
+import 'package:flutter_quill/quill_delta.dart' as quill_delta;
 import 'package:flutter_quill_extensions/flutter_quill_extensions.dart';
 import 'package:html2md/html2md.dart' as html2md;
 import 'package:markdown_quill/markdown_quill.dart';
@@ -93,6 +93,33 @@ class AttachmentsFormat {
     this.fileUrlName = "",
     this.fileUrlSize = 0,
   });
+
+  factory AttachmentsFormat.fromJson(Map<String, dynamic> json) {
+    return AttachmentsFormat(
+      fileType: FileType.values[json['fileType']],
+      isNewFile: json['isNewFile'],
+      fileLocalPath:
+          json['fileLocalPath'] is String ? json['fileLocalPath'] : null,
+      uuid: json['uuid'] is String ? json['uuid'] : null,
+      id: json['id'],
+      fileUrlPath: json['fileUrlPath'] is String ? json['fileUrlPath'] : null,
+      fileUrlName: json['fileUrlName'] is String ? json['fileUrlName'] : "",
+      fileUrlSize: json['fileUrlSize'] ?? 0,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'fileType': fileType.index,
+      'isNewFile': isNewFile,
+      'fileLocalPath': fileLocalPath,
+      'uuid': uuid,
+      'id': id,
+      'fileUrlPath': fileUrlPath,
+      'fileUrlName': fileUrlName,
+      'fileUrlSize': fileUrlSize,
+    };
+  }
 }
 
 class _PostWritePageState extends State<PostWritePage>
@@ -235,8 +262,8 @@ class _PostWritePageState extends State<PostWritePage>
 
   @override
   void didChangeMetrics() async {
-    var now = DateTime.now();
-    debugPrint("now: $now, ${MediaQuery.of(context).viewInsets.bottom}");
+    // var now = DateTime.now();
+    // debugPrint("now: $now, ${MediaQuery.of(context).viewInsets.bottom}");
     // 기기의 키보드가 올라가거나 내려가는 애니메이션 길이가 다르다.
     // 기기의 애니메이션이 끝나고 확인하기 위해 50ms의 딜레이를 준다.
     await Future.delayed(const Duration(milliseconds: 50));
@@ -271,29 +298,24 @@ class _PostWritePageState extends State<PostWritePage>
           DeltaToHTML.encodeJson(_quillController.document.toDelta().toJson()),
       'is_content_sexual': _selectedCheckboxes[1],
       'is_content_social': _selectedCheckboxes[2],
-      'name_type': (_chosenBoardValue != null)
-          ? (_defaultBoardDetailActionModel.slug == 'with-school'
-              ? 'REALNAME'
-              : _chosenBoardValue!.slug == "talk" &&
-                      _selectedCheckboxes[0]! == true
-                  ? 'ANONYMOUS'
-                  : 'REGULAR')
-          : 'REGULAR',
+      'name_type': _chosenBoardValue!.slug == 'with-school'
+          ? 'REALNAME'
+          : _chosenBoardValue!.slug == "talk" && _selectedCheckboxes[0]! == true
+              ? 'ANONYMOUS'
+              : 'REGULAR',
       'parent_topic':
           _chosenTopicValue!.id == -1 ? '' : _chosenTopicValue!.slug,
       'parent_board':
           _chosenBoardValue!.id == -1 ? '' : _chosenBoardValue!.slug,
-      'attachments': _chosenBoardValue!.id == -1 ? '' : _chosenBoardValue!.slug,
     };
 
     data['attachments'] = _attachmentList;
 
     String key = _isEditingPost
         ? '/cache/${widget.previousArticle!.id}/'
-        : '/cache/${userID}/';
+        : '/cache/$userID/';
 
     await cacheApiData(key, data);
-    debugPrint(key);
   }
 
   /// 사용자가 선택 가능한 게시판 목록을 가져오는 함수.
@@ -338,8 +360,7 @@ class _PostWritePageState extends State<PostWritePage>
             newChosenBoard = newBoardList.firstWhere(
                 (board) => board.slug == widget.previousBoard!.slug,
                 orElse: () => _defaultBoardDetailActionModel);
-            newSpecTopicList = [_defaultTopicModelNone]
-              ..addAll(newChosenBoard.topics);
+            newSpecTopicList = [_defaultTopicModelNone, ...newChosenBoard.topics];
             // 게시판 목록 상태 업데이트(else)
           } else {
             newSpecTopicList = [_defaultTopicModelSelect];
@@ -357,10 +378,9 @@ class _PostWritePageState extends State<PostWritePage>
               _isLoading = false;
             });
           }
-
-          //_boardList를 모두 불러온 후 cache 업데이트
-          await _getCachedContents();
         });
+    //_boardList를 모두 불러온 후 cache 업데이트
+    await _getCachedContents();
   }
 
   /// 사용자가 임시 저장한 데이터를 가져오는 함수.
@@ -368,7 +388,7 @@ class _PostWritePageState extends State<PostWritePage>
   Future<void> _getCachedContents() async {
     String key = (_isEditingPost)
         ? '/cache/${widget.previousArticle!.id}/'
-        : '/cache/${userID}/';
+        : '/cache/$userID/';
     Map<String, dynamic>? cachedData = await fetchCachedApiData(key);
     debugPrint('cache : ${cachedData}');
     if (_isEditingPost) {
@@ -388,32 +408,22 @@ class _PostWritePageState extends State<PostWritePage>
     try {
       String? title = cachedData['title'];
       _titleController.text = title ?? '';
-
+      debugPrint('get cached data called!');
       for (int i = 0; i < cachedData['attachments'].length; i++) {
-        AttachmentModel attachment = cachedData['attachments'][i];
-        int id = attachment.id;
-        String? fileUrlPath = attachment.file;
-        String fileUrlName = _extractAndDecodeFileNameFromUrl(attachment.file);
-        int? fileUrlSize = attachment.size ?? 0;
-
         // TODO: fileType이 이미지인지 아닌지 판단해서 넣기.
-        _attachmentList.add(AttachmentsFormat(
-            fileType: FileType.image,
-            isNewFile: false,
-            id: id,
-            fileUrlPath: fileUrlPath,
-            fileUrlName: fileUrlName,
-            fileUrlSize: fileUrlSize));
+        _attachmentList
+            .add(AttachmentsFormat.fromJson(cachedData['attachments'][i]));
       }
 
       setState(() {
         _quillController.document = (cachedData['content'] != null)
             ? quill.Document.fromDelta(_htmlToQuillDelta(cachedData['content']))
-            : '';
+            : quill.Document.fromDelta(_htmlToQuillDelta(''));  // TODO: 비어있는 document 만드는 방법
         _isFileMenuBarSelected = _attachmentList.isNotEmpty;
 
         //TODO: 명명 규칙 다름
-        _selectedCheckboxes[0] = cachedData['name_type'] == 2 ? true : false;
+        _selectedCheckboxes[0] =
+            cachedData['name_type'] == 'ANONYMOUS' ? true : false;
         _selectedCheckboxes[1] = cachedData['is_content_sexual'] ?? false;
         _selectedCheckboxes[2] = cachedData['is_content_social'] ?? false;
         //_isLoading = false; (only finish loading AFTER boardlist load)
@@ -429,6 +439,11 @@ class _PostWritePageState extends State<PostWritePage>
             : _findSpecTopicListValue(cachedData['parent_topic'].toString());
         _chosenBoardValue = boardDetailActionModel;
       });
+      debugPrint('get cached data attachment List : $_attachmentList');
+
+      if (mounted) {
+        showInfoBySnackBar(context, LocaleKeys.postWritePage_restoreFromCache.tr());
+      }
     } catch (error) {
       debugPrint('_getCachedContents error: $error');
     }
@@ -436,6 +451,7 @@ class _PostWritePageState extends State<PostWritePage>
 
   /// 기존 게시물의 내용과 첨부 파일 가져오기.
   Future<void> _getPostContent() async {
+    debugPrint('get Post Content called!');
     // 새로 작성하는 게시물의 경우 함수 종료.
     if (!_isEditingPost) return;
 
@@ -463,6 +479,8 @@ class _PostWritePageState extends State<PostWritePage>
           fileUrlName: fileUrlName,
           fileUrlSize: fileUrlSize));
     }
+
+    debugPrint('$_attachmentList');
 
     // 수정 게시물의 기존 상태 반영.
     setState(() {
@@ -520,7 +538,7 @@ class _PostWritePageState extends State<PostWritePage>
 
   @override
   Widget build(BuildContext context) {
-    debugPrint("BUILD invoked!!!");
+    // debugPrint("BUILD invoked!!!");
 
     /// 게시물 업로드 가능한지 확인
     /// TODO: 업로드 로딩 인디케이터 추가하기
@@ -536,43 +554,47 @@ class _PostWritePageState extends State<PostWritePage>
 
     return _isLoading
         ? const LoadingIndicator()
-        : WillPopScope(
-            onWillPop: () async {
-              if (_hasEditorText || _titleController.text != '') {
-                final shouldPop = await showDialog<bool>(
+        : PopScope(
+          canPop: false,
+          onPopInvokedWithResult:(didPop, result) async {
+            if (didPop) return;
+            if (_hasEditorText || _titleController.text != '') {
+              final bool shouldPop = await showDialog<bool>(
                     context: context,
                     builder: (context) => ExitConfirmDialog(
                           userProvider: userProvider,
                           targetContext: context,
                           onTapConfirm: () async {
+                            debugPrint("onTapConfirm invoked");
                             //dialog pop
                             String key = _isEditingPost
                                 ? '/cache/${widget.previousArticle!.id}/'
                                 : '/cache/${userID}/';
                             await removeApiData(key);
                             debugPrint('Cache Reset!');
-                            if (mounted) {
+                            if (context.mounted) {
                               Navigator.pop(context, true);
                             }
                           },
                           onTapSave: () async {
+                            debugPrint("onTapSave invoked");
                             await cacheCurrentData();
-                            if (mounted) {
+                            if (context.mounted) {
                               Navigator.pop(context, true);
                             }
                           },
-                        ));
-                return shouldPop ?? false;
-              } else {
-                String key = _isEditingPost
+                        )) ?? false;
+              if (context.mounted && shouldPop) Navigator.of(context).pop();
+            } else {
+              String key = _isEditingPost
                     ? '/cache/${widget.previousArticle!.id}/'
                     : '/cache/${userID}/';
                 await removeApiData(key);
                 debugPrint('Cache Reset!');
-                return true;
-              }
-            },
-            child: Scaffold(
+                if (context.mounted) Navigator.of(context).pop();
+            }
+          },
+          child: Scaffold(
               appBar: _buildAppBar(canIupload, userProvider),
               body: SafeArea(
                 child: Column(
@@ -603,7 +625,7 @@ class _PostWritePageState extends State<PostWritePage>
                 ),
               ),
             ),
-          );
+        );
   }
 
   PreferredSizeWidget _buildAppBar(bool canIupload, UserProvider userProvider) {
@@ -633,7 +655,7 @@ class _PostWritePageState extends State<PostWritePage>
                         await removeApiData(key);
                         debugPrint('Cache Reset!');
                         try {
-                          if (mounted) {
+                          if (context.mounted) {
                             Navigator.of(context)
                               ..pop() //dialog pop
                               ..pop(); //PostWritePage pop
@@ -645,10 +667,11 @@ class _PostWritePageState extends State<PostWritePage>
                       onTapSave: () async {
                         await cacheCurrentData();
                         try {
-                          if (mounted) {
+                          if (context.mounted) {
                             Navigator.of(context)
                               ..pop() //dialog pop
                               ..pop(); //PostWritePage pop
+                            showInfoBySnackBar(context, LocaleKeys.postWritePage_savedAtCache.tr());
                           }
                         } catch (error) {
                           debugPrint("pop error: $error");
@@ -1438,32 +1461,43 @@ class _PostWritePageState extends State<PostWritePage>
         Expanded(
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 20),
-            child: quill.QuillToolbar.basic(
+            child: quill.QuillToolbar.simple(
               controller: _quillController,
-              multiRowsDisplay: true,
-              showUndo: false,
-              showRedo: false,
-              showColorButton: false,
-              showBackgroundColorButton: false,
-              showFontFamily: false,
-              showFontSize: false,
-              showDividers: false,
-              showListCheck: false,
-              showSearchButton: false,
-              showSubscript: false,
-              showSuperscript: false,
-
-              toolbarIconAlignment: WrapAlignment.start,
-              toolbarIconCrossAlignment: WrapCrossAlignment.start,
-              customButtons: [
-                quill.QuillCustomButton(
-                  icon: Icons.camera_alt,
-                  onTap: () async {
+              configurations: quill.QuillSimpleToolbarConfigurations(
+                // buttonOptions: quill.QuillSimpleToolbarButtonOptions(
+                //   base: quill.QuillToolbarBaseButtonOptions(
+                //     iconSize: 18,
+                //     iconButtonFactor: 1.0,
+                //   ),
+                // ),
+                multiRowsDisplay: true,
+                showUndo: false,
+                showRedo: false,
+                showColorButton: false,
+                showBackgroundColorButton: false,
+                showFontFamily: false,
+                showFontSize: false,
+                showDividers: false,
+                showListCheck: false,
+                showSearchButton: false,
+                showSubscript: false,
+                showSuperscript: false,
+                showClipboardPaste: false,
+                showClipboardCopy: false,
+                showClipboardCut: false,
+                toolbarIconAlignment: WrapAlignment.start,
+                toolbarIconCrossAlignment: WrapCrossAlignment.start,
+                toolbarSectionSpacing: 0.5,
+                customButtons: [
+                  quill.QuillToolbarCustomButtonOptions(
+                    icon: const Icon(Icons.camera_alt),
+                    onPressed: () async {
                     await _pickImage();
                     _onTextChanged();
                   },
-                ),
-              ],
+                  ),
+                ],
+              ),
               // embedButtons: FlutterQuillEmbeds.buttons(),
             ),
           ),
@@ -1483,6 +1517,7 @@ class _PostWritePageState extends State<PostWritePage>
         h1h2h3h4h5h6CommonStyle.copyWith(
           fontSize: 32,
         ),
+        quill.HorizontalSpacing.zero,
         // Vertical spacing around a text block.
         const quill.VerticalSpacing(2, 0),
         // Vertical spacing for individual lines within a text block.
@@ -1493,6 +1528,7 @@ class _PostWritePageState extends State<PostWritePage>
         h1h2h3h4h5h6CommonStyle.copyWith(
           fontSize: 28,
         ),
+        quill.HorizontalSpacing.zero,
         const quill.VerticalSpacing(2, 0),
         const quill.VerticalSpacing(0, 0),
         null,
@@ -1501,19 +1537,21 @@ class _PostWritePageState extends State<PostWritePage>
         h1h2h3h4h5h6CommonStyle.copyWith(
           fontSize: 24,
         ),
+        quill.HorizontalSpacing.zero,
         const quill.VerticalSpacing(2, 0),
         const quill.VerticalSpacing(0, 0),
         null,
       ),
-      paragraph: quill.DefaultTextBlockStyle(
-        const TextStyle(
+      paragraph: const quill.DefaultTextBlockStyle(
+        TextStyle(
           color: Color(0xFF4a4a4a),
           fontWeight: FontWeight.w500,
           height: 1.5,
           fontSize: 16,
         ),
-        const quill.VerticalSpacing(2, 0),
-        const quill.VerticalSpacing(0, 0),
+        quill.HorizontalSpacing.zero,
+        quill.VerticalSpacing(2, 0),
+        quill.VerticalSpacing(0, 0),
         null,
       ),
 
@@ -1537,29 +1575,31 @@ class _PostWritePageState extends State<PostWritePage>
         radius: const Radius.circular(0),
       ),
 
-      placeHolder: quill.DefaultTextBlockStyle(
-        const TextStyle(
+      placeHolder: const quill.DefaultTextBlockStyle(
+        TextStyle(
           color: Color(0xffBBBBBB),
           fontWeight: FontWeight.w500,
           height: 1.5,
           fontSize: 16,
         ),
-        const quill.VerticalSpacing(2, 0),
-        const quill.VerticalSpacing(0, 0),
+        quill.HorizontalSpacing.zero,
+        quill.VerticalSpacing(2, 0),
+        quill.VerticalSpacing(0, 0),
         null,
       ),
       // <pre> 태그
-      code: quill.DefaultTextBlockStyle(
-        const TextStyle(
+      code: const quill.DefaultTextBlockStyle(
+        TextStyle(
           //  backgroundColor: Colors.grey,
           color: Color(0xFF4a4a4a),
           fontWeight: FontWeight.w400,
           height: 1.5,
           fontSize: 16,
         ),
-        const quill.VerticalSpacing(2, 0),
-        const quill.VerticalSpacing(0, 0),
-        const BoxDecoration(
+        quill.HorizontalSpacing.zero,
+        quill.VerticalSpacing(2, 0),
+        quill.VerticalSpacing(0, 0),
+        BoxDecoration(
           color: Color(0xfff5f5f5),
         ),
       ),
@@ -1574,17 +1614,17 @@ class _PostWritePageState extends State<PostWritePage>
       child: quill.QuillEditor(
         focusNode: _editorFocusNode,
         controller: _quillController,
-        placeholder: LocaleKeys.postWritePage_contentPlaceholder.tr(),
-        embedBuilders: FlutterQuillEmbeds.builders(),
-        readOnly: false, // The editor is editable
-
+        configurations: quill.QuillEditorConfigurations(
+          placeholder: LocaleKeys.postWritePage_contentPlaceholder.tr(),
+          embedBuilders: FlutterQuillEmbeds.defaultEditorBuilders(),
+          // readOnly: false,
+          padding: EdgeInsets.zero,
+          scrollable: true,
+          autoFocus: false,
+          expands: false,
+          customStyles: editorStyles()
+        ),
         scrollController: _editorScrollController,
-
-        padding: EdgeInsets.zero,
-        scrollable: true,
-        autoFocus: false,
-        expands: false,
-        customStyles: editorStyles(),
       ),
     );
   }
@@ -1602,7 +1642,7 @@ class _PostWritePageState extends State<PostWritePage>
     }
   }
 
-  quill.Delta _htmlToQuillDelta(String html) {
+  quill_delta.Delta _htmlToQuillDelta(String html) {
     //TODO: quill에서 <hr> 지원 안됨
     //TODO: phase3에서 MarkdownToDelta 이 strikethrough 지원 안됨
     html = html
@@ -1696,6 +1736,7 @@ class _PostWritePageState extends State<PostWritePage>
   /// previousArticleId: 수정하는 경우 수정할 글의 id
   void Function() _managePost({bool isUpdate = false, int? previousArticleId}) {
     UserProvider userProvider = context.read<UserProvider>();
+    debugPrint('manage Post called');
     return () async {
       // 아래의 변수들로 api POST, PATCH를 보낸다.
       // 게시물의 제목
@@ -1704,6 +1745,11 @@ class _PostWritePageState extends State<PostWritePage>
       String contentValue;
       // 게시물에 첨부된 파일의 ID
       List<int> attachmentIds = [];
+
+      String key = isUpdate
+          ? '/cache/${widget.previousArticle!.id}/'
+          : '/cache/$userID/';
+      await cacheApiData(key, null);
 
       try {
         titleValue = _titleController.text;
@@ -1717,7 +1763,7 @@ class _PostWritePageState extends State<PostWritePage>
         _isUploadingPost = true;
         _isLoading = true;
       });
-
+      debugPrint('attachmentList : $_attachmentList');
       for (int i = 0; i < _attachmentList.length; i++) {
         //새로 올리는 파일이면 새로운 id 할당 받기.
         if (_attachmentList[i].isNewFile) {
@@ -1728,9 +1774,8 @@ class _PostWritePageState extends State<PostWritePage>
               "file": await MultipartFile.fromFile(attachFile.path,
                   filename: attachFile.path.split('/').last),
             });
-            Response? response = await userProvider.postApiRes(
-                "attachments/",
-                data: formData);
+            Response? response =
+                await userProvider.postApiRes("attachments/", data: formData);
             if (response != null) {
               final attachmentModel = AttachmentModel.fromJson(response.data);
               attachmentIds.add(attachmentModel.id);
@@ -1763,6 +1808,7 @@ class _PostWritePageState extends State<PostWritePage>
       };
       Response? response;
       if (isUpdate) {
+        debugPrint('manage post data : $data');
         response = await userProvider.putApiRes(
           'articles/$previousArticleId/',
           data: data,
@@ -1771,6 +1817,7 @@ class _PostWritePageState extends State<PostWritePage>
         data['parent_topic'] =
             _chosenTopicValue!.id == -1 ? '' : _chosenTopicValue!.id;
         data['parent_board'] = _chosenBoardValue!.id;
+        debugPrint('manage post data : $data');
         response = await userProvider.postApiRes(
           'articles/',
           data: data,
@@ -1806,6 +1853,7 @@ class _PostWritePageState extends State<PostWritePage>
 
   /// 사진 추가 시 실행되는 함수
   Future<void> _pickImage() async {
+    debugPrint('pick Image called');
     FocusScope.of(context).unfocus();
     final ImagePicker imagePicker = ImagePicker();
     final XFile? image =
@@ -1840,6 +1888,7 @@ class _PostWritePageState extends State<PostWritePage>
           fileLocalPath: imageUrl,
           uuid: uuid,
         ));
+        debugPrint('$_attachmentList');
       });
     }
     _editorFocusNode.requestFocus();
@@ -1866,6 +1915,7 @@ class _PostWritePageState extends State<PostWritePage>
           isNewFile: true,
           fileLocalPath: file.path,
         ));
+        debugPrint('$_attachmentList');
       });
       return true;
     } else {

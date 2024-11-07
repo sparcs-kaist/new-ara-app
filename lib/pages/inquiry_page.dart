@@ -64,8 +64,8 @@ class _InquiryPageState extends State<InquiryPage> {
             children: [
               Container(
                 width: MediaQuery.of(context).size.width,
-                margin: EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0), 
-                padding: EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
+                margin: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0), 
+                padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
                 decoration: BoxDecoration(
                   color: Colors.white, 
                   borderRadius: BorderRadius.circular(8.0), 
