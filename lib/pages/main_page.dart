@@ -1,4 +1,3 @@
-import 'package:adaptive_theme/adaptive_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -380,7 +379,6 @@ class _MainPageState extends State<MainPage> with WidgetsBindingObserver {
         actions: [
           IconButton(
               onPressed: () {
-                AdaptiveTheme.of(context).toggleThemeMode();
                 themeProvider.updateTheme();
               },
               icon: Icon(themeProvider.isDarkMode
