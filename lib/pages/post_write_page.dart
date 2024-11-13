@@ -791,6 +791,7 @@ class _PostWritePageState extends State<PostWritePage>
                           // TODO: 원하는 메뉴 모양 만들기 위해 속성 테스트 할 것
                           // isDense: true,
                           // isExpanded: true,
+                          dropdownColor: themeProvider.isDarkMode? Color(0xFF181818) : Color(0xFFF8F8F8),
                           isExpanded: true,
                           value: _chosenBoardValue,
                           style: const TextStyle(color: ColorsInfo.newara),
@@ -842,6 +843,7 @@ class _PostWritePageState extends State<PostWritePage>
                   child: ButtonTheme(
                     alignedDropdown: true,
                     child: DropdownButton<TopicModel>(
+                      dropdownColor: themeProvider.isDarkMode? Color(0xFF181818) : Color(0xFFF8F8F8),
                       isExpanded: true,
                       value: _chosenTopicValue,
                       style: const TextStyle(color: Colors.red),
@@ -896,10 +898,11 @@ class _PostWritePageState extends State<PostWritePage>
         minLines: 1,
         maxLines: 1,
         maxLength: 255,
-        style: const TextStyle(
+        style: TextStyle(
           height: 27 / 22,
           fontSize: 22,
           fontWeight: FontWeight.w700,
+          color: themeProvider.isDarkMode? Color(0xffeeeeee) : Colors.black,
         ),
         onChanged: (String s) {
           // build 함수를 다시 실행하여 올릴 수 있는 게시물인지 유효성 검사
@@ -917,7 +920,7 @@ class _PostWritePageState extends State<PostWritePage>
           // ),
           counterText: "",
           filled: true,
-          fillColor: themeProvider.isDarkMode? Colors.black : Colors.white,
+          fillColor: themeProvider.isDarkMode? Color(0xff111111) : Colors.white,
           isDense: true,
           isCollapsed: true,
           contentPadding: const EdgeInsets.fromLTRB(0, 0, 0, 0),
@@ -1031,8 +1034,8 @@ class _PostWritePageState extends State<PostWritePage>
                         children: [
                           SvgPicture.asset(
                             'assets/icons/clip.svg',
-                            colorFilter: const ColorFilter.mode(
-                              Color(0xFF636363),
+                            colorFilter: ColorFilter.mode(
+                              themeProvider.isDarkMode? Color(0xFF181818) : Color(0xFF636363),
                               BlendMode.srcIn,
                             ),
                             width: 34,
@@ -1040,10 +1043,10 @@ class _PostWritePageState extends State<PostWritePage>
                           ),
                           Text(
                             LocaleKeys.postWritePage_addAttach.tr(),
-                            style: const TextStyle(
+                            style: TextStyle(
                                 fontWeight: FontWeight.w500,
                                 fontSize: 16,
-                                color: Color(0xFF636363)),
+                                color: themeProvider.isDarkMode? Color(0xFF181818) : Color(0xFF636363),),
                           ),
                         ],
                       ),
@@ -1481,12 +1484,29 @@ class _PostWritePageState extends State<PostWritePage>
             child: quill.QuillToolbar.simple(
               controller: _quillController,
               configurations: quill.QuillSimpleToolbarConfigurations(
-                // buttonOptions: quill.QuillSimpleToolbarButtonOptions(
-                //   base: quill.QuillToolbarBaseButtonOptions(
-                //     iconSize: 18,
-                //     iconButtonFactor: 1.0,
-                //   ),
-                // ),
+                buttonOptions: quill.QuillSimpleToolbarButtonOptions(
+                  selectHeaderStyleDropdownButton: quill.QuillToolbarSelectHeaderStyleDropdownButtonOptions(
+                      textStyle: TextStyle(
+                          color: themeProvider.isDarkMode? Color(0xffcccccc): Color(0xff333333)
+                      ),
+                  ),
+                  selectHeaderStyleButtons: quill.QuillToolbarSelectHeaderStyleButtonsOptions(
+                      iconTheme: quill.QuillIconTheme(
+                          iconButtonUnselectedData: quill.IconButtonData(
+                              color: themeProvider.isDarkMode? Color(0xffcccccc): Color(0xff333333)
+                          )
+                      ),
+                  ),
+                  base: quill.QuillToolbarBaseButtonOptions(
+                    iconSize: 18,
+                    iconButtonFactor: 1.0,
+                    iconTheme: quill.QuillIconTheme(
+                      iconButtonUnselectedData: quill.IconButtonData(
+                        color: themeProvider.isDarkMode? Color(0xffcccccc): Color(0xff333333)
+                      )
+                    )
+                  ),
+                ),
                 multiRowsDisplay: true,
                 showUndo: false,
                 showRedo: false,
@@ -1561,9 +1581,9 @@ class _PostWritePageState extends State<PostWritePage>
         const quill.VerticalSpacing(0, 0),
         null,
       ),
-      paragraph: const quill.DefaultTextBlockStyle(
+      paragraph: quill.DefaultTextBlockStyle(
         TextStyle(
-          color: Color(0xFF4a4a4a),
+          color: themeProvider.isDarkMode? Color(0xFFcdcdcd) :Color(0xFF4a4a4a),
           fontWeight: FontWeight.w500,
           height: 1.5,
           fontSize: 16,
@@ -1574,8 +1594,8 @@ class _PostWritePageState extends State<PostWritePage>
         null,
       ),
 
-      bold: const TextStyle(
-          color: Color(0xff363636), fontWeight: FontWeight.w700),
+      bold: TextStyle(
+          color: themeProvider.isDarkMode? Color(0xFFdddddd) : Color(0xff363636), fontWeight: FontWeight.w700),
       italic: const TextStyle(
         fontStyle: FontStyle.italic,
       ),
@@ -1594,7 +1614,8 @@ class _PostWritePageState extends State<PostWritePage>
         radius: const Radius.circular(0),
       ),
 
-      placeHolder: const quill.DefaultTextBlockStyle(
+      placeHolder: quill.DefaultTextBlockStyle(
+
         TextStyle(
           color: themeProvider.isDarkMode? NewAraThemes.darkInputHint : NewAraThemes.lightInputHint,
           fontWeight: FontWeight.w500,
@@ -1607,10 +1628,10 @@ class _PostWritePageState extends State<PostWritePage>
         null,
       ),
       // <pre> 태그
-      code: const quill.DefaultTextBlockStyle(
+      code: quill.DefaultTextBlockStyle(
         TextStyle(
           //  backgroundColor: Colors.grey,
-          color: Color(0xFF4a4a4a),
+          color: themeProvider.isDarkMode? Color(0xFFcdcdcd) :Color(0xFF4a4a4a),
           fontWeight: FontWeight.w400,
           height: 1.5,
           fontSize: 16,

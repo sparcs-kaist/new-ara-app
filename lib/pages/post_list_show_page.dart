@@ -252,7 +252,7 @@ class _PostListShowPageState extends State<PostListShowPage>
       child: TextButton(
           style: ButtonStyle(
             backgroundColor: WidgetStateProperty.all(
-                currentFilter == index ? ColorsInfo.newara : Colors.white),
+                currentFilter == index ? ColorsInfo.newara : themeProvider.isDarkMode? Colors.black : Colors.white),
             overlayColor:
                 WidgetStateProperty.all(Colors.transparent), // no splash
             shape: WidgetStateProperty.all(

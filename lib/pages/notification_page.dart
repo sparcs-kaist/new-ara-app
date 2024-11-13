@@ -463,7 +463,7 @@ class _NotificationPageState extends State<NotificationPage> {
                 LocaleKeys.notificationPage_allNotificationsChecked.tr());
           }
         },
-        backgroundColor: Colors.white,
+        backgroundColor: themeProvider.isDarkMode? NewAraThemes.gry3: Colors.white,
         child: Center(
           child: SvgPicture.asset(
             'assets/icons/verified.svg',
