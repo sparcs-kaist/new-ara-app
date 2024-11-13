@@ -57,6 +57,7 @@ void main() async {
                   ..updateCookie(userProvider.getCookiesToString());
               }),
           ChangeNotifierProvider(create: (_) => BlockedProvider()),
+          ChangeNotifierProvider(create: (_) => ThemeProvider()),
         ],
         child: const MyApp(),
       ),
