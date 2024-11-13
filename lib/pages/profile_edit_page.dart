@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:http_parser/http_parser.dart';
 import 'package:flutter/material.dart';
 import 'package:easy_localization/easy_localization.dart';
+import 'package:new_ara_app/providers/theme_provider.dart';
 import 'package:new_ara_app/translations/locale_keys.g.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -150,6 +151,8 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
   /// infoText 매개변수를 전달받아 스낵바 메시지를 띄워주는 함수
   /// 프로필 설정 변경 시에 문제가 생겼을 때 알려주는 용도로 사용.
   void noticeUserBySnackBar(String infoText) {
+    final themeProvider = Provider.of<ThemeProvider>(context);
+
     SnackBar araSnackBar = buildAraSnackBar(
       context,
       content: Row(
@@ -165,8 +168,8 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
           Flexible(
               child: Text(
             infoText,
-            style: const TextStyle(
-              color: Colors.black,
+            style: TextStyle(
+              color: themeProvider.isDarkMode? Colors.white : Colors.black,
               fontWeight: FontWeight.w400,
               fontSize: 15,
             ),
@@ -184,6 +187,8 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
 
     MediaQueryData mediaQueryData = MediaQuery.of(context);
     double profileDiameter = mediaQueryData.size.width - 70;
+
+    final themeProvider = Provider.of<ThemeProvider>(context);
 
     return _isLoading
         ? const LoadingIndicator()
@@ -308,8 +313,8 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
                                     ),
                                     child: SvgPicture.asset(
                                       "assets/icons/camera.svg",
-                                      colorFilter: const ColorFilter.mode(
-                                          Colors.white, BlendMode.srcIn),
+                                      colorFilter: ColorFilter.mode(
+                                          themeProvider.isDarkMode? Colors.black : Colors.white, BlendMode.srcIn),
                                     ),
                                   ),
                                 ),
@@ -324,17 +329,17 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
                             children: [
                               Text(
                                 LocaleKeys.profileEditPage_nickname.tr(),
-                                style: const TextStyle(
+                                style: TextStyle(
                                   fontWeight: FontWeight.w700,
                                   fontSize: 17,
-                                  color: Color.fromRGBO(99, 99, 99, 1),
+                                  color: themeProvider.isDarkMode? Color.fromRGBO(171, 171, 171, 1) : Color.fromRGBO(99, 99, 99, 1),
                                 ),
                               ),
                               const SizedBox(width: 30),
                               Expanded(
                                 child: Container(
-                                  decoration: const BoxDecoration(
-                                    color: Color.fromRGBO(235, 235, 235, 1),
+                                  decoration: BoxDecoration(
+                                    color: themeProvider.isDarkMode? Color.fromRGBO(65, 65, 65, 1) : Color.fromRGBO(235, 235, 235, 1),
                                     borderRadius:
                                         BorderRadius.all(Radius.circular(10)),
                                   ),
@@ -355,10 +360,10 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
                                     : 110),
                             child: Text(
                               LocaleKeys.profileEditPage_nicknameInfo.tr(),
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontSize: 12,
                                 fontWeight: FontWeight.w600,
-                                color: Color.fromRGBO(191, 191, 191, 1),
+                                color: themeProvider.isDarkMode? Color.fromRGBO(91, 91, 91, 1) : Color.fromRGBO(191, 191, 191, 1),
                               ),
                             ),
                           ),
@@ -370,10 +375,10 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
                             children: [
                               Text(
                                 LocaleKeys.profileEditPage_email.tr(),
-                                style: const TextStyle(
+                                style: TextStyle(
                                   fontWeight: FontWeight.w700,
                                   fontSize: 17,
-                                  color: Color.fromRGBO(99, 99, 99, 1),
+                                  color: themeProvider.isDarkMode? Color.fromRGBO(171, 171, 171, 1) : Color.fromRGBO(99, 99, 99, 1),
                                 ),
                               ),
                               SizedBox(
@@ -384,10 +389,10 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
                                 child: Text(
                                   userProviderData.naUser!.email ??
                                       LocaleKeys.profileEditPage_noEmail.tr(),
-                                  style: const TextStyle(
+                                  style: TextStyle(
                                     fontWeight: FontWeight.w500,
                                     fontSize: 15,
-                                    color: Color.fromRGBO(177, 177, 177, 1),
+                                    color: themeProvider.isDarkMode? Color.fromRGBO(110, 110, 110, 1) : Color.fromRGBO(177, 177, 177, 1),
                                   ),
                                 ),
                               ),

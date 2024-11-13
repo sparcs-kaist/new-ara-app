@@ -3,6 +3,8 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:new_ara_app/constants/theme_info.dart';
+import 'package:new_ara_app/providers/theme_provider.dart';
 import 'package:new_ara_app/translations/locale_keys.g.dart';
 import 'package:provider/provider.dart';
 
@@ -171,6 +173,7 @@ class _NotificationPageState extends State<NotificationPage> {
     UserProvider userProvider = context.read<UserProvider>();
     NotificationProvider notificationProvider =
         context.read<NotificationProvider>();
+    final themeProvider = Provider.of<ThemeProvider>(context);
     return Scaffold(
       appBar: AppBar(
         centerTitle: false,
@@ -216,8 +219,8 @@ class _NotificationPageState extends State<NotificationPage> {
                                       'assets/icons/information.svg',
                                       width: 50,
                                       height: 50,
-                                      colorFilter: const ColorFilter.mode(
-                                        Color(0xFFBBBBBB),
+                                      colorFilter: ColorFilter.mode(
+                                        themeProvider.isDarkMode? NewAraThemes.gry6 :NewAraThemes.gryB,
                                         BlendMode.srcIn,
                                       ),
                                     ),
@@ -225,8 +228,8 @@ class _NotificationPageState extends State<NotificationPage> {
                                       LocaleKeys
                                           .notificationPage_noNotifications
                                           .tr(),
-                                      style: const TextStyle(
-                                        color: Color(0xFFBBBBBB),
+                                      style: TextStyle(
+                                        color: themeProvider.isDarkMode? NewAraThemes.gry6 :NewAraThemes.gryB,
                                         fontSize: 15,
                                       ),
                                     )
@@ -261,11 +264,10 @@ class _NotificationPageState extends State<NotificationPage> {
                                                 getFormattedDate(
                                                     _modelList[0].created_at,
                                                     context.locale),
-                                                style: const TextStyle(
+                                                style: TextStyle(
                                                   fontSize: 14,
                                                   fontWeight: FontWeight.w500,
-                                                  color: Color.fromRGBO(
-                                                      177, 177, 177, 1),
+                                                  color: themeProvider.isDarkMode? Color.fromRGBO(97, 97, 97, 1) : Color.fromRGBO(177, 177, 177, 1)
                                                 ),
                                               ),
                                             ),
@@ -313,7 +315,7 @@ class _NotificationPageState extends State<NotificationPage> {
                                             decoration: BoxDecoration(
                                               border: Border.all(
                                                 width: 1,
-                                                color: const Color(0xfff0f0f0),
+                                                color: themeProvider.isDarkMode? NewAraThemes.darkBRLine :NewAraThemes.lightBRLine,
                                               ),
                                               borderRadius:
                                                   const BorderRadius.all(
@@ -326,7 +328,7 @@ class _NotificationPageState extends State<NotificationPage> {
                                                   offset: Offset(0, 2),
                                                 ),
                                               ],
-                                              color: Colors.white,
+                                              color: themeProvider.isDarkMode? Colors.black : Colors.white,
                                             ),
                                             child: Row(
                                               crossAxisAlignment:
@@ -343,8 +345,7 @@ class _NotificationPageState extends State<NotificationPage> {
                                                         color: (targetNoti
                                                                     .is_read ??
                                                                 false)
-                                                            ? const Color(
-                                                                0xffbbbbbb)
+                                                            ? themeProvider.isDarkMode? NewAraThemes.gry6 :NewAraThemes.gryB
                                                             : ColorsInfo.newara,
                                                       ),
                                                       child: Center(
@@ -356,9 +357,9 @@ class _NotificationPageState extends State<NotificationPage> {
                                                               ? "assets/icons/notification.svg"
                                                               : "assets/icons/comment.svg",
                                                           colorFilter:
-                                                              const ColorFilter
+                                                              ColorFilter
                                                                   .mode(
-                                                                  Colors.white,
+                                                                  themeProvider.isDarkMode? Colors.black : Colors.white,
                                                                   BlendMode
                                                                       .srcIn),
                                                         ),
@@ -389,7 +390,7 @@ class _NotificationPageState extends State<NotificationPage> {
                                                                       .is_read ??
                                                                   false)
                                                               ? Colors.grey
-                                                              : Colors.black,
+                                                              : themeProvider.isDarkMode? Colors.white : Colors.black,
                                                         ),
                                                       ),
                                                       Text(
@@ -397,7 +398,8 @@ class _NotificationPageState extends State<NotificationPage> {
                                                         maxLines: 1,
                                                         overflow: TextOverflow
                                                             .ellipsis,
-                                                        style: const TextStyle(
+                                                        style: TextStyle(
+                                                          color: themeProvider.isDarkMode? Colors.white : Colors.black,
                                                           fontSize: 14,
                                                           fontWeight:
                                                               FontWeight.w500,
@@ -408,7 +410,8 @@ class _NotificationPageState extends State<NotificationPage> {
                                                         maxLines: 1,
                                                         overflow: TextOverflow
                                                             .ellipsis,
-                                                        style: const TextStyle(
+                                                        style: TextStyle(
+                                                          color: themeProvider.isDarkMode? Colors.white : Colors.black,
                                                           fontSize: 12,
                                                           fontWeight:
                                                               FontWeight.w500,
@@ -468,7 +471,7 @@ class _NotificationPageState extends State<NotificationPage> {
             colorFilter: ColorFilter.mode(
                 notificationProvider.isNotReadExist
                     ? ColorsInfo.newara
-                    : const Color(0xFFBBBBBB),
+                    : themeProvider.isDarkMode? NewAraThemes.gry6 :NewAraThemes.gryB,
                 BlendMode.srcIn),
             width: 40,
             height: 40,
@@ -503,6 +506,8 @@ class _NotificationPageState extends State<NotificationPage> {
 
   /// 현재 date와 알림 생성 date의 차이를 계산하여 문자열로 변경해줌.
   Widget _buildDateInfo(String strDate1, String strDate2) {
+    final themeProvider = Provider.of<ThemeProvider>(context);
+
     DateTime now = DateTime.now();
     DateTime prevDate = DateTime.parse(strDate1).toLocal();
     DateTime curDate = DateTime.parse(strDate2).toLocal();
@@ -524,10 +529,10 @@ class _NotificationPageState extends State<NotificationPage> {
           context.locale.languageCode == "ko"
               ? dateTextInKorean
               : dateTextInEnglish,
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 14,
             fontWeight: FontWeight.w500,
-            color: Color(0xffbbbbbb),
+            color: themeProvider.isDarkMode? NewAraThemes.gry6 :NewAraThemes.gryB,
           ),
         ),
       ),

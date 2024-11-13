@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:new_ara_app/constants/theme_info.dart';
+import 'package:new_ara_app/providers/theme_provider.dart';
 import 'package:new_ara_app/providers/user_provider.dart';
 import 'package:new_ara_app/utils/slide_routing.dart';
 import 'package:provider/provider.dart';
@@ -22,7 +24,9 @@ class _ChatListPageState extends State<ChatListPage> {
   void initState() {
     super.initState();
     UserProvider userProvider = context.read<UserProvider>();
+    ThemeProvider themeProvider = context.read<ThemeProvider>();
     context.read<NotificationProvider>().checkIsNotReadExist(userProvider);
+
 
     //totest: 채팅창 하나는 미리 추가해놓은 로직
     chatPreviewList.add(
@@ -42,7 +46,7 @@ class _ChatListPageState extends State<ChatListPage> {
           ),
           Container(
             height: 1,
-            color: const Color(0xFFF0F0F0),
+            color: themeProvider.isDarkMode? Color(0xFF555555) : Color(0xFFF0F0F0),
           ),
         ],
       ),
@@ -51,6 +55,7 @@ class _ChatListPageState extends State<ChatListPage> {
 
   @override
   Widget build(BuildContext context) {
+    final themeProvider = Provider.of<ThemeProvider>(context);
     return Scaffold(
       appBar: AppBar(
         title: Text(
@@ -97,7 +102,7 @@ class _ChatListPageState extends State<ChatListPage> {
                       ),
                       Container(
                         height: 1,
-                        color: const Color(0xFFF0F0F0),
+                        color: themeProvider.isDarkMode? Color(0xFF555555) : Color(0xFFF0F0F0),
                       ),
                     ],
                   ),
@@ -135,6 +140,8 @@ class ChatPreview extends StatefulWidget {
 class _ChatPreviewState extends State<ChatPreview> {
   @override
   Widget build(BuildContext context) {
+    final themeProvider = Provider.of<ThemeProvider>(context);
+
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -154,7 +161,7 @@ class _ChatPreviewState extends State<ChatPreview> {
             mainAxisAlignment: MainAxisAlignment.start,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const SizedBox(
+              SizedBox(
                 height: 24,
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.start,
@@ -177,7 +184,7 @@ class _ChatPreviewState extends State<ChatPreview> {
                     Text(
                       "20:22",
                       maxLines: 1,
-                      style: TextStyle(fontSize: 12, color: Color(0xFFB1B1B1)),
+                      style: TextStyle(fontSize: 12, color: themeProvider.isDarkMode? NewAraThemes.gry61 :NewAraThemes.gryB1 ,),
                     ),
                   ],
                   //attachment_type
@@ -187,14 +194,14 @@ class _ChatPreviewState extends State<ChatPreview> {
                 height: 21,
                 child: Row(
                   children: [
-                    const Expanded(
+                    Expanded(
                       child: Text(
                         "족보 구할 수 있을까요~ 족보 주세요 족봉!!!!!!!",
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                         style: TextStyle(
                           fontSize: 14,
-                          color: Color(0xFFB1B1B1),
+                          color: themeProvider.isDarkMode? NewAraThemes.gry61 :NewAraThemes.gryB1,
                         ),
                       ),
                     ),

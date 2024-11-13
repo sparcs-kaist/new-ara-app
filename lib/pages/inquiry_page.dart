@@ -3,6 +3,7 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:new_ara_app/constants/colors_info.dart';
+import 'package:new_ara_app/providers/theme_provider.dart';
 import 'package:new_ara_app/providers/user_provider.dart';
 import 'package:new_ara_app/translations/locale_keys.g.dart';
 import 'package:provider/provider.dart';
@@ -24,8 +25,10 @@ class _InquiryPageState extends State<InquiryPage> {
   @override
   Widget build(BuildContext context) {
     UserProvider userProvider = context.watch<UserProvider>();
+    final themeProvider = Provider.of<ThemeProvider>(context);
+
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: themeProvider.isDarkMode? Colors.black : Colors.white,
       appBar: AppBar(
         centerTitle: true,
         title: SizedBox(
@@ -67,7 +70,7 @@ class _InquiryPageState extends State<InquiryPage> {
                 margin: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0), 
                 padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
                 decoration: BoxDecoration(
-                  color: Colors.white, 
+                  color: themeProvider.isDarkMode? Colors.black : Colors.white,
                   borderRadius: BorderRadius.circular(8.0), 
                   border: Border.all(
                     color: Colors.red, 

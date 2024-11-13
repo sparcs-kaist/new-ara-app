@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:new_ara_app/constants/theme_info.dart';
 import 'package:new_ara_app/models/board_group_model.dart';
 import 'package:new_ara_app/pages/bulletin_search_page.dart';
+import 'package:new_ara_app/providers/theme_provider.dart';
 import 'package:new_ara_app/translations/locale_keys.g.dart';
 import 'package:new_ara_app/utils/cache_function.dart';
 import 'package:provider/provider.dart';
@@ -79,6 +81,8 @@ class _BoardListPageState extends State<BoardListPage> {
 
   @override
   Widget build(BuildContext context) {
+    final themeProvider = Provider.of<ThemeProvider>(context);
+
     return Scaffold(
       appBar: AppBar(
         centerTitle: false,
@@ -126,7 +130,7 @@ class _BoardListPageState extends State<BoardListPage> {
                             // ),
                             decoration: InputDecoration(
                               filled: true,
-                              fillColor: const Color(0xFFF6F6F6),
+                              fillColor: themeProvider.isDarkMode? NewAraThemes.darkInputDecoration : NewAraThemes.lightInputDecoration,
                               isCollapsed: true,
                               isDense: true,
                               contentPadding: const EdgeInsets.fromLTRB(
@@ -152,8 +156,8 @@ class _BoardListPageState extends State<BoardListPage> {
                               hintText: LocaleKeys
                                   .boardListPage_searchBoardsPostsComments
                                   .tr(),
-                              hintStyle: const TextStyle(
-                                color: Color(0xFFBBBBBB),
+                              hintStyle: TextStyle(
+                                color: themeProvider.isDarkMode? NewAraThemes.darkInputHint : NewAraThemes.lightInputHint,
                                 fontSize: 16,
                                 height: null,
                                 fontWeight: FontWeight.w500,
@@ -199,16 +203,16 @@ class _BoardListPageState extends State<BoardListPage> {
                                   'assets/icons/menu_1.svg',
                                   height: 32,
                                   width: 32,
-                                  colorFilter: const ColorFilter.mode(
-                                      Color(0xFFED3A3A), BlendMode.srcIn),
+                                  colorFilter: ColorFilter.mode(
+                                      themeProvider.isDarkMode? NewAraThemes.gryC : NewAraThemes.gry3, BlendMode.srcIn),
                                 ),
                                 const SizedBox(
                                   width: 5,
                                 ),
                                 Text(
                                   LocaleKeys.boardListPage_viewAll.tr(),
-                                  style: const TextStyle(
-                                    color: Color(0xFF333333),
+                                  style: TextStyle(
+                                    color: themeProvider.isDarkMode? NewAraThemes.gryC : NewAraThemes.gry3,
                                     fontSize: 17,
                                     fontWeight: FontWeight.w700,
                                   ),
@@ -240,16 +244,16 @@ class _BoardListPageState extends State<BoardListPage> {
                                   'assets/icons/star.svg',
                                   height: 32,
                                   width: 32,
-                                  colorFilter: const ColorFilter.mode(
-                                      Color(0xFFED3A3A), BlendMode.srcIn),
+                                  colorFilter: ColorFilter.mode(
+                                      themeProvider.isDarkMode? NewAraThemes.gryC : NewAraThemes.gry3, BlendMode.srcIn),
                                 ),
                                 const SizedBox(
                                   width: 5,
                                 ),
                                 Text(
                                   LocaleKeys.boardListPage_topPosts.tr(),
-                                  style: const TextStyle(
-                                    color: Color(0xFF333333),
+                                  style: TextStyle(
+                                    color: themeProvider.isDarkMode? NewAraThemes.gryC : NewAraThemes.gry3,
                                     fontSize: 17,
                                     fontWeight: FontWeight.w700,
                                   ),
@@ -281,16 +285,16 @@ class _BoardListPageState extends State<BoardListPage> {
                                   'assets/icons/download_2.svg',
                                   height: 32,
                                   width: 32,
-                                  colorFilter: const ColorFilter.mode(
-                                      Color(0xFFED3A3A), BlendMode.srcIn),
+                                  colorFilter: ColorFilter.mode(
+                                      themeProvider.isDarkMode? NewAraThemes.gryC : NewAraThemes.gry3, BlendMode.srcIn),
                                 ),
                                 const SizedBox(
                                   width: 5,
                                 ),
                                 Text(
                                   LocaleKeys.boardListPage_bookmarks.tr(),
-                                  style: const TextStyle(
-                                    color: Color(0xFF333333),
+                                  style: TextStyle(
+                                    color: themeProvider.isDarkMode? NewAraThemes.gryC : NewAraThemes.gry3,
                                     fontSize: 17,
                                     fontWeight: FontWeight.w700,
                                   ),
@@ -304,7 +308,7 @@ class _BoardListPageState extends State<BoardListPage> {
                         ),
                         Container(
                           height: 1,
-                          color: const Color(0xFFF0F0F0),
+                          color: themeProvider.isDarkMode? Color(0xFF555555) : Color(0xFFF0F0F0),
                         ),
                         const SizedBox(
                           height: 10,
@@ -332,8 +336,8 @@ class _BoardListPageState extends State<BoardListPage> {
                                     'assets/icons/notify.svg',
                                     height: 32,
                                     width: 32,
-                                    colorFilter: const ColorFilter.mode(
-                                        Color(0xFF333333), BlendMode.srcIn),
+                                    colorFilter: ColorFilter.mode(
+                                        themeProvider.isDarkMode? NewAraThemes.gryC : NewAraThemes.gry3, BlendMode.srcIn),
                                   ),
                                   const SizedBox(
                                     width: 5,
@@ -342,8 +346,8 @@ class _BoardListPageState extends State<BoardListPage> {
                                     context.locale == const Locale("ko")
                                         ? boardsByGroup[2][0].ko_name
                                         : boardsByGroup[2][0].en_name,
-                                    style: const TextStyle(
-                                      color: Color(0xFF333333),
+                                    style: TextStyle(
+                                      color: themeProvider.isDarkMode? NewAraThemes.gryC : NewAraThemes.gry3,
                                       fontSize: 20,
                                       fontWeight: FontWeight.w700,
                                     ),
@@ -379,6 +383,8 @@ class BoardExpansionTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final themeProvider = Provider.of<ThemeProvider>(context);
+
     return Theme(
       data: Theme.of(context).copyWith(
         dividerColor: Colors.transparent, // 액센트 색상을 투명으로 설정
@@ -403,8 +409,8 @@ class BoardExpansionTile extends StatelessWidget {
                   'assets/icons/notify.svg',
                   height: 32,
                   width: 32,
-                  colorFilter: const ColorFilter.mode(
-                      Color(0xFF333333), BlendMode.srcIn),
+                  colorFilter: ColorFilter.mode(
+                      themeProvider.isDarkMode? NewAraThemes.gryC : NewAraThemes.gry3, BlendMode.srcIn),
                 ),
                 const SizedBox(
                   width: 5,
@@ -413,8 +419,8 @@ class BoardExpansionTile extends StatelessWidget {
                   context.locale == const Locale("ko")
                       ? boardsByGroup[0].group.ko_name
                       : boardsByGroup[0].group.en_name,
-                  style: const TextStyle(
-                    color: Color(0xFF333333),
+                  style: TextStyle(
+                    color: themeProvider.isDarkMode? NewAraThemes.gryC : NewAraThemes.gry3,
                     fontSize: 20,
                     fontWeight: FontWeight.w700,
                   ),
@@ -439,8 +445,8 @@ class BoardExpansionTile extends StatelessWidget {
                       context.locale == const Locale("ko")
                           ? model.ko_name
                           : model.en_name,
-                      style: const TextStyle(
-                        color: Color(0xFF333333),
+                      style: TextStyle(
+                        color: themeProvider.isDarkMode? NewAraThemes.gryC : NewAraThemes.gry3,
                         fontSize: 16,
                         fontWeight: FontWeight.w500,
                       ),

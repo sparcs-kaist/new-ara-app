@@ -1,6 +1,7 @@
 // PostViewPage에 쓰이는 PopupMenuButton 위젯 일부를 클래스화한 파일
 // 첨부파일, 타인의 댓글에 사용되는 PopupMenuButton을 클래스화함.
 import 'package:flutter/material.dart';
+import 'package:new_ara_app/providers/theme_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:easy_localization/easy_localization.dart';
@@ -20,11 +21,13 @@ class WithSchoolPopupMenuButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final themeProvider = Provider.of<ThemeProvider>(context);
+
     return PopupMenuButton<String>(
-      shadowColor: const Color.fromRGBO(0, 0, 0, 0.2),
+      shadowColor: themeProvider.isDarkMode? Color.fromRGBO(255, 255, 255, 0.2) : Color.fromRGBO(0, 0, 0, 0.2),
       splashRadius: 5,
-      shape: const RoundedRectangleBorder(
-          side: BorderSide(color: Color.fromRGBO(217, 217, 217, 1), width: 0.5),
+      shape: RoundedRectangleBorder(
+          side: BorderSide(color: themeProvider.isDarkMode? Color.fromRGBO(90, 90, 90, 1) : Color.fromRGBO(217, 217, 217, 1), width: 0.5),
           borderRadius: BorderRadius.all(Radius.circular(12.0))),
       padding: const EdgeInsets.all(2.0),
       offset: const Offset(0, 45),
@@ -70,11 +73,13 @@ class AttachPopupMenuButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final themeProvider = Provider.of<ThemeProvider>(context);
+
     return PopupMenuButton<int>(
-      shadowColor: const Color.fromRGBO(0, 0, 0, 0.2),
+      shadowColor: themeProvider.isDarkMode? Color.fromRGBO(255, 255, 255, 0.2) : Color.fromRGBO(0, 0, 0, 0.2),
       splashRadius: 5,
-      shape: const RoundedRectangleBorder(
-        side: BorderSide(color: Color.fromRGBO(217, 217, 217, 1), width: 0.5),
+      shape: RoundedRectangleBorder(
+        side: BorderSide(color: themeProvider.isDarkMode? Color.fromRGBO(90, 90, 90, 1) : Color.fromRGBO(217, 217, 217, 1), width: 0.5),
         borderRadius: BorderRadius.all(Radius.circular(12.0)),
       ),
       padding: const EdgeInsets.all(2.0),
@@ -95,7 +100,7 @@ class AttachPopupMenuButton extends StatelessWidget {
                     SvgPicture.asset(
                       'assets/icons/close-1.svg',
                       colorFilter:
-                          const ColorFilter.mode(Colors.black, BlendMode.srcIn),
+                        ColorFilter.mode(themeProvider.isDarkMode? Colors.white : Colors.black, BlendMode.srcIn),
                       width: 32,
                       height: 32,
                     ),
@@ -103,8 +108,8 @@ class AttachPopupMenuButton extends StatelessWidget {
                       res
                           ? LocaleKeys.popUpMenuButtons_downloadSucceed.tr()
                           : LocaleKeys.popUpMenuButtons_downloadFailed.tr(),
-                      style: const TextStyle(
-                        color: Colors.black,
+                      style: TextStyle(
+                        color: themeProvider.isDarkMode? Colors.white : Colors.black,
                         fontWeight: FontWeight.w400,
                         fontSize: 15,
                       ),
@@ -116,9 +121,10 @@ class AttachPopupMenuButton extends StatelessWidget {
       },
       child: Text(
         '${LocaleKeys.popUpMenuButtons_attachments.tr()} $fileNum',
-        style: const TextStyle(
+        style: TextStyle(
           fontSize: 16,
           fontWeight: FontWeight.w500,
+          color: themeProvider.isDarkMode? Colors.white : Colors.black,
         ),
       ),
     );
@@ -128,6 +134,8 @@ class AttachPopupMenuButton extends StatelessWidget {
   /// Entry의 List 형태로 리턴함.
   /// PopupMenuButton의 itemBuilder로 사용됨.
   List<PopupMenuEntry<int>> _buildItems(BuildContext context) {
+    final themeProvider = Provider.of<ThemeProvider>(context);
+
     return List.generate(
       attachments.length,
       (idx) {
@@ -150,7 +158,7 @@ class AttachPopupMenuButton extends StatelessWidget {
             padding: const EdgeInsets.only(left: 3),
             decoration: BoxDecoration(
               border: Border.all(
-                color: const Color(0x00FFFFFF),
+                color: themeProvider.isDarkMode? Colors.black : Colors.white,
                 width: 2,
               ),
               borderRadius: const BorderRadius.all(Radius.circular(5)),
@@ -164,15 +172,15 @@ class AttachPopupMenuButton extends StatelessWidget {
                   child: Text(
                     fileName,
                     overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(
-                      color: Colors.black,
+                    style: TextStyle(
+                      color: themeProvider.isDarkMode? Colors.white : Colors.black,
                     ),
                   ),
                 ),
                 Text(
                   extension,
-                  style: const TextStyle(
-                    color: Colors.black,
+                  style: TextStyle(
+                    color: themeProvider.isDarkMode? Colors.white : Colors.black,
                   ),
                 ),
               ],
@@ -220,11 +228,13 @@ class OthersPopupMenuButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final themeProvider = Provider.of<ThemeProvider>(context);
+
     return PopupMenuButton<String>(
-      shadowColor: const Color.fromRGBO(0, 0, 0, 0.2),
+      shadowColor: themeProvider.isDarkMode? Color.fromRGBO(255, 255, 255, 0.2) : Color.fromRGBO(0, 0, 0, 0.2),
       splashRadius: 5,
-      shape: const RoundedRectangleBorder(
-          side: BorderSide(color: Color.fromRGBO(217, 217, 217, 1), width: 0.5),
+      shape: RoundedRectangleBorder(
+          side: BorderSide(color: themeProvider.isDarkMode? Color.fromRGBO(90, 90, 90, 1) : Color.fromRGBO(217, 217, 217, 1), width: 0.5),
           borderRadius: BorderRadius.all(Radius.circular(12.0))),
       padding: const EdgeInsets.all(2.0),
       child: SvgPicture.asset(
@@ -321,11 +331,13 @@ class MyPopupMenuButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final themeProvider = Provider.of<ThemeProvider>(context);
+
     return PopupMenuButton<String>(
-      shadowColor: const Color.fromRGBO(0, 0, 0, 0.2),
+      shadowColor: themeProvider.isDarkMode? Color.fromRGBO(255, 255, 255, 0.2) : Color.fromRGBO(0, 0, 0, 0.2),
       splashRadius: 5,
-      shape: const RoundedRectangleBorder(
-        side: BorderSide(color: Color.fromRGBO(217, 217, 217, 1), width: 0.5),
+      shape: RoundedRectangleBorder(
+        side: BorderSide(color: themeProvider.isDarkMode? Color.fromRGBO(90, 90, 90, 1) : Color.fromRGBO(217, 217, 217, 1), width: 0.5),
         borderRadius: BorderRadius.all(Radius.circular(12.0)),
       ),
       padding: const EdgeInsets.all(2.0),
@@ -338,18 +350,18 @@ class MyPopupMenuButton extends StatelessWidget {
                 'assets/icons/modify.svg',
                 width: 25,
                 height: 25,
-                colorFilter: const ColorFilter.mode(
-                  Color.fromRGBO(51, 51, 51, 1),
+                colorFilter: ColorFilter.mode(
+                  themeProvider.isDarkMode? Color.fromRGBO(240, 240, 240, 1) : Color.fromRGBO(51, 51, 51, 1),
                   BlendMode.srcIn,
                 ),
               ),
               const SizedBox(width: 10),
               Text(
                 LocaleKeys.popUpMenuButtons_edit.tr(),
-                style: const TextStyle(
+                style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w700,
-                    color: Color.fromRGBO(51, 51, 51, 1)),
+                    color: themeProvider.isDarkMode? Color.fromRGBO(240, 240, 240, 1) : Color.fromRGBO(51, 51, 51, 1),),
               ),
             ],
           ),

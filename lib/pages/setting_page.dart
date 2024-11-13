@@ -6,6 +6,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:new_ara_app/pages/terms_and_conditions_page.dart';
+import 'package:new_ara_app/providers/theme_provider.dart';
 import 'package:new_ara_app/providers/user_provider.dart';
 import 'package:new_ara_app/translations/locale_keys.g.dart';
 import 'package:new_ara_app/utils/slide_routing.dart';
@@ -55,6 +56,7 @@ class SettingPageState extends State<SettingPage> {
   Widget build(BuildContext context) {
     var userProvider = context.watch<UserProvider>();
 
+    final themeProvider = Provider.of<ThemeProvider>(context);
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
@@ -99,12 +101,15 @@ class SettingPageState extends State<SettingPage> {
                               'assets/icons/post_list.svg',
                               width: 34,
                               height: 34,
+                              colorFilter: ColorFilter.mode(
+                                  themeProvider.isDarkMode? Colors.white: Colors.black, BlendMode.srcIn),
                             ),
                             Text(
                               LocaleKeys.settingPage_postSetting.tr(),
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontSize: 18,
                                 fontWeight: FontWeight.w700,
+                                color: themeProvider.isDarkMode? Colors.white : Colors.black
                               ),
                             ),
                           ],
@@ -119,7 +124,7 @@ class SettingPageState extends State<SettingPage> {
                           borderRadius:
                               const BorderRadius.all(Radius.circular(10)),
                           border: Border.all(
-                            color: const Color.fromRGBO(240, 240, 240, 1),
+                            color: themeProvider.isDarkMode? Color.fromRGBO(60, 60, 60, 1) : Color.fromRGBO(240, 240, 240, 1),
                           ),
                         ),
                         child: Column(
@@ -135,9 +140,10 @@ class SettingPageState extends State<SettingPage> {
                                     margin: const EdgeInsets.only(left: 10),
                                     child: Text(
                                       LocaleKeys.settingPage_adult.tr(),
-                                      style: const TextStyle(
+                                      style: TextStyle(
                                         fontSize: 16,
                                         fontWeight: FontWeight.w500,
+                                        color: themeProvider.isDarkMode? Colors.white : Colors.black
                                       ),
                                     )),
                                 // 성인글 보기 CupertinoSwitch
@@ -186,9 +192,10 @@ class SettingPageState extends State<SettingPage> {
                                     margin: const EdgeInsets.only(left: 10),
                                     child: Text(
                                       LocaleKeys.settingPage_politics.tr(),
-                                      style: const TextStyle(
+                                      style: TextStyle(
                                         fontSize: 16,
                                         fontWeight: FontWeight.w500,
+                                        color: themeProvider.isDarkMode? Colors.white : Colors.black
                                       ),
                                     )),
                                 // 정치글 보기 CupertinoSwitch
@@ -273,12 +280,15 @@ class SettingPageState extends State<SettingPage> {
                               'assets/icons/barrior.svg',
                               width: 34,
                               height: 34,
+                              colorFilter: ColorFilter.mode(
+                                  themeProvider.isDarkMode? Colors.white: Colors.black, BlendMode.srcIn),
                             ),
                             Text(
                               LocaleKeys.settingPage_block.tr(),
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontSize: 18,
                                 fontWeight: FontWeight.w700,
+                                color: themeProvider.isDarkMode? Colors.white : Colors.black
                               ),
                             ),
                           ],
@@ -293,7 +303,7 @@ class SettingPageState extends State<SettingPage> {
                           borderRadius:
                               const BorderRadius.all(Radius.circular(10)),
                           border: Border.all(
-                            color: const Color.fromRGBO(240, 240, 240, 1),
+                            color: themeProvider.isDarkMode? Color.fromRGBO(60, 60, 60, 1) : Color.fromRGBO(240, 240, 240, 1),
                           ),
                         ),
                         child: InkWell(
@@ -337,12 +347,15 @@ class SettingPageState extends State<SettingPage> {
                               'assets/icons/information.svg',
                               width: 36,
                               height: 36,
+                              colorFilter: ColorFilter.mode(
+                                  themeProvider.isDarkMode? Colors.white: Colors.black, BlendMode.srcIn),
                             ),
                             Text(
                               LocaleKeys.settingPage_information.tr(),
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontSize: 18,
                                 fontWeight: FontWeight.w700,
+                                color: themeProvider.isDarkMode? Colors.white : Colors.black
                               ),
                             ),
                           ],
@@ -357,7 +370,7 @@ class SettingPageState extends State<SettingPage> {
                           borderRadius:
                               const BorderRadius.all(Radius.circular(10)),
                           border: Border.all(
-                            color: const Color.fromRGBO(240, 240, 240, 1),
+                            color: themeProvider.isDarkMode? Color.fromRGBO(60, 60, 60, 1) : Color.fromRGBO(240, 240, 240, 1),
                           ),
                         ),
                         child: Column(
@@ -387,15 +400,18 @@ class SettingPageState extends State<SettingPage> {
                                         LocaleKeys
                                             .settingPage_termsAndConditions
                                             .tr(),
-                                        style: const TextStyle(
+                                        style: TextStyle(
                                           fontSize: 16,
                                           fontWeight: FontWeight.w500,
+                                          color: themeProvider.isDarkMode? Colors.white : Colors.black
                                         ),
                                       )),
                                   SvgPicture.asset(
                                     'assets/icons/right_chevron.svg',
                                     width: 20,
                                     height: 20,
+                                    colorFilter: ColorFilter.mode(
+                                        themeProvider.isDarkMode? Colors.white: Colors.black, BlendMode.srcIn),
                                   ),
                                 ],
                               ),
@@ -414,15 +430,18 @@ class SettingPageState extends State<SettingPage> {
                                       child: Text(
                                         LocaleKeys.settingPage_contactAdmins
                                             .tr(),
-                                        style: const TextStyle(
+                                        style: TextStyle(
                                           fontSize: 16,
                                           fontWeight: FontWeight.w500,
+                                          color: themeProvider.isDarkMode? Colors.white : Colors.black
                                         ),
                                       )),
                                   SvgPicture.asset(
                                     'assets/icons/right_chevron.svg',
                                     width: 20,
                                     height: 20,
+                                    colorFilter: ColorFilter.mode(
+                                        themeProvider.isDarkMode? Colors.white: Colors.black, BlendMode.srcIn),
                                   ),
                                 ],
                               ),
@@ -440,7 +459,7 @@ class SettingPageState extends State<SettingPage> {
                           borderRadius:
                               const BorderRadius.all(Radius.circular(10)),
                           border: Border.all(
-                            color: const Color.fromRGBO(240, 240, 240, 1),
+                            color: themeProvider.isDarkMode? Color.fromRGBO(60, 60, 60, 1) : Color.fromRGBO(240, 240, 240, 1),
                           ),
                         ),
                         child: SizedBox(
@@ -461,7 +480,7 @@ class SettingPageState extends State<SettingPage> {
                             child: Center(
                               child: Text(
                                 LocaleKeys.settingPage_signOut.tr(),
-                                style: const TextStyle(
+                                style: TextStyle(
                                   color: ColorsInfo.newara,
                                   fontSize: 16,
                                   fontWeight: FontWeight.w500,
@@ -479,7 +498,7 @@ class SettingPageState extends State<SettingPage> {
                           borderRadius:
                               const BorderRadius.all(Radius.circular(10)),
                           border: Border.all(
-                            color: const Color.fromRGBO(240, 240, 240, 1),
+                            color: themeProvider.isDarkMode? Color.fromRGBO(60, 60, 60, 1) : Color.fromRGBO(240, 240, 240, 1),
                           ),
                         ),
                         child: SizedBox(

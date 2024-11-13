@@ -1,6 +1,7 @@
 // PostViewPage의 글/댓글 신고, 댓글 수정에 사용되는 Dialog 위젯 파일.
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:new_ara_app/providers/theme_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:dio/dio.dart';
 import 'package:easy_localization/easy_localization.dart';
@@ -64,6 +65,8 @@ class _ReportDialogState extends State<ReportDialog> {
 
   @override
   Widget build(BuildContext context) {
+    final themeProvider = Provider.of<ThemeProvider>(context);
+
     return Dialog(
       child: Container(
         decoration: const BoxDecoration(
@@ -117,17 +120,17 @@ class _ReportDialogState extends State<ReportDialog> {
                         width: 1, // 테두리의 두께를 2로 지정
                       ),
                       borderRadius: const BorderRadius.all(Radius.circular(20)),
-                      color: Colors.white,
+                      color: themeProvider.isDarkMode? Colors.black : Colors.white,
                     ),
                     width: 60,
                     height: 40,
-                    child: const Center(
+                    child: Center(
                       child: Text(
                         '취소',
                         style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w500,
-                          color: Colors.black,
+                          color: themeProvider.isDarkMode? Colors.white : Colors.black,
                         ),
                       ),
                     ),
@@ -155,13 +158,13 @@ class _ReportDialogState extends State<ReportDialog> {
                     ),
                     width: 100,
                     height: 40,
-                    child: const Center(
+                    child: Center(
                       child: Text(
                         '신고하기',
                         style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w500,
-                          color: Colors.white,
+                          color: themeProvider.isDarkMode? Colors.black : Colors.white,
                         ),
                       ),
                     ),
@@ -213,6 +216,8 @@ class _ReportDialogState extends State<ReportDialog> {
 
   // 각각의 신고항목에 대한 button
   InkWell _buildReportButton(int idx) {
+    final themeProvider = Provider.of<ThemeProvider>(context);
+
     return InkWell(
       onTap: () {
         if (!mounted) return;
@@ -223,7 +228,7 @@ class _ReportDialogState extends State<ReportDialog> {
           borderRadius: const BorderRadius.all(Radius.circular(20)),
           color: isChosen[idx]
               ? ColorsInfo.newara
-              : const Color.fromRGBO(220, 220, 220, 1),
+              : themeProvider.isDarkMode? Color.fromRGBO(80, 80, 80, 1) : Color.fromRGBO(220, 220, 220, 1),
         ),
         width: 180,
         height: 40,
@@ -233,7 +238,7 @@ class _ReportDialogState extends State<ReportDialog> {
             style: TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.w500,
-              color: isChosen[idx] ? Colors.white : Colors.black,
+              color: isChosen[idx] ? themeProvider.isDarkMode? Colors.black : Colors.white : themeProvider.isDarkMode? Colors.white : Colors.black,
             ),
           ),
         ),
@@ -261,6 +266,8 @@ class DeleteDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final themeProvider = Provider.of<ThemeProvider>(context);
+
     return Dialog(
       child: Container(
         decoration: const BoxDecoration(
@@ -286,10 +293,10 @@ class DeleteDialog extends StatelessWidget {
               child: Text(
                 LocaleKeys.dialogs_deleteConfirm.tr(),
                 textAlign: TextAlign.center,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 17,
                   fontWeight: FontWeight.w700,
-                  color: Colors.black,
+                  color: themeProvider.isDarkMode? Colors.white : Colors.black,
                 ),
               ),
             ),
@@ -310,17 +317,17 @@ class DeleteDialog extends StatelessWidget {
                         width: 1,
                       ),
                       borderRadius: const BorderRadius.all(Radius.circular(20)),
-                      color: Colors.white,
+                      color: themeProvider.isDarkMode? Colors.black : Colors.white,
                     ),
                     width: 60,
                     height: 40,
                     child: Center(
                       child: Text(
                         LocaleKeys.dialogs_cancel.tr(),
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w500,
-                          color: Colors.black,
+                          color: themeProvider.isDarkMode? Colors.white : Colors.black,
                         ),
                       ),
                     ),
@@ -340,10 +347,10 @@ class DeleteDialog extends StatelessWidget {
                     child: Center(
                       child: Text(
                         LocaleKeys.dialogs_confirm.tr(),
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w500,
-                          color: Colors.white,
+                          color: themeProvider.isDarkMode? Colors.black : Colors.white,
                         ),
                       ),
                     ),
@@ -422,6 +429,8 @@ class _BlockedUserDialogState extends State<BlockedUserDialog> {
 
   @override
   Widget build(BuildContext context) {
+    final themeProvider = Provider.of<ThemeProvider>(context);
+
     return !isLoaded
         ? Container()
         : Dialog(
@@ -434,8 +443,8 @@ class _BlockedUserDialogState extends State<BlockedUserDialog> {
                     child: Center(
                       child: Text(
                         LocaleKeys.dialogs_noBlockedUsers.tr(),
-                        style: const TextStyle(
-                          color: Colors.black,
+                        style: TextStyle(
+                          color: themeProvider.isDarkMode? Colors.white : Colors.black,
                           fontSize: 15,
                           fontWeight: FontWeight.w500,
                         ),
@@ -494,8 +503,8 @@ class _BlockedUserDialogState extends State<BlockedUserDialog> {
                                         return SizedBox(
                                           child: SvgPicture.asset(
                                             "assets/icons/warning.svg",
-                                            colorFilter: const ColorFilter.mode(
-                                              Colors.black,
+                                            colorFilter: ColorFilter.mode(
+                                              themeProvider.isDarkMode? Colors.white : Colors.black,
                                               BlendMode.srcIn,
                                             ),
                                             width: 35,
@@ -514,9 +523,10 @@ class _BlockedUserDialogState extends State<BlockedUserDialog> {
                                       LocaleKeys.dialogs_noNickname.tr(),
                                   overflow: TextOverflow.ellipsis,
                                   maxLines: 1,
-                                  style: const TextStyle(
+                                  style: TextStyle(
                                     fontSize: 15,
                                     fontWeight: FontWeight.w500,
+                                    color: themeProvider.isDarkMode? Colors.white : Colors.black
                                   ),
                                 ),
                               ),
@@ -535,8 +545,8 @@ class _BlockedUserDialogState extends State<BlockedUserDialog> {
                                 },
                                 child: SvgPicture.asset(
                                   "assets/icons/close-2.svg",
-                                  colorFilter: const ColorFilter.mode(
-                                      Colors.black, BlendMode.srcIn),
+                                  colorFilter: ColorFilter.mode(
+                                      themeProvider.isDarkMode? Colors.white : Colors.black, BlendMode.srcIn),
                                   width: 25,
                                   height: 25,
                                 ),
@@ -587,6 +597,8 @@ class BlockConfirmDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final themeProvider = Provider.of<ThemeProvider>(context);
+
     return Dialog(
       child: Container(
         decoration: const BoxDecoration(
@@ -612,10 +624,10 @@ class BlockConfirmDialog extends StatelessWidget {
               child: Text(
                 LocaleKeys.dialogs_blockConfirm.tr(),
                 textAlign: TextAlign.center,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 17,
                   fontWeight: FontWeight.w700,
-                  color: Colors.black,
+                  color: themeProvider.isDarkMode? Colors.white : Colors.black,
                 ),
               ),
             ),
@@ -647,18 +659,18 @@ class BlockConfirmDialog extends StatelessWidget {
                         color: Colors.grey,
                         width: 1,
                       ),
-                      borderRadius: const BorderRadius.all(Radius.circular(20)),
-                      color: Colors.white,
+                      borderRadius: BorderRadius.all(Radius.circular(20)),
+                      color: themeProvider.isDarkMode? Colors.black : Colors.white,
                     ),
                     width: 60,
                     height: 40,
                     child: Center(
                       child: Text(
                         LocaleKeys.dialogs_cancel.tr(),
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w500,
-                          color: Colors.black,
+                          color: themeProvider.isDarkMode? Colors.white : Colors.black,
                         ),
                       ),
                     ),
@@ -678,10 +690,10 @@ class BlockConfirmDialog extends StatelessWidget {
                     child: Center(
                       child: Text(
                         LocaleKeys.dialogs_confirm.tr(),
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w500,
-                          color: Colors.white,
+                          color: themeProvider.isDarkMode? Colors.black : Colors.white,
                         ),
                       ),
                     ),
@@ -714,6 +726,8 @@ class SignoutConfirmDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final themeProvider = Provider.of<ThemeProvider>(context);
+
     return Dialog(
       child: Container(
         decoration: const BoxDecoration(
@@ -736,10 +750,10 @@ class SignoutConfirmDialog extends StatelessWidget {
             ),
             Text(
               LocaleKeys.dialogs_logoutConfirm.tr(),
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 17,
                 fontWeight: FontWeight.w700,
-                color: Colors.black,
+                color: themeProvider.isDarkMode? Colors.white : Colors.black,
               ),
             ),
             const SizedBox(height: 20),
@@ -758,18 +772,18 @@ class SignoutConfirmDialog extends StatelessWidget {
                         color: Colors.grey,
                         width: 1,
                       ),
-                      borderRadius: const BorderRadius.all(Radius.circular(20)),
-                      color: Colors.white,
+                      borderRadius: BorderRadius.all(Radius.circular(20)),
+                      color: themeProvider.isDarkMode? Colors.black : Colors.white,
                     ),
                     width: 60,
                     height: 40,
                     child: Center(
                       child: Text(
                         LocaleKeys.dialogs_cancel.tr(),
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w500,
-                          color: Colors.black,
+                          color: themeProvider.isDarkMode? Colors.white : Colors.black,
                         ),
                       ),
                     ),
@@ -789,10 +803,10 @@ class SignoutConfirmDialog extends StatelessWidget {
                     child: Center(
                       child: Text(
                         LocaleKeys.dialogs_confirm.tr(),
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w500,
-                          color: Colors.white,
+                          color: themeProvider.isDarkMode? Colors.black : Colors.white,
                         ),
                       ),
                     ),
@@ -825,6 +839,8 @@ class UnregisterConfirmDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final themeProvider = Provider.of<ThemeProvider>(context);
+
     return Dialog(
       child: Container(
         decoration: const BoxDecoration(
@@ -850,10 +866,10 @@ class UnregisterConfirmDialog extends StatelessWidget {
               child: Text(
                 LocaleKeys.dialogs_withdrawalConfirm.tr(),
                 textAlign: TextAlign.center,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 17,
                   fontWeight: FontWeight.w700,
-                  color: Colors.black,
+                  color: themeProvider.isDarkMode? Colors.white : Colors.black,
                 ),
               ),
             ),
@@ -862,10 +878,10 @@ class UnregisterConfirmDialog extends StatelessWidget {
               child: Text(
                 LocaleKeys.dialogs_withdrawalEmailInfo.tr(),
                 textAlign: TextAlign.center,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 12,
                   fontWeight: FontWeight.w700,
-                  color: Color(0xFFBBBBBB),
+                  color: themeProvider.isDarkMode? Color(0xff666666) : Color(0xFFBBBBBB),
                 ),
               ),
             ),
@@ -885,18 +901,18 @@ class UnregisterConfirmDialog extends StatelessWidget {
                         color: Colors.grey,
                         width: 1,
                       ),
-                      borderRadius: const BorderRadius.all(Radius.circular(20)),
-                      color: Colors.white,
+                      borderRadius: BorderRadius.all(Radius.circular(20)),
+                      color: themeProvider.isDarkMode? Colors.black : Colors.white,
                     ),
                     width: 60,
                     height: 40,
                     child: Center(
                       child: Text(
                         LocaleKeys.dialogs_cancel.tr(),
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w500,
-                          color: Colors.black,
+                          color: themeProvider.isDarkMode? Colors.white : Colors.black,
                         ),
                       ),
                     ),
@@ -916,10 +932,10 @@ class UnregisterConfirmDialog extends StatelessWidget {
                     child: Center(
                       child: Text(
                         LocaleKeys.dialogs_confirm.tr(),
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w500,
-                          color: Colors.white,
+                          color: themeProvider.isDarkMode? Colors.black : Colors.white,
                         ),
                       ),
                     ),
@@ -953,6 +969,8 @@ class ForAndroidTesterDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final themeProvider = Provider.of<ThemeProvider>(context);
+
     return Dialog(
       child: Container(
         decoration: const BoxDecoration(
@@ -974,12 +992,12 @@ class ForAndroidTesterDialog extends StatelessWidget {
                   BlendMode.srcIn,
                 ),
               ),
-              const Text(
+              Text(
                 'Dear Google Play Review Team,',
                 style: TextStyle(
                   fontSize: 17,
                   fontWeight: FontWeight.w700,
-                  color: Colors.black,
+                  color: themeProvider.isDarkMode? Colors.white : Colors.black,
                 ),
               ),
               Expanded(
@@ -997,7 +1015,7 @@ class ForAndroidTesterDialog extends StatelessWidget {
                       padding: const EdgeInsets.only(right: 10),
                       child: ListView(
                         controller: _scrollController,
-                        children: const [
+                        children: [
                           Text(
                             '''I am writing to seek assistance regarding an issue we have encountered following the production review of our app on the Google Play Store.
 
@@ -1045,7 +1063,7 @@ Google Playストアでのアプリのプロダクションレビュー後に遭
                             style: TextStyle(
                               fontSize: 15,
                               fontWeight: FontWeight.w700,
-                              color: Color(0xFFBBBBBB),
+                              color: themeProvider.isDarkMode? Color(0xff666666) : Color(0xFFBBBBBB),
                             ),
                           ),
                         ],
@@ -1068,13 +1086,13 @@ Google Playストアでのアプリのプロダクションレビュー後に遭
                       ),
                       width: 80,
                       height: 40,
-                      child: const Center(
+                      child: Center(
                         child: Text(
                           'Confirm',
                           style: TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.w500,
-                            color: Colors.white,
+                            color: themeProvider.isDarkMode? Colors.black : Colors.white,
                           ),
                         ),
                       ),
@@ -1115,6 +1133,9 @@ class ExitConfirmDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final themeProvider = Provider.of<ThemeProvider>(context);
+
+
     return Dialog(
       child: Container(
         decoration: const BoxDecoration(
@@ -1140,10 +1161,10 @@ class ExitConfirmDialog extends StatelessWidget {
               child: Text(
                 LocaleKeys.dialogs_exitConfirm.tr(),
                 textAlign: TextAlign.center,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 17,
                   fontWeight: FontWeight.w700,
-                  color: Colors.black,
+                  color: themeProvider.isDarkMode? Colors.white : Colors.black,
                 ),
               ),
             ),
@@ -1163,18 +1184,18 @@ class ExitConfirmDialog extends StatelessWidget {
                         color: Colors.grey,
                         width: 1,
                       ),
-                      borderRadius: const BorderRadius.all(Radius.circular(20)),
-                      color: Colors.white,
+                      borderRadius: BorderRadius.all(Radius.circular(20)),
+                      color: themeProvider.isDarkMode? Colors.black : Colors.white,
                     ),
                     width: 60,
                     height: 40,
                     child: Center(
                       child: Text(
                         LocaleKeys.dialogs_cancel.tr(),
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w500,
-                          color: Colors.black,
+                          color: themeProvider.isDarkMode? Colors.white : Colors.black,
                         ),
                       ),
                     ),
@@ -1197,10 +1218,10 @@ class ExitConfirmDialog extends StatelessWidget {
                     child: Center(
                       child: Text(
                         LocaleKeys.dialogs_tempSave.tr(),
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w500,
-                          color: Colors.white,
+                          color: themeProvider.isDarkMode? Colors.black : Colors.white,
                         ),
                       ),
                     ),
@@ -1220,10 +1241,10 @@ class ExitConfirmDialog extends StatelessWidget {
                     child: Center(
                       child: Text(
                         LocaleKeys.dialogs_confirm.tr(),
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w500,
-                          color: Colors.white,
+                          color: themeProvider.isDarkMode? Colors.black : Colors.white,
                         ),
                       ),
                     ),
