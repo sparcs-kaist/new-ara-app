@@ -84,9 +84,7 @@ platform :ios do
       workspace: "Runner.xcworkspace",
       scheme: "Runner",
       clean: true,
-      export_method: "app-store",
-      xcargs: "-allowProvisioningUpdates",
-      export_xcargs: "-allowProvisioningUpdates",
+      export_method: "app-store"
     )
     upload_to_testflight(
       skip_waiting_for_build_processing: true,

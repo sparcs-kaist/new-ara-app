@@ -366,9 +366,8 @@ class _MainPageState extends State<MainPage> with WidgetsBindingObserver {
 
   @override
   Widget build(BuildContext context) {
-    debugPrint("build invoked!!");
     final themeProvider = Provider.of<ThemeProvider>(context);
-
+    // debugPrint("build invoked!!");
     return Scaffold(
       appBar: AppBar(
         elevation: 0,

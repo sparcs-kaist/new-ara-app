@@ -5,7 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:new_ara_app/constants/url_info.dart';
 import 'package:new_ara_app/pages/terms_and_conditions_page.dart';
 import 'package:new_ara_app/providers/theme_provider.dart';
 import 'package:new_ara_app/providers/user_provider.dart';
@@ -57,10 +56,7 @@ class SettingPageState extends State<SettingPage> {
   Widget build(BuildContext context) {
     var userProvider = context.watch<UserProvider>();
 
-    Dio dio = userProvider.createDioWithHeadersForNonget();
     final themeProvider = Provider.of<ThemeProvider>(context);
-
-
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
