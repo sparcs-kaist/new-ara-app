@@ -7,6 +7,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:new_ara_app/pages/bulletin_search_page.dart';
 import 'package:new_ara_app/providers/connectivity_provider.dart';
 import 'package:new_ara_app/translations/locale_keys.g.dart';
+import 'package:new_ara_app/widgets/refresh_indicator.dart';
 import 'package:provider/provider.dart';
 
 import 'package:new_ara_app/constants/board_type.dart';
@@ -450,14 +451,14 @@ class _MainPageState extends State<MainPage> with WidgetsBindingObserver {
                   _isLoading[10] ||
                   _isLoading[11]
               ? const LoadingIndicator()
-              : RefreshIndicator.adaptive(
-                  displacement: 0.0,
-                  color: ColorsInfo.newara,
-                  onRefresh: () async {
+              : CustomRefreshIndicator(
+                  onRefresh: () {
                     //api를 호출 후 최신 데이터로 갱신
-                    await _refreshAllPosts();
+                    _refreshAllPosts();
                   },
                   child: SingleChildScrollView(
+                    physics: AlwaysScrollableScrollPhysics(
+                        parent: BouncingScrollPhysics()),
                     child: SizedBox(
                       width: MediaQuery.of(context).size.width,
                       child: Column(

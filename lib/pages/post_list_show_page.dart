@@ -5,6 +5,7 @@ import 'package:new_ara_app/pages/bulletin_search_page.dart';
 import 'package:new_ara_app/pages/post_write_page.dart';
 import 'package:new_ara_app/providers/connectivity_provider.dart';
 import 'package:new_ara_app/translations/locale_keys.g.dart';
+import 'package:new_ara_app/widgets/refresh_indicator.dart';
 import 'package:provider/provider.dart';
 
 import 'package:new_ara_app/constants/board_type.dart';
@@ -480,9 +481,7 @@ class _PostListShowPageState extends State<PostListShowPage>
                     color: const Color(0xFFF0F0F0),
                   ),
                 Expanded(
-                  child: RefreshIndicator.adaptive(
-                    displacement: 0.0,
-                    color: ColorsInfo.newara,
+                  child: CustomRefreshIndicator(
                     onRefresh: () async {
                       // refresh 중에는 LoadingIndicator를 사용하지 않으므로 setState()는 제거함.
                       // 로직상 isLoading 변수의 값은 상황에 맞게 변경되도록 함.
@@ -500,7 +499,8 @@ class _PostListShowPageState extends State<PostListShowPage>
                     child: isLoading
                         ? const LoadingIndicator()
                         : ListView.separated(
-                            physics: const AlwaysScrollableScrollPhysics(),
+                            physics: const AlwaysScrollableScrollPhysics(
+                                parent: BouncingScrollPhysics()),
                             controller: _scrollController,
                             itemCount: postPreviewList.length +
                                 (_isLoadingNextPage ? 1 : 0), // 아이템 개수
