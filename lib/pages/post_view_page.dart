@@ -934,7 +934,7 @@ class _PostViewPageState extends State<PostViewPage> {
                 width: context.locale == const Locale('ko') ? 80 : 110,
                 height: 35,
                 decoration: BoxDecoration(
-                  color: themeProvider.isDarkMode? Colors.black : Colors.white,
+                  color: themeProvider.isDarkMode? Color(0xff111111) : Colors.white,
                   borderRadius: BorderRadius.circular(8),
                   border: Border.all(
                     color: _article.my_scrap == null
@@ -1067,15 +1067,25 @@ class _PostViewPageState extends State<PostViewPage> {
                     } else {
                       await showDialog(
                         context: context,
-                        builder: (context) => BlockConfirmDialog(
-                          onTap: () {
-                            blockedProvider
-                                .addBlockedAnonymousPostID(
-                                    _article.created_by.id.toString())
-                                .then((_) => Navigator.pop(context));
-                          },
-                          userProvider: userProvider,
-                          targetContext: context,
+                        builder: (context) => Theme(
+                          data: Theme.of(context).copyWith(
+                              dialogBackgroundColor: themeProvider.isDarkMode? Color(0xff111111) : Colors.white,
+                              textButtonTheme: TextButtonThemeData(
+                                  style: ButtonStyle(
+                                    backgroundColor: WidgetStateProperty.all<Color>(themeProvider.isDarkMode? Colors.black : Colors.white),
+                                  )
+                              )
+                          ),
+                          child: BlockConfirmDialog(
+                            onTap: () {
+                              blockedProvider
+                                  .addBlockedAnonymousPostID(
+                                      _article.created_by.id.toString())
+                                  .then((_) => Navigator.pop(context));
+                            },
+                            userProvider: userProvider,
+                            targetContext: context,
+                          ),
                         ),
                       );
                     }
@@ -1087,30 +1097,40 @@ class _PostViewPageState extends State<PostViewPage> {
                   if (!isAuthorBlocked) {
                     await showDialog(
                       context: context,
-                      builder: (context) => BlockConfirmDialog(
-                        onTap: () {
-                          ArticleController(
-                                  model: _article, userProvider: userProvider)
-                              .handleBlock(true)
-                              .then((blockRes) {
-                            // 차단이 성공한 경우
-                            if (blockRes) {
-                              _fetchArticle(userProvider).then((_) {
-                                _updateState();
+                      builder: (context) => Theme(
+                        data: Theme.of(context).copyWith(
+                            dialogBackgroundColor: themeProvider.isDarkMode? Color(0xff111111) : Colors.white,
+                            textButtonTheme: TextButtonThemeData(
+                                style: ButtonStyle(
+                                  backgroundColor: WidgetStateProperty.all<Color>(themeProvider.isDarkMode? Colors.black : Colors.white),
+                                )
+                            )
+                        ),
+                        child: BlockConfirmDialog(
+                          onTap: () {
+                            ArticleController(
+                                    model: _article, userProvider: userProvider)
+                                .handleBlock(true)
+                                .then((blockRes) {
+                              // 차단이 성공한 경우
+                              if (blockRes) {
+                                _fetchArticle(userProvider).then((_) {
+                                  _updateState();
+                                  Navigator.pop(context);
+                                });
+                              }
+                              // 차단에 실패할 경우 오류 메시지, 스낵바 출력
+                              else {
+                                debugPrint("failed to block");
                                 Navigator.pop(context);
-                              });
-                            }
-                            // 차단에 실패할 경우 오류 메시지, 스낵바 출력
-                            else {
-                              debugPrint("failed to block");
-                              Navigator.pop(context);
-                              showInfoBySnackBar(context,
-                                  LocaleKeys.postViewPage_failedToBlock.tr());
-                            }
-                          });
-                        },
-                        userProvider: userProvider,
-                        targetContext: context,
+                                showInfoBySnackBar(context,
+                                    LocaleKeys.postViewPage_failedToBlock.tr());
+                              }
+                            });
+                          },
+                          userProvider: userProvider,
+                          targetContext: context,
+                        ),
                       ),
                     );
                   }
@@ -1180,30 +1200,41 @@ class _PostViewPageState extends State<PostViewPage> {
                 onTap: () async {
                   await showDialog(
                       context: context,
-                      builder: (context) => DeleteDialog(
-                            userProvider: userProvider,
-                            targetContext: context,
-                            onTap: () {
-                              ArticleController(
-                                      model: _article,
-                                      userProvider: userProvider)
-                                  .delete()
-                                  .then((res) {
-                                // 사용자가 미리 뒤로가기 버튼을 누르는 경우 에러 방지를 위해
-                                // try-catch 문을 도입함.
-                                try {
-                                  // dialog pop
-                                  Navigator.pop(context);
-                                  if (res == true) {
-                                    // PostViewPage pop
+                      builder: (context) => Theme(
+                        data: Theme.of(context).copyWith(
+                            dialogBackgroundColor: themeProvider.isDarkMode? Color(0xff111111) : Colors.white,
+                            textButtonTheme: TextButtonThemeData(
+                                style: ButtonStyle(
+                                  backgroundColor: WidgetStateProperty.all<Color>(themeProvider.isDarkMode? Colors.black : Colors.white),
+                                )
+                            )
+                        ),
+                        child: DeleteDialog(
+                              isDarkMode: themeProvider.isDarkMode,
+                              userProvider: userProvider,
+                              targetContext: context,
+                              onTap: () {
+                                ArticleController(
+                                        model: _article,
+                                        userProvider: userProvider)
+                                    .delete()
+                                    .then((res) {
+                                  // 사용자가 미리 뒤로가기 버튼을 누르는 경우 에러 방지를 위해
+                                  // try-catch 문을 도입함.
+                                  try {
+                                    // dialog pop
                                     Navigator.pop(context);
+                                    if (res == true) {
+                                      // PostViewPage pop
+                                      Navigator.pop(context);
+                                    }
+                                  } catch (error) {
+                                    debugPrint("pop error: $error");
                                   }
-                                } catch (error) {
-                                  debugPrint("pop error: $error");
-                                }
-                              });
-                            },
-                          ));
+                                });
+                              },
+                            ),
+                      ));
                 },
                 child: Container(
                   width: 65,
@@ -1242,7 +1273,18 @@ class _PostViewPageState extends State<PostViewPage> {
                   showDialog(
                       context: context,
                       builder: (context) {
-                        return ReportDialogWidget(articleID: _article.id);
+
+                        return Theme(
+                          data: Theme.of(context).copyWith(
+                            dialogBackgroundColor: themeProvider.isDarkMode? Color(0xff111111) : Colors.white,
+                            textButtonTheme: TextButtonThemeData(
+                              style: ButtonStyle(
+                                backgroundColor: WidgetStateProperty.all<Color>(themeProvider.isDarkMode? Colors.black : Colors.white),
+                              )
+                            )
+                          ),
+                          child: ReportDialogWidget(articleID: _article.id)
+                        );
                       });
                 },
                 child: Container(
@@ -1446,26 +1488,37 @@ class _PostViewPageState extends State<PostViewPage> {
                                           showDialog(
                                             context: context,
                                             builder: (context) {
-                                              return DeleteDialog(
-                                                userProvider: userProvider,
-                                                targetContext: context,
-                                                onTap: () {
-                                                  CommentController(
-                                                          model: curComment,
-                                                          userProvider:
-                                                              userProvider)
-                                                      .delComment(curComment.id,
-                                                          userProvider)
-                                                      .then((res) async {
-                                                    if (res) {
-                                                      bool res =
-                                                          await _fetchArticle(
-                                                              userProvider);
-                                                      _setIsPageLoaded(res);
-                                                    }
-                                                  });
-                                                  Navigator.pop(context);
-                                                },
+                                              return Theme(
+                                                data: Theme.of(context).copyWith(
+                                                    dialogBackgroundColor: themeProvider.isDarkMode? Color(0xff111111) : Colors.white,
+                                                    textButtonTheme: TextButtonThemeData(
+                                                        style: ButtonStyle(
+                                                          backgroundColor: WidgetStateProperty.all<Color>(themeProvider.isDarkMode? Colors.black : Colors.white),
+                                                        )
+                                                    )
+                                                ),
+                                                child: DeleteDialog(
+                                                  isDarkMode: themeProvider.isDarkMode,
+                                                  userProvider: userProvider,
+                                                  targetContext: context,
+                                                  onTap: () {
+                                                    CommentController(
+                                                            model: curComment,
+                                                            userProvider:
+                                                                userProvider)
+                                                        .delComment(curComment.id,
+                                                            userProvider)
+                                                        .then((res) async {
+                                                      if (res) {
+                                                        bool res =
+                                                            await _fetchArticle(
+                                                                userProvider);
+                                                        _setIsPageLoaded(res);
+                                                      }
+                                                    });
+                                                    Navigator.pop(context);
+                                                  },
+                                                ),
                                               );
                                             },
                                           );
@@ -1784,7 +1837,7 @@ class _PostViewPageState extends State<PostViewPage> {
                     minHeight: 36,
                   ),
                   decoration: BoxDecoration(
-                    color: themeProvider.isDarkMode? Color(0xff111111) : Color(0xfff8f8f8),
+                    color: themeProvider.isDarkMode? Color(0xff222222) : Color(0xfff8f8f8),
                     borderRadius: BorderRadius.all(Radius.circular(10)),
                   ),
                   child: _buildForm(),
@@ -1802,13 +1855,23 @@ class _PostViewPageState extends State<PostViewPage> {
                             userProvider.naUser!.email ==
                                 "tkddh1109@gmail.com")) {
                       await showDialog(
-                          builder: (context) => ForAndroidTesterDialog(
-                                userProvider: userProvider,
-                                targetContext: context,
-                                onTap: () {
-                                  Navigator.pop(context);
-                                },
-                              ),
+                          builder: (context) => Theme(
+                            data: Theme.of(context).copyWith(
+                                dialogBackgroundColor: themeProvider.isDarkMode? Color(0xff111111) : Colors.white,
+                                textButtonTheme: TextButtonThemeData(
+                                    style: ButtonStyle(
+                                      backgroundColor: WidgetStateProperty.all<Color>(themeProvider.isDarkMode? Colors.black : Colors.white),
+                                    )
+                                )
+                            ),
+                            child: ForAndroidTesterDialog(
+                                  userProvider: userProvider,
+                                  targetContext: context,
+                                  onTap: () {
+                                    Navigator.pop(context);
+                                  },
+                                ),
+                          ),
                           context: context);
 
                       return;
@@ -1859,8 +1922,9 @@ class _PostViewPageState extends State<PostViewPage> {
       child: Container(
           margin: const EdgeInsets.only(left: 13),
           child: TextFormField(
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 14,
+              color: themeProvider.isDarkMode? Colors.white :Colors.black,
             ),
             cursorColor: ColorsInfo.newara,
             controller: _textEditingController,
@@ -1871,8 +1935,8 @@ class _PostViewPageState extends State<PostViewPage> {
             decoration: InputDecoration(
               border: InputBorder.none,
               hintText: LocaleKeys.postViewPage_commentHintText.tr(),
-              hintStyle: const TextStyle(
-                color: Color(0xFFBBBBBB),
+              hintStyle: TextStyle(
+                color: themeProvider.isDarkMode? Color(0xFF888888) : Color(0xFFBBBBBB),
                 fontSize: 14,
                 fontWeight: FontWeight.w500,
               ),

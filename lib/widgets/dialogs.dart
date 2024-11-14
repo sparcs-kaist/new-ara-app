@@ -1,6 +1,7 @@
 // PostViewPage의 글/댓글 신고, 댓글 수정에 사용되는 Dialog 위젯 파일.
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:new_ara_app/constants/theme_info.dart';
 import 'package:new_ara_app/providers/theme_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:dio/dio.dart';
@@ -27,7 +28,8 @@ class ReportDialog extends StatefulWidget {
 
   /// 댓글에 대한 신고일 경우 null이 아님.
   final int? commentID;
-  const ReportDialog({super.key, this.articleID, this.commentID});
+  final bool isDarkMode;
+  const ReportDialog({super.key, this.articleID, this.commentID, required this.isDarkMode});
 
   @override
   State<ReportDialog> createState() => _ReportDialogState();
@@ -65,11 +67,11 @@ class _ReportDialogState extends State<ReportDialog> {
 
   @override
   Widget build(BuildContext context) {
-    final themeProvider = Provider.of<ThemeProvider>(context);
-
     return Dialog(
+      backgroundColor: widget.isDarkMode? NewAraThemes.gry36 : Colors.white,
+      surfaceTintColor: Colors.transparent,
       child: Container(
-        decoration: const BoxDecoration(
+        decoration: BoxDecoration(
           borderRadius: BorderRadius.all(Radius.circular(15)),
         ),
         width: 380,
@@ -88,23 +90,24 @@ class _ReportDialogState extends State<ReportDialog> {
             const SizedBox(height: 5),
             Text(
               '${widget.articleID == null ? '댓글' : '게시글'} 신고 사유를 알려주세요.',
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 17,
                 fontWeight: FontWeight.w600,
+                color: widget.isDarkMode? Colors.white : Colors.black,
               ),
             ),
             const SizedBox(height: 20),
-            _buildReportButton(0),
+            _buildReportButton(0, widget.isDarkMode),
             const SizedBox(height: 10),
-            _buildReportButton(1),
+            _buildReportButton(1, widget.isDarkMode),
             const SizedBox(height: 10),
-            _buildReportButton(2),
+            _buildReportButton(2, widget.isDarkMode),
             const SizedBox(height: 10),
-            _buildReportButton(3),
+            _buildReportButton(3, widget.isDarkMode),
             const SizedBox(height: 10),
-            _buildReportButton(4),
+            _buildReportButton(4, widget.isDarkMode),
             const SizedBox(height: 10),
-            _buildReportButton(5),
+            _buildReportButton(5, widget.isDarkMode),
             const SizedBox(height: 20),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -120,7 +123,7 @@ class _ReportDialogState extends State<ReportDialog> {
                         width: 1, // 테두리의 두께를 2로 지정
                       ),
                       borderRadius: const BorderRadius.all(Radius.circular(20)),
-                      color: themeProvider.isDarkMode? Colors.black : Colors.white,
+                      color: widget.isDarkMode? Colors.black : Colors.white,
                     ),
                     width: 60,
                     height: 40,
@@ -130,7 +133,7 @@ class _ReportDialogState extends State<ReportDialog> {
                         style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w500,
-                          color: themeProvider.isDarkMode? Colors.white : Colors.black,
+                          color: widget.isDarkMode? Colors.white : Colors.black,
                         ),
                       ),
                     ),
@@ -164,7 +167,7 @@ class _ReportDialogState extends State<ReportDialog> {
                         style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w500,
-                          color: themeProvider.isDarkMode? Colors.black : Colors.white,
+                          color: widget.isDarkMode? Colors.black : Colors.white,
                         ),
                       ),
                     ),
@@ -215,8 +218,7 @@ class _ReportDialogState extends State<ReportDialog> {
   }
 
   // 각각의 신고항목에 대한 button
-  InkWell _buildReportButton(int idx) {
-    final themeProvider = Provider.of<ThemeProvider>(context);
+  InkWell _buildReportButton(int idx, bool isDarkMode) {
 
     return InkWell(
       onTap: () {
@@ -228,7 +230,7 @@ class _ReportDialogState extends State<ReportDialog> {
           borderRadius: const BorderRadius.all(Radius.circular(20)),
           color: isChosen[idx]
               ? ColorsInfo.newara
-              : themeProvider.isDarkMode? Color.fromRGBO(80, 80, 80, 1) : Color.fromRGBO(220, 220, 220, 1),
+              : Color(0xff111111),
         ),
         width: 180,
         height: 40,
@@ -238,7 +240,7 @@ class _ReportDialogState extends State<ReportDialog> {
             style: TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.w500,
-              color: isChosen[idx] ? themeProvider.isDarkMode? Colors.black : Colors.white : themeProvider.isDarkMode? Colors.white : Colors.black,
+              color: isChosen[idx] ? (isDarkMode? Colors.black : Colors.white) : (isDarkMode? Colors.white : Colors.black),
             ),
           ),
         ),
@@ -257,16 +259,18 @@ class DeleteDialog extends StatelessWidget {
   /// '확인' 버튼을 눌렀을 때 적용되는 onTap 메서드
   final void Function()? onTap;
 
+  final bool isDarkMode;
+
   const DeleteDialog({
     super.key,
     required this.userProvider,
     required this.targetContext,
     required this.onTap,
+    required this.isDarkMode
   });
 
   @override
   Widget build(BuildContext context) {
-    final themeProvider = Provider.of<ThemeProvider>(context);
 
     return Dialog(
       child: Container(
@@ -296,7 +300,7 @@ class DeleteDialog extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 17,
                   fontWeight: FontWeight.w700,
-                  color: themeProvider.isDarkMode? Colors.white : Colors.black,
+                  color: isDarkMode? Colors.white : Colors.black,
                 ),
               ),
             ),
@@ -317,7 +321,7 @@ class DeleteDialog extends StatelessWidget {
                         width: 1,
                       ),
                       borderRadius: const BorderRadius.all(Radius.circular(20)),
-                      color: themeProvider.isDarkMode? Colors.black : Colors.white,
+                      color: isDarkMode? Colors.black : Colors.white,
                     ),
                     width: 60,
                     height: 40,
@@ -327,7 +331,7 @@ class DeleteDialog extends StatelessWidget {
                         style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w500,
-                          color: themeProvider.isDarkMode? Colors.white : Colors.black,
+                          color: isDarkMode? Colors.white : Colors.black,
                         ),
                       ),
                     ),
@@ -350,7 +354,7 @@ class DeleteDialog extends StatelessWidget {
                         style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w500,
-                          color: themeProvider.isDarkMode? Colors.black : Colors.white,
+                          color: isDarkMode? Colors.black : Colors.white,
                         ),
                       ),
                     ),

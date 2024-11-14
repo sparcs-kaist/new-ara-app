@@ -311,7 +311,16 @@ class SettingPageState extends State<SettingPage> {
                             showDialog(
                                 context: context,
                                 builder: (context) =>
-                                    const BlockedUserDialog());
+                                    Theme(
+                                        data: Theme.of(context).copyWith(
+                                            dialogBackgroundColor: themeProvider.isDarkMode? Color(0xff111111) : Colors.white,
+                                            textButtonTheme: TextButtonThemeData(
+                                                style: ButtonStyle(
+                                                  backgroundColor: WidgetStateProperty.all<Color>(themeProvider.isDarkMode? Colors.black : Colors.white),
+                                                )
+                                            )
+                                        ),
+                                        child: const BlockedUserDialog()));
                           },
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.center,
@@ -468,12 +477,22 @@ class SettingPageState extends State<SettingPage> {
                             onTap: () async {
                               await showDialog(
                                 context: context,
-                                builder: (context) => SignoutConfirmDialog(
-                                  onTap: () async {
-                                    await _logout();
-                                  },
-                                  userProvider: userProvider,
-                                  targetContext: context,
+                                builder: (context) => Theme(
+                                  data: Theme.of(context).copyWith(
+                                      dialogBackgroundColor: themeProvider.isDarkMode? Color(0xff111111) : Colors.white,
+                                      textButtonTheme: TextButtonThemeData(
+                                          style: ButtonStyle(
+                                            backgroundColor: WidgetStateProperty.all<Color>(themeProvider.isDarkMode? Colors.black : Colors.white),
+                                          )
+                                      )
+                                  ),
+                                  child: SignoutConfirmDialog(
+                                    onTap: () async {
+                                      await _logout();
+                                    },
+                                    userProvider: userProvider,
+                                    targetContext: context,
+                                  ),
                                 ),
                               );
                             },
@@ -507,39 +526,49 @@ class SettingPageState extends State<SettingPage> {
                             onTap: () async {
                               await showDialog(
                                 context: context,
-                                builder: (context) => UnregisterConfirmDialog(
-                                  onTap: () async {
-                                    Navigator.pop(context);
-                                    setState(() {
-                                      _isLoading = true;
-                                    });
-                                    var response = await userProvider
-                                        .getApiRes('unregister');
-                                    // ignore: unused_local_variable
-                                    final Map<String, dynamic>? responseResult =
-                                        await response?.data;
-
-                                    //TODO: 회원탈퇴 로직 보강 필요
-                                    // if(responseResult == null){
-                                    //   ///회원탈퇴 실패
-                                    // }
-                                    final prefs =
-                                        await SharedPreferences.getInstance();
-                                    String jsonString = userProvider
-                                        .naUser!.user
-                                        .toString(); // 데이터를 JSON 문자열로 인코딩
-                                    await prefs.setString(
-                                        '심사통과를위한탈퇴탈퇴한유저', jsonString);
-
-                                    if (mounted) {
+                                builder: (context) => Theme(
+                                  data: Theme.of(context).copyWith(
+                                      dialogBackgroundColor: themeProvider.isDarkMode? Color(0xff111111) : Colors.white,
+                                      textButtonTheme: TextButtonThemeData(
+                                          style: ButtonStyle(
+                                            backgroundColor: WidgetStateProperty.all<Color>(themeProvider.isDarkMode? Colors.black : Colors.white),
+                                          )
+                                      )
+                                  ),
+                                  child: UnregisterConfirmDialog(
+                                    onTap: () async {
+                                      Navigator.pop(context);
                                       setState(() {
-                                        _isLoading = false;
+                                        _isLoading = true;
                                       });
-                                    }
-                                    await _logout();
-                                  },
-                                  userProvider: userProvider,
-                                  targetContext: context,
+                                      var response = await userProvider
+                                          .getApiRes('unregister');
+                                      // ignore: unused_local_variable
+                                      final Map<String, dynamic>? responseResult =
+                                          await response?.data;
+
+                                      //TODO: 회원탈퇴 로직 보강 필요
+                                      // if(responseResult == null){
+                                      //   ///회원탈퇴 실패
+                                      // }
+                                      final prefs =
+                                          await SharedPreferences.getInstance();
+                                      String jsonString = userProvider
+                                          .naUser!.user
+                                          .toString(); // 데이터를 JSON 문자열로 인코딩
+                                      await prefs.setString(
+                                          '심사통과를위한탈퇴탈퇴한유저', jsonString);
+
+                                      if (mounted) {
+                                        setState(() {
+                                          _isLoading = false;
+                                        });
+                                      }
+                                      await _logout();
+                                    },
+                                    userProvider: userProvider,
+                                    targetContext: context,
+                                  ),
                                 ),
                               );
                             },

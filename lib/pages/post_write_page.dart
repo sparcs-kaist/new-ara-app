@@ -567,29 +567,39 @@ class _PostWritePageState extends State<PostWritePage>
             if (_hasEditorText || _titleController.text != '') {
               final bool shouldPop = await showDialog<bool>(
                     context: context,
-                    builder: (context) => ExitConfirmDialog(
-                          userProvider: userProvider,
-                          targetContext: context,
-                          onTapConfirm: () async {
-                            debugPrint("onTapConfirm invoked");
-                            //dialog pop
-                            String key = _isEditingPost
-                                ? '/cache/${widget.previousArticle!.id}/'
-                                : '/cache/${userID}/';
-                            await removeApiData(key);
-                            debugPrint('Cache Reset!');
-                            if (context.mounted) {
-                              Navigator.pop(context, true);
-                            }
-                          },
-                          onTapSave: () async {
-                            debugPrint("onTapSave invoked");
-                            await cacheCurrentData();
-                            if (context.mounted) {
-                              Navigator.pop(context, true);
-                            }
-                          },
-                        )) ?? false;
+                    builder: (context) => Theme(
+                      data: Theme.of(context).copyWith(
+                          dialogBackgroundColor: themeProvider.isDarkMode? Color(0xff111111) : Colors.white,
+                          textButtonTheme: TextButtonThemeData(
+                              style: ButtonStyle(
+                                backgroundColor: WidgetStateProperty.all<Color>(themeProvider.isDarkMode? Colors.black : Colors.white),
+                              )
+                          )
+                      ),
+                      child: ExitConfirmDialog(
+                            userProvider: userProvider,
+                            targetContext: context,
+                            onTapConfirm: () async {
+                              debugPrint("onTapConfirm invoked");
+                              //dialog pop
+                              String key = _isEditingPost
+                                  ? '/cache/${widget.previousArticle!.id}/'
+                                  : '/cache/${userID}/';
+                              await removeApiData(key);
+                              debugPrint('Cache Reset!');
+                              if (context.mounted) {
+                                Navigator.pop(context, true);
+                              }
+                            },
+                            onTapSave: () async {
+                              debugPrint("onTapSave invoked");
+                              await cacheCurrentData();
+                              if (context.mounted) {
+                                Navigator.pop(context, true);
+                              }
+                            },
+                          ),
+                    )) ?? false;
               if (context.mounted && shouldPop) Navigator.of(context).pop();
             } else {
               String key = _isEditingPost
@@ -651,41 +661,51 @@ class _PostWritePageState extends State<PostWritePage>
           if (_hasEditorText || _titleController.text != '') {
             showDialog(
                 context: context,
-                builder: (context) => ExitConfirmDialog(
-                      userProvider: userProvider,
-                      targetContext: context,
-                      onTapConfirm: () async {
-                        // 사용자가 미리 뒤로가기 버튼을 누르는 경우 에러 방지를 위해
-                        // try-catch 문을 도입함.
-                        String key = _isEditingPost
-                            ? '/cache/${widget.previousArticle!.id}/'
-                            : '/cache/${userID}/';
-                        await removeApiData(key);
-                        debugPrint('Cache Reset!');
-                        try {
-                          if (context.mounted) {
-                            Navigator.of(context)
-                              ..pop() //dialog pop
-                              ..pop(); //PostWritePage pop
+                builder: (context) => Theme(
+                  data: Theme.of(context).copyWith(
+                      dialogBackgroundColor: themeProvider.isDarkMode? Color(0xff111111) : Colors.white,
+                      textButtonTheme: TextButtonThemeData(
+                          style: ButtonStyle(
+                            backgroundColor: WidgetStateProperty.all<Color>(themeProvider.isDarkMode? Colors.black : Colors.white),
+                          )
+                      )
+                  ),
+                  child: ExitConfirmDialog(
+                        userProvider: userProvider,
+                        targetContext: context,
+                        onTapConfirm: () async {
+                          // 사용자가 미리 뒤로가기 버튼을 누르는 경우 에러 방지를 위해
+                          // try-catch 문을 도입함.
+                          String key = _isEditingPost
+                              ? '/cache/${widget.previousArticle!.id}/'
+                              : '/cache/${userID}/';
+                          await removeApiData(key);
+                          debugPrint('Cache Reset!');
+                          try {
+                            if (context.mounted) {
+                              Navigator.of(context)
+                                ..pop() //dialog pop
+                                ..pop(); //PostWritePage pop
+                            }
+                          } catch (error) {
+                            debugPrint("pop error: $error");
                           }
-                        } catch (error) {
-                          debugPrint("pop error: $error");
-                        }
-                      },
-                      onTapSave: () async {
-                        await cacheCurrentData();
-                        try {
-                          if (context.mounted) {
-                            Navigator.of(context)
-                              ..pop() //dialog pop
-                              ..pop(); //PostWritePage pop
-                            showInfoBySnackBar(context, LocaleKeys.postWritePage_savedAtCache.tr());
+                        },
+                        onTapSave: () async {
+                          await cacheCurrentData();
+                          try {
+                            if (context.mounted) {
+                              Navigator.of(context)
+                                ..pop() //dialog pop
+                                ..pop(); //PostWritePage pop
+                              showInfoBySnackBar(context, LocaleKeys.postWritePage_savedAtCache.tr());
+                            }
+                          } catch (error) {
+                            debugPrint("pop error: $error");
                           }
-                        } catch (error) {
-                          debugPrint("pop error: $error");
-                        }
-                      },
-                    ));
+                        },
+                      ),
+                ));
           } else {
             String key = _isEditingPost
                 ? '/cache/${widget.previousArticle!.id}/'
