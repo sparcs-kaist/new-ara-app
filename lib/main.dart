@@ -1,3 +1,4 @@
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -5,6 +6,7 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:new_ara_app/constants/theme_info.dart';
 import 'package:new_ara_app/constants/url_info.dart';
 import 'package:new_ara_app/providers/theme_provider.dart';
+import 'package:new_ara_app/providers/connectivity_provider.dart';
 import 'package:new_ara_app/translations/codegen_loader.g.dart';
 import 'package:new_ara_app/utils/global_key.dart';
 import 'package:new_ara_app/widgets/loading_indicator.dart';
@@ -58,6 +60,7 @@ void main() async {
               }),
           ChangeNotifierProvider(create: (_) => BlockedProvider()),
           ChangeNotifierProvider(create: (_) => ThemeProvider()),
+          ChangeNotifierProvider(create: (_) => ConnectivityProvider()),
         ],
         child: const MyApp(),
       ),
