@@ -452,9 +452,9 @@ class _MainPageState extends State<MainPage> with WidgetsBindingObserver {
                   _isLoading[11]
               ? const LoadingIndicator()
               : CustomRefreshIndicator(
-                  onRefresh: () {
+                  onRefresh: () async {
                     //api를 호출 후 최신 데이터로 갱신
-                    _refreshAllPosts();
+                    await _refreshAllPosts();
                   },
                   child: SingleChildScrollView(
                     physics: AlwaysScrollableScrollPhysics(
