@@ -384,11 +384,10 @@ class _MainPageState extends State<MainPage> with WidgetsBindingObserver {
   @override
   Widget build(BuildContext context) {
     final themeProvider = Provider.of<ThemeProvider>(context);
-    
+
     debugPrint("build invoked!!");
     return Consumer<ConnectivityProvider>(
         builder: (context, connectivityProvider, child) {
-          
       return Scaffold(
         appBar: AppBar(
           elevation: 0,
@@ -404,7 +403,7 @@ class _MainPageState extends State<MainPage> with WidgetsBindingObserver {
               icon: Icon(themeProvider.isDarkMode
                   ? Icons.light_mode
                   : Icons.dark_mode),
-                color: ColorsInfo.newara,
+              color: ColorsInfo.newara,
             ),
             IconButton(
                 onPressed: () async {
@@ -529,7 +528,9 @@ class _MainPageState extends State<MainPage> with WidgetsBindingObserver {
                   Expanded(
                     child: Container(
                       height: 1,
-                      color: themeProvider.isDarkMode? NewAraThemes.darkBRLine :NewAraThemes.lightBRLine,
+                      color: themeProvider.isDarkMode
+                          ? NewAraThemes.darkBRLine
+                          : NewAraThemes.lightBRLine,
                     ),
                   ),
                 ],
@@ -547,7 +548,9 @@ class _MainPageState extends State<MainPage> with WidgetsBindingObserver {
                   Expanded(
                     child: Container(
                       height: 1,
-                      color: themeProvider.isDarkMode? NewAraThemes.darkBRLine :NewAraThemes.lightBRLine,
+                      color: themeProvider.isDarkMode
+                          ? NewAraThemes.darkBRLine
+                          : NewAraThemes.lightBRLine,
                     ),
                   ),
                 ],
@@ -593,7 +596,9 @@ class _MainPageState extends State<MainPage> with WidgetsBindingObserver {
                   Expanded(
                     child: Container(
                       height: 1,
-                      color: themeProvider.isDarkMode? NewAraThemes.darkBRLine :NewAraThemes.lightBRLine,
+                      color: themeProvider.isDarkMode
+                          ? NewAraThemes.darkBRLine
+                          : NewAraThemes.lightBRLine,
                     ),
                   ),
                 ],
@@ -608,7 +613,9 @@ class _MainPageState extends State<MainPage> with WidgetsBindingObserver {
                   Expanded(
                     child: Container(
                       height: 1,
-                      color: themeProvider.isDarkMode? NewAraThemes.darkBRLine :NewAraThemes.lightBRLine,
+                      color: themeProvider.isDarkMode
+                          ? NewAraThemes.darkBRLine
+                          : NewAraThemes.lightBRLine,
                     ),
                   ),
                 ],
@@ -636,7 +643,7 @@ class _MainPageState extends State<MainPage> with WidgetsBindingObserver {
             style: TextStyle(
               fontWeight: FontWeight.w600,
               fontSize: 20,
-              color: themeProvider.isDarkMode? Colors.white: Colors.black,
+              color: themeProvider.isDarkMode ? Colors.white : Colors.black,
             ),
           ),
         ),
@@ -648,7 +655,9 @@ class _MainPageState extends State<MainPage> with WidgetsBindingObserver {
           decoration: BoxDecoration(
             border: Border.all(
               width: 1,
-              color: themeProvider.isDarkMode? Color.fromRGBO(63, 63, 63, 1): Color.fromRGBO(240, 240, 240, 1),
+              color: themeProvider.isDarkMode
+                  ? Color.fromRGBO(63, 63, 63, 1)
+                  : Color.fromRGBO(240, 240, 240, 1),
             ),
             borderRadius: const BorderRadius.all(Radius.circular(20)),
           ),
@@ -681,7 +690,9 @@ class _MainPageState extends State<MainPage> with WidgetsBindingObserver {
                       style: TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.w700,
-                        color: themeProvider.isDarkMode? Color(0xff3469d1) : Color(0xFF1F4899),
+                        color: themeProvider.isDarkMode
+                            ? Color(0xff3469d1)
+                            : Color(0xFF1F4899),
                       ),
                     ),
                     const SizedBox(
@@ -690,7 +701,10 @@ class _MainPageState extends State<MainPage> with WidgetsBindingObserver {
                     SvgPicture.asset(
                       'assets/icons/right_chevron.svg',
                       colorFilter: ColorFilter.mode(
-                          themeProvider.isDarkMode? Color(0xff3469d1) : Color(0xFF1F4899), BlendMode.srcIn),
+                          themeProvider.isDarkMode
+                              ? Color(0xff3469d1)
+                              : Color(0xFF1F4899),
+                          BlendMode.srcIn),
                       fit: BoxFit.fill,
                       width: 17,
                       height: 17,
@@ -748,7 +762,9 @@ class _MainPageState extends State<MainPage> with WidgetsBindingObserver {
               ),
               Container(
                 height: 1,
-                color: themeProvider.isDarkMode? NewAraThemes.darkBRLine :NewAraThemes.lightBRLine,
+                color: themeProvider.isDarkMode
+                    ? NewAraThemes.darkBRLine
+                    : NewAraThemes.lightBRLine,
               ),
               const SizedBox(
                 height: 14,
@@ -767,7 +783,9 @@ class _MainPageState extends State<MainPage> with WidgetsBindingObserver {
                       style: TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.w700,
-                        color: themeProvider.isDarkMode? Color(0xffb1b1b1): Color(0xFF646464),
+                        color: themeProvider.isDarkMode
+                            ? Color(0xffb1b1b1)
+                            : Color(0xFF646464),
                       ),
                     ),
                     const SizedBox(
@@ -776,7 +794,10 @@ class _MainPageState extends State<MainPage> with WidgetsBindingObserver {
                     SvgPicture.asset(
                       'assets/icons/right_chevron.svg',
                       colorFilter: ColorFilter.mode(
-                          themeProvider.isDarkMode? Color(0xffb1b1b1): Color(0xFF646464), BlendMode.srcIn),
+                          themeProvider.isDarkMode
+                              ? Color(0xffb1b1b1)
+                              : Color(0xFF646464),
+                          BlendMode.srcIn),
                       fit: BoxFit.fill,
                       width: 17,
                       height: 17,
@@ -871,7 +892,7 @@ class _MainPageState extends State<MainPage> with WidgetsBindingObserver {
             style: TextStyle(
               fontWeight: FontWeight.w600,
               fontSize: 20,
-              color: themeProvider.isDarkMode? Colors.white: Colors.black,
+              color: themeProvider.isDarkMode ? Colors.white : Colors.black,
             ),
           ),
         ),
@@ -883,7 +904,9 @@ class _MainPageState extends State<MainPage> with WidgetsBindingObserver {
           decoration: BoxDecoration(
             border: Border.all(
               width: 1,
-              color: themeProvider.isDarkMode? Color.fromRGBO(63, 63, 63, 1): Color.fromRGBO(240, 240, 240, 1),
+              color: themeProvider.isDarkMode
+                  ? Color.fromRGBO(63, 63, 63, 1)
+                  : Color.fromRGBO(240, 240, 240, 1),
             ),
             borderRadius: const BorderRadius.all(Radius.circular(20)),
           ),
@@ -960,7 +983,9 @@ class _MainPageState extends State<MainPage> with WidgetsBindingObserver {
                       style: TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.w700,
-                        color: themeProvider.isDarkMode? Color(0xffb1b1b1): Color(0xFF646464),
+                        color: themeProvider.isDarkMode
+                            ? Color(0xffb1b1b1)
+                            : Color(0xFF646464),
                       ),
                     ),
                     const SizedBox(
@@ -969,7 +994,10 @@ class _MainPageState extends State<MainPage> with WidgetsBindingObserver {
                     SvgPicture.asset(
                       'assets/icons/right_chevron.svg',
                       colorFilter: ColorFilter.mode(
-                          themeProvider.isDarkMode? Color(0xffb1b1b1): Color(0xFF646464), BlendMode.srcIn),
+                          themeProvider.isDarkMode
+                              ? Color(0xffb1b1b1)
+                              : Color(0xFF646464),
+                          BlendMode.srcIn),
                       fit: BoxFit.fill,
                       width: 17,
                       height: 17,
@@ -1074,7 +1102,9 @@ class _MainPageState extends State<MainPage> with WidgetsBindingObserver {
           decoration: BoxDecoration(
             border: Border.all(
               width: 1,
-              color: themeProvider.isDarkMode? Color.fromRGBO(63, 63, 63, 1): Color.fromRGBO(240, 240, 240, 1),
+              color: themeProvider.isDarkMode
+                  ? Color.fromRGBO(63, 63, 63, 1)
+                  : Color.fromRGBO(240, 240, 240, 1),
             ),
             borderRadius: const BorderRadius.all(Radius.circular(20)),
           ),
@@ -1089,7 +1119,9 @@ class _MainPageState extends State<MainPage> with WidgetsBindingObserver {
                     style: TextStyle(
                       fontWeight: FontWeight.w700,
                       fontSize: 14,
-                      color: themeProvider.isDarkMode? Color.fromRGBO(90, 90, 90, 1): Color.fromRGBO(177, 177, 177, 1),
+                      color: themeProvider.isDarkMode
+                          ? Color.fromRGBO(90, 90, 90, 1)
+                          : Color.fromRGBO(177, 177, 177, 1),
                     ),
                   ),
                   const SizedBox(
@@ -1121,7 +1153,9 @@ class _MainPageState extends State<MainPage> with WidgetsBindingObserver {
                     style: TextStyle(
                       fontWeight: FontWeight.w700,
                       fontSize: 14,
-                      color: themeProvider.isDarkMode? Color.fromRGBO(90, 90, 90, 1): Color.fromRGBO(177, 177, 177, 1),
+                      color: themeProvider.isDarkMode
+                          ? Color.fromRGBO(90, 90, 90, 1)
+                          : Color.fromRGBO(177, 177, 177, 1),
                     ),
                   ),
                   const SizedBox(
@@ -1153,7 +1187,9 @@ class _MainPageState extends State<MainPage> with WidgetsBindingObserver {
                     style: TextStyle(
                       fontWeight: FontWeight.w700,
                       fontSize: 14,
-                      color: themeProvider.isDarkMode? Color.fromRGBO(90, 90, 90, 1): Color.fromRGBO(177, 177, 177, 1),
+                      color: themeProvider.isDarkMode
+                          ? Color.fromRGBO(90, 90, 90, 1)
+                          : Color.fromRGBO(177, 177, 177, 1),
                     ),
                   ),
                   const SizedBox(
@@ -1267,7 +1303,8 @@ class MainPageTextButton extends StatelessWidget {
                   style: TextStyle(
                     fontWeight: FontWeight.w600,
                     fontSize: 20,
-                    color: themeProvider.isDarkMode? Colors.white: Colors.black,
+                    color:
+                        themeProvider.isDarkMode ? Colors.white : Colors.black,
                   ),
                 ),
                 const SizedBox(
@@ -1275,8 +1312,9 @@ class MainPageTextButton extends StatelessWidget {
                 ),
                 SvgPicture.asset(
                   'assets/icons/right_chevron.svg',
-                  colorFilter:
-                      ColorFilter.mode(themeProvider.isDarkMode? Colors.white: Colors.black, BlendMode.srcIn),
+                  colorFilter: ColorFilter.mode(
+                      themeProvider.isDarkMode ? Colors.white : Colors.black,
+                      BlendMode.srcIn),
                   width: 22,
                   height: 22,
                 ),
@@ -1370,7 +1408,13 @@ class LittleText extends StatelessWidget {
             text:
                 getTitle(content.title, content.is_hidden, content.why_hidden),
             style: TextStyle(
-              color: content.is_hidden ? themeProvider.isDarkMode? NewAraThemes.gry6: NewAraThemes.gryB : themeProvider.isDarkMode? Colors.white: Colors.black,
+              color: content.is_hidden
+                  ? themeProvider.isDarkMode
+                      ? NewAraThemes.gry6
+                      : NewAraThemes.gryB
+                  : themeProvider.isDarkMode
+                      ? Colors.white
+                      : Colors.black,
               fontSize: 14,
               fontWeight: FontWeight.w400,
             ),

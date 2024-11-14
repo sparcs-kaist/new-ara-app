@@ -265,8 +265,11 @@ class _PostListShowPageState extends State<PostListShowPage>
       margin: const EdgeInsets.only(right: 10),
       child: TextButton(
           style: ButtonStyle(
-            backgroundColor: WidgetStateProperty.all(
-                currentFilter == index ? ColorsInfo.newara : themeProvider.isDarkMode? Colors.black : Colors.white),
+            backgroundColor: WidgetStateProperty.all(currentFilter == index
+                ? ColorsInfo.newara
+                : themeProvider.isDarkMode
+                    ? Colors.black
+                    : Colors.white),
             overlayColor:
                 WidgetStateProperty.all(Colors.transparent), // no splash
             shape: WidgetStateProperty.all(
@@ -275,7 +278,9 @@ class _PostListShowPageState extends State<PostListShowPage>
                 side: BorderSide(
                     color: currentFilter == index
                         ? ColorsInfo.newara
-                        : themeProvider.isDarkMode? NewAraThemes.gry6 :NewAraThemes.gryB,
+                        : themeProvider.isDarkMode
+                            ? NewAraThemes.gry6
+                            : NewAraThemes.gryB,
                     width: 1),
               ),
             ),
@@ -308,8 +313,12 @@ class _PostListShowPageState extends State<PostListShowPage>
             style: TextStyle(
               fontSize: 16, // PostPreview의 제목과 동일한 폰트 크기
               color: currentFilter == index
-                  ? themeProvider.isDarkMode? Colors.black : Colors.white
-                  : themeProvider.isDarkMode? Color.fromARGB(255, 170, 170, 170): Color.fromARGB(255, 101, 100, 100),
+                  ? themeProvider.isDarkMode
+                      ? Colors.black
+                      : Colors.white
+                  : themeProvider.isDarkMode
+                      ? Color.fromARGB(255, 170, 170, 170)
+                      : Color.fromARGB(255, 101, 100, 100),
             ),
           )),
     );
@@ -483,7 +492,9 @@ class _PostListShowPageState extends State<PostListShowPage>
                   Container(
                     margin: const EdgeInsets.only(top: 5),
                     height: 1,
-                    color: themeProvider.isDarkMode? NewAraThemes.darkBRLine :NewAraThemes.lightBRLine,
+                    color: themeProvider.isDarkMode
+                        ? NewAraThemes.darkBRLine
+                        : NewAraThemes.lightBRLine,
                   ),
                 Expanded(
                   child: RefreshIndicator.adaptive(
@@ -563,7 +574,9 @@ class _PostListShowPageState extends State<PostListShowPage>
                                   postPreviewList[index], currentFilter)) {
                                 return Container(
                                   height: 1,
-                                  color: themeProvider.isDarkMode? NewAraThemes.darkBRLine :NewAraThemes.lightBRLine,
+                                  color: themeProvider.isDarkMode
+                                      ? NewAraThemes.darkBRLine
+                                      : NewAraThemes.lightBRLine,
                                 );
                               } else {
                                 return Container();

@@ -12,7 +12,7 @@ class ConnectivityProvider with ChangeNotifier {
   StreamSubscription<List<ConnectivityResult>>? _connectSubscription;
 
   // 인터넷 연결 여부 표시
-  bool _isConnected = false;
+  bool _isConnected = true;
 
   ConnectivityProvider() {
     _initConnectivity();
@@ -37,7 +37,7 @@ class ConnectivityProvider with ChangeNotifier {
       // 연결됨
       _isConnected = true;
       notifyListeners(); // 인터넷 복구를 알림
-      snackBarKey.currentState?.removeCurrentSnackBar();
+      snackBarKey.currentState?.hideCurrentSnackBar();
       debugPrint("Connected to ${result.last.toString().split('.').last}");
     } else {
       // 인터넷 연결 없음
