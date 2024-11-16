@@ -199,6 +199,9 @@ class _NotificationPageState extends State<NotificationPage> {
                   // Android, IOS에 따라 당겨서 새로고침 디자인이 다르므로
                   // adaptive 적용.
                   child: RefreshIndicator.adaptive(
+                    backgroundColor: themeProvider.isDarkMode
+                        ? Color(0xff1a1a1a)
+                        : Colors.white,
                     color: ColorsInfo.newara,
                     onRefresh: () async {
                       // 새로고침 시 첫 페이지만 다시 불러옴.

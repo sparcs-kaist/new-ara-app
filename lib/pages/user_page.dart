@@ -365,9 +365,14 @@ class _UserPageState extends State<UserPage>
   /// tabIndex에 해당하는 ListView를 생성하여 리턴함.
   /// 각각의 ListView 구현에 동일한 부분이 많아 메서드화하게 됨.
   Widget _buildPostList(TabType tabType, UserProvider userProvider) {
+    final themeProvider = Provider.of<ThemeProvider>(context);
+
     // build 대상 tab의 article 개수 조회
     int itemCount = getItemCount(tabType);
     return RefreshIndicator.adaptive(
+      backgroundColor: themeProvider.isDarkMode
+          ? Color(0xff1a1a1a)
+          : Colors.white,
       color: ColorsInfo.newara,
       onRefresh: () async {
         setIsLoaded(false, tabType);

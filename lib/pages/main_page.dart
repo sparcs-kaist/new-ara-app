@@ -463,6 +463,9 @@ class _MainPageState extends State<MainPage> with WidgetsBindingObserver {
                   _isLoading[11]
               ? const LoadingIndicator()
               : RefreshIndicator.adaptive(
+                  backgroundColor: themeProvider.isDarkMode
+                      ? Color(0xff1a1a1a)
+                      : Colors.white,
                   displacement: 0.0,
                   color: ColorsInfo.newara,
                   onRefresh: () async {

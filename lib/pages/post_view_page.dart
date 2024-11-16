@@ -271,6 +271,9 @@ class _PostViewPageState extends State<PostViewPage> {
                             Expanded(
                               // Android, iOS 여부에 따라 다른 새로고침
                               child: RefreshIndicator.adaptive(
+                                backgroundColor: themeProvider.isDarkMode
+                                    ? Color(0xff1a1a1a)
+                                    : Colors.white,
                                 color: ColorsInfo.newara,
                                 onRefresh: () async {
                                   userProvider.setIsContentLoaded(false);

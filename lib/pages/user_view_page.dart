@@ -134,6 +134,9 @@ class _UserViewPageState extends State<UserViewPage> {
             : SizedBox(
                 width: MediaQuery.of(context).size.width,
                 child: RefreshIndicator.adaptive(
+                  backgroundColor: themeProvider.isDarkMode
+                      ? Color(0xff1a1a1a)
+                      : Colors.white,
                   color: ColorsInfo.newara,
                   onRefresh: () async {
                     _setIsLoaded(false);
