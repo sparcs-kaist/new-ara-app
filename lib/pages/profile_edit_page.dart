@@ -155,6 +155,8 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
 
     SnackBar araSnackBar = buildAraSnackBar(
       context,
+      backgroundColor: themeProvider.isDarkMode? Color(0xff1a1a1a) : Colors.white,
+      shape: RoundedRectangleBorder(side: BorderSide(color: themeProvider.isDarkMode? Color(0xff1a1a1a) : Color(0xfff0f0f0), width: 0.5), borderRadius: BorderRadius.all(Radius.circular(16))),
       content: Row(
         children: [
           SvgPicture.asset(

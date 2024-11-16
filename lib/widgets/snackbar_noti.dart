@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:new_ara_app/providers/theme_provider.dart';
 import 'package:new_ara_app/utils/global_key.dart';
+import 'package:provider/provider.dart';
 
 const Duration _araSnackBarDisplayDuration = Duration(milliseconds: 2500);
 
@@ -144,9 +146,13 @@ void hideOldsAndShowAraSnackBar(context, SnackBar araSnackBar) {
 /// information.svg와 함께 동일한 위젯 구성을 가진 SnackBar가 자주 사용되어
 /// infoText만 전달하면 반복적으로 생성이 가능하도록 함수화함.
 void showInfoBySnackBar(BuildContext context, String infoText) {
+  final themeProvider = Provider.of<ThemeProvider>(context);
+
   // 이전에 존재하던 스낵바 제거
   ScaffoldMessenger.of(context).hideCurrentSnackBar();
   ScaffoldMessenger.of(context).showSnackBar(buildAraSnackBar(context,
+      backgroundColor: themeProvider.isDarkMode? Color(0xff1a1a1a) : Colors.white,
+      shape: RoundedRectangleBorder(side: BorderSide(color: themeProvider.isDarkMode? Color(0xff1a1a1a) : Color(0xfff0f0f0), width: 0.5), borderRadius: BorderRadius.all(Radius.circular(16))),
       content: Row(
         children: [
           SvgPicture.asset(
@@ -161,8 +167,8 @@ void showInfoBySnackBar(BuildContext context, String infoText) {
               infoText,
               // 오버플로우 나면 다음줄로 넘어가도록 하기 위해
               overflow: TextOverflow.visible,
-              style: const TextStyle(
-                color: Colors.black,
+              style: TextStyle(
+                color: themeProvider.isDarkMode? Colors.white : Colors.black,
                 fontWeight: FontWeight.w400,
                 fontSize: 15,
               ),
@@ -201,6 +207,8 @@ void showInternetErrorBySnackBar(String errorText) {
           ),
         ),
       ],
-    )));
+    ),
+
+    ));
   });
 }
