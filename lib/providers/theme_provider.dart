@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 class ThemeProvider extends ChangeNotifier {
 
   //-----Store the theme of our app--
-  ThemeMode themeMode = ThemeMode.light;
+  ThemeMode? themeMode = null;
 
   //----If theme mode is equal to dark then we return True----
   //-----isDarkMode--is the field we will use in our switch---
@@ -12,7 +12,9 @@ class ThemeProvider extends ChangeNotifier {
   // bool get isDarkMode => themeMode == ThemeMode.dark;
   bool get isDarkMode => _isDarkMode;
 
-
+  void setTheme(bool change) {
+    _isDarkMode = change;
+  }
 
 
   //---implement ToggleTheme function----

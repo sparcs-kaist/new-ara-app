@@ -1,6 +1,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:easy_localization/easy_localization.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:new_ara_app/constants/theme_info.dart';
@@ -92,6 +93,14 @@ class _MyAppState extends State<MyApp> {
   void initState() {
     super.initState();
 
+    var brightness = SchedulerBinding.instance.platformDispatcher.platformBrightness;
+    bool isDarkMode = brightness == Brightness.dark;
+
+    final themeProvider = Provider.of<ThemeProvider>(context, listen: false);
+
+    themeProvider.setTheme(isDarkMode);
+
+
     // 자동 로그인을 위한 초기 설정
     autoLoginByGetCookie(Provider.of<UserProvider>(context, listen: false));
 
@@ -101,6 +110,8 @@ class _MyAppState extends State<MyApp> {
     blockedProvider.fetchBlockedAnonymousPostID().then((_) {
       debugPrint("차단한 글 postid 목록: ${blockedProvider.blockedAnonymousPostIDs}");
     });
+
+
   }
 
   /// 자동 로그인을 위한 메서드
