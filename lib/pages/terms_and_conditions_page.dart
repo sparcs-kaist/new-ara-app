@@ -174,10 +174,12 @@ class _TermsAndConditionsPageState extends State<TermsAndConditionsPage> {
   }
 
   Widget _buildNormalText(text) {
+    final themeProvider = Provider.of<ThemeProvider>(context);
+
     return Text(
       text,
-      style: const TextStyle(
-        color: Color(0xFF4a4a4a),
+      style: TextStyle(
+        color: themeProvider.isDarkMode? Color(0xFFa4a4a4) : Color(0xFF4a4a4a),
         fontWeight: FontWeight.w500,
         height: 1.6,
         fontSize: 16,
@@ -186,10 +188,12 @@ class _TermsAndConditionsPageState extends State<TermsAndConditionsPage> {
   }
 
   Widget _buildBoldText(text) {
+    final themeProvider = Provider.of<ThemeProvider>(context);
+
     return Text(
       text,
-      style: const TextStyle(
-        color: Color(0xff363636),
+      style:  TextStyle(
+        color: themeProvider.isDarkMode? Color(0xFFcccccc) : Color(0xFF363636),
         fontWeight: FontWeight.w700,
         height: 1.6,
         fontSize: 16,
