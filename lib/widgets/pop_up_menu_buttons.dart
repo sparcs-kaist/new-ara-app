@@ -24,6 +24,8 @@ class WithSchoolPopupMenuButton extends StatelessWidget {
     final themeProvider = Provider.of<ThemeProvider>(context);
 
     return PopupMenuButton<String>(
+      color: themeProvider.isDarkMode? Color(0xff111111) : Colors.white,
+      surfaceTintColor: Colors.transparent,
       shadowColor: themeProvider.isDarkMode? Color.fromRGBO(255, 255, 255, 0.2) : Color.fromRGBO(0, 0, 0, 0.2),
       splashRadius: 5,
       shape: RoundedRectangleBorder(
@@ -76,6 +78,8 @@ class AttachPopupMenuButton extends StatelessWidget {
     final themeProvider = Provider.of<ThemeProvider>(context);
 
     return PopupMenuButton<int>(
+      color: themeProvider.isDarkMode? Color(0xff111111) : Colors.white,
+      surfaceTintColor: Colors.transparent,
       shadowColor: themeProvider.isDarkMode? Color.fromRGBO(255, 255, 255, 0.2) : Color.fromRGBO(0, 0, 0, 0.2),
       splashRadius: 5,
       shape: RoundedRectangleBorder(
@@ -83,7 +87,9 @@ class AttachPopupMenuButton extends StatelessWidget {
         borderRadius: BorderRadius.all(Radius.circular(12.0)),
       ),
       padding: const EdgeInsets.all(2.0),
-      itemBuilder: _buildItems,
+      itemBuilder: (BuildContext context) {
+        return _buildItems(context, themeProvider.isDarkMode);
+      },
       onSelected: (int result) {
         AttachmentModel model = attachments[result];
         UserProvider userProvider = context.read<UserProvider>();
@@ -133,8 +139,8 @@ class AttachPopupMenuButton extends StatelessWidget {
   /// PopupMenuButton에 들어가는 각각의 Entry를 생성.
   /// Entry의 List 형태로 리턴함.
   /// PopupMenuButton의 itemBuilder로 사용됨.
-  List<PopupMenuEntry<int>> _buildItems(BuildContext context) {
-    final themeProvider = Provider.of<ThemeProvider>(context);
+  List<PopupMenuEntry<int>> _buildItems(BuildContext context, bool isDarkMode) {
+
 
     return List.generate(
       attachments.length,
@@ -157,30 +163,26 @@ class AttachPopupMenuButton extends StatelessWidget {
           child: Container(
             padding: const EdgeInsets.only(left: 3),
             decoration: BoxDecoration(
-              border: Border.all(
-                color: themeProvider.isDarkMode? Colors.black : Colors.white,
-                width: 2,
-              ),
               borderRadius: const BorderRadius.all(Radius.circular(5)),
             ),
             child: Row(
               children: [
                 // 파일 타입에 따라 이미지를 설정.
-                _getFileTypeImage(extension.substring(1)),
+                _getFileTypeImage(extension.substring(1), isDarkMode),
                 const SizedBox(width: 10),
                 Flexible(
                   child: Text(
                     fileName,
                     overflow: TextOverflow.ellipsis,
                     style: TextStyle(
-                      color: themeProvider.isDarkMode? Colors.white : Colors.black,
+                      color: isDarkMode? Colors.white : Colors.black,
                     ),
                   ),
                 ),
                 Text(
                   extension,
                   style: TextStyle(
-                    color: themeProvider.isDarkMode? Colors.white : Colors.black,
+                    color: isDarkMode? Colors.white : Colors.black,
                   ),
                 ),
               ],
@@ -193,7 +195,7 @@ class AttachPopupMenuButton extends StatelessWidget {
 
   /// 첨부파일명과 함께 파일 타입 사진을 보여주기 위해 사용.
   /// 파일 확장자를 ext를 통해 받은 후 해당하는 svg 이미지를 리턴.
-  SvgPicture _getFileTypeImage(String ext) {
+  SvgPicture _getFileTypeImage(String ext, bool isDarkMode) {
     late String assetPath;
     if (AttachFileType.imageExt.contains(ext)) {
       assetPath = "assets/icons/image.svg";
@@ -209,7 +211,7 @@ class AttachPopupMenuButton extends StatelessWidget {
     debugPrint(ext);
     return SvgPicture.asset(
       assetPath,
-      colorFilter: const ColorFilter.mode(Colors.black, BlendMode.srcIn),
+      colorFilter: ColorFilter.mode(isDarkMode? Colors.white : Colors.black, BlendMode.srcIn),
       width: 30,
       height: 30,
     );
@@ -334,6 +336,8 @@ class MyPopupMenuButton extends StatelessWidget {
     final themeProvider = Provider.of<ThemeProvider>(context);
 
     return PopupMenuButton<String>(
+      color: themeProvider.isDarkMode? Color(0xff111111) : Colors.white,
+      surfaceTintColor: Colors.transparent,
       shadowColor: themeProvider.isDarkMode? Color.fromRGBO(255, 255, 255, 0.2) : Color.fromRGBO(0, 0, 0, 0.2),
       splashRadius: 5,
       shape: RoundedRectangleBorder(
