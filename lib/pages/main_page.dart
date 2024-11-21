@@ -397,15 +397,6 @@ class _MainPageState extends State<MainPage> with WidgetsBindingObserver {
           ),
           actions: [
             IconButton(
-              onPressed: () {
-                themeProvider.updateTheme();
-              },
-              icon: Icon(themeProvider.isDarkMode
-                  ? Icons.light_mode
-                  : Icons.dark_mode),
-              color: ColorsInfo.newara,
-            ),
-            IconButton(
                 onPressed: () async {
                   if (context.locale == const Locale('ko')) {
                     await context.setLocale(const Locale('en'));
