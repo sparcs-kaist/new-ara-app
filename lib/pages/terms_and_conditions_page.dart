@@ -4,6 +4,8 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:new_ara_app/constants/colors_info.dart';
+import 'package:new_ara_app/constants/theme_info.dart';
+import 'package:new_ara_app/providers/theme_provider.dart';
 import 'package:new_ara_app/providers/user_provider.dart';
 import 'package:new_ara_app/widgets/loading_indicator.dart';
 import 'package:provider/provider.dart';
@@ -25,8 +27,10 @@ class _TermsAndConditionsPageState extends State<TermsAndConditionsPage> {
   @override
   Widget build(BuildContext context) {
     UserProvider userProvider = context.watch<UserProvider>();
+    final themeProvider = Provider.of<ThemeProvider>(context);
+
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: themeProvider.isDarkMode? Colors.black: Colors.white,
       appBar: AppBar(
         centerTitle: true,
         title: SizedBox(
@@ -80,7 +84,7 @@ class _TermsAndConditionsPageState extends State<TermsAndConditionsPage> {
                         child: SingleChildScrollView(
                           controller: _controller,
                           child: Container(
-                            color: const Color(0xFFF6F6F6),
+                            color: themeProvider.isDarkMode? NewAraThemes.darkInputDecoration : NewAraThemes.lightInputDecoration,
                             child: Padding(
                                 padding: const EdgeInsets.all(15.0),
                                 child: _buildTermsAndConditionsText(
@@ -139,8 +143,8 @@ class _TermsAndConditionsPageState extends State<TermsAndConditionsPage> {
                                       child: Text(
                                         LocaleKeys.termsAndConditionsPage_agree
                                             .tr(),
-                                        style: const TextStyle(
-                                          color: Colors.white,
+                                        style: TextStyle(
+                                          color: themeProvider.isDarkMode? Colors.black : Colors.white,
                                           fontSize: 16,
                                           fontWeight: FontWeight.w500,
                                         ),
@@ -170,10 +174,12 @@ class _TermsAndConditionsPageState extends State<TermsAndConditionsPage> {
   }
 
   Widget _buildNormalText(text) {
+    final themeProvider = Provider.of<ThemeProvider>(context);
+
     return Text(
       text,
-      style: const TextStyle(
-        color: Color(0xFF4a4a4a),
+      style: TextStyle(
+        color: themeProvider.isDarkMode? Color(0xFFa4a4a4) : Color(0xFF4a4a4a),
         fontWeight: FontWeight.w500,
         height: 1.6,
         fontSize: 16,
@@ -182,10 +188,12 @@ class _TermsAndConditionsPageState extends State<TermsAndConditionsPage> {
   }
 
   Widget _buildBoldText(text) {
+    final themeProvider = Provider.of<ThemeProvider>(context);
+
     return Text(
       text,
-      style: const TextStyle(
-        color: Color(0xff363636),
+      style:  TextStyle(
+        color: themeProvider.isDarkMode? Color(0xFFcccccc) : Color(0xFF363636),
         fontWeight: FontWeight.w700,
         height: 1.6,
         fontSize: 16,

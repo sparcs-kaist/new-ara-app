@@ -80,7 +80,8 @@
         "hotNotifications": "Hot Notifications",
         "hotPosts": "Hot Posts",
         "hotInfo": "We deliver trending announcements and posts every day at 8:30 a.m.",
-        "emailNotAvailable": "If the default mail application cannot be opened, please contact ara@sparcs.org."
+        "emailNotAvailable": "If the default mail application cannot be opened, please contact ara@sparcs.org.",
+        "dark": "Dark Mode"
     },
     "userPage": {
         "change": "Chg.",

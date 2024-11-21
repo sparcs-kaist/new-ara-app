@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:new_ara_app/constants/theme_info.dart';
+import 'package:new_ara_app/providers/theme_provider.dart';
+import 'package:provider/provider.dart';
 
 class BorderBoxes extends StatefulWidget {
   final double height;
@@ -11,13 +14,15 @@ class BorderBoxes extends StatefulWidget {
 class _BorderBoxesState extends State<BorderBoxes> {
   @override
   Widget build(BuildContext context) {
+    final themeProvider = Provider.of<ThemeProvider>(context);
+
     return Container(
       width: MediaQuery.of(context).size.width - 40,
       height: widget.height,
       decoration: BoxDecoration(
         borderRadius: const BorderRadius.all(Radius.circular(10)),
         border: Border.all(
-          color: const Color.fromRGBO(240, 240, 240, 1),
+          color: themeProvider.isDarkMode? NewAraThemes.darkBRLine : NewAraThemes.lightBRLine,
         ),
       ),
       child: Column(

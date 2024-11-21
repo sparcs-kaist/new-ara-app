@@ -1,8 +1,11 @@
 import 'package:flutter/cupertino.dart';
 import 'package:easy_localization/easy_localization.dart';
+import 'package:flutter/material.dart';
 
 import 'package:new_ara_app/constants/colors_info.dart';
+import 'package:new_ara_app/providers/theme_provider.dart';
 import 'package:new_ara_app/translations/locale_keys.g.dart';
+import 'package:provider/provider.dart';
 
 List<bool> switchLights = [
   true,
@@ -48,6 +51,8 @@ class TextAndSwitch extends StatefulWidget {
 class _TextAndSwitchState extends State<TextAndSwitch> {
   @override
   Widget build(BuildContext context) {
+    final themeProvider = Provider.of<ThemeProvider>(context);
+
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
@@ -55,9 +60,10 @@ class _TextAndSwitchState extends State<TextAndSwitch> {
             margin: const EdgeInsets.only(left: 10),
             child: Text(
               widget.title,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.w500,
+                color: themeProvider.isDarkMode? Colors.white : Colors.black
               ),
             )),
         Container(

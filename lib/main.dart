@@ -1,11 +1,15 @@
-import 'package:connectivity_plus/connectivity_plus.dart';
+
 import 'package:flutter/material.dart';
 import 'package:easy_localization/easy_localization.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:new_ara_app/constants/theme_info.dart';
 import 'package:new_ara_app/constants/url_info.dart';
+import 'package:new_ara_app/providers/theme_provider.dart';
 import 'package:new_ara_app/providers/connectivity_provider.dart';
 import 'package:new_ara_app/translations/codegen_loader.g.dart';
+import 'package:new_ara_app/utils/cache_function.dart';
 import 'package:new_ara_app/utils/global_key.dart';
 import 'package:new_ara_app/widgets/loading_indicator.dart';
 import 'package:provider/provider.dart';
@@ -31,12 +35,16 @@ void main() async {
   // ex) flutter run --dart-define=ENV=development
   // ex) flutter run --dart-define=ENV=production
   const String environment =
-      String.fromEnvironment('ENV', defaultValue: 'development');
+  String.fromEnvironment('ENV', defaultValue: 'development');
   await dotenv.load(fileName: ".env.$environment");
 
   newAraDefaultUrl = dotenv.env['NEW_ARA_DEFAULT_URL']!;
   newAraAuthority = dotenv.env['NEW_ARA_AUTHORITY']!;
   sparcsSSODefaultUrl = dotenv.env['SPARCS_SSO_DEFAULT_URL']!;
+
+  final isDarkMode = await fetchCachedApiData('cache/dark_mode_setting') ??
+      SchedulerBinding.instance.platformDispatcher.platformBrightness == Brightness.dark;
+  print(isDarkMode);
 
   // 앱 시작점. 다국어 지원 및 여러 데이터 제공자를 포함한 구조로 설정
   runApp(
@@ -57,7 +65,8 @@ void main() async {
                   ..updateCookie(userProvider.getCookiesToString());
               }),
           ChangeNotifierProvider(create: (_) => BlockedProvider()),
-          ChangeNotifierProvider(create: (_) => ConnectivityProvider()),
+          ChangeNotifierProvider(create: (_) => ThemeProvider()..setTheme(isDarkMode)),
+          ChangeNotifierProvider(create: (context) => ConnectivityProvider(context.read<ThemeProvider>())),
         ],
         child: const MyApp(),
       ),
@@ -88,7 +97,6 @@ class _MyAppState extends State<MyApp> {
   @override
   void initState() {
     super.initState();
-
     // 자동 로그인을 위한 초기 설정
     autoLoginByGetCookie(Provider.of<UserProvider>(context, listen: false));
 
@@ -98,7 +106,11 @@ class _MyAppState extends State<MyApp> {
     blockedProvider.fetchBlockedAnonymousPostID().then((_) {
       debugPrint("차단한 글 postid 목록: ${blockedProvider.blockedAnonymousPostIDs}");
     });
+
+
   }
+
+
 
   /// 자동 로그인을 위한 메서드
   /// secureStorage에서 쿠키를 가져와서 사용자 로그인 상태 확인
@@ -127,17 +139,23 @@ class _MyAppState extends State<MyApp> {
 
   @override
   Widget build(BuildContext context) {
+    final themeProvider = Provider.of<ThemeProvider>(context);
+
     return MaterialApp(
         localizationsDelegates: context.localizationDelegates,
         supportedLocales: context.supportedLocales,
         locale: context.locale,
         scaffoldMessengerKey: snackBarKey, //
-        theme: _setThemeData(),
+        theme: NewAraThemes.lightTheme,
+        darkTheme: NewAraThemes.darkTheme,
+        themeMode: themeProvider.themeMode,
         // TODO: CustionScrollBehavior의 역할은?
         builder: (context, child) {
           final MediaQueryData data = MediaQuery.of(context);
           return MediaQuery(
+            
               // 시스템 폰트 사이즈에 영향을 받지 않도록 textScaleFactor 지정함
+            
               data: data.copyWith(textScaler: const TextScaler.linear(1.0)),
               child: ScrollConfiguration(
                 behavior: CustomScrollBehavior(),
@@ -148,21 +166,21 @@ class _MyAppState extends State<MyApp> {
         home: isLoading == true
             ? const LoadingIndicator() // 로그인 중에는 로딩 인디케이터 표시
             : context.watch<UserProvider>().hasData
-                ? (context
-                            .watch<UserProvider>()
-                            .naUser!
-                            .agree_terms_of_service_at !=
-                        null
-                    ? const MainNavigationTabPage()
-                    : const LoginPage())
-                : const LoginPage());
+            ? (context
+            .watch<UserProvider>()
+            .naUser!
+            .agree_terms_of_service_at !=
+            null
+            ? const MainNavigationTabPage()
+            : const LoginPage())
+            : const LoginPage());
   }
 
   // 앱의 전반적인 테마 설정
   ThemeData _setThemeData() {
     return ThemeData(
       appBarTheme:
-          const AppBarTheme(elevation: 0, backgroundColor: Colors.white),
+      const AppBarTheme(elevation: 0, backgroundColor: Colors.white),
       fontFamily: 'Pretendard',
       scaffoldBackgroundColor: Colors.white,
       splashColor: Colors.transparent,
@@ -172,3 +190,4 @@ class _MyAppState extends State<MyApp> {
     );
   }
 }
+

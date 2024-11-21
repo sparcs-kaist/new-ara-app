@@ -75,6 +75,7 @@ abstract class  LocaleKeys {
   static const settingPage_hotPosts = 'settingPage.hotPosts';
   static const settingPage_hotInfo = 'settingPage.hotInfo';
   static const settingPage_emailNotAvailable = 'settingPage.emailNotAvailable';
+  static const settingPage_dark = 'settingPage.dark';
   static const settingPage = 'settingPage';
   static const userPage_change = 'userPage.change';
   static const userPage_myPosts = 'userPage.myPosts';

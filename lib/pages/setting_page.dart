@@ -3,11 +3,14 @@
 
 import 'package:flutter/material.dart';
 import 'package:easy_localization/easy_localization.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:new_ara_app/pages/terms_and_conditions_page.dart';
+import 'package:new_ara_app/providers/theme_provider.dart';
 import 'package:new_ara_app/providers/user_provider.dart';
 import 'package:new_ara_app/translations/locale_keys.g.dart';
+import 'package:new_ara_app/utils/cache_function.dart';
 import 'package:new_ara_app/utils/slide_routing.dart';
 import 'package:new_ara_app/widgets/loading_indicator.dart';
 import 'package:provider/provider.dart';
@@ -39,21 +42,48 @@ class SettingPageState extends State<SettingPage> {
   /// 정치글 보기 설정. true이면 정치글을 보여줌.
   late bool seeSocial;
 
+  bool setDarkMode = false;
+
   bool _isLoading = false;
+
 
   @override
   void initState() {
     super.initState();
     var userProvider = context.read<UserProvider>();
+    var themeProvider = context.read<ThemeProvider>();
     seeSexual = userProvider.naUser?.see_sexual ?? true;
     seeSocial = userProvider.naUser?.see_social ?? true;
+    setDarkMode = themeProvider.isDarkMode;
     // 페이지 전환 과정에서 새로운 알림을 확인하기 위한 호출.
     context.read<NotificationProvider>().checkIsNotReadExist(userProvider);
+
+    _loadDarkModeSetting();
+  }
+
+  String darkModeKey = 'cache/dark_mode_setting';
+
+  Future<void> saveDarkModeSetting(bool isDarkMode) async {
+    await cacheApiData(darkModeKey, isDarkMode);
+  }
+
+  Future<bool> getDarkModeSetting() async {
+    final cachedData = await fetchCachedApiData(darkModeKey);
+    return cachedData ?? SchedulerBinding.instance.platformDispatcher.platformBrightness == Brightness.dark;
+  }
+
+  Future<void> _loadDarkModeSetting() async {
+    final isDarkMode = await getDarkModeSetting();
+    setState(() {
+      setDarkMode = isDarkMode;
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     var userProvider = context.watch<UserProvider>();
+
+    final themeProvider = Provider.of<ThemeProvider>(context);
 
     return Scaffold(
       appBar: AppBar(
@@ -99,12 +129,15 @@ class SettingPageState extends State<SettingPage> {
                               'assets/icons/post_list.svg',
                               width: 34,
                               height: 34,
+                              colorFilter: ColorFilter.mode(
+                                  themeProvider.isDarkMode? Colors.white: Colors.black, BlendMode.srcIn),
                             ),
                             Text(
                               LocaleKeys.settingPage_postSetting.tr(),
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontSize: 18,
                                 fontWeight: FontWeight.w700,
+                                color: themeProvider.isDarkMode? Colors.white : Colors.black
                               ),
                             ),
                           ],
@@ -119,7 +152,7 @@ class SettingPageState extends State<SettingPage> {
                           borderRadius:
                               const BorderRadius.all(Radius.circular(10)),
                           border: Border.all(
-                            color: const Color.fromRGBO(240, 240, 240, 1),
+                            color: themeProvider.isDarkMode? Color.fromRGBO(60, 60, 60, 1) : Color.fromRGBO(240, 240, 240, 1),
                           ),
                         ),
                         child: Column(
@@ -135,9 +168,10 @@ class SettingPageState extends State<SettingPage> {
                                     margin: const EdgeInsets.only(left: 10),
                                     child: Text(
                                       LocaleKeys.settingPage_adult.tr(),
-                                      style: const TextStyle(
+                                      style: TextStyle(
                                         fontSize: 16,
                                         fontWeight: FontWeight.w500,
+                                        color: themeProvider.isDarkMode? Colors.white : Colors.black
                                       ),
                                     )),
                                 // 성인글 보기 CupertinoSwitch
@@ -186,9 +220,10 @@ class SettingPageState extends State<SettingPage> {
                                     margin: const EdgeInsets.only(left: 10),
                                     child: Text(
                                       LocaleKeys.settingPage_politics.tr(),
-                                      style: const TextStyle(
+                                      style: TextStyle(
                                         fontSize: 16,
                                         fontWeight: FontWeight.w500,
+                                        color: themeProvider.isDarkMode? Colors.white : Colors.black
                                       ),
                                     )),
                                 // 정치글 보기 CupertinoSwitch
@@ -273,12 +308,15 @@ class SettingPageState extends State<SettingPage> {
                               'assets/icons/barrior.svg',
                               width: 34,
                               height: 34,
+                              colorFilter: ColorFilter.mode(
+                                  themeProvider.isDarkMode? Colors.white: Colors.black, BlendMode.srcIn),
                             ),
                             Text(
                               LocaleKeys.settingPage_block.tr(),
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontSize: 18,
                                 fontWeight: FontWeight.w700,
+                                color: themeProvider.isDarkMode? Colors.white : Colors.black
                               ),
                             ),
                           ],
@@ -293,7 +331,7 @@ class SettingPageState extends State<SettingPage> {
                           borderRadius:
                               const BorderRadius.all(Radius.circular(10)),
                           border: Border.all(
-                            color: const Color.fromRGBO(240, 240, 240, 1),
+                            color: themeProvider.isDarkMode? Color.fromRGBO(60, 60, 60, 1) : Color.fromRGBO(240, 240, 240, 1),
                           ),
                         ),
                         child: InkWell(
@@ -301,7 +339,16 @@ class SettingPageState extends State<SettingPage> {
                             showDialog(
                                 context: context,
                                 builder: (context) =>
-                                    const BlockedUserDialog());
+                                    Theme(
+                                        data: Theme.of(context).copyWith(
+                                            dialogBackgroundColor: themeProvider.isDarkMode? Color(0xff111111) : Colors.white,
+                                            textButtonTheme: TextButtonThemeData(
+                                                style: ButtonStyle(
+                                                  backgroundColor: WidgetStateProperty.all<Color>(themeProvider.isDarkMode? Colors.black : Colors.white),
+                                                )
+                                            )
+                                        ),
+                                        child: const BlockedUserDialog()));
                           },
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.center,
@@ -337,12 +384,15 @@ class SettingPageState extends State<SettingPage> {
                               'assets/icons/information.svg',
                               width: 36,
                               height: 36,
+                              colorFilter: ColorFilter.mode(
+                                  themeProvider.isDarkMode? Colors.white: Colors.black, BlendMode.srcIn),
                             ),
                             Text(
                               LocaleKeys.settingPage_information.tr(),
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontSize: 18,
                                 fontWeight: FontWeight.w700,
+                                color: themeProvider.isDarkMode? Colors.white : Colors.black
                               ),
                             ),
                           ],
@@ -352,12 +402,12 @@ class SettingPageState extends State<SettingPage> {
                       Container(
                         width: MediaQuery.of(context).size.width - 40,
                         padding: const EdgeInsets.only(right: 5),
-                        height: 94,
+                        height: 134,
                         decoration: BoxDecoration(
                           borderRadius:
                               const BorderRadius.all(Radius.circular(10)),
                           border: Border.all(
-                            color: const Color.fromRGBO(240, 240, 240, 1),
+                            color: themeProvider.isDarkMode? Color.fromRGBO(60, 60, 60, 1) : Color.fromRGBO(240, 240, 240, 1),
                           ),
                         ),
                         child: Column(
@@ -365,6 +415,42 @@ class SettingPageState extends State<SettingPage> {
                           crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
                             const SizedBox(height: 10),
+                            //다크모드
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                // 성인글 보기 글씨
+                                Container(
+                                    margin: const EdgeInsets.only(left: 10),
+                                    child: Text(
+                                      LocaleKeys.settingPage_dark.tr(),
+                                      style: TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.w500,
+                                          color: themeProvider.isDarkMode? Colors.white : Colors.black
+                                      ),
+                                    )),
+                                Container(
+                                  margin: const EdgeInsets.only(right: 10),
+                                  width: 43,
+                                  height: 27,
+                                  child: FittedBox(
+                                    fit: BoxFit.fill,
+                                    child: CupertinoSwitch(
+                                        activeColor: ColorsInfo.newara,
+                                        value: setDarkMode,
+                                        onChanged: (value) async {
+                                          setState(() {
+                                            setDarkMode = value;
+                                          });
+                                          await saveDarkModeSetting(value);
+                                          themeProvider.updateTheme();
+                                        }),
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 16),
                             // 이용약관
                             InkWell(
                               onTap: () {
@@ -387,15 +473,18 @@ class SettingPageState extends State<SettingPage> {
                                         LocaleKeys
                                             .settingPage_termsAndConditions
                                             .tr(),
-                                        style: const TextStyle(
+                                        style: TextStyle(
                                           fontSize: 16,
                                           fontWeight: FontWeight.w500,
+                                          color: themeProvider.isDarkMode? Colors.white : Colors.black
                                         ),
                                       )),
                                   SvgPicture.asset(
                                     'assets/icons/right_chevron.svg',
                                     width: 20,
                                     height: 20,
+                                    colorFilter: ColorFilter.mode(
+                                        themeProvider.isDarkMode? Colors.white: Colors.black, BlendMode.srcIn),
                                   ),
                                 ],
                               ),
@@ -414,15 +503,18 @@ class SettingPageState extends State<SettingPage> {
                                       child: Text(
                                         LocaleKeys.settingPage_contactAdmins
                                             .tr(),
-                                        style: const TextStyle(
+                                        style: TextStyle(
                                           fontSize: 16,
                                           fontWeight: FontWeight.w500,
+                                          color: themeProvider.isDarkMode? Colors.white : Colors.black
                                         ),
                                       )),
                                   SvgPicture.asset(
                                     'assets/icons/right_chevron.svg',
                                     width: 20,
                                     height: 20,
+                                    colorFilter: ColorFilter.mode(
+                                        themeProvider.isDarkMode? Colors.white: Colors.black, BlendMode.srcIn),
                                   ),
                                 ],
                               ),
@@ -440,7 +532,7 @@ class SettingPageState extends State<SettingPage> {
                           borderRadius:
                               const BorderRadius.all(Radius.circular(10)),
                           border: Border.all(
-                            color: const Color.fromRGBO(240, 240, 240, 1),
+                            color: themeProvider.isDarkMode? Color.fromRGBO(60, 60, 60, 1) : Color.fromRGBO(240, 240, 240, 1),
                           ),
                         ),
                         child: SizedBox(
@@ -449,19 +541,29 @@ class SettingPageState extends State<SettingPage> {
                             onTap: () async {
                               await showDialog(
                                 context: context,
-                                builder: (context) => SignoutConfirmDialog(
-                                  onTap: () async {
-                                    await _logout();
-                                  },
-                                  userProvider: userProvider,
-                                  targetContext: context,
+                                builder: (context) => Theme(
+                                  data: Theme.of(context).copyWith(
+                                      dialogBackgroundColor: themeProvider.isDarkMode? Color(0xff111111) : Colors.white,
+                                      textButtonTheme: TextButtonThemeData(
+                                          style: ButtonStyle(
+                                            backgroundColor: WidgetStateProperty.all<Color>(themeProvider.isDarkMode? Colors.black : Colors.white),
+                                          )
+                                      )
+                                  ),
+                                  child: SignoutConfirmDialog(
+                                    onTap: () async {
+                                      await _logout();
+                                    },
+                                    userProvider: userProvider,
+                                    targetContext: context,
+                                  ),
                                 ),
                               );
                             },
                             child: Center(
                               child: Text(
                                 LocaleKeys.settingPage_signOut.tr(),
-                                style: const TextStyle(
+                                style: TextStyle(
                                   color: ColorsInfo.newara,
                                   fontSize: 16,
                                   fontWeight: FontWeight.w500,
@@ -479,7 +581,7 @@ class SettingPageState extends State<SettingPage> {
                           borderRadius:
                               const BorderRadius.all(Radius.circular(10)),
                           border: Border.all(
-                            color: const Color.fromRGBO(240, 240, 240, 1),
+                            color: themeProvider.isDarkMode? Color.fromRGBO(60, 60, 60, 1) : Color.fromRGBO(240, 240, 240, 1),
                           ),
                         ),
                         child: SizedBox(
@@ -488,39 +590,49 @@ class SettingPageState extends State<SettingPage> {
                             onTap: () async {
                               await showDialog(
                                 context: context,
-                                builder: (context) => UnregisterConfirmDialog(
-                                  onTap: () async {
-                                    Navigator.pop(context);
-                                    setState(() {
-                                      _isLoading = true;
-                                    });
-                                    var response = await userProvider
-                                        .getApiRes('unregister');
-                                    // ignore: unused_local_variable
-                                    final Map<String, dynamic>? responseResult =
-                                        await response?.data;
-
-                                    //TODO: 회원탈퇴 로직 보강 필요
-                                    // if(responseResult == null){
-                                    //   ///회원탈퇴 실패
-                                    // }
-                                    final prefs =
-                                        await SharedPreferences.getInstance();
-                                    String jsonString = userProvider
-                                        .naUser!.user
-                                        .toString(); // 데이터를 JSON 문자열로 인코딩
-                                    await prefs.setString(
-                                        '심사통과를위한탈퇴탈퇴한유저', jsonString);
-
-                                    if (mounted) {
+                                builder: (context) => Theme(
+                                  data: Theme.of(context).copyWith(
+                                      dialogBackgroundColor: themeProvider.isDarkMode? Color(0xff111111) : Colors.white,
+                                      textButtonTheme: TextButtonThemeData(
+                                          style: ButtonStyle(
+                                            backgroundColor: WidgetStateProperty.all<Color>(themeProvider.isDarkMode? Colors.black : Colors.white),
+                                          )
+                                      )
+                                  ),
+                                  child: UnregisterConfirmDialog(
+                                    onTap: () async {
+                                      Navigator.pop(context);
                                       setState(() {
-                                        _isLoading = false;
+                                        _isLoading = true;
                                       });
-                                    }
-                                    await _logout();
-                                  },
-                                  userProvider: userProvider,
-                                  targetContext: context,
+                                      var response = await userProvider
+                                          .getApiRes('unregister');
+                                      // ignore: unused_local_variable
+                                      final Map<String, dynamic>? responseResult =
+                                          await response?.data;
+
+                                      //TODO: 회원탈퇴 로직 보강 필요
+                                      // if(responseResult == null){
+                                      //   ///회원탈퇴 실패
+                                      // }
+                                      final prefs =
+                                          await SharedPreferences.getInstance();
+                                      String jsonString = userProvider
+                                          .naUser!.user
+                                          .toString(); // 데이터를 JSON 문자열로 인코딩
+                                      await prefs.setString(
+                                          '심사통과를위한탈퇴탈퇴한유저', jsonString);
+
+                                      if (mounted) {
+                                        setState(() {
+                                          _isLoading = false;
+                                        });
+                                      }
+                                      await _logout();
+                                    },
+                                    userProvider: userProvider,
+                                    targetContext: context,
+                                  ),
                                 ),
                               );
                             },

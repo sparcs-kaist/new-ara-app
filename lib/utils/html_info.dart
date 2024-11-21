@@ -1,6 +1,6 @@
 import 'package:sanitize_html/sanitize_html.dart' show sanitizeHtml;
 
-String getContentHtml(String content, {double? width}) {
+String getContentHtml(String content, bool isDark, {double? width}) {
   /* sanitize_html 패키지에서는 <u> 태그를 제거해버림
      (sanitize_html은 다소 strict하게 sanitizing을 시행함).
      따라서 <u>의 sanitizing을 피하기 위해 sanitize_html이 허용하는 태그
@@ -15,7 +15,7 @@ String getContentHtml(String content, {double? width}) {
       .replaceAll('<h8>', '<u>')
       .replaceAll('</h8>', '</u>');
 
-  return '''
+  String lightHTML = '''
   <!DOCTYPE html>
   <html>
     <head>
@@ -213,4 +213,206 @@ String getContentHtml(String content, {double? width}) {
     </body>
   </html>
   ''';
+
+
+  String darkHTML = '''
+  <!DOCTYPE html>
+  <html>
+    <head>
+      <meta name="viewport" content="width=device-width initial-scale=1.0">
+      <style>
+
+      /*! minireset.css v0.0.3 | MIT License | github.com/jgthms/minireset.css */
+      blockquote,body,dd,dl,dt,fieldset,figure,h1,h2,h3,h4,h5,h6,hr,html,iframe,legend,li,ol,p,pre,textarea,ul {
+        margin: 0;
+        padding: 0
+      }
+
+      strong {
+        color: #cccccc;
+        font-weight: 700
+      }
+
+      a {
+        color: #00b8d4;
+        text-decoration: underline;
+        display: inline-block;
+      }
+
+      h1, h2, h3, h4, h5, h6 {
+        color: #cccccc;
+        font-weight: 600;
+        line-height: 1.125;
+      }
+
+      h1 {
+        font-size: 32px;
+      }
+
+      h2 {
+        font-size: 28px;
+      }
+
+      h3 {
+        font-size: 24px;
+      }
+
+      h4 {
+        font-size: 20px;
+      }
+
+      h5 {
+        font-size: 20px;
+      }
+
+      h6 {
+        font-size: 16px;
+      }
+
+      
+
+      
+
+      hr {
+        border: none;
+        display: block;
+        height: 2px;
+        margin: 1.5rem 0
+      }
+
+      ul {
+        list-style: none
+      }
+
+      button,input,select,textarea {
+        margin: 0
+      }
+
+      html {
+          -webkit-box-sizing: border-box;
+          box-sizing: border-box
+          font-family: "Pretendard",sans-serif;
+      }
+
+      audio,img,video {
+        height: auto;
+        max-width: 100%
+      }
+
+      table {
+        border-collapse: collapse;
+        border-spacing: 0
+      }
+
+      td,th {
+        padding: 0;
+        text-align: left
+      }
+
+      html {
+        background-color: #111111;
+        font-size: 16px;
+        -moz-osx-font-smoothing: grayscale;
+        -webkit-font-smoothing: antialiased;
+        min-width: 300px;
+        overflow-x: hidden;
+        overflow-y: scroll;
+        text-rendering: auto;
+        -webkit-text-size-adjust: 100%;
+        -moz-text-size-adjust: 100%;
+        -ms-text-size-adjust: 100%;
+        text-size-adjust: 100%
+      }
+
+      article,aside,figure,footer,header,hgroup,section {
+        display: block
+      }
+
+      body,button,input,select,textarea {
+        font-family: "Pretendard",sans-serif
+      }
+
+      code,pre {
+        -moz-osx-font-smoothing: auto;
+        -webkit-font-smoothing: auto;
+        font-family: monospace;
+      }
+
+      code {
+        color: #ff3860;
+        font-size: .875em;
+        font-weight: 400;
+        padding: .25em .5em .25em
+      }
+
+      code,hr {
+        background-color: #333333
+      }
+
+      body {
+        color: #c0c0c0;
+        font-size: 14px;
+        font-weight: 400;
+        
+        line-height: 1.5
+      }
+
+      small {
+        font-size: .875em
+      }
+
+      span {
+        font-style: inherit;
+        font-weight: inherit
+      }
+
+      pre {
+        -webkit-overflow-scrolling: touch;
+        background-color: #333333;
+        color: #c0c0c0;
+        font-size: .875em;
+        overflow-x: auto;
+        padding: 1.25rem 1.5rem;
+        white-space: pre;
+        word-wrap: normal
+      }
+
+      pre code {
+        background-color: transparent;
+        color: currentColor;
+        font-size: 1em;
+        padding: 0
+      }
+
+      table td,table th {
+        text-align: left;
+        vertical-align: top
+      }
+
+      table th {
+        color: #bebebe
+      }
+
+      html, body {
+        margin: 0;
+        padding: 0;
+      }
+
+      blockquote {
+        margin: 0;
+        padding: 0;
+        background-color: #33333;
+        border-left: 5px solid #4a4a4a;
+        padding: 1em 1.5em;
+        display: block;
+      }
+      </style>
+    </head>
+    <body>
+      $sanitized
+    </body>
+  </html>
+  ''';
+
+  return isDark? darkHTML : lightHTML;
 }

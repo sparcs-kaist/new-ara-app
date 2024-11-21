@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:new_ara_app/providers/theme_provider.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 // Import for Android features.
 import 'package:webview_flutter_android/webview_flutter_android.dart';
@@ -134,6 +135,9 @@ class _InArticleWebViewState extends State<InArticleWebView> {
   @override
   void initState() {
     UserProvider userProvider = context.read<UserProvider>();
+    ThemeProvider themeProvider = context.read<ThemeProvider>();
+
+
     super.initState();
     isFitted = false;
     webViewHeight = widget.initialHeight;
@@ -153,7 +157,7 @@ class _InArticleWebViewState extends State<InArticleWebView> {
 
     controller
       ..setJavaScriptMode(JavaScriptMode.unrestricted)
-      ..setBackgroundColor(const Color(0x00000000))
+      // ..setBackgroundColor(const Color(0x00000000))
       ..setNavigationDelegate(NavigationDelegate(
         onNavigationRequest: (NavigationRequest request) async {
           if (request.url == 'about:blank') {
@@ -192,7 +196,7 @@ class _InArticleWebViewState extends State<InArticleWebView> {
               'code: ${error.errorCode}\ndescription: ${error.description}\nerrorType: ${error.errorType}\nisForMainFrame: ${error.isForMainFrame}');
         },
       ))
-      ..loadHtmlString(getContentHtml(widget.content));
+      ..loadHtmlString(getContentHtml(widget.content, themeProvider.isDarkMode));
 
     _webViewController = controller;
   }
@@ -200,6 +204,7 @@ class _InArticleWebViewState extends State<InArticleWebView> {
   @override
   Widget build(BuildContext context) {
     late WebViewWidget webViewWidget;
+    final themeProvider = Provider.of<ThemeProvider>(context);
 
     // 안드로이드 플랫폼의 경우 displayHybridComposition: true로 설정한다
     // 안드로이드의 경우 이렇게 하지않으면 웹뷰 crash 문제가 발생
