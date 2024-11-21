@@ -100,6 +100,7 @@ class AttachPopupMenuButton extends StatelessWidget {
           hideOldsAndShowAraSnackBar(
               context,
               buildAraSnackBar(
+                backgroundColor: themeProvider.isDarkMode? Color(0xff1a1a1a) : Colors.white,
                 context,
                 content: Row(
                   children: [

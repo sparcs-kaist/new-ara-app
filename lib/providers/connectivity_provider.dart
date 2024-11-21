@@ -3,18 +3,21 @@ import 'dart:async';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:new_ara_app/providers/theme_provider.dart';
 import 'package:new_ara_app/translations/locale_keys.g.dart';
 import 'package:new_ara_app/utils/global_key.dart';
 import 'package:new_ara_app/widgets/snackbar_noti.dart';
 
 /// `ConnectivityProvider`는 인터넷 에러 관련 로직 및 스낵바를 관리하는 클래스입니다.
 class ConnectivityProvider with ChangeNotifier {
+  final ThemeProvider themeProvider;
+
   StreamSubscription<List<ConnectivityResult>>? _connectSubscription;
 
   // 인터넷 연결 여부 표시
   bool _isConnected = true;
 
-  ConnectivityProvider() {
+  ConnectivityProvider(this.themeProvider) {
     _initConnectivity();
   }
 
@@ -42,7 +45,7 @@ class ConnectivityProvider with ChangeNotifier {
     } else {
       // 인터넷 연결 없음
       _isConnected = false;
-      showInternetErrorBySnackBar(LocaleKeys.userProvider_internetError.tr());
+      showInternetErrorBySnackBar(LocaleKeys.userProvider_internetError.tr(), themeProvider.isDarkMode);
       debugPrint("Internet Connectivity Error");
     }
   }

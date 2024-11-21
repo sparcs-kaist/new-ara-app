@@ -180,11 +180,12 @@ void showInfoBySnackBar(BuildContext context, String infoText) {
 
 /// internet error가 발생할 때 errorText를 전달하면 반복적으로 생성이 가능하도록 함수화함.
 /// 추후 information.svg 외 wifi 오류를 나타낼 수 있는 아이콘을 추가할 예정.
-void showInternetErrorBySnackBar(String errorText) {
+void showInternetErrorBySnackBar(String errorText, bool isDarkMode) {
   WidgetsBinding.instance.addPostFrameCallback((_) {
     // 이전에 존재하던 스낵바 제거
     //snackBarKey.currentState?.hideCurrentSnackBar();
     snackBarKey.currentState?.showSnackBar(buildAraSnackBarFromGlobalKey(
+      backgroundColor: isDarkMode? Color(0xff1a1a1a): Colors.white,
         content: Row(
       children: [
         SvgPicture.asset(
@@ -199,8 +200,8 @@ void showInternetErrorBySnackBar(String errorText) {
             errorText,
             // 오버플로우 나면 다음줄로 넘어가도록 하기 위해
             overflow: TextOverflow.visible,
-            style: const TextStyle(
-              color: Colors.black,
+            style: TextStyle(
+              color: isDarkMode? Colors.white : Colors.black,
               fontWeight: FontWeight.w400,
               fontSize: 15,
             ),

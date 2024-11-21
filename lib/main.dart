@@ -66,7 +66,7 @@ void main() async {
               }),
           ChangeNotifierProvider(create: (_) => BlockedProvider()),
           ChangeNotifierProvider(create: (_) => ThemeProvider()..setTheme(isDarkMode)),
-          ChangeNotifierProvider(create: (_) => ConnectivityProvider()),
+          ChangeNotifierProvider(create: (context) => ConnectivityProvider(context.read<ThemeProvider>())),
         ],
         child: const MyApp(),
       ),
