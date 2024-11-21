@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 
+/// 다크/라이트 모드를 Theme으로 정의합니다
 class NewAraThemes {
-
-  //-------------DARK THEME SETTINGS----
+  // DARK THEME SETTINGS
   static final darkTheme = ThemeData(
-    appBarTheme: const AppBarTheme(elevation: 0, backgroundColor: Color(0xff111111)),
+    appBarTheme:
+        const AppBarTheme(elevation: 0, backgroundColor: Color(0xff111111)),
     fontFamily: 'Pretendard',
     scaffoldBackgroundColor: Color(0xff111111),
     splashColor: Colors.transparent,
@@ -60,66 +61,63 @@ class NewAraThemes {
     ),
   );
 
-
-  //-------------light THEME SETTINGS----
+  // LIGHT THEME SETTINGS
   static final lightTheme = ThemeData(
-    appBarTheme: const AppBarTheme(elevation: 0, backgroundColor: Colors.white),
-    fontFamily: 'Pretendard',
-    scaffoldBackgroundColor: Colors.white,
-    splashColor: Colors.transparent,
-    textSelectionTheme: const TextSelectionThemeData(
-      cursorColor: Colors.transparent,
-    ),
-    textTheme: TextTheme(
-      displayLarge: TextStyle(
-        color: Colors.black,
+      appBarTheme:
+          const AppBarTheme(elevation: 0, backgroundColor: Colors.white),
+      fontFamily: 'Pretendard',
+      scaffoldBackgroundColor: Colors.white,
+      splashColor: Colors.transparent,
+      textSelectionTheme: const TextSelectionThemeData(
+        cursorColor: Colors.transparent,
       ),
-      displayMedium: TextStyle(
-        color: Colors.black,
-      ),
-      displaySmall: TextStyle(
-        color: Colors.black,
-      ),
-      headlineLarge: TextStyle(
-        color: Colors.black,
-      ),
-      headlineMedium: TextStyle(
-        color: Colors.black,
-      ),
-      headlineSmall: TextStyle(
-        color: Colors.black,
-      ),
-      titleLarge: TextStyle(
-        color: Colors.black,
-      ),
-      titleMedium: TextStyle(
-        color: Colors.black,
-      ),
-      titleSmall: TextStyle(
-        color: Colors.black,
-      ),
-      bodyLarge: TextStyle(
-        color: Colors.black,
-      ),
-      bodyMedium: TextStyle(
-        color: Colors.black,
-      ),
-      bodySmall: TextStyle(
-        color: Colors.black,
-      ),
-      labelLarge: TextStyle(
-        color: Colors.black,
-      ),
-      labelMedium: TextStyle(
-        color: Colors.black,
-      ),
-      labelSmall: TextStyle(
-        color: Colors.black,
-      ),
-    )
-  );
-
-
+      textTheme: TextTheme(
+        displayLarge: TextStyle(
+          color: Colors.black,
+        ),
+        displayMedium: TextStyle(
+          color: Colors.black,
+        ),
+        displaySmall: TextStyle(
+          color: Colors.black,
+        ),
+        headlineLarge: TextStyle(
+          color: Colors.black,
+        ),
+        headlineMedium: TextStyle(
+          color: Colors.black,
+        ),
+        headlineSmall: TextStyle(
+          color: Colors.black,
+        ),
+        titleLarge: TextStyle(
+          color: Colors.black,
+        ),
+        titleMedium: TextStyle(
+          color: Colors.black,
+        ),
+        titleSmall: TextStyle(
+          color: Colors.black,
+        ),
+        bodyLarge: TextStyle(
+          color: Colors.black,
+        ),
+        bodyMedium: TextStyle(
+          color: Colors.black,
+        ),
+        bodySmall: TextStyle(
+          color: Colors.black,
+        ),
+        labelLarge: TextStyle(
+          color: Colors.black,
+        ),
+        labelMedium: TextStyle(
+          color: Colors.black,
+        ),
+        labelSmall: TextStyle(
+          color: Colors.black,
+        ),
+      ));
 
   static const Color darkMainText = Color(0xff000000);
   static const Color darkInputDecoration = Color(0xFF161616);
@@ -151,5 +149,4 @@ class NewAraThemes {
   static const Color gryEB = Color(0xffebebeb);
 
   static const Color darkBRLine = Color(0xff3f3f3f);
-
 }
