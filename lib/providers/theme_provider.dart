@@ -14,6 +14,8 @@ class ThemeProvider extends ChangeNotifier {
 
   void setTheme(bool change) {
     _isDarkMode = change;
+    themeMode = _isDarkMode ? ThemeMode.dark : ThemeMode.light;
+    notifyListeners();
   }
 
 

@@ -9,6 +9,7 @@ import 'package:new_ara_app/constants/url_info.dart';
 import 'package:new_ara_app/providers/theme_provider.dart';
 import 'package:new_ara_app/providers/connectivity_provider.dart';
 import 'package:new_ara_app/translations/codegen_loader.g.dart';
+import 'package:new_ara_app/utils/cache_function.dart';
 import 'package:new_ara_app/utils/global_key.dart';
 import 'package:new_ara_app/widgets/loading_indicator.dart';
 import 'package:provider/provider.dart';
@@ -41,6 +42,10 @@ void main() async {
   newAraAuthority = dotenv.env['NEW_ARA_AUTHORITY']!;
   sparcsSSODefaultUrl = dotenv.env['SPARCS_SSO_DEFAULT_URL']!;
 
+  final isDarkMode = await fetchCachedApiData('cache/dark_mode_setting') ??
+      SchedulerBinding.instance.platformDispatcher.platformBrightness == Brightness.dark;
+  print(isDarkMode);
+
   // 앱 시작점. 다국어 지원 및 여러 데이터 제공자를 포함한 구조로 설정
   runApp(
     EasyLocalization(
@@ -60,7 +65,7 @@ void main() async {
                   ..updateCookie(userProvider.getCookiesToString());
               }),
           ChangeNotifierProvider(create: (_) => BlockedProvider()),
-          ChangeNotifierProvider(create: (_) => ThemeProvider()),
+          ChangeNotifierProvider(create: (_) => ThemeProvider()..setTheme(isDarkMode)),
           ChangeNotifierProvider(create: (_) => ConnectivityProvider()),
         ],
         child: const MyApp(),
@@ -92,15 +97,6 @@ class _MyAppState extends State<MyApp> {
   @override
   void initState() {
     super.initState();
-
-    var brightness = SchedulerBinding.instance.platformDispatcher.platformBrightness;
-    bool isDarkMode = brightness == Brightness.dark;
-
-    final themeProvider = Provider.of<ThemeProvider>(context, listen: false);
-
-    themeProvider.setTheme(isDarkMode);
-
-
     // 자동 로그인을 위한 초기 설정
     autoLoginByGetCookie(Provider.of<UserProvider>(context, listen: false));
 
@@ -113,6 +109,8 @@ class _MyAppState extends State<MyApp> {
 
 
   }
+
+
 
   /// 자동 로그인을 위한 메서드
   /// secureStorage에서 쿠키를 가져와서 사용자 로그인 상태 확인

@@ -3,12 +3,14 @@
 
 import 'package:flutter/material.dart';
 import 'package:easy_localization/easy_localization.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:new_ara_app/pages/terms_and_conditions_page.dart';
 import 'package:new_ara_app/providers/theme_provider.dart';
 import 'package:new_ara_app/providers/user_provider.dart';
 import 'package:new_ara_app/translations/locale_keys.g.dart';
+import 'package:new_ara_app/utils/cache_function.dart';
 import 'package:new_ara_app/utils/slide_routing.dart';
 import 'package:new_ara_app/widgets/loading_indicator.dart';
 import 'package:provider/provider.dart';
@@ -40,16 +42,41 @@ class SettingPageState extends State<SettingPage> {
   /// 정치글 보기 설정. true이면 정치글을 보여줌.
   late bool seeSocial;
 
+  bool setDarkMode = false;
+
   bool _isLoading = false;
+
 
   @override
   void initState() {
     super.initState();
     var userProvider = context.read<UserProvider>();
+    var themeProvider = context.read<ThemeProvider>();
     seeSexual = userProvider.naUser?.see_sexual ?? true;
     seeSocial = userProvider.naUser?.see_social ?? true;
+    setDarkMode = themeProvider.isDarkMode;
     // 페이지 전환 과정에서 새로운 알림을 확인하기 위한 호출.
     context.read<NotificationProvider>().checkIsNotReadExist(userProvider);
+
+    _loadDarkModeSetting();
+  }
+
+  String darkModeKey = 'cache/dark_mode_setting';
+
+  Future<void> saveDarkModeSetting(bool isDarkMode) async {
+    await cacheApiData(darkModeKey, isDarkMode);
+  }
+
+  Future<bool> getDarkModeSetting() async {
+    final cachedData = await fetchCachedApiData(darkModeKey);
+    return cachedData ?? SchedulerBinding.instance.platformDispatcher.platformBrightness == Brightness.dark;
+  }
+
+  Future<void> _loadDarkModeSetting() async {
+    final isDarkMode = await getDarkModeSetting();
+    setState(() {
+      setDarkMode = isDarkMode;
+    });
   }
 
   @override
@@ -57,6 +84,7 @@ class SettingPageState extends State<SettingPage> {
     var userProvider = context.watch<UserProvider>();
 
     final themeProvider = Provider.of<ThemeProvider>(context);
+
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
@@ -374,7 +402,7 @@ class SettingPageState extends State<SettingPage> {
                       Container(
                         width: MediaQuery.of(context).size.width - 40,
                         padding: const EdgeInsets.only(right: 5),
-                        height: 94,
+                        height: 134,
                         decoration: BoxDecoration(
                           borderRadius:
                               const BorderRadius.all(Radius.circular(10)),
@@ -387,6 +415,42 @@ class SettingPageState extends State<SettingPage> {
                           crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
                             const SizedBox(height: 10),
+                            //다크모드
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                // 성인글 보기 글씨
+                                Container(
+                                    margin: const EdgeInsets.only(left: 10),
+                                    child: Text(
+                                      LocaleKeys.settingPage_dark.tr(),
+                                      style: TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.w500,
+                                          color: themeProvider.isDarkMode? Colors.white : Colors.black
+                                      ),
+                                    )),
+                                Container(
+                                  margin: const EdgeInsets.only(right: 10),
+                                  width: 43,
+                                  height: 27,
+                                  child: FittedBox(
+                                    fit: BoxFit.fill,
+                                    child: CupertinoSwitch(
+                                        activeColor: ColorsInfo.newara,
+                                        value: setDarkMode,
+                                        onChanged: (value) async {
+                                          setState(() {
+                                            setDarkMode = value;
+                                          });
+                                          await saveDarkModeSetting(value);
+                                          themeProvider.updateTheme();
+                                        }),
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 16),
                             // 이용약관
                             InkWell(
                               onTap: () {
