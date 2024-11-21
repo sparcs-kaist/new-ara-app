@@ -26,8 +26,8 @@ on:
           - Both
 
 env:
-  FLUTTER_VERSION: "3.13"
-  JAVA_VERSION: "11"
+  FLUTTER_VERSION: "3.24"
+  JAVA_VERSION: "17"
   XCODE_VERSION: "15.2"
   DEPLOY_ENVIRONMENT: ${{ github.event.inputs.deploy_environment || 'production' }}
 
@@ -102,10 +102,12 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       # Setup Xcode
-      - name: Setup Xcode environment
-        uses: maxim-lobanov/setup-xcode@v1
-        with:
-          xcode-version: ${{ env.XCODE_VERSION }}
+      - name: Select Xcode version
+        run: sudo xcode-select -s '/Applications/Xcode_15.0.app/Contents/Developer'
+      # - name: Setup Xcode environment
+      #   uses: maxim-lobanov/setup-xcode@v1
+      #   with:
+      #     xcode-version: ${{ env.XCODE_VERSION }}
 
       # Setup Flutter environments for iOS (Flutter, Java는 필요X)
       - name: Setup Flutter
