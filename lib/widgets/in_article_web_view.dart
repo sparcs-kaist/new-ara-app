@@ -202,9 +202,16 @@ class _InArticleWebViewState extends State<InArticleWebView> {
   }
 
   @override
+  void dispose() {
+    _webViewController.removeJavaScriptChannel('Toaster');
+    _webViewController.clearCache();
+    super.dispose();
+  }
+
+
+  @override
   Widget build(BuildContext context) {
     late WebViewWidget webViewWidget;
-    final themeProvider = Provider.of<ThemeProvider>(context);
 
     // 안드로이드 플랫폼의 경우 displayHybridComposition: true로 설정한다
     // 안드로이드의 경우 이렇게 하지않으면 웹뷰 crash 문제가 발생
@@ -214,7 +221,6 @@ class _InArticleWebViewState extends State<InArticleWebView> {
       webViewWidget = WebViewWidget.fromPlatformCreationParams(
         params: AndroidWebViewWidgetCreationParams(
           controller: _webViewController.platform,
-          displayWithHybridComposition: true,
           gestureRecognizers: {
           Factory<OneSequenceGestureRecognizer>(() {
             TapGestureRecognizer tabGestureRecognizer = TapGestureRecognizer();
