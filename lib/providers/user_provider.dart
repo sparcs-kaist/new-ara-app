@@ -1,14 +1,10 @@
 import 'dart:async';
 import 'dart:io';
 import 'package:dio/dio.dart';
-import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:new_ara_app/constants/url_info.dart';
 import 'package:new_ara_app/models/user_profile_model.dart';
-import 'package:new_ara_app/translations/locale_keys.g.dart';
 import 'package:new_ara_app/utils/create_dio_with_config.dart';
-import 'package:new_ara_app/utils/global_key.dart';
-import 'package:new_ara_app/widgets/snackbar_noti.dart';
 import 'package:webview_cookie_manager/webview_cookie_manager.dart';
 
 /// `UserProvider`는 사용자 정보 및 연관된 API 로직을 관리하는 클래스입니다.
