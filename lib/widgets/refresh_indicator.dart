@@ -1,3 +1,4 @@
+import 'dart:io' show Platform; // 플랫폼 체크
 import 'package:flutter/cupertino.dart' hide RefreshCallback;
 import 'package:flutter/material.dart';
 import 'package:new_ara_app/constants/colors_info.dart';
@@ -5,7 +6,7 @@ import 'package:new_ara_app/constants/colors_info.dart';
 const scrollDownLength = 30.0; // refresh를 위한 최소 픽셀
 const displacementLength = 0.0; // 위로부터의 default displacement
 const offsetLength = 5.0; // 위/아래의 default offset
-const indicatorRadius = 15.0; // 원의 default radius
+const indicatorRadius = 10.0; // 원의 default radius
 
 /// Custom으로 scrollDownLength를 설정할 수 있는 위젯으로, [RefreshIndicator.adaptive]를 대체합니다.
 ///
@@ -76,16 +77,33 @@ class _CustomRefreshIndicatorState extends State<CustomRefreshIndicator>
 
   @override
   Widget build(BuildContext context) {
-    // NotificationListener로 scroll 업데이트를 감지
-    return NotificationListener<ScrollNotification>(
-      onNotification: _handleScrollNotification,
-      child: Stack(
-        children: [
-          widget.child,
-          if (_isDragging || _isRefreshing) _buildRefreshIndicator(),
-        ],
-      ),
-    );
+    // 플랫폼에 따라 다른 RefreshIndicator 사용
+    if (Theme.of(context).platform == TargetPlatform.iOS) {
+      // iOS: CustomRefreshIndicator
+      return NotificationListener<ScrollNotification>(
+        onNotification: _handleScrollNotification,
+        child: Stack(
+          children: [
+            widget.child,
+            if (_isDragging || _isRefreshing) _buildRefreshIndicator(),
+          ],
+        ),
+      );
+    } else {
+      // Android 및 기타 플랫폼: 기본 RefreshIndicator 사용
+      return RefreshIndicator(
+        onRefresh: widget.onRefresh,
+        color: widget.color,
+        backgroundColor: widget.backgroundColor,
+        displacement: widget.displacement,
+        notificationPredicate: (ScrollNotification notification) {
+          // 기본적으로 항상 스크롤 가능하도록 설정
+          return notification.depth == 0;
+        },
+        edgeOffset: widget.edgeOffset,
+        child: widget.child,
+      );
+    }
   }
 
   // 실제 LoadingIndicator build 과정
@@ -101,7 +119,7 @@ class _CustomRefreshIndicatorState extends State<CustomRefreshIndicator>
           padding: EdgeInsets.symmetric(vertical: widget.edgeOffset),
           alignment: Alignment.center,
           child: CupertinoActivityIndicator(
-            // 편의상 iOS, Android 통일 (maybe TODO)
+            // 편의상 iOS, Android 통일
             color: widget.color,
             radius: widget.radius,
           ),
