@@ -4,6 +4,8 @@ import 'dart:core';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:new_ara_app/constants/theme_info.dart';
+import 'package:new_ara_app/providers/theme_provider.dart';
 import 'package:new_ara_app/providers/connectivity_provider.dart';
 import 'package:new_ara_app/widgets/refresh_indicator.dart';
 import 'package:provider/provider.dart';
@@ -211,6 +213,7 @@ class _PostViewPageState extends State<PostViewPage> {
   Widget build(BuildContext context) {
     UserProvider userProvider = context.read<UserProvider>();
     BlockedProvider blockedProvider = context.watch<BlockedProvider>();
+    final themeProvider = Provider.of<ThemeProvider>(context);
 
     // _fetchArticle이 진행중일 때는 Stack을 이용해 가림.
     // _fetchArticle이 끝났지만 웹뷰 로드가 끝나지 않았을 때는 조건문으로 가림.
@@ -219,7 +222,7 @@ class _PostViewPageState extends State<PostViewPage> {
     return Stack(
       children: [
         Scaffold(
-            backgroundColor: Colors.white,
+            backgroundColor: themeProvider.isDarkMode? Color(0xff111111) : Colors.white,
             appBar: AppBar(
               centerTitle: true,
               leadingWidth: 200,
@@ -269,6 +272,10 @@ class _PostViewPageState extends State<PostViewPage> {
                             Expanded(
                               // Android, iOS 여부에 따라 다른 새로고침
                               child: CustomRefreshIndicator(
+                                backgroundColor: themeProvider.isDarkMode
+                                    ? Color(0xff1a1a1a)
+                                    : Colors.white,
+                                color: ColorsInfo.newara,
                                 onRefresh: () async {
                                   userProvider.setIsContentLoaded(false);
                                   _setIsPageLoaded(false);
@@ -289,8 +296,8 @@ class _PostViewPageState extends State<PostViewPage> {
                                       const SizedBox(height: 10),
                                       // 유저 정보 (프로필 이미지, 닉네임)
                                       _buildAuthorInfo(userProvider),
-                                      const Divider(
-                                        color: Color(0xFFF0F0F0),
+                                      Divider(
+                                        color: themeProvider.isDarkMode? NewAraThemes.darkBRLine :NewAraThemes.lightBRLine,
                                         thickness: 1,
                                       ),
                                       if (_article.parent_board.slug ==
@@ -316,20 +323,19 @@ class _PostViewPageState extends State<PostViewPage> {
                                                 40,
                                             height: 85,
                                             decoration: BoxDecoration(
-                                              color: Colors.white,
+                                              color: themeProvider.isDarkMode? Colors.black : Colors.white,
                                               borderRadius:
                                                   const BorderRadius.all(
                                                       Radius.circular(10)),
                                               border: Border.all(
-                                                  color:
-                                                      const Color(0xFFDBDBDB),
+                                                  color: themeProvider.isDarkMode? NewAraThemes.gry36 : NewAraThemes.gryDB,
                                                   width: 1),
-                                              boxShadow: const [
+                                              boxShadow: [
                                                 BoxShadow(
                                                   blurRadius: 2,
                                                   spreadRadius: 0,
                                                   offset: Offset(0, 0),
-                                                  color: Color(0xFFA9A9A9),
+                                                  color: themeProvider.isDarkMode? NewAraThemes.gry67 : NewAraThemes.gryA9,
                                                 ),
                                               ],
                                             ),
@@ -352,12 +358,11 @@ class _PostViewPageState extends State<PostViewPage> {
                                                             .toString(),
                                                         overflow: TextOverflow
                                                             .ellipsis,
-                                                        style: const TextStyle(
+                                                        style: TextStyle(
                                                             fontWeight:
                                                                 FontWeight.w400,
                                                             fontSize: 14,
-                                                            color: Color(
-                                                                0xFF4A4A4A)),
+                                                            color: themeProvider.isDarkMode? NewAraThemes.gryD5 : NewAraThemes.gry4A),
                                                       ),
                                                     ),
                                                     SvgPicture.asset(
@@ -365,9 +370,9 @@ class _PostViewPageState extends State<PostViewPage> {
                                                       width: 15,
                                                       height: 25,
                                                       colorFilter:
-                                                          const ColorFilter
+                                                          ColorFilter
                                                               .mode(
-                                                              Color(0xFF4A4A4A),
+                                                              themeProvider.isDarkMode? NewAraThemes.gryD5 : NewAraThemes.gry4A,
                                                               BlendMode.srcIn),
                                                     ),
                                                   ],
@@ -376,11 +381,11 @@ class _PostViewPageState extends State<PostViewPage> {
                                                   _article.url.toString(),
                                                   overflow:
                                                       TextOverflow.ellipsis,
-                                                  style: const TextStyle(
+                                                  style: TextStyle(
                                                       fontWeight:
                                                           FontWeight.w400,
                                                       fontSize: 14,
-                                                      color: Color(0xFF4A4A4A)),
+                                                      color: themeProvider.isDarkMode? NewAraThemes.gryD5 : NewAraThemes.gry4A),
                                                 ),
                                               ],
                                             ),
@@ -418,10 +423,10 @@ class _PostViewPageState extends State<PostViewPage> {
                                                         .created_by.id
                                                         .toString())),
                                         child: Container(
-                                            decoration: const BoxDecoration(
+                                            decoration: BoxDecoration(
                                               borderRadius: BorderRadius.all(
                                                   Radius.circular(10)),
-                                              color: Color(0xfffafafa),
+                                              color: themeProvider.isDarkMode? Color(0xff242424) : Color(0xfffafafa),
                                             ),
                                             width: MediaQuery.of(context)
                                                     .size
@@ -454,8 +459,8 @@ class _PostViewPageState extends State<PostViewPage> {
                                                               context.locale)
                                                           .join('\n'),
                                                   textAlign: TextAlign.center,
-                                                  style: const TextStyle(
-                                                    color: Color(0xFF4A4A4A),
+                                                  style: TextStyle(
+                                                    color: themeProvider.isDarkMode? NewAraThemes.gryD5 : NewAraThemes.gry4A,
                                                     fontWeight: FontWeight.w700,
                                                     fontSize: 16,
                                                   ),
@@ -470,10 +475,10 @@ class _PostViewPageState extends State<PostViewPage> {
                                                                   .toString()))
                                                       ? ""
                                                       : "(${getHiddenInfo(_article.why_hidden)})",
-                                                  style: const TextStyle(
+                                                  style: TextStyle(
                                                     fontWeight: FontWeight.w400,
                                                     fontSize: 14,
-                                                    color: Color(0xFF4A4A4A),
+                                                    color: themeProvider.isDarkMode? NewAraThemes.gryD5 : NewAraThemes.gry4A,
                                                   ),
                                                 ),
                                                 const SizedBox(height: 8),
@@ -499,8 +504,7 @@ class _PostViewPageState extends State<PostViewPage> {
                                                                           10)),
                                                           border: Border.all(
                                                             width: 1,
-                                                            color: const Color(
-                                                                0xFFDBDBDB),
+                                                            color: themeProvider.isDarkMode? NewAraThemes.gry36 : NewAraThemes.gryDB,
                                                           ),
                                                         ),
                                                         child: InkWell(
@@ -517,9 +521,8 @@ class _PostViewPageState extends State<PostViewPage> {
                                                                   .postViewPage_showHiddenPosts
                                                                   .tr(),
                                                               style:
-                                                                  const TextStyle(
-                                                                color: Color(
-                                                                    0xff4a4a4a),
+                                                                  TextStyle(
+                                                                color: themeProvider.isDarkMode? NewAraThemes.gryD5 : NewAraThemes.gry4A,
                                                                 fontWeight:
                                                                     FontWeight
                                                                         .w400,
@@ -553,9 +556,9 @@ class _PostViewPageState extends State<PostViewPage> {
                                       _buildUtilityButtons(
                                           userProvider, blockedProvider),
                                       const SizedBox(height: 15),
-                                      const Divider(
+                                      Divider(
                                           thickness: 1,
-                                          color: Color(0xFFF0F0F0)),
+                                          color: themeProvider.isDarkMode? NewAraThemes.darkBRLine : NewAraThemes.lightBRLine),
                                       const SizedBox(height: 15),
                                       SizedBox(
                                         width:
@@ -563,7 +566,8 @@ class _PostViewPageState extends State<PostViewPage> {
                                                 40,
                                         child: Text(
                                           '${_article.comment_count}${LocaleKeys.postViewPage_displayCommentCount.tr()}',
-                                          style: const TextStyle(
+                                          style: TextStyle(
+                                            color: themeProvider.isDarkMode? Colors.white : Colors.black,
                                             fontSize: 16,
                                             fontWeight: FontWeight.w700,
                                           ),
@@ -594,6 +598,8 @@ class _PostViewPageState extends State<PostViewPage> {
   /// 작성자 정보 상단까지의 빌드를 담당하며 빌드된 위젯을 리턴.
   /// _article 클래스 전역변수를 사용함.
   Widget _buildTitle(BlockedProvider blockedProvider) {
+    final themeProvider = Provider.of<ThemeProvider>(context);
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -618,7 +624,8 @@ class _PostViewPageState extends State<PostViewPage> {
                     ? LocaleKeys.postViewPage_blockedUsersPost.tr()
                     : getTitle(_article.title, _article.is_hidden,
                         _article.why_hidden),
-                style: const TextStyle(
+                style: TextStyle(
+                  color: themeProvider.isDarkMode? Colors.white : Colors.black,
                   fontSize: 18,
                   fontWeight: FontWeight.w700,
                 ),
@@ -637,19 +644,19 @@ class _PostViewPageState extends State<PostViewPage> {
               children: [
                 Text(
                   specificTime(_article.created_at, context.locale),
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 12,
                     fontWeight: FontWeight.w500,
-                    color: Color(0xFFBBBBBB),
+                    color: themeProvider.isDarkMode? NewAraThemes.gry6 : NewAraThemes.gryB,
                   ),
                 ),
                 const SizedBox(width: 10),
                 Text(
                   '${LocaleKeys.postViewPage_hit.tr()} ${_article.hit_count}',
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 12,
                     fontWeight: FontWeight.w500,
-                    color: Color(0xFFBBBBBB),
+                    color: themeProvider.isDarkMode? NewAraThemes.gry6 : NewAraThemes.gryB,
                   ),
                 ),
                 if (_article.parent_board.slug == 'with-school')
@@ -713,6 +720,8 @@ class _PostViewPageState extends State<PostViewPage> {
     debugPrint("**********************************************");
     debugPrint("BUILDAUTHORINFO INVOKED");
     debugPrint("**********************************************");
+    final themeProvider = Provider.of<ThemeProvider>(context);
+
     return InkWell(
       // 익명일 경우 작성자 정보확인이 불가하도록 함.
       onTap: !isRegular(_article.name_type)
@@ -733,9 +742,9 @@ class _PostViewPageState extends State<PostViewPage> {
           Container(
             width: 30,
             height: 30,
-            decoration: const BoxDecoration(
+            decoration: BoxDecoration(
               shape: BoxShape.circle,
-              color: Colors.grey,
+              color: themeProvider.isDarkMode? Colors.white : Colors.grey,
             ),
             child: ClipRRect(
               borderRadius: const BorderRadius.all(Radius.circular(100)),
@@ -757,7 +766,8 @@ class _PostViewPageState extends State<PostViewPage> {
                     _article.name_type,
                     _article.created_by.profile.nickname.toString(),
                     context.locale),
-                style: const TextStyle(
+                style: TextStyle(
+                  color: themeProvider.isDarkMode? Colors.white : Colors.black,
                   fontSize: 14,
                   fontWeight: FontWeight.w500,
                 ),
@@ -770,8 +780,7 @@ class _PostViewPageState extends State<PostViewPage> {
             visible: isRegular(_article.name_type),
             child: SvgPicture.asset(
               'assets/icons/right_chevron.svg',
-              colorFilter:
-                  const ColorFilter.mode(Colors.black, BlendMode.srcIn),
+              colorFilter: ColorFilter.mode(themeProvider.isDarkMode? Colors.white : Colors.black, BlendMode.srcIn),
               width: 6,
               height: 15,
             ),
@@ -784,6 +793,7 @@ class _PostViewPageState extends State<PostViewPage> {
   /// 좋아요, 싫어요 버튼 빌드를 담당하며 빌드된 위젯을 리턴.
   /// _article 클래스 전역변수를 사용함.
   Widget _buildVoteButtons(UserProvider userProvider) {
+    final themeProvider = Provider.of<ThemeProvider>(context);
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
@@ -879,6 +889,7 @@ class _PostViewPageState extends State<PostViewPage> {
   /// PostViewPage에서 화면 상단 및 댓글 위의 좋아요, 싫어요 아이콘 설정을 위해 사용됨.
   Widget _buildVoteIcons(bool isPositive, bool? myVote, Color highlightColor,
       double width, double height) {
+    final themeProvider = Provider.of<ThemeProvider>(context);
     late Color widgetColor;
     late String iconPath;
     // 투표한 반대 위젯을 설정하는 경우
@@ -907,6 +918,7 @@ class _PostViewPageState extends State<PostViewPage> {
   /// _article 클래스 전역변수를 사용함.
   Widget _buildUtilityButtons(
       UserProvider userProvider, BlockedProvider blockedProvider) {
+    final themeProvider = Provider.of<ThemeProvider>(context);
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
@@ -926,11 +938,11 @@ class _PostViewPageState extends State<PostViewPage> {
                 width: context.locale == const Locale('ko') ? 80 : 110,
                 height: 35,
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: themeProvider.isDarkMode? Color(0xff111111) : Colors.white,
                   borderRadius: BorderRadius.circular(8),
                   border: Border.all(
                     color: _article.my_scrap == null
-                        ? const Color(0xFFF0F0F0)
+                        ? themeProvider.isDarkMode? NewAraThemes.darkBRLine : NewAraThemes.lightBRLine
                         : ColorsInfo.newara,
                   ),
                 ),
@@ -944,7 +956,7 @@ class _PostViewPageState extends State<PostViewPage> {
                       height: 22,
                       colorFilter: ColorFilter.mode(
                           _article.my_scrap == null
-                              ? const Color(0xFF646464)
+                              ? themeProvider.isDarkMode? NewAraThemes.gryEB : NewAraThemes.gry64
                               : ColorsInfo.newara,
                           BlendMode.srcIn),
                     ),
@@ -955,7 +967,7 @@ class _PostViewPageState extends State<PostViewPage> {
                           : LocaleKeys.postViewPage_scrapped.tr(),
                       style: TextStyle(
                         color: _article.my_scrap == null
-                            ? const Color(0xFF646464)
+                            ? themeProvider.isDarkMode? NewAraThemes.gryEB : NewAraThemes.gry64
                             : ColorsInfo.newara,
                         fontSize: 13,
                         fontWeight: FontWeight.w500,
@@ -976,6 +988,8 @@ class _PostViewPageState extends State<PostViewPage> {
                   hideOldsAndShowAraSnackBar(
                       context,
                       buildAraSnackBar(context,
+                          backgroundColor: themeProvider.isDarkMode? Color(0xff1a1a1a) : Colors.white,
+                          shape: RoundedRectangleBorder(side: BorderSide(color: themeProvider.isDarkMode? Color(0xff1a1a1a) : Color(0xfff0f0f0), width: 0.5), borderRadius: BorderRadius.all(Radius.circular(16))),
                           duration: const Duration(seconds: 1),
                           content: Row(
                             children: [
@@ -993,8 +1007,8 @@ class _PostViewPageState extends State<PostViewPage> {
                                       .tr(),
                                   // 오버플로우 나면 다음줄로 넘어가도록 하기 위해
                                   overflow: TextOverflow.visible,
-                                  style: const TextStyle(
-                                    color: Colors.black,
+                                  style: TextStyle(
+                                    color: themeProvider.isDarkMode? Colors.white : Colors.black,
                                     fontWeight: FontWeight.w400,
                                     fontSize: 15,
                                   ),
@@ -1010,7 +1024,7 @@ class _PostViewPageState extends State<PostViewPage> {
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(8),
                   border: Border.all(
-                    color: const Color(0xFFF0F0F0),
+                    color: themeProvider.isDarkMode? NewAraThemes.darkBRLine : NewAraThemes.lightBRLine,
                     width: 1,
                   ),
                 ),
@@ -1022,16 +1036,16 @@ class _PostViewPageState extends State<PostViewPage> {
                       'assets/icons/share.svg',
                       width: 19,
                       height: 22,
-                      colorFilter: const ColorFilter.mode(
-                          Color.fromRGBO(100, 100, 100, 1), BlendMode.srcIn),
+                      colorFilter: ColorFilter.mode(
+                          themeProvider.isDarkMode? NewAraThemes.gryEB : NewAraThemes.gry64, BlendMode.srcIn),
                     ),
                     //const SizedBox(width: 6),
                     Text(
                       LocaleKeys.postViewPage_share.tr(),
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 13,
                         fontWeight: FontWeight.w500,
-                        color: Color(0xFF646464),
+                        color: themeProvider.isDarkMode? NewAraThemes.gryEB : NewAraThemes.gry64,
                       ),
                     ),
                   ],
@@ -1059,15 +1073,25 @@ class _PostViewPageState extends State<PostViewPage> {
                     } else {
                       await showDialog(
                         context: context,
-                        builder: (context) => BlockConfirmDialog(
-                          onTap: () {
-                            blockedProvider
-                                .addBlockedAnonymousPostID(
-                                    _article.created_by.id.toString())
-                                .then((_) => Navigator.pop(context));
-                          },
-                          userProvider: userProvider,
-                          targetContext: context,
+                        builder: (context) => Theme(
+                          data: Theme.of(context).copyWith(
+                              dialogBackgroundColor: themeProvider.isDarkMode? Color(0xff111111) : Colors.white,
+                              textButtonTheme: TextButtonThemeData(
+                                  style: ButtonStyle(
+                                    backgroundColor: WidgetStateProperty.all<Color>(themeProvider.isDarkMode? Colors.black : Colors.white),
+                                  )
+                              )
+                          ),
+                          child: BlockConfirmDialog(
+                            onTap: () {
+                              blockedProvider
+                                  .addBlockedAnonymousPostID(
+                                      _article.created_by.id.toString())
+                                  .then((_) => Navigator.pop(context));
+                            },
+                            userProvider: userProvider,
+                            targetContext: context,
+                          ),
                         ),
                       );
                     }
@@ -1079,30 +1103,40 @@ class _PostViewPageState extends State<PostViewPage> {
                   if (!isAuthorBlocked) {
                     await showDialog(
                       context: context,
-                      builder: (context) => BlockConfirmDialog(
-                        onTap: () {
-                          ArticleController(
-                                  model: _article, userProvider: userProvider)
-                              .handleBlock(true)
-                              .then((blockRes) {
-                            // 차단이 성공한 경우
-                            if (blockRes) {
-                              _fetchArticle(userProvider).then((_) {
-                                _updateState();
+                      builder: (context) => Theme(
+                        data: Theme.of(context).copyWith(
+                            dialogBackgroundColor: themeProvider.isDarkMode? Color(0xff111111) : Colors.white,
+                            textButtonTheme: TextButtonThemeData(
+                                style: ButtonStyle(
+                                  backgroundColor: WidgetStateProperty.all<Color>(themeProvider.isDarkMode? Colors.black : Colors.white),
+                                )
+                            )
+                        ),
+                        child: BlockConfirmDialog(
+                          onTap: () {
+                            ArticleController(
+                                    model: _article, userProvider: userProvider)
+                                .handleBlock(true)
+                                .then((blockRes) {
+                              // 차단이 성공한 경우
+                              if (blockRes) {
+                                _fetchArticle(userProvider).then((_) {
+                                  _updateState();
+                                  Navigator.pop(context);
+                                });
+                              }
+                              // 차단에 실패할 경우 오류 메시지, 스낵바 출력
+                              else {
+                                debugPrint("failed to block");
                                 Navigator.pop(context);
-                              });
-                            }
-                            // 차단에 실패할 경우 오류 메시지, 스낵바 출력
-                            else {
-                              debugPrint("failed to block");
-                              Navigator.pop(context);
-                              showInfoBySnackBar(context,
-                                  LocaleKeys.postViewPage_failedToBlock.tr());
-                            }
-                          });
-                        },
-                        userProvider: userProvider,
-                        targetContext: context,
+                                showInfoBySnackBar(context,
+                                    LocaleKeys.postViewPage_failedToBlock.tr());
+                              }
+                            });
+                          },
+                          userProvider: userProvider,
+                          targetContext: context,
+                        ),
                       ),
                     );
                   }
@@ -1135,7 +1169,7 @@ class _PostViewPageState extends State<PostViewPage> {
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(8),
                     border: Border.all(
-                      color: const Color(0xFFF0F0F0),
+                      color: themeProvider.isDarkMode? NewAraThemes.darkBRLine : NewAraThemes.lightBRLine,
                     ),
                   ),
                   child: Center(
@@ -1145,8 +1179,8 @@ class _PostViewPageState extends State<PostViewPage> {
                         SvgPicture.asset("assets/icons/barrior.svg",
                             width: 11,
                             height: 19,
-                            colorFilter: const ColorFilter.mode(
-                                Color(0xFF646464), BlendMode.srcIn)),
+                            colorFilter: ColorFilter.mode(
+                                themeProvider.isDarkMode? NewAraThemes.gryEB : NewAraThemes.gry64, BlendMode.srcIn)),
                         const SizedBox(width: 3),
                         Text(
                           // TODO: 아래 코드는 iOS 심사 통과를 위한 임시 방편. 익명 차단이 BE에서 구현되면 제거해야함 (2023.02.29)
@@ -1157,10 +1191,10 @@ class _PostViewPageState extends State<PostViewPage> {
                                               .toString())))
                               ? LocaleKeys.postViewPage_unblock.tr()
                               : LocaleKeys.postViewPage_block.tr(),
-                          style: const TextStyle(
+                          style: TextStyle(
                               fontSize: 13,
                               fontWeight: FontWeight.w500,
-                              color: Color(0xFF646464)),
+                              color: themeProvider.isDarkMode? NewAraThemes.gryEB : NewAraThemes.gry64),
                         ),
                       ],
                     ),
@@ -1172,30 +1206,41 @@ class _PostViewPageState extends State<PostViewPage> {
                 onTap: () async {
                   await showDialog(
                       context: context,
-                      builder: (context) => DeleteDialog(
-                            userProvider: userProvider,
-                            targetContext: context,
-                            onTap: () {
-                              ArticleController(
-                                      model: _article,
-                                      userProvider: userProvider)
-                                  .delete()
-                                  .then((res) {
-                                // 사용자가 미리 뒤로가기 버튼을 누르는 경우 에러 방지를 위해
-                                // try-catch 문을 도입함.
-                                try {
-                                  // dialog pop
-                                  Navigator.pop(context);
-                                  if (res == true) {
-                                    // PostViewPage pop
+                      builder: (context) => Theme(
+                        data: Theme.of(context).copyWith(
+                            dialogBackgroundColor: themeProvider.isDarkMode? Color(0xff111111) : Colors.white,
+                            textButtonTheme: TextButtonThemeData(
+                                style: ButtonStyle(
+                                  backgroundColor: WidgetStateProperty.all<Color>(themeProvider.isDarkMode? Colors.black : Colors.white),
+                                )
+                            )
+                        ),
+                        child: DeleteDialog(
+                              isDarkMode: themeProvider.isDarkMode,
+                              userProvider: userProvider,
+                              targetContext: context,
+                              onTap: () {
+                                ArticleController(
+                                        model: _article,
+                                        userProvider: userProvider)
+                                    .delete()
+                                    .then((res) {
+                                  // 사용자가 미리 뒤로가기 버튼을 누르는 경우 에러 방지를 위해
+                                  // try-catch 문을 도입함.
+                                  try {
+                                    // dialog pop
                                     Navigator.pop(context);
+                                    if (res == true) {
+                                      // PostViewPage pop
+                                      Navigator.pop(context);
+                                    }
+                                  } catch (error) {
+                                    debugPrint("pop error: $error");
                                   }
-                                } catch (error) {
-                                  debugPrint("pop error: $error");
-                                }
-                              });
-                            },
-                          ));
+                                });
+                              },
+                            ),
+                      ));
                 },
                 child: Container(
                   width: 65,
@@ -1203,7 +1248,7 @@ class _PostViewPageState extends State<PostViewPage> {
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(8),
                     border: Border.all(
-                      color: const Color(0xFFF0F0F0),
+                      color: themeProvider.isDarkMode? NewAraThemes.darkBRLine : NewAraThemes.lightBRLine,
                     ),
                   ),
                   child: Row(
@@ -1213,14 +1258,14 @@ class _PostViewPageState extends State<PostViewPage> {
                       SvgPicture.asset("assets/icons/delete.svg",
                           width: 15,
                           height: 22,
-                          colorFilter: const ColorFilter.mode(
-                              Color(0xFF646464), BlendMode.srcIn)),
+                          colorFilter: ColorFilter.mode(
+                              themeProvider.isDarkMode? NewAraThemes.gryEB : NewAraThemes.gry64, BlendMode.srcIn)),
                       Text(
                         LocaleKeys.postViewPage_delete.tr(),
-                        style: const TextStyle(
+                        style: TextStyle(
                             fontSize: 13,
                             fontWeight: FontWeight.w500,
-                            color: Color(0xFF646464)),
+                            color: themeProvider.isDarkMode? NewAraThemes.gryEB : NewAraThemes.gry64),
                       ),
                     ],
                   ),
@@ -1234,7 +1279,18 @@ class _PostViewPageState extends State<PostViewPage> {
                   showDialog(
                       context: context,
                       builder: (context) {
-                        return ReportDialogWidget(articleID: _article.id);
+
+                        return Theme(
+                          data: Theme.of(context).copyWith(
+                            dialogBackgroundColor: themeProvider.isDarkMode? Color(0xff111111) : Colors.white,
+                            textButtonTheme: TextButtonThemeData(
+                              style: ButtonStyle(
+                                backgroundColor: WidgetStateProperty.all<Color>(themeProvider.isDarkMode? Colors.black : Colors.white),
+                              )
+                            )
+                          ),
+                          child: ReportDialogWidget(articleID: _article.id)
+                        );
                       });
                 },
                 child: Container(
@@ -1243,7 +1299,7 @@ class _PostViewPageState extends State<PostViewPage> {
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(8),
                     border: Border.all(
-                      color: const Color(0xFFF0F0F0),
+                      color: themeProvider.isDarkMode? NewAraThemes.darkBRLine : NewAraThemes.lightBRLine,
                     ),
                   ),
                   child: Row(
@@ -1254,15 +1310,15 @@ class _PostViewPageState extends State<PostViewPage> {
                         'assets/icons/warning.svg',
                         width: 19,
                         height: 22,
-                        colorFilter: const ColorFilter.mode(
-                            Color(0xFF646464), BlendMode.srcIn),
+                        colorFilter: ColorFilter.mode(
+                            themeProvider.isDarkMode? NewAraThemes.gryEB : NewAraThemes.gry64, BlendMode.srcIn),
                       ),
                       Text(
                         LocaleKeys.postViewPage_report.tr(),
-                        style: const TextStyle(
+                        style: TextStyle(
                             fontSize: 13,
                             fontWeight: FontWeight.w500,
-                            color: Color(0xFF646464)),
+                            color: themeProvider.isDarkMode? NewAraThemes.gryEB : NewAraThemes.gry64),
                       ),
                     ],
                   ),
@@ -1284,7 +1340,7 @@ class _PostViewPageState extends State<PostViewPage> {
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(8),
                     border: Border.all(
-                      color: const Color(0xFFF0F0F0),
+                      color: themeProvider.isDarkMode? NewAraThemes.darkBRLine : NewAraThemes.lightBRLine,
                     ),
                   ),
                   child: Row(
@@ -1295,17 +1351,17 @@ class _PostViewPageState extends State<PostViewPage> {
                         'assets/icons/modify.svg',
                         width: 15,
                         height: 22,
-                        colorFilter: const ColorFilter.mode(
-                          Color(0xFF646464),
+                        colorFilter: ColorFilter.mode(
+                          themeProvider.isDarkMode? NewAraThemes.gryEB : NewAraThemes.gry64,
                           BlendMode.srcIn,
                         ),
                       ),
                       Text(
                         LocaleKeys.postViewPage_edit.tr(),
-                        style: const TextStyle(
+                        style: TextStyle(
                             fontSize: 13,
                             fontWeight: FontWeight.w500,
-                            color: Color(0xFF646464)),
+                            color: themeProvider.isDarkMode? NewAraThemes.gryEB : NewAraThemes.gry64),
                       ),
                     ],
                   ),
@@ -1321,6 +1377,8 @@ class _PostViewPageState extends State<PostViewPage> {
   /// _commentList 클래스 전역변수를 사용함.
   Widget _buildCommentListView(
       UserProvider userProvider, BlockedProvider blockedProvider) {
+    final themeProvider = Provider.of<ThemeProvider>(context);
+
     return ListView.builder(
       padding: const EdgeInsets.only(bottom: 15),
       shrinkWrap: true, // 모든 댓글을 보여주는 선에서 크기를 최소화
@@ -1359,9 +1417,9 @@ class _PostViewPageState extends State<PostViewPage> {
                             Container(
                               width: 25,
                               height: 25,
-                              decoration: const BoxDecoration(
+                              decoration: BoxDecoration(
                                 shape: BoxShape.circle,
-                                color: Colors.grey,
+                                color: themeProvider.isDarkMode? Colors.white : Colors.grey,
                               ),
                               child: ClipRRect(
                                 borderRadius: const BorderRadius.all(
@@ -1396,16 +1454,16 @@ class _PostViewPageState extends State<PostViewPage> {
                                                   _article.created_by.id &&
                                               _article.name_type == 2)
                                           ? ColorsInfo.newara
-                                          : const Color(0xFF333333)),
+                                          : themeProvider.isDarkMode? NewAraThemes.gryB : NewAraThemes.gry3),
                                   maxLines: 1,
                                   overflow: TextOverflow.ellipsis,
                                 )),
                             const SizedBox(width: 7),
                             Text(getTime(curComment.created_at, context.locale),
-                                style: const TextStyle(
+                                style: TextStyle(
                                   fontSize: 12,
                                   fontWeight: FontWeight.w400,
-                                  color: Color(0xFFBBBBBB),
+                                  color: themeProvider.isDarkMode? NewAraThemes.gry3 : NewAraThemes.gryB,
                                 )),
                           ],
                         ),
@@ -1436,26 +1494,37 @@ class _PostViewPageState extends State<PostViewPage> {
                                           showDialog(
                                             context: context,
                                             builder: (context) {
-                                              return DeleteDialog(
-                                                userProvider: userProvider,
-                                                targetContext: context,
-                                                onTap: () {
-                                                  CommentController(
-                                                          model: curComment,
-                                                          userProvider:
-                                                              userProvider)
-                                                      .delComment(curComment.id,
-                                                          userProvider)
-                                                      .then((res) async {
-                                                    if (res) {
-                                                      bool res =
-                                                          await _fetchArticle(
-                                                              userProvider);
-                                                      _setIsPageLoaded(res);
-                                                    }
-                                                  });
-                                                  Navigator.pop(context);
-                                                },
+                                              return Theme(
+                                                data: Theme.of(context).copyWith(
+                                                    dialogBackgroundColor: themeProvider.isDarkMode? Color(0xff111111) : Colors.white,
+                                                    textButtonTheme: TextButtonThemeData(
+                                                        style: ButtonStyle(
+                                                          backgroundColor: WidgetStateProperty.all<Color>(themeProvider.isDarkMode? Colors.black : Colors.white),
+                                                        )
+                                                    )
+                                                ),
+                                                child: DeleteDialog(
+                                                  isDarkMode: themeProvider.isDarkMode,
+                                                  userProvider: userProvider,
+                                                  targetContext: context,
+                                                  onTap: () {
+                                                    CommentController(
+                                                            model: curComment,
+                                                            userProvider:
+                                                                userProvider)
+                                                        .delComment(curComment.id,
+                                                            userProvider)
+                                                        .then((res) async {
+                                                      if (res) {
+                                                        bool res =
+                                                            await _fetchArticle(
+                                                                userProvider);
+                                                        _setIsPageLoaded(res);
+                                                      }
+                                                    });
+                                                    Navigator.pop(context);
+                                                  },
+                                                ),
                                               );
                                             },
                                           );
@@ -1474,10 +1543,10 @@ class _PostViewPageState extends State<PostViewPage> {
                                 .contains(curComment.created_by.id.toString()))
                         ? Text(
                             LocaleKeys.postViewPage_blockedUsersComment.tr(),
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontSize: 14,
                               fontWeight: FontWeight.w400,
-                              color: Colors.grey,
+                              color: themeProvider.isDarkMode? Colors.white : Colors.grey,
                             ),
                           )
                         : (curComment.is_hidden == false
@@ -1485,10 +1554,10 @@ class _PostViewPageState extends State<PostViewPage> {
                             : Text(
                                 getHiddenCommentReasons(
                                     curComment.why_hidden, context.locale),
-                                style: const TextStyle(
+                                style: TextStyle(
                                   fontSize: 14,
                                   fontWeight: FontWeight.w400,
-                                  color: Colors.grey,
+                                  color: themeProvider.isDarkMode? Colors.white : Colors.grey,
                                 ),
                               )),
                   ),
@@ -1627,7 +1696,8 @@ class _PostViewPageState extends State<PostViewPage> {
                                 ),
                                 Text(
                                   LocaleKeys.postViewPage_reply.tr(),
-                                  style: const TextStyle(
+                                  style: TextStyle(
+                                    color: themeProvider.isDarkMode? Colors.white : Colors.black,
                                     fontSize: 13,
                                     fontWeight: FontWeight.w500,
                                   ),
@@ -1642,7 +1712,7 @@ class _PostViewPageState extends State<PostViewPage> {
                 ],
               ),
             ),
-            const Divider(color: Color(0xFFF0F0F0)),
+            Divider(color: themeProvider.isDarkMode? NewAraThemes.darkBRLine : NewAraThemes.lightBRLine),
           ],
         );
       },
@@ -1654,6 +1724,7 @@ class _PostViewPageState extends State<PostViewPage> {
   /// 웹뷰로 로드, 나머지는 텍스트로 댓글을 로드하도록 함.
   /// _buildCommentListView에서 사용함.
   Widget _buildCommentContent(String content) {
+    final themeProvider = Provider.of<ThemeProvider>(context);
     // html 태그에서 사용하는 '<', '>'의 경우 형태가 그대로 저장됨
     // html 태그가 아닌 '<', '>'의 경우 '&lt;', '&gt;'로 인코딩되어 저장됨
     // 따라서 위 두 가지 경우에 대해서는 웹뷰로 로드하고 나머지는 Text 위젲 사용.
@@ -1661,17 +1732,17 @@ class _PostViewPageState extends State<PostViewPage> {
         content.contains('&lt;') ||
         content.contains('&gt;')) {
       return InArticleWebView(
-        content: getContentHtml(content),
+        content: getContentHtml(content, themeProvider.isDarkMode),
         initialHeight: 10,
         isComment: true,
       );
     }
     return Text(
       content,
-      style: const TextStyle(
+      style: TextStyle(
         fontSize: 14,
         fontWeight: FontWeight.w400,
-        color: Color(0xFF4A4A4A),
+        color: themeProvider.isDarkMode? NewAraThemes.gryD5 : NewAraThemes.gry4A,
       ),
     );
   }
@@ -1679,11 +1750,12 @@ class _PostViewPageState extends State<PostViewPage> {
   /// 댓글 입력창 빌드를 담당하며 빌드된 위젯을 리턴.
   /// targetComment, _isNestedComment, _isModify, _textEditingController 클래스 전역변수 사용.
   Widget _buildCommentTextFormField(UserProvider userProvider) {
+    final themeProvider = Provider.of<ThemeProvider>(context);
     return Container(
-      decoration: const BoxDecoration(
+      decoration: BoxDecoration(
         border: Border(
           top: BorderSide(
-              width: 1.0, color: Color(0xFFF0F0F0)), // 원하는 색상과 두께로 설정
+              width: 1.0, color: themeProvider.isDarkMode? NewAraThemes.darkBRLine : NewAraThemes.lightBRLine), // 원하는 색상과 두께로 설정
         ),
       ),
       padding: const EdgeInsets.only(top: 7),
@@ -1702,7 +1774,8 @@ class _PostViewPageState extends State<PostViewPage> {
                       : "Replying to '${targetComment?.created_by.profile.nickname}'",
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(
+                  style: TextStyle(
+                    color: themeProvider.isDarkMode? Colors.white : Colors.black,
                     fontSize: 13,
                     fontWeight: FontWeight.w500,
                   ),
@@ -1722,7 +1795,8 @@ class _PostViewPageState extends State<PostViewPage> {
                       : 'Editing my comment "${targetComment?.content}"',
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(
+                  style: TextStyle(
+                    color: themeProvider.isDarkMode? Colors.white : Colors.black,
                     fontSize: 13,
                     fontWeight: FontWeight.w500,
                   ),
@@ -1768,8 +1842,8 @@ class _PostViewPageState extends State<PostViewPage> {
                   constraints: const BoxConstraints(
                     minHeight: 36,
                   ),
-                  decoration: const BoxDecoration(
-                    color: Color(0xFFF8F8F8),
+                  decoration: BoxDecoration(
+                    color: themeProvider.isDarkMode? Color(0xff222222) : Color(0xfff8f8f8),
                     borderRadius: BorderRadius.all(Radius.circular(10)),
                   ),
                   child: _buildForm(),
@@ -1787,13 +1861,23 @@ class _PostViewPageState extends State<PostViewPage> {
                             userProvider.naUser!.email ==
                                 "tkddh1109@gmail.com")) {
                       await showDialog(
-                          builder: (context) => ForAndroidTesterDialog(
-                                userProvider: userProvider,
-                                targetContext: context,
-                                onTap: () {
-                                  Navigator.pop(context);
-                                },
-                              ),
+                          builder: (context) => Theme(
+                            data: Theme.of(context).copyWith(
+                                dialogBackgroundColor: themeProvider.isDarkMode? Color(0xff111111) : Colors.white,
+                                textButtonTheme: TextButtonThemeData(
+                                    style: ButtonStyle(
+                                      backgroundColor: WidgetStateProperty.all<Color>(themeProvider.isDarkMode? Colors.black : Colors.white),
+                                    )
+                                )
+                            ),
+                            child: ForAndroidTesterDialog(
+                                  userProvider: userProvider,
+                                  targetContext: context,
+                                  onTap: () {
+                                    Navigator.pop(context);
+                                  },
+                                ),
+                          ),
                           context: context);
 
                       return;
@@ -1837,13 +1921,16 @@ class _PostViewPageState extends State<PostViewPage> {
   /// 댓글 입력을 위한 Form을 생성하여 리턴함.
   /// _buildCommentTextFormField 함수에서 사용함.
   Form _buildForm() {
+    final themeProvider = Provider.of<ThemeProvider>(context);
+
     return Form(
       key: _formKey,
       child: Container(
           margin: const EdgeInsets.only(left: 13),
           child: TextFormField(
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 14,
+              color: themeProvider.isDarkMode? Colors.white :Colors.black,
             ),
             cursorColor: ColorsInfo.newara,
             controller: _textEditingController,
@@ -1854,8 +1941,8 @@ class _PostViewPageState extends State<PostViewPage> {
             decoration: InputDecoration(
               border: InputBorder.none,
               hintText: LocaleKeys.postViewPage_commentHintText.tr(),
-              hintStyle: const TextStyle(
-                color: Color(0xFFBBBBBB),
+              hintStyle: TextStyle(
+                color: themeProvider.isDarkMode? Color(0xFF888888) : Color(0xFFBBBBBB),
                 fontSize: 14,
                 fontWeight: FontWeight.w500,
               ),

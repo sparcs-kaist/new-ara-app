@@ -2,6 +2,9 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:new_ara_app/constants/theme_info.dart';
+import 'package:new_ara_app/constants/url_info.dart';
+import 'package:new_ara_app/providers/theme_provider.dart';
 import 'package:new_ara_app/translations/locale_keys.g.dart';
 import 'package:new_ara_app/widgets/refresh_indicator.dart';
 import 'package:provider/provider.dart';
@@ -170,6 +173,7 @@ class _UserPageState extends State<UserPage>
   @override
   Widget build(BuildContext context) {
     UserProvider userProvider = context.watch<UserProvider>();
+    final themeProvider = Provider.of<ThemeProvider>(context);
 
     return Scaffold(
       appBar: AppBar(
@@ -183,8 +187,8 @@ class _UserPageState extends State<UserPage>
         ),
         actions: [
           IconButton(
-            highlightColor: Colors.white,
-            splashColor: Colors.white,
+            highlightColor: themeProvider.isDarkMode? Colors.black : Colors.white,
+            splashColor: themeProvider.isDarkMode? Colors.black : Colors.white,
             icon: SvgPicture.asset(
               'assets/icons/setting.svg',
               colorFilter:
@@ -219,7 +223,7 @@ class _UserPageState extends State<UserPage>
               SizedBox(
                 width: MediaQuery.of(context).size.width - 40,
                 child: TabBar(
-                  unselectedLabelColor: const Color.fromRGBO(177, 177, 177, 1),
+                  unselectedLabelColor: themeProvider.isDarkMode? Color.fromRGBO(100, 100, 100, 1) : Color.fromRGBO(177, 177, 177, 1),
                   labelColor: ColorsInfo.newara,
                   indicatorColor: ColorsInfo.newara,
                   tabs: tabs.map((String tab) {
@@ -238,10 +242,10 @@ class _UserPageState extends State<UserPage>
                 child: Text(
                   LocaleKeys.userPage_totalNPosts
                       .tr(namedArgs: {'curCount': curCount.toString()}),
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w700,
-                    color: Color.fromRGBO(177, 177, 177, 1),
+                    color: themeProvider.isDarkMode? Color.fromRGBO(100, 100, 100, 1) : Color.fromRGBO(177, 177, 177, 1),
                   ),
                 ),
               ),
@@ -275,6 +279,8 @@ class _UserPageState extends State<UserPage>
 
   /// UserPage에서 TabBar의 상단 부분인 유저 정보 위젯을 빌드.
   Widget _buildUserInfo(UserProvider userProvider) {
+    final themeProvider = Provider.of<ThemeProvider>(context);
+
     return SizedBox(
       width: MediaQuery.of(context).size.width - 40,
       height: 60,
@@ -308,9 +314,10 @@ class _UserPageState extends State<UserPage>
                 children: [
                   Text(
                     "${userProvider.naUser!.sso_user_info['first_name']} ${userProvider.naUser!.sso_user_info['last_name']}",
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.w700,
+                      color: themeProvider.isDarkMode? Colors.white : Colors.black,
                     ),
                   ),
                   Text(
@@ -318,10 +325,10 @@ class _UserPageState extends State<UserPage>
                             userProvider.naUser?.email == null
                         ? LocaleKeys.userPage_noEmailInfo.tr()
                         : "${userProvider.naUser?.email}",
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.w500,
-                      color: Color.fromRGBO(177, 177, 177, 1),
+                      color: themeProvider.isDarkMode? Color.fromRGBO(100, 100, 100, 1) : Color.fromRGBO(177, 177, 177, 1),
                     ),
                   ),
                 ],
@@ -343,8 +350,8 @@ class _UserPageState extends State<UserPage>
               },
               child: Text(
                 LocaleKeys.userPage_change.tr(),
-                style: const TextStyle(
-                  color: Color.fromRGBO(100, 100, 100, 1),
+                style: TextStyle(
+                  color: themeProvider.isDarkMode? Color.fromRGBO(177, 177, 177, 1) : Color.fromRGBO(100, 100, 100, 1),
                   fontSize: 14,
                   fontWeight: FontWeight.w500,
                 ),
@@ -359,9 +366,15 @@ class _UserPageState extends State<UserPage>
   /// tabIndex에 해당하는 ListView를 생성하여 리턴함.
   /// 각각의 ListView 구현에 동일한 부분이 많아 메서드화하게 됨.
   Widget _buildPostList(TabType tabType, UserProvider userProvider) {
+    final themeProvider = Provider.of<ThemeProvider>(context);
+
     // build 대상 tab의 article 개수 조회
     int itemCount = getItemCount(tabType);
     return CustomRefreshIndicator(
+      backgroundColor: themeProvider.isDarkMode
+          ? Color(0xff1a1a1a)
+          : Colors.white,
+      color: ColorsInfo.newara,
       onRefresh: () async {
         setIsLoaded(false, tabType);
         UserProvider userProvider = context.read<UserProvider>();
@@ -427,9 +440,11 @@ class _UserPageState extends State<UserPage>
                   child: PostPreview(model: curPost)));
         },
         separatorBuilder: (context, index) {
+          final themeProvider = Provider.of<ThemeProvider>(context);
+
           return Container(
             height: 1,
-            color: const Color(0xFFF0F0F0),
+            color: themeProvider.isDarkMode? NewAraThemes.darkBRLine : NewAraThemes.lightBRLine,
           );
         },
       ),

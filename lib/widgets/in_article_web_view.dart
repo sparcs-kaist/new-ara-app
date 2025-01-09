@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:new_ara_app/providers/theme_provider.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 // Import for Android features.
 import 'package:webview_flutter_android/webview_flutter_android.dart';
@@ -134,6 +135,9 @@ class _InArticleWebViewState extends State<InArticleWebView> {
   @override
   void initState() {
     UserProvider userProvider = context.read<UserProvider>();
+    ThemeProvider themeProvider = context.read<ThemeProvider>();
+
+
     super.initState();
     isFitted = false;
     webViewHeight = widget.initialHeight;
@@ -153,7 +157,7 @@ class _InArticleWebViewState extends State<InArticleWebView> {
 
     controller
       ..setJavaScriptMode(JavaScriptMode.unrestricted)
-      ..setBackgroundColor(const Color(0x00000000))
+      // ..setBackgroundColor(const Color(0x00000000))
       ..setNavigationDelegate(NavigationDelegate(
         onNavigationRequest: (NavigationRequest request) async {
           if (request.url == 'about:blank') {
@@ -192,10 +196,18 @@ class _InArticleWebViewState extends State<InArticleWebView> {
               'code: ${error.errorCode}\ndescription: ${error.description}\nerrorType: ${error.errorType}\nisForMainFrame: ${error.isForMainFrame}');
         },
       ))
-      ..loadHtmlString(getContentHtml(widget.content));
+      ..loadHtmlString(getContentHtml(widget.content, themeProvider.isDarkMode));
 
     _webViewController = controller;
   }
+
+  @override
+  void dispose() {
+    _webViewController.removeJavaScriptChannel('Toaster');
+    _webViewController.clearCache();
+    super.dispose();
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -209,7 +221,6 @@ class _InArticleWebViewState extends State<InArticleWebView> {
       webViewWidget = WebViewWidget.fromPlatformCreationParams(
         params: AndroidWebViewWidgetCreationParams(
           controller: _webViewController.platform,
-          displayWithHybridComposition: true,
           gestureRecognizers: {
           Factory<OneSequenceGestureRecognizer>(() {
             TapGestureRecognizer tabGestureRecognizer = TapGestureRecognizer();

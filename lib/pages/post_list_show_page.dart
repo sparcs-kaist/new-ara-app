@@ -1,8 +1,10 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:new_ara_app/constants/theme_info.dart';
 import 'package:new_ara_app/pages/bulletin_search_page.dart';
 import 'package:new_ara_app/pages/post_write_page.dart';
+import 'package:new_ara_app/providers/theme_provider.dart';
 import 'package:new_ara_app/providers/connectivity_provider.dart';
 import 'package:new_ara_app/translations/locale_keys.g.dart';
 import 'package:new_ara_app/widgets/refresh_indicator.dart';
@@ -257,13 +259,18 @@ class _PostListShowPageState extends State<PostListShowPage>
   }
 
   Widget _buildTopicButton(String text, int index) {
+    final themeProvider = Provider.of<ThemeProvider>(context);
+
     return Container(
       height: 35,
       margin: const EdgeInsets.only(right: 10),
       child: TextButton(
           style: ButtonStyle(
-            backgroundColor: WidgetStateProperty.all(
-                currentFilter == index ? ColorsInfo.newara : Colors.white),
+            backgroundColor: WidgetStateProperty.all(currentFilter == index
+                ? ColorsInfo.newara
+                : themeProvider.isDarkMode
+                    ? Colors.black
+                    : Colors.white),
             overlayColor:
                 WidgetStateProperty.all(Colors.transparent), // no splash
             shape: WidgetStateProperty.all(
@@ -272,7 +279,9 @@ class _PostListShowPageState extends State<PostListShowPage>
                 side: BorderSide(
                     color: currentFilter == index
                         ? ColorsInfo.newara
-                        : const Color(0xFFBBBBBB),
+                        : themeProvider.isDarkMode
+                            ? NewAraThemes.gry6
+                            : NewAraThemes.gryB,
                     width: 1),
               ),
             ),
@@ -305,8 +314,12 @@ class _PostListShowPageState extends State<PostListShowPage>
             style: TextStyle(
               fontSize: 16, // PostPreview의 제목과 동일한 폰트 크기
               color: currentFilter == index
-                  ? Colors.white
-                  : const Color.fromARGB(255, 101, 100, 100),
+                  ? themeProvider.isDarkMode
+                      ? Colors.black
+                      : Colors.white
+                  : themeProvider.isDarkMode
+                      ? Color.fromARGB(255, 170, 170, 170)
+                      : Color.fromARGB(255, 101, 100, 100),
             ),
           )),
     );
@@ -358,6 +371,8 @@ class _PostListShowPageState extends State<PostListShowPage>
 
   @override
   Widget build(BuildContext context) {
+    final themeProvider = Provider.of<ThemeProvider>(context);
+
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
@@ -478,10 +493,17 @@ class _PostListShowPageState extends State<PostListShowPage>
                   Container(
                     margin: const EdgeInsets.only(top: 5),
                     height: 1,
-                    color: const Color(0xFFF0F0F0),
+                    color: themeProvider.isDarkMode
+                        ? NewAraThemes.darkBRLine
+                        : NewAraThemes.lightBRLine,
                   ),
                 Expanded(
                   child: CustomRefreshIndicator(
+                    backgroundColor: themeProvider.isDarkMode
+                        ? Color(0xff1a1a1a)
+                        : Colors.white,
+                    displacement: 0.0,
+                    color: ColorsInfo.newara,
                     onRefresh: () async {
                       // refresh 중에는 LoadingIndicator를 사용하지 않으므로 setState()는 제거함.
                       // 로직상 isLoading 변수의 값은 상황에 맞게 변경되도록 함.
@@ -557,7 +579,9 @@ class _PostListShowPageState extends State<PostListShowPage>
                                   postPreviewList[index], currentFilter)) {
                                 return Container(
                                   height: 1,
-                                  color: const Color(0xFFF0F0F0),
+                                  color: themeProvider.isDarkMode
+                                      ? NewAraThemes.darkBRLine
+                                      : NewAraThemes.lightBRLine,
                                 );
                               } else {
                                 return Container();

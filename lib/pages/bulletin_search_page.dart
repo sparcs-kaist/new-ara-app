@@ -5,9 +5,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:new_ara_app/constants/board_type.dart';
 import 'package:new_ara_app/constants/colors_info.dart';
+import 'package:new_ara_app/constants/theme_info.dart';
 import 'package:new_ara_app/models/article_list_action_model.dart';
 import 'package:new_ara_app/models/board_detail_action_model.dart';
 import 'package:new_ara_app/pages/post_view_page.dart';
+import 'package:new_ara_app/providers/theme_provider.dart';
 import 'package:new_ara_app/providers/user_provider.dart';
 import 'package:new_ara_app/translations/locale_keys.g.dart';
 import 'package:new_ara_app/utils/slide_routing.dart';
@@ -196,6 +198,7 @@ class _BulletinSearchPageState extends State<BulletinSearchPage> {
 
   @override
   Widget build(BuildContext context) {
+    final themeProvider = Provider.of<ThemeProvider>(context);
     return Scaffold(
       appBar: AppBar(
         centerTitle: false,
@@ -269,7 +272,7 @@ class _BulletinSearchPageState extends State<BulletinSearchPage> {
                             isCollapsed: true,
                             isDense: true,
                             filled: true,
-                            fillColor: const Color(0xFFF6F6F6),
+                            fillColor: themeProvider.isDarkMode? NewAraThemes.darkInputDecoration : NewAraThemes.lightInputDecoration,
                             // richtext를 밑으로 내리고 싶으면 contentPadding의 B를 줄일것
                             contentPadding:
                                 const EdgeInsets.fromLTRB(100, 10, 10, 9),
@@ -283,15 +286,15 @@ class _BulletinSearchPageState extends State<BulletinSearchPage> {
                                 height: 24,
                                 child: SvgPicture.asset(
                                   'assets/icons/search.svg',
-                                  colorFilter: const ColorFilter.mode(
-                                      Color(0xFFBBBBBB), BlendMode.srcIn),
+                                  colorFilter: ColorFilter.mode(
+                                      themeProvider.isDarkMode? NewAraThemes.gry6 : NewAraThemes.gryB, BlendMode.srcIn),
                                   fit: BoxFit.contain,
                                 ),
                               ),
                             ),
                             hintText: _hintText,
-                            hintStyle: const TextStyle(
-                              color: Color(0xFFBBBBBB),
+                            hintStyle: TextStyle(
+                              color: themeProvider.isDarkMode? NewAraThemes.gry6 : NewAraThemes.gryB,
                               fontSize: 14,
                               height: null,
                               fontWeight: FontWeight.w500,
@@ -348,8 +351,8 @@ class _BulletinSearchPageState extends State<BulletinSearchPage> {
                                 Text(
                                   LocaleKeys.bulletinSearchPage_pleaseEnter
                                       .tr(),
-                                  style: const TextStyle(
-                                    color: Color(0xFFBBBBBB),
+                                  style: TextStyle(
+                                    color: themeProvider.isDarkMode? NewAraThemes.gry6 : NewAraThemes.gryB,
                                     fontSize: 16,
                                     fontWeight: FontWeight.w500,
                                   ),
@@ -369,8 +372,8 @@ class _BulletinSearchPageState extends State<BulletinSearchPage> {
                               children: [
                                 Text(
                                   LocaleKeys.bulletinSearchPage_noResults.tr(),
-                                  style: const TextStyle(
-                                    color: Color(0xFFBBBBBB),
+                                  style: TextStyle(
+                                    color: themeProvider.isDarkMode? NewAraThemes.gry6 : NewAraThemes.gryB,
                                     fontSize: 16,
                                     fontWeight: FontWeight.w500,
                                   ),
@@ -411,7 +414,7 @@ class _BulletinSearchPageState extends State<BulletinSearchPage> {
                                     ),
                                     Container(
                                       height: 1,
-                                      color: const Color(0xFFF0F0F0),
+                                      color: themeProvider.isDarkMode? Color(0xFF555555) : Color(0xFFF0F0F0),
                                     ),
                                   ],
                                 ),

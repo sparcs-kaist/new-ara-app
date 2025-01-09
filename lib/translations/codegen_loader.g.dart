@@ -96,7 +96,8 @@ class CodegenLoader extends AssetLoader{
     "hotNotifications": "Hot Notifications",
     "hotPosts": "Hot Posts",
     "hotInfo": "We deliver trending announcements and posts every day at 8:30 a.m.",
-    "emailNotAvailable": "If the default mail application cannot be opened, please contact ara@sparcs.org."
+    "emailNotAvailable": "If the default mail application cannot be opened, please contact ara@sparcs.org.",
+    "dark": "Dark Mode"
   },
   "userPage": {
     "change": "Chg.",
@@ -302,7 +303,8 @@ static const Map<String,dynamic> ko = {
     "hotNotifications": "인기 공지글",
     "hotPosts": "인기글",
     "hotInfo": "인기 공지글 및 인기 글을 매일 오전 8시 30분에 전달해 드립니다.",
-    "emailNotAvailable": "기본 메일 어플리케이션을 열 수 없습니다. ara@sparcs.org로 문의 부탁드립니다."
+    "emailNotAvailable": "기본 메일 어플리케이션을 열 수 없습니다. ara@sparcs.org로 문의 부탁드립니다.",
+    "dark": "다크 모드"
   },
   "userPage": {
     "change": "수정",

@@ -82,6 +82,7 @@ android {
             signingConfig signingConfigs.release
         }
     }
+    namespace 'com.example.new_ara_app'
 }
 
 flutter {

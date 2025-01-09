@@ -5,8 +5,10 @@ import 'package:flutter_native_splash/flutter_native_splash.dart';
 
 import 'package:new_ara_app/constants/colors_info.dart';
 import 'package:new_ara_app/pages/sparcs_sso_page.dart';
+import 'package:new_ara_app/providers/theme_provider.dart';
 import 'package:new_ara_app/translations/locale_keys.g.dart';
 import 'package:new_ara_app/utils/slide_routing.dart';
+import 'package:provider/provider.dart';
 
 /// `LoginPage` 위젯은 사용자에게 로그인 페이지를 표시.
 class LoginPage extends StatefulWidget {
@@ -31,6 +33,8 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
+    final themeProvider = Provider.of<ThemeProvider>(context);
+
     return Scaffold(
       body: SafeArea(
         child: Center(
@@ -55,8 +59,8 @@ class _LoginPageState extends State<LoginPage> {
                 child: TextButton(
                   child: Text(
                     LocaleKeys.loginPage_login.tr(),
-                    style: const TextStyle(
-                      color: Colors.white,
+                    style: TextStyle(
+                      color: themeProvider.isDarkMode? Colors.black : Colors.white,
                       fontSize: 18,
                       fontWeight: FontWeight.w500,
                     ),
