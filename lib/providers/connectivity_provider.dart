@@ -36,7 +36,8 @@ class ConnectivityProvider with ChangeNotifier {
   /// 인터넷 연결 상태에 따라 [showInternetErrorBySnackBar]를 실행합니다.
   void showConnectivitySnackBar(List<ConnectivityResult> result) {
     if (result.contains(ConnectivityResult.wifi) ||
-        result.contains(ConnectivityResult.ethernet)) {
+        result.contains(ConnectivityResult.ethernet) ||
+        result.contains(ConnectivityResult.mobile)) {
       // 연결됨
       _isConnected = true;
       notifyListeners(); // 인터넷 복구를 알림
@@ -45,7 +46,8 @@ class ConnectivityProvider with ChangeNotifier {
     } else {
       // 인터넷 연결 없음
       _isConnected = false;
-      showInternetErrorBySnackBar(LocaleKeys.userProvider_internetError.tr(), themeProvider.isDarkMode);
+      showInternetErrorBySnackBar(
+          LocaleKeys.userProvider_internetError.tr(), themeProvider.isDarkMode);
       debugPrint("Internet Connectivity Error");
     }
   }
