@@ -180,7 +180,7 @@ class _MyAppState extends State<MyApp> {
   ThemeData _setThemeData() {
     return ThemeData(
       appBarTheme:
-      const AppBarTheme(elevation: 0, backgroundColor: Colors.white),
+      const AppBarTheme(elevation: 0, backgroundColor: Colors.white, scrolledUnderElevation: 0.0),
       fontFamily: 'Pretendard',
       scaffoldBackgroundColor: Colors.white,
       splashColor: Colors.transparent,

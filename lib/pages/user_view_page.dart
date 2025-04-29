@@ -3,6 +3,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:new_ara_app/widgets/refresh_indicator.dart';
 import 'package:new_ara_app/constants/theme_info.dart';
 import 'package:new_ara_app/providers/theme_provider.dart';
 import 'package:provider/provider.dart';
@@ -133,7 +134,7 @@ class _UserViewPageState extends State<UserViewPage> {
             ? const LoadingIndicator()
             : SizedBox(
                 width: MediaQuery.of(context).size.width,
-                child: RefreshIndicator.adaptive(
+                child: CustomRefreshIndicator(
                   backgroundColor: themeProvider.isDarkMode
                       ? Color(0xff1a1a1a)
                       : Colors.white,
@@ -234,7 +235,8 @@ class _UserViewPageState extends State<UserViewPage> {
         width: MediaQuery.of(context).size.width - 40,
         child: ListView.separated(
           // PullToRefresh를 위해 아래 physics 추가 필요
-          physics: const AlwaysScrollableScrollPhysics(),
+          physics: const AlwaysScrollableScrollPhysics(
+              parent: BouncingScrollPhysics()),
           controller: _listViewController,
           itemCount: _articleList.length + 1,
           itemBuilder: (BuildContext context, int idx) {

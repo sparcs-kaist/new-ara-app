@@ -8,6 +8,7 @@ import 'package:new_ara_app/pages/bulletin_search_page.dart';
 import 'package:new_ara_app/providers/theme_provider.dart';
 import 'package:new_ara_app/providers/connectivity_provider.dart';
 import 'package:new_ara_app/translations/locale_keys.g.dart';
+import 'package:new_ara_app/widgets/refresh_indicator.dart';
 import 'package:provider/provider.dart';
 
 import 'package:new_ara_app/constants/board_type.dart';
@@ -453,7 +454,7 @@ class _MainPageState extends State<MainPage> with WidgetsBindingObserver {
                   _isLoading[10] ||
                   _isLoading[11]
               ? const LoadingIndicator()
-              : RefreshIndicator.adaptive(
+              : CustomRefreshIndicator(
                   backgroundColor: themeProvider.isDarkMode
                       ? Color(0xff1a1a1a)
                       : Colors.white,
@@ -464,6 +465,8 @@ class _MainPageState extends State<MainPage> with WidgetsBindingObserver {
                     await _refreshAllPosts();
                   },
                   child: SingleChildScrollView(
+                    physics: AlwaysScrollableScrollPhysics(
+                        parent: BouncingScrollPhysics()),
                     child: SizedBox(
                       width: MediaQuery.of(context).size.width,
                       child: Column(

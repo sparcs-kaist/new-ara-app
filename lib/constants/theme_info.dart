@@ -5,7 +5,7 @@ class NewAraThemes {
   // DARK THEME SETTINGS
   static final darkTheme = ThemeData(
     appBarTheme:
-        const AppBarTheme(elevation: 0, backgroundColor: Color(0xff111111)),
+        const AppBarTheme(elevation: 0, backgroundColor: Color(0xff111111), scrolledUnderElevation: 0.0),
     fontFamily: 'Pretendard',
     scaffoldBackgroundColor: Color(0xff111111),
     splashColor: Colors.transparent,
@@ -64,7 +64,7 @@ class NewAraThemes {
   // LIGHT THEME SETTINGS
   static final lightTheme = ThemeData(
       appBarTheme:
-          const AppBarTheme(elevation: 0, backgroundColor: Colors.white),
+          const AppBarTheme(elevation: 0, backgroundColor: Colors.white, scrolledUnderElevation: 0.0),
       fontFamily: 'Pretendard',
       scaffoldBackgroundColor: Colors.white,
       splashColor: Colors.transparent,

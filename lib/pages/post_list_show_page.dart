@@ -7,6 +7,7 @@ import 'package:new_ara_app/pages/post_write_page.dart';
 import 'package:new_ara_app/providers/theme_provider.dart';
 import 'package:new_ara_app/providers/connectivity_provider.dart';
 import 'package:new_ara_app/translations/locale_keys.g.dart';
+import 'package:new_ara_app/widgets/refresh_indicator.dart';
 import 'package:provider/provider.dart';
 
 import 'package:new_ara_app/constants/board_type.dart';
@@ -497,7 +498,7 @@ class _PostListShowPageState extends State<PostListShowPage>
                         : NewAraThemes.lightBRLine,
                   ),
                 Expanded(
-                  child: RefreshIndicator.adaptive(
+                  child: CustomRefreshIndicator(
                     backgroundColor: themeProvider.isDarkMode
                         ? Color(0xff1a1a1a)
                         : Colors.white,
@@ -520,7 +521,8 @@ class _PostListShowPageState extends State<PostListShowPage>
                     child: isLoading
                         ? const LoadingIndicator()
                         : ListView.separated(
-                            physics: const AlwaysScrollableScrollPhysics(),
+                            physics: const AlwaysScrollableScrollPhysics(
+                                parent: BouncingScrollPhysics()),
                             controller: _scrollController,
                             itemCount: postPreviewList.length +
                                 (_isLoadingNextPage ? 1 : 0), // 아이템 개수
