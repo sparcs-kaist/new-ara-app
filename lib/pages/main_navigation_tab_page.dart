@@ -9,6 +9,7 @@ import 'package:new_ara_app/pages/main_page.dart';
 import 'package:new_ara_app/pages/board_list_page.dart';
 import 'package:new_ara_app/pages/notification_page.dart';
 import 'package:new_ara_app/pages/user_page.dart';
+import 'package:new_ara_app/pages/meal_page.dart';
 import 'package:new_ara_app/providers/notification_provider.dart';
 import 'package:new_ara_app/constants/colors_info.dart';
 
@@ -30,6 +31,7 @@ class _MainNavigationTabPageState extends State<MainNavigationTabPage> {
     //const ChatListPage(),
     const NotificationPage(),
     const UserPage(),
+    const MealPage(),
   ];
 
   // 탭을 클릭할 때 실행될 함수
@@ -78,7 +80,7 @@ class _MainNavigationTabPageState extends State<MainNavigationTabPage> {
   Widget _buildBottomNavigationBar() {
     final themeProvider = Provider.of<ThemeProvider>(context);
 
-    double gapHalfWidth = (MediaQuery.of(context).size.width - 36 * 4) / 10;
+    double gapHalfWidth = (MediaQuery.of(context).size.width - 36 * 5) / 12;
     double iconWidth = gapHalfWidth * 2 + 36;
     return SizedBox(
       height: 50,
@@ -185,6 +187,28 @@ class _MainNavigationTabPageState extends State<MainNavigationTabPage> {
                     'assets/icons/member.svg',
                     colorFilter: ColorFilter.mode(
                         _selectedIndex == 3 ? themeProvider.isDarkMode? Colors.white: Colors.black : themeProvider.isDarkMode? NewAraThemes.gry5: NewAraThemes.gryB,
+                        BlendMode.srcIn),
+                    width: 36,
+                    height: 36,
+                  ),
+                ),
+              ),
+            ),
+          ),
+          GestureDetector(
+            behavior: HitTestBehavior.translucent,
+            onTap: () => _onItemTapped(4),
+            child: SizedBox(
+              width: iconWidth,
+              height: 50,
+              child: Center(
+                child: SizedBox(
+                  width: 36,
+                  height: 36,
+                  child: SvgPicture.asset(
+                    'assets/icons/member.svg',  // @ToDo : 학식 아이콘 디자인 해서 변경 할 것.
+                    colorFilter: ColorFilter.mode(
+                        _selectedIndex == 4 ? themeProvider.isDarkMode? Colors.white: Colors.black : themeProvider.isDarkMode? NewAraThemes.gry5: NewAraThemes.gryB,
                         BlendMode.srcIn),
                     width: 36,
                     height: 36,
