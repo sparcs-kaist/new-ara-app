@@ -516,6 +516,7 @@ class _MealPageState extends State<MealPage> {
                       style: TextStyle(
                         fontSize: 16,
                         color: hasSelectedAllergy ? Colors.red : Colors.black,
+                        fontWeight: FontWeight.w500,
                       ),
                     ),
                   ],
