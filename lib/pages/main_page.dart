@@ -24,6 +24,7 @@ import 'package:new_ara_app/pages/post_view_page.dart';
 import 'package:new_ara_app/utils/slide_routing.dart';
 import 'package:new_ara_app/providers/notification_provider.dart';
 import 'package:new_ara_app/utils/cache_function.dart';
+import 'package:new_ara_app/widgets/event_pop_up.dart';
 
 class MainPage extends StatefulWidget {
   const MainPage({super.key});
@@ -91,6 +92,10 @@ class _MainPageState extends State<MainPage> with WidgetsBindingObserver {
 
     WidgetsBinding.instance.addObserver(this); // 옵저버 등록
     context.read<NotificationProvider>().checkIsNotReadExist(userProvider);
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      showEventPopupIfNeeded(context);
+    });
   }
 
   @override

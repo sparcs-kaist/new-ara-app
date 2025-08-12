@@ -33,7 +33,7 @@ android {
     - 앱을 컴파일할 때 사용하는 SDK의 버전
     - compileSdkVersion에서 지정한 SDK의 Android API를 사용하게 됨
     - 구글 정책(2024.08.31 이후로 앱은 API 버전 34를 타겟팅해야함)에 따라 33->34로 상향 */
-    compileSdkVersion 34
+    compileSdkVersion 36
     ndkVersion flutter.ndkVersion
 
     compileOptions {
@@ -63,7 +63,7 @@ android {
         - 앱이 테스트되고 최적화된 Android SDK 버전을 의미
         - targetSdkVersion에 해당하는 Android SDK 버전을 염두해두고 개발되었다는 의미 
         - 구글 정책(2024.08.31 이후로 앱은 API 버전 34를 타겟팅해야함)에 따라 33->34로 상향 */
-        targetSdkVersion 34
+        targetSdkVersion 36
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
     }

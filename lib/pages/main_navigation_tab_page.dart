@@ -31,7 +31,6 @@ class _MainNavigationTabPageState extends State<MainNavigationTabPage> {
     //const ChatListPage(),
     const NotificationPage(),
     const UserPage(),
-    const MealPage(),
   ];
 
   // 탭을 클릭할 때 실행될 함수
@@ -59,7 +58,9 @@ class _MainNavigationTabPageState extends State<MainNavigationTabPage> {
             Container(
               width: MediaQuery.of(context).size.width,
               height: 1,
-              color: themeProvider.isDarkMode? NewAraThemes.darkBRLine :NewAraThemes.lightBRLine,
+              color: themeProvider.isDarkMode
+                  ? NewAraThemes.darkBRLine
+                  : NewAraThemes.lightBRLine,
             ),
             _buildBottomNavigationBar(),
           ],
@@ -80,7 +81,7 @@ class _MainNavigationTabPageState extends State<MainNavigationTabPage> {
   Widget _buildBottomNavigationBar() {
     final themeProvider = Provider.of<ThemeProvider>(context);
 
-    double gapHalfWidth = (MediaQuery.of(context).size.width - 36 * 5) / 12;
+    double gapHalfWidth = (MediaQuery.of(context).size.width - 36 * 4) / 12;
     double iconWidth = gapHalfWidth * 2 + 36;
     return SizedBox(
       height: 50,
@@ -103,7 +104,13 @@ class _MainNavigationTabPageState extends State<MainNavigationTabPage> {
                   child: SvgPicture.asset(
                     'assets/icons/home.svg',
                     colorFilter: ColorFilter.mode(
-                        _selectedIndex == 0 ? themeProvider.isDarkMode? Colors.white: Colors.black : themeProvider.isDarkMode? NewAraThemes.gry5: NewAraThemes.gryB,
+                        _selectedIndex == 0
+                            ? themeProvider.isDarkMode
+                                ? Colors.white
+                                : Colors.black
+                            : themeProvider.isDarkMode
+                                ? NewAraThemes.gry5
+                                : NewAraThemes.gryB,
                         BlendMode.srcIn),
                   ),
                 ),
@@ -123,7 +130,13 @@ class _MainNavigationTabPageState extends State<MainNavigationTabPage> {
                   child: SvgPicture.asset(
                     'assets/icons/post_list.svg',
                     colorFilter: ColorFilter.mode(
-                        _selectedIndex == 1 ? themeProvider.isDarkMode? Colors.white: Colors.black : themeProvider.isDarkMode? NewAraThemes.gry5: NewAraThemes.gryB,
+                        _selectedIndex == 1
+                            ? themeProvider.isDarkMode
+                                ? Colors.white
+                                : Colors.black
+                            : themeProvider.isDarkMode
+                                ? NewAraThemes.gry5
+                                : NewAraThemes.gryB,
                         BlendMode.srcIn),
                     width: 36,
                     height: 36,
@@ -147,7 +160,13 @@ class _MainNavigationTabPageState extends State<MainNavigationTabPage> {
                       SvgPicture.asset(
                         'assets/icons/notification.svg',
                         colorFilter: ColorFilter.mode(
-                            _selectedIndex == 2 ? themeProvider.isDarkMode? Colors.white: Colors.black : themeProvider.isDarkMode? NewAraThemes.gry5: NewAraThemes.gryB,
+                            _selectedIndex == 2
+                                ? themeProvider.isDarkMode
+                                    ? Colors.white
+                                    : Colors.black
+                                : themeProvider.isDarkMode
+                                    ? NewAraThemes.gry5
+                                    : NewAraThemes.gryB,
                             BlendMode.srcIn),
                       ),
                       Visibility(
@@ -186,29 +205,13 @@ class _MainNavigationTabPageState extends State<MainNavigationTabPage> {
                   child: SvgPicture.asset(
                     'assets/icons/member.svg',
                     colorFilter: ColorFilter.mode(
-                        _selectedIndex == 3 ? themeProvider.isDarkMode? Colors.white: Colors.black : themeProvider.isDarkMode? NewAraThemes.gry5: NewAraThemes.gryB,
-                        BlendMode.srcIn),
-                    width: 36,
-                    height: 36,
-                  ),
-                ),
-              ),
-            ),
-          ),
-          GestureDetector(
-            behavior: HitTestBehavior.translucent,
-            onTap: () => _onItemTapped(4),
-            child: SizedBox(
-              width: iconWidth,
-              height: 50,
-              child: Center(
-                child: SizedBox(
-                  width: 36,
-                  height: 36,
-                  child: SvgPicture.asset(
-                    'assets/icons/member.svg',  // @ToDo : 학식 아이콘 디자인 해서 변경 할 것.
-                    colorFilter: ColorFilter.mode(
-                        _selectedIndex == 4 ? themeProvider.isDarkMode? Colors.white: Colors.black : themeProvider.isDarkMode? NewAraThemes.gry5: NewAraThemes.gryB,
+                        _selectedIndex == 3
+                            ? themeProvider.isDarkMode
+                                ? Colors.white
+                                : Colors.black
+                            : themeProvider.isDarkMode
+                                ? NewAraThemes.gry5
+                                : NewAraThemes.gryB,
                         BlendMode.srcIn),
                     width: 36,
                     height: 36,
