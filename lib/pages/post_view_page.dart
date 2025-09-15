@@ -36,6 +36,7 @@ import 'package:new_ara_app/providers/blocked_provider.dart';
 import 'package:new_ara_app/utils/handle_hidden.dart';
 import 'package:new_ara_app/utils/handle_name.dart';
 import 'package:new_ara_app/utils/with_school.dart';
+import 'package:new_ara_app/constants/url_info.dart';
 
 // TODO: Dio 사용방식 createDioWithHeaders~ 로 변경하기
 
@@ -544,7 +545,9 @@ class _PostViewPageState extends State<PostViewPage> {
                                                         .created_by.id
                                                         .toString()))),
                                         child: InArticleWebView(
+                                          // 서버에서 제공하는 PostFrame 페이지를 직접 로드
                                           content: _article.content ?? "",
+                                          remoteUrl: "$newAraDefaultUrl/web_view/PostFrame/${_article.id}",
                                           initialHeight: 150,
                                           isComment: false,
                                         ),

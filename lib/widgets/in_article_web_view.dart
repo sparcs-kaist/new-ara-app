@@ -23,6 +23,10 @@ class InArticleWebView extends StatefulWidget {
   /// 웹뷰에서 로딩하기 전에 sanitize함.
   final String content;
 
+  /// 원격 주소를 직접 로드할 때 사용하는 URL.
+  /// 지정되면 [content] 대신 이 URL을 로드합니다.
+  final String? remoteUrl;
+
   /// 초기 웹뷰 위젯의 높이.
   final double initialHeight;
 
@@ -35,6 +39,7 @@ class InArticleWebView extends StatefulWidget {
     required this.content,
     required this.initialHeight,
     required this.isComment,
+    this.remoteUrl,
   });
 
   @override
@@ -164,6 +169,13 @@ class _InArticleWebViewState extends State<InArticleWebView> {
             return NavigationDecision.navigate;
           }
           Uri uri = Uri.parse(request.url);
+          // 원격 페이지를 처음 로드할 때는 내부에서 허용한다.
+          if ((widget.remoteUrl != null &&
+                  (request.url == widget.remoteUrl ||
+                      request.url.startsWith(widget.remoteUrl!))) ||
+              request.isMainFrame && (uri.scheme == "data")) {
+            return NavigationDecision.navigate;
+          }
           if (uri.scheme == "https" || uri.scheme == "http") {
             await launchInBrowser(request.url);
           } else {
@@ -194,9 +206,22 @@ class _InArticleWebViewState extends State<InArticleWebView> {
         onWebResourceError: (WebResourceError error) async {
           debugPrint(
               'code: ${error.errorCode}\ndescription: ${error.description}\nerrorType: ${error.errorType}\nisForMainFrame: ${error.isForMainFrame}');
+          // 원격 URL 로드에 실패하면 텍스트 기반 HTML로 폴백합니다.
+          if (widget.remoteUrl != null && (error.isForMainFrame ?? false)) {
+            controller.loadHtmlString(
+              getContentHtml(widget.content, themeProvider.isDarkMode),
+            );
+          }
         },
-      ))
-      ..loadHtmlString(getContentHtml(widget.content, themeProvider.isDarkMode));
+      ));
+
+    // 원격 URL이 지정된 경우 해당 URL을 로드하고, 그렇지 않으면 HTML 문자열을 로드합니다.
+    if (widget.remoteUrl != null && widget.remoteUrl!.isNotEmpty) {
+      controller.loadRequest(Uri.parse(widget.remoteUrl!));
+    } else {
+      controller
+          .loadHtmlString(getContentHtml(widget.content, themeProvider.isDarkMode));
+    }
 
     _webViewController = controller;
   }
@@ -221,6 +246,7 @@ class _InArticleWebViewState extends State<InArticleWebView> {
       webViewWidget = WebViewWidget.fromPlatformCreationParams(
         params: AndroidWebViewWidgetCreationParams(
           controller: _webViewController.platform,
+          displayWithHybridComposition: true,
           gestureRecognizers: {
           Factory<OneSequenceGestureRecognizer>(() {
             TapGestureRecognizer tabGestureRecognizer = TapGestureRecognizer();
