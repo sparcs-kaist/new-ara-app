@@ -415,37 +415,58 @@ class SettingPageState extends State<SettingPage> {
                           crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
                             const SizedBox(height: 10),
-                            //다크모드
+                            // 다크모드 (임시 비활성화: 항상 라이트 모드 고정)
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
-                                // 성인글 보기 글씨
                                 Container(
-                                    margin: const EdgeInsets.only(left: 10),
-                                    child: Text(
-                                      LocaleKeys.settingPage_dark.tr(),
-                                      style: TextStyle(
+                                  margin: const EdgeInsets.only(left: 10),
+                                  child: Row(
+                                    children: [
+                                      Text(
+                                        LocaleKeys.settingPage_dark.tr(),
+                                        style: TextStyle(
                                           fontSize: 16,
                                           fontWeight: FontWeight.w500,
-                                          color: themeProvider.isDarkMode? Colors.white : Colors.black
+                                          color: Colors.grey.shade500,
+                                        ),
                                       ),
-                                    )),
+                                      const SizedBox(width: 6),
+                                      Container(
+                                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                        decoration: BoxDecoration(
+                                          color: Colors.grey.shade300,
+                                          borderRadius: BorderRadius.circular(6),
+                                        ),
+                                        child: Text(
+                                          'Beta 준비중',
+                                          style: TextStyle(
+                                            fontSize: 10,
+                                            fontWeight: FontWeight.w600,
+                                            color: Colors.grey.shade600,
+                                          ),
+                                        ),
+                                      )
+                                    ],
+                                  ),
+                                ),
                                 Container(
                                   margin: const EdgeInsets.only(right: 10),
                                   width: 43,
                                   height: 27,
-                                  child: FittedBox(
-                                    fit: BoxFit.fill,
-                                    child: CupertinoSwitch(
-                                        activeColor: ColorsInfo.newara,
-                                        value: setDarkMode,
-                                        onChanged: (value) async {
-                                          setState(() {
-                                            setDarkMode = value;
-                                          });
-                                          await saveDarkModeSetting(value);
-                                          themeProvider.updateTheme();
-                                        }),
+                                  child: IgnorePointer(
+                                    ignoring: true,
+                                    child: Opacity(
+                                      opacity: 0.4,
+                                      child: FittedBox(
+                                        fit: BoxFit.fill,
+                                        child: CupertinoSwitch(
+                                          activeColor: ColorsInfo.newara,
+                                          value: false,
+                                          onChanged: (_) {}, // disabled
+                                        ),
+                                      ),
+                                    ),
                                   ),
                                 ),
                               ],
