@@ -33,8 +33,9 @@ android {
     - 앱을 컴파일할 때 사용하는 SDK의 버전
     - compileSdkVersion에서 지정한 SDK의 Android API를 사용하게 됨
     - 구글 정책(2024.08.31 이후로 앱은 API 버전 34를 타겟팅해야함)에 따라 33->34로 상향 */
+    //ndk Version은 flutter의 기본 제공 버전 대신에 수동으로 세팅
     compileSdkVersion 36
-    ndkVersion flutter.ndkVersion
+    ndkVersion "27.0.12077973"
 
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
