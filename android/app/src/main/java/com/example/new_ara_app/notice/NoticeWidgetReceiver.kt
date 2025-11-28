@@ -1,4 +1,4 @@
-package com.example.new_ara_app.Notice
+package com.example.new_ara_app.notice
 
 import androidx.glance.appwidget.GlanceAppWidget
 import androidx.glance.appwidget.GlanceAppWidgetReceiver

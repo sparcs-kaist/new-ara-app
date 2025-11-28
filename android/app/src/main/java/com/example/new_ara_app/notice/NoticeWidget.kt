@@ -1,10 +1,10 @@
-package com.example.new_ara_app.Notice
+package com.example.new_ara_app.notice
 
 import android.content.Context
 import androidx.glance.GlanceId
 import androidx.glance.appwidget.GlanceAppWidget
 import androidx.glance.appwidget.provideContent
-import com.example.new_ara_app.Notice.Components.MyContent
+import com.example.new_ara_app.notice.components.MyContent
 
 class NoticeWidget : GlanceAppWidget() {
 
