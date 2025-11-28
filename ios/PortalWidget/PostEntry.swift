@@ -42,11 +42,11 @@ extension Post {
   
   static var mockList: [Post] =
     [
-      .init(id: "1", title: "Trending Post", author: "Admission Dept.", reason: .trending, date: Date()),
-      .init(id: "2", title: "Trending Post", author: "Admission Dept.", reason: .board(selectedBoard: .affiliates), date: Date()),
-      .init(id: "3", title: "Trending Post", author: "Admission Dept.", reason: .board(selectedBoard: .affiliates), date: Date()),
-      .init(id: "4", title: "Trending Post", author: "Admission Dept.", reason: .keyword(word: "Post"), date: Date()),
-      .init(id: "5", title: "Trending Post", author: "Admission Dept.", reason: .keyword(word: "Trending"), date: Date()),
+      .init(id: UUID().uuidString, title: "Post 1", author: "Admission Dept.", reason: .trending, date: Calendar.current.date(byAdding: .minute, value: 1, to: Date())!),
+      .init(id: UUID().uuidString, title: "Post 2", author: "Admission Dept.", reason: .board(selectedBoard: .affiliates), date:  Calendar.current.date(byAdding: .minute, value: 2, to: Date())!),
+      .init(id: UUID().uuidString, title: "Post 3", author: "Admission Dept.", reason: .board(selectedBoard: .affiliates), date:  Calendar.current.date(byAdding: .minute, value: 3, to: Date())!),
+      .init(id: UUID().uuidString, title: "Post 4", author: "Admission Dept.", reason: .keyword(word: "Post"), date:  Calendar.current.date(byAdding: .minute, value: 4, to: Date())!),
+      .init(id: UUID().uuidString, title: "Post 5", author: "Admission Dept.", reason: .keyword(word: "Trending"), date:  Calendar.current.date(byAdding: .minute, value: 5, to: Date())!),
     ]
 }
 
