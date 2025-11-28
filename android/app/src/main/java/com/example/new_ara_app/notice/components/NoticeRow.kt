@@ -1,4 +1,4 @@
-package com.example.new_ara_app.Notice.Components
+package com.example.new_ara_app.notice.components
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
@@ -26,7 +26,7 @@ import androidx.glance.text.FontWeight
 import androidx.glance.text.Text
 import androidx.glance.text.TextStyle
 import androidx.glance.unit.ColorProvider
-import com.example.new_ara_app.Models.BoardType
+import com.example.new_ara_app.models.BoardType
 import io.flutter.embedding.android.FlutterActivity
 
 

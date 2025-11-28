@@ -1,5 +1,5 @@
 
-package com.example.new_ara_app.Models
+package com.example.new_ara_app.models
 
 import com.example.new_ara_app.R
 
