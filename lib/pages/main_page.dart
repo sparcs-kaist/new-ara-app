@@ -25,6 +25,8 @@ import 'package:new_ara_app/utils/slide_routing.dart';
 import 'package:new_ara_app/providers/notification_provider.dart';
 import 'package:new_ara_app/utils/cache_function.dart';
 import 'package:new_ara_app/widgets/event_pop_up.dart';
+import 'package:new_ara_app/widgets/meal_banner.dart';
+import 'package:new_ara_app/pages/meal_webview_page.dart';
 
 class MainPage extends StatefulWidget {
   const MainPage({super.key});
@@ -481,6 +483,8 @@ class _MainPageState extends State<MainPage> with WidgetsBindingObserver {
                           const SizedBox(height: 20),
                           _buildTalkContents(),
                           const SizedBox(height: 20),
+                          _buildMealBanner(),
+                          const SizedBox(height: 20),
                           _buildNoticeContents(),
                           const SizedBox(height: 20),
                           _buildTradeContents(),
@@ -631,6 +635,27 @@ class _MainPageState extends State<MainPage> with WidgetsBindingObserver {
           ),
         ),
       ],
+    );
+  }
+
+  Widget _buildMealBanner() {
+    return MealBanner(
+      onTap: () {
+        Navigator.of(context).push(
+          PageRouteBuilder(
+            pageBuilder: (context, animation, secondaryAnimation) =>
+                const MealWebViewPage(),
+            transitionsBuilder:
+                (context, animation, secondaryAnimation, child) {
+              // 애니메이션은 MealWebViewPage 내부에서 처리
+              return child;
+            },
+            opaque: true,
+            barrierDismissible: false,
+            transitionDuration: Duration.zero, // 애니메이션은 페이지 내부에서
+          ),
+        );
+      },
     );
   }
 
