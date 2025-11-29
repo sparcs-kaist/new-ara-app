@@ -4,5 +4,3 @@ import 'package:flutter/material.dart';
 /// globalKey를 설정합니다.
 final GlobalKey<ScaffoldMessengerState> snackBarKey =
     GlobalKey<ScaffoldMessengerState>();
-/// Global navigator key so code outside widget context can navigate.
-final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();

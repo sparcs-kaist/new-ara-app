@@ -6,7 +6,6 @@ import 'package:new_ara_app/constants/url_info.dart';
 import 'package:new_ara_app/models/user_profile_model.dart';
 import 'package:new_ara_app/utils/create_dio_with_config.dart';
 import 'package:webview_cookie_manager/webview_cookie_manager.dart';
-import 'package:home_widget/home_widget.dart';
 
 /// `UserProvider`는 사용자 정보 및 연관된 API 로직을 관리하는 클래스입니다.
 class UserProvider with ChangeNotifier {
@@ -34,7 +33,7 @@ class UserProvider with ChangeNotifier {
   }
 
   /// 문자열 쿠키를 Cookie 객체 리스트로 변환합니다.
-  Future<void> setCookieToList(String cookieString) async {
+  void setCookieToList(String cookieString) {
     _loginCookie.clear();
     List<String> tempCookieList = cookieString.split('; ');
     for (String cookie in tempCookieList) {
@@ -42,15 +41,6 @@ class UserProvider with ChangeNotifier {
       String name = cookieParts[0];
       String value = cookieParts[1];
       _loginCookie.add(Cookie(name, value));
-    }
-
-    // user_cookie라는 key로 Cookie String을 home widget에 전송
-    try {
-      final cookieStr = getCookiesToString();
-      await HomeWidget.saveWidgetData<String>('user_cookie', cookieStr);
-      await HomeWidget.updateWidget(name: 'PortalWidgetProvider', iOSName: 'PortalWidgetProvider');
-    } catch (e) {
-      debugPrint('Failed to save cookie to widget: $e');
     }
   }
 
@@ -78,14 +68,6 @@ class UserProvider with ChangeNotifier {
   /// 지정된 URL의 웹뷰에서 쿠키를 가져와 저장합니다.
   Future<void> setCookiesFromUrl(url) async {
     _loginCookie = await WebviewCookieManager().getCookies(url);
-    // home widget에 새로운 쿠키 전송
-    try {
-      final cookieStr = getCookiesToString();
-      await HomeWidget.saveWidgetData<String>('user_cookie', cookieStr);
-      await HomeWidget.updateWidget(name: 'PortalWidgetProvider', iOSName: 'PortalWidgetProvider');
-    } catch (e) {
-      debugPrint('Failed to save cookie to widget after fetching from webview: $e');
-    }
     return;
   }
 

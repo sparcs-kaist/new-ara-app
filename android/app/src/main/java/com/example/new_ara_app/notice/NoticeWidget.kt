@@ -27,7 +27,7 @@ class NoticeWidget : GlanceAppWidget() {
             val size = LocalSize.current
             val prefs = context.dataStore.data.collectAsState(initial = emptyPreferences()).value
 
-            val data = prefs[KEY_WIDGET_DATA] ?: "데이터 없음"
+            val data =""
 
 
             MyContent(context, size, data)

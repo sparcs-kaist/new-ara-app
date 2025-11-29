@@ -26,8 +26,6 @@ import 'package:new_ara_app/providers/notification_provider.dart';
 import 'package:new_ara_app/widgets/dialogs.dart';
 import 'package:new_ara_app/widgets/snackbar_noti.dart';
 
-import 'package:home_widget/home_widget.dart';
-
 /// 설정 페이지 빌드 및 이벤트 처리를 담당하는 StatefulWidget.
 class SettingPage extends StatefulWidget {
   const SettingPage({super.key});
@@ -95,7 +93,7 @@ class SettingPageState extends State<SettingPage> {
           icon: SvgPicture.asset(
             'assets/icons/left_chevron.svg',
             colorFilter:
-                const ColorFilter.mode(ColorsInfo.newara, BlendMode.srcIn),
+            const ColorFilter.mode(ColorsInfo.newara, BlendMode.srcIn),
             width: 35,
             height: 35,
           ),
@@ -116,568 +114,568 @@ class SettingPageState extends State<SettingPage> {
         child: _isLoading
             ? const LoadingIndicator()
             : SingleChildScrollView(
-                child: SizedBox(
-                  width: MediaQuery.of(context).size.width,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.center,
+          child: SizedBox(
+            width: MediaQuery.of(context).size.width,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                const SizedBox(height: 23),
+                // 게시글 아이콘 및 '게시글' 텍스트
+                SizedBox(
+                  width: MediaQuery.of(context).size.width - 50,
+                  child: Row(
                     children: [
-                      const SizedBox(height: 23),
-                      // 게시글 아이콘 및 '게시글' 텍스트
-                      SizedBox(
-                        width: MediaQuery.of(context).size.width - 50,
-                        child: Row(
-                          children: [
-                            SvgPicture.asset(
-                              'assets/icons/post_list.svg',
-                              width: 34,
-                              height: 34,
-                              colorFilter: ColorFilter.mode(
-                                  themeProvider.isDarkMode? Colors.white: Colors.black, BlendMode.srcIn),
-                            ),
-                            Text(
-                              LocaleKeys.settingPage_postSetting.tr(),
-                              style: TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.w700,
-                                color: themeProvider.isDarkMode? Colors.white : Colors.black
-                              ),
-                            ),
-                          ],
+                      SvgPicture.asset(
+                        'assets/icons/post_list.svg',
+                        width: 34,
+                        height: 34,
+                        colorFilter: ColorFilter.mode(
+                            themeProvider.isDarkMode? Colors.white: Colors.black, BlendMode.srcIn),
+                      ),
+                      Text(
+                        LocaleKeys.settingPage_postSetting.tr(),
+                        style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.w700,
+                            color: themeProvider.isDarkMode? Colors.white : Colors.black
                         ),
                       ),
-                      const SizedBox(height: 7),
-                      // 성인글 보기, 정치글 보기 스위치 버튼
-                      Container(
-                        width: MediaQuery.of(context).size.width - 40,
-                        height: 94,
-                        decoration: BoxDecoration(
-                          borderRadius:
-                              const BorderRadius.all(Radius.circular(10)),
-                          border: Border.all(
-                            color: themeProvider.isDarkMode? Color.fromRGBO(60, 60, 60, 1) : Color.fromRGBO(240, 240, 240, 1),
-                          ),
-                        ),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-                            const SizedBox(height: 10),
-                            // 성인글 보기
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                // 성인글 보기 글씨
-                                Container(
-                                    margin: const EdgeInsets.only(left: 10),
-                                    child: Text(
-                                      LocaleKeys.settingPage_adult.tr(),
-                                      style: TextStyle(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.w500,
-                                        color: themeProvider.isDarkMode? Colors.white : Colors.black
-                                      ),
-                                    )),
-                                // 성인글 보기 CupertinoSwitch
-                                Container(
-                                  margin: const EdgeInsets.only(right: 10),
-                                  width: 43,
-                                  height: 27,
-                                  child: FittedBox(
-                                    fit: BoxFit.fill,
-                                    child: CupertinoSwitch(
-                                        activeColor: ColorsInfo.newara,
-                                        value: seeSexual,
-                                        onChanged: (value) async {
-                                          setState(() => seeSexual = value);
-                                          Response? patchRes =
-                                              await userProvider.patchApiRes(
-                                                  'user_profiles/${userProvider.naUser!.user}/',
-                                                  data: {'see_sexual': value});
-                                          if (patchRes != null) {
-                                            await userProvider.apiMeUserInfo();
-                                            debugPrint(
-                                                "Change of 'see_sexual' succeed!");
-                                            requestSnackBar(LocaleKeys
-                                                .settingPage_settingsSaved
-                                                .tr());
-                                          } else {
-                                            debugPrint(
-                                                "Change of 'see_sexual' failed");
-                                            requestSnackBar(LocaleKeys
-                                                .settingPage_errorSavingSettings
-                                                .tr());
-                                            setState(() => seeSexual = !value);
-                                          }
-                                        }),
-                                  ),
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: 16),
-                            // 정치글 보기
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                // 정치글 보기 글씨
-                                Container(
-                                    margin: const EdgeInsets.only(left: 10),
-                                    child: Text(
-                                      LocaleKeys.settingPage_politics.tr(),
-                                      style: TextStyle(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.w500,
-                                        color: themeProvider.isDarkMode? Colors.white : Colors.black
-                                      ),
-                                    )),
-                                // 정치글 보기 CupertinoSwitch
-                                Container(
-                                  margin: const EdgeInsets.only(right: 10),
-                                  width: 43,
-                                  height: 27,
-                                  child: FittedBox(
-                                    fit: BoxFit.fill,
-                                    child: CupertinoSwitch(
-                                        activeColor: ColorsInfo.newara,
-                                        value: seeSocial,
-                                        onChanged: (value) async {
-                                          setState(() {
-                                            seeSocial = value;
-                                          });
-                                          Response? patchRes =
-                                              await userProvider.patchApiRes(
-                                                  'user_profiles/${userProvider.naUser!.user}/',
-                                                  data: {'see_social': value});
-                                          if (patchRes != null) {
-                                            await userProvider.apiMeUserInfo();
-                                            debugPrint(
-                                                "Change of 'see_social' succeed!");
-                                            requestSnackBar(LocaleKeys
-                                                .settingPage_settingsSaved
-                                                .tr());
-                                          } else {
-                                            debugPrint(
-                                                "Change of 'see_social' failed");
-                                            requestSnackBar(LocaleKeys
-                                                .settingPage_errorSavingSettings
-                                                .tr());
-                                            setState(() => seeSocial = !value);
-                                          }
-                                        }),
-                                  ),
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: 10),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(height: 24),
-                      // // 알림 아이콘 및 '알림' 텍스트
-                      // SizedBox(
-                      //   width: MediaQuery.of(context).size.width - 50,
-                      //   child: Row(
-                      //     children: [
-                      //       SvgPicture.asset(
-                      //         'assets/icons/notification.svg',
-                      //         width: 34,
-                      //         height: 34,
-                      //       ),
-                      //       Text(
-                      //         'setting_page.noti'.tr(),
-                      //         style: const TextStyle(
-                      //           fontSize: 18,
-                      //           fontWeight: FontWeight.w700,
-                      //         ),
-                      //       ),
-                      //     ],
-                      //   ),
-                      // ),
-                      // const SizedBox(height: 7),
-                      // // 댓글, 대댓글 설정 UI의 border 설정
-                      // BorderBoxes(94, switchItems[1]),
-                      // const SizedBox(height: 10),
-                      // // 인기글 관련 설정 UI의 border 설정
-                      // BorderBoxes(94, switchItems[2]),
-                      // const SizedBox(height: 5),
-                      // // 인기 공지글 제공 시간 문구
-                      // TextInfo('setting_page.hot_info'.tr()),
-                      // const SizedBox(height: 10),
-                      // 차단 아이콘, '차단' 텍스트
-                      SizedBox(
-                        width: MediaQuery.of(context).size.width - 50,
-                        child: Row(
-                          children: [
-                            SvgPicture.asset(
-                              'assets/icons/barrior.svg',
-                              width: 34,
-                              height: 34,
-                              colorFilter: ColorFilter.mode(
-                                  themeProvider.isDarkMode? Colors.white: Colors.black, BlendMode.srcIn),
-                            ),
-                            Text(
-                              LocaleKeys.settingPage_block.tr(),
-                              style: TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.w700,
-                                color: themeProvider.isDarkMode? Colors.white : Colors.black
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(height: 7),
-                      // 차단한 유저 목록 버튼
-                      Container(
-                        width: MediaQuery.of(context).size.width - 40,
-                        height: 50,
-                        decoration: BoxDecoration(
-                          borderRadius:
-                              const BorderRadius.all(Radius.circular(10)),
-                          border: Border.all(
-                            color: themeProvider.isDarkMode? Color.fromRGBO(60, 60, 60, 1) : Color.fromRGBO(240, 240, 240, 1),
-                          ),
-                        ),
-                        child: InkWell(
-                          onTap: () {
-                            showDialog(
-                                context: context,
-                                builder: (context) =>
-                                    Theme(
-                                        data: Theme.of(context).copyWith(
-                                            dialogBackgroundColor: themeProvider.isDarkMode? Color(0xff111111) : Colors.white,
-                                            textButtonTheme: TextButtonThemeData(
-                                                style: ButtonStyle(
-                                                  backgroundColor: WidgetStateProperty.all<Color>(themeProvider.isDarkMode? Colors.black : Colors.white),
-                                                )
-                                            )
-                                        ),
-                                        child: const BlockedUserDialog()));
-                          },
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              SizedBox(
-                                width: MediaQuery.of(context).size.width - 60,
-                                child: Center(
-                                  child: Text(
-                                    LocaleKeys.settingPage_viewBlockedUsers
-                                        .tr(),
-                                    style: const TextStyle(
-                                      color: ColorsInfo.newara,
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.w500,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 5),
-                      // 유저 차단 기능 설명 문구
-                      TextInfo(LocaleKeys.settingPage_userBlockingGuide.tr()),
-                      const SizedBox(height: 20),
-                      SizedBox(
-                        width: MediaQuery.of(context).size.width - 50,
-                        child: Row(
-                          children: [
-                            SvgPicture.asset(
-                              'assets/icons/information.svg',
-                              width: 36,
-                              height: 36,
-                              colorFilter: ColorFilter.mode(
-                                  themeProvider.isDarkMode? Colors.white: Colors.black, BlendMode.srcIn),
-                            ),
-                            Text(
-                              LocaleKeys.settingPage_information.tr(),
-                              style: TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.w700,
-                                color: themeProvider.isDarkMode? Colors.white : Colors.black
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(height: 7),
-                      Container(
-                        width: MediaQuery.of(context).size.width - 40,
-                        padding: const EdgeInsets.only(right: 5),
-                        height: 134,
-                        decoration: BoxDecoration(
-                          borderRadius:
-                              const BorderRadius.all(Radius.circular(10)),
-                          border: Border.all(
-                            color: themeProvider.isDarkMode? Color.fromRGBO(60, 60, 60, 1) : Color.fromRGBO(240, 240, 240, 1),
-                          ),
-                        ),
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-                            const SizedBox(height: 10),
-                            // 다크모드 (임시 비활성화: 항상 라이트 모드 고정)
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Container(
-                                  margin: const EdgeInsets.only(left: 10),
-                                  child: Row(
-                                    children: [
-                                      Text(
-                                        LocaleKeys.settingPage_dark.tr(),
-                                        style: TextStyle(
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.w500,
-                                          color: Colors.grey.shade500,
-                                        ),
-                                      ),
-                                      const SizedBox(width: 6),
-                                      Container(
-                                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                                        decoration: BoxDecoration(
-                                          color: Colors.grey.shade300,
-                                          borderRadius: BorderRadius.circular(6),
-                                        ),
-                                        child: Text(
-                                          'Beta 준비중',
-                                          style: TextStyle(
-                                            fontSize: 10,
-                                            fontWeight: FontWeight.w600,
-                                            color: Colors.grey.shade600,
-                                          ),
-                                        ),
-                                      )
-                                    ],
-                                  ),
-                                ),
-                                Container(
-                                  margin: const EdgeInsets.only(right: 10),
-                                  width: 43,
-                                  height: 27,
-                                  child: IgnorePointer(
-                                    ignoring: true,
-                                    child: Opacity(
-                                      opacity: 0.4,
-                                      child: FittedBox(
-                                        fit: BoxFit.fill,
-                                        child: CupertinoSwitch(
-                                          activeColor: ColorsInfo.newara,
-                                          value: false,
-                                          onChanged: (_) {}, // disabled
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: 16),
-                            // 이용약관
-                            InkWell(
-                              onTap: () {
-                                // TermsAndConditionsPage의 변경된 locale을 즉시 적용하기 위해 setState 호출함.
-                                Navigator.of(context)
-                                    .push(
-                                      slideRoute(
-                                        const TermsAndConditionsPage(),
-                                      ),
-                                    )
-                                    .then((_) => setState(() {}));
-                              },
-                              child: Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Container(
-                                      margin: const EdgeInsets.only(left: 10),
-                                      child: Text(
-                                        LocaleKeys
-                                            .settingPage_termsAndConditions
-                                            .tr(),
-                                        style: TextStyle(
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.w500,
-                                          color: themeProvider.isDarkMode? Colors.white : Colors.black
-                                        ),
-                                      )),
-                                  SvgPicture.asset(
-                                    'assets/icons/right_chevron.svg',
-                                    width: 20,
-                                    height: 20,
-                                    colorFilter: ColorFilter.mode(
-                                        themeProvider.isDarkMode? Colors.white: Colors.black, BlendMode.srcIn),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            const SizedBox(height: 16),
-                            // 문의
-                            InkWell(
-                              onTap: () => launchInBrowser(0),
-                              child: Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  // 정치글 보기 글씨
-                                  Container(
-                                      margin: const EdgeInsets.only(left: 10),
-                                      child: Text(
-                                        LocaleKeys.settingPage_contactAdmins
-                                            .tr(),
-                                        style: TextStyle(
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.w500,
-                                          color: themeProvider.isDarkMode? Colors.white : Colors.black
-                                        ),
-                                      )),
-                                  SvgPicture.asset(
-                                    'assets/icons/right_chevron.svg',
-                                    width: 20,
-                                    height: 20,
-                                    colorFilter: ColorFilter.mode(
-                                        themeProvider.isDarkMode? Colors.white: Colors.black, BlendMode.srcIn),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            const SizedBox(height: 10),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(height: 20),
-                      // 로그아웃 버튼 UI (border도 포함)
-                      Container(
-                        width: MediaQuery.of(context).size.width - 40,
-                        height: 50,
-                        decoration: BoxDecoration(
-                          borderRadius:
-                              const BorderRadius.all(Radius.circular(10)),
-                          border: Border.all(
-                            color: themeProvider.isDarkMode? Color.fromRGBO(60, 60, 60, 1) : Color.fromRGBO(240, 240, 240, 1),
-                          ),
-                        ),
-                        child: SizedBox(
-                          width: MediaQuery.of(context).size.width - 60,
-                          child: InkWell(
-                            onTap: () async {
-                              await showDialog(
-                                context: context,
-                                builder: (context) => Theme(
-                                  data: Theme.of(context).copyWith(
-                                      dialogBackgroundColor: themeProvider.isDarkMode? Color(0xff111111) : Colors.white,
-                                      textButtonTheme: TextButtonThemeData(
-                                          style: ButtonStyle(
-                                            backgroundColor: WidgetStateProperty.all<Color>(themeProvider.isDarkMode? Colors.black : Colors.white),
-                                          )
-                                      )
-                                  ),
-                                  child: SignoutConfirmDialog(
-                                    onTap: () async {
-                                      await _logout();
-                                    },
-                                    userProvider: userProvider,
-                                    targetContext: context,
-                                  ),
-                                ),
-                              );
-                            },
-                            child: Center(
-                              child: Text(
-                                LocaleKeys.settingPage_signOut.tr(),
-                                style: TextStyle(
-                                  color: ColorsInfo.newara,
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w500,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 20),
-                      Container(
-                        width: MediaQuery.of(context).size.width - 40,
-                        height: 50,
-                        decoration: BoxDecoration(
-                          borderRadius:
-                              const BorderRadius.all(Radius.circular(10)),
-                          border: Border.all(
-                            color: themeProvider.isDarkMode? Color.fromRGBO(60, 60, 60, 1) : Color.fromRGBO(240, 240, 240, 1),
-                          ),
-                        ),
-                        child: SizedBox(
-                          width: MediaQuery.of(context).size.width - 60,
-                          child: InkWell(
-                            onTap: () async {
-                              await showDialog(
-                                context: context,
-                                builder: (context) => Theme(
-                                  data: Theme.of(context).copyWith(
-                                      dialogBackgroundColor: themeProvider.isDarkMode? Color(0xff111111) : Colors.white,
-                                      textButtonTheme: TextButtonThemeData(
-                                          style: ButtonStyle(
-                                            backgroundColor: WidgetStateProperty.all<Color>(themeProvider.isDarkMode? Colors.black : Colors.white),
-                                          )
-                                      )
-                                  ),
-                                  child: UnregisterConfirmDialog(
-                                    onTap: () async {
-                                      Navigator.pop(context);
-                                      setState(() {
-                                        _isLoading = true;
-                                      });
-                                      var response = await userProvider
-                                          .getApiRes('unregister');
-                                      // ignore: unused_local_variable
-                                      final Map<String, dynamic>? responseResult =
-                                          await response?.data;
-
-                                      //TODO: 회원탈퇴 로직 보강 필요
-                                      // if(responseResult == null){
-                                      //   ///회원탈퇴 실패
-                                      // }
-                                      final prefs =
-                                          await SharedPreferences.getInstance();
-                                      String jsonString = userProvider
-                                          .naUser!.user
-                                          .toString(); // 데이터를 JSON 문자열로 인코딩
-                                      await prefs.setString(
-                                          '심사통과를위한탈퇴탈퇴한유저', jsonString);
-
-                                      if (mounted) {
-                                        setState(() {
-                                          _isLoading = false;
-                                        });
-                                      }
-                                      await _logout();
-                                    },
-                                    userProvider: userProvider,
-                                    targetContext: context,
-                                  ),
-                                ),
-                              );
-                            },
-                            child: Center(
-                              child: Text(
-                                LocaleKeys.settingPage_withdrawal.tr(),
-                                style: const TextStyle(
-                                  color: ColorsInfo.newara,
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w500,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 5),
-                      TextInfo(LocaleKeys.settingPage_withdrawalGuide.tr()),
                     ],
                   ),
                 ),
-              ),
+                const SizedBox(height: 7),
+                // 성인글 보기, 정치글 보기 스위치 버튼
+                Container(
+                  width: MediaQuery.of(context).size.width - 40,
+                  height: 94,
+                  decoration: BoxDecoration(
+                    borderRadius:
+                    const BorderRadius.all(Radius.circular(10)),
+                    border: Border.all(
+                      color: themeProvider.isDarkMode? Color.fromRGBO(60, 60, 60, 1) : Color.fromRGBO(240, 240, 240, 1),
+                    ),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      const SizedBox(height: 10),
+                      // 성인글 보기
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          // 성인글 보기 글씨
+                          Container(
+                              margin: const EdgeInsets.only(left: 10),
+                              child: Text(
+                                LocaleKeys.settingPage_adult.tr(),
+                                style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w500,
+                                    color: themeProvider.isDarkMode? Colors.white : Colors.black
+                                ),
+                              )),
+                          // 성인글 보기 CupertinoSwitch
+                          Container(
+                            margin: const EdgeInsets.only(right: 10),
+                            width: 43,
+                            height: 27,
+                            child: FittedBox(
+                              fit: BoxFit.fill,
+                              child: CupertinoSwitch(
+                                  activeColor: ColorsInfo.newara,
+                                  value: seeSexual,
+                                  onChanged: (value) async {
+                                    setState(() => seeSexual = value);
+                                    Response? patchRes =
+                                    await userProvider.patchApiRes(
+                                        'user_profiles/${userProvider.naUser!.user}/',
+                                        data: {'see_sexual': value});
+                                    if (patchRes != null) {
+                                      await userProvider.apiMeUserInfo();
+                                      debugPrint(
+                                          "Change of 'see_sexual' succeed!");
+                                      requestSnackBar(LocaleKeys
+                                          .settingPage_settingsSaved
+                                          .tr());
+                                    } else {
+                                      debugPrint(
+                                          "Change of 'see_sexual' failed");
+                                      requestSnackBar(LocaleKeys
+                                          .settingPage_errorSavingSettings
+                                          .tr());
+                                      setState(() => seeSexual = !value);
+                                    }
+                                  }),
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 16),
+                      // 정치글 보기
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          // 정치글 보기 글씨
+                          Container(
+                              margin: const EdgeInsets.only(left: 10),
+                              child: Text(
+                                LocaleKeys.settingPage_politics.tr(),
+                                style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w500,
+                                    color: themeProvider.isDarkMode? Colors.white : Colors.black
+                                ),
+                              )),
+                          // 정치글 보기 CupertinoSwitch
+                          Container(
+                            margin: const EdgeInsets.only(right: 10),
+                            width: 43,
+                            height: 27,
+                            child: FittedBox(
+                              fit: BoxFit.fill,
+                              child: CupertinoSwitch(
+                                  activeColor: ColorsInfo.newara,
+                                  value: seeSocial,
+                                  onChanged: (value) async {
+                                    setState(() {
+                                      seeSocial = value;
+                                    });
+                                    Response? patchRes =
+                                    await userProvider.patchApiRes(
+                                        'user_profiles/${userProvider.naUser!.user}/',
+                                        data: {'see_social': value});
+                                    if (patchRes != null) {
+                                      await userProvider.apiMeUserInfo();
+                                      debugPrint(
+                                          "Change of 'see_social' succeed!");
+                                      requestSnackBar(LocaleKeys
+                                          .settingPage_settingsSaved
+                                          .tr());
+                                    } else {
+                                      debugPrint(
+                                          "Change of 'see_social' failed");
+                                      requestSnackBar(LocaleKeys
+                                          .settingPage_errorSavingSettings
+                                          .tr());
+                                      setState(() => seeSocial = !value);
+                                    }
+                                  }),
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 10),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 24),
+                // // 알림 아이콘 및 '알림' 텍스트
+                // SizedBox(
+                //   width: MediaQuery.of(context).size.width - 50,
+                //   child: Row(
+                //     children: [
+                //       SvgPicture.asset(
+                //         'assets/icons/notification.svg',
+                //         width: 34,
+                //         height: 34,
+                //       ),
+                //       Text(
+                //         'setting_page.noti'.tr(),
+                //         style: const TextStyle(
+                //           fontSize: 18,
+                //           fontWeight: FontWeight.w700,
+                //         ),
+                //       ),
+                //     ],
+                //   ),
+                // ),
+                // const SizedBox(height: 7),
+                // // 댓글, 대댓글 설정 UI의 border 설정
+                // BorderBoxes(94, switchItems[1]),
+                // const SizedBox(height: 10),
+                // // 인기글 관련 설정 UI의 border 설정
+                // BorderBoxes(94, switchItems[2]),
+                // const SizedBox(height: 5),
+                // // 인기 공지글 제공 시간 문구
+                // TextInfo('setting_page.hot_info'.tr()),
+                // const SizedBox(height: 10),
+                // 차단 아이콘, '차단' 텍스트
+                SizedBox(
+                  width: MediaQuery.of(context).size.width - 50,
+                  child: Row(
+                    children: [
+                      SvgPicture.asset(
+                        'assets/icons/barrior.svg',
+                        width: 34,
+                        height: 34,
+                        colorFilter: ColorFilter.mode(
+                            themeProvider.isDarkMode? Colors.white: Colors.black, BlendMode.srcIn),
+                      ),
+                      Text(
+                        LocaleKeys.settingPage_block.tr(),
+                        style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.w700,
+                            color: themeProvider.isDarkMode? Colors.white : Colors.black
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 7),
+                // 차단한 유저 목록 버튼
+                Container(
+                  width: MediaQuery.of(context).size.width - 40,
+                  height: 50,
+                  decoration: BoxDecoration(
+                    borderRadius:
+                    const BorderRadius.all(Radius.circular(10)),
+                    border: Border.all(
+                      color: themeProvider.isDarkMode? Color.fromRGBO(60, 60, 60, 1) : Color.fromRGBO(240, 240, 240, 1),
+                    ),
+                  ),
+                  child: InkWell(
+                    onTap: () {
+                      showDialog(
+                          context: context,
+                          builder: (context) =>
+                              Theme(
+                                  data: Theme.of(context).copyWith(
+                                      dialogBackgroundColor: themeProvider.isDarkMode? Color(0xff111111) : Colors.white,
+                                      textButtonTheme: TextButtonThemeData(
+                                          style: ButtonStyle(
+                                            backgroundColor: WidgetStateProperty.all<Color>(themeProvider.isDarkMode? Colors.black : Colors.white),
+                                          )
+                                      )
+                                  ),
+                                  child: const BlockedUserDialog()));
+                    },
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        SizedBox(
+                          width: MediaQuery.of(context).size.width - 60,
+                          child: Center(
+                            child: Text(
+                              LocaleKeys.settingPage_viewBlockedUsers
+                                  .tr(),
+                              style: const TextStyle(
+                                color: ColorsInfo.newara,
+                                fontSize: 16,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 5),
+                // 유저 차단 기능 설명 문구
+                TextInfo(LocaleKeys.settingPage_userBlockingGuide.tr()),
+                const SizedBox(height: 20),
+                SizedBox(
+                  width: MediaQuery.of(context).size.width - 50,
+                  child: Row(
+                    children: [
+                      SvgPicture.asset(
+                        'assets/icons/information.svg',
+                        width: 36,
+                        height: 36,
+                        colorFilter: ColorFilter.mode(
+                            themeProvider.isDarkMode? Colors.white: Colors.black, BlendMode.srcIn),
+                      ),
+                      Text(
+                        LocaleKeys.settingPage_information.tr(),
+                        style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.w700,
+                            color: themeProvider.isDarkMode? Colors.white : Colors.black
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 7),
+                Container(
+                  width: MediaQuery.of(context).size.width - 40,
+                  padding: const EdgeInsets.only(right: 5),
+                  height: 134,
+                  decoration: BoxDecoration(
+                    borderRadius:
+                    const BorderRadius.all(Radius.circular(10)),
+                    border: Border.all(
+                      color: themeProvider.isDarkMode? Color.fromRGBO(60, 60, 60, 1) : Color.fromRGBO(240, 240, 240, 1),
+                    ),
+                  ),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      const SizedBox(height: 10),
+                      // 다크모드 (임시 비활성화: 항상 라이트 모드 고정)
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Container(
+                            margin: const EdgeInsets.only(left: 10),
+                            child: Row(
+                              children: [
+                                Text(
+                                  LocaleKeys.settingPage_dark.tr(),
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w500,
+                                    color: Colors.grey.shade500,
+                                  ),
+                                ),
+                                const SizedBox(width: 6),
+                                Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                  decoration: BoxDecoration(
+                                    color: Colors.grey.shade300,
+                                    borderRadius: BorderRadius.circular(6),
+                                  ),
+                                  child: Text(
+                                    'Beta 준비중',
+                                    style: TextStyle(
+                                      fontSize: 10,
+                                      fontWeight: FontWeight.w600,
+                                      color: Colors.grey.shade600,
+                                    ),
+                                  ),
+                                )
+                              ],
+                            ),
+                          ),
+                          Container(
+                            margin: const EdgeInsets.only(right: 10),
+                            width: 43,
+                            height: 27,
+                            child: IgnorePointer(
+                              ignoring: true,
+                              child: Opacity(
+                                opacity: 0.4,
+                                child: FittedBox(
+                                  fit: BoxFit.fill,
+                                  child: CupertinoSwitch(
+                                    activeColor: ColorsInfo.newara,
+                                    value: false,
+                                    onChanged: (_) {}, // disabled
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 16),
+                      // 이용약관
+                      InkWell(
+                        onTap: () {
+                          // TermsAndConditionsPage의 변경된 locale을 즉시 적용하기 위해 setState 호출함.
+                          Navigator.of(context)
+                              .push(
+                            slideRoute(
+                              const TermsAndConditionsPage(),
+                            ),
+                          )
+                              .then((_) => setState(() {}));
+                        },
+                        child: Row(
+                          mainAxisAlignment:
+                          MainAxisAlignment.spaceBetween,
+                          children: [
+                            Container(
+                                margin: const EdgeInsets.only(left: 10),
+                                child: Text(
+                                  LocaleKeys
+                                      .settingPage_termsAndConditions
+                                      .tr(),
+                                  style: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w500,
+                                      color: themeProvider.isDarkMode? Colors.white : Colors.black
+                                  ),
+                                )),
+                            SvgPicture.asset(
+                              'assets/icons/right_chevron.svg',
+                              width: 20,
+                              height: 20,
+                              colorFilter: ColorFilter.mode(
+                                  themeProvider.isDarkMode? Colors.white: Colors.black, BlendMode.srcIn),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                      // 문의
+                      InkWell(
+                        onTap: () => launchInBrowser(0),
+                        child: Row(
+                          mainAxisAlignment:
+                          MainAxisAlignment.spaceBetween,
+                          children: [
+                            // 정치글 보기 글씨
+                            Container(
+                                margin: const EdgeInsets.only(left: 10),
+                                child: Text(
+                                  LocaleKeys.settingPage_contactAdmins
+                                      .tr(),
+                                  style: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w500,
+                                      color: themeProvider.isDarkMode? Colors.white : Colors.black
+                                  ),
+                                )),
+                            SvgPicture.asset(
+                              'assets/icons/right_chevron.svg',
+                              width: 20,
+                              height: 20,
+                              colorFilter: ColorFilter.mode(
+                                  themeProvider.isDarkMode? Colors.white: Colors.black, BlendMode.srcIn),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 20),
+                // 로그아웃 버튼 UI (border도 포함)
+                Container(
+                  width: MediaQuery.of(context).size.width - 40,
+                  height: 50,
+                  decoration: BoxDecoration(
+                    borderRadius:
+                    const BorderRadius.all(Radius.circular(10)),
+                    border: Border.all(
+                      color: themeProvider.isDarkMode? Color.fromRGBO(60, 60, 60, 1) : Color.fromRGBO(240, 240, 240, 1),
+                    ),
+                  ),
+                  child: SizedBox(
+                    width: MediaQuery.of(context).size.width - 60,
+                    child: InkWell(
+                      onTap: () async {
+                        await showDialog(
+                          context: context,
+                          builder: (context) => Theme(
+                            data: Theme.of(context).copyWith(
+                                dialogBackgroundColor: themeProvider.isDarkMode? Color(0xff111111) : Colors.white,
+                                textButtonTheme: TextButtonThemeData(
+                                    style: ButtonStyle(
+                                      backgroundColor: WidgetStateProperty.all<Color>(themeProvider.isDarkMode? Colors.black : Colors.white),
+                                    )
+                                )
+                            ),
+                            child: SignoutConfirmDialog(
+                              onTap: () async {
+                                await _logout();
+                              },
+                              userProvider: userProvider,
+                              targetContext: context,
+                            ),
+                          ),
+                        );
+                      },
+                      child: Center(
+                        child: Text(
+                          LocaleKeys.settingPage_signOut.tr(),
+                          style: TextStyle(
+                            color: ColorsInfo.newara,
+                            fontSize: 16,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 20),
+                Container(
+                  width: MediaQuery.of(context).size.width - 40,
+                  height: 50,
+                  decoration: BoxDecoration(
+                    borderRadius:
+                    const BorderRadius.all(Radius.circular(10)),
+                    border: Border.all(
+                      color: themeProvider.isDarkMode? Color.fromRGBO(60, 60, 60, 1) : Color.fromRGBO(240, 240, 240, 1),
+                    ),
+                  ),
+                  child: SizedBox(
+                    width: MediaQuery.of(context).size.width - 60,
+                    child: InkWell(
+                      onTap: () async {
+                        await showDialog(
+                          context: context,
+                          builder: (context) => Theme(
+                            data: Theme.of(context).copyWith(
+                                dialogBackgroundColor: themeProvider.isDarkMode? Color(0xff111111) : Colors.white,
+                                textButtonTheme: TextButtonThemeData(
+                                    style: ButtonStyle(
+                                      backgroundColor: WidgetStateProperty.all<Color>(themeProvider.isDarkMode? Colors.black : Colors.white),
+                                    )
+                                )
+                            ),
+                            child: UnregisterConfirmDialog(
+                              onTap: () async {
+                                Navigator.pop(context);
+                                setState(() {
+                                  _isLoading = true;
+                                });
+                                var response = await userProvider
+                                    .getApiRes('unregister');
+                                // ignore: unused_local_variable
+                                final Map<String, dynamic>? responseResult =
+                                await response?.data;
+
+                                //TODO: 회원탈퇴 로직 보강 필요
+                                // if(responseResult == null){
+                                //   ///회원탈퇴 실패
+                                // }
+                                final prefs =
+                                await SharedPreferences.getInstance();
+                                String jsonString = userProvider
+                                    .naUser!.user
+                                    .toString(); // 데이터를 JSON 문자열로 인코딩
+                                await prefs.setString(
+                                    '심사통과를위한탈퇴탈퇴한유저', jsonString);
+
+                                if (mounted) {
+                                  setState(() {
+                                    _isLoading = false;
+                                  });
+                                }
+                                await _logout();
+                              },
+                              userProvider: userProvider,
+                              targetContext: context,
+                            ),
+                          ),
+                        );
+                      },
+                      child: Center(
+                        child: Text(
+                          LocaleKeys.settingPage_withdrawal.tr(),
+                          style: const TextStyle(
+                            color: ColorsInfo.newara,
+                            fontSize: 16,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 5),
+                TextInfo(LocaleKeys.settingPage_withdrawalGuide.tr()),
+              ],
+            ),
+          ),
+        ),
       ),
     );
   }
@@ -693,16 +691,13 @@ class SettingPageState extends State<SettingPage> {
     await secureStorage.delete(key: 'cookie');
     await WebviewCookieManager().clearCookies();
 
-    await HomeWidget.saveWidgetData<String>('user_cookie', '');
-    await HomeWidget.updateWidget(name: 'PortalWidgetProvider', iOSName: 'PortalWidgetProvider');
-
     debugPrint("log out success");
   }
 
   String? encodeQueryParameters(Map<String, String> params) {
     return params.entries
         .map((MapEntry<String, String> e) =>
-            '${Uri.encodeComponent(e.key)}=${Uri.encodeComponent(e.value)}')
+    '${Uri.encodeComponent(e.key)}=${Uri.encodeComponent(e.value)}')
         .join('&');
   }
 
@@ -714,7 +709,7 @@ class SettingPageState extends State<SettingPage> {
     String? email = userProvider.naUser?.email;
     String? nickname = userProvider.naUser?.nickname;
     final String body =
-        """유저 번호: $userID\n닉네임: $nickname\n이메일: $email\n 탈퇴 요청드립니다(Ara 관리자가 확인 후 처리해드리며 조금의 시간이 소요될 수 있습니다)""";
+    """유저 번호: $userID\n닉네임: $nickname\n이메일: $email\n 탈퇴 요청드립니다(Ara 관리자가 확인 후 처리해드리며 조금의 시간이 소요될 수 있습니다)""";
     late final Uri emailLaunchUri;
     // 문의하기에 사용되는 경우
     if (mode == 0) {
