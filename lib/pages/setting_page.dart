@@ -26,6 +26,8 @@ import 'package:new_ara_app/providers/notification_provider.dart';
 import 'package:new_ara_app/widgets/dialogs.dart';
 import 'package:new_ara_app/widgets/snackbar_noti.dart';
 
+import 'package:home_widget/home_widget.dart';
+
 /// 설정 페이지 빌드 및 이벤트 처리를 담당하는 StatefulWidget.
 class SettingPage extends StatefulWidget {
   const SettingPage({super.key});
@@ -690,6 +692,9 @@ class SettingPageState extends State<SettingPage> {
     FlutterSecureStorage secureStorage = const FlutterSecureStorage();
     await secureStorage.delete(key: 'cookie');
     await WebviewCookieManager().clearCookies();
+
+    await HomeWidget.saveWidgetData<String>('user_cookie', '');
+    await HomeWidget.updateWidget(name: 'PortalWidgetProvider', iOSName: 'PortalWidgetProvider');
 
     debugPrint("log out success");
   }

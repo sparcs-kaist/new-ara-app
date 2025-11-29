@@ -1,5 +1,10 @@
 
+import 'dart:async';
+import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
+import 'package:uni_links/uni_links.dart';
+import 'package:new_ara_app/pages/post_view_page.dart';
+import 'package:new_ara_app/utils/slide_routing.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -19,6 +24,7 @@ import 'package:new_ara_app/pages/login_page.dart';
 import 'package:new_ara_app/providers/user_provider.dart';
 import 'package:new_ara_app/providers/notification_provider.dart';
 import 'package:new_ara_app/providers/blocked_provider.dart';
+import 'package:home_widget/home_widget.dart';
 
 /// 앱에서 지원하는 언어 설정
 final supportedLocales = [
@@ -93,28 +99,95 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> {
   bool isLoading = false;
+  StreamSubscription<Uri?>? _sub;
 
   @override
   void initState() {
     super.initState();
+    // iOS Home Widget을 위한 App Group 설정
+    HomeWidget.setAppGroupId("group.org.sparcs.new-ara-app");
+
     // 자동 로그인을 위한 초기 설정
-    autoLoginByGetCookie(Provider.of<UserProvider>(context, listen: false));
+    isLoading = true;
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      await autoLoginByGetCookie(Provider.of<UserProvider>(context, listen: false));
 
-    // TODO: 아래 코드는 iOS 심사 통과를 위한 임시 방편. 익명 차단이 BE에서 구현되면 제거해야함 (2023.02.29)
-    // 앱이 시작될 때 shared preferences에서 차단한 글 목록 조회하기
-    BlockedProvider blockedProvider = context.read<BlockedProvider>();
-    blockedProvider.fetchBlockedAnonymousPostID().then((_) {
+      // TODO: 아래 코드는 iOS 심사 통과를 위한 임시 방편. 익명 차단이 BE에서 구현되면 제거해야함 (2023.02.29)
+      // 앱이 시작될 때 shared preferences에서 차단한 글 목록 조회하기
+      BlockedProvider blockedProvider = context.read<BlockedProvider>();
+      await blockedProvider.fetchBlockedAnonymousPostID();
       debugPrint("차단한 글 postid 목록: ${blockedProvider.blockedAnonymousPostIDs}");
+
+      // Initialize deep link handling (widget URL taps)
+      try {
+        await _initUriHandling();
+      } catch (e, st) {
+        debugPrint('$st');
+      }
+
+      // 자동 로그인 및 초기 작업 완료 후 로딩 해제
+      if (mounted) {
+        setState(() {
+          isLoading = false;
+        });
+      }
     });
+  }
 
+  Future<void> _initUriHandling() async {
+    // Handle the initial uri that launched the app
+    try {
+      final initialUri = await getInitialUri();
+      if (initialUri != null) {
+        _navigateFromUri(initialUri);
+      }
+    } catch (e, st) {
+      debugPrint('Unhandled error in _initUriHandling: $e');
+      debugPrint('$st');
+    }
 
+    // Listen for incoming uri while the app is running
+    _sub = uriLinkStream.listen((Uri? uri) {
+      if (uri != null) _navigateFromUri(uri);
+    }, onError: (err) {
+      debugPrint('uriLinkStream error: $err');
+    });
+  }
+
+  void _navigateFromUri(Uri uri) {
+    if (!mounted) return;
+    try {
+      // Expecting newara://post/<id>
+      if (uri.pathSegments.isNotEmpty) {
+        final int idSegmentIndex = (uri.pathSegments[0] == 'post') ? 1 : 0;
+        if (uri.pathSegments.length > idSegmentIndex) {
+          final rawId = uri.pathSegments[idSegmentIndex];
+          final id = int.tryParse(rawId);
+          if (id != null) {
+            try {
+              final navState = navigatorKey.currentState;
+              if (navState != null) {
+                navState.push(slideRoute(PostViewPage(id: id)));
+              } else {
+                debugPrint('  navigatorKey.currentState is null — cannot navigate');
+              }
+            } catch (navErr, navSt) {
+              debugPrint('  navigation error: $navErr');
+              debugPrint('$navSt');
+            }
+          } 
+        }
+      }
+    } catch (e) {
+      debugPrint('Failed to navigate from uri: $e');
+    }
   }
 
 
 
   /// 자동 로그인을 위한 메서드
   /// secureStorage에서 쿠키를 가져와서 사용자 로그인 상태 확인
-  void autoLoginByGetCookie(UserProvider userProvider) async {
+  Future<void> autoLoginByGetCookie(UserProvider userProvider) async {
     FlutterSecureStorage secureStorage = const FlutterSecureStorage();
     var cookiesBySecureStorage = await secureStorage.read(key: 'cookie');
 
@@ -129,7 +202,7 @@ class _MyAppState extends State<MyApp> {
       debugPrint("main.dart : tf: $tf");
       if (tf) {
         userProvider.setHasData(true);
-        userProvider.setCookieToList(cookiesBySecureStorage);
+        await userProvider.setCookieToList(cookiesBySecureStorage);
       }
       setState(() {
         isLoading = false;
@@ -149,6 +222,7 @@ class _MyAppState extends State<MyApp> {
         theme: NewAraThemes.lightTheme,
         darkTheme: NewAraThemes.darkTheme,
         themeMode: themeProvider.themeMode,
+        navigatorKey: navigatorKey,
         // TODO: CustionScrollBehavior의 역할은?
         builder: (context, child) {
           final MediaQueryData data = MediaQuery.of(context);
@@ -174,6 +248,12 @@ class _MyAppState extends State<MyApp> {
             ? const MainNavigationTabPage()
             : const LoginPage())
             : const LoginPage());
+  }
+
+  @override
+  void dispose() {
+    _sub?.cancel();
+    super.dispose();
   }
 
   // 앱의 전반적인 테마 설정
