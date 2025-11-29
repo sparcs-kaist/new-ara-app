@@ -12,61 +12,27 @@ struct Provider: IntentTimelineProvider {
   typealias Entry = PostEntry
   typealias Intent = PortalWidgetConfigurationIntent
   
+  private var portalWidgetAPI = PortalWidgetAPI()
+  
   func placeholder(in context: Context) -> PostEntry {
     .mock
   }
-
+ 
   func getSnapshot(for configuration: PortalWidgetConfigurationIntent, in context: Context, completion: @escaping (PostEntry) -> ()) {
     let entry = PostEntry(date: Date(), posts: Post.mockList, configuration: configuration)
     completion(entry)
   }
 
   func getTimeline(for configuration: PortalWidgetConfigurationIntent, in context: Context, completion: @escaping (Timeline<Entry>) -> ()) {
-    var entries: [PostEntry] = []
-    var posts: [Post] = []
-    
-    var showTrending: Bool {
-      (configuration.showTrending ?? 0) == 1
+    Task {
+      let entry = await PostEntry(
+        date: Date(),
+        posts: portalWidgetAPI.fetchPosts(for: configuration),
+        configuration: configuration
+      )
+      let timeline = Timeline(entries: [entry], policy: .atEnd)
+      completion(timeline)
     }
-    
-    var keywords: [String]? {
-      guard configuration.showKeyword == 1 else { return nil }
-      
-      return configuration.keyword
-    }
-    
-    var selectedBoard: Board? {
-      guard configuration.showBoard == 1 else { return nil }
-      
-      return configuration.selectedBoard
-    }
-    
-    if showTrending {
-      // TODO: fetch trending posts
-      posts.append(contentsOf: Post.mockList)
-    }
-    
-    if let keywords {
-      // TODO: fetch keyword posts
-      posts.append(contentsOf: Post.mockList)
-    }
-    
-    if let selectedBoard {
-      // TODO: fetch board specific posts
-      posts.append(contentsOf: Post.mockList)
-    }
-    
-    posts.sort { $0.date > $1.date }
-
-    let entry = PostEntry(
-      date: Date(),
-      posts: Array(posts.prefix(5)),
-      configuration: configuration
-    )
-    entries.append(entry)
-
-    let timeline = Timeline(entries: entries, policy: .atEnd)
-    completion(timeline)
   }
 }
 

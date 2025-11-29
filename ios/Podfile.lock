@@ -47,6 +47,8 @@ PODS:
   - gal (1.0.0):
     - Flutter
     - FlutterMacOS
+  - home_widget (0.0.1):
+    - Flutter
   - image_picker_ios (0.0.1):
     - Flutter
   - irondash_engine_context (0.0.1):
@@ -87,6 +89,7 @@ DEPENDENCIES:
   - flutter_native_splash (from `.symlinks/plugins/flutter_native_splash/ios`)
   - flutter_secure_storage (from `.symlinks/plugins/flutter_secure_storage/ios`)
   - gal (from `.symlinks/plugins/gal/darwin`)
+  - home_widget (from `.symlinks/plugins/home_widget/ios`)
   - image_picker_ios (from `.symlinks/plugins/image_picker_ios/ios`)
   - irondash_engine_context (from `.symlinks/plugins/irondash_engine_context/ios`)
   - path_provider_foundation (from `.symlinks/plugins/path_provider_foundation/darwin`)
@@ -123,6 +126,8 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/flutter_secure_storage/ios"
   gal:
     :path: ".symlinks/plugins/gal/darwin"
+  home_widget:
+    :path: ".symlinks/plugins/home_widget/ios"
   image_picker_ios:
     :path: ".symlinks/plugins/image_picker_ios/ios"
   irondash_engine_context:
@@ -157,6 +162,7 @@ SPEC CHECKSUMS:
   flutter_native_splash: 35ddbc7228eafcb3969dcc5f1fbbe27c1145a4f0
   flutter_secure_storage: 1ed9476fba7e7a782b22888f956cce43e2c62f13
   gal: 44e5b10dbd347c8247a2851acee6c1fbe282c1d3
+  home_widget: 098bd20343c62d324046d527ee741e231bc5e8cc
   image_picker_ios: 7fe1ff8e34c1790d6fff70a32484959f563a928a
   irondash_engine_context: 8e58ca8e0212ee9d1c7dc6a42121849986c88486
   path_provider_foundation: 080d55be775b7414fd5a5ef3ac137b97b097e564
