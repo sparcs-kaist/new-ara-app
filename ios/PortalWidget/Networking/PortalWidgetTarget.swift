@@ -51,7 +51,7 @@ extension PortalWidgetTarget: TargetType {
   var task: Task {
     switch self {
     case .fetchPostsByKeyword(keyword: let keyword):
-      return .requestParameters(parameters: ["main_search__contains": keyword, "parent_board": 1], encoding: URLEncoding.default)
+      return .requestParameters(parameters: ["main_search__contains": keyword, "parent_board": 1, "page": 1, "page_size": 5], encoding: URLEncoding.default)
     case .fetchPostsByBoardId(boardId: let boardId):
       return .requestParameters(parameters: ["board": boardId, "page": 1, "page_size": 5], encoding: URLEncoding.default)
     case .fetchTrendingPosts:

@@ -20,7 +20,7 @@ class PortalWidgetAPI {
       
       var result: [Post] = []
       
-      for listing in posts.results {
+      for listing in posts.results.prefix(5) {
         if let post = await listing.getPost(keyword: keyword) {
           result.append(post)
         }
@@ -37,7 +37,7 @@ class PortalWidgetAPI {
       let response = try await provider.request(.fetchPostsByBoardId(boardId: board.rawValue))
       let _ = try response.filterSuccessfulStatusCodes()
       
-      let posts = try response.map(ResultDTO.self).results.compactMap { $0.toModel(reason: .board(selectedBoard: board)) }
+      let posts = try response.map(ResultDTO.self).results.prefix(5).compactMap { $0.toModel(reason: .board(selectedBoard: board)) }
       
       return posts
     } catch {
@@ -50,7 +50,7 @@ class PortalWidgetAPI {
       let response = try await provider.request(.fetchTrendingPosts)
       let _ = try response.filterSuccessfulStatusCodes()
       
-      let posts = try response.map([PostDTO].self).compactMap { $0.toModel(reason: .trending) }
+      let posts = try response.map([PostDTO].self).prefix(5).compactMap { $0.toModel(reason: .trending) }
       
       return posts
     } catch {
