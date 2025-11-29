@@ -18,7 +18,7 @@
         android:icon="@mipmap/ic_launcher"
         android:label="Ara">
         <receiver
-            android:name=".notice.NoticeWidgetReceiver"
+            android:name=".PortalWidgetProvider"
             android:exported="false">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />

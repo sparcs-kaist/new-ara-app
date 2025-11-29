@@ -1,6 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="appwidget_text">EXAMPLE</string>
-    <string name="add_widget">Add widget</string>
-    <string name="app_widget_description">This is an app widget description</string>
+    <string name="appwidget_text">포탈 공지</string>
+    <string name="add_widget" translatable="false">Add widget</string>
+    <string name="app_widget_description">학교 포탈 공지사항을 볼 수 있는 위젯입니다.</string>
+    <string name="setting_icon">설정 아이콘</string>
+    <string name="cancel">취소</string>
+    <string name="confirm">확인</string>
+    <string name="portal_notices">포탈 공지</string>
+    <string name="show_trending_posts">인기 급상승 게시물 보기</string>
+    <string name="boards_to_display">표시 게시판</string>
+    <string name="delete">삭제</string>
+    <string name="three_keywords_only">키워드는 최대 3개까지만 추가 가능합니다.</string>
+    <string name="widget_settings">위젯 설정</string>
+    <string name="register_keyword">키워드 등록</string>
+    <string name="enter_keyword">키워드 입력</string>
 </resources>

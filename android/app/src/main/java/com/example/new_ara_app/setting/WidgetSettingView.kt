@@ -43,10 +43,12 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.example.new_ara_app.R
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
@@ -66,6 +68,8 @@ fun WidgetSettingView(
     var originalShowTrending by remember { mutableStateOf(true) }
     var originalBoards by remember { mutableStateOf(setOf("TRENDING")) }
 
+    val message = context.getString(R.string.three_keywords_only)
+
     LaunchedEffect(Unit) {
         originalKeywords = WidgetSettings.getKeywords(context).first()
         originalShowTrending = WidgetSettings.getShowTrending(context).first()
@@ -81,7 +85,7 @@ fun WidgetSettingView(
         modifier = Modifier.padding(16.dp)
     ) {
         Text(
-            "위젯 설정",
+            context.getString(R.string.widget_settings),
             style = MaterialTheme.typography.headlineMedium,
             fontWeight = FontWeight.Bold,
             color = Color(0xFFE45A4E),
@@ -96,7 +100,7 @@ fun WidgetSettingView(
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             Text(
-                "키워드 등록",
+                context.getString(R.string.register_keyword),
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.SemiBold
             )
@@ -108,14 +112,14 @@ fun WidgetSettingView(
                 CustomTextField(
                     value = newKeyword,
                     onValueChange = { newKeyword = it },
-                    placeholder = "키워드 입력",
+                    placeholder = context.getString(R.string.enter_keyword),
                     onEnter = {
                         val trimmed = newKeyword.trim()
                         if (trimmed.isNotBlank() && keywords.size < 3) {
                             keywords = keywords + trimmed
                             newKeyword = ""
                         } else if (keywords.size >= 3) {
-                            Toast.makeText(context, "키워드는 최대 3개까지만 추가 가능합니다.", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
                         }
                     }
                 )
@@ -132,7 +136,7 @@ fun WidgetSettingView(
                         IconButton(onClick = {
                             keywords = keywords - keyword
                         }) {
-                            Icon(Icons.Default.Delete, contentDescription = "삭제", tint = Color.Gray)
+                            Icon(Icons.Default.Delete, contentDescription = context.getString(R.string.delete), tint = Color.Gray)
                         }
                     }
                 }
@@ -152,7 +156,7 @@ fun WidgetSettingView(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Text("인기 급상승 게시물 보기", style = MaterialTheme.typography.titleMedium)
+                Text(context.getString(R.string.show_trending_posts), style = MaterialTheme.typography.titleMedium)
                 Switch(
                     checked = showTrending,
                     onCheckedChange = { showTrending = it },
@@ -166,7 +170,7 @@ fun WidgetSettingView(
             }
         }
 
-        Text("표시 게시판", style = MaterialTheme.typography.titleMedium)
+        Text(context.getString(R.string.boards_to_display), style = MaterialTheme.typography.titleMedium)
         Column(
             modifier = Modifier
                 .shadow(elevation = 4.dp, shape = MaterialTheme.shapes.medium)
@@ -217,7 +221,7 @@ fun WidgetSettingView(
                 ),
                 shape = RoundedCornerShape(12.dp)
             ) {
-                Text("취소")
+                Text(context.getString(R.string.cancel))
             }
 
             Button(
@@ -240,7 +244,7 @@ fun WidgetSettingView(
                 ),
                 shape = RoundedCornerShape(12.dp)
             ) {
-                Text("확인")
+                Text(context.getString(R.string.confirm))
             }
         }
     }

@@ -1,5 +1,6 @@
 package com.example.new_ara_app.notice.components
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
@@ -26,12 +27,19 @@ import androidx.glance.text.FontWeight
 import androidx.glance.text.Text
 import androidx.glance.text.TextStyle
 import androidx.glance.unit.ColorProvider
-import com.example.new_ara_app.models.BoardType
+import com.example.new_ara_app.models.DisplayReason
+import com.example.new_ara_app.models.image
 import io.flutter.embedding.android.FlutterActivity
 
 
 @Composable
-fun NoticeRow(title: String, subtitle: String, author: String, board: BoardType, onClick: Action) {
+fun NoticeRow(
+    title: String,
+    subtitle: String,
+    author: String,
+    board: DisplayReason,
+    onClick: Action,
+) {
 
     Spacer(
         modifier = GlanceModifier
@@ -48,7 +56,8 @@ fun NoticeRow(title: String, subtitle: String, author: String, board: BoardType,
             .clickable(onClick)
     ) {
 
-        Row(verticalAlignment = Alignment.CenterVertically) {
+        Row(verticalAlignment = Alignment.CenterVertically,
+            modifier = GlanceModifier.fillMaxWidth()) {
             Text(
                 text = title,
                 maxLines = 1,
@@ -59,6 +68,7 @@ fun NoticeRow(title: String, subtitle: String, author: String, board: BoardType,
                 ),
                 modifier = GlanceModifier.padding(end = 4.dp).defaultWeight()
             )
+
 
             Text(
                 text = author,
@@ -72,10 +82,10 @@ fun NoticeRow(title: String, subtitle: String, author: String, board: BoardType,
 
         Row(verticalAlignment = Alignment.CenterVertically) {
             Image(
-                provider = ImageProvider(BoardType.fromBoard(board)),
+                provider = ImageProvider(board.image()),
                 contentDescription = "Board icon",
                 colorFilter = ColorFilter.tint(ColorProvider(Color.LightGray)),
-                modifier = GlanceModifier.size(20.dp)
+                modifier = GlanceModifier.size(20.dp).padding(end = 4.dp)
             )
 
             Text(
@@ -98,7 +108,7 @@ private fun Preview() {
         title = "< 공지 > 캠퍼스 내 실내소독 작업 안내 (어쩌구저쩌구 대충 엄청 긴 제목",
         subtitle = "인기 급상승",
         author = "시설팀",
-        board = BoardType.TRENDING,
+        board = DisplayReason.Trending,
         onClick = actionStartActivity<FlutterActivity>()
     )
 }

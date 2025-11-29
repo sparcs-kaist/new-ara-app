@@ -2,6 +2,7 @@ plugins {
     id "com.android.application"
     id "kotlin-android"
     id "dev.flutter.flutter-gradle-plugin"
+    id "org.jetbrains.kotlin.plugin.compose"
 }
 
 def localProperties = new Properties()
@@ -30,10 +31,10 @@ if (keystorePropertiesFile.exists()) {
 
 android {
     /* compileSdkVersion
-    - 앱을 컴파일할 때 사용하는 SDK의 버전
-    - compileSdkVersion에서 지정한 SDK의 Android API를 사용하게 됨
-    - 구글 정책(2024.08.31 이후로 앱은 API 버전 34를 타겟팅해야함)에 따라 33->34로 상향 */
-    //ndk Version은 flutter의 기본 제공 버전 대신에 수동으로 세팅
+    - ?�을 컴파?�할 ???�용?�는 SDK??버전
+    - compileSdkVersion?�서 지?�한 SDK??Android API�??�용?�게 ??
+    - 구�? ?�책(2024.08.31 ?�후�??��? API 버전 34�??�겟팅?�야?????�라 33->34�??�향 */
+    //ndk Version?� flutter??기본 ?�공 버전 ?�?�에 ?�동?�로 ?�팅
     compileSdkVersion 36
     ndkVersion "27.0.12077973"
 
@@ -56,14 +57,14 @@ android {
         // For more information, see: https://docs.flutter.dev/deployment/android#reviewing-the-build-configuration.
 
         /* minSdkVersion
-        - 앱이 설치될 수 있는 최소한의 API 버전 (이 버전보다 낮은 것만 지원하는 기기에는 설치 불가)
-        - super_native_extensions에서 요구하는 최소 버전인 23으로 설정 */
+        - ?�이 ?�치?????�는 최소?�의 API 버전 (??버전보다 ??? 것만 지?�하??기기?�는 ?�치 불�?)
+        - super_native_extensions?�서 ?�구?�는 최소 버전??23?�로 ?�정 */
         minSdkVersion 23
 
         /* targetSdkVersion
-        - 앱이 테스트되고 최적화된 Android SDK 버전을 의미
-        - targetSdkVersion에 해당하는 Android SDK 버전을 염두해두고 개발되었다는 의미 
-        - 구글 정책(2024.08.31 이후로 앱은 API 버전 34를 타겟팅해야함)에 따라 33->34로 상향 */
+        - ?�이 ?�스?�되�?최적?�된 Android SDK 버전???��?
+        - targetSdkVersion???�당?�는 Android SDK 버전???�두?�두�?개발?�었?�는 ?��? 
+        - 구�? ?�책(2024.08.31 ?�후�??��? API 버전 34�??�겟팅?�야?????�라 33->34�??�향 */
         targetSdkVersion 36
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
@@ -89,7 +90,7 @@ android {
         compose true
     }
     composeOptions {
-        kotlinCompilerExtensionVersion = "1.5.2"
+        kotlinCompilerExtensionVersion = "1.5.3"
     }
 }
 
@@ -102,16 +103,17 @@ dependencies {
     implementation 'androidx.appcompat:appcompat:1.6.1'
 
     // Compose
-    implementation "androidx.activity:activity-compose:1.9.0"
+    implementation "androidx.activity:activity-compose:1.8.2"
     implementation "androidx.compose.ui:ui:1.6.1"
     implementation "androidx.compose.material3:material3:1.2.1"
 
-    // Glance - 버전 통일 (1.1.1)
+    // Glance - 버전 ?�일 (1.1.1)
     implementation "androidx.glance:glance:1.1.1"
     implementation "androidx.glance:glance-appwidget:1.1.1"
     implementation "androidx.glance:glance-material3:1.1.1"
     implementation "androidx.glance:glance-preview:1.1.1"
     implementation 'androidx.compose.ui:ui-tooling-preview-android:1.9.5'
+    implementation 'androidx.work:work-runtime-ktx:2.11.0'
     debugImplementation "androidx.glance:glance-appwidget-preview:1.1.1"
 
     // DataStore
@@ -119,4 +121,11 @@ dependencies {
 
     // Lifecycle
     implementation "androidx.lifecycle:lifecycle-runtime-ktx:2.7.0"
+
+    implementation 'com.squareup.retrofit2:retrofit:2.9.0'
+    implementation 'com.squareup.retrofit2:converter-scalars:2.9.0'
+
+    // OkHttp (?�더/쿠키 ?�정??
+    implementation 'com.squareup.okhttp3:okhttp:4.10.0'
+    implementation 'com.squareup.okhttp3:logging-interceptor:5.0.0-alpha.11'
 }
