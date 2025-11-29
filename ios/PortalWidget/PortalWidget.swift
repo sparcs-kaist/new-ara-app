@@ -62,7 +62,9 @@ struct PortalWidgetEntryView : View {
       
       if !posts.isEmpty {
         ForEach(posts) { post in
-          PostRow(post: post)
+          Link(destination: URL(string: "newara://post/\(post.id)")!) {
+            PostRow(post: post)
+          }
           
           if post.id != posts.last?.id {
             Divider()

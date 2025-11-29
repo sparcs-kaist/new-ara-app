@@ -1,5 +1,10 @@
 
+import 'dart:async';
+import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
+import 'package:uni_links/uni_links.dart';
+import 'package:new_ara_app/pages/post_view_page.dart';
+import 'package:new_ara_app/utils/slide_routing.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -94,6 +99,7 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> {
   bool isLoading = false;
+  StreamSubscription<Uri?>? _sub;
 
   @override
   void initState() {
@@ -112,6 +118,13 @@ class _MyAppState extends State<MyApp> {
       await blockedProvider.fetchBlockedAnonymousPostID();
       debugPrint("차단한 글 postid 목록: ${blockedProvider.blockedAnonymousPostIDs}");
 
+      // Initialize deep link handling (widget URL taps)
+      try {
+        await _initUriHandling();
+      } catch (e, st) {
+        debugPrint('$st');
+      }
+
       // 자동 로그인 및 초기 작업 완료 후 로딩 해제
       if (mounted) {
         setState(() {
@@ -119,6 +132,55 @@ class _MyAppState extends State<MyApp> {
         });
       }
     });
+  }
+
+  Future<void> _initUriHandling() async {
+    // Handle the initial uri that launched the app
+    try {
+      final initialUri = await getInitialUri();
+      if (initialUri != null) {
+        _navigateFromUri(initialUri);
+      }
+    } catch (e, st) {
+      debugPrint('Unhandled error in _initUriHandling: $e');
+      debugPrint('$st');
+    }
+
+    // Listen for incoming uri while the app is running
+    _sub = uriLinkStream.listen((Uri? uri) {
+      if (uri != null) _navigateFromUri(uri);
+    }, onError: (err) {
+      debugPrint('uriLinkStream error: $err');
+    });
+  }
+
+  void _navigateFromUri(Uri uri) {
+    if (!mounted) return;
+    try {
+      // Expecting newara://post/<id>
+      if (uri.pathSegments.isNotEmpty) {
+        final int idSegmentIndex = (uri.pathSegments[0] == 'post') ? 1 : 0;
+        if (uri.pathSegments.length > idSegmentIndex) {
+          final rawId = uri.pathSegments[idSegmentIndex];
+          final id = int.tryParse(rawId);
+          if (id != null) {
+            try {
+              final navState = navigatorKey.currentState;
+              if (navState != null) {
+                navState.push(slideRoute(PostViewPage(id: id)));
+              } else {
+                debugPrint('  navigatorKey.currentState is null — cannot navigate');
+              }
+            } catch (navErr, navSt) {
+              debugPrint('  navigation error: $navErr');
+              debugPrint('$navSt');
+            }
+          } 
+        }
+      }
+    } catch (e) {
+      debugPrint('Failed to navigate from uri: $e');
+    }
   }
 
 
@@ -160,6 +222,7 @@ class _MyAppState extends State<MyApp> {
         theme: NewAraThemes.lightTheme,
         darkTheme: NewAraThemes.darkTheme,
         themeMode: themeProvider.themeMode,
+        navigatorKey: navigatorKey,
         // TODO: CustionScrollBehavior의 역할은?
         builder: (context, child) {
           final MediaQueryData data = MediaQuery.of(context);
@@ -185,6 +248,12 @@ class _MyAppState extends State<MyApp> {
             ? const MainNavigationTabPage()
             : const LoginPage())
             : const LoginPage());
+  }
+
+  @override
+  void dispose() {
+    _sub?.cancel();
+    super.dispose();
   }
 
   // 앱의 전반적인 테마 설정

@@ -40,7 +40,7 @@ struct KeywordResultDTO: Codable {
 extension PostDTO {
   func toModel(reason: DisplayReason) -> Post {
     Post(
-      id: self.id,
+      id: self.araID,
       title: self.title,
       author: self.author,
       reason: reason,
