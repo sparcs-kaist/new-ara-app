@@ -16,9 +16,17 @@ class PortalWidgetAPI {
       let response = try await provider.request(.fetchPostsByKeyword(keyword: keyword))
       let _ = try response.filterSuccessfulStatusCodes()
       
-      let posts = try response.map(ResultDTO.self).results.compactMap { $0.toModel(reason: .keyword(word: keyword)) }
+      let posts = try response.map(KeywordResultDTO.self)
       
-      return posts
+      var result: [Post] = []
+      
+      for listing in posts.results {
+        if let post = await listing.getPost(keyword: keyword) {
+          result.append(post)
+        }
+      }
+      
+      return result
     } catch {
       return []
     }
@@ -82,6 +90,8 @@ class PortalWidgetAPI {
     if let selectedBoard {
       await result.append(contentsOf: fetchPostsByBoardId(selectedBoard))
     }
+    
+    result = Array(Set(result)) // remove duplicates
     
     return result.sorted { $0.date > $1.date }
   }

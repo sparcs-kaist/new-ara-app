@@ -33,6 +33,10 @@ struct KeywordListDTO: Codable {
   var title: String
 }
 
+struct KeywordResultDTO: Codable {
+  var results: [KeywordListDTO]
+}
+
 extension PostDTO {
   func toModel(reason: DisplayReason) -> Post {
     Post(

@@ -30,7 +30,10 @@ struct Provider: IntentTimelineProvider {
         posts: portalWidgetAPI.fetchPosts(for: configuration),
         configuration: configuration
       )
-      let timeline = Timeline(entries: [entry], policy: .atEnd)
+      let currentDate = Date()
+      let refreshDate = Calendar.current.date(byAdding: .hour, value: 1, to: currentDate)!
+      
+      let timeline = Timeline(entries: [entry], policy: .after(refreshDate))
       completion(timeline)
     }
   }
