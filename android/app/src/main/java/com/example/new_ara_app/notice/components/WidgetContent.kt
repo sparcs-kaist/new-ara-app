@@ -37,15 +37,16 @@ import androidx.glance.text.FontWeight
 import androidx.glance.text.Text
 import androidx.glance.text.TextStyle
 import androidx.glance.unit.ColorProvider
-import com.example.new_ara_app.models.BoardType
 import com.example.new_ara_app.R
+import com.example.new_ara_app.models.Post
+import com.example.new_ara_app.models.localizedString
 import com.example.new_ara_app.setting.SettingActivity
 import com.example.new_ara_app.setting.WidgetSettings
 import io.flutter.embedding.android.FlutterActivity
 
 
 @Composable
-fun MyContent(context: Context) {
+fun MyContent(posts: List<Post>, context: Context) {
 
     val clickAction = actionStartActivity<FlutterActivity>()
     val size = LocalSize.current
@@ -114,28 +115,24 @@ fun MyContent(context: Context) {
 
         Spacer(modifier = GlanceModifier.height(8.dp))
 
-        repeat(showCount) {
+        val showCount = if (posts.size < 5) posts.size else 5
+        for (i in 0 until showCount) {
+            val post = posts[i]
             NoticeRow(
-                title = "< 공지 > 캠퍼스 내 실내소독 작업 안내 (어쩌구저쩌구 대충 엄청 긴 제목",
-                subtitle = "인기 급상승",
-                author = "시설팀",
-                board = BoardType.TRENDING,
+                title = post.title,
+                subtitle = post.reason.localizedString,
+                author = post.author,
+                board = post.reason,
                 onClick = clickAction
             )
         }
     }
 }
 
-
-//Button(
-//                text = "Home",
-//                onClick = actionStartActivity<FlutterActivity>()
-//            )
-
 @OptIn(ExperimentalGlancePreviewApi::class)
 @Preview
 @Composable
 private fun Preview() {
-    MyContent(LocalContext.current)
+    MyContent(Post.mockList, LocalContext.current)
 }
 

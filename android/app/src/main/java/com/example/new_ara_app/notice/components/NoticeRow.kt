@@ -26,12 +26,12 @@ import androidx.glance.text.FontWeight
 import androidx.glance.text.Text
 import androidx.glance.text.TextStyle
 import androidx.glance.unit.ColorProvider
-import com.example.new_ara_app.models.BoardType
+import com.example.new_ara_app.models.DisplayReason
 import io.flutter.embedding.android.FlutterActivity
 
 
 @Composable
-fun NoticeRow(title: String, subtitle: String, author: String, board: BoardType, onClick: Action) {
+fun NoticeRow(title: String, subtitle: String, author: String, board: DisplayReason, onClick: Action) {
 
     Spacer(
         modifier = GlanceModifier
@@ -72,7 +72,7 @@ fun NoticeRow(title: String, subtitle: String, author: String, board: BoardType,
 
         Row(verticalAlignment = Alignment.CenterVertically) {
             Image(
-                provider = ImageProvider(BoardType.fromBoard(board)),
+                provider = ImageProvider(DisplayReason.icon(res = board)),
                 contentDescription = "Board icon",
                 colorFilter = ColorFilter.tint(ColorProvider(Color.LightGray)),
                 modifier = GlanceModifier.size(20.dp)
@@ -98,7 +98,7 @@ private fun Preview() {
         title = "< 공지 > 캠퍼스 내 실내소독 작업 안내 (어쩌구저쩌구 대충 엄청 긴 제목",
         subtitle = "인기 급상승",
         author = "시설팀",
-        board = BoardType.TRENDING,
+        board = DisplayReason.Trending,
         onClick = actionStartActivity<FlutterActivity>()
     )
 }

@@ -18,8 +18,8 @@
         android:icon="@mipmap/ic_launcher"
         android:label="Ara">
         <receiver
-            android:name=".notice.NoticeWidgetReceiver"
-            android:exported="false">
+            android:name=".notice.PortalWidgetProvider"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
             </intent-filter>
@@ -70,7 +70,7 @@
         -->
 
         <activity
-            android:name=".setting.SettingActivity"
+            android:name=".SettingActivity"
             android:exported="true"
             android:theme="@style/LaunchTheme" />
 
