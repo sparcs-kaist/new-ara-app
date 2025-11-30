@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="appwidget_text">Portal Notice</string>
+    <string name="app_widget_description">A widget that displays school portal notices.</string>
+    <string name="setting_icon">setting icon</string>
+    <string name="cancel">Cancel</string>
+    <string name="confirm">Confirm</string>
+    <string name="portal_notices">Portal Notices</string>
+    <string name="show_trending_posts">Show Trending Posts</string>
+    <string name="boards_to_display">Boards to display</string>
+    <string name="delete">delete</string>
+    <string name="three_keywords_only">"You can add up to 3 keywords only. "</string>
+    <string name="widget_settings">Widget Settings</string>
+    <string name="register_keyword">Register Keyword</string>
+    <string name="enter_keyword">Enter Keyword</string>
+</resources>
