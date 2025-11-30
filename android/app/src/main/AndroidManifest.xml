@@ -18,7 +18,7 @@
         android:icon="@mipmap/ic_launcher"
         android:label="Ara">
         <receiver
-            android:name=".notice.PortalWidgetProvider"
+            android:name=".notice.PortalWidgetReceiver"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
@@ -70,7 +70,7 @@
         -->
 
         <activity
-            android:name=".SettingActivity"
+            android:name=".setting.SettingActivity"
             android:exported="true"
             android:theme="@style/LaunchTheme" />
 
@@ -78,5 +78,4 @@
             android:name="flutterEmbedding"
             android:value="2" />
     </application>
-
 </manifest>

@@ -5,7 +5,7 @@ import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringSetPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
-
+import com.example.new_ara_app.models.Board
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
@@ -30,10 +30,14 @@ object WidgetSettings {
         context.dataStore.edit { it[SHOW_TRENDING] = show }
     }
 
-    fun getBoards(context: Context): Flow<Set<String>> =
-        context.dataStore.data.map { it[BOARDS] ?: setOf("TRENDING") }
-
-    suspend fun setBoards(context: Context, boards: Set<String>) {
-        context.dataStore.edit { it[BOARDS] = boards }
+    suspend fun setBoards(context: Context, boards: Set<Int>) {
+        context.dataStore.edit { prefs ->
+            prefs[BOARDS] = boards.map { it.toString() }.toSet()
+        }
     }
+
+    fun getBoards(context: Context): Flow<Set<Int>> =
+        context.dataStore.data.map { prefs ->
+            prefs[BOARDS]?.map { it.toInt() }?.toSet() ?: setOf(Board.Unknown.id)
+        }
 }

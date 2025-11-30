@@ -1,6 +1,49 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="appwidget_text">EXAMPLE</string>
-    <string name="add_widget">Add widget</string>
+    <string name="appwidget_text">포탈 공지</string>
+    <string name="add_widget" translatable="false">Add widget</string>
     <string name="app_widget_description">This is an app widget description</string>
+    <string name="cancel">취소</string>
+    <string name="setting_icon">설정 아이콘</string>
+    <string name="confirm">확인</string>
+    <string name="portal_notices">포탈 공지</string>
+    <string name="show_trending_posts">인기 게시글 표시</string>
+    <string name="boards_to_display">표시할 게시글</string>
+    <string name="delete">삭제</string>
+    <string name="three_keywords_only">키워드는 최대 3개까지만 추가 가능합니다.</string>
+    <string name="widget_settings">위젯 세팅</string>
+    <string name="register_keyword">키워드 등록</string>
+    <string name="enter_keyword">키워드 입력</string>
+    <string name="portal_icon">포탈 아이콘</string>
+    <string name="trending">인기 급상승</string>
+    <string name="keyword_detected">"%1$s" 키워드</string>
+    <string name="board_notice">%1$s 게시판</string>
+    <string name="general_notice">통합 공지</string>
+    <string name="international_community">국제교원 및 학생지원팀</string>
+    <string name="international_opportunities_collaboration">국제 협력팀</string>
+    <string name="it_services">IT 서비스</string>
+    <string name="family_events">경조사</string>
+    <string name="faculty_clubs">교직원동호회</string>
+    <string name="work_study_scholarship">근로장학생</string>
+    <string name="newsletter">뉴스레터</string>
+    <string name="seminar_and_event">세미나/행사</string>
+    <string name="work_manual">업무 편람</string>
+    <string name="student_council_notice">원총/총학 공지</string>
+    <string name="maintenance_notice">작업 공지</string>
+    <string name="affiliates">제휴업체</string>
+    <string name="startup">창업</string>
+    <string name="sports_and_health">체육/건강관리/클리닉</string>
+    <string name="employment">취업</string>
+    <string name="covid19">코로나19</string>
+    <string name="student_clubs">학생동아리소개</string>
+    <string name="curriculum_changes">교과과정 신설 변경</string>
+    <string name="leadership_and_internship">리더십/인턴/상담</string>
+    <string name="dormitory">생활관</string>
+    <string name="course_and_thesis">수강/학적/논문</string>
+    <string name="scholarship_and_welfare">장학/복지</string>
+    <string name="research_personnel">전문연구요원</string>
+    <string name="teaching_and_learning">교수학습게시판</string>
+    <string name="library">도서관</string>
+    <string name="unknown">알수없음</string>
+    <string name="no_results">결과 없음</string>
 </resources>

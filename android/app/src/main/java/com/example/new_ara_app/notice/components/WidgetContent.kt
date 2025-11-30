@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.Intent
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -11,6 +12,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.net.toUri
 import androidx.glance.ColorFilter
 import androidx.glance.GlanceModifier
 import androidx.glance.Image
@@ -20,8 +22,10 @@ import androidx.glance.LocalSize
 import androidx.glance.action.actionStartActivity
 import androidx.glance.action.clickable
 import androidx.glance.appwidget.action.actionStartActivity
+import androidx.glance.appwidget.lazy.LazyColumn
 import androidx.glance.background
 import androidx.glance.layout.Alignment
+import androidx.glance.layout.Box
 import androidx.glance.layout.Column
 import androidx.glance.layout.Row
 import androidx.glance.layout.Spacer
@@ -37,31 +41,28 @@ import androidx.glance.text.FontWeight
 import androidx.glance.text.Text
 import androidx.glance.text.TextStyle
 import androidx.glance.unit.ColorProvider
+import com.example.new_ara_app.MainActivity
 import com.example.new_ara_app.R
+import com.example.new_ara_app.models.Board
 import com.example.new_ara_app.models.Post
-import com.example.new_ara_app.models.localizedString
+import com.example.new_ara_app.networkings.NoticeState
 import com.example.new_ara_app.setting.SettingActivity
 import com.example.new_ara_app.setting.WidgetSettings
-import io.flutter.embedding.android.FlutterActivity
 
 
 @Composable
-fun MyContent(posts: List<Post>, context: Context) {
+fun MyContent(context: Context) {
+    val posts = NoticeState.posts.collectAsState().value
 
-    val clickAction = actionStartActivity<FlutterActivity>()
     val size = LocalSize.current
-
-    val showCount = when {
-        size.height < 150.dp -> 3
-        size.height > 150.dp -> 5
-        else -> 5
-    }
+    val showCount = if (size.height < 250.dp) 3 else 5
 
     var keywords by remember { mutableStateOf(emptySet<String>()) }
     var showTrending by remember { mutableStateOf(true) }
-    var boards by remember { mutableStateOf(setOf("TRENDING")) }
-    val openSettings = actionStartActivity(Intent(context, SettingActivity::class.java))
+    var boards by remember { mutableStateOf(setOf(Board.Unknown.id)) }
 
+    val openSettings = actionStartActivity(SettingActivity::class.java)
+    val clickAction = actionStartActivity(MainActivity::class.java)
 
     LaunchedEffect(Unit) {
         WidgetSettings.getKeywords(context).collect { keywords = it }
@@ -69,70 +70,86 @@ fun MyContent(posts: List<Post>, context: Context) {
         WidgetSettings.getBoards(context).collect { boards = it }
     }
 
-    Column(
-        modifier = GlanceModifier
-            .fillMaxSize()
-            .background(ColorProvider(Color.White))
-            .padding(16.dp)
-            .clickable(clickAction),
-        verticalAlignment = Alignment.Top,
-        horizontalAlignment = Alignment.Start
+    LazyColumn(
+        modifier = GlanceModifier.fillMaxSize().background(ColorProvider(Color.White))
+            .padding(16.dp).clickable(clickAction), horizontalAlignment = Alignment.Start
     ) {
-        // Header
-        Row(
-            modifier = GlanceModifier.fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Image(
-                provider = ImageProvider(R.drawable.rounded_inbox_text_24),
-                contentDescription = "portal icon",
-                colorFilter = ColorFilter.tint(ColorProvider(Color(0xFFE45A4E))),
-                modifier = GlanceModifier.size(20.dp)
-            )
+        item {
+            Row(
+                modifier = GlanceModifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Image(
+                    provider = ImageProvider(R.drawable.rounded_inbox_text_24),
+                    contentDescription = context.getString(R.string.portal_icon),
+                    colorFilter = ColorFilter.tint(ColorProvider(Color(0xFFE45A4E))),
+                    modifier = GlanceModifier.size(20.dp)
+                )
 
-            Spacer(modifier = GlanceModifier.width(8.dp))
+                Spacer(modifier = GlanceModifier.width(8.dp))
 
-            Text(
-                text = "포탈 공지",
-                style = TextStyle(
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = ColorProvider(Color(0xFFE45A4E))
-                ),
-            )
+                Text(
+                    text = context.getString(R.string.portal_notices),
+                    style = TextStyle(
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = ColorProvider(Color(0xFFE45A4E))
+                    ),
+                )
 
-            Spacer(GlanceModifier.defaultWeight())
+                Spacer(GlanceModifier.defaultWeight())
 
-            Image(
-                provider = ImageProvider(R.drawable.round_settings_24),
-                contentDescription = "setting icon",
-                colorFilter = ColorFilter.tint(ColorProvider(Color(0xFFE45A4E))),
-                modifier = GlanceModifier
-                    .size(20.dp)
-                    .clickable(openSettings)
-            )
+                Image(
+                    provider = ImageProvider(R.drawable.round_settings_24),
+                    contentDescription = context.getString(R.string.setting_icon),
+                    colorFilter = ColorFilter.tint(ColorProvider(Color(0xFFE45A4E))),
+                    modifier = GlanceModifier.size(20.dp).clickable(openSettings)
+                )
+            }
         }
 
-        Spacer(modifier = GlanceModifier.height(8.dp))
-
-        val showCount = if (posts.size < 5) posts.size else 5
-        for (i in 0 until showCount) {
-            val post = posts[i]
-            NoticeRow(
-                title = post.title,
-                subtitle = post.reason.localizedString,
-                author = post.author,
-                board = post.reason,
-                onClick = clickAction
-            )
+        item { Spacer(modifier = GlanceModifier.height(8.dp)) }
+        if (posts.isNotEmpty()) {
+            item {
+                Box(modifier = GlanceModifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        Image(
+                            provider = ImageProvider(R.drawable.baseline_browser_not_supported_24),
+                            contentDescription = null,
+                            colorFilter = ColorFilter.tint(ColorProvider(Color.Gray)),
+                            modifier = GlanceModifier.size(50.dp)
+                        )
+                        Text(
+                            text = context.getString(R.string.no_results),
+                            style = TextStyle(
+                                fontSize = 16.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = ColorProvider(Color.Gray)
+                            ),
+                        )
+                    }
+                }
+            }
+        } else posts.take(showCount).forEach { post ->
+            item {
+                val intent = Intent (Intent.ACTION_VIEW, "newara://post/${post.id}".toUri()).setPackage(context.packageName)
+                NoticeRow(
+                    title = post.title,
+                    subtitle = post.reason.localizedString(res = post.reason, context),
+                    author = post.author,
+                    board = post.reason,
+                    onClick = actionStartActivity(intent)
+                )
+            }
         }
     }
 }
+
 
 @OptIn(ExperimentalGlancePreviewApi::class)
 @Preview
 @Composable
 private fun Preview() {
-    MyContent(Post.mockList, LocalContext.current)
+    MyContent(LocalContext.current)
 }
 

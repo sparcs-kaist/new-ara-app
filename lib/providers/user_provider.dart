@@ -6,6 +6,7 @@ import 'package:new_ara_app/constants/url_info.dart';
 import 'package:new_ara_app/models/user_profile_model.dart';
 import 'package:new_ara_app/utils/create_dio_with_config.dart';
 import 'package:webview_cookie_manager/webview_cookie_manager.dart';
+import 'package:home_widget/home_widget.dart';
 
 /// `UserProvider`는 사용자 정보 및 연관된 API 로직을 관리하는 클래스입니다.
 class UserProvider with ChangeNotifier {
@@ -33,7 +34,7 @@ class UserProvider with ChangeNotifier {
   }
 
   /// 문자열 쿠키를 Cookie 객체 리스트로 변환합니다.
-  void setCookieToList(String cookieString) {
+  Future<void> setCookieToList(String cookieString) async {
     _loginCookie.clear();
     List<String> tempCookieList = cookieString.split('; ');
     for (String cookie in tempCookieList) {
@@ -41,6 +42,21 @@ class UserProvider with ChangeNotifier {
       String name = cookieParts[0];
       String value = cookieParts[1];
       _loginCookie.add(Cookie(name, value));
+    }
+
+    // user_cookie라는 key로 Cookie String을 home widget에 전송
+    try {
+      final cookieStr = getCookiesToString();
+      await HomeWidget.saveWidgetData<String>('user_cookie', cookieStr);
+      await HomeWidget.updateWidget(
+          name: 'PortalWidgetProvider',
+          androidName: 'PortalWidgetProvider',
+          qualifiedAndroidName: 'com.example.new_ara_app.notice.PortalWidgetProvider',
+          iOSName: 'PortalWidgetProvider'
+      );
+
+    } catch (e) {
+      debugPrint('Failed to save cookie to widget: $e');
     }
   }
 
@@ -68,6 +84,20 @@ class UserProvider with ChangeNotifier {
   /// 지정된 URL의 웹뷰에서 쿠키를 가져와 저장합니다.
   Future<void> setCookiesFromUrl(url) async {
     _loginCookie = await WebviewCookieManager().getCookies(url);
+    // home widget에 새로운 쿠키 전송
+    try {
+      final cookieStr = getCookiesToString();
+      await HomeWidget.saveWidgetData<String>('user_cookie', cookieStr);
+      await HomeWidget.updateWidget(
+          name: 'PortalWidgetProvider',
+          androidName: 'PortalWidgetProvider',
+          qualifiedAndroidName: 'com.example.new_ara_app.notice.PortalWidgetProvider',
+          iOSName: 'PortalWidgetProvider'
+      );
+
+    } catch (e) {
+      debugPrint('Failed to save cookie to widget after fetching from webview: $e');
+    }
     return;
   }
 
@@ -184,13 +214,13 @@ class UserProvider with ChangeNotifier {
   ///
   /// 사용 예시: await getApiRes('unregister', queryParameters:queryParameters);
   Future<Response<T>?> getApiRes<T>(
-    String path, {
-    Object? data,
-    Map<String, dynamic>? queryParameters,
-    Options? options,
-    CancelToken? cancelToken,
-    ProgressCallback? onReceiveProgress,
-  }) async {
+      String path, {
+        Object? data,
+        Map<String, dynamic>? queryParameters,
+        Options? options,
+        CancelToken? cancelToken,
+        ProgressCallback? onReceiveProgress,
+      }) async {
     var toUrl = "$newAraDefaultUrl/api/$path";
     Dio dio = createDioWithHeadersForGet();
     try {
@@ -224,11 +254,11 @@ class UserProvider with ChangeNotifier {
   /// 실패하면 내부에서 exception handling한 이후 null을 반환.
   Future<Response<T>?> postApiRes<T>(String path,
       {Object? data,
-      Map<String, dynamic>? queryParameters,
-      Options? options,
-      CancelToken? cancelToken,
-      ProgressCallback? onSendProgress,
-      ProgressCallback? onReceiveProgress}) async {
+        Map<String, dynamic>? queryParameters,
+        Options? options,
+        CancelToken? cancelToken,
+        ProgressCallback? onSendProgress,
+        ProgressCallback? onReceiveProgress}) async {
     String toUrl = "$newAraDefaultUrl/api/$path";
     Dio dio = createDioWithHeadersForNonget();
     try {
@@ -259,11 +289,11 @@ class UserProvider with ChangeNotifier {
   /// 실패하면 내부에서 exception handling한 이후 null을 반환.
   Future<Response<T>?> putApiRes<T>(String path,
       {Object? data,
-      Map<String, dynamic>? queryParameters,
-      Options? options,
-      CancelToken? cancelToken,
-      ProgressCallback? onSendProgress,
-      ProgressCallback? onReceiveProgress}) async {
+        Map<String, dynamic>? queryParameters,
+        Options? options,
+        CancelToken? cancelToken,
+        ProgressCallback? onSendProgress,
+        ProgressCallback? onReceiveProgress}) async {
     String toUrl = "$newAraDefaultUrl/api/$path";
     Dio dio = createDioWithHeadersForNonget();
     try {
@@ -294,11 +324,11 @@ class UserProvider with ChangeNotifier {
   /// 실패하면 내부에서 exception handling한 이후 null을 반환.
   Future<Response<T>?> patchApiRes<T>(String path,
       {Object? data,
-      Map<String, dynamic>? queryParameters,
-      Options? options,
-      CancelToken? cancelToken,
-      ProgressCallback? onSendProgress,
-      ProgressCallback? onReceiveProgress}) async {
+        Map<String, dynamic>? queryParameters,
+        Options? options,
+        CancelToken? cancelToken,
+        ProgressCallback? onSendProgress,
+        ProgressCallback? onReceiveProgress}) async {
     String toUrl = "$newAraDefaultUrl/api/$path";
     Dio dio = createDioWithHeadersForNonget();
     try {
@@ -328,12 +358,12 @@ class UserProvider with ChangeNotifier {
   /// 성공하면 Response 객체를 반환.
   /// 실패하면 내부에서 exception handling한 이후 null을 반환.
   Future<Response<T>?> delApiRes<T>(
-    String path, {
-    Object? data,
-    Map<String, dynamic>? queryParameters,
-    Options? options,
-    CancelToken? cancelToken,
-  }) async {
+      String path, {
+        Object? data,
+        Map<String, dynamic>? queryParameters,
+        Options? options,
+        CancelToken? cancelToken,
+      }) async {
     String toUrl = "$newAraDefaultUrl/api/$path";
     Dio dio = createDioWithHeadersForNonget();
     try {
