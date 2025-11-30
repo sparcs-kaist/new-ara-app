@@ -6,8 +6,8 @@ import retrofit2.http.Query
 import retrofit2.http.Header
 
 fun readCookie(context: Context): String {
-    val prefs = context.getSharedPreferences("group.org.sparcs.new-ara-app", Context.MODE_PRIVATE)
-    return prefs.getString("user_cookie", "") ?: ""
+    val sharedPref = context.getSharedPreferences("home_widget_prefs", Context.MODE_PRIVATE)
+    return sharedPref.getString("user_cookie", "") ?: ""
 }
 
 sealed interface PortalWidgetTarget {

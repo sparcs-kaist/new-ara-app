@@ -22,7 +22,6 @@ class SettingActivity : ComponentActivity() {
                         WidgetSettingView(context = context)
                     }
                 }
-
             }
         }
     }

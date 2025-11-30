@@ -11,6 +11,8 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import com.example.new_ara_app.setting.WidgetSettings
 import kotlinx.coroutines.flow.first
+import okhttp3.OkHttpClient
+import okhttp3.logging.HttpLoggingInterceptor
 
 class PortalWidgetAPI(private val api: PortalWidgetService, private val context: Context) {
 
@@ -65,9 +67,19 @@ class PortalWidgetAPI(private val api: PortalWidgetService, private val context:
 }
 
 object RetrofitInstance {
+
+    private val loggingInterceptor = HttpLoggingInterceptor().apply {
+        level = HttpLoggingInterceptor.Level.BODY
+    }
+
+    private val client = OkHttpClient.Builder()
+        .addInterceptor(loggingInterceptor)
+        .build()
+
     val api: PortalWidgetService by lazy {
         Retrofit.Builder()
-            .baseUrl("https://newara.sparcs.org/api/")
+            .baseUrl("https://newara.dev.sparcs.org/api/")
+            .client(client)
             .addConverterFactory(GsonConverterFactory.create())
             .build()
             .create(PortalWidgetService::class.java)
