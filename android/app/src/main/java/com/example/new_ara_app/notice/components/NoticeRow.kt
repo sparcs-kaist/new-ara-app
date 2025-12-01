@@ -38,61 +38,62 @@ fun NoticeRow(
     board: DisplayReason,
     onClick: Action,
 ) {
-    Column(
-        modifier = GlanceModifier
-            .fillMaxWidth()
-            .padding(8.dp)
-            .clickable(onClick)
-    ) {
+    Column {
         Spacer(
             modifier = GlanceModifier
                 .fillMaxWidth()
                 .height(1.dp)
                 .background(ColorProvider(Color.LightGray))
-                .padding(4.dp)
         )
 
-        Text(
-            text = title,
-            maxLines = 1,
-            style = TextStyle(
-                fontSize = 14.sp,
-                fontWeight = FontWeight.Medium,
-                color = ColorProvider(Color.Black)
-            ),
-            modifier = GlanceModifier.padding(end = 4.dp)
-        )
-
-
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = GlanceModifier.fillMaxWidth()
+        Column(
+            modifier = GlanceModifier
+                .fillMaxWidth()
+                .padding(8.dp)
+                .clickable(onClick)
         ) {
-            Image(
-                provider = ImageProvider(DisplayReason.icon(res = board)),
-                contentDescription = null,
-                colorFilter = ColorFilter.tint(ColorProvider(Color.LightGray)),
-                modifier = GlanceModifier.size(20.dp).padding(end = 4.dp)
-            )
-
             Text(
-                text = subtitle,
+                text = title,
                 maxLines = 1,
                 style = TextStyle(
-                    fontSize = 12.sp,
-                    color = ColorProvider(Color(0xFF7A7A7A))
+                    fontSize = 14.sp,
+                    fontWeight = FontWeight.Medium,
+                    color = ColorProvider(Color.Black)
                 ),
-                modifier = GlanceModifier.defaultWeight()
+                modifier = GlanceModifier.padding(end = 4.dp)
             )
 
-            Text(
-                text = author,
-                maxLines = 1,
-                style = TextStyle(
-                    fontSize = 10.sp,
-                    color = ColorProvider(Color.Gray)
-                ),
-            )
+
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = GlanceModifier.fillMaxWidth()
+            ) {
+                Image(
+                    provider = ImageProvider(DisplayReason.icon(res = board)),
+                    contentDescription = null,
+                    colorFilter = ColorFilter.tint(ColorProvider(Color.LightGray)),
+                    modifier = GlanceModifier.size(20.dp).padding(end = 4.dp)
+                )
+
+                Text(
+                    text = subtitle,
+                    maxLines = 1,
+                    style = TextStyle(
+                        fontSize = 12.sp,
+                        color = ColorProvider(Color(0xFF7A7A7A))
+                    ),
+                    modifier = GlanceModifier.defaultWeight()
+                )
+
+                Text(
+                    text = author,
+                    maxLines = 1,
+                    style = TextStyle(
+                        fontSize = 10.sp,
+                        color = ColorProvider(Color.Gray)
+                    ),
+                )
+            }
         }
     }
 }

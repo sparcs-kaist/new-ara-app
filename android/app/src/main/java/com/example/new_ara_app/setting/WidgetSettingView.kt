@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
@@ -51,6 +52,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.glance.preview.ExperimentalGlancePreviewApi
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
 import com.example.new_ara_app.PortalWidgetWorker
@@ -104,6 +106,7 @@ fun WidgetSettingView(
             Row(
                 Modifier
                     .navigationBarsPadding()
+                    .padding(bottom = 4.dp)
                     .fillMaxWidth()
             ) {
                 Button(
@@ -118,8 +121,9 @@ fun WidgetSettingView(
 
                     },
                     modifier = Modifier
-                        .weight(1f)
-                        .border(2.dp, Color(0xFFE45A4E), RoundedCornerShape(12.dp)),
+                        .border(2.dp, Color(0xFFE45A4E), RoundedCornerShape(12.dp))
+                        .height(50.dp)
+                        .weight(1f),
                     colors = ButtonDefaults.buttonColors(
                         containerColor = Color.White,
                         contentColor = Color(0xFFE45A4E)
@@ -145,13 +149,14 @@ fun WidgetSettingView(
                         }
                     },
                     modifier = Modifier
-                        .weight(1f)
-                        .border(2.dp, Color(0xFFE45A4E), RoundedCornerShape(8.dp)),
-                    shape = RoundedCornerShape(8.dp),
+                        .border(2.dp, Color(0xFFE45A4E), RoundedCornerShape(12.dp))
+                        .height(50.dp)
+                        .weight(1f),
                     colors = ButtonDefaults.buttonColors(
                         containerColor = Color(0xFFE45A4E),
                         contentColor = Color.White
-                    )
+                    ),
+                    shape = RoundedCornerShape(12.dp)
                 ) {
                     Text(
                         context.getString(R.string.confirm)

@@ -8,7 +8,15 @@ object NoticeState {
     private val _posts = MutableStateFlow<List<Post>>(emptyList())
     val posts = _posts.asStateFlow()
 
+    private val _loading = MutableStateFlow<Boolean>(false)
+    val loading = _loading.asStateFlow()
+
     fun setPosts(list: List<Post>) {
         _posts.value = list
+    }
+
+
+    fun setLoading(loading: Boolean) {
+        _loading.value = loading
     }
 }

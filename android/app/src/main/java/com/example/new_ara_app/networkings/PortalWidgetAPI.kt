@@ -4,6 +4,7 @@ import android.content.Context
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.glance.appwidget.GlanceAppWidgetManager
+import androidx.glance.appwidget.updateAll
 import com.example.new_ara_app.models.Board
 import com.example.new_ara_app.models.DisplayReason
 import com.example.new_ara_app.models.Post
@@ -33,11 +34,15 @@ class PortalWidgetAPI(private val api: PortalWidgetService, private val context:
 
     @RequiresApi(Build.VERSION_CODES.O)
     suspend fun fetchAndStorePosts(configuration: WidgetConfiguration) {
+        NoticeState.setLoading(true)
+        PortalWidgetProvider().updateAll(context)
+
         val data = fetchPosts(configuration)
         val manager = GlanceAppWidgetManager(context)
         val ids = manager.getGlanceIds(PortalWidgetProvider::class.java)
 
         NoticeState.setPosts(data)
+        NoticeState.setLoading(false)
 
         ids.forEach { id ->
             PortalWidgetProvider().update(context, id)
