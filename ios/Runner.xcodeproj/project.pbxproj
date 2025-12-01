@@ -14,7 +14,47 @@
 		97C146FC1CF9000F007C117D /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 97C146FA1CF9000F007C117D /* Main.storyboard */; };
 		97C146FE1CF9000F007C117D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 97C146FD1CF9000F007C117D /* Assets.xcassets */; };
 		97C147011CF9000F007C117D /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 97C146FF1CF9000F007C117D /* LaunchScreen.storyboard */; };
+		F6145B3D2EDA85B7001B6592 /* CombineMoya in Frameworks */ = {isa = PBXBuildFile; productRef = F6145B3C2EDA85B7001B6592 /* CombineMoya */; };
+		F6145B3F2EDA85B7001B6592 /* Moya in Frameworks */ = {isa = PBXBuildFile; productRef = F6145B3E2EDA85B7001B6592 /* Moya */; };
+		F6145B412EDA85B7001B6592 /* ReactiveMoya in Frameworks */ = {isa = PBXBuildFile; productRef = F6145B402EDA85B7001B6592 /* ReactiveMoya */; };
+		F6145B432EDA85B7001B6592 /* RxMoya in Frameworks */ = {isa = PBXBuildFile; productRef = F6145B422EDA85B7001B6592 /* RxMoya */; };
+		F6145B532EDA9167001B6592 /* CombineMoya in Frameworks */ = {isa = PBXBuildFile; productRef = F6145B522EDA9167001B6592 /* CombineMoya */; };
+		F6145B552EDA9167001B6592 /* Moya in Frameworks */ = {isa = PBXBuildFile; productRef = F6145B542EDA9167001B6592 /* Moya */; };
+		F6145B572EDA9167001B6592 /* ReactiveMoya in Frameworks */ = {isa = PBXBuildFile; productRef = F6145B562EDA9167001B6592 /* ReactiveMoya */; };
+		F6145B592EDA9167001B6592 /* RxMoya in Frameworks */ = {isa = PBXBuildFile; productRef = F6145B582EDA9167001B6592 /* RxMoya */; };
+		F623F5A52ED9C491008FA99E /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F623F5A42ED9C491008FA99E /* WidgetKit.framework */; };
+		F623F5A72ED9C491008FA99E /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F623F5A62ED9C491008FA99E /* SwiftUI.framework */; };
+		F623F5B32ED9C492008FA99E /* PortalWidgetExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = F623F5A32ED9C491008FA99E /* PortalWidgetExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		F64917A82EDA2CBA00B13642 /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = F64917A72EDA2CBA00B13642 /* Localizable.xcstrings */; };
+		F6B78EDC2EDA1FC5001B42D6 /* PortalWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6B78ED72EDA1FC5001B42D6 /* PortalWidget.swift */; };
+		F6B78EDD2EDA1FC5001B42D6 /* PortalWidgetBundle.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6B78ED82EDA1FC5001B42D6 /* PortalWidgetBundle.swift */; };
+		F6B78EDE2EDA1FC5001B42D6 /* PostEntry.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6B78ED92EDA1FC5001B42D6 /* PostEntry.swift */; };
+		F6B78EDF2EDA1FC5001B42D6 /* PostRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6B78EDA2EDA1FC5001B42D6 /* PostRow.swift */; };
+		F6B78EE02EDA1FC5001B42D6 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = F6B78ED42EDA1FC5001B42D6 /* Assets.xcassets */; };
+		F6EA8F412EDA43EB00EC4FD1 /* Intents.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F6B78D212EDA04F6001B42D6 /* Intents.framework */; };
+		F6EA8F482EDA43EB00EC4FD1 /* PortalWidgetConfiguration.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = F6EA8F402EDA43EB00EC4FD1 /* PortalWidgetConfiguration.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		F6EA8F7C2EDA467000EC4FD1 /* IntentHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6EA8F762EDA467000EC4FD1 /* IntentHandler.swift */; };
+		F6EA8F7D2EDA467000EC4FD1 /* PortalWidgetConfiguration.intentdefinition in Sources */ = {isa = PBXBuildFile; fileRef = F6EA8F782EDA467000EC4FD1 /* PortalWidgetConfiguration.intentdefinition */; };
+		F6EA8F7E2EDA467000EC4FD1 /* PortalWidgetConfiguration.intentdefinition in Sources */ = {isa = PBXBuildFile; fileRef = F6EA8F782EDA467000EC4FD1 /* PortalWidgetConfiguration.intentdefinition */; };
+		F6EA8F7F2EDA467000EC4FD1 /* PortalWidgetConfiguration.intentdefinition in Sources */ = {isa = PBXBuildFile; fileRef = F6EA8F782EDA467000EC4FD1 /* PortalWidgetConfiguration.intentdefinition */; };
 /* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		F623F5B12ED9C492008FA99E /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 97C146E61CF9000F007C117D /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = F623F5A22ED9C491008FA99E;
+			remoteInfo = PortalWidgetExtension;
+		};
+		F6EA8F462EDA43EB00EC4FD1 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 97C146E61CF9000F007C117D /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = F6EA8F3F2EDA43EB00EC4FD1;
+			remoteInfo = PortalWidgetConfiguration;
+		};
+/* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
 		9705A1C41CF9048500538489 /* Embed Frameworks */ = {
@@ -25,6 +65,18 @@
 			files = (
 			);
 			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		F623F5B42ED9C492008FA99E /* Embed Foundation Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				F623F5B32ED9C492008FA99E /* PortalWidgetExtension.appex in Embed Foundation Extensions */,
+				F6EA8F482EDA43EB00EC4FD1 /* PortalWidgetConfiguration.appex in Embed Foundation Extensions */,
+			);
+			name = "Embed Foundation Extensions";
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXCopyFilesBuildPhase section */
@@ -47,7 +99,52 @@
 		97C147001CF9000F007C117D /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		97C147021CF9000F007C117D /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		A7B6F93FD45640F3C42E975D /* Pods-Runner.profile.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Runner.profile.xcconfig"; path = "Target Support Files/Pods-Runner/Pods-Runner.profile.xcconfig"; sourceTree = "<group>"; };
+		F623F5A32ED9C491008FA99E /* PortalWidgetExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = PortalWidgetExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		F623F5A42ED9C491008FA99E /* WidgetKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WidgetKit.framework; path = /System/Library/Frameworks/WidgetKit.framework; sourceTree = "<absolute>"; };
+		F623F5A62ED9C491008FA99E /* SwiftUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftUI.framework; path = /System/Library/Frameworks/SwiftUI.framework; sourceTree = "<absolute>"; };
+		F64917A72EDA2CBA00B13642 /* Localizable.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = Localizable.xcstrings; sourceTree = "<group>"; };
+		F6B78D1B2EDA04C3001B42D6 /* Runner.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Runner.entitlements; sourceTree = "<group>"; };
+		F6B78D212EDA04F6001B42D6 /* Intents.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Intents.framework; path = System/Library/Frameworks/Intents.framework; sourceTree = SDKROOT; };
+		F6B78D2C2EDA04F6001B42D6 /* IntentsUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = IntentsUI.framework; path = System/Library/Frameworks/IntentsUI.framework; sourceTree = SDKROOT; };
+		F6B78ED42EDA1FC5001B42D6 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		F6B78ED52EDA1FC5001B42D6 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		F6B78ED62EDA1FC5001B42D6 /* PortalWidget.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = PortalWidget.entitlements; sourceTree = "<group>"; };
+		F6B78ED72EDA1FC5001B42D6 /* PortalWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PortalWidget.swift; sourceTree = "<group>"; };
+		F6B78ED82EDA1FC5001B42D6 /* PortalWidgetBundle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PortalWidgetBundle.swift; sourceTree = "<group>"; };
+		F6B78ED92EDA1FC5001B42D6 /* PostEntry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PostEntry.swift; sourceTree = "<group>"; };
+		F6B78EDA2EDA1FC5001B42D6 /* PostRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PostRow.swift; sourceTree = "<group>"; };
+		F6EA8F402EDA43EB00EC4FD1 /* PortalWidgetConfiguration.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = PortalWidgetConfiguration.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		F6EA8F752EDA467000EC4FD1 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		F6EA8F762EDA467000EC4FD1 /* IntentHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IntentHandler.swift; sourceTree = "<group>"; };
+		F6EA8F772EDA467000EC4FD1 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.intentdefinition; name = Base; path = Base.lproj/PortalWidgetConfiguration.intentdefinition; sourceTree = "<group>"; };
+		F6EA8F812EDA470900EC4FD1 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/PortalWidgetConfiguration.strings; sourceTree = "<group>"; };
+		F6EA8F832EDA470900EC4FD1 /* ko */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ko; path = ko.lproj/PortalWidgetConfiguration.strings; sourceTree = "<group>"; };
 /* End PBXFileReference section */
+
+/* Begin PBXFileSystemSynchronizedRootGroup section */
+		F6145B4C2EDA8C9D001B6592 /* Helper */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+			);
+			explicitFileTypes = {
+			};
+			explicitFolders = (
+			);
+			path = Helper;
+			sourceTree = "<group>";
+		};
+		F6145B4D2EDA8CA3001B6592 /* Networking */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+			);
+			explicitFileTypes = {
+			};
+			explicitFolders = (
+			);
+			path = Networking;
+			sourceTree = "<group>";
+		};
+/* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
 		97C146EB1CF9000F007C117D /* Frameworks */ = {
@@ -58,6 +155,31 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		F623F5A02ED9C491008FA99E /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				F6145B592EDA9167001B6592 /* RxMoya in Frameworks */,
+				F6145B432EDA85B7001B6592 /* RxMoya in Frameworks */,
+				F623F5A72ED9C491008FA99E /* SwiftUI.framework in Frameworks */,
+				F6145B552EDA9167001B6592 /* Moya in Frameworks */,
+				F623F5A52ED9C491008FA99E /* WidgetKit.framework in Frameworks */,
+				F6145B532EDA9167001B6592 /* CombineMoya in Frameworks */,
+				F6145B572EDA9167001B6592 /* ReactiveMoya in Frameworks */,
+				F6145B3F2EDA85B7001B6592 /* Moya in Frameworks */,
+				F6145B412EDA85B7001B6592 /* ReactiveMoya in Frameworks */,
+				F6145B3D2EDA85B7001B6592 /* CombineMoya in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		F6EA8F3D2EDA43EB00EC4FD1 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				F6EA8F412EDA43EB00EC4FD1 /* Intents.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -65,6 +187,10 @@
 			isa = PBXGroup;
 			children = (
 				80930981239ED868C9674FDB /* Pods_Runner.framework */,
+				F623F5A42ED9C491008FA99E /* WidgetKit.framework */,
+				F623F5A62ED9C491008FA99E /* SwiftUI.framework */,
+				F6B78D212EDA04F6001B42D6 /* Intents.framework */,
+				F6B78D2C2EDA04F6001B42D6 /* IntentsUI.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -93,8 +219,11 @@
 		97C146E51CF9000F007C117D = {
 			isa = PBXGroup;
 			children = (
+				F64917A72EDA2CBA00B13642 /* Localizable.xcstrings */,
 				9740EEB11CF90186004384FC /* Flutter */,
 				97C146F01CF9000F007C117D /* Runner */,
+				F6B78EDB2EDA1FC5001B42D6 /* PortalWidget */,
+				F6EA8F792EDA467000EC4FD1 /* PortalWidgetConfiguration */,
 				97C146EF1CF9000F007C117D /* Products */,
 				2A1466B8462738612A9B9E1C /* Pods */,
 				255132087A5BBACEF51390A3 /* Frameworks */,
@@ -105,6 +234,8 @@
 			isa = PBXGroup;
 			children = (
 				97C146EE1CF9000F007C117D /* Runner.app */,
+				F623F5A32ED9C491008FA99E /* PortalWidgetExtension.appex */,
+				F6EA8F402EDA43EB00EC4FD1 /* PortalWidgetConfiguration.appex */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -112,6 +243,7 @@
 		97C146F01CF9000F007C117D /* Runner */ = {
 			isa = PBXGroup;
 			children = (
+				F6B78D1B2EDA04C3001B42D6 /* Runner.entitlements */,
 				97C146FA1CF9000F007C117D /* Main.storyboard */,
 				97C146FD1CF9000F007C117D /* Assets.xcassets */,
 				97C146FF1CF9000F007C117D /* LaunchScreen.storyboard */,
@@ -124,6 +256,32 @@
 			path = Runner;
 			sourceTree = "<group>";
 		};
+		F6B78EDB2EDA1FC5001B42D6 /* PortalWidget */ = {
+			isa = PBXGroup;
+			children = (
+				F6145B4D2EDA8CA3001B6592 /* Networking */,
+				F6145B4C2EDA8C9D001B6592 /* Helper */,
+				F6B78ED42EDA1FC5001B42D6 /* Assets.xcassets */,
+				F6B78ED52EDA1FC5001B42D6 /* Info.plist */,
+				F6B78ED62EDA1FC5001B42D6 /* PortalWidget.entitlements */,
+				F6B78ED72EDA1FC5001B42D6 /* PortalWidget.swift */,
+				F6B78ED82EDA1FC5001B42D6 /* PortalWidgetBundle.swift */,
+				F6B78ED92EDA1FC5001B42D6 /* PostEntry.swift */,
+				F6B78EDA2EDA1FC5001B42D6 /* PostRow.swift */,
+			);
+			path = PortalWidget;
+			sourceTree = "<group>";
+		};
+		F6EA8F792EDA467000EC4FD1 /* PortalWidgetConfiguration */ = {
+			isa = PBXGroup;
+			children = (
+				F6EA8F752EDA467000EC4FD1 /* Info.plist */,
+				F6EA8F762EDA467000EC4FD1 /* IntentHandler.swift */,
+				F6EA8F782EDA467000EC4FD1 /* PortalWidgetConfiguration.intentdefinition */,
+			);
+			path = PortalWidgetConfiguration;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -132,6 +290,7 @@
 			buildConfigurationList = 97C147051CF9000F007C117D /* Build configuration list for PBXNativeTarget "Runner" */;
 			buildPhases = (
 				12B04F90BCF1D10558235412 /* [CP] Check Pods Manifest.lock */,
+				F623F5B42ED9C492008FA99E /* Embed Foundation Extensions */,
 				9740EEB61CF901F6004384FC /* Run Script */,
 				97C146EA1CF9000F007C117D /* Sources */,
 				97C146EB1CF9000F007C117D /* Frameworks */,
@@ -144,11 +303,51 @@
 			buildRules = (
 			);
 			dependencies = (
+				F623F5B22ED9C492008FA99E /* PBXTargetDependency */,
+				F6EA8F472EDA43EB00EC4FD1 /* PBXTargetDependency */,
 			);
 			name = Runner;
 			productName = Runner;
 			productReference = 97C146EE1CF9000F007C117D /* Runner.app */;
 			productType = "com.apple.product-type.application";
+		};
+		F623F5A22ED9C491008FA99E /* PortalWidgetExtension */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = F623F5B92ED9C492008FA99E /* Build configuration list for PBXNativeTarget "PortalWidgetExtension" */;
+			buildPhases = (
+				F623F59F2ED9C491008FA99E /* Sources */,
+				F623F5A02ED9C491008FA99E /* Frameworks */,
+				F623F5A12ED9C491008FA99E /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				F6145B4C2EDA8C9D001B6592 /* Helper */,
+				F6145B4D2EDA8CA3001B6592 /* Networking */,
+			);
+			name = PortalWidgetExtension;
+			productName = PortalWidgetExtension;
+			productReference = F623F5A32ED9C491008FA99E /* PortalWidgetExtension.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
+		F6EA8F3F2EDA43EB00EC4FD1 /* PortalWidgetConfiguration */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = F6EA8F4A2EDA43EB00EC4FD1 /* Build configuration list for PBXNativeTarget "PortalWidgetConfiguration" */;
+			buildPhases = (
+				F6EA8F3C2EDA43EB00EC4FD1 /* Sources */,
+				F6EA8F3D2EDA43EB00EC4FD1 /* Frameworks */,
+				F6EA8F3E2EDA43EB00EC4FD1 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = PortalWidgetConfiguration;
+			productName = PortalWidgetConfiguration;
+			productReference = F6EA8F402EDA43EB00EC4FD1 /* PortalWidgetConfiguration.appex */;
+			productType = "com.apple.product-type.app-extension";
 		};
 /* End PBXNativeTarget section */
 
@@ -156,12 +355,19 @@
 		97C146E61CF9000F007C117D /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
+				LastSwiftUpdateCheck = 1640;
 				LastUpgradeCheck = 1510;
 				ORGANIZATIONNAME = "";
 				TargetAttributes = {
 					97C146ED1CF9000F007C117D = {
 						CreatedOnToolsVersion = 7.3.1;
 						LastSwiftMigration = 1100;
+					};
+					F623F5A22ED9C491008FA99E = {
+						CreatedOnToolsVersion = 16.4;
+					};
+					F6EA8F3F2EDA43EB00EC4FD1 = {
+						CreatedOnToolsVersion = 16.4;
 					};
 				};
 			};
@@ -172,13 +378,19 @@
 			knownRegions = (
 				en,
 				Base,
+				ko,
 			);
 			mainGroup = 97C146E51CF9000F007C117D;
+			packageReferences = (
+				F6145B3B2EDA85B7001B6592 /* XCRemoteSwiftPackageReference "Moya" */,
+			);
 			productRefGroup = 97C146EF1CF9000F007C117D /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
 				97C146ED1CF9000F007C117D /* Runner */,
+				F623F5A22ED9C491008FA99E /* PortalWidgetExtension */,
+				F6EA8F3F2EDA43EB00EC4FD1 /* PortalWidgetConfiguration */,
 			);
 		};
 /* End PBXProject section */
@@ -192,6 +404,22 @@
 				3B3967161E833CAA004F5970 /* AppFrameworkInfo.plist in Resources */,
 				97C146FE1CF9000F007C117D /* Assets.xcassets in Resources */,
 				97C146FC1CF9000F007C117D /* Main.storyboard in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		F623F5A12ED9C491008FA99E /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				F64917A82EDA2CBA00B13642 /* Localizable.xcstrings in Resources */,
+				F6B78EE02EDA1FC5001B42D6 /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		F6EA8F3E2EDA43EB00EC4FD1 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -292,12 +520,47 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				F6EA8F7D2EDA467000EC4FD1 /* PortalWidgetConfiguration.intentdefinition in Sources */,
 				74858FAF1ED2DC5600515810 /* AppDelegate.swift in Sources */,
 				1498D2341E8E89220040F4C2 /* GeneratedPluginRegistrant.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		F623F59F2ED9C491008FA99E /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				F6B78EDC2EDA1FC5001B42D6 /* PortalWidget.swift in Sources */,
+				F6B78EDD2EDA1FC5001B42D6 /* PortalWidgetBundle.swift in Sources */,
+				F6EA8F7E2EDA467000EC4FD1 /* PortalWidgetConfiguration.intentdefinition in Sources */,
+				F6B78EDE2EDA1FC5001B42D6 /* PostEntry.swift in Sources */,
+				F6B78EDF2EDA1FC5001B42D6 /* PostRow.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		F6EA8F3C2EDA43EB00EC4FD1 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				F6EA8F7C2EDA467000EC4FD1 /* IntentHandler.swift in Sources */,
+				F6EA8F7F2EDA467000EC4FD1 /* PortalWidgetConfiguration.intentdefinition in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		F623F5B22ED9C492008FA99E /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = F623F5A22ED9C491008FA99E /* PortalWidgetExtension */;
+			targetProxy = F623F5B12ED9C492008FA99E /* PBXContainerItemProxy */;
+		};
+		F6EA8F472EDA43EB00EC4FD1 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = F6EA8F3F2EDA43EB00EC4FD1 /* PortalWidgetConfiguration */;
+			targetProxy = F6EA8F462EDA43EB00EC4FD1 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
 
 /* Begin PBXVariantGroup section */
 		97C146FA1CF9000F007C117D /* Main.storyboard */ = {
@@ -316,6 +579,16 @@
 			name = LaunchScreen.storyboard;
 			sourceTree = "<group>";
 		};
+		F6EA8F782EDA467000EC4FD1 /* PortalWidgetConfiguration.intentdefinition */ = {
+			isa = PBXVariantGroup;
+			children = (
+				F6EA8F772EDA467000EC4FD1 /* Base */,
+				F6EA8F812EDA470900EC4FD1 /* en */,
+				F6EA8F832EDA470900EC4FD1 /* ko */,
+			);
+			name = PortalWidgetConfiguration.intentdefinition;
+			sourceTree = "<group>";
+		};
 /* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
@@ -323,6 +596,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
 				CLANG_CXX_LIBRARY = "libc++";
@@ -364,6 +638,7 @@
 				MTL_ENABLE_DEBUG_INFO = NO;
 				SDKROOT = iphoneos;
 				SUPPORTED_PLATFORMS = iphoneos;
+				SWIFT_EMIT_LOC_STRINGS = YES;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VALIDATE_PRODUCT = YES;
 			};
@@ -375,10 +650,13 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_ENTITLEMENTS = Runner/Runner.entitlements;
 				CURRENT_PROJECT_VERSION = 240926.2335;
 				DEVELOPMENT_TEAM = N5V8W52U3U;
 				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = Runner/Info.plist;
+				INTENTS_CODEGEN_LANGUAGE = Swift;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -395,6 +673,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
 				CLANG_CXX_LIBRARY = "libc++";
@@ -442,6 +721,7 @@
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = iphoneos;
+				SWIFT_EMIT_LOC_STRINGS = YES;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Debug;
@@ -450,6 +730,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
 				CLANG_CXX_LIBRARY = "libc++";
@@ -492,6 +773,7 @@
 				SDKROOT = iphoneos;
 				SUPPORTED_PLATFORMS = iphoneos;
 				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_OPTIMIZATION_LEVEL = "-O";
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VALIDATE_PRODUCT = YES;
@@ -504,10 +786,13 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_ENTITLEMENTS = Runner/Runner.entitlements;
 				CURRENT_PROJECT_VERSION = 240926.2335;
 				DEVELOPMENT_TEAM = N5V8W52U3U;
 				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = Runner/Info.plist;
+				INTENTS_CODEGEN_LANGUAGE = Swift;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -527,6 +812,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_ENTITLEMENTS = Runner/Runner.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
@@ -534,6 +820,8 @@
 				DEVELOPMENT_TEAM = N5V8W52U3U;
 				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = Runner/Info.plist;
+				INTENTS_CODEGEN_LANGUAGE = Swift;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -546,6 +834,283 @@
 				VERSIONING_SYSTEM = "apple-generic";
 			};
 			name = Release;
+		};
+		F623F5B52ED9C492008FA99E /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CODE_SIGN_ENTITLEMENTS = PortalWidget/PortalWidget.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = N5V8W52U3U;
+				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = PortalWidget/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = PortalWidget;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				INTENTS_CODEGEN_LANGUAGE = Swift;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@executable_path/../../../../Frameworks",
+				);
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MACOSX_DEPLOYMENT_TARGET = 15.5;
+				MARKETING_VERSION = 1.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = "org.sparcs.new-ara-app.PortalWidget";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = auto;
+				SKIP_INSTALL = YES;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				XROS_DEPLOYMENT_TARGET = 2.5;
+			};
+			name = Debug;
+		};
+		F623F5B62ED9C492008FA99E /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CODE_SIGN_ENTITLEMENTS = PortalWidget/PortalWidget.entitlements;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = N5V8W52U3U;
+				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = PortalWidget/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = PortalWidget;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				INTENTS_CODEGEN_LANGUAGE = Swift;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@executable_path/../../../../Frameworks",
+				);
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MACOSX_DEPLOYMENT_TARGET = 15.5;
+				MARKETING_VERSION = 1.0;
+				MTL_FAST_MATH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = "org.sparcs.new-ara-app.PortalWidget";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = auto;
+				SKIP_INSTALL = YES;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				XROS_DEPLOYMENT_TARGET = 2.5;
+			};
+			name = Release;
+		};
+		F623F5B72ED9C492008FA99E /* Profile */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CODE_SIGN_ENTITLEMENTS = PortalWidget/PortalWidget.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = N5V8W52U3U;
+				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = PortalWidget/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = PortalWidget;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				INTENTS_CODEGEN_LANGUAGE = Swift;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@executable_path/../../../../Frameworks",
+				);
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MACOSX_DEPLOYMENT_TARGET = 15.5;
+				MARKETING_VERSION = 1.0;
+				MTL_FAST_MATH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = "org.sparcs.new-ara-app.PortalWidget";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = auto;
+				SKIP_INSTALL = YES;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				XROS_DEPLOYMENT_TARGET = 2.5;
+			};
+			name = Profile;
+		};
+		F6EA8F4B2EDA43EB00EC4FD1 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = N5V8W52U3U;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = PortalWidgetConfiguration/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = PortalWidgetConfiguration;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				IPHONEOS_DEPLOYMENT_TARGET = 18.5;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MARKETING_VERSION = 1.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = "org.sparcs.new-ara-app.PortalWidgetConfiguration";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		F6EA8F4C2EDA43EB00EC4FD1 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = N5V8W52U3U;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = PortalWidgetConfiguration/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = PortalWidgetConfiguration;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				IPHONEOS_DEPLOYMENT_TARGET = 18.5;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MARKETING_VERSION = 1.0;
+				MTL_FAST_MATH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = "org.sparcs.new-ara-app.PortalWidgetConfiguration";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		F6EA8F4D2EDA43EB00EC4FD1 /* Profile */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = N5V8W52U3U;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = PortalWidgetConfiguration/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = PortalWidgetConfiguration;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				IPHONEOS_DEPLOYMENT_TARGET = 18.5;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MARKETING_VERSION = 1.0;
+				MTL_FAST_MATH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = "org.sparcs.new-ara-app.PortalWidgetConfiguration";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Profile;
 		};
 /* End XCBuildConfiguration section */
 
@@ -570,7 +1135,77 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
+		F623F5B92ED9C492008FA99E /* Build configuration list for PBXNativeTarget "PortalWidgetExtension" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				F623F5B52ED9C492008FA99E /* Debug */,
+				F623F5B62ED9C492008FA99E /* Release */,
+				F623F5B72ED9C492008FA99E /* Profile */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		F6EA8F4A2EDA43EB00EC4FD1 /* Build configuration list for PBXNativeTarget "PortalWidgetConfiguration" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				F6EA8F4B2EDA43EB00EC4FD1 /* Debug */,
+				F6EA8F4C2EDA43EB00EC4FD1 /* Release */,
+				F6EA8F4D2EDA43EB00EC4FD1 /* Profile */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		F6145B3B2EDA85B7001B6592 /* XCRemoteSwiftPackageReference "Moya" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/Moya/Moya.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 15.0.3;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		F6145B3C2EDA85B7001B6592 /* CombineMoya */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = F6145B3B2EDA85B7001B6592 /* XCRemoteSwiftPackageReference "Moya" */;
+			productName = CombineMoya;
+		};
+		F6145B3E2EDA85B7001B6592 /* Moya */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = F6145B3B2EDA85B7001B6592 /* XCRemoteSwiftPackageReference "Moya" */;
+			productName = Moya;
+		};
+		F6145B402EDA85B7001B6592 /* ReactiveMoya */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = F6145B3B2EDA85B7001B6592 /* XCRemoteSwiftPackageReference "Moya" */;
+			productName = ReactiveMoya;
+		};
+		F6145B422EDA85B7001B6592 /* RxMoya */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = F6145B3B2EDA85B7001B6592 /* XCRemoteSwiftPackageReference "Moya" */;
+			productName = RxMoya;
+		};
+		F6145B522EDA9167001B6592 /* CombineMoya */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = CombineMoya;
+		};
+		F6145B542EDA9167001B6592 /* Moya */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = Moya;
+		};
+		F6145B562EDA9167001B6592 /* ReactiveMoya */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = ReactiveMoya;
+		};
+		F6145B582EDA9167001B6592 /* RxMoya */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = RxMoya;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 97C146E61CF9000F007C117D /* Project object */;
 }

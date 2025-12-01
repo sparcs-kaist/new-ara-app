@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="appwidget_text">Portal Notice</string>
+    <string name="app_widget_description">A widget that displays school portal notices.</string>
+    <string name="setting_icon">setting icon</string>
+    <string name="cancel">Cancel</string>
+    <string name="confirm">Confirm</string>
+    <string name="portal_notices">Portal Notices</string>
+    <string name="show_trending_posts">Show Trending Posts</string>
+    <string name="boards_to_display">Boards to display</string>
+    <string name="delete">delete</string>
+    <string name="three_keywords_only">"You can add up to 3 keywords only. "</string>
+    <string name="widget_settings">Widget Settings</string>
+    <string name="register_keyword">Register Keyword</string>
+    <string name="enter_keyword">Enter Keyword</string>
+    <string name="portal_icon">portal icon</string>
+    <string name="trending">Trending</string>
+    <string name="keyword_detected">Keyword "%1$s" detected</string>
+    <string name="board_notice">Notice in %1$s board</string>
+    <string name="general_notice">General Notice</string>
+    <string name="it_services">IT Services</string>
+    <string name="family_events">Family Events</string>
+    <string name="faculty_clubs">Faculty Clubs</string>
+    <string name="work_study_scholarship">Work-study scholarship</string>
+    <string name="international_community">International Community</string>
+    <string name="newsletter">Newsletter</string>
+    <string name="international_opportunities_collaboration">International Opportunities/Collaboration</string>
+    <string name="seminar_and_event">Seminars and events</string>
+    <string name="work_manual">Work manual</string>
+    <string name="student_council_notice">Student council notice</string>
+    <string name="maintenance_notice">Maintenance notice</string>
+    <string name="affiliates">Affiliates</string>
+    <string name="startup">Startup</string>
+    <string name="sports_and_health">Sports and health care</string>
+    <string name="employment">Employment</string>
+    <string name="covid19">COVID-19</string>
+    <string name="student_clubs">Student clubs</string>
+    <string name="curriculum_changes">Curriculum changes</string>
+    <string name="leadership_and_internship">Leadership and internship</string>
+    <string name="dormitory">Dormitory</string>
+    <string name="course_and_thesis">Course and thesis</string>
+    <string name="scholarship_and_welfare">Scholarship and welfare</string>
+    <string name="research_personnel">Research personnel</string>
+    <string name="teaching_and_learning">Teaching and learning board</string>
+    <string name="library">Library</string>
+    <string name="unknown">Unknown</string>
+    <string name="no_results">No Results</string>
+
+</resources>
