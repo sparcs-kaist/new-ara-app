@@ -7,7 +7,6 @@ import 'package:flutter_native_splash/flutter_native_splash.dart';
 
 import 'package:new_ara_app/pages/main_page.dart';
 import 'package:new_ara_app/pages/board_list_page.dart';
-import 'package:new_ara_app/pages/chat_webview_page.dart';
 import 'package:new_ara_app/pages/notification_page.dart';
 import 'package:new_ara_app/pages/user_page.dart';
 import 'package:new_ara_app/providers/notification_provider.dart';
@@ -28,7 +27,7 @@ class _MainNavigationTabPageState extends State<MainNavigationTabPage> {
   final List<Widget> _widgetOptions = <Widget>[
     const MainPage(),
     const BoardListPage(),
-    const ChatWebviewPage(),
+    //const ChatWebviewPage(),
     const NotificationPage(),
     const UserPage(),
   ];
@@ -81,7 +80,7 @@ class _MainNavigationTabPageState extends State<MainNavigationTabPage> {
   Widget _buildBottomNavigationBar() {
     final themeProvider = Provider.of<ThemeProvider>(context);
 
-    double gapHalfWidth = (MediaQuery.of(context).size.width - 36 * 5) / 12;
+    double gapHalfWidth = (MediaQuery.of(context).size.width - 36 * 4) / 12;
     double iconWidth = gapHalfWidth * 2 + 36;
     return SizedBox(
       height: 50,
@@ -155,40 +154,12 @@ class _MainNavigationTabPageState extends State<MainNavigationTabPage> {
                 child: SizedBox(
                   width: 36,
                   height: 36,
-                  child: SvgPicture.asset(
-                    'assets/icons/chat.svg',
-                    colorFilter: ColorFilter.mode(
-                        _selectedIndex == 2
-                            ? themeProvider.isDarkMode
-                                ? Colors.white
-                                : Colors.black
-                            : themeProvider.isDarkMode
-                                ? NewAraThemes.gry5
-                                : NewAraThemes.gryB,
-                        BlendMode.srcIn),
-                    width: 36,
-                    height: 36,
-                  ),
-                ),
-              ),
-            ),
-          ),
-          GestureDetector(
-            behavior: HitTestBehavior.translucent,
-            onTap: (() => _onItemTapped(3)),
-            child: SizedBox(
-              width: iconWidth,
-              height: 50,
-              child: Center(
-                child: SizedBox(
-                  width: 36,
-                  height: 36,
                   child: Stack(
                     children: [
                       SvgPicture.asset(
                         'assets/icons/notification.svg',
                         colorFilter: ColorFilter.mode(
-                            _selectedIndex == 3
+                            _selectedIndex == 2
                                 ? themeProvider.isDarkMode
                                     ? Colors.white
                                     : Colors.black
@@ -222,7 +193,7 @@ class _MainNavigationTabPageState extends State<MainNavigationTabPage> {
           ),
           GestureDetector(
             behavior: HitTestBehavior.translucent,
-            onTap: () => _onItemTapped(4),
+            onTap: () => _onItemTapped(3),
             child: SizedBox(
               width: iconWidth,
               height: 50,
@@ -233,7 +204,7 @@ class _MainNavigationTabPageState extends State<MainNavigationTabPage> {
                   child: SvgPicture.asset(
                     'assets/icons/member.svg',
                     colorFilter: ColorFilter.mode(
-                        _selectedIndex == 4
+                        _selectedIndex == 3
                             ? themeProvider.isDarkMode
                                 ? Colors.white
                                 : Colors.black
