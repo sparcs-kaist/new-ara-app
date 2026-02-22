@@ -55,6 +55,10 @@ class _InArticleWebViewState extends State<InArticleWebView> {
   /// webViewHeight 조정 완료 여부.
   late bool isFitted;
 
+  /// 높이 리포트 수신 횟수 (무한 반복 방지).
+  int _heightReportCount = 0;
+  static const int _maxHeightReports = 30;
+
   /// content에 뉴아라 게시물에 대한 링크가 있을 경우 게시물 번호를 추출해줌.
   /// launchInBrower 메서드에서 사용함.
   /// ```
@@ -133,8 +137,48 @@ class _InArticleWebViewState extends State<InArticleWebView> {
   Future<void> updatePageHeight() async {
     getPageHeight().then((height) {
       if (!mounted) return;
-      setState(() => webViewHeight = height);
+      // 높이 차이가 충분히 클 때만 업데이트 (불필요한 rebuild 방지)
+      if ((height - webViewHeight).abs() > 10.0) {
+        setState(() => webViewHeight = height);
+      }
     });
+  }
+
+  /// 원격 URL 페이지에 ResizeObserver를 주입하여 콘텐츠 크기 변화 감지.
+  Future<void> _injectResizeObserver() async {
+    await _webViewController.runJavaScript('''
+      (function() {
+        if (window._araResizeObserverInstalled) return;
+        window._araResizeObserverInstalled = true;
+        var lastHeight = 0;
+        function reportHeight() {
+          var h = Math.max(
+            document.body.scrollHeight || 0,
+            document.documentElement.scrollHeight || 0,
+            document.body.offsetHeight || 0,
+            document.documentElement.offsetHeight || 0
+          );
+          if (h !== lastHeight && h > 0) {
+            lastHeight = h;
+            HeightChannel.postMessage(h.toString());
+          }
+        }
+        if (typeof ResizeObserver !== 'undefined') {
+          new ResizeObserver(function() { reportHeight(); }).observe(document.body);
+        }
+        new MutationObserver(function() { reportHeight(); }).observe(
+          document.body, { childList: true, subtree: true, attributes: true }
+        );
+        // 이미지 로드 등 비동기 리소스를 위한 폴링
+        var pollCount = 0;
+        var pollInterval = setInterval(function() {
+          reportHeight();
+          pollCount++;
+          if (pollCount > 20) clearInterval(pollInterval);
+        }, 500);
+        reportHeight();
+      })();
+    ''');
   }
 
   @override
@@ -142,9 +186,9 @@ class _InArticleWebViewState extends State<InArticleWebView> {
     UserProvider userProvider = context.read<UserProvider>();
     ThemeProvider themeProvider = context.read<ThemeProvider>();
 
-
     super.initState();
     isFitted = false;
+    _heightReportCount = 0;
     webViewHeight = widget.initialHeight;
 
     late final PlatformWebViewControllerCreationParams params;
@@ -159,6 +203,24 @@ class _InArticleWebViewState extends State<InArticleWebView> {
 
     final WebViewController controller =
         WebViewController.fromPlatformCreationParams(params);
+
+    // 높이 변화를 실시간으로 수신하는 JavaScript 채널
+    controller.addJavaScriptChannel(
+      'HeightChannel',
+      onMessageReceived: (JavaScriptMessage message) {
+        if (!mounted) return;
+        if (_heightReportCount >= _maxHeightReports) return;
+        _heightReportCount++;
+        final double? newHeight = double.tryParse(message.message);
+        if (newHeight != null &&
+            newHeight > 0 &&
+            (newHeight - webViewHeight).abs() > 10.0) {
+          setState(() => webViewHeight = newHeight);
+          debugPrint(
+              'HeightChannel: updated to $newHeight (report #$_heightReportCount)');
+        }
+      },
+    );
 
     controller
       ..setJavaScriptMode(JavaScriptMode.unrestricted)
@@ -192,6 +254,10 @@ class _InArticleWebViewState extends State<InArticleWebView> {
         onPageFinished: (String url) async {
           if (!isFitted) {
             await updatePageHeight();
+            // 원격 URL인 경우 ResizeObserver를 주입하여 동적 높이 추적
+            if (widget.remoteUrl != null) {
+              await _injectResizeObserver();
+            }
             WidgetsBinding.instance.addPostFrameCallback((_) {
               isFitted = true;
               debugPrint("height fitted!!");
@@ -219,8 +285,8 @@ class _InArticleWebViewState extends State<InArticleWebView> {
     if (widget.remoteUrl != null && widget.remoteUrl!.isNotEmpty) {
       controller.loadRequest(Uri.parse(widget.remoteUrl!));
     } else {
-      controller
-          .loadHtmlString(getContentHtml(widget.content, themeProvider.isDarkMode));
+      controller.loadHtmlString(
+          getContentHtml(widget.content, themeProvider.isDarkMode));
     }
 
     _webViewController = controller;
@@ -228,11 +294,12 @@ class _InArticleWebViewState extends State<InArticleWebView> {
 
   @override
   void dispose() {
-    _webViewController.removeJavaScriptChannel('Toaster');
+    try {
+      _webViewController.removeJavaScriptChannel('HeightChannel');
+    } catch (_) {}
     _webViewController.clearCache();
     super.dispose();
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -248,16 +315,17 @@ class _InArticleWebViewState extends State<InArticleWebView> {
           controller: _webViewController.platform,
           displayWithHybridComposition: true,
           gestureRecognizers: {
-          Factory<OneSequenceGestureRecognizer>(() {
-            TapGestureRecognizer tabGestureRecognizer = TapGestureRecognizer();
-            tabGestureRecognizer.onTapDown = (_) {
-              FocusScope.of(context).unfocus();
-            };
-            return tabGestureRecognizer;
-          }),
-          // pinch-to-zoom 기능을 위해서
-          Factory<ScaleGestureRecognizer>(() => ScaleGestureRecognizer()),
-        },
+            Factory<OneSequenceGestureRecognizer>(() {
+              TapGestureRecognizer tabGestureRecognizer =
+                  TapGestureRecognizer();
+              tabGestureRecognizer.onTapDown = (_) {
+                FocusScope.of(context).unfocus();
+              };
+              return tabGestureRecognizer;
+            }),
+            // pinch-to-zoom 기능을 위해서
+            Factory<ScaleGestureRecognizer>(() => ScaleGestureRecognizer()),
+          },
         ),
       );
     } else {
