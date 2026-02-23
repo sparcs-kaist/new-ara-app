@@ -52,6 +52,13 @@ class _SparcsSSOPageState extends State<SparcsSSOPage> {
       ..setNavigationDelegate(NavigationDelegate(
         onNavigationRequest: (NavigationRequest request) async {
           Uri uri = Uri.parse(request.url);
+          // KAIST SSO의 redirect url이 http를 사용하여 iOS에서 접속이 불가능, https로 강제
+          if (Platform.isIOS && uri.scheme == 'http' && uri.authority == 'sso.kaist.ac.kr') {
+            final httpsUri = uri.replace(scheme: 'https');
+            debugPrint('http 요청을 https로 변경: $uri -> $httpsUri');
+            await _controller.loadRequest(httpsUri);
+            return NavigationDecision.navigate;
+          }
           // SPARCS SSO 페이지에서 개발팀, 관리자에게 연락하기 기능이
           // mailto scheme을 사용하는데 웹뷰에서 잘 처리가 되지 않아 비활성화시켜둠.
           if (uri.scheme == 'mailto') {
