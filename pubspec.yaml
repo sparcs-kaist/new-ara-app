@@ -35,10 +35,6 @@ dependencies:
   webview_flutter_wkwebview: "^3.10.2"
   flutter_dotenv: ^6.0.0
   connectivity_plus: ^7.0.0
-  # WebView shell + bridge stack
-  flutter_inappwebview: ^6.0.0
-  package_info_plus: ^8.0.0
-  app_links: ^6.3.0
 dev_dependencies:
   flutter_test:
     sdk: flutter
